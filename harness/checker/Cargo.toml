@@ -19,3 +19,9 @@ path = "src/main.rs"
 # The WebAssembly interpreter. Default features are off so the `wat` text parser is not pulled in;
 # "validate" makes wasmi check every module before running it.
 wasmi = { version = "=2.0.0", default-features = false, features = ["std", "validate"] }
+# Only for the "zk" feature: the shapes the zkVM host sends into the guest and the journal it publishes.
+serde = { version = "=1.0.229", default-features = false, features = ["std", "derive"], optional = true }
+
+[features]
+# Shared types for the RISC Zero guest and host (src/zk.rs). The native checker does not need them.
+zk = ["dep:serde"]

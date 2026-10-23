@@ -1,0 +1,24 @@
+== honest fuzz 16
+user cycles: 7845739
+segments: 19
+segment po2: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
+execute seconds: 1.92
+journal.verdict: PASS
+wall_seconds=1.91 max_rss_kb=89496
+== honest fuzz 64
+user cycles: 14306190
+segments: 35
+segment po2: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
+execute seconds: 3.27
+journal.verdict: PASS
+wall_seconds=3.26 max_rss_kb=105952
+== honest fuzz 128
+user cycles: 22788162
+segments: 56
+segment po2: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 18]
+execute seconds: 4.99
+journal.verdict: PASS
+wall_seconds=4.99 max_rss_kb=128392
+user cycles: 10741914
+segments: 26
+journal.verdict: FAIL

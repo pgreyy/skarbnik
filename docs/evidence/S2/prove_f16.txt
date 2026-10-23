@@ -1,0 +1,4 @@
+Mem:            10Gi       4.4Gi       1.7Gi       7.1Mi       4.9Gi       6.3Gi
+Command terminated by signal 15
+wall_seconds=179.99 max_rss_kb=13120
+exit=143

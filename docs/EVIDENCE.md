@@ -5,6 +5,74 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S2: How slow and heavy is proving?
+
+Question: time to prove, peak memory, receipt size, cycle count and verification time for the checker inside RISC Zero at
+16, 64 and 128 fairness inputs (32 crash variants each, honest patch `data/demo/fixed.wasm`). `RISC0_DEV_MODE=0` on every
+run. Proving is local (`r0vm` 3.0.6, CPU only, 16 cores, about 10 GiB RAM for WSL). Outputs in `docs/evidence/S2/`.
+
+**Verdict: in progress.** Results so far:
+
+### Cycles (executor only, no proof)
+
+```bash
+./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count <N> --variants 32
+```
+
+| Fairness inputs | User cycles | Segments at 2^20 | Execute time | Verdict |
+| --- | --- | --- | --- | --- |
+| 16 | 7,845,739 | 19 | 1.92 s | PASS |
+| 64 | 14,306,190 | 35 | 3.27 s | PASS |
+| 128 | 22,788,162 | 56 | 4.99 s | PASS |
+
+The cheat `special_case_exploit` at 64 inputs: 10,741,914 user cycles, FAIL. Output: `docs/evidence/S2/execute.txt`.
+At 16 inputs, a segment limit of 2^19 gives 43 segments and 2^18 gives 104 (`docs/evidence/S2/execute_po2.txt`).
+
+### Proofs
+
+| Fairness inputs | Segment size | Result | Prove time | Prover peak memory | Receipt | Verify |
+| --- | --- | --- | --- | --- | --- | --- |
+| 16 | 2^20 (default) | **stopped by us after 180 s**: r0vm reached 8,600 MiB resident, 423 to 884 MiB left available, 3 GiB swap in use | - | at least 8,600 MiB | - | - |
+| 16 | 2^19 | **proved**, journal verdict PASS | 5,124.96 s (85.4 min) | 4,718 MiB (r0vm VmHWM, read 25 min into the run) | composite, 11,516,294 bytes (seal 11,506,616 bytes, journal 780 bytes); 43 segments, 22,282,240 total cycles | 1.63 s in a separate process |
+| 64 | 2^19 | running (3 hour cap) | | | | |
+| 128 | 2^19 | not started (4 hour cap) | | | | |
+
+Commands:
+
+```bash
+scripts/s2_measure.sh target/s2-logs/prove_f16_po19.log -- ./target/release/kintsugi-host prove data/demo/fixed.wasm --fuzz-count 16 --variants 32 --po2 19 --out target/s2/receipt_f16.bin
+./target/release/kintsugi-host verify target/s2/receipt_f16.bin
+```
+
+Notes, kept on purpose:
+
+- The 16 input proof took 85 minutes: more than the blueprint's "under about 15 minutes" pass condition at the smallest
+  setting. The receipt is a composite receipt (one proof per segment), 11.5 MB; a succinct receipt (compressed to one
+  proof) is not measured yet.
+- `scripts/s2_measure.sh` was edited by us while it ran this proof (to add a time limit), which broke the script's last
+  lines: the exit code, wall time and final peak memory lines were not written. The host's own output (prove time, sizes,
+  journal) is complete. The memory figure above is the r0vm peak (VmHWM) read by our status sampler 25 minutes into the run.
+- `/usr/bin/time` cannot measure the prover's memory here: it reported 13 MB for the stopped 2^20 run because r0vm is a
+  separate process it does not see.
+
+## S1 (zkVM part): the checker inside RISC Zero, and tampered receipts
+
+**Verdict: PASS (2026-10-24).** This finishes S1 together with the native results below.
+
+- The zkVM guest `harness/check-guest` (image id `d3f158571bbb5af7d57751350f8f5fc3baa6e5ce155199c8186849e92ff628a3`) runs
+  the same checker and commits only the journal; the crash input and salt stay inside. Inside the zkVM the honest fix gives
+  PASS and the cheat `special_case_exploit` gives FAIL (executor, `docs/evidence/S2/execute.txt`).
+- Journal of the 16 input proof: verdict PASS, candidate hash `42edaaf5...fdc97`, original hash `fce3c7f2...45fd8`,
+  exploit commitment sha256(salt || exploit) `9a1be994...66387`, corpus hash `736d160d...a1e61b`, the S1 seed, counts 16 and
+  32. Full values: `docs/evidence/S2/prove_f16_po19.txt`.
+- Separate process checks (`docs/evidence/S2/verify_tamper_f16.txt`):
+
+| Receipt file | Command | Result | Exit |
+| --- | --- | --- | --- |
+| the real receipt | `kintsugi-host verify target/s2/receipt_f16.bin` | VALID, verdict PASS, 1.628 s | 0 |
+| verdict in the journal changed PASS to FAIL (`kintsugi-host tamper ... journal`) | `kintsugi-host verify target/s2/receipt_f16_tampered_journal.bin` | INVALID: claim digest does not match the expected digest | 1 |
+| one bit flipped in the seal (`kintsugi-host tamper ... seal`) | `kintsugi-host verify target/s2/receipt_f16_tampered_seal.bin` | INVALID: verification indicates proof is invalid | 1 |
+
 ## S3: Does the full bounty lifecycle work on NEAR testnet?
 
 Question: does the smallest bounty contract work on testnet, including the silent vendor timeout by a plain call? Also: does
@@ -90,9 +158,8 @@ Failures on the way (kept on purpose):
 
 Question: does the checker give PASS to an honest patch and FAIL to every cheating patch, publishing only PASS or FAIL?
 
-**Verdict: PASS for the native checker (2026-10-23), with one mismatch explained below.** The blueprint's full S1 also needs
-the same checks inside the RISC Zero zkVM with a receipt, and a tampered receipt failing in a separate process. That part is
-not done yet, so S1 as a whole is partial.
+**Verdict: PASS for the native checker (2026-10-23), with one mismatch explained below.** The zkVM part (receipt, and
+tampered receipts failing in a separate process) passed on 2026-10-24; see "S1 (zkVM part)" above.
 
 Full write-up, all commands and raw outputs: `docs/evidence/S1/RESULTS.md`.
 
@@ -144,6 +211,10 @@ Results: `cargo test`: 16 passed, 0 failed (6 unit, 10 integration). Table (seed
   maximum is 2 pages, so WebAssembly refuses the request (returns -1) without a trap, and the module then behaves like the
   honest fix. It never gets or uses extra memory. The expectation was wrong, not the checker; the variants that really use the
   memory fail. Kept in the table on purpose. A test pins this behaviour.
+- **Decision (2026-10-23): `memory_grow` stays PASS.** A memory request that the module's own declared limit refuses gives
+  the module nothing: no extra memory, no different output. The checker judges what a patch does, and this patch does exactly
+  what the honest fix does on every input checked. Patches that really obtain or touch extra memory still FAIL
+  (`memory_grow_use`, `memory_grow_nomax`, `memory_declared`).
 - **The seeded steps matter:** with fairness and variants turned off (`--fuzz-count 0 --variants 0`), `special_case_exploit`,
   `memorize_tests`, `subtle_change` and `overbroad_fix` all PASS (15 of 20 match). Output: `docs/evidence/S1/table_seeded_steps_off.txt`.
 - **Seed sweep:** 200 seeds with 128 fairness inputs: every fairness and variant cheat failed on every seed and the honest fix

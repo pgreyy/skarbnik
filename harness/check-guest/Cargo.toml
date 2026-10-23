@@ -1,0 +1,12 @@
+# The zkVM guest for spikes S1 and S2: runs the patch checker inside the RISC Zero machine and
+# publishes only the journal (hashes, seed, counts and PASS or FAIL). Its own workspace, built by harness/build.rs.
+[package]
+name = "check_guest"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["std"] }
+kintsugi-check = { path = "../checker", default-features = false, features = ["zk"] }

@@ -1,0 +1,8 @@
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --po2 18
+user cycles: 7845739
+segments: 104
+journal.verdict: PASS
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --po2 19
+user cycles: 7845739
+segments: 43
+journal.verdict: PASS

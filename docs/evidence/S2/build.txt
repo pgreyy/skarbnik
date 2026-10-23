@@ -1,0 +1,23 @@
+start 2026-10-23T22:22:28Z
+   Compiling spin v0.9.9
+   Compiling wasmparser v0.228.0
+   Compiling wasmi_ir v2.0.0
+   Compiling wasmi_core v2.0.0
+   Compiling wasmi v2.0.0
+   Compiling wasmi_collections v2.0.0
+   Compiling kintsugi-harness v0.1.0 (<repo>/harness)
+   Compiling lazy_static v1.5.1
+   Compiling risc0-binfmt v3.0.5
+   Compiling num-bigint-dig v0.8.6
+   Compiling risc0-circuit-rv32im v4.0.5
+   Compiling risc0-groth16 v3.0.5
+   Compiling risc0-circuit-keccak v4.0.6
+   Compiling rsa v0.9.10
+   Compiling rzup v0.5.2
+   Compiling risc0-build v3.0.6
+   Compiling risc0-zkvm v3.0.6
+   Compiling kintsugi-check v0.1.0 (<repo>/harness/checker)
+   Compiling kintsugi-host v0.1.0 (<repo>/host)
+    Finished `release` profile [optimized] target(s) in 1m 11s
+wall_seconds=71.39 max_rss_kb=1066108
+exit=0

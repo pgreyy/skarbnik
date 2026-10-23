@@ -49,6 +49,8 @@ CARGO_NET_GIT_FETCH_WITH_CLI=true`, which only change how crates are downloaded.
 | wasmi (default features off; `std`, `validate`) | =2.0.0 | `harness/checker/Cargo.toml` |
 | wasmi_core, wasmi_ir, wasmi_collections | 2.0.0 | `Cargo.lock` |
 | wasmparser | 0.228.0 | `Cargo.lock` |
+| serde (checker feature `zk`, shared guest and host types) | =1.0.229 | `harness/checker/Cargo.toml` |
+| bincode (receipt files) | =1.3.3 | `host/Cargo.toml` |
 
 The demo program and patches in `data/` are built to wasm32-unknown-unknown with plain `rustc` 1.99.1 by
 `harness/checker/build_modules.sh`.

@@ -21,6 +21,8 @@
 pub mod exec;
 pub mod gen;
 pub mod text;
+#[cfg(feature = "zk")]
+pub mod zk;
 
 pub use exec::{Limits, LoadError, Loaded, Outcome, RunResult};
 

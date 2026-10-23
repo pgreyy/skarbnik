@@ -2,6 +2,29 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-23: S2 proving cost, S1 inside the zkVM, S3b fees (in progress)
+
+- Pushed S0, S1 and S3 to the private repository after an audit of the full history (no keys, paths, emails or
+  attribution; repository still private).
+- New zkVM guest `harness/check-guest` runs the same checker (`kintsugi-check`, feature `zk`) and commits a journal:
+  candidate hash, original hash, exploit commitment sha256(salt || exploit), corpus hash, seed, counts, submission id and
+  PASS or FAIL. Host commands `execute`, `prove`, `verify`, `tamper` (host/src/main.rs).
+- Cycle counts without proving (`kintsugi-host execute`): 7,845,739 / 14,306,190 / 22,788,162 user cycles for 16 / 64 / 128
+  fairness inputs (19 / 35 / 56 segments of 2^20 cycles).
+- **Failure: the first proof did not fit in memory.** `prove ... --fuzz-count 16` with RISC Zero's default segment size
+  (2^20 cycles) took the r0vm prover to 8,600 MiB resident memory (sampled), with only 423 to 884 MiB left available and
+  3 GiB of swap in use. It was stopped by us after 180 s to protect other services on the machine. `/usr/bin/time` showed
+  only 13 MB because it does not see the r0vm process; memory is now read from r0vm's own peak (VmHWM) by
+  `scripts/s2_measure.sh`, which also stops r0vm if it passes 6 GiB or available memory falls under 1.5 GiB.
+- Fix being tried: smaller segments with `--po2 19` (43 segments at 16 inputs) and `--po2 18` (104 segments).
+- 16 inputs at `--po2 19`: proved in 5,124.96 s (85 min), r0vm peak 4,718 MiB, composite receipt 11,516,294 bytes,
+  verdict PASS. Verified in a separate process (1.63 s, exit 0). Changing the verdict in the journal, or one bit of the seal,
+  makes verification fail (exit 1). This finishes S1's zkVM part.
+- Our mistake: we edited `scripts/s2_measure.sh` while it was running the 16 input proof; bash reads scripts as it goes, so
+  the script's final lines (exit code, wall time, final memory peak) were lost. The proof itself and the host output are
+  fine. Rule for ourselves: never edit a script that is running.
+- 64 inputs started at 23:56 UTC with a 3 hour cap; 128 inputs follows with a 4 hour cap.
+
 ## 2026-10-23: S1 harness and S3 contract (both PASS)
 
 - S0 committed as `2962c48` ("S0: workspace, hello contract on testnet, hello proof").

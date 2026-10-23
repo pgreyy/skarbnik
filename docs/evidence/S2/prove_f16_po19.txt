@@ -1,0 +1,25 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host prove data/demo/fixed.wasm --fuzz-count 16 --variants 32 --po2 19 --out target/s2/receipt_f16.bin
+utc_start=2026-10-23T22:29:23Z
+limits: max_rss_mib=6144 min_avail_mib=1536
+candidate: data/demo/fixed.wasm
+image id: d3f158571bbb5af7d57751350f8f5fc3baa6e5ce155199c8186849e92ff628a3
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 16 variants: 32
+total cycles: 22282240
+user cycles: 7845739
+segments: 43
+prove seconds: 5124.96
+verify seconds (in process): 1.610
+receipt file: target/s2/receipt_f16.bin (11516294 bytes)
+seal bytes: 11506616
+journal bytes: 780
+journal.verdict: PASS
+journal.candidate_hash: 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97
+journal.original_hash: fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8
+journal.exploit_commitment: 9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387
+journal.corpus_hash: 736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b
+journal.fuzz_seed: 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21
+journal.fuzz_count: 16
+journal.variant_count: 32
+journal.submission_id: 0000000000000000000000000000000000000000000000000000000000000000
