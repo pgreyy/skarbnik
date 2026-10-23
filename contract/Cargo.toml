@@ -1,7 +1,7 @@
-# The Kintsugi NEAR contract. For spike S0 it is only a hello world that stores one greeting.
+# The Kintsugi NEAR bounty contract (spike S3): holds a bounty and pays it out by fixed rules.
 [package]
 name = "kintsugi-contract"
-description = "Kintsugi bounty contract (S0: hello world)"
+description = "Kintsugi bounty contract (S3: minimal bounty lifecycle)"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.93"

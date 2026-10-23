@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet expire json-args '{"bounty_id":"3"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-23T22:00:37.904228993Z
+{
+ "tx_hash": "BaFDwWLTfD6N92f8uf863NcK7FS1soJ1NvmiEdrHdNHY",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: no such bounty'}}}}",
+ "total_gas_burnt": 1837237211428,
+ "logs": [],
+ "wall_seconds": 3.755,
+ "rpc_error": null
+}

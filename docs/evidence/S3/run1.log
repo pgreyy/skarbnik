@@ -1,0 +1,17 @@
+### S3 testnet run 2026-10-23T21:56:23Z, contract kintsugi-djloo.testnet
+== happy_register_verifier1 (register_verifier by kintsugi-djloo.testnet): exit=0 tx=91S33R933hGcaqcoGCLDgbpYaozzpWeeLcCFi8G2Gvas gas=0.309 Tgas
+== happy_register_verifier2 (register_verifier by kintsugi-djloo.testnet): exit=0 tx=6GDPogFokryubXgQ3uE5cLoh9UvJtHr51UYsseVeWpEU gas=0.309 Tgas
+== happy_create_bounty (create_bounty by vendor.kintsugi-djloo.testnet): exit=0 tx=Fq8ZFjcbhMjhe3gMWzM3xWqUZaCYC7wxsepHyn44w4Ts gas=0.337 Tgas
+happy bounty id 0
+== happy_commit (commit by researcher.kintsugi-djloo.testnet): exit=0 tx=SRaBr14w6JorNFyUswzLBkw1AHDw6aTPiHHhFwntB6j gas=0.315 Tgas
+== happy_reveal (reveal by researcher.kintsugi-djloo.testnet): exit=0 tx=HAjzWVZMpVyQUaswbRqiZsvb3qpQ5RJ7TmFYCdWRnUBq gas=0.320 Tgas
+== happy_post_verdict (post_verdict by vendor.kintsugi-djloo.testnet): exit=0 tx=EHJHxPdeMMaJ36g1xAQXo6v4oQsd4Pb3HAzP6YH8w6gU gas=0.319 Tgas
+== happy_attest_v1 (attest by verifier1.kintsugi-djloo.testnet): exit=0 tx=Yge6hA8fu1Q4CYaRsjMVxvdcNVHfZXEvqcrnmbdEjY7 gas=0.319 Tgas
+== happy_attest_v1_again (attest by verifier1.kintsugi-djloo.testnet): exit=0 tx=7kf5g3BuvMZS5NnoVtdra6LcdpDZLvMnetwXYUe57Ncy gas=0.319 Tgas
+== happy_attest_v2 (attest by verifier2.kintsugi-djloo.testnet): exit=0 tx=9xSP37uDCWffiKrFJu5aBUEuXYZkVbnU8raKXvMVaj4t gas=0.319 Tgas
+happy payout balance change (yoctoNEAR): 500000000000000000000000 expected 500000000000000000000000
+== silent_create_bounty (create_bounty by vendor.kintsugi-djloo.testnet): exit=0 tx=411FUNStgVEuTU2gy7Fgjs8iVC9ks7oPphkiqvgCLt61 gas=0.337 Tgas
+silent bounty id 1
+== silent_commit (commit by researcher.kintsugi-djloo.testnet): exit=0 tx=CG9YEutq5fhT9whSaEspy1urgevxfWHdBTWSQsTLUqLh gas=0.315 Tgas
+== silent_reveal (reveal by researcher.kintsugi-djloo.testnet): exit=0 tx=CeEELmGQV8rmMvafjVR2nBWgintHhcAeZ5ff7uCypfwo gas=0.320 Tgas
+exit=1

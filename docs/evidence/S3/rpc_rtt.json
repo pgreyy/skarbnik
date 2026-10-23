@@ -1,0 +1,1 @@
+{"rpc": "https://test.rpc.fastnear.com", "call": "gas_price", "round_trip_seconds": {"count": 10, "mean": 0.589017915725708, "median": 0.5650143623352051, "min": 0.36559534072875977, "max": 0.8295080661773682, "p95": 0.8295080661773682}}

@@ -1,0 +1,6 @@
+kintsugi-djloo.testnet 5.359457409759479
+vendor.kintsugi-djloo.testnet 1.4986613575894454
+researcher.kintsugi-djloo.testnet 0.4971318766343458
+verifier1.kintsugi-djloo.testnet 0.4995281621556558
+verifier2.kintsugi-djloo.testnet 0.4997017036671007
+payout.kintsugi-djloo.testnet 1.5999999999999999

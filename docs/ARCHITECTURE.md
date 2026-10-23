@@ -6,7 +6,8 @@ This file describes only what is in the repository now. It grows as parts are bu
 
 | Folder | What is there | Status |
 | --- | --- | --- |
-| `contract/` | A hello world NEAR contract that stores one greeting (`get_greeting`, `set_greeting`) | Hello world only. No bounty logic yet |
+| `contract/` | The bounty contract: create, register verifier, commit, reveal, verdict, attest (two different verifiers), timeout, expire; unit tests in `contract/src/tests.rs` | S3, deployed on `kintsugi-djloo.testnet` |
+| `scripts/` | `build_all.sh` (builds everything); `s3_deploy.sh`, `s3_testnet.sh`, `s3_lib.sh`, `s3_measure.py` (testnet runs and measurements) | S0, S3 |
 | `harness/` | Build crate that compiles the zkVM guest in `harness/guest/` and exposes its program and image id | Hello world guest only |
 | `harness/guest/` | A zkVM guest program that reads a name and publishes "hello, <name>" | Hello world only |
 | `harness/checker/` | Native patch checker (`kintsugi-check`): runs a candidate wasm patch on the crash input, the public tests, seeded fairness inputs and seeded crash variants; verdict PASS or FAIL | S1, runs outside the zkVM |
@@ -29,4 +30,7 @@ This file describes only what is in the repository now. It grows as parts are bu
 - `kintsugi-check` reads the demo files and prints a verdict; its core is pure functions (bytes in, verdict out) so it can
   later move into the zkVM guest. It is not inside the zkVM yet.
 
-Nothing yet connects the proof to the contract.
+- The contract never sees the secret or checks a patch; it checks who called, with which values, and when. Verifiers are
+  registered accounts that call `attest`.
+
+Nothing yet connects the proof to the contract: posted hashes are placeholders until the harness runs in the zkVM.

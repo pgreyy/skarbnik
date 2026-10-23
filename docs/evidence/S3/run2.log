@@ -1,0 +1,22 @@
+### S3 testnet run 2026-10-23T21:59:18Z, contract kintsugi-djloo.testnet
+== silent_create_bounty (create_bounty by vendor.kintsugi-djloo.testnet): exit=0 tx=GiKdntx5Z7vENY4aBHHsSz3Z33aYQ9UjGCxzuxgZ3o3y gas=0.337 Tgas
+silent bounty id 2
+== silent_commit (commit by researcher.kintsugi-djloo.testnet): exit=0 tx=AyVT9GrXmdezBZDwUv3PVYBTUhHg1myriSokvYh6dYEf gas=0.315 Tgas
+== silent_reveal (reveal by researcher.kintsugi-djloo.testnet): exit=0 tx=4R2RPPtZeWUt9VkiNdeVHa95ibqFFYZuroW4KZVNvnqx gas=0.320 Tgas
+== silent_timeout_too_early (claim_timeout by researcher.kintsugi-djloo.testnet, expected to fail): outcome=failed tx=AvdNdUt4pgkmi35JtHW4ECv9iugYqpqWCq4pbzXnBnah
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: deadline has not passed'}}}}"
+silent deadline_ns 1792792801345797002; waiting for the final block time to pass it
+== silent_late_verdict (post_verdict by vendor.kintsugi-djloo.testnet, expected to fail): outcome=failed tx=5adj3H7kzwFVtUXFZdv5QBLmi4wHs8DhUjtsYvjgR81B
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: verdict window has closed'}}}}"
+== silent_claim_timeout (claim_timeout by researcher.kintsugi-djloo.testnet): exit=0 tx=5aqYBwqVs7Z4jkGMYd71bKeQveskXoGN1qMnETC1L8kD gas=0.310 Tgas
+silent payout balance change (yoctoNEAR): 500000000000000000000000 expected 500000000000000000000000
+== expire_create_bounty (create_bounty by vendor.kintsugi-djloo.testnet): exit=1 tx=- gas=-
+expire bounty id 3
+== expire_too_early (expire by researcher.kintsugi-djloo.testnet, expected to fail): outcome=failed tx=BaFDwWLTfD6N92f8uf863NcK7FS1soJ1NvmiEdrHdNHY
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: no such bounty'}}}}"
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+    for k in filter(None, sys.argv[2].split(".")): d=d[int(k)] if isinstance(d,list) else d[k]
+                                                                                          ~^^^
+TypeError: 'NoneType' object is not subscriptable
+exit=1

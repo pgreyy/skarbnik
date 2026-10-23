@@ -1,0 +1,10 @@
+{"wait_until": "FINAL", "wall_seconds": 3.587, "tx_hash": "9mH939ynQRP8oMGVVGGGkZirz9RKZFANvU6uNJjfYE66", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.747, "tx_hash": "5hrxSwygY7hkE1PoF7HLUz85ogpjJARgmwN5uEsp1fvm", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+{"wait_until": "FINAL", "wall_seconds": 3.549, "tx_hash": "GrjPaPViQLBZNa7c5Vgvptqq8Grok8qMqNkaCdX2Fk8x", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.882, "tx_hash": "BDX3PjnQYFtPoPa3txoLTc4GCsgwvhZ5ovxjJWjn8fX7", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+{"wait_until": "FINAL", "wall_seconds": 3.77, "tx_hash": "CFdtdmEggTNK4ocvzdSS2QqHRBbSRpDFRbHMt6ADUoiT", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.328, "tx_hash": "6cU7gEXppCkbWs1XP6SiDiEEJ1VwET3qrdd2FKjPJvqX", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+{"wait_until": "FINAL", "wall_seconds": 3.68, "tx_hash": "5PZWYB9wuLXvnW7s8PF1LxxEZdEeS9ywnBo37jShJF93", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.655, "tx_hash": "ShzChYm9bJT6mhWaPyNeMxBySxqS8fbvbaVuFN7pF1M", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+{"wait_until": "FINAL", "wall_seconds": 3.63, "tx_hash": "3Wi1NfXddPEzfaKPdMqnSYVQACJEb8CdN5vhBXbULyru", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.446, "tx_hash": "GmkVtdEHMKAgjf5Rz99SM837QXPGYhLjMqpmY3eSFAU6", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}

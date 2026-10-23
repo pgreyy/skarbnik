@@ -1,0 +1,46 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet expire json-args {"bounty_id":"3"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T22:02:09.655867675Z
+├  Unsigned transaction:
+│    signer_id:    researcher.kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  expire
+│                       args:         {
+│                                       "bounty_id": "3"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EtG8bWeDuYgkp1E9FciBNi29aeKWcGr4WG3AjpDzEEGu
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.310 Tgas
+│    Transaction fee: 0.0000309156225445 NEAR
+│    Transaction ID: Do3TNA8D5d6i2iy6jGk9kWVCWPJUemukMv1pxnAeqNRn
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/Do3TNA8D5d6i2iy6jGk9kWVCWPJUemukMv1pxnAeqNRn
+│     
+├  Function execution logs:
+│    Logs [kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"refunded","data":[{"bounty_id":"3","to":"vendor.kintsugi-djloo.testnet","amount":"500000000000000000000000","caller":"researcher.kintsugi-djloo.testnet"}]}
+│    Logs [vendor.kintsugi-djloo.testnet]:   No logs
+│    Logs [researcher.kintsugi-djloo.testnet]:   No logs
+│    Logs [researcher.kintsugi-djloo.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "expire" call to <kintsugi-djloo.testnet> on behalf of <researcher.kintsugi-djloo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-djloo.testnet expire json-args '{"bounty_id":"3"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.64

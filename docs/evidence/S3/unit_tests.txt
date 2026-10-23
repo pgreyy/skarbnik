@@ -1,0 +1,44 @@
+$ (repo root) flock target/.heavy-build.lock cargo test -p kintsugi-contract --offline
+    Finished `test` profile [optimized + debuginfo] target(s) in 3.63s
+     Running unittests src/lib.rs (target/debug/deps/kintsugi_contract-85f83b3c0f32614a)
+
+running 30 tests
+test tests::init_replaces_hello_world_state ... ok
+test tests::fingerprint_layout_is_stable ... ok
+test tests::expire_refunds_vendor ... ok
+test tests::expire_too_early_rejected - should panic ... ok
+test tests::expire_waits_for_revealed_submission - should panic ... ok
+test tests::fingerprint_binds_payout_account - should panic ... ok
+test tests::only_owner_registers_verifiers - should panic ... ok
+test tests::only_vendor_posts_verdict - should panic ... ok
+test tests::commits_beyond_k_are_ignored ... ok
+test tests::only_committer_reveals - should panic ... ok
+test tests::expire_after_payout_rejected - should panic ... ok
+test tests::oversized_patch_rejected - should panic ... ok
+test tests::mismatched_attestation_rejected - should panic ... ok
+test tests::reveal_before_gap_rejected - should panic ... ok
+test tests::same_verifier_twice_counts_once ... ok
+test tests::timeout_before_deadline_rejected - should panic ... ok
+test tests::researcher_cannot_attest_own_submission - should panic ... ok
+test tests::tiny_bounty_rejected - should panic ... ok
+test tests::silent_vendor_timeout_pays_researcher ... ok
+test tests::late_verdict_rejected - should panic ... ok
+test tests::late_attestation_rejected - should panic ... ok
+test tests::final_fail_spends_attempt_and_later_pass_pays ... ok
+test tests::verifier_cannot_be_vendor - should panic ... ok
+test tests::wrong_patch_rejected - should panic ... ok
+test tests::happy_path_two_verifiers_pay_researcher ... ok
+test tests::no_second_payout_after_pass - should panic ... ok
+test tests::vendor_cannot_be_verifier - should panic ... ok
+test tests::wrong_nonce_rejected - should panic ... ok
+test tests::unregistered_attester_rejected - should panic ... ok
+test tests::verdict_without_two_attestations_times_out ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+   Doc-tests kintsugi_contract
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

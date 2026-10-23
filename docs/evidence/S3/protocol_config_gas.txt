@@ -1,0 +1,6 @@
+# $ curl -4 -s https://test.rpc.fastnear.com -d {"method":"EXPERIMENTAL_protocol_config","params":{"finality":"final"}} (fields filtered), 2026-10-23
+min_gas_price 5000
+protocol_version 88
+runtime_config.storage_amount_per_byte 10000000000000000000
+runtime_config.wasm_config.limit_config.max_gas_burnt 1000000000000000
+runtime_config.wasm_config.limit_config.max_total_prepaid_gas 1000000000000000

@@ -1,0 +1,30 @@
+$ near tokens kintsugi-djloo.testnet send-near vendor.kintsugi-djloo.testnet 1 NEAR network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T22:01:04.910253777Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-djloo.testnet
+│    receiver_id:  vendor.kintsugi-djloo.testnet
+│    actions:
+│       -- transfer deposit:    1 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EfmcwS9tW3D2sRQHiLR544XxY7adj7ZreEaTTbqhanmd
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.224 Tgas
+│    Transaction fee: 0.00002231825625 NEAR
+│    Transaction ID: CL44USsbM9hQWeuTPx8FuDQeA5vnH5rU42MFauYQtB3y
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/CL44USsbM9hQWeuTPx8FuDQeA5vnH5rU42MFauYQtB3y
+│     
+
+
+<kintsugi-djloo.testnet> has transferred 1 NEAR to <vendor.kintsugi-djloo.testnet> successfully.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near tokens kintsugi-djloo.testnet send-near vendor.kintsugi-djloo.testnet '1 NEAR' network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.25

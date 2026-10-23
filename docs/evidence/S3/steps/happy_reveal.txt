@@ -1,0 +1,47 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet reveal json-args {"bounty_id":"0","index":0,"patch":"a2ludHN1Z2kgUzMgcGxhY2Vob2xkZXIgcGF0Y2gsIG5vdCBhIHJlYWwgbW9kdWxlOiBoYXBweSBib3VudHkgMCAxNzkyNzkyNjA2OTk4Mjg2ODg4","nonce":"b86474f69d7d7a130e66d65ecdaf3d6c02c380d278fd77504fb402e4ee7817ae"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T21:56:58.929644590Z
+├  Unsigned transaction:
+│    signer_id:    researcher.kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  reveal
+│                       args:         {
+│                                       "bounty_id": "0",
+│                                       "index": 0,
+│                                       "nonce": "b86474f69d7d7a130e66d65ecdaf3d6c02c380d278fd77504fb402e4ee7817ae",
+│                                       "patch": "a2ludHN1Z2kgUzMgcGxhY2Vob2xkZXIgcGF0Y2gsIG5vdCBhIHJlYWwgbW9kdWxlOiBoYXBweSBib3VudHkgMCAxNzkyNzkyNjA2OTk4Mjg2ODg4"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EtG8bWeDuYgkp1E9FciBNi29aeKWcGr4WG3AjpDzEEGu
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.320 Tgas
+│    Transaction fee: 0.0000319074438165 NEAR
+│    Transaction ID: HAjzWVZMpVyQUaswbRqiZsvb3qpQ5RJ7TmFYCdWRnUBq
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/HAjzWVZMpVyQUaswbRqiZsvb3qpQ5RJ7TmFYCdWRnUBq
+│     
+├  Function execution logs:
+│    Logs [kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"revealed","data":[{"bounty_id":"0","index":0,"patch_hash":"8b1d52760f766af34b3cd7a7ebff5c51dc543f012490d2acd03224ab3972b180","patch_len":84,"seed":"e1461fcc4c3a36cc1d10cd427625fab18ee815be0d9f7cf679ef7fbadc1d3b76","revealed_at_ns":"1792792621489799162"}]}
+│    Logs [researcher.kintsugi-djloo.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "reveal" call to <kintsugi-djloo.testnet> on behalf of <researcher.kintsugi-djloo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-djloo.testnet reveal json-args '{"bounty_id":"0","index":0,"patch":"a2ludHN1Z2kgUzMgcGxhY2Vob2xkZXIgcGF0Y2gsIG5vdCBhIHJlYWwgbW9kdWxlOiBoYXBweSBib3VudHkgMCAxNzkyNzkyNjA2OTk4Mjg2ODg4","nonce":"b86474f69d7d7a130e66d65ecdaf3d6c02c380d278fd77504fb402e4ee7817ae"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=7.04

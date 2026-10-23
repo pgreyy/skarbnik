@@ -1,0 +1,36 @@
+{
+ "rpc": "https://test.rpc.fastnear.com",
+ "method": "(a) query block finality=optimistic then finality=final (two calls, so the head may move between them); (b) structural: the optimistic head's header field last_final_block, looked up by hash; lag = difference of heights and header timestamps",
+ "height_lag": {
+  "count": 20,
+  "mean": 0.8,
+  "median": 1.0,
+  "min": 0,
+  "max": 2,
+  "p95": 2
+ },
+ "time_lag_s": {
+  "count": 20,
+  "mean": 0.4718008311,
+  "median": 0.555425534,
+  "min": 0.0,
+  "max": 1.178490346,
+  "p95": 1.12943517
+ },
+ "head_to_last_final_height_lag": {
+  "count": 20,
+  "mean": 2,
+  "median": 2.0,
+  "min": 2,
+  "max": 2,
+  "p95": 2
+ },
+ "head_to_last_final_time_lag_s": {
+  "count": 20,
+  "mean": 1.15879251845,
+  "median": 1.165081961,
+  "min": 0.81759137,
+  "max": 1.346697414,
+  "p95": 1.302648045
+ }
+}

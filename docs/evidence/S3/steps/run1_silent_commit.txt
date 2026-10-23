@@ -1,0 +1,46 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet commit json-args {"bounty_id":"1","fingerprint":"079627a5e089aa40e425f305d53a2869bc82d38ee10692c80da5ca8238db286a","payout":"payout.kintsugi-djloo.testnet"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T21:57:54.773310330Z
+├  Unsigned transaction:
+│    signer_id:    researcher.kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  commit
+│                       args:         {
+│                                       "bounty_id": "1",
+│                                       "fingerprint": "079627a5e089aa40e425f305d53a2869bc82d38ee10692c80da5ca8238db286a",
+│                                       "payout": "payout.kintsugi-djloo.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EtG8bWeDuYgkp1E9FciBNi29aeKWcGr4WG3AjpDzEEGu
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.315 Tgas
+│    Transaction fee: 0.0000314973638675 NEAR
+│    Transaction ID: CG9YEutq5fhT9whSaEspy1urgevxfWHdBTWSQsTLUqLh
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/CG9YEutq5fhT9whSaEspy1urgevxfWHdBTWSQsTLUqLh
+│     
+├  Function execution logs:
+│    Logs [kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"committed","data":[{"bounty_id":"1","index":0,"committer":"researcher.kintsugi-djloo.testnet","payout":"payout.kintsugi-djloo.testnet","fingerprint":"079627a5e089aa40e425f305d53a2869bc82d38ee10692c80da5ca8238db286a"}]}
+│    Logs [researcher.kintsugi-djloo.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+0
+
+
+The "commit" call to <kintsugi-djloo.testnet> on behalf of <researcher.kintsugi-djloo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-djloo.testnet commit json-args '{"bounty_id":"1","fingerprint":"079627a5e089aa40e425f305d53a2869bc82d38ee10692c80da5ca8238db286a","payout":"payout.kintsugi-djloo.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.1

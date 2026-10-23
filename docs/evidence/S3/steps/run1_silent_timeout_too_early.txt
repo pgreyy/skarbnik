@@ -1,0 +1,30 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet claim_timeout json-args {"bounty_id":"1","index":0} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T21:58:14.198102332Z
+├  Unsigned transaction:
+│    signer_id:    researcher.kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  claim_timeout
+│                       args:         {
+│                                       "bounty_id": "1",
+│                                       "index": 0
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EtG8bWeDuYgkp1E9FciBNi29aeKWcGr4WG3AjpDzEEGu
+│     
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-djloo.testnet claim_timeout json-args '{"bounty_id":"1","index":0}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as researcher.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: An error occurred during a `FunctionCall` action.
+      ExecutionError("Smart contract panicked: deadline has not passed")
+
+Location:
+   src/common.rs:1808
+exit=1
+wall_seconds=5.43

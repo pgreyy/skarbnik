@@ -1,0 +1,25 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet get_next_bounty_id json-args {} prepaid-gas 1001 Tgas attached-deposit 0 NEAR sign-as kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T22:02:31.744160628Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  get_next_bounty_id
+│                       args:         {}
+│                       gas:          1001.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EfmcwS9tW3D2sRQHiLR544XxY7adj7ZreEaTTbqhanmd
+│     
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-djloo.testnet get_next_bounty_id json-args {} prepaid-gas '1001.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: The total prepaid gas (1001.0 Tgas) for all given actions exceeded the limit (1000.0 Tgas).
+
+Location:
+exit=1
+wall_seconds=2.48

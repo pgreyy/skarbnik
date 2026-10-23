@@ -1,0 +1,20 @@
+{
+ "rpc": "https://test.rpc.fastnear.com",
+ "method": "block by height for every height from final_height-N to final_height",
+ "measured_at_utc": "2026-10-23T22:02:57Z",
+ "first_height": 274457951,
+ "last_height": 274458071,
+ "blocks_fetched": 121,
+ "heights_without_block": [],
+ "span_seconds": 69.432008744,
+ "seconds_per_height": 0.5786000728666667,
+ "seconds_per_produced_block": 0.5786000728666667,
+ "interval_seconds": {
+  "count": 120,
+  "mean": 0.5786000728666667,
+  "median": 0.5909422485,
+  "min": 0.183003535,
+  "max": 1.18192521,
+  "p95": 0.694101582
+ }
+}

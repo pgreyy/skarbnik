@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet post_verdict json-args '{"bounty_id":"2","index":0,"verdict":"FAIL","journal_hash":"9f892b1a5cfab2a8615ff7cc5b473d33b418a3e7e564a3629db4f3fc066ca01a","receipt_hash":"13332560d2c38bbb2531d0f5db99098fd8f159fe63df2c53b488c99cf70eacb1"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as vendor.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-23T22:00:12.614847353Z
+{
+ "tx_hash": "5adj3H7kzwFVtUXFZdv5QBLmi4wHs8DhUjtsYvjgR81B",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: verdict window has closed'}}}}",
+ "total_gas_burnt": 1978043840131,
+ "logs": [],
+ "wall_seconds": 3.872,
+ "rpc_error": null
+}

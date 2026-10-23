@@ -2,7 +2,7 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
-## 2026-10-23: S1 harness and S3 contract (in progress)
+## 2026-10-23: S1 harness and S3 contract (both PASS)
 
 - S0 committed as `2962c48` ("S0: workspace, hello contract on testnet, hello proof").
 - S1 (harness outside the zkVM, cheating patches) and S3 (bounty contract on testnet) built in parallel. Heavy builds are
@@ -23,6 +23,27 @@ One dated entry per work block: what was done, the exact commands, the results, 
   `memorize_tests` and was corrected to match the checker.
 - Not done: the zkVM part of S1 (receipt, journal, tampered receipt check). Limits (2,048 bytes, 50,000 fuel, 64 fairness
   inputs, 32 variants) are first choices to revisit in S2.
+- Committed as `d150da2`.
+
+### S3 (bounty contract on testnet): PASS
+
+- Replaced the hello world contract with the smallest bounty contract (create, register verifier, commit, reveal, verdict,
+  attest with two different verifiers, timeout, expire). 30 unit tests pass. near-sdk's `unit-testing` feature pulls in
+  aws-lc-sys; it built with gcc, no cmake needed.
+- Deployed to `kintsugi-djloo.testnet` with `#[init(ignore_state)]` (the account still held the hello world state). Wasm
+  228,358 bytes; its code locks about 2.3 NEAR of storage on the account.
+- Testnet: happy path paid 0.5 NEAR on the second verifier's attestation; silent vendor path paid 0.5 NEAR by
+  `claim_timeout`; expiry refunded the vendor 0.5 NEAR; early and late calls were refused on chain. 500 and 1,000 TGas
+  were accepted on one call. Block time median 0.591 s; finality 2 blocks, about 1.16 s.
+- What failed on the way: run 1 stopped because near-cli-rs prints no transaction id for a refused call (now sent over RPC);
+  run 2 ran the vendor out of testnet NEAR (topped up 1 NEAR). Details in docs/EVIDENCE.md.
+- Left out for now: Proof 0 attestations, attempt fees and credit (so the K commit slots can be filled with junk commits),
+  a reveal deadline, vendor storage deposits.
+
+### Next
+
+- S2: proving time and memory for the harness inside the zkVM (this also completes S1's zkVM part).
+- Add attempt fees or credit to the contract before any demo, so commit slots cannot be filled for free.
 
 ## 2026-10-23: S0 setup (PASS)
 

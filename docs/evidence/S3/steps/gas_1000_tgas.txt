@@ -1,0 +1,41 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet get_next_bounty_id json-args {} prepaid-gas 1000 Tgas attached-deposit 0 NEAR sign-as kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T22:02:25.688201165Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  get_next_bounty_id
+│                       args:         {}
+│                       gas:          1000.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EfmcwS9tW3D2sRQHiLR544XxY7adj7ZreEaTTbqhanmd
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.000030810421868 NEAR
+│    Transaction ID: EthQyLec4q8KQ9gfL9bEqWx47i4vu4fmWNrHyPF5Lo5a
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/EthQyLec4q8KQ9gfL9bEqWx47i4vu4fmWNrHyPF5Lo5a
+│     
+├  Function execution logs:
+│    Logs [kintsugi-djloo.testnet]:   No logs
+│    Logs [kintsugi-djloo.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"4"
+
+
+The "get_next_bounty_id" call to <kintsugi-djloo.testnet> on behalf of <kintsugi-djloo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-djloo.testnet get_next_bounty_id json-args {} prepaid-gas '1000.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=4.52

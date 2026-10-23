@@ -1,0 +1,238 @@
+{
+ "rpc": "https://test.rpc.fastnear.com",
+ "method": "(a) query block finality=optimistic then finality=final (two calls, so the head may move between them); (b) structural: the optimistic head's header field last_final_block, looked up by hash; lag = difference of heights and header timestamps",
+ "height_lag": {
+  "count": 20,
+  "mean": 0.8,
+  "median": 1.0,
+  "min": 0,
+  "max": 2,
+  "p95": 2
+ },
+ "time_lag_s": {
+  "count": 20,
+  "mean": 0.4718008311,
+  "median": 0.555425534,
+  "min": 0.0,
+  "max": 1.178490346,
+  "p95": 1.12943517
+ },
+ "head_to_last_final_height_lag": {
+  "count": 20,
+  "mean": 2,
+  "median": 2.0,
+  "min": 2,
+  "max": 2,
+  "p95": 2
+ },
+ "head_to_last_final_time_lag_s": {
+  "count": 20,
+  "mean": 1.15879251845,
+  "median": 1.165081961,
+  "min": 0.81759137,
+  "max": 1.346697414,
+  "p95": 1.302648045
+ },
+ "samples": [
+  {
+   "wall_utc": 1792793176.9739447,
+   "optimistic_height": 274458443,
+   "final_height": 274458443,
+   "height_lag": 0,
+   "time_lag_s": 0.0,
+   "head_last_final_height": 274458441,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 0.956548149
+  },
+  {
+   "wall_utc": 1792793180.13583,
+   "optimistic_height": 274458449,
+   "final_height": 274458448,
+   "height_lag": 1,
+   "time_lag_s": 0.540882852,
+   "head_last_final_height": 274458447,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 0.973717541
+  },
+  {
+   "wall_utc": 1792793183.369537,
+   "optimistic_height": 274458454,
+   "final_height": 274458454,
+   "height_lag": 0,
+   "time_lag_s": 0.0,
+   "head_last_final_height": 274458452,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.263540904
+  },
+  {
+   "wall_utc": 1792793186.9589343,
+   "optimistic_height": 274458461,
+   "final_height": 274458459,
+   "height_lag": 2,
+   "time_lag_s": 1.12943517,
+   "head_last_final_height": 274458459,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.12943517
+  },
+  {
+   "wall_utc": 1792793190.486294,
+   "optimistic_height": 274458466,
+   "final_height": 274458465,
+   "height_lag": 1,
+   "time_lag_s": 0.594056178,
+   "head_last_final_height": 274458464,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.271127789
+  },
+  {
+   "wall_utc": 1792793193.3570464,
+   "optimistic_height": 274458470,
+   "final_height": 274458469,
+   "height_lag": 1,
+   "time_lag_s": 0.537856823,
+   "head_last_final_height": 274458468,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.082276011
+  },
+  {
+   "wall_utc": 1792793196.1531496,
+   "optimistic_height": 274458475,
+   "final_height": 274458474,
+   "height_lag": 1,
+   "time_lag_s": 0.624979084,
+   "head_last_final_height": 274458473,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.144344361
+  },
+  {
+   "wall_utc": 1792793199.180399,
+   "optimistic_height": 274458481,
+   "final_height": 274458480,
+   "height_lag": 1,
+   "time_lag_s": 0.638698388,
+   "head_last_final_height": 274458479,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.271326046
+  },
+  {
+   "wall_utc": 1792793202.5630639,
+   "optimistic_height": 274458487,
+   "final_height": 274458485,
+   "height_lag": 2,
+   "time_lag_s": 1.178490346,
+   "head_last_final_height": 274458485,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.178490346
+  },
+  {
+   "wall_utc": 1792793205.7173398,
+   "optimistic_height": 274458491,
+   "final_height": 274458491,
+   "height_lag": 0,
+   "time_lag_s": 0.0,
+   "head_last_final_height": 274458489,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.086290838
+  },
+  {
+   "wall_utc": 1792793209.8041742,
+   "optimistic_height": 274458497,
+   "final_height": 274458496,
+   "height_lag": 1,
+   "time_lag_s": 0.687870594,
+   "head_last_final_height": 274458495,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.302648045
+  },
+  {
+   "wall_utc": 1792793212.5377753,
+   "optimistic_height": 274458504,
+   "final_height": 274458504,
+   "height_lag": 0,
+   "time_lag_s": 0.0,
+   "head_last_final_height": 274458502,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 0.81759137
+  },
+  {
+   "wall_utc": 1792793216.9302955,
+   "optimistic_height": 274458510,
+   "final_height": 274458510,
+   "height_lag": 0,
+   "time_lag_s": 0.0,
+   "head_last_final_height": 274458508,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.228425096
+  },
+  {
+   "wall_utc": 1792793220.670483,
+   "optimistic_height": 274458517,
+   "final_height": 274458516,
+   "height_lag": 1,
+   "time_lag_s": 0.627278238,
+   "head_last_final_height": 274458515,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.261086002
+  },
+  {
+   "wall_utc": 1792793224.096278,
+   "optimistic_height": 274458523,
+   "final_height": 274458522,
+   "height_lag": 1,
+   "time_lag_s": 0.645298193,
+   "head_last_final_height": 274458521,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.346697414
+  },
+  {
+   "wall_utc": 1792793227.762955,
+   "optimistic_height": 274458528,
+   "final_height": 274458527,
+   "height_lag": 1,
+   "time_lag_s": 0.569968216,
+   "head_last_final_height": 274458526,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.213207739
+  },
+  {
+   "wall_utc": 1792793231.380661,
+   "optimistic_height": 274458535,
+   "final_height": 274458534,
+   "height_lag": 1,
+   "time_lag_s": 0.536589318,
+   "head_last_final_height": 274458533,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.145651132
+  },
+  {
+   "wall_utc": 1792793234.9184792,
+   "optimistic_height": 274458542,
+   "final_height": 274458541,
+   "height_lag": 1,
+   "time_lag_s": 0.608875709,
+   "head_last_final_height": 274458540,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.151673576
+  },
+  {
+   "wall_utc": 1792793239.6775308,
+   "optimistic_height": 274458548,
+   "final_height": 274458548,
+   "height_lag": 0,
+   "time_lag_s": 0.0,
+   "head_last_final_height": 274458546,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.245467018
+  },
+  {
+   "wall_utc": 1792793243.4546452,
+   "optimistic_height": 274458555,
+   "final_height": 274458554,
+   "height_lag": 1,
+   "time_lag_s": 0.515737513,
+   "head_last_final_height": 274458553,
+   "head_to_last_final_height_lag": 2,
+   "head_to_last_final_time_lag_s": 1.106305822
+  }
+ ]
+}

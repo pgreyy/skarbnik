@@ -1,0 +1,35 @@
+$ near account create-account fund-myself verifier1.kintsugi-djloo.testnet 0.5 NEAR autogenerate-new-keypair save-to-legacy-keychain sign-as kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T21:52:05.561623838Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-djloo.testnet
+│    receiver_id:  verifier1.kintsugi-djloo.testnet
+│    actions:
+│       -- create account:      verifier1.kintsugi-djloo.testnet
+│       -- transfer deposit:    0.5 NEAR
+│       -- add access key:     
+│                       public key:   ed25519:D6ZF4GSdEHzNDiteNx4ZWwcnRKwXVvbNZkf2V1vRiBGB
+│                       nonce:        0
+│                       permission:   FullAccess
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EfmcwS9tW3D2sRQHiLR544XxY7adj7ZreEaTTbqhanmd
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.825 Tgas
+│    Transaction fee: 0.00008249476875 NEAR
+│    Transaction ID: CbaDuN5x8GBxLjLdZSW4CUsXERN2j3tskajQqN4Dsy4T
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/CbaDuN5x8GBxLjLdZSW4CUsXERN2j3tskajQqN4Dsy4T
+│     
+
+
+New account <verifier1.kintsugi-djloo.testnet> has been successfully created.
+<kintsugi-djloo.testnet> has transferred 0.5 NEAR to <verifier1.kintsugi-djloo.testnet> successfully.
+Added access key = ed25519:D6ZF4GSdEHzNDiteNx4ZWwcnRKwXVvbNZkf2V1vRiBGB to verifier1.kintsugi-djloo.testnet.
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=7.14

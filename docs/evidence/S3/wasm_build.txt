@@ -1,0 +1,51 @@
+$ (in contract/) flock ../target/.heavy-build.lock cargo near build non-reproducible-wasm
+Migrating config.toml from V1 to V2...
+Migrating config.toml from V2 to V3...
+Migrating config.toml from V3 to v4...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+• Collecting cargo project metadata...
+• done
+
+• Checking rustc version...
+INFO: contract's near-sdk targets protocol version 84; rustc 1.99.1 accepted (bulk-memory opcodes supported by nearcore VM)
+• done
+
+• Checking the host environment...
+• done
+
+• Generating ABI
+ │    Compiling kintsugi-contract v0.1.0 (contract)
+ │     Finished `dev` profile [unoptimized] target(s) in 1.20s
+• Extracting ABI...
+• done
+
+• Compressing ABI to be embedded..
+• done
+
+• Building contract
+ │    Compiling kintsugi-contract v0.1.0 (contract)
+ │     Finished `release` profile [optimized] target(s) in 2.52s
+
+Modification timestamps of:
+ |    "target/wasm32-unknown-unknown/release/kintsugi_contract.wasm" = SystemTime { tv_sec: 1792792161, tv_nsec: 693131529 }
+ |    "target/near/kintsugi_contract/kintsugi_contract.wasm" = SystemTime { tv_sec: 1792790507, tv_nsec: 210834995 }
+
+• Running an optimize for size post-step with wasm-opt --enable-nontrapping-float-to-int --enable-bulk-memory...
+    Finished wasm-opt -O in 573ms
+• done
+
+✓ Contract successfully built! (in CARGO_NEAR_BUILD_ENVIRONMENT=host)
+     -                Binary: target/near/kintsugi_contract/kintsugi_contract.wasm
+     -                  Size: 228.4 KB (228358 bytes)
+     - SHA-256 checksum hex : cac3684a6719d631eb48626e13fe1ae430a6409f512b095950766a91d62d7bb7
+     - SHA-256 checksum bs58: EeWB77MDSHLYBLYHpoPdqNmtWno6HVdSqaZc9dGdnnyC
+     -                   ABI: target/near/kintsugi_contract/kintsugi_contract_abi.json
+     -          Embedded ABI: target/near/kintsugi_contract/kintsugi_contract_abi.zst
+    Finished cargo near build in 5s
+Here is the console command if you ever need to re-run it again:
+cargo near build non-reproducible-wasm
+
+real	0m5.537s
+user	0m7.656s
+sys	0m1.581s
+exit=0

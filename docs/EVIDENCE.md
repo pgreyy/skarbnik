@@ -5,6 +5,87 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S3: Does the full bounty lifecycle work on NEAR testnet?
+
+Question: does the smallest bounty contract work on testnet, including the silent vendor timeout by a plain call? Also: does
+testnet accept more than 300 TGas on one call, and what are block time and finality?
+
+**Verdict: PASS (2026-10-23).** Full write-up, every command and raw output: `docs/evidence/S3/RESULTS.md`
+(all transactions in `docs/evidence/S3/transactions.tsv`, gas in `docs/evidence/S3/gas.tsv`).
+
+Contract (`contract/src/lib.rs`): `create_bounty`, `register_verifier` (owner only), `commit`, `reveal`, `post_verdict`,
+`attest`, `claim_timeout`, `expire`, plus views. Verifiers are registered accounts; an attestation is an `attest` call signed
+by that account's own key. A verdict is final only with matching attestations from two different registered verifiers; a
+second attestation from the same verifier counts once. A vendor can never be a verifier and the reverse. Windows use block
+time. `expire` waits while a revealed submission still waits for its verdict or timeout, so a vendor cannot take back a
+timeout payout by letting the bounty expire. Left out for now: Proof 0 attestations, attempt fees and credit, a reveal
+deadline, vendor storage deposits; all posted hashes are labelled placeholders.
+
+Unit tests: `cargo test -p kintsugi-contract --offline`: 30 passed, 0 failed (re-run 2026-10-23 for this file).
+
+Wasm: `target/near/kintsugi_contract/kintsugi_contract.wasm`, 228,358 bytes, SHA-256
+`cac3684a6719d631eb48626e13fe1ae430a6409f512b095950766a91d62d7bb7`. The code on `kintsugi-djloo.testnet` has the same
+SHA-256 (checked with the RPC `view_code` query). This replaced the S0 hello world contract on that account.
+
+Testnet runs: `./scripts/s3_deploy.sh`, then `./scripts/s3_testnet.sh` (explorer: `https://explorer.testnet.near.org/transactions/<hash>`).
+
+| Path | Step | Transaction | Result |
+| --- | --- | --- | --- |
+| Setup | deploy and init | `BxNA4Zdhs8ZRZFeYumic1hy5atkdztjb8yqs1FN5TWwA` | ok |
+| Happy (bounty 0) | register verifier1, verifier2 | `91S33R933hGcaqcoGCLDgbpYaozzpWeeLcCFi8G2Gvas`, `6GDPogFokryubXgQ3uE5cLoh9UvJtHr51UYsseVeWpEU` | ok |
+| Happy | create, commit, reveal | `Fq8ZFjcbhMjhe3gMWzM3xWqUZaCYC7wxsepHyn44w4Ts`, `SRaBr14w6JorNFyUswzLBkw1AHDw6aTPiHHhFwntB6j`, `HAjzWVZMpVyQUaswbRqiZsvb3qpQ5RJ7TmFYCdWRnUBq` | ok |
+| Happy | vendor posts PASS | `EHJHxPdeMMaJ36g1xAQXo6v4oQsd4Pb3HAzP6YH8w6gU` | ok |
+| Happy | verifier1 attests | `Yge6hA8fu1Q4CYaRsjMVxvdcNVHfZXEvqcrnmbdEjY7` | "recorded" |
+| Happy | verifier1 attests again | `7kf5g3BuvMZS5NnoVtdra6LcdpDZLvMnetwXYUe57Ncy` | "duplicate", counted once |
+| Happy | verifier2 attests | `9xSP37uDCWffiKrFJu5aBUEuXYZkVbnU8raKXvMVaj4t` | "final_pass", payout account +0.5 NEAR |
+| Silent vendor (bounty 2) | create, commit, reveal | `GiKdntx5Z7vENY4aBHHsSz3Z33aYQ9UjGCxzuxgZ3o3y`, `AyVT9GrXmdezBZDwUv3PVYBTUhHg1myriSokvYh6dYEf`, `4R2RPPtZeWUt9VkiNdeVHa95ibqFFYZuroW4KZVNvnqx` | ok |
+| Silent vendor | early `claim_timeout` | `AvdNdUt4pgkmi35JtHW4ECv9iugYqpqWCq4pbzXnBnah` | refused: "deadline has not passed" |
+| Silent vendor | late verdict | `5adj3H7kzwFVtUXFZdv5QBLmi4wHs8DhUjtsYvjgR81B` | refused: "verdict window has closed" |
+| Silent vendor | `claim_timeout` | `5aqYBwqVs7Z4jkGMYd71bKeQveskXoGN1qMnETC1L8kD` | paid, payout account +0.5 NEAR |
+| Expiry (bounty 3) | create | `C5GxEFeEuB54QX22MsmTSM1ziNEuV7bWZrimvd67wtFe` | ok |
+| Expiry | early `expire` | `4hWsEev7nEo9jQYUHfhEd39z8ixbyqjPzKCrkNq6ucoj` | refused: "bounty has not expired" |
+| Expiry | `expire` | `Do3TNA8D5d6i2iy6jGk9kWVCWPJUemukMv1pxnAeqNRn` | vendor refunded +0.5 NEAR |
+
+Test accounts (sub-accounts of `kintsugi-djloo.testnet`, testnet NEAR only): vendor, researcher, verifier1, verifier2, payout.
+
+Gas per call (total over the transaction and its receipts, read from RPC):
+
+| Call | TGas |
+| --- | --- |
+| deploy and init | 18.58 |
+| create_bounty | 2.58 |
+| commit | 2.49 |
+| reveal | 2.61 |
+| post_verdict | 2.42 |
+| attest | 2.57 (3.43 for the final one that pays) |
+| claim_timeout | 3.20 |
+| expire | 2.95 |
+| a refused call | about 1.8 to 2.0 |
+
+The "Gas burned" figure near-cli-rs prints (about 0.31 TGas) leaves out the contract's execution and is not used here.
+
+More than 300 TGas on one call: 500 TGas accepted (`n6ptdLi4pbhxdmb2oEk8DFTBrqaw1ibudibcYds6dNQ`), 1,000 TGas accepted
+(`EthQyLec4q8KQ9gfL9bEqWx47i4vu4fmWNrHyPF5Lo5a`, re-checked by RPC: prepaid 1000.0 TGas, status success). 1,001 TGas was
+refused by near-cli-rs before sending, so the chain's own answer to that was not tested. Testnet runtime config (protocol
+version 88) sets both limits to 1,000 TGas. Mainnet not checked.
+
+Block time and finality (`scripts/s3_measure.py`, RPC):
+
+| Measure | Result |
+| --- | --- |
+| Block time, 121 consecutive blocks (274457951 to 274458071, none skipped) | mean 0.579 s, median 0.591 s, range 0.18 to 1.18 s |
+| Finality lag | the latest block names a final block exactly 2 blocks back, about 1.16 s on average (0.82 to 1.35 s, 20 samples) |
+| Send to FINAL, 10 transactions | median 3.63 s (3.55 to 3.77), including about 0.57 s network round trip from this machine |
+| Send to executed (not yet final) | median 1.66 s |
+
+Failures on the way (kept on purpose):
+
+1. Run 1 stopped after the bounty 1 reveal: near-cli-rs prints no transaction id for a call the contract refuses, and the
+   script stopped there. Fix: expected refusals are sent over RPC so they get an id. Bounty 1 was closed later by a second
+   on-chain timeout (`CxasRTaCcLej6pUCNGG42FmBzVTnj9PshgG3EtADQ4fc`).
+2. Run 2 did not create the expiry bounty: the vendor had 0.499 NEAR left. Fix: a 1 NEAR top-up
+   (`CL44USsbM9hQWeuTPx8FuDQeA5vnH5rU42MFauYQtB3y`) and a stop if a bounty is not created. Run 3 completed it.
+
 ## S1: Does the harness give the right verdicts? (native run, outside the zkVM)
 
 Question: does the checker give PASS to an honest patch and FAIL to every cheating patch, publishing only PASS or FAIL?
@@ -126,7 +207,9 @@ near contract call-function as-read-only kintsugi-djloo.testnet get_greeting jso
 | Call `set_greeting` | Log: `greeting set by kintsugi-djloo.testnet at block 274454082` | [`4xrdsVRocd8iEWmULFRAAHPgnPkZRZb9iDgcVm4kJby6`](https://explorer.testnet.near.org/transactions/4xrdsVRocd8iEWmULFRAAHPgnPkZRZb9iDgcVm4kJby6) | 0.309 Tgas | 5.75 s |
 | View `get_greeting` | `"hello from S0"` | (view, no transaction) | | 2.03 s |
 
-Output: `docs/evidence/S0/b_deploy.txt`, `docs/evidence/S0/b_calls.txt`. The wall times include the CLI's own network round
+Output: `docs/evidence/S0/b_deploy.txt`, `docs/evidence/S0/b_calls.txt`. On the same day the S3 bounty contract replaced this
+hello world contract on the same account, so these calls no longer work today; the transactions above remain on chain. The
+wall times include the CLI's own network round
 trips; they are not block times (block time is measured in S3).
 
 ### (c) Hello world proof is generated and verified locally: PASS

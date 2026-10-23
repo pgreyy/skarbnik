@@ -1,0 +1,95 @@
+### S3 testnet run 2026-10-23T22:01:28Z, contract kintsugi-djloo.testnet
+== expire_create_bounty (create_bounty by vendor.kintsugi-djloo.testnet): exit=0 tx=C5GxEFeEuB54QX22MsmTSM1ziNEuV7bWZrimvd67wtFe gas=0.337 Tgas
+expire bounty id 3
+== expire_too_early (expire by researcher.kintsugi-djloo.testnet, expected to fail): outcome=failed tx=4hWsEev7nEo9jQYUHfhEd39z8ixbyqjPzKCrkNq6ucoj
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: bounty has not expired'}}}}"
+== expire_refund (expire by researcher.kintsugi-djloo.testnet): exit=0 tx=Do3TNA8D5d6i2iy6jGk9kWVCWPJUemukMv1pxnAeqNRn gas=0.310 Tgas
+expire vendor balance change (yoctoNEAR): 500000000000000000000000 expected 500000000000000000000000
+== gas_500_tgas (get_next_bounty_id by kintsugi-djloo.testnet): exit=0 tx=n6ptdLi4pbhxdmb2oEk8DFTBrqaw1ibudibcYds6dNQ gas=0.309 Tgas
+== gas_1000_tgas (get_next_bounty_id by kintsugi-djloo.testnet): exit=0 tx=EthQyLec4q8KQ9gfL9bEqWx47i4vu4fmWNrHyPF5Lo5a gas=0.309 Tgas
+== gas_1001_tgas (get_next_bounty_id by kintsugi-djloo.testnet): exit=1 tx=- gas=-
+{"rpc": "https://test.rpc.fastnear.com", "call": "gas_price", "round_trip_seconds": {"count": 10, "mean": 0.589017915725708, "median": 0.5650143623352051, "min": 0.36559534072875977, "max": 0.8295080661773682, "p95": 0.8295080661773682}}
+{
+ "rpc": "https://test.rpc.fastnear.com",
+ "method": "block by height for every height from final_height-N to final_height",
+ "measured_at_utc": "2026-10-23T22:02:57Z",
+ "first_height": 274457951,
+ "last_height": 274458071,
+ "blocks_fetched": 121,
+ "heights_without_block": [],
+ "span_seconds": 69.432008744,
+ "seconds_per_height": 0.5786000728666667,
+ "seconds_per_produced_block": 0.5786000728666667,
+ "interval_seconds": {
+  "count": 120,
+  "mean": 0.5786000728666667,
+  "median": 0.5909422485,
+  "min": 0.183003535,
+  "max": 1.18192521,
+  "p95": 0.694101582
+ }
+}
+{
+ "rpc": "https://test.rpc.fastnear.com",
+ "method": "query block finality=optimistic then finality=final; lag = difference of heights and header timestamps",
+ "height_lag": {
+  "count": 20,
+  "mean": 0.95,
+  "median": 1.0,
+  "min": 0,
+  "max": 2,
+  "p95": 2
+ },
+ "time_lag_s": {
+  "count": 20,
+  "mean": 0.6035166396,
+  "median": 0.63758132,
+  "min": 0.0,
+  "max": 1.36372082,
+  "p95": 1.171002962
+ }
+}
+{"wait_until": "FINAL", "wall_seconds": 3.587, "tx_hash": "9mH939ynQRP8oMGVVGGGkZirz9RKZFANvU6uNJjfYE66", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.747, "tx_hash": "5hrxSwygY7hkE1PoF7HLUz85ogpjJARgmwN5uEsp1fvm", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+{"wait_until": "FINAL", "wall_seconds": 3.549, "tx_hash": "GrjPaPViQLBZNa7c5Vgvptqq8Grok8qMqNkaCdX2Fk8x", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.882, "tx_hash": "BDX3PjnQYFtPoPa3txoLTc4GCsgwvhZ5ovxjJWjn8fX7", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+{"wait_until": "FINAL", "wall_seconds": 3.77, "tx_hash": "CFdtdmEggTNK4ocvzdSS2QqHRBbSRpDFRbHMt6ADUoiT", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.328, "tx_hash": "6cU7gEXppCkbWs1XP6SiDiEEJ1VwET3qrdd2FKjPJvqX", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+{"wait_until": "FINAL", "wall_seconds": 3.68, "tx_hash": "5PZWYB9wuLXvnW7s8PF1LxxEZdEeS9ywnBo37jShJF93", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.655, "tx_hash": "ShzChYm9bJT6mhWaPyNeMxBySxqS8fbvbaVuFN7pF1M", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+{"wait_until": "FINAL", "wall_seconds": 3.63, "tx_hash": "3Wi1NfXddPEzfaKPdMqnSYVQACJEb8CdN5vhBXbULyru", "final_execution_status": "FINAL", "error": null}
+{"wait_until": "EXECUTED_OPTIMISTIC", "wall_seconds": 1.446, "tx_hash": "GmkVtdEHMKAgjf5Rz99SM837QXPGYhLjMqpmY3eSFAU6", "final_execution_status": "EXECUTED_OPTIMISTIC", "error": null}
+deploy                       deploy+new             ok      total=18.5792 Tgas  
+create_vendor                create-account         ok      total=8.5731 Tgas  
+create_researcher            create-account         ok      total=8.5731 Tgas  
+create_verifier1             create-account         ok      total=8.5731 Tgas  
+create_verifier2             create-account         ok      total=8.5731 Tgas  
+create_payout                create-account         ok      total=8.5731 Tgas  
+happy_register_verifier1     register_verifier      ok      total=2.3598 Tgas  
+happy_register_verifier2     register_verifier      ok      total=2.3712 Tgas  
+happy_create_bounty          create_bounty          ok      total=2.5746 Tgas  
+happy_commit                 commit                 ok      total=2.4856 Tgas  
+happy_reveal                 reveal                 ok      total=2.6035 Tgas  
+happy_post_verdict           post_verdict           ok      total=2.4165 Tgas  
+happy_attest_v1              attest                 ok      total=2.5910 Tgas  
+happy_attest_v1_again        attest                 ok      total=2.5738 Tgas  
+happy_attest_v2              attest                 ok      total=3.4293 Tgas  
+run1_silent_create_bounty    create_bounty          ok      total=2.5841 Tgas  
+run1_silent_commit           commit                 ok      total=2.4923 Tgas  
+run1_silent_reveal           reveal                 ok      total=2.6132 Tgas  
+silent_create_bounty         create_bounty          ok      total=2.5864 Tgas  
+silent_commit                commit                 ok      total=2.4947 Tgas  
+silent_reveal                reveal                 ok      total=2.6133 Tgas  
+silent_timeout_too_early     claim_timeout          failed  total=1.9483 Tgas  {"ActionError": {"index": 0, "kind": {"FunctionCallError": {"ExecutionError": "S
+silent_late_verdict          post_verdict           failed  total=1.9780 Tgas  {"ActionError": {"index": 0, "kind": {"FunctionCallError": {"ExecutionError": "S
+silent_claim_timeout         claim_timeout          ok      total=3.2027 Tgas  
+run2_expire_too_early_no_such_bounty expire                 failed  total=1.8372 Tgas  {"ActionError": {"index": 0, "kind": {"FunctionCallError": {"ExecutionError": "S
+topup_vendor                 send-near              ok      total=0.6695 Tgas  
+run1_cleanup_bounty1_claim_timeout claim_timeout          ok      total=3.2027 Tgas  
+expire_create_bounty         create_bounty          ok      total=2.5859 Tgas  
+expire_too_early             expire                 failed  total=1.8594 Tgas  {"ActionError": {"index": 0, "kind": {"FunctionCallError": {"ExecutionError": "S
+expire_refund                expire                 ok      total=2.9512 Tgas  
+gas_500_tgas                 get_next_bounty_id     ok      total=1.7547 Tgas  
+gas_1000_tgas                get_next_bounty_id     ok      total=1.7547 Tgas  
+### done 2026-10-23T22:05:51Z
+exit=0

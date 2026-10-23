@@ -1,0 +1,54 @@
+$ near contract call-function as-transaction kintsugi-djloo.testnet create_bounty json-args {"original_hash":"988ef0b52c158d1df42e686d015a9c52e6b17da2867eb772c397cb094d66a7f0","corpus_hash":"d4f6a83a88e6d03689b57c29b2069a377cc5dc1c9e8f4091a0d011e15d4d0bc4","image_id":"6be26a657834bc059bf73e5310fed0307158febe0f7cca667ff34f6e9d9ae93b","exploit_commitment":"a3ddbfb71028684ecfa7d0864a8efa8b64754aeeceeb4d2213d0fc0fb2ee47bc","proof0_receipt_hash":"44b4bb921b5c82cfa7f16089af4fd7d1f8e77175e030cdced274a7b3ed25e249","max_commits":3,"max_patch_bytes":1024,"reveal_gap_ns":"2000000000","verdict_window_ns":"20000000000","attest_window_ns":"20000000000","expiry_ns":"3600000000000"} prepaid-gas 100 Tgas attached-deposit 0.5 NEAR sign-as vendor.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-23T21:57:46.098121176Z
+├  Unsigned transaction:
+│    signer_id:    vendor.kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  create_bounty
+│                       args:         {
+│                                       "attest_window_ns": "20000000000",
+│                                       "corpus_hash": "d4f6a83a88e6d03689b57c29b2069a377cc5dc1c9e8f4091a0d011e15d4d0bc4",
+│                                       "expiry_ns": "3600000000000",
+│                                       "exploit_commitment": "a3ddbfb71028684ecfa7d0864a8efa8b64754aeeceeb4d2213d0fc0fb2ee47bc",
+│                                       "image_id": "6be26a657834bc059bf73e5310fed0307158febe0f7cca667ff34f6e9d9ae93b",
+│                                       "max_commits": 3,
+│                                       "max_patch_bytes": 1024,
+│                                       "original_hash": "988ef0b52c158d1df42e686d015a9c52e6b17da2867eb772c397cb094d66a7f0",
+│                                       "proof0_receipt_hash": "44b4bb921b5c82cfa7f16089af4fd7d1f8e77175e030cdced274a7b3ed25e249",
+│                                       "reveal_gap_ns": "2000000000",
+│                                       "verdict_window_ns": "20000000000"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0.5 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:8Uu6sKeii3XCJUW6Mvmt9gPWEKhKN2KwPQUWqWEoCmP8
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.337 Tgas
+│    Transaction fee: 0.000033647899414 NEAR
+│    Transaction ID: 411FUNStgVEuTU2gy7Fgjs8iVC9ks7oPphkiqvgCLt61
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/411FUNStgVEuTU2gy7Fgjs8iVC9ks7oPphkiqvgCLt61
+│     
+├  Function execution logs:
+│    Logs [kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_created","data":[{"bounty_id":"1","vendor":"vendor.kintsugi-djloo.testnet","amount":"500000000000000000000000","image_id":"6be26a657834bc059bf73e5310fed0307158febe0f7cca667ff34f6e9d9ae93b","exploit_commitment":"a3ddbfb71028684ecfa7d0864a8efa8b64754aeeceeb4d2213d0fc0fb2ee47bc","max_commits":3,"expires_at_ns":"1792796267726146283"}]}
+│    Logs [vendor.kintsugi-djloo.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"1"
+
+
+The "create_bounty" call to <kintsugi-djloo.testnet> on behalf of <vendor.kintsugi-djloo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-djloo.testnet create_bounty json-args '{"original_hash":"988ef0b52c158d1df42e686d015a9c52e6b17da2867eb772c397cb094d66a7f0","corpus_hash":"d4f6a83a88e6d03689b57c29b2069a377cc5dc1c9e8f4091a0d011e15d4d0bc4","image_id":"6be26a657834bc059bf73e5310fed0307158febe0f7cca667ff34f6e9d9ae93b","exploit_commitment":"a3ddbfb71028684ecfa7d0864a8efa8b64754aeeceeb4d2213d0fc0fb2ee47bc","proof0_receipt_hash":"44b4bb921b5c82cfa7f16089af4fd7d1f8e77175e030cdced274a7b3ed25e249","max_commits":3,"max_patch_bytes":1024,"reveal_gap_ns":"2000000000","verdict_window_ns":"20000000000","attest_window_ns":"20000000000","expiry_ns":"3600000000000"}' prepaid-gas '100.0 Tgas' attached-deposit '0.5 NEAR' sign-as vendor.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.1
