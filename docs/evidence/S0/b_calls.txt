@@ -1,0 +1,54 @@
+== view 1
+├  Logs:
+│    No logs
+Function execution return value (printed to stdout):
+"hello from kintsugi"
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-read-only kintsugi-djloo.testnet get_greeting json-args {} network-config testnet now
+wall_seconds=8.13
+exit=0
+== call set_greeting
+├  Unsigned transaction:
+│    signer_id:    kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  set_greeting
+│                       args:         {
+│                                       "greeting": "hello from S0"
+│                                     }
+│                       gas:          30.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EfmcwS9tW3D2sRQHiLR544XxY7adj7ZreEaTTbqhanmd
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.000030814893736 NEAR
+│    Transaction ID: 4xrdsVRocd8iEWmULFRAAHPgnPkZRZb9iDgcVm4kJby6
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/4xrdsVRocd8iEWmULFRAAHPgnPkZRZb9iDgcVm4kJby6
+│     
+├  Function execution logs:
+│    Logs [kintsugi-djloo.testnet]:
+│      greeting set by kintsugi-djloo.testnet at block 274454082
+│    Logs [kintsugi-djloo.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+The "set_greeting" call to <kintsugi-djloo.testnet> on behalf of <kintsugi-djloo.testnet> succeeded.
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-djloo.testnet set_greeting json-args '{"greeting":"hello from S0"}' prepaid-gas '30.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+wall_seconds=5.75
+exit=0
+== view 2
+├  Logs:
+│    No logs
+Function execution return value (printed to stdout):
+"hello from S0"
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-read-only kintsugi-djloo.testnet get_greeting json-args {} network-config testnet now
+wall_seconds=2.03
+exit=0

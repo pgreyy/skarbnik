@@ -1,0 +1,35 @@
+attempt 5 start 2026-10-23T21:02:53Z env: MULTIPLEXING=false TIMEOUT=60 RETRY=10 GIT_FETCH_WITH_CLI=true; host without bonsai feature; no auto-kill
+ Downloading crates ...
+  Downloaded aws-lc-sys v0.39.1
+error: 1. 🔨️  Use `cargo near build` instead of `cargo build` to compile your contract
+       💡  Install cargo-near from https://github.com/near/cargo-near
+       
+       2. ✅ Use `cargo check --target wasm32-unknown-unknown` instead of `cargo check` to error-check your contract
+       
+       3. ⚙️ Only following cfg-s are considered VALID for `near-sdk`:
+         - `#[cfg(near)]` (set by `cargo-near`. uses on-chain host-functions)
+         - `#[cfg(target_family = "wasm")]` (uses pure-Rust fallbacks. not for on-chain use)
+         - `#[cfg(feature = "non-contract-usage")]` (intended for use of `near-sdk` in non-contract environment. NOTE: consider using leaf crates)
+         - `#[cfg(feature = "unit-testing")]` (intended for use of `near-sdk` as one of `[dev-dependencies]`)
+         - `#[cfg(feature = "__abi-generate")]`
+         - `#[cfg(test)]`
+         - `#[cfg(doctest)]`
+         - `#[cfg(docsrs)]` (set by docs.rs when building documentation)
+         - `#[cfg(clippy)]`
+       ⚠️ a cfg, which is not one of the above, results in CURRENT compilation error to be emitted.
+       
+   --> ~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/near-sdk-5.29.1/src/lib.rs:142:1
+    |
+142 | / compile_error!(
+143 | |     r#"1. 🔨️  Use `cargo near build` instead of `cargo build` to compile your contract
+144 | | 💡  Install cargo-near from https://github.com/near/cargo-near
+...   |
+159 | | "#
+160 | | );
+    | |_^
+
+error: could not compile `near-sdk` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+Command exited with non-zero status 101
+wall_seconds=652.12 max_rss_kb=484584
+exit=101

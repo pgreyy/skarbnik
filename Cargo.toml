@@ -1,0 +1,24 @@
+# Kintsugi Rust workspace: one `cargo build --release` builds the NEAR contract (native),
+# the proof harness (which compiles the zkVM guest) and the host that proves and verifies.
+[workspace]
+resolver = "3"
+members = ["contract", "harness", "host"]
+# near-sdk refuses a plain native `cargo build` of a contract, so a bare `cargo build` builds only
+# the proof side. scripts/build_all.sh builds everything: this, then `cargo near build` for the contract.
+default-members = ["harness", "host"]
+
+# The zkVM guest is built by harness/build.rs with the RISC Zero toolchain, not by this workspace.
+exclude = ["harness/guest"]
+
+# Always optimize; building and running zkVM code is very slow without it.
+[profile.dev]
+opt-level = 3
+
+# Settings from the cargo-near template, so the contract wasm stays small and safe.
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true

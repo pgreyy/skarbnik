@@ -1,0 +1,49 @@
+build_all run 2 start 2026-10-23T21:22:33Z
+== 1/2 harness, guest and host (cargo build --release)
+   Compiling kintsugi-harness v0.1.0 (<repo>/harness)
+   Compiling kintsugi-host v0.1.0 (<repo>/host)
+    Finished `release` profile [optimized] target(s) in 17.05s
+== 2/2 contract wasm (cargo near build non-reproducible-wasm)
+• Collecting cargo project metadata...
+• done
+
+• Checking rustc version...
+INFO: contract's near-sdk targets protocol version 84; rustc 1.99.1 accepted (bulk-memory opcodes supported by nearcore VM)
+• done
+
+• Checking the host environment...
+• done
+
+• Generating ABI
+ │     Finished `dev` profile [unoptimized] target(s) in 0.14s
+• Extracting ABI...
+• done
+
+• Compressing ABI to be embedded..
+• done
+
+• Building contract
+ │     Finished `release` profile [optimized] target(s) in 0.16s
+
+Modification timestamps of:
+ |    "<repo>/target/wasm32-unknown-unknown/release/kintsugi_contract.wasm" = SystemTime { tv_sec: 1792790506, tv_nsec: 837415222 }
+ |    "<repo>/target/near/kintsugi_contract/kintsugi_contract.wasm" = SystemTime { tv_sec: 1792790507, tv_nsec: 210834995 }
+
+• Skipped running wasm-opt as final target exists and is newer than wasm produced by cargo
+
+✓ Contract successfully built! (in CARGO_NEAR_BUILD_ENVIRONMENT=host)
+     -                Binary: <repo>/target/near/kintsugi_contract/kintsugi_contract.wasm
+     -                  Size: 85.8 KB (85755 bytes)
+     - SHA-256 checksum hex : 5acf78cf300418ce7cf51119949af734b0e2baca54f6d26162596c887a322d15
+     - SHA-256 checksum bs58: 77VBZH68nvpkTCqTsckjAoZu8vTS5jYZ5A44qUCBhpXn
+     -                   ABI: <repo>/target/near/kintsugi_contract/kintsugi_contract_abi.json
+     -          Embedded ABI: <repo>/target/near/kintsugi_contract/kintsugi_contract_abi.zst
+    Finished cargo near build in 1s
+Here is the console command if you ever need to re-run it again:
+cargo near build non-reproducible-wasm
+== done
+4564152 bytes  target/release/kintsugi-host
+85755 bytes  target/near/kintsugi_contract/kintsugi_contract.wasm
+5acf78cf300418ce7cf51119949af734b0e2baca54f6d26162596c887a322d15  target/near/kintsugi_contract/kintsugi_contract.wasm
+wall_seconds=25.03 max_rss_kb=752464
+exit=0

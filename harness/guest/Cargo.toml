@@ -1,0 +1,11 @@
+# The zkVM guest for spike S0: a hello world program that runs inside the RISC Zero machine.
+# It is its own workspace because it is built for the zkVM, not for this computer.
+[package]
+name = "hello_guest"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["std"] }

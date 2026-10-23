@@ -1,0 +1,10 @@
+2026-10-23T21:24:17Z
+journal: hello, kintsugi
+image id: 2cf67c95daf4745939443d2c3772891a0e0e02d04fb0a5196cc9508e917f31fc
+total cycles: 32768
+segments: 1
+prove seconds: 5.03
+verify seconds: 0.030
+verified: true
+wall_seconds=5.05 max_rss_kb=318004
+exit=0

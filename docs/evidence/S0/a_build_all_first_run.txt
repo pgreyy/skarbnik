@@ -1,0 +1,256 @@
+build_all start 2026-10-23T21:14:11Z
+== 1/2 harness, guest and host (cargo build --release)
+   Compiling cfg-if v1.0.5
+   Compiling const-oid v0.9.6
+   Compiling typenum v1.20.1
+   Compiling subtle v2.6.1
+   Compiling serde_core v1.0.229
+   Compiling once_cell v1.21.4
+   Compiling borsh v1.8.1
+   Compiling hex v0.4.3
+   Compiling getrandom v0.2.17
+   Compiling risc0-zkvm-platform v2.2.3
+   Compiling memchr v2.8.3
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.3
+   Compiling encoding_rs v0.8.42
+   Compiling zmij v1.0.23
+   Compiling getrandom v0.4.3
+   Compiling serde_json v1.0.154
+   Compiling itoa v1.0.18
+   Compiling kintsugi-harness v0.1.0 (<repo>/harness)
+   Compiling der v0.7.10
+   Compiling tracing-core v0.1.36
+   Compiling rand_core v0.6.4
+   Compiling ahash v0.8.12
+   Compiling tempfile v3.27.0
+   Compiling risc0-zkos-v1compat v2.2.3
+   Compiling rand_chacha v0.3.1
+   Compiling merlin v3.0.0
+   Compiling rand v0.8.8
+   Compiling tracing v0.1.44
+   Compiling tracing-subscriber v0.2.25
+   Compiling aho-corasick v1.1.5
+   Compiling generic-array v0.14.9
+   Compiling indexmap v2.14.2
+   Compiling ark-std v0.5.0
+   Compiling num-bigint-dig v0.8.6
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.6
+   Compiling spki v0.7.3
+   Compiling digest v0.10.7
+   Compiling yaml-rust2 v0.10.4
+   Compiling pkcs8 v0.10.2
+   Compiling sha2 v0.10.9
+   Compiling blake2 v0.10.6
+   Compiling ark-serialize v0.5.0
+   Compiling signature v2.2.0
+   Compiling pkcs1 v0.7.5
+   Compiling ark-ff v0.5.0
+   Compiling regex-automata v0.4.18
+   Compiling rsa v0.9.10
+   Compiling serde v1.0.229
+   Compiling semver v1.0.28
+   Compiling ruint v1.21.1
+   Compiling camino v1.2.6
+   Compiling serde_with v3.24.0
+   Compiling risc0-zkp v3.0.5
+   Compiling postcard v1.1.3
+   Compiling serde_spanned v0.6.9
+   Compiling toml_datetime v0.6.11
+   Compiling cargo-platform v0.1.9
+   Compiling bytes v1.12.1
+   Compiling bincode v1.3.3
+   Compiling toml_edit v0.22.27
+   Compiling cargo_metadata v0.19.2
+   Compiling prost v0.13.5
+   Compiling regex v1.13.1
+   Compiling risc0-binfmt v3.0.5
+   Compiling risc0-circuit-recursion v4.0.5
+   Compiling lazy-regex v3.6.2
+   Compiling risc0-circuit-rv32im v4.0.5
+   Compiling risc0-circuit-keccak v4.0.6
+   Compiling toml v0.8.23
+   Compiling rzup v0.5.2
+   Compiling risc0-build v3.0.6
+   Compiling ark-poly v0.5.0
+   Compiling ark-relations v0.5.1
+   Compiling ark-snark v0.5.1
+   Compiling ark-ec v0.5.0
+   Compiling ark-crypto-primitives v0.5.0
+   Compiling ark-bn254 v0.5.0
+   Compiling ark-groth16 v0.5.0
+   Compiling risc0-groth16 v3.0.5
+   Compiling risc0-zkvm v3.0.6
+   Compiling kintsugi-host v0.1.0 (<repo>/host)
+    Finished `release` profile [optimized] target(s) in 32.53s
+== 2/2 contract wasm (cargo near build non-reproducible-wasm)
+Migrating config.toml from V1 to V2...
+Migrating config.toml from V2 to V3...
+Migrating config.toml from V3 to v4...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+• Collecting cargo project metadata...
+• done
+
+• Checking rustc version...
+INFO: contract's near-sdk targets protocol version 84; rustc 1.99.1 accepted (bulk-memory opcodes supported by nearcore VM)
+• done
+
+• Checking the host environment...
+• done
+
+• Generating ABI
+ │     Updating crates.io index
+ │  Downloading crates ...
+ │   Downloaded near-abi v0.4.5
+ │   Downloaded schemars_derive v0.8.22
+ │   Downloaded serde_derive_internals v0.29.1
+ │   Downloaded schemars v0.8.22
+ │    Compiling proc-macro2 v1.0.107
+ │    Compiling quote v1.0.47
+ │    Compiling unicode-ident v1.0.27
+ │    Compiling hashbrown v0.17.1
+ │    Compiling equivalent v1.0.3
+ │    Compiling typenum v1.20.1
+ │    Compiling zmij v1.0.23
+ │    Compiling serde_core v1.0.229
+ │    Compiling ident_case v1.0.1
+ │    Compiling winnow v1.0.4
+ │    Compiling itoa v1.0.18
+ │    Compiling memchr v2.8.3
+ │    Compiling serde_json v1.0.154
+ │    Compiling toml_datetime v1.1.2+spec-1.1.0
+ │    Compiling serde v1.0.229
+ │    Compiling schemars v0.8.22
+ │    Compiling foldhash v0.2.0
+ │    Compiling cfg_aliases v0.2.2
+ │    Compiling dyn-clone v1.0.20
+ │    Compiling borsh v1.8.1
+ │    Compiling once_cell v1.21.4
+ │    Compiling version_check v0.9.5
+ │    Compiling strsim v0.11.1
+ │    Compiling const-oid v0.10.2
+ │    Compiling cfg-if v1.0.5
+ │    Compiling rustversion v1.0.23
+ │    Compiling fnv v1.0.7
+ │    Compiling keccak v0.2.2
+ │    Compiling hex v0.4.3
+ │    Compiling base64 v0.23.1
+ │    Compiling bs58 v0.5.1
+ │    Compiling generic-array v0.14.9
+ │    Compiling near-crypto-hash v0.2.0
+ │    Compiling cpufeatures v0.3.1
+ │    Compiling near-sdk-macros v5.29.1
+ │    Compiling heck v0.5.0
+ │    Compiling base64 v0.22.1
+ │    Compiling semver v1.0.28
+ │    Compiling strum v0.26.3
+ │    Compiling indexmap v2.14.2
+ │    Compiling Inflector v0.11.4
+ │    Compiling near-sys v0.2.14
+ │    Compiling hybrid-array v0.4.15
+ │    Compiling syn v3.0.9
+ │    Compiling syn v2.0.119
+ │    Compiling toml_parser v1.1.5+spec-1.1.0
+ │    Compiling block-buffer v0.12.1
+ │    Compiling crypto-common v0.2.2
+ │    Compiling block-buffer v0.10.4
+ │    Compiling crypto-common v0.1.6
+ │    Compiling digest v0.10.7
+ │    Compiling ripemd v0.1.3
+ │    Compiling toml_edit v0.25.17+spec-1.1.0
+ │    Compiling digest v0.11.3
+ │    Compiling sha3 v0.11.0
+ │    Compiling sha2 v0.11.1
+ │    Compiling digest-io v0.1.0
+ │    Compiling proc-macro-crate v3.5.0
+ │    Compiling near-sdk-env v0.1.6
+ │    Compiling serde_derive_internals v0.29.1
+ │    Compiling darling_core v0.20.11
+ │    Compiling darling_core v0.24.1
+ │    Compiling cfg_eval v0.1.2
+ │    Compiling strum_macros v0.26.4
+ │    Compiling schemars_derive v0.8.22
+ │    Compiling serde_derive v1.0.229
+ │    Compiling borsh-derive v1.8.1
+ │    Compiling darling_macro v0.20.11
+ │    Compiling darling v0.20.11
+ │    Compiling darling_macro v0.24.1
+ │    Compiling darling v0.24.1
+ │    Compiling serde_with_macros v3.24.0
+ │    Compiling serde_with v3.24.0
+ │    Compiling near-account-id v2.6.0
+ │    Compiling near-token v0.3.6
+ │    Compiling near-gas v0.3.7
+ │    Compiling near-abi v0.4.5
+ │    Compiling near-sdk-core v4.2.3
+ │    Compiling near-global-contracts v0.2.6
+ │    Compiling near-sdk v5.29.1
+ │    Compiling kintsugi-contract v0.1.0 (<repo>/contract)
+ │     Finished `dev` profile [unoptimized] target(s) in 18.55s
+• Extracting ABI...
+• done
+
+• Compressing ABI to be embedded..
+• done
+
+• Building contract
+ │    Compiling serde_core v1.0.229
+ │    Compiling serde_json v1.0.154
+ │    Compiling serde v1.0.229
+ │    Compiling zmij v1.0.23
+ │    Compiling hashbrown v0.17.1
+ │    Compiling equivalent v1.0.3
+ │    Compiling foldhash v0.2.0
+ │    Compiling itoa v1.0.18
+ │    Compiling borsh v1.8.1
+ │    Compiling memchr v2.8.3
+ │    Compiling syn v2.0.119
+ │    Compiling bs58 v0.5.1
+ │    Compiling near-sys v0.2.14
+ │    Compiling hex v0.4.3
+ │    Compiling base64 v0.23.1
+ │    Compiling near-sdk-env v0.1.6
+ │    Compiling wee_alloc v0.4.5
+ │    Compiling near-crypto-hash v0.2.0
+ │    Compiling near-sdk-macros v5.29.1
+ │    Compiling memory_units v0.4.0
+ │    Compiling cfg-if v0.1.10
+ │    Compiling base64 v0.22.1
+ │    Compiling once_cell v1.21.4
+ │    Compiling indexmap v2.14.2
+ │    Compiling darling_core v0.20.11
+ │    Compiling near-account-id v2.6.0
+ │    Compiling near-gas v0.3.7
+ │    Compiling near-token v0.3.6
+ │    Compiling cfg_eval v0.1.2
+ │    Compiling strum_macros v0.26.4
+ │    Compiling serde_with v3.24.0
+ │    Compiling darling_macro v0.20.11
+ │    Compiling darling v0.20.11
+ │    Compiling near-sdk-core v4.2.3
+ │    Compiling near-global-contracts v0.2.6
+ │    Compiling near-sdk v5.29.1
+ │    Compiling kintsugi-contract v0.1.0 (<repo>/contract)
+ │     Finished `release` profile [optimized] target(s) in 6.28s
+
+• Running an optimize for size post-step with wasm-opt --enable-nontrapping-float-to-int --enable-bulk-memory...
+    Finished wasm-opt -O in 340ms
+• done
+
+✓ Contract successfully built! (in CARGO_NEAR_BUILD_ENVIRONMENT=host)
+     -                Binary: <repo>/target/near/kintsugi_contract/kintsugi_contract.wasm
+     -                  Size: 85.8 KB (85755 bytes)
+     - SHA-256 checksum hex : 5acf78cf300418ce7cf51119949af734b0e2baca54f6d26162596c887a322d15
+     - SHA-256 checksum bs58: 77VBZH68nvpkTCqTsckjAoZu8vTS5jYZ5A44qUCBhpXn
+     -                   ABI: <repo>/target/near/kintsugi_contract/kintsugi_contract_abi.json
+     -          Embedded ABI: <repo>/target/near/kintsugi_contract/kintsugi_contract_abi.zst
+    Finished cargo near build in 7m 3s
+Here is the console command if you ever need to re-run it again:
+cargo near build non-reproducible-wasm
+== done
+ls: cannot access 'target/near/kintsugi_contract.wasm': No such file or directory
+-rwxr-xr-x 2 <host> <host> 4564152 Oct 23 22:14 target/release/kintsugi-host
+Command exited with non-zero status 2
+wall_seconds=456.13 max_rss_kb=752080
+exit=2

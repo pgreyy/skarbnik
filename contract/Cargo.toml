@@ -1,0 +1,22 @@
+# The Kintsugi NEAR contract. For spike S0 it is only a hello world that stores one greeting.
+[package]
+name = "kintsugi-contract"
+description = "Kintsugi bounty contract (S0: hello world)"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.93"
+repository = "https://github.com/pgreyy/farbox"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = "5.29.1"
+
+[dev-dependencies]
+near-sdk = { version = "5.29.1", features = ["unit-testing"] }
+
+# `cfg(near)` is set by near-sdk when building for the chain.
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ['cfg(near)']

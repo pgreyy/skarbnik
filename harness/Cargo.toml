@@ -1,0 +1,12 @@
+# The proof harness. Its build script compiles the zkVM guest program(s) in harness/guest
+# and exposes each one's ELF (the program) and image id (its fingerprint) to the host.
+[package]
+name = "kintsugi-harness"
+version = "0.1.0"
+edition = "2021"
+
+[build-dependencies]
+risc0-build = "=3.0.6"
+
+[package.metadata.risc0]
+methods = ["guest"]

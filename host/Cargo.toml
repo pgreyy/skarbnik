@@ -1,0 +1,11 @@
+# The host program: runs the zkVM guest, produces a proof (receipt) and verifies it.
+[package]
+name = "kintsugi-host"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+kintsugi-harness = { path = "../harness" }
+# "client" proves through the locally installed r0vm. The default "bonsai" feature (remote proving
+# service) is left out on purpose: the vendor's secret input must never leave the vendor's machine.
+risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["client"] }

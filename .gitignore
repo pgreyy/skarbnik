@@ -1,0 +1,39 @@
+# Private notes and plans (never public)
+notes/
+notes/ACCOUNTS.md
+notes/BLUEPRINT.md
+
+# Session and transcript files (never committed)
+*.transcript
+*.transcript.*
+*-transcript.jsonl
+transcript*.jsonl
+session*.jsonl
+
+# Secrets and keys
+.kintsugi-secrets/
+**/near-credentials/
+.near-credentials/
+.outlayer/
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.age
+*.secret
+secrets.json
+secrets/
+*credentials*.json
+id_rsa*
+id_ed25519*
+
+# Build output
+target/
+node_modules/
+**/res/*.wasm
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,24 @@
+2026-10-23T21:23:17Z
+Migrating config.toml from V4 to V5...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+├  Unsigned transaction:
+│    signer_id:    kintsugi-djloo.testnet
+│    receiver_id:  kintsugi-djloo.testnet
+│    actions:
+│       -- deploy code <77VBZH68nvpkTCqTsckjAoZu8vTS5jYZ5A44qUCBhpXn> to a account <kintsugi-djloo.testnet>
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EfmcwS9tW3D2sRQHiLR544XxY7adj7ZreEaTTbqhanmd
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.878 Tgas
+│    Transaction fee: 0.0000877073979245 NEAR
+│    Transaction ID: 6nNNsGGHEVBbAJmAyU8TGEd7tfC8fEnYSxx3uoG5SVJj
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/6nNNsGGHEVBbAJmAyU8TGEd7tfC8fEnYSxx3uoG5SVJj
+│     
+Contract code has been successfully deployed.
+Here is your console command if you need to script it or re-run:
+    near contract deploy kintsugi-djloo.testnet use-file target/near/kintsugi_contract/kintsugi_contract.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+wall_seconds=6.39
+exit=0
