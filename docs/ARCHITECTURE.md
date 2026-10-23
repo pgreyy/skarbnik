@@ -9,9 +9,11 @@ This file describes only what is in the repository now. It grows as parts are bu
 | `contract/` | A hello world NEAR contract that stores one greeting (`get_greeting`, `set_greeting`) | Hello world only. No bounty logic yet |
 | `harness/` | Build crate that compiles the zkVM guest in `harness/guest/` and exposes its program and image id | Hello world guest only |
 | `harness/guest/` | A zkVM guest program that reads a name and publishes "hello, <name>" | Hello world only |
+| `harness/checker/` | Native patch checker (`kintsugi-check`): runs a candidate wasm patch on the crash input, the public tests, seeded fairness inputs and seeded crash variants; verdict PASS or FAIL | S1, runs outside the zkVM |
 | `host/` | A program that proves one run of the guest on this machine and verifies the receipt | Hello world only |
 | `web/` | Empty placeholder for the dashboard | Not started |
-| `data/` | Empty placeholder for test data | Not started |
+| `data/demo/` | Demo parser with a hidden crash (`original`), honest fix (`fixed`), demo crash input, public tests | S1 demo data |
+| `data/attacks/` | 18 cheating patches, inert test data, with expected verdicts in `manifest.txt` | S1 test data |
 | `docs/` | Versions, evidence, devlog, decisions and this file | Kept up to date each work block |
 
 ## How the pieces connect today
@@ -23,5 +25,8 @@ This file describes only what is in the repository now. It grows as parts are bu
   - The contract is a workspace member but is not built by a plain `cargo build`: near-sdk 5.29.1 stops a native contract
     build with a `compile_error!` and asks for `cargo near build`.
 - `host` proves the guest locally with the installed RISC Zero prover (`r0vm`) and checks the receipt against the guest's image id.
+
+- `kintsugi-check` reads the demo files and prints a verdict; its core is pure functions (bytes in, verdict out) so it can
+  later move into the zkVM guest. It is not inside the zkVM yet.
 
 Nothing yet connects the proof to the contract.

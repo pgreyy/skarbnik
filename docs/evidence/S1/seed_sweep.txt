@@ -1,0 +1,12 @@
+# Seed sweep, run from the repository root after `cargo build -p kintsugi-check --offline`.
+# For each of 200 seeds (the numbers 1 to 200 written as 64 hex digits), fuzz-count 128, variants 32:
+#   for n in $(seq 1 200); do SD=$(printf '%064x' $n);
+#     target/debug/kintsugi-check check --candidate data/attacks/<name>.wasm --seed $SD --fuzz-count 128 --variants 32 --explain; done
+# "first mismatch index" is the number of the first fairness input (or variant, for
+# special_case_exploit) on which the cheat disagreed with the original, counted from 0.
+subtle_change: PASS on 0 of 200 seeds; first mismatch index max=21 median=3
+overbroad_fix: PASS on 0 of 200 seeds; first mismatch index max=41 median=6
+memorize_tests: PASS on 0 of 200 seeds; first mismatch index max=3 median=0
+special_case_exploit: PASS on 0 of 200 seeds; first mismatch index max=8 median=0
+demo/fixed: PASS on 200 of 200 seeds
+attacks/memory_grow: PASS on 200 of 200 seeds

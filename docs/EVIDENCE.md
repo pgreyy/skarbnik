@@ -5,6 +5,71 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S1: Does the harness give the right verdicts? (native run, outside the zkVM)
+
+Question: does the checker give PASS to an honest patch and FAIL to every cheating patch, publishing only PASS or FAIL?
+
+**Verdict: PASS for the native checker (2026-10-23), with one mismatch explained below.** The blueprint's full S1 also needs
+the same checks inside the RISC Zero zkVM with a receipt, and a tampered receipt failing in a separate process. That part is
+not done yet, so S1 as a whole is partial.
+
+Full write-up, all commands and raw outputs: `docs/evidence/S1/RESULTS.md`.
+
+What the checker does (`harness/checker/`, wasmi 2.0.0 interpreter, each input in a fresh instance, 50,000 fuel per input,
+2 memory pages, call depth 64):
+
+1. Validate: at most 2,048 bytes, no imports, the `parse` export, at most 2 memory pages, no start function, no floats.
+2. The secret crash input (`data/demo/exploit.hex`, demo data only) must not trap or run out of fuel.
+3. All 17 public tests (`data/demo/public_tests.txt`) must return the listed value.
+4. Fairness: 64 inputs from the seed must give the same output as the original.
+5. Variants: 32 seeded one or two byte changes of the crash input; where the original traps the candidate must not, where
+   the original returns a value the candidate must return the same.
+
+Commands (from the repository root):
+
+```bash
+cargo test -p kintsugi-check --offline
+target/debug/kintsugi-check table --manifest data/attacks/manifest.txt --seed 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21
+```
+
+Results: `cargo test`: 16 passed, 0 failed (6 unit, 10 integration). Table (seed above, 64 fairness inputs, 32 variants):
+
+| Patch | Expected | Actual | Caught at |
+| --- | --- | --- | --- |
+| `data/demo/fixed.wasm` (honest fix) | PASS | PASS | - |
+| `data/demo/original.wasm` (unpatched) | FAIL | FAIL | 2 crash input: trap |
+| `reject_all` | FAIL | FAIL | 3 public tests |
+| `constant` | FAIL | FAIL | 3 public tests |
+| `special_case_exploit` | FAIL | FAIL | 5 variants |
+| `loop_forever` | FAIL | FAIL | 2 crash input: out of fuel |
+| `memory_grow` | FAIL | **PASS** | mismatch, see below |
+| `memory_grow_use` | FAIL | FAIL | 2 crash input: out of bounds |
+| `memory_grow_nomax` | FAIL | FAIL | 2 crash input: growth limited |
+| `memory_declared` | FAIL | FAIL | 1 validate: memory too large |
+| `early_return_prefix` | FAIL | FAIL | 3 public tests |
+| `disable_lists` | FAIL | FAIL | 3 public tests |
+| `memorize_tests` | FAIL | FAIL | 4 fairness |
+| `wrong_fix` | FAIL | FAIL | 2 crash input: trap |
+| `subtle_change` | FAIL | FAIL | 4 fairness |
+| `overbroad_fix` | FAIL | FAIL | 4 fairness |
+| `wrong_export` | FAIL | FAIL | 1 validate |
+| `imports_host` | FAIL | FAIL | 1 validate |
+| `too_large` | FAIL | FAIL | 1 validate |
+| `invalid_truncated` | FAIL | FAIL | 1 validate |
+
+19 of 20 match. Re-run on 2026-10-23 for this file with the same command: same 19 of 20.
+
+- **The mismatch, `memory_grow`:** on the crash input it asks for 64 more memory pages and ignores the answer. Its own declared
+  maximum is 2 pages, so WebAssembly refuses the request (returns -1) without a trap, and the module then behaves like the
+  honest fix. It never gets or uses extra memory. The expectation was wrong, not the checker; the variants that really use the
+  memory fail. Kept in the table on purpose. A test pins this behaviour.
+- **The seeded steps matter:** with fairness and variants turned off (`--fuzz-count 0 --variants 0`), `special_case_exploit`,
+  `memorize_tests`, `subtle_change` and `overbroad_fix` all PASS (15 of 20 match). Output: `docs/evidence/S1/table_seeded_steps_off.txt`.
+- **Seed sweep:** 200 seeds with 128 fairness inputs: every fairness and variant cheat failed on every seed and the honest fix
+  passed on all 200; the latest first mismatch was fairness input #41. Output: `docs/evidence/S1/seed_sweep.txt`.
+- **Timings:** a full check of one candidate (210 module runs) takes 0.1 to 2.3 ms; the whole 20-module table runs in under
+  0.01 s wall time. Highest fuel used by one input on this seed: 2,100 (limit 50,000), apart from `loop_forever`, which hits the limit.
+
 ## S0: Can we build everything?
 
 Question: does the workspace build with one command, does a hello world NEAR contract build and deploy to testnet, and does a

@@ -1,0 +1,25 @@
+# Spike S1 manifest: every module the checker is run on, and the verdict it must give.
+# Format: <module path relative to this file> <expected verdict>. Used by
+#   kintsugi-check table --manifest data/attacks/manifest.txt --seed <hex>
+# and by harness/checker/tests/corpus.rs.
+
+../demo/fixed.wasm            PASS   # the honest patch
+../demo/original.wasm         FAIL   # unpatched original (still crashes)
+reject_all.wasm               FAIL
+constant.wasm                 FAIL
+special_case_exploit.wasm     FAIL
+loop_forever.wasm             FAIL
+memory_grow.wasm              FAIL
+memory_grow_use.wasm          FAIL
+memory_grow_nomax.wasm        FAIL
+memory_declared.wasm          FAIL
+early_return_prefix.wasm      FAIL
+disable_lists.wasm            FAIL
+memorize_tests.wasm           FAIL
+wrong_fix.wasm                FAIL
+subtle_change.wasm            FAIL
+overbroad_fix.wasm            FAIL
+wrong_export.wasm             FAIL
+imports_host.wasm             FAIL
+too_large.wasm                FAIL
+invalid_truncated.wasm        FAIL

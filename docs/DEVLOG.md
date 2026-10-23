@@ -2,6 +2,28 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-23: S1 harness and S3 contract (in progress)
+
+- S0 committed as `2962c48` ("S0: workspace, hello contract on testnet, hello proof").
+- S1 (harness outside the zkVM, cheating patches) and S3 (bounty contract on testnet) built in parallel. Heavy builds are
+  serialized with `flock target/.heavy-build.lock`, so only one cargo build runs at a time. No RISC Zero proving in this block.
+
+### S1 (native checker): PASS, with one finding
+
+- Built `harness/checker/` (crate `kintsugi-check`, wasmi 2.0.0): validate, crash input, public tests, 64 seeded fairness
+  inputs and 32 seeded variants of the crash input; verdict PASS or FAIL only. CLI commands `check`, `proof0`, `run`, `table`.
+- Demo program `data/demo/original.rs` (a record parser with an off by one length check that traps), honest fix
+  `data/demo/fixed.rs`, 18 cheating patches in `data/attacks/` (inert test data), built to wasm with
+  `harness/checker/build_modules.sh` (plain rustc, no downloads; 556 byte modules).
+- `cargo test -p kintsugi-check --offline`: 16 passed. Table: honest fix PASS, 19 of 20 as expected.
+- Finding: `memory_grow` PASSes. Its memory request is refused by its own declared maximum, so it never gets extra memory;
+  the expectation was wrong. Kept in the table.
+- What failed on the way: the first parser build was 3,282 bytes because of Rust's bounds check panic code (replaced by a
+  small trap helper); an offline build needed one online index lookup first; one test was wrong about which step catches
+  `memorize_tests` and was corrected to match the checker.
+- Not done: the zkVM part of S1 (receipt, journal, tampered receipt check). Limits (2,048 bytes, 50,000 fuel, 64 fairness
+  inputs, 32 variants) are first choices to revisit in S2.
+
 ## 2026-10-23: S0 setup (PASS)
 
 ### Done

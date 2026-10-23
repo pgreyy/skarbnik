@@ -1,0 +1,21 @@
+# The native checker for spike S1: runs a candidate WebAssembly patch against the secret crash
+# input, the public tests and the seeded fairness check, and gives a PASS or FAIL verdict.
+# The core (src/lib.rs and its modules) does no file or network I/O, so it can later move into
+# the RISC Zero guest. The command line tool (src/main.rs) reads the files.
+[package]
+name = "kintsugi-check"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "kintsugi_check"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kintsugi-check"
+path = "src/main.rs"
+
+[dependencies]
+# The WebAssembly interpreter. Default features are off so the `wat` text parser is not pulled in;
+# "validate" makes wasmi check every module before running it.
+wasmi = { version = "=2.0.0", default-features = false, features = ["std", "validate"] }

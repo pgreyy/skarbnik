@@ -1,0 +1,46 @@
+$ date -u
+Fri Oct 23 21:57:57 UTC 2026
+$ /usr/bin/time -f 'wall_seconds=%e max_rss_kb=%M' cargo test -p kintsugi-check --offline
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.09s
+     Running unittests src/lib.rs (target/debug/deps/kintsugi_check-e01c8f602fa5cc16)
+
+running 6 tests
+test gen::tests::same_seed_same_inputs ... ok
+test text::tests::hex_round_trip ... ok
+test text::tests::test_list ... ok
+test gen::tests::inputs_respect_max_len ... ok
+test gen::tests::variants_keep_length_and_differ_by_at_most_two_bytes ... ok
+test text::tests::seed_length ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/kintsugi_check-63a498f4181108a0)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/corpus.rs (target/debug/deps/corpus-ce54fb9e620d1dc6)
+
+running 10 tests
+test manifest_has_honest_patch_and_at_least_eight_cheats ... ok
+test memorized_tests_cheat_passes_only_if_both_seeded_steps_are_off ... ok
+test proof0_accepts_the_original_and_rejects_a_module_that_does_not_crash ... ok
+test each_cheat_fails_at_the_step_meant_to_catch_it ... ok
+test special_case_cheat_passes_if_the_variant_step_is_off ... ok
+test finding_memory_grow_refused_by_its_own_maximum_passes ... ok
+test same_inputs_give_the_same_report ... ok
+test fairness_inputs_are_mostly_well_formed_for_the_original ... ok
+test every_module_gets_its_expected_verdict_on_three_seeds ... ok
+test honest_patch_passes_on_twenty_seeds ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+   Doc-tests kintsugi_check
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+wall_seconds=0.17 max_rss_kb=81540
+exit=0

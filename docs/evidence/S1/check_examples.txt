@@ -1,0 +1,16 @@
+$ /usr/bin/time -f 'wall_seconds=%e max_rss_kb=%M' target/debug/kintsugi-check check --candidate data/demo/fixed.wasm --seed 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21 --explain
+PASS
+reason (internal): -
+stats: runs=210 max_fuel_candidate=2059 max_fuel_original=2059 fairness_original_traps=0 fairness_original_errors=14 variants_original_traps=19
+wall_seconds=0.00 max_rss_kb=4592
+exit=0
+$ target/debug/kintsugi-check check --candidate data/attacks/special_case_exploit.wasm --seed 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21 --explain
+FAIL
+reason (internal): 5 variants: variant #0: original trapped (wasm `unreachable` instruction executed), candidate trapped (wasm `unreachable` instruction executed)
+stats: runs=148 max_fuel_candidate=2069 max_fuel_original=2059 fairness_original_traps=0 fairness_original_errors=14 variants_original_traps=1
+exit=1
+$ target/debug/kintsugi-check check --candidate data/attacks/special_case_exploit.wasm --seed 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21 --variants 0 --explain
+PASS
+reason (internal): -
+stats: runs=146 max_fuel_candidate=2069 max_fuel_original=2059 fairness_original_traps=0 fairness_original_errors=14 variants_original_traps=0
+exit=0

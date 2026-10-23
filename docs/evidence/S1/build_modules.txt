@@ -1,0 +1,24 @@
+$ date -u
+Fri Oct 23 21:57:56 UTC 2026
+$ bash harness/checker/build_modules.sh
+   556 bytes  42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97  data/demo/fixed.wasm
+   556 bytes  fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8  data/demo/original.wasm
+    89 bytes  88ff4ecb9516d4f4558e4f9ce17dd161609e806ddda1bffa2a2896ce1edc6015  data/attacks/constant.wasm
+   428 bytes  735f3517a9b762b30b2689b94a54d92b94bd3c4f645c9d0b1b7e98c67ecaa3b4  data/attacks/disable_lists.wasm
+   606 bytes  361763f47674614bc1e96161e20f63ac744196373c99e06e3066cef18981f011  data/attacks/early_return_prefix.wasm
+   589 bytes  0dde7953f1b1ff966b32efeb16abf976055bdbfd25ee09354ec0bc7f9d30070d  data/attacks/imports_host.wasm
+   100 bytes  83816ee5281a6dfaff9ee7b4d6560ad6cf4851b472624139c8871e518598ab75  data/attacks/invalid_truncated.wasm
+   573 bytes  ee7e3ce687a401733ec9044945af1a2cc861c4d86129dee2e7743416be84b25b  data/attacks/loop_forever.wasm
+   565 bytes  3a97440c9e7cdac3858f7a40c9a3ab48841cb95faa869c5b713f17b785c38da1  data/attacks/memorize_tests.wasm
+   556 bytes  f665ba804a153705f4fc5756299925db656550d1712a213f0e95c8c8f233dddc  data/attacks/memory_declared.wasm
+   572 bytes  567debcb0b5ab82119e911c0fdcd8983b4725e74bca54ed89e6bab0fe25f63d1  data/attacks/memory_grow.wasm
+   571 bytes  b040bfaa914af77b4dac67a23610dc73a6f7e3d571408d45008e1b0e19ca17c9  data/attacks/memory_grow_nomax.wasm
+   585 bytes  954c9c9d565ea8ebce0a8c734c08ecd5133690136540b43d291c7b7d0678f3d7  data/attacks/memory_grow_use.wasm
+   564 bytes  85472d05392b1d1107ea6bba784a5236c797caaa9743701b1513f673393ada4c  data/attacks/overbroad_fix.wasm
+    80 bytes  0839953ef612b12a363319b4148bafb381630577f75129f06940392a1a9ea7ed  data/attacks/reject_all.wasm
+   702 bytes  5c85a006f41eddc40df5b921ef5b56631231ffbb457f6980603cdae6f27345bc  data/attacks/special_case_exploit.wasm
+   561 bytes  f5b2018622c46cb108a49c6555a0014d743299216bc74bc5d66b08a7bb76164f  data/attacks/subtle_change.wasm
+  4685 bytes  73ce1646af6935c9480f2449607c02dfc8343f7d0066a04833776b2a7a41833f  data/attacks/too_large.wasm
+   562 bytes  021bcff339d89a014ba3a3561a18b33fee1ed7ecd509d77c6ac7120fca1ba539  data/attacks/wrong_export.wasm
+   564 bytes  79fde4285378fb5c0470c3eca8ff9078e57f8d660ca22ca55d3e64aa1be2f0de  data/attacks/wrong_fix.wasm
+exit=0

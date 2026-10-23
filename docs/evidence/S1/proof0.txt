@@ -1,0 +1,6 @@
+$ /usr/bin/time -f 'wall_seconds=%e max_rss_kb=%M' target/debug/kintsugi-check proof0
+proof0: PASS
+reason (internal): -
+stats: runs=18 max_fuel_candidate=0 max_fuel_original=722 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+wall_seconds=0.00 max_rss_kb=4340
+exit=0

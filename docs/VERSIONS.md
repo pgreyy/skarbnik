@@ -42,6 +42,17 @@ All crate versions are locked in `Cargo.lock` (workspace) and `harness/guest/Car
 Builds of S0 used no extra flags beyond `CARGO_HTTP_MULTIPLEXING=false CARGO_HTTP_TIMEOUT=60 CARGO_NET_RETRY=10
 CARGO_NET_GIT_FETCH_WITH_CLI=true`, which only change how crates are downloaded.
 
+## Patch checker (S1)
+
+| Crate | Version | Where |
+| --- | --- | --- |
+| wasmi (default features off; `std`, `validate`) | =2.0.0 | `harness/checker/Cargo.toml` |
+| wasmi_core, wasmi_ir, wasmi_collections | 2.0.0 | `Cargo.lock` |
+| wasmparser | 0.228.0 | `Cargo.lock` |
+
+The demo program and patches in `data/` are built to wasm32-unknown-unknown with plain `rustc` 1.99.1 by
+`harness/checker/build_modules.sh`.
+
 ## Other
 
 | Tool | Version | Command |

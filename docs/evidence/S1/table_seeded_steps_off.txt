@@ -1,0 +1,28 @@
+$ target/debug/kintsugi-check table --manifest data/attacks/manifest.txt --seed 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21 --fuzz-count 0 --variants 0
+seed=6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21 fuzz_count=0 variants=0
+
+| patch | expected verdict | actual verdict | match | reason (internal) | runs | max fuel | ms |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ../demo/fixed.wasm | PASS | PASS | yes | - | 18 | 722 | 0.4 |
+| ../demo/original.wasm | FAIL | FAIL | yes | 2 exploit: trapped (wasm `unreachable` instruction executed) | 1 | 620 | 0.1 |
+| reject_all.wasm | FAIL | FAIL | yes | 3 public tests: test #0: expected 84696351, returned -1 | 2 | 4 | 0.1 |
+| constant.wasm | FAIL | FAIL | yes | 3 public tests: test #0: expected 84696351, returned 0 | 2 | 9 | 0.1 |
+| special_case_exploit.wasm | FAIL | PASS | NO | - | 18 | 732 | 0.2 |
+| loop_forever.wasm | FAIL | FAIL | yes | 2 exploit: ran out of fuel | 1 | 49999 | 1.4 |
+| memory_grow.wasm | FAIL | PASS | NO | - | 18 | 745 | 0.2 |
+| memory_grow_use.wasm | FAIL | FAIL | yes | 2 exploit: trapped (out of bounds memory access) | 1 | 579 | 0.1 |
+| memory_grow_nomax.wasm | FAIL | FAIL | yes | 2 exploit: trapped (growth operation limited) | 1 | 561 | 0.1 |
+| memory_declared.wasm | FAIL | FAIL | yes | 1 validate: MemoryTooLarge { pages: 16, max: 2 } | 0 | 0 | 0.1 |
+| early_return_prefix.wasm | FAIL | FAIL | yes | 3 public tests: test #9: expected 1917760368, returned 0 | 11 | 588 | 0.1 |
+| disable_lists.wasm | FAIL | FAIL | yes | 3 public tests: test #6: expected 177712277, returned -4 | 8 | 477 | 0.1 |
+| memorize_tests.wasm | FAIL | PASS | NO | - | 18 | 641 | 0.2 |
+| wrong_fix.wasm | FAIL | FAIL | yes | 2 exploit: trapped (wasm `unreachable` instruction executed) | 1 | 632 | 0.1 |
+| subtle_change.wasm | FAIL | PASS | NO | - | 18 | 736 | 0.1 |
+| overbroad_fix.wasm | FAIL | PASS | NO | - | 18 | 742 | 0.2 |
+| wrong_export.wasm | FAIL | FAIL | yes | 1 validate: MissingExport("parse") | 0 | 0 | 0.1 |
+| imports_host.wasm | FAIL | FAIL | yes | 1 validate: HasImports(1) | 0 | 0 | 0.1 |
+| too_large.wasm | FAIL | FAIL | yes | 1 validate: TooLarge { bytes: 4685, max: 2048 } | 0 | 0 | 0.0 |
+| invalid_truncated.wasm | FAIL | FAIL | yes | 1 validate: DoesNotParse("unexpected end-of-file (at offset 0x4e)") | 0 | 0 | 0.1 |
+
+15 of 20 verdicts match the expected verdict
+exit=1
