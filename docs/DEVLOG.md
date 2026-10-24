@@ -10,8 +10,9 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - Verifier program `verifier/outlayer` (`farbox-verifier`), native tests correct on the 16 input receipt; wasm32-wasip1 build
   1,134,249 bytes, strings scan clean. Installed the wasm32-wasip1 Rust target (owner approved).
 - Host: `compress`, `--submission-id`, `cuda` feature. GPU test plan written (private notes).
-- Waiting: the owner's go to publish the verifier wasm in a separate public repository; compression of the 16 input receipt
-  is running (2 hour cap).
+- Compressed the 16 input receipt to one succinct proof on the laptop: 944.27 s, r0vm peak 1,484 MiB, 224,786 bytes,
+  verified in 0.027 s; the native verifier gives `ok: true` on it.
+- Waiting: the owner's go to publish the verifier wasm in a separate public repository.
 
 ## 2026-10-24: S2b cutting the proving cost
 

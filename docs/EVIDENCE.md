@@ -40,8 +40,29 @@ Wasm for OutLayer (`./scripts/build_verifier_wasm.sh`, wasm32-wasip1, paths rema
 paths, user names, project names or keys (`docs/evidence/S4/verifier_wasm_build_scan.txt`). Not run as wasm yet: no WASI
 runtime is installed here.
 
-Still open: the composite receipts (7 to 33 MB) are far above NEAR's 1.5 MiB transaction size, so the OutLayer check needs
-a compressed receipt; publishing the wasm at a public https URL; then one testnet run.
+Compression to one succinct proof (laptop CPU, alone, 2 hour cap):
+
+```bash
+MAX_SECONDS=7200 scripts/s2_measure.sh target/s4-logs/compress_succinct_f16.log -- ./target/release/kintsugi-host compress target/s2/receipt_f16_alloc.bin target/s2/receipt_f16_succinct.bin succinct
+./target/release/kintsugi-host verify target/s2/receipt_f16_succinct.bin
+./target/release/farbox-verifier < succinct_input.json
+```
+
+| Measure | Value |
+| --- | --- |
+| Input | composite receipt of the 16 input proof, 7,180,838 bytes |
+| Compress time | 944.27 s (15.7 min) |
+| Prover peak memory | 1,484 MiB (r0vm VmHWM) |
+| Output | succinct receipt, 224,786 bytes |
+| Verify in a separate process | 0.027 s, VALID, verdict PASS |
+| Native verifier on it | `ok: true`, PASS, 0.03 s, 4,188 KB peak; its JSON input is 299,987 bytes |
+
+Outputs: `docs/evidence/S4/compress_succinct_f16.txt`, `docs/evidence/S4/verify_succinct.txt`,
+`docs/evidence/S4/verifier_native_succinct.txt`. So one check costs 46.9 min of proving plus 15.7 min of compression on this
+laptop. The succinct receipt fits NEAR's 1.5 MiB transaction size; its 299,987 byte input to OutLayer is above OutLayer's
+free 32 KB, which costs 0.00001 NEAR per extra byte, held while pending and returned (about 2.7 testnet NEAR).
+
+Still open: publishing the wasm at a public https URL (owner's go needed), then one testnet run through OutLayer.
 
 ## S3b: Attempt fees and credit, on a dedicated contract account
 

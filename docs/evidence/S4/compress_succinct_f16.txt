@@ -1,0 +1,13 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/s2/receipt_f16_alloc.bin target/s2/receipt_f16_succinct.bin succinct
+utc_start=2026-10-24T09:37:58Z
+limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=7200
+input receipt: target/s2/receipt_f16_alloc.bin (7180838 bytes)
+compressed to: succinct
+compress seconds: 944.27
+verify seconds: 0.028
+output receipt: target/s2/receipt_f16_succinct.bin (224786 bytes)
+exit=0
+wall_seconds=944.38
+r0vm_peak_rss_mib=1484 (VmHWM, sampled every 5 s)
+min_available_mib=6332
+result: finished

@@ -1,0 +1,3 @@
+$ ./target/release/farbox-verifier < succinct_input.json
+{"ok":true,"verdict":"PASS","image_id":"3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d","submission_id":"0000000000000000000000000000000000000000000000000000000000000000","receipt_sha256":"6dcf09d015ae8e3b6088f012e6b8982f4e46aea2984825868261c18e70847b24","journal_sha256":"ca847eadaeb1032ada6942ca3042e3bd15cda8a4499edf8b24c2205754722bbe","error":null}
+wall_seconds=0.03 max_rss_kb=4188
