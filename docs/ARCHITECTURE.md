@@ -13,6 +13,7 @@ This file describes only what is in the repository now. It grows as parts are bu
 | `harness/check-guest/` | The zkVM guest that runs the patch checker on one candidate and commits the journal (hashes, seed, counts, PASS or FAIL); the secret crash input and salt stay inside | S1/S2 |
 | `harness/checker/` | Native patch checker (`kintsugi-check`): runs a candidate wasm patch on the crash input, the public tests, seeded fairness inputs and seeded crash variants; verdict PASS or FAIL | S1, runs natively and inside the zkVM guest |
 | `host/` | `kintsugi-host`: `hello`, `execute` (cycles only), `prove` (receipt file), `verify` (separate process check of a receipt file), `tamper` (changed copy for tests) | S0, S1/S2 |
+| `verifier/outlayer/` | `farbox-verifier`: reads a receipt and the values it must match (image id, submission id, receipt sha256) from stdin, verifies it with RISC Zero's verify-only code, prints a short JSON answer; built for wasm32-wasip1 to run on OutLayer | S4, in progress |
 | `web/` | Empty placeholder for the dashboard | Not started |
 | `data/demo/` | Demo parser with a hidden crash (`original`), honest fix (`fixed`), demo crash input, public tests | S1 demo data |
 | `data/attacks/` | 18 cheating patches, inert test data, with expected verdicts in `manifest.txt` | S1 test data |

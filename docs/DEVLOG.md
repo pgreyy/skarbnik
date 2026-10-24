@@ -9,7 +9,8 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - Switched the guest to RISC Zero's freeing allocator (`heap-embedded-alloc`). Padded cycles (the work a proof must cover)
   fell 42 to 46% at 16, 64 and 128 inputs; e.g. 20,185,088 to 11,010,048 at 16 inputs and 32 variants.
 - Verdicts unchanged for all 20 corpus modules, native and in the zkVM; checker tests 16 passed.
-- Next: one laptop proof at 16 inputs and 32 variants with a 2 hour cap.
+- Confirming laptop proof at 16 inputs and 32 variants: 2,814.45 s (46.9 min) instead of 5,124.96 s (85.4 min), 27 segments
+  instead of 43, receipt 7.2 MB instead of 11.5 MB, verified in a separate process (VALID).
 
 ## 2026-10-24: S3b attempt fees and credit (PASS)
 

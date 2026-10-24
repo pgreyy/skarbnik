@@ -18,6 +18,7 @@ Exact versions of every tool used to build and run Kintsugi, checked on 2026-10-
 | rustc (stable) | 1.99.1 (58cf8f9c3 2026-10-13) | `rustc --version` |
 | cargo (stable) | 1.99.1 (5f94df478 2026-08-27) | `cargo --version` |
 | wasm target | wasm32-unknown-unknown installed | `rustup target list --installed` |
+| wasm target for OutLayer (S4) | wasm32-wasip1 installed 2026-10-24 | `rustup target list --installed` |
 
 ## NEAR
 

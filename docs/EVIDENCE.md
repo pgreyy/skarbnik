@@ -65,8 +65,28 @@ The S3 contract on `kintsugi-djloo.testnet` (no fees) is left as it was; its S3 
 Question: where do the guest's cycles go, and can the cost drop while every input still gets a fresh instance (fresh memory,
 globals and state)?
 
-**Verdict: the work a proof must cover dropped by 42 to 46% with identical verdicts (2026-10-24).** One laptop proof to
-confirm the real speed-up: see the proof row below.
+**Verdict: PASS (2026-10-24).** The work a proof must cover dropped by 42 to 46% with identical verdicts, and a real laptop
+proof at 16 inputs and 32 variants took 46.9 minutes instead of 85.4 (45% less). Still above the blueprint's 15 minutes.
+
+Confirming proof, same settings as the S2 baseline (16 fairness inputs, 32 variants, segment size 2^19, CPU only):
+
+```bash
+MAX_SECONDS=7200 scripts/s2_measure.sh target/s2b-logs/prove_f16_alloc.log -- ./target/release/kintsugi-host prove data/demo/fixed.wasm --fuzz-count 16 --variants 32 --po2 19 --out target/s2/receipt_f16_alloc.bin
+./target/release/kintsugi-host verify target/s2/receipt_f16_alloc.bin
+```
+
+| | S2 baseline (default allocator) | S2b (freeing allocator) |
+| --- | --- | --- |
+| Prove time | 5,124.96 s (85.4 min) | **2,814.45 s (46.9 min)** |
+| Segments at 2^19 | 43 | 27 |
+| Total cycles | 22,282,240 | 13,664,256 |
+| User cycles | 7,845,739 | 8,587,922 |
+| Prover peak memory (r0vm VmHWM) | 4,718 MiB | 4,724 MiB |
+| Receipt (composite) | 11,516,294 bytes | 7,180,838 bytes |
+| Verify in a separate process | 1.63 s, VALID | 0.92 s, VALID |
+| Journal verdict | PASS | PASS |
+
+Outputs: `docs/evidence/S2b/prove_f16_alloc.txt`, `docs/evidence/S2b/verify_f16_alloc.txt`.
 
 What we found:
 
