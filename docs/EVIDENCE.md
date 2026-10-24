@@ -11,7 +11,10 @@ Question: time to prove, peak memory, receipt size, cycle count and verification
 16, 64 and 128 fairness inputs (32 crash variants each, honest patch `data/demo/fixed.wasm`). `RISC0_DEV_MODE=0` on every
 run. Proving is local (`r0vm` 3.0.6, CPU only, 16 cores, about 10 GiB RAM for WSL). Outputs in `docs/evidence/S2/`.
 
-**Verdict: in progress.** Results so far:
+**Verdict: FAIL against the blueprint's pass condition (under about 15 minutes per proof), measured 2026-10-24.** All three
+proofs completed and verified, but the fastest (16 inputs) took 85 minutes. Fallback taken: record the real numbers, use
+smaller segments for memory, and propose smaller limits and a cheaper per-run cost (below). The verdict window W must be set
+from these numbers.
 
 ### Cycles (executor only, no proof)
 
@@ -34,21 +37,52 @@ At 16 inputs, a segment limit of 2^19 gives 43 segments and 2^18 gives 104 (`doc
 | --- | --- | --- | --- | --- | --- | --- |
 | 16 | 2^20 (default) | **stopped by us after 180 s**: r0vm reached 8,600 MiB resident, 423 to 884 MiB left available, 3 GiB swap in use | - | at least 8,600 MiB | - | - |
 | 16 | 2^19 | **proved**, journal verdict PASS | 5,124.96 s (85.4 min) | 4,718 MiB (r0vm VmHWM, read 25 min into the run) | composite, 11,516,294 bytes (seal 11,506,616 bytes, journal 780 bytes); 43 segments, 22,282,240 total cycles | 1.63 s in a separate process |
-| 64 | 2^19 | running (3 hour cap) | | | | |
-| 128 | 2^19 | not started (4 hour cap) | | | | |
+| 64 | 2^19 | **proved** within its 3 hour cap, journal verdict PASS | 7,993.49 s (133.2 min) | 4,730 MiB (r0vm VmHWM, sampled every 5 s; lowest available 3,382 MiB) | composite, 20,642,762 bytes (seal 20,626,760 bytes, journal 780 bytes); 77 segments, 40,370,176 total cycles | 2.86 s in a separate process (VALID) |
+| 128 | 2^19 | **proved** within its 4 hour cap, journal verdict PASS | 12,664.94 s (211.1 min) | 4,748 MiB (r0vm VmHWM, sampled every 5 s; lowest available 3,200 MiB) | composite, 32,926,822 bytes (seal 32,902,264 bytes, journal 780 bytes); 123 segments, 64,028,672 total cycles | 4.75 s in a separate process (VALID) |
 
 Commands:
 
 ```bash
 scripts/s2_measure.sh target/s2-logs/prove_f16_po19.log -- ./target/release/kintsugi-host prove data/demo/fixed.wasm --fuzz-count 16 --variants 32 --po2 19 --out target/s2/receipt_f16.bin
 ./target/release/kintsugi-host verify target/s2/receipt_f16.bin
+MAX_SECONDS=10800 RUST_LOG=info scripts/s2_measure.sh target/s2-logs/prove_f64_po19.log -- ./target/release/kintsugi-host prove data/demo/fixed.wasm --fuzz-count 64 --variants 32 --po2 19 --out target/s2/receipt_f64.bin
+./target/release/kintsugi-host verify target/s2/receipt_f64.bin
+MAX_SECONDS=14400 scripts/s2_measure.sh target/s2-logs/prove_f128_po19.log -- ./target/release/kintsugi-host prove data/demo/fixed.wasm --fuzz-count 128 --variants 32 --po2 19 --out target/s2/receipt_f128.bin
+./target/release/kintsugi-host verify target/s2/receipt_f128.bin
 ```
+
+### Where the cycles go (executor, `docs/evidence/S2/execute_breakdown.txt`)
+
+| Run | User cycles |
+| --- | --- |
+| no fairness inputs, no variants (validate, crash input, 17 public tests) | 1,818,418 |
+| 16 fairness inputs, no variants | 3,969,905 |
+| no fairness inputs, 32 variants | 5,694,449 |
+| 16 fairness inputs, 8 variants | 4,959,939 |
+
+- Each fairness input costs about 134,000 user cycles and each variant about 121,000 (each runs the original and the
+  candidate). One module run costs about 60,000 to 67,000 cycles, while the module itself uses at most about 2,100 fuel: almost
+  all the cost is setting up a fresh wasmi instance for every input.
+- Measured proving speed on this machine, from the three proofs: 230, 198 and 198 seconds per million total cycles.
+
+### What this means, and the proposal
+
+- **15 minutes is out of reach on this CPU with the current harness.** Even the base run (no fairness inputs, no variants)
+  is 1.8 million user cycles. No proof with fewer inputs was run, so no time for one is claimed.
+- **Proposal 1 (biggest effect, code change):** stop creating a fresh interpreter for every input. Load and validate each
+  module once and reset only its memory between runs. To be measured with `execute` first.
+- **Proposal 2 (smaller limits, from blueprint section 7):** 16 fairness inputs and 8 variants (4,959,939 user cycles,
+  measured above, about 63% of the 16/32 run). Proving time for it is not measured.
+- **Proposal 3:** the verdict window W must be at least K times the slowest proof plus a margin. With the measured 85 minutes
+  at 16 inputs and K = 3, W is at least about 4.3 hours on this machine.
+- **Proposal 4:** a faster prover machine (more cores or an NVIDIA GPU) would change these numbers; not measured.
+- Receipts here are composite (one proof per segment): 11.5 to 32.9 MB, too big to store on chain (about 1 NEAR per 100 KB).
+  A succinct receipt (compressed into one proof) or Groth16 is needed before the contract can use it; not measured yet.
 
 Notes, kept on purpose:
 
 - The 16 input proof took 85 minutes: more than the blueprint's "under about 15 minutes" pass condition at the smallest
-  setting. The receipt is a composite receipt (one proof per segment), 11.5 MB; a succinct receipt (compressed to one
-  proof) is not measured yet.
+  setting.
 - `scripts/s2_measure.sh` was edited by us while it ran this proof (to add a time limit), which broke the script's last
   lines: the exit code, wall time and final peak memory lines were not written. The host's own output (prove time, sizes,
   journal) is complete. The memory figure above is the r0vm peak (VmHWM) read by our status sampler 25 minutes into the run.

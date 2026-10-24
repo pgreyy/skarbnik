@@ -1,0 +1,16 @@
+$ ./target/release/kintsugi-host verify target/s2/receipt_f64.bin
+receipt file: target/s2/receipt_f64.bin (20642762 bytes)
+image id: d3f158571bbb5af7d57751350f8f5fc3baa6e5ce155199c8186849e92ff628a3
+verify seconds: 2.863
+VALID
+journal.verdict: PASS
+journal.candidate_hash: 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97
+journal.original_hash: fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8
+journal.exploit_commitment: 9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387
+journal.corpus_hash: 736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b
+journal.fuzz_seed: 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21
+journal.fuzz_count: 64
+journal.variant_count: 32
+journal.submission_id: 0000000000000000000000000000000000000000000000000000000000000000
+wall_seconds=2.96 max_rss_kb=45576
+exit=0

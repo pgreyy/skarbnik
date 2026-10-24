@@ -1,0 +1,16 @@
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 0 --variants 0
+user cycles: 1818418
+segments: 4
+journal.verdict: PASS
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 0
+user cycles: 3969905
+segments: 10
+journal.verdict: PASS
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 0 --variants 32
+user cycles: 5694449
+segments: 14
+journal.verdict: PASS
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 8
+user cycles: 4959939
+segments: 12
+journal.verdict: PASS

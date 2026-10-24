@@ -2,7 +2,7 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
-## 2026-10-23: S2 proving cost, S1 inside the zkVM, S3b fees (in progress)
+## 2026-10-23 to 24: S2 proving cost, S1 inside the zkVM (S1 PASS, S2 measured), S3b fees (in progress)
 
 - Pushed S0, S1 and S3 to the private repository after an audit of the full history (no keys, paths, emails or
   attribution; repository still private).
@@ -23,7 +23,13 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - Our mistake: we edited `scripts/s2_measure.sh` while it was running the 16 input proof; bash reads scripts as it goes, so
   the script's final lines (exit code, wall time, final memory peak) were lost. The proof itself and the host output are
   fine. Rule for ourselves: never edit a script that is running.
-- 64 inputs started at 23:56 UTC with a 3 hour cap; 128 inputs follows with a 4 hour cap.
+- 64 inputs started at 23:56 UTC with a 3 hour cap and finished: 7,993.49 s (133 min), 77 segments, r0vm peak 4,730 MiB,
+  composite receipt 20,642,762 bytes, verdict PASS, verified in a separate process in 2.86 s.
+- 128 inputs started at 02:10 UTC with a 4 hour cap and finished: 12,664.94 s (211 min), 123 segments, r0vm peak
+  4,748 MiB, composite receipt 32,926,822 bytes, verdict PASS, verified in a separate process in 4.75 s.
+- S2 verdict: FAIL against "under about 15 minutes". Executor breakdown: about 60,000 to 67,000 cycles per module run,
+  almost all spent creating a fresh interpreter per input. Proposals in docs/EVIDENCE.md (reuse the loaded module per
+  input; 16 fairness inputs and 8 variants; W of at least about 4.3 hours at K = 3 on this machine).
 
 ## 2026-10-23: S1 harness and S3 contract (both PASS)
 
