@@ -4,3 +4,5 @@ s7_limit_send_near_via_contract: Error:
 s7_limit_attach_deposit: Error: 
 s7_limit_other_method: Error: 
 s7_limit_transfer: Error: 
+agent owner (payout) balance change: 500000000000000000000000 yoctoNEAR
+{'outcome': 'Passed', 'attestations': ['kintsugi-ver1-prnvm.testnet', 'kintsugi-ver2-prnvm.testnet'], 'verdict': 'PASS'}

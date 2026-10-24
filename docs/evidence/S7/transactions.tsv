@@ -8,3 +8,6 @@ s7_limit_send_near_via_contract	withdraw_credit	agent key of kintsugi-res2-prnvm
 s7_limit_attach_deposit	commit	agent key of kintsugi-res2-prnvm.testnet	-	-	-	1	1.84
 s7_limit_other_method	expire	agent key of kintsugi-res2-prnvm.testnet	-	-	-	1	1.84
 s7_limit_transfer	send-near	agent key of kintsugi-res2-prnvm.testnet	-	-	-	1	2.38
+s7_post_verdict	post_verdict	kintsugi-vendor-prnvm.testnet	CuqC2X7XyczAhXa4eFoYtGLSgcVkdXXVxwsC2nyEqiSk	0.319 Tgas	0.00003185499173	0	5.66
+s7_attest_v1	attest	kintsugi-ver1-prnvm.testnet	GFG81YhEFNcMBTxrrjXCszYEi8vnPdLnXpUb2arXMnHq	0.319 Tgas	0.000031826381501	0	5.48
+s7_attest_v2	attest	kintsugi-ver2-prnvm.testnet	35q1VXV3XWeEbK8A9V4QA8kyLtY8guwn6qxHhDw9hSby	0.319 Tgas	0.000031826381501	0	7.64

@@ -46,7 +46,8 @@ Question: can a researcher agent commit and reveal using a key that cannot move 
 agent's patch gets PASS and the key cannot transfer funds. Fallback used: **a scripted agent with a canned patch, labelled as
 scripted** (the model-driven agent needs a NEAR AI Cloud account and key from the owner, not available).
 
-**Verdict: key part PASS (2026-10-24); the agent's PASS verdict is in progress** (its proof runs after the S4 proof).
+**Verdict: PASS (2026-10-24), as the scripted fallback.** The agent's patch got PASS from a real proof, two verifiers checked
+and attested it, and the owner's payout account was paid. The key could not move funds.
 
 Script: `./scripts/s7_agent.sh setup|bounty|limits|prove|finish`. Owner account: `kintsugi-res2-prnvm.testnet`.
 
@@ -70,6 +71,16 @@ What the agent key must not do (`docs/evidence/S7/steps/s7_limit_*.txt`, `docs/e
 
 The two direct RPC attempts were signed with the agent key, saved without sending, then sent to the RPC node, which refused
 them before execution (no transaction id, no gas).
+
+The agent's submission to PASS (`./scripts/s7_agent.sh prove`, then the steps below):
+
+| Step | Transaction or command | Result |
+| --- | --- | --- |
+| prove with the seed and submission id recorded on chain | `kintsugi-host prove ... --seed <seed> --submission-id <id>` | 2,995.69 s, 26 segments, r0vm peak 4,725 MiB, verdict PASS |
+| compress | `kintsugi-host compress ... succinct` | 922.49 s, 224,786 bytes, r0vm peak 1,483 MiB |
+| vendor posts PASS | `CuqC2X7XyczAhXa4eFoYtGLSgcVkdXXVxwsC2nyEqiSk` | ok |
+| Level 0 check by the verifiers | `scripts/verifier_check.sh submission bounty.kintsugi-djloo.testnet 3 0 target/s7/receipt_succinct.bin` | 11 of 11 checks OK, ATTEST (`docs/evidence/S7/level0_check.txt`) |
+| verifier 1, verifier 2 attest | `GFG81YhEFNcMBTxrrjXCszYEi8vnPdLnXpUb2arXMnHq`, `35q1VXV3XWeEbK8A9V4QA8kyLtY8guwn6qxHhDw9hSby` | outcome Passed; the owner's payout account +0.5 NEAR exactly |
 
 ## S4/S5: OutLayer as verifier 1 (Level 1)
 

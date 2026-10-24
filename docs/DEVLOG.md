@@ -21,7 +21,7 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - On testnet, the fourth probe commit on an arena bounty with `max_commits` 3 was ignored at no cost.
 - Verdicts from the native checker, not proofs (labelled). First build failed: the no_std modules needed a panic handler.
 
-## 2026-10-24: S7 scripted agent with a function call key (key part PASS)
+## 2026-10-24: S7 scripted agent with a function call key (PASS, scripted fallback)
 
 - Fallback, labelled: scripted agent, canned patch; no language model (needs a NEAR AI Cloud account from the owner).
 - The agent key (methods `commit`, `reveal` on the bounty contract) committed and revealed on bounty 3 and paid the fee from
@@ -29,7 +29,8 @@ One dated entry per work block: what was done, the exact commands, the results, 
   transfer also by the RPC node (`MethodNameMismatch`, `RequiresFullAccess`).
 - Caught before commit: the first run wrote the agent key file's local path into `docs/evidence/S7/run.env`. Moved to an
   ignored file; the evidence is clean.
-- Next: prove the agent's submission and finish with two Level 0 verifiers.
+- The agent's submission: proved (2,996 s) and compressed (922 s); verifiers ran `scripts/verifier_check.sh` (11 of 11)
+  and attested; outcome Passed, the owner +0.5 NEAR. S7 PASS as the scripted fallback.
 
 ## 2026-10-24: S4/S5 OutLayer as verifier 1 (in progress)
 
