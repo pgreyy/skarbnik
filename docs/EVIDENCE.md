@@ -100,6 +100,10 @@ FastFS link or as a project, while a cached program answers. Not conclusive for 
 down during the test.** As the owner set out, no new proof was spent on the full contract path (that waits for a FastFS
 job that gets an answer), and no contract change was made (neither the project name nor the link worked).
 
+Reported to OutLayer: https://github.com/out-layer/outlayer/issues/33 ("testnet: WasmUrl programs not already cached
+never get a worker answer (yield times out)", opened 2026-10-24 15:05 UTC by the project owner). Replies are recorded
+here as they come; as of 2026-10-24 15:07 UTC it is open with 0 comments.
+
 Small inconsistency in OutLayer's docs, for the record: the Pricing page says failed executions are not refunded; the NEAR
 Integration page and what we saw (0.099 of 0.1 NEAR refunded on every failed job) say the unused deposit is refunded.
 
