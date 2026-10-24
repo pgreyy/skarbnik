@@ -20,7 +20,8 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 | Attempt fees paid from prepaid credit; fees go to the verifiers | works on testnet | `scripts/s3b_testnet.sh` (EVIDENCE, S3b) |
 | An agent key that can only `commit` and `reveal` cannot move its owner's money | works on testnet (scripted agent, no language model yet) | `scripts/s7_agent.sh` (phases setup, bounty, limits) (EVIDENCE, S7) |
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts, no proofs for the arena) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
-| OutLayer runs our verifier program and its answer counts as one of the two verifiers | in progress | EVIDENCE, S4/S5 |
+| End to end on testnet with a real proof: commit and reveal, proof bound to the on-chain seed and submission id, verdict, two verifiers check the receipt against the chain and attest, researcher paid | works at Level 0 (two registered verifier accounts) | `scripts/s4_testnet.sh` (EVIDENCE, S4/S5) |
+| OutLayer (TEE) as one of the two verifiers | not working yet: OutLayer accepted the jobs but no testnet worker answered within NEAR's yield window (twice); the contract recorded nothing, as designed | EVIDENCE, S4/S5 |
 
 ## Try it
 
@@ -42,10 +43,12 @@ All commands run from the repository root on Linux x86_64. Versions: [docs/VERSI
   only after two different registered verifiers confirm a verdict, or after a timeout. `contract/src/lib.rs`
 - Function call keys let an agent commit and reveal without access to its owner's wallet; attempt fees come from credit held
   in the contract. `scripts/s7_agent.sh`
-- OutLayer (TEE) as one verifier is being built; today the contract trusts the OutLayer contract and its operator for that
-  verifier, and says so. `contract/src/lib.rs` (`request_outlayer_check`, `on_outlayer_result`)
+- OutLayer (TEE) as one verifier is built into the contract (`request_outlayer_check`, `on_outlayer_result` in
+  `contract/src/lib.rs`): the contract sends the job itself and accepts only an answer whose echoed values match its own
+  record. That trusts the OutLayer contract and its operator, and the contract says so. It has not yet produced an answer on
+  testnet (see the table above).
 
-Track hints used: function call keys, agent security, TEE attestation (in progress).
+Track hints used: function call keys, agent security.
 
 ## Limits
 
