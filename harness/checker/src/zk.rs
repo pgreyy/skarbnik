@@ -25,6 +25,9 @@ pub struct GuestInput {
     pub fuzz_count: u32,
     pub variant_count: u32,
     pub submission_id: [u8; 32],
+    /// When true the guest prints a cycle profile (load, setup, run, hashing, rest) to its standard
+    /// output. It changes nothing in the journal. Used for measuring only.
+    pub profile: bool,
 }
 
 /// The public output of one check. Fixed fields only; the verdict is PASS or FAIL, never a reason.

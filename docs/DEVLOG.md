@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: S2b cutting the proving cost
+
+- Added a cycle profile to the guest (`--profile`): 74 to 77% of the guest's cycles are interpreter setup per input, mostly
+  wasmi zero-filling each new instance's 128 KiB memory. The module was already compiled once per check.
+- Switched the guest to RISC Zero's freeing allocator (`heap-embedded-alloc`). Padded cycles (the work a proof must cover)
+  fell 42 to 46% at 16, 64 and 128 inputs; e.g. 20,185,088 to 11,010,048 at 16 inputs and 32 variants.
+- Verdicts unchanged for all 20 corpus modules, native and in the zkVM; checker tests 16 passed.
+- Next: one laptop proof at 16 inputs and 32 variants with a 2 hour cap.
+
 ## 2026-10-24: S3b attempt fees and credit (PASS)
 
 - Contract: `deposit_credit`, `withdraw_credit` (1 yoctoNEAR), `get_credit`; rising attempt fee per commit from credit;

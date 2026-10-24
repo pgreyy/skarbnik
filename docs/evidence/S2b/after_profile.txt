@@ -1,0 +1,24 @@
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 32 --profile
+profile cycles: read_input=212650 module_load=611522 instance_setup=6415038 run_patch=939633 checker_other=407663 hashing=10122 commit=22068 total=8618696
+user cycles: 8639064
+segments: 11
+padded cycles (sum of 2^po2, the work a proof must cover): 11010048
+journal.verdict: PASS
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 64 --variants 32 --profile
+profile cycles: read_input=212650 module_load=611522 instance_setup=11831600 run_patch=2147444 checker_other=899208 hashing=10122 commit=22068 total=15734614
+user cycles: 15754945
+segments: 19
+padded cycles (sum of 2^po2, the work a proof must cover): 19922944
+journal.verdict: PASS
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 128 --variants 32 --profile
+profile cycles: read_input=212650 module_load=611522 instance_setup=19040088 run_patch=3640980 checker_other=1513440 hashing=10122 commit=22068 total=25050870
+user cycles: 25071218
+segments: 30
+padded cycles (sum of 2^po2, the work a proof must cover): 31457280
+journal.verdict: PASS
+$ ./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 8 --profile
+profile cycles: read_input=212650 module_load=611522 instance_setup=3705502 run_patch=616697 checker_other=255071 hashing=10122 commit=22068 total=5433632
+user cycles: 5454000
+segments: 7
+padded cycles (sum of 2^po2, the work a proof must cover): 7340032
+journal.verdict: PASS

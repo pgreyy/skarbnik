@@ -60,6 +60,83 @@ Failures on the way: `scripts/s3b_setup.sh` stopped once with exit 141 after dep
 
 The S3 contract on `kintsugi-djloo.testnet` (no fees) is left as it was; its S3 evidence above still describes it.
 
+## S2b: Cutting the proving cost
+
+Question: where do the guest's cycles go, and can the cost drop while every input still gets a fresh instance (fresh memory,
+globals and state)?
+
+**Verdict: the work a proof must cover dropped by 42 to 46% with identical verdicts (2026-10-24).** One laptop proof to
+confirm the real speed-up: see the proof row below.
+
+What we found:
+
+- The checker already parsed, validated and compiled each module once per check (`Loaded::load`); every input then got a
+  new wasmi store and instance. That stays: fresh memory, globals and state for every input.
+- A cycle profile (`kintsugi-host execute ... --profile`, guest cycle counter around each phase, printed by the guest and
+  never put in the journal) shows that 74 to 77% of the guest's cycles are interpreter setup per input. Each instance's
+  memory is 2 pages (128 KiB), and wasmi fills all of it with zeros when the instance is created.
+- The work a proof must cover ("padded cycles", the sum of 2^po2 over segments) was 2.6 times the guest's own cycle count.
+  The guest used RISC Zero's default allocator, which never frees, so every new instance landed on memory pages the prover had
+  not loaded yet in that segment, and loading pages costs cycles.
+- Change: the guest now uses RISC Zero's freeing allocator (`risc0-zkvm` feature `heap-embedded-alloc`,
+  `harness/check-guest/Cargo.toml`). A new instance reuses the memory the last one freed, already loaded by the prover; wasmi
+  still zero-fills it, so nothing carries over between inputs.
+
+Cycles, executor only (`docs/evidence/S2b/before_profile.txt`, `docs/evidence/S2b/after_profile.txt`):
+
+| Fairness / variants | Padded cycles before | after | change | Segments (2^20) before | after | User cycles before | after |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 16 / 32 | 20,185,088 | 11,010,048 | -45% | 20 | 11 | 7,891,548 | 8,639,064 |
+| 64 / 32 | 36,700,160 | 19,922,944 | -46% | 35 | 19 | 14,384,576 | 15,754,945 |
+| 128 / 32 | 58,720,256 | 31,457,280 | -46% | 56 | 30 | 22,909,934 | 25,071,218 |
+| 16 / 8 | 12,582,912 | 7,340,032 | -42% | 12 | 7 | 4,989,582 | 5,454,000 |
+
+| Phase (16 / 32) | Before | Share | After | Share |
+| --- | --- | --- | --- | --- |
+| reading the input | 207,950 | 3% | 212,650 | 2% |
+| module load (parse, validate, compile, trial instance) | 541,848 | 7% | 611,522 | 7% |
+| interpreter setup per input (fresh store, instance, 128 KiB memory, input) | 6,037,023 | 77% | 6,415,038 | 74% |
+| running the patch | 928,955 | 12% | 939,633 | 11% |
+| the rest of the checker (input generation, comparisons) | 139,794 | 2% | 407,663 | 5% |
+| hashing for the journal | 6,122 | 0% | 10,122 | 0% |
+| writing the journal | 19,280 | 0% | 22,068 | 0% |
+| total (guest cycle counter) | 7,880,972 | | 8,618,696 | |
+
+The guest's own cycle count rose 9% (the allocator's bookkeeping), but the padded cycles fell 42 to 46%.
+
+Verdicts before and after, for the full S1 corpus (seed as in S1, 16 fairness inputs, 32 variants), native table and inside
+the zkVM (`docs/evidence/S2b/`):
+
+| Module | Expected | Native before | Native after | zkVM before | zkVM after | Same? | zkVM user cycles before | after |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `fixed.wasm` | PASS | PASS | PASS | PASS | PASS | yes | 7,845,739 | 8,587,922 |
+| `original.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 845,382 | 958,886 |
+| `constant.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 646,313 | 757,453 |
+| `disable_lists.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 1,177,282 | 1,318,433 |
+| `early_return_prefix.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 1,438,823 | 1,592,912 |
+| `imports_host.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 746,270 | 851,703 |
+| `invalid_truncated.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 474,284 | 566,795 |
+| `loop_forever.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 3,104,820 | 3,219,124 |
+| `memorize_tests.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 1,979,140 | 2,218,585 |
+| `memory_declared.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 730,340 | 833,414 |
+| `memory_grow.wasm` | FAIL | PASS | PASS | PASS | PASS | yes | 7,864,242 | 8,609,977 |
+| `memory_grow_nomax.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 854,505 | 967,897 |
+| `memory_grow_use.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 859,735 | 973,314 |
+| `overbroad_fix.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 2,266,206 | 2,512,489 |
+| `reject_all.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 641,604 | 752,451 |
+| `special_case_exploit.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 4,230,768 | 4,659,546 |
+| `subtle_change.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 3,582,169 | 3,925,710 |
+| `too_large.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 1,134,058 | 1,202,194 |
+| `wrong_export.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 731,751 | 835,093 |
+| `wrong_fix.wasm` | FAIL | FAIL | FAIL | FAIL | FAIL | yes | 849,393 | 962,985 |
+
+20 of 20 modules give the same verdict natively and in the zkVM, before and after.
+
+Native checker tests after the change: `cargo test -p kintsugi-check --offline`: 16 passed.
+
+Not changed: the 128 KiB zero fill per input remains the largest cost. Halving it would need modules that declare 1 memory
+page instead of 2, which changes the demo program and corpus; not done.
+
 ## S2: How slow and heavy is proving?
 
 Question: time to prove, peak memory, receipt size, cycle count and verification time for the checker inside RISC Zero at

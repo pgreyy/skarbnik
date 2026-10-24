@@ -16,6 +16,40 @@ use wasmi::{
     StoreLimits, StoreLimitsBuilder, TrapCode, ValType,
 };
 
+/// Optional cycle profile, used by the zkVM guest to see where its cycles go. Nothing is measured
+/// unless a clock is set with `set_clock`, so the native checker and normal proofs are unaffected.
+/// Phases: `LOAD` (parse, validate, compile and trial instance of a module), `SETUP` (fresh store and
+/// instance per input, writing the input), `RUN` (the patch's `parse` call).
+pub mod profile {
+    use std::sync::atomic::{AtomicU64, Ordering::Relaxed};
+    use std::sync::OnceLock;
+
+    static CLOCK: OnceLock<fn() -> u64> = OnceLock::new();
+    pub static LOAD: AtomicU64 = AtomicU64::new(0);
+    pub static SETUP: AtomicU64 = AtomicU64::new(0);
+    pub static RUN: AtomicU64 = AtomicU64::new(0);
+
+    /// Sets the clock (in the guest: the zkVM cycle counter). Can be set once.
+    pub fn set_clock(clock: fn() -> u64) {
+        let _ = CLOCK.set(clock);
+    }
+
+    pub(crate) fn now() -> Option<u64> {
+        CLOCK.get().map(|clock| clock())
+    }
+
+    pub(crate) fn add(counter: &AtomicU64, start: Option<u64>) {
+        if let (Some(start), Some(end)) = (start, now()) {
+            counter.fetch_add(end.saturating_sub(start), Relaxed);
+        }
+    }
+
+    /// Cycles spent so far in each phase.
+    pub fn totals() -> (u64, u64, u64) {
+        (LOAD.load(Relaxed), SETUP.load(Relaxed), RUN.load(Relaxed))
+    }
+}
+
 /// Every limit the checker enforces. The same values must be used for the candidate and the
 /// original, and they are part of what a verdict means.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -116,6 +150,13 @@ fn is_func(ty: Option<ExternType>, params: &[ValType], results: &[ValType]) -> O
 impl Loaded {
     /// Runs every load check. On success the module is ready to run.
     pub fn load(bytes: &[u8], limits: &Limits) -> Result<Loaded, LoadError> {
+        let started = profile::now();
+        let result = Self::load_inner(bytes, limits);
+        profile::add(&profile::LOAD, started);
+        result
+    }
+
+    fn load_inner(bytes: &[u8], limits: &Limits) -> Result<Loaded, LoadError> {
         if bytes.len() > limits.max_module_bytes {
             return Err(LoadError::TooLarge { bytes: bytes.len(), max: limits.max_module_bytes });
         }
@@ -177,13 +218,14 @@ impl Loaded {
 
     /// Runs the module on one input in a fresh instance.
     pub fn run(&self, input: &[u8]) -> RunResult {
+        let started = profile::now();
         let mut store = self.new_store();
-        let outcome = self.run_in(&mut store, input);
+        let outcome = self.run_in(&mut store, input, started);
         let left = store.get_fuel().unwrap_or(0);
         RunResult { outcome, fuel_used: self.limits.fuel_per_run.saturating_sub(left) }
     }
 
-    fn run_in(&self, store: &mut Store<StoreLimits>, input: &[u8]) -> Outcome {
+    fn run_in(&self, store: &mut Store<StoreLimits>, input: &[u8], setup_started: Option<u64>) -> Outcome {
         if input.len() > self.limits.max_input_len {
             return Outcome::Trapped { out_of_fuel: false, detail: "input too long".into() };
         }
@@ -209,9 +251,13 @@ impl Loaded {
                 detail: "input buffer is outside memory".into(),
             };
         }
-        match parse.call(&mut *store, input.len() as i32) {
+        profile::add(&profile::SETUP, setup_started);
+        let run_started = profile::now();
+        let outcome = match parse.call(&mut *store, input.len() as i32) {
             Ok(v) => Outcome::Returned(v),
             Err(e) => trap_outcome(&e),
-        }
+        };
+        profile::add(&profile::RUN, run_started);
+        outcome
     }
 }

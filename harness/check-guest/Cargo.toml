@@ -8,5 +8,7 @@ edition = "2021"
 [workspace]
 
 [dependencies]
-risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["std"] }
+# "heap-embedded-alloc": a real allocator that reuses freed memory. The default bump allocator never
+# frees, so every fresh wasmi instance landed on new memory pages, which the prover pays for each time.
+risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["std", "heap-embedded-alloc"] }
 kintsugi-check = { path = "../checker", default-features = false, features = ["zk"] }

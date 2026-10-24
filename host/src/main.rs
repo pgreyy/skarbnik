@@ -9,7 +9,8 @@
 //! Options for execute and prove: --fuzz-count N (default 64), --variants N (default 32),
 //! --seed <64 hex chars> (default: the S1 demo seed), --succinct (prove only: compress to one succinct receipt),
 //! --out <file> (prove only: receipt file, default target/s2/receipt.bin), --po2 N (segment size limit as a
-//! power of two, smaller uses less memory per segment; default: RISC Zero's default of 20).
+//! power of two, smaller uses less memory per segment; default: RISC Zero's default of 20), --profile (execute
+//! only: the guest prints its cycles per phase).
 //! The bounty files are the demo files in data/demo/. Proving runs on this machine through the installed
 //! r0vm; nothing is sent to a remote prover.
 
@@ -74,6 +75,7 @@ struct Opts {
     succinct: bool,
     out: String,
     po2: Option<u32>,
+    profile: bool,
 }
 
 fn parse_opts(args: &[String]) -> Result<Opts, String> {
@@ -86,6 +88,7 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
         succinct: false,
         out: "target/s2/receipt.bin".to_string(),
         po2: None,
+        profile: false,
     };
     let mut i = 1;
     while i < args.len() {
@@ -98,6 +101,11 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
             "--po2" => opts.po2 = Some(value()?.parse().map_err(|e| format!("--po2: {e}"))?),
             "--succinct" => {
                 opts.succinct = true;
+                i += 1;
+                continue;
+            }
+            "--profile" => {
+                opts.profile = true;
                 i += 1;
                 continue;
             }
@@ -126,6 +134,7 @@ fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
         fuzz_count: opts.fuzz_count,
         variant_count: opts.variants,
         submission_id: [0u8; 32],
+        profile: opts.profile,
     })
 }
 
@@ -171,6 +180,7 @@ fn execute(args: &[String]) -> Result<(), String> {
     println!("user cycles: {}", session.cycles());
     println!("segments: {}", session.segments.len());
     println!("segment po2: {:?}", session.segments.iter().map(|s| s.po2).collect::<Vec<_>>());
+    println!("padded cycles (sum of 2^po2, the work a proof must cover): {}", session.segments.iter().map(|s| 1u64 << s.po2).sum::<u64>());
     println!("execute seconds: {secs:.2}");
     print_journal(&journal);
     Ok(())
