@@ -18,6 +18,9 @@ const H2: &str = "22222222222222222222222222222222222222222222222222222222222222
 const H3: &str = "3333333333333333333333333333333333333333333333333333333333333333";
 const NONCE: &str = "abababababababababababababababababababababababababababababababab";
 const PATCH: &[u8] = b"\0asm\x01\0\0\0 fake patch bytes";
+/// Attempt fee for the first commit (0.01 NEAR) and the step added per later commit (0.005 NEAR).
+const FEE: u128 = 10_000_000_000_000_000_000_000;
+const STEP: u128 = 5_000_000_000_000_000_000_000;
 
 fn acc(s: &str) -> AccountId {
     s.parse().unwrap()
@@ -71,14 +74,24 @@ fn fingerprint_hex(patch: &[u8], pay: &AccountId) -> String {
     to_hex(&commit_fingerprint(patch, pay, &nonce_bytes()))
 }
 
-/// A fresh contract with two registered verifiers and one open bounty (id 0) created at T0.
+/// Credit each test researcher starts with.
+fn start_credit() -> NearToken {
+    NearToken::from_near(1)
+}
+
+/// A fresh contract with two registered verifiers, one open bounty (id 0) created at T0, and
+/// 1 NEAR of credit for the researcher accounts used in the tests.
 fn setup() -> Contract {
     call(owner(), T0 - 10);
     let mut c = Contract::new(owner());
     c.register_verifier(v1(), "verifier 1".into());
     c.register_verifier(v2(), "verifier 2".into());
+    for a in [researcher(), acc("r0.testnet"), acc("r1.testnet"), acc("r2.testnet"), acc("r3.testnet"), v1()] {
+        at(a, T0 - 5, start_credit());
+        c.deposit_credit(None);
+    }
     at(vendor(), T0, bounty_amount());
-    let id = c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E));
+    let id = c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP));
     assert_eq!(id.0, 0);
     c
 }
@@ -196,14 +209,115 @@ fn expire_waits_for_revealed_submission() {
 }
 
 #[test]
-#[should_panic(expected = "bounty is closed")]
-fn expire_after_payout_rejected() {
+fn expire_after_payout_only_sweeps_fees() {
     let mut c = setup();
     let idx = commit_and_reveal(&mut c, T0 + SEC);
     call(researcher(), T0 + SEC + GAP + W + 1);
     c.claim_timeout(U64(0), idx);
-    call(vendor(), T0 + E + 1);
+    call(acc("stranger.testnet"), T0 + E + 1);
     c.expire(U64(0));
+    // One commit paid FEE; two verifiers get half each. The vendor gets nothing: the bounty was paid.
+    let mut t = transfers();
+    t.sort();
+    assert_eq!(t, vec![(v1(), FEE / 2), (v2(), FEE / 2)]);
+    let b = c.get_bounty(U64(0)).unwrap();
+    assert_eq!(b.state, BountyState::Paid);
+    assert!(b.fees_swept);
+}
+
+#[test]
+#[should_panic(expected = "nothing to do")]
+fn second_expire_after_sweep_rejected() {
+    let mut c = setup();
+    let idx = commit_and_reveal(&mut c, T0 + SEC);
+    call(researcher(), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(0), idx);
+    call(acc("stranger.testnet"), T0 + E + 1);
+    c.expire(U64(0));
+    c.expire(U64(0));
+}
+
+#[test]
+#[should_panic(expected = "bounty is closed")]
+fn timeout_after_payout_rejected() {
+    let mut c = setup();
+    let idx = commit_and_reveal(&mut c, T0 + SEC);
+    call(researcher(), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(0), idx);
+    c.claim_timeout(U64(0), idx);
+}
+
+#[test]
+fn expire_refunds_vendor_and_sweeps_fees() {
+    let mut c = setup();
+    call(researcher(), T0 + SEC);
+    c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
+    call(acc("stranger.testnet"), T0 + E);
+    c.expire(U64(0));
+    let mut t = transfers();
+    t.sort();
+    let mut want = vec![(vendor(), bounty_amount().as_yoctonear()), (v1(), FEE / 2), (v2(), FEE / 2)];
+    want.sort();
+    assert_eq!(t, want);
+    assert_eq!(c.get_bounty(U64(0)).unwrap().state, BountyState::Refunded);
+}
+
+#[test]
+fn fee_rises_with_each_attempt_and_comes_from_credit() {
+    let mut c = setup();
+    let mut total = 0u128;
+    for i in 0..3u32 {
+        let who = acc(&format!("r{i}.testnet"));
+        let fee = FEE + STEP * i as u128;
+        assert_eq!(c.get_bounty(U64(0)).unwrap().next_fee.0, fee);
+        call(who.clone(), T0 + SEC);
+        c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
+        assert_eq!(c.get_credit(who).0, start_credit().as_yoctonear() - fee);
+        total += fee;
+    }
+    assert_eq!(c.get_bounty(U64(0)).unwrap().fees_collected.0, total);
+}
+
+#[test]
+#[should_panic(expected = "not enough credit")]
+fn commit_without_credit_rejected() {
+    let mut c = setup();
+    call(acc("nocredit.testnet"), T0 + SEC);
+    c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout());
+}
+
+#[test]
+fn deposit_credit_for_another_account() {
+    let mut c = setup();
+    at(acc("owner-of-agent.testnet"), T0, NearToken::from_millinear(50));
+    c.deposit_credit(Some(acc("agent.testnet")));
+    assert_eq!(c.get_credit(acc("agent.testnet")).0, NearToken::from_millinear(50).as_yoctonear());
+    assert_eq!(c.get_credit(acc("owner-of-agent.testnet")).0, 0);
+}
+
+#[test]
+#[should_panic(expected = "Requires attached deposit of exactly 1 yoctoNEAR")]
+fn withdraw_needs_one_yocto() {
+    let mut c = setup();
+    call(researcher(), T0);
+    c.withdraw_credit(U128(1));
+}
+
+#[test]
+fn withdraw_returns_unspent_credit() {
+    let mut c = setup();
+    at(researcher(), T0, NearToken::from_yoctonear(1));
+    let left = c.withdraw_credit(U128(NearToken::from_millinear(400).as_yoctonear()));
+    assert_eq!(left.0, NearToken::from_millinear(600).as_yoctonear());
+    assert_eq!(transfers(), vec![(researcher(), NearToken::from_millinear(400).as_yoctonear())]);
+}
+
+#[test]
+#[should_panic(expected = "attempt_fee must be above zero")]
+fn zero_fee_bounty_rejected() {
+    let mut c = setup();
+    at(acc("vendor2.testnet"), T0, bounty_amount());
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(0), U128(0));
 }
 
 #[test]
@@ -236,7 +350,7 @@ fn vendor_cannot_be_verifier() {
 fn verifier_cannot_be_vendor() {
     let mut c = setup();
     at(v1(), T0 + SEC, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E));
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP));
 }
 
 #[test]
@@ -370,6 +484,8 @@ fn commits_beyond_k_are_ignored() {
     }
     call(acc("r3.testnet"), T0 + SEC);
     assert_eq!(c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()), None);
+    // An ignored commit takes no fee.
+    assert_eq!(c.get_credit(acc("r3.testnet")).0, start_credit().as_yoctonear());
     assert!(get_logs().iter().any(|l| l.contains("\"event\":\"commit_ignored\"")));
     assert_eq!(c.get_bounty(U64(0)).unwrap().commits, 3);
     assert!(c.get_submission(U64(0), 3).is_none());
@@ -437,7 +553,7 @@ fn researcher_cannot_attest_own_submission() {
 fn tiny_bounty_rejected() {
     let mut c = setup();
     at(acc("vendor2.testnet"), T0, NearToken::from_millinear(99));
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E));
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP));
 }
 
 #[test]

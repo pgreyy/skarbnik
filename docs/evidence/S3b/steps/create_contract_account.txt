@@ -1,0 +1,37 @@
+$ near account create-account fund-myself bounty.kintsugi-djloo.testnet 3 NEAR autogenerate-new-keypair save-to-legacy-keychain sign-as kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T05:43:46.896579365Z
+Migrating config.toml from V4 to V5...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+├  Unsigned transaction:
+│    signer_id:    kintsugi-djloo.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- create account:      bounty.kintsugi-djloo.testnet
+│       -- transfer deposit:    3 NEAR
+│       -- add access key:     
+│                       public key:   ed25519:5PeFEXv1ZyR4mSo92n45KgJDenCxrxyNRK8SSS8BQyRX
+│                       nonce:        0
+│                       permission:   FullAccess
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:EfmcwS9tW3D2sRQHiLR544XxY7adj7ZreEaTTbqhanmd
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.825 Tgas
+│    Transaction fee: 0.00008249476875 NEAR
+│    Transaction ID: 8BT7rhwtAc2cbe5cgMfocrxDc81SB9C6JJuzAnxPA6mM
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/8BT7rhwtAc2cbe5cgMfocrxDc81SB9C6JJuzAnxPA6mM
+│     
+
+
+New account <bounty.kintsugi-djloo.testnet> has been successfully created.
+<kintsugi-djloo.testnet> has transferred 3 NEAR to <bounty.kintsugi-djloo.testnet> successfully.
+Added access key = ed25519:5PeFEXv1ZyR4mSo92n45KgJDenCxrxyNRK8SSS8BQyRX to bounty.kintsugi-djloo.testnet.
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=7.61

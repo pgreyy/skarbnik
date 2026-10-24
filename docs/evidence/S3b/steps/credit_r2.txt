@@ -1,0 +1,42 @@
+$ near contract call-function as-transaction bounty.kintsugi-djloo.testnet deposit_credit json-args {} prepaid-gas 100 Tgas attached-deposit 0.1 NEAR sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T05:45:55.812075298Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  deposit_credit
+│                       args:         {}
+│                       gas:          100.0 Tgas
+│                       deposit:      0.1 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.000030882243944 NEAR
+│    Transaction ID: Foqzj6zNCk8aaGasq7r2SXGDjDnEcFiR16aemGiVWD9e
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/Foqzj6zNCk8aaGasq7r2SXGDjDnEcFiR16aemGiVWD9e
+│     
+├  Function execution logs:
+│    Logs [bounty.kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"credit_deposited","data":[{"account_id":"kintsugi-res2-prnvm.testnet","amount":"100000000000000000000000","total":"100000000000000000000000"}]}
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"100000000000000000000000"
+
+
+The "deposit_credit" call to <bounty.kintsugi-djloo.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction bounty.kintsugi-djloo.testnet deposit_credit json-args {} prepaid-gas '100.0 Tgas' attached-deposit '0.1 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.03

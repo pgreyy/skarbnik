@@ -16,11 +16,11 @@ TXT="$OUT/transactions.tsv"
 
 # Remove anything private before output is saved: lines naming private keys, secret keys or seed
 # phrases, signature lines, and any line holding a base58 string of 80+ characters (private keys and
-# signatures are that long; transaction hashes and public keys are about 44).
+# signatures are that long; transaction hashes and public keys are about 44). Home folder paths become ~.
 filter_private() {
   grep -v -i -E 'private|secret|seed.?phrase|mnemonic|signature' \
     | grep -v -E '[1-9A-HJ-NP-Za-km-z]{80,}' \
-    | sed -E 's/\x1b\[[0-9;]*m//g'
+    | sed -E -e 's/\x1b\[[0-9;]*m//g' -e 's#/home/[^/ "]+#~#g'
   return 0
 }
 

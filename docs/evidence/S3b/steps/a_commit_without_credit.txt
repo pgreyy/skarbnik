@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction bounty.kintsugi-djloo.testnet commit json-args '{"bounty_id":"0","fingerprint":"3fbfb68963628d627db8f8fb83f4625b7766a57fb1ccd00d08934f47dd04fc4c","payout":"kintsugi-ver3-prnvm.testnet"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-ver3-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T05:46:24.106576202Z
+{
+ "tx_hash": "8E7u8BMebiY4SUMiWHgYGHM83UYjDzDbVc87EGyobo9y",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: not enough credit for the attempt fee: call deposit_credit first'}}}}",
+ "total_gas_burnt": 1982871245403,
+ "logs": [],
+ "wall_seconds": 4.05,
+ "rpc_error": null
+}

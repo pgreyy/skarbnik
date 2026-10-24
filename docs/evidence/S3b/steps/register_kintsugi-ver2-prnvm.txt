@@ -1,0 +1,45 @@
+$ near contract call-function as-transaction bounty.kintsugi-djloo.testnet register_verifier json-args {"account_id":"kintsugi-ver2-prnvm.testnet","label":"verifier 2 (S3b test account, run by the project)"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as bounty.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T05:45:36.476584148Z
+├  Unsigned transaction:
+│    signer_id:    bounty.kintsugi-djloo.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  register_verifier
+│                       args:         {
+│                                       "account_id": "kintsugi-ver2-prnvm.testnet",
+│                                       "label": "verifier 2 (S3b test account, run by the project)"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:5PeFEXv1ZyR4mSo92n45KgJDenCxrxyNRK8SSS8BQyRX
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.0000308330048014 NEAR
+│    Transaction ID: 3GWZ3JLMpBfonwAuKMwdnoYKR39w3cj3PF1us61cFDX6
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/3GWZ3JLMpBfonwAuKMwdnoYKR39w3cj3PF1us61cFDX6
+│     
+├  Function execution logs:
+│    Logs [bounty.kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"verifier_registered","data":[{"account_id":"kintsugi-ver2-prnvm.testnet","label":"verifier 2 (S3b test account, run by the project)"}]}
+│    Logs [bounty.kintsugi-djloo.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "register_verifier" call to <bounty.kintsugi-djloo.testnet> on behalf of <bounty.kintsugi-djloo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction bounty.kintsugi-djloo.testnet register_verifier json-args '{"account_id":"kintsugi-ver2-prnvm.testnet","label":"verifier 2 (S3b test account, run by the project)"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as bounty.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=4.48

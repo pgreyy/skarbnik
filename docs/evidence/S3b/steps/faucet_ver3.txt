@@ -1,0 +1,22 @@
+$ near account create-account sponsor-by-faucet-service kintsugi-ver3-prnvm.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
+utc_start=2026-10-24T05:45:06.939129277Z
+├  Your transaction:
+│    signer_id:    testnet
+│    actions:
+│       -- create account:      kintsugi-ver3-prnvm.testnet
+│       -- add access key:     
+│                       public key:   ed25519:5X2ugGp2QnCfi4888bRFGtHPP4QY6NzeTgTE6fUQ1h1Q
+│                       permission:   FullAccess
+│     
+├  Transaction Execution Info:
+│    Transaction ID: 8AXXTE7XikoLGS5aJveEpD1dZ53kpyvCh4BgniMSUYTL
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/8AXXTE7XikoLGS5aJveEpD1dZ53kpyvCh4BgniMSUYTL
+
+New account <kintsugi-ver3-prnvm.testnet> created successfully.
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=3.15

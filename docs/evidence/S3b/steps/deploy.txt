@@ -1,0 +1,45 @@
+$ near contract deploy bounty.kintsugi-djloo.testnet use-file target/near/kintsugi_contract/kintsugi_contract.wasm with-init-call new json-args {"owner":"bounty.kintsugi-djloo.testnet"} prepaid-gas 100 Tgas attached-deposit 0 NEAR network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T05:43:56.055423373Z
+├  Unsigned transaction:
+│    signer_id:    bounty.kintsugi-djloo.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- deploy code <62SVqdkzHDZeyS5Ta1wBe5LzXu5ECv36CU74ZFV4fmL5> to a account <bounty.kintsugi-djloo.testnet>
+│       -- function call:      
+│                       method name:  new
+│                       args:         {
+│                                       "owner": "bounty.kintsugi-djloo.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:5PeFEXv1ZyR4mSo92n45KgJDenCxrxyNRK8SSS8BQyRX
+│     
+├  Transaction Execution Info:
+│    Gas burned: 2.2 Tgas
+│    Transaction fee: 0.000215438244523 NEAR
+│    Transaction ID: 72VTiMGEbBp1Hdk3AQHxgj5YznUsmqsBAb5uvHZQR32a
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/72VTiMGEbBp1Hdk3AQHxgj5YznUsmqsBAb5uvHZQR32a
+│     
+├  Function execution logs:
+│    Logs [bounty.kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"init","data":[{"owner":"bounty.kintsugi-djloo.testnet"}]}
+│    Logs [bounty.kintsugi-djloo.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+Contract code has been successfully deployed.
+The "new" call to <bounty.kintsugi-djloo.testnet> on behalf of <bounty.kintsugi-djloo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract deploy bounty.kintsugi-djloo.testnet use-file target/near/kintsugi_contract/kintsugi_contract.wasm with-init-call new json-args '{"owner":"bounty.kintsugi-djloo.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.98

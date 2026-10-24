@@ -1,0 +1,27 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+create_contract_account	create-account	kintsugi-djloo.testnet	8BT7rhwtAc2cbe5cgMfocrxDc81SB9C6JJuzAnxPA6mM	0.825 Tgas	0.00008249476875	0	7.61
+deploy	deploy+new	bounty.kintsugi-djloo.testnet	72VTiMGEbBp1Hdk3AQHxgj5YznUsmqsBAb5uvHZQR32a	2.2 Tgas	0.000215438244523	0	6.98
+faucet_vendor	create-account	faucet	BPHgAVuRVRGe4xTwrN7tXx2HJDYRqEbqPW5MKoih2CUr	-	-	0	4.4
+faucet_res1	create-account	faucet	3qPYEempg4HpVGW79UM9zNKtvq1fA9ZABsQhG2kBGuoD	-	-	0	2.98
+faucet_res2	create-account	faucet	3AFFEpjSfNy8V3WJaZUu9hWCSDB8zYvQ5vLn6DrDZPhG	-	-	0	3.74
+faucet_ver1	create-account	faucet	HgzD2PqAPEzqTtWUTeh1JA3pUDgyrZxnuNYaSqcH5nU6	-	-	0	3.22
+faucet_ver2	create-account	faucet	9aUMGraiQhSiJ2iaxigDrSfVGvnXa7Dd8eeQGCjcvUc5	-	-	0	3.31
+faucet_ver3	create-account	faucet	8AXXTE7XikoLGS5aJveEpD1dZ53kpyvCh4BgniMSUYTL	-	-	0	3.15
+register_kintsugi-ver1-prnvm	register_verifier	bounty.kintsugi-djloo.testnet	8hoiajVKe6GYXNuRxm77yq7xait8MKJwW2pf6bBiqeMx	0.309 Tgas	0.0000308330048014	0	4.59
+register_kintsugi-ver2-prnvm	register_verifier	bounty.kintsugi-djloo.testnet	3GWZ3JLMpBfonwAuKMwdnoYKR39w3cj3PF1us61cFDX6	0.309 Tgas	0.0000308330048014	0	4.48
+register_kintsugi-ver3-prnvm	register_verifier	bounty.kintsugi-djloo.testnet	3jK6iQQQK8xhpC1gLyRb7HpmnZKTebYRAsQv7d2hufT2	0.309 Tgas	0.0000308330048014	0	5.07
+credit_r1	deposit_credit	kintsugi-res1-prnvm.testnet	BthTa3YsgwqMaasY1Cfw8FbMLVFAqXUbPbvTuNoJsn3W	0.309 Tgas	0.000030882243944	0	5.14
+credit_r2	deposit_credit	kintsugi-res2-prnvm.testnet	Foqzj6zNCk8aaGasq7r2SXGDjDnEcFiR16aemGiVWD9e	0.309 Tgas	0.000030882243944	0	5.03
+a_create_bounty	create_bounty	kintsugi-vendor-prnvm.testnet	5aqPDbkryiLCGerajXMxpgmSyueRv5g9AtuDhD39EcU4	0.341 Tgas	0.0000340150640195	0	4.52
+a_commit_r1	commit	kintsugi-res1-prnvm.testnet	W8AVDvxSFr9rjGUVjLKU2DkGr7289NHyaQ1GhNNkYmh	0.315 Tgas	0.0000314878271245	0	4.7
+a_commit_r2	commit	kintsugi-res2-prnvm.testnet	HvErQztKDeAqezBKKADP8ZJA3GcWh7XHWCFmRnxJh5p3	0.315 Tgas	0.0000314878271245	0	4.48
+a_commit_without_credit	commit	kintsugi-ver3-prnvm.testnet	8E7u8BMebiY4SUMiWHgYGHM83UYjDzDbVc87EGyobo9y	-	-	rpc:failed	-
+a_reveal_r1	reveal	kintsugi-res1-prnvm.testnet	9HRPtPMWw9ikraFoNVGd6sJyYR8cBzMB7pAKdmQx1e4K	0.318 Tgas	0.0000317357824425	0	4.89
+a_post_verdict	post_verdict	kintsugi-vendor-prnvm.testnet	Bq35JYq9qzYHHhzcRfLJhmhvze3oSkknyGsDD79eJxzo	0.319 Tgas	0.00003185499173	0	5.21
+a_attest_v1	attest	kintsugi-ver1-prnvm.testnet	4JjzCpYCQjppcQHhQ9MEv9jj5trUunpgumAqvMtrmjEb	0.319 Tgas	0.000031826381501	0	6.13
+a_attest_v2	attest	kintsugi-ver2-prnvm.testnet	CMKG5ihUMBRsbHQG5Vj2kuaZnaaRrRk2qCdq3bZFUf4M	0.319 Tgas	0.000031826381501	0	5.42
+b_create_bounty	create_bounty	kintsugi-vendor-prnvm.testnet	2VLLaPpRiWg4ghVDRJNxpbv1aLURKZdMATphhXytzYng	0.341 Tgas	0.000034010295648	0	4.49
+withdraw_r2	withdraw_credit	kintsugi-res2-prnvm.testnet	4DBFH8ZCbgtQEh984N8H369tsvUBPrDJeT3ddVj41aGe	0.311 Tgas	0.0000310491369465	0	5.99
+b_expire_refund	expire	kintsugi-res1-prnvm.testnet	C3hsfHVfhSQ9xWVhQBgjWpgXA3qG6F1noFNBMPhs5gbP	0.310 Tgas	0.0000309156225445	0	5.25
+a_expire_sweep_fees	expire	kintsugi-res2-prnvm.testnet	EAomjDsQ41Z1Wt5XZLAZ6Abu6pGQv1nRFbeq4o9HGJew	0.310 Tgas	0.0000309156225445	0	5.41
+a_expire_again	expire	kintsugi-res2-prnvm.testnet	FLSQZWSQYjcf6QPGk2RDs5NyMPV5xFKJe9sfdEMfFE8Q	-	-	rpc:failed	-

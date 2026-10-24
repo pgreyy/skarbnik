@@ -1,0 +1,48 @@
+$ near contract call-function as-transaction bounty.kintsugi-djloo.testnet post_verdict json-args {"bounty_id":"0","index":0,"verdict":"PASS","journal_hash":"5e4a88a1bab15b17a9969aa8c88688cc3aebd2d58467cf653266c600d72106cd","receipt_hash":"cfddf7fd1ae32b7d778f71632828a3d00ac2d7dafa8abc00165e47172363425b"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T05:46:40.765162530Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  post_verdict
+│                       args:         {
+│                                       "bounty_id": "0",
+│                                       "index": 0,
+│                                       "journal_hash": "5e4a88a1bab15b17a9969aa8c88688cc3aebd2d58467cf653266c600d72106cd",
+│                                       "receipt_hash": "cfddf7fd1ae32b7d778f71632828a3d00ac2d7dafa8abc00165e47172363425b",
+│                                       "verdict": "PASS"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.319 Tgas
+│    Transaction fee: 0.00003185499173 NEAR
+│    Transaction ID: Bq35JYq9qzYHHhzcRfLJhmhvze3oSkknyGsDD79eJxzo
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/Bq35JYq9qzYHHhzcRfLJhmhvze3oSkknyGsDD79eJxzo
+│     
+├  Function execution logs:
+│    Logs [bounty.kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"verdict_posted","data":[{"bounty_id":"0","index":0,"verdict":"PASS","journal_hash":"5e4a88a1bab15b17a9969aa8c88688cc3aebd2d58467cf653266c600d72106cd","receipt_hash":"cfddf7fd1ae32b7d778f71632828a3d00ac2d7dafa8abc00165e47172363425b"}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "post_verdict" call to <bounty.kintsugi-djloo.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction bounty.kintsugi-djloo.testnet post_verdict json-args '{"bounty_id":"0","index":0,"verdict":"PASS","journal_hash":"5e4a88a1bab15b17a9969aa8c88688cc3aebd2d58467cf653266c600d72106cd","receipt_hash":"cfddf7fd1ae32b7d778f71632828a3d00ac2d7dafa8abc00165e47172363425b"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.21

@@ -14,8 +14,15 @@
 //!    is final only with attestations from two different registered verifiers. A final PASS pays the
 //!    researcher's payout account and closes the bounty; a final FAIL spends that attempt.
 //! 6. `claim_timeout`: anyone may call it once the deadline has passed with no final verdict; it pays the
-//!    researcher. `expire`: anyone may call it after the bounty's expiry if nothing was paid; it refunds
-//!    the vendor.
+//!    researcher. `expire`: anyone may call it after the bounty's expiry; if nothing was paid it refunds
+//!    the vendor, and it sends the bounty's collected attempt fees to the registered verifiers.
+//!
+//! Attempt fees: every counted commit costs a fee, taken from the committer's credit inside this
+//! contract. Credit is added with `deposit_credit` (attach NEAR, from a normal key). An AI agent's
+//! function call key cannot attach NEAR, so it can only spend credit here, never the wallet behind it.
+//! `withdraw_credit` needs 1 yoctoNEAR attached, which a function call key cannot do, so an agent key
+//! cannot take the credit out either. The fee for a bounty's n-th commit (n from 0) is
+//! `attempt_fee + n * fee_step`, both set by the vendor.
 //!
 //! The contract never sees the secret exploit and never checks a patch itself. It only checks who
 //! called, with which values, and when. Times are block timestamps in nanoseconds.
@@ -48,6 +55,7 @@ enum StorageKey {
     Submissions,
     Verifiers,
     Vendors,
+    Credits,
 }
 
 /// Where a bounty stands. `Paid` covers both a final PASS and a timeout payout.
@@ -103,6 +111,13 @@ pub struct Bounty {
     /// Revealed submissions with no final verdict and no timeout yet. `expire` waits for these.
     pending: u32,
     winner: Option<u32>,
+    /// Fee for the first counted commit.
+    attempt_fee: NearToken,
+    /// Added to the fee for each later commit.
+    fee_step: NearToken,
+    /// Attempt fees taken so far, held by the contract until `expire` sends them to the verifiers.
+    fees_collected: NearToken,
+    fees_swept: bool,
 }
 
 #[near(serializers = [borsh])]
@@ -156,6 +171,12 @@ pub struct BountyView {
     pub commits: u32,
     pub pending: u32,
     pub winner: Option<u32>,
+    pub attempt_fee: U128,
+    pub fee_step: U128,
+    pub fees_collected: U128,
+    pub fees_swept: bool,
+    /// The fee the next counted commit will cost.
+    pub next_fee: U128,
 }
 
 /// JSON view of a submission.
@@ -198,6 +219,8 @@ pub struct Contract {
     verifiers: IterableMap<AccountId, VerifierInfo>,
     /// Every account that ever created a bounty. These can never be registered as verifiers.
     vendors: LookupSet<AccountId>,
+    /// Prepaid credit per account, spent on attempt fees.
+    credits: LookupMap<AccountId, NearToken>,
 }
 
 /// The commit fingerprint. Byte layout (all lengths little endian u32):
@@ -262,6 +285,14 @@ fn verdict_str(v: Verdict) -> &'static str {
     }
 }
 
+impl Bounty {
+    /// Fee for the next counted commit: `attempt_fee + commits * fee_step`.
+    fn next_fee(&self) -> NearToken {
+        let step = self.fee_step.as_yoctonear().saturating_mul(self.commits as u128);
+        NearToken::from_yoctonear(self.attempt_fee.as_yoctonear().saturating_add(step))
+    }
+}
+
 impl Submission {
     /// The time after which a still open, revealed submission can be timed out:
     /// the end of the attestation window if a verdict was posted, else the end of the verdict window.
@@ -276,9 +307,10 @@ impl Submission {
 
 #[near]
 impl Contract {
-    /// Set up the contract. `ignore_state` lets this replace the S0 hello world state that is already
-    /// stored on the account. `private` means only the contract account itself can call it (the deploy
-    /// transaction is signed by that account), so nobody else can reset the state later.
+    /// Set up the contract. `ignore_state` lets this replace any older state on the account (S3 used it to
+    /// replace the S0 hello world state; calling it again wipes all bounties, so later code updates deploy
+    /// without an init call). `private` means only the contract account itself can call it (the deploy
+    /// transaction is signed by that account), so nobody else can reset the state.
     #[init(ignore_state)]
     #[private]
     pub fn new(owner: AccountId) -> Self {
@@ -290,6 +322,7 @@ impl Contract {
             submissions: LookupMap::new(StorageKey::Submissions),
             verifiers: IterableMap::new(StorageKey::Verifiers),
             vendors: LookupSet::new(StorageKey::Vendors),
+            credits: LookupMap::new(StorageKey::Credits),
         }
     }
 
@@ -312,6 +345,8 @@ impl Contract {
     /// The vendor attaches the bounty amount. Hashes are 64 hex characters each. Window lengths are in
     /// nanoseconds: `reveal_gap_ns` (commit to earliest reveal), `verdict_window_ns` (reveal to latest
     /// verdict), `attest_window_ns` (verdict to latest attestation), `expiry_ns` (creation to expiry).
+    /// `attempt_fee` and `fee_step` are in yoctoNEAR: the n-th counted commit (n from 0) costs
+    /// `attempt_fee + n * fee_step`, paid from the committer's credit. `attempt_fee` must be above zero.
     #[payable]
     #[allow(clippy::too_many_arguments)]
     pub fn create_bounty(
@@ -327,6 +362,8 @@ impl Contract {
         verdict_window_ns: U64,
         attest_window_ns: U64,
         expiry_ns: U64,
+        attempt_fee: U128,
+        fee_step: U128,
     ) -> U64 {
         let vendor = env::predecessor_account_id();
         let amount = env::attached_deposit();
@@ -335,6 +372,7 @@ impl Contract {
         require!((1..=MAX_COMMITS_CAP).contains(&max_commits), "max_commits must be 1 to 16");
         require!((1..=MAX_PATCH_BYTES_CAP).contains(&max_patch_bytes), "max_patch_bytes must be 1 to 4096");
         require!(verdict_window_ns.0 > 0 && attest_window_ns.0 > 0 && expiry_ns.0 > 0, "windows must be above zero");
+        require!(attempt_fee.0 > 0, "attempt_fee must be above zero");
         let now = env::block_timestamp();
         let bounty = Bounty {
             vendor: vendor.clone(),
@@ -355,6 +393,10 @@ impl Contract {
             commits: 0,
             pending: 0,
             winner: None,
+            attempt_fee: NearToken::from_yoctonear(attempt_fee.0),
+            fee_step: NearToken::from_yoctonear(fee_step.0),
+            fees_collected: NearToken::from_yoctonear(0),
+            fees_swept: false,
         };
         let id = self.next_bounty_id;
         self.next_bounty_id += 1;
@@ -367,6 +409,8 @@ impl Contract {
                 "image_id": image_id.to_lowercase(),
                 "exploit_commitment": exploit_commitment.to_lowercase(),
                 "max_commits": max_commits,
+                "attempt_fee": attempt_fee,
+                "fee_step": fee_step,
                 "expires_at_ns": U64(bounty.expires_at_ns),
             }),
         );
@@ -404,8 +448,8 @@ impl Contract {
     // ---------- researcher ----------
 
     /// Post a patch fingerprint (see `commit_fingerprint` for the byte layout) and the payout account.
-    /// Returns the submission index, or null when the bounty already has its K commits (the commit is
-    /// ignored and nothing is stored).
+    /// Takes the attempt fee from the committer's credit. Returns the submission index, or null when the
+    /// bounty already has its K commits (the commit is ignored, nothing is stored and no fee is taken).
     pub fn commit(&mut self, bounty_id: U64, fingerprint: String, payout: AccountId) -> Option<u32> {
         let now = env::block_timestamp();
         let committer = env::predecessor_account_id();
@@ -418,11 +462,16 @@ impl Contract {
             emit("commit_ignored", json!({ "bounty_id": bounty_id, "committer": committer, "reason": "max_commits reached" }));
             return None;
         }
+        let fee = bounty.next_fee();
+        let credit = self.credits.get(&committer).copied().unwrap_or(NearToken::from_yoctonear(0));
+        require!(credit >= fee, "not enough credit for the attempt fee: call deposit_credit first");
+        self.credits.insert(committer.clone(), credit.saturating_sub(fee));
+        bounty.fees_collected = bounty.fees_collected.saturating_add(fee);
         let index = bounty.commits;
         bounty.commits += 1;
         emit(
             "committed",
-            json!({ "bounty_id": bounty_id, "index": index, "committer": committer, "payout": payout, "fingerprint": to_hex(&fp) }),
+            json!({ "bounty_id": bounty_id, "index": index, "committer": committer, "payout": payout, "fingerprint": to_hex(&fp), "fee": U128(fee.as_yoctonear()) }),
         );
         self.submissions.insert(
             (bounty_id.0, index),
@@ -476,6 +525,35 @@ impl Contract {
         sub.revealed_at_ns = Some(now);
         sub.seed = Some(seed);
         bounty.pending += 1;
+    }
+
+    /// Adds the attached NEAR to the credit of `account_id` (default: the caller). Credit is spent only
+    /// on attempt fees in this contract.
+    #[payable]
+    pub fn deposit_credit(&mut self, account_id: Option<AccountId>) -> U128 {
+        let amount = env::attached_deposit();
+        require!(amount.as_yoctonear() > 0, "attach NEAR to deposit credit");
+        let account = account_id.unwrap_or_else(env::predecessor_account_id);
+        let total = self.credits.get(&account).copied().unwrap_or(NearToken::from_yoctonear(0)).saturating_add(amount);
+        self.credits.insert(account.clone(), total);
+        emit("credit_deposited", json!({ "account_id": account, "amount": U128(amount.as_yoctonear()), "total": U128(total.as_yoctonear()) }));
+        U128(total.as_yoctonear())
+    }
+
+    /// Sends `amount` of the caller's unspent credit back to the caller. Needs exactly 1 yoctoNEAR
+    /// attached, which a function call key cannot attach, so an agent key cannot withdraw.
+    #[payable]
+    pub fn withdraw_credit(&mut self, amount: U128) -> U128 {
+        near_sdk::assert_one_yocto();
+        let account = env::predecessor_account_id();
+        let credit = self.credits.get(&account).copied().unwrap_or(NearToken::from_yoctonear(0));
+        let amount = NearToken::from_yoctonear(amount.0);
+        require!(amount.as_yoctonear() > 0 && amount <= credit, "amount must be above zero and at most the credit");
+        let left = credit.saturating_sub(amount);
+        self.credits.insert(account.clone(), left);
+        emit("credit_withdrawn", json!({ "account_id": account, "amount": U128(amount.as_yoctonear()), "left": U128(left.as_yoctonear()) }));
+        Promise::new(account).transfer(amount).detach();
+        U128(left.as_yoctonear())
     }
 
     // ---------- verifiers ----------
@@ -564,23 +642,54 @@ impl Contract {
         Promise::new(sub.payout.clone()).transfer(bounty.amount).detach();
     }
 
-    /// Anyone. After the bounty's expiry, if nothing was paid and no revealed submission is still
-    /// waiting for its verdict or timeout, refunds the bounty to the vendor.
+    /// Anyone. After the bounty's expiry: if nothing was paid and no revealed submission is still waiting
+    /// for its verdict or timeout, refunds the bounty to the vendor. In the same call (also for a bounty
+    /// that was already paid), sends the collected attempt fees to the registered verifiers in equal
+    /// shares, the remainder of the division to the first one. Fails if there is nothing left to do.
     pub fn expire(&mut self, bounty_id: U64) {
         let now = env::block_timestamp();
+        let caller = env::predecessor_account_id();
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
-        require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(now >= bounty.expires_at_ns, "bounty has not expired");
-        require!(bounty.pending == 0, "a revealed submission is still unresolved");
-        bounty.state = BountyState::Refunded;
-        emit(
-            "refunded",
-            json!({ "bounty_id": bounty_id, "to": bounty.vendor, "amount": U128(bounty.amount.as_yoctonear()), "caller": env::predecessor_account_id() }),
-        );
-        Promise::new(bounty.vendor.clone()).transfer(bounty.amount).detach();
+        let mut acted = false;
+        if bounty.state == BountyState::Open {
+            require!(bounty.pending == 0, "a revealed submission is still unresolved");
+            bounty.state = BountyState::Refunded;
+            emit(
+                "refunded",
+                json!({ "bounty_id": bounty_id, "to": bounty.vendor, "amount": U128(bounty.amount.as_yoctonear()), "caller": caller }),
+            );
+            Promise::new(bounty.vendor.clone()).transfer(bounty.amount).detach();
+            acted = true;
+        }
+        let fees = bounty.fees_collected.as_yoctonear();
+        if !bounty.fees_swept && fees > 0 && !self.verifiers.is_empty() {
+            let verifiers: Vec<AccountId> = self.verifiers.keys().cloned().collect();
+            let n = verifiers.len() as u128;
+            let share = fees / n;
+            let remainder = fees - share * n;
+            for (i, v) in verifiers.iter().enumerate() {
+                let amount = share + if i == 0 { remainder } else { 0 };
+                if amount > 0 {
+                    Promise::new(v.clone()).transfer(NearToken::from_yoctonear(amount)).detach();
+                }
+            }
+            bounty.fees_swept = true;
+            emit(
+                "fees_swept",
+                json!({ "bounty_id": bounty_id, "total": U128(fees), "verifiers": verifiers, "share": U128(share), "caller": caller }),
+            );
+            acted = true;
+        }
+        require!(acted, "nothing to do: bounty already closed and fees already swept");
     }
 
     // ---------- views (free, change nothing) ----------
+
+    /// Unspent credit of an account, in yoctoNEAR.
+    pub fn get_credit(&self, account_id: AccountId) -> U128 {
+        U128(self.credits.get(&account_id).map(|c| c.as_yoctonear()).unwrap_or(0))
+    }
 
     pub fn get_owner(&self) -> AccountId {
         self.owner.clone()
@@ -611,6 +720,11 @@ impl Contract {
             commits: b.commits,
             pending: b.pending,
             winner: b.winner,
+            attempt_fee: U128(b.attempt_fee.as_yoctonear()),
+            fee_step: U128(b.fee_step.as_yoctonear()),
+            fees_collected: U128(b.fees_collected.as_yoctonear()),
+            fees_swept: b.fees_swept,
+            next_fee: U128(b.next_fee().as_yoctonear()),
         })
     }
 

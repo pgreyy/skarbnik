@@ -6,8 +6,8 @@ This file describes only what is in the repository now. It grows as parts are bu
 
 | Folder | What is there | Status |
 | --- | --- | --- |
-| `contract/` | The bounty contract: create, register verifier, commit, reveal, verdict, attest (two different verifiers), timeout, expire; unit tests in `contract/src/tests.rs` | S3, deployed on `kintsugi-djloo.testnet` |
-| `scripts/` | `build_all.sh` (builds everything); `s3_deploy.sh`, `s3_testnet.sh`, `s3_lib.sh`, `s3_measure.py` (testnet runs and measurements) | S0, S3 |
+| `contract/` | The bounty contract: create, register verifier, credit (deposit, withdraw), commit with a rising attempt fee from credit, reveal, verdict, attest (two different verifiers), timeout, expire (refund and fee sweep to verifiers); unit tests in `contract/src/tests.rs` | S3b, deployed on `bounty.kintsugi-djloo.testnet` (the S3 version without fees stays on `kintsugi-djloo.testnet`) |
+| `scripts/` | `build_all.sh` (builds everything); `s3_deploy.sh`, `s3_testnet.sh`, `s3_lib.sh`, `s3_measure.py`, `s3b_setup.sh`, `s3b_testnet.sh` (testnet runs and measurements); `s2_measure.sh` (proof memory and time) | S0, S2, S3, S3b |
 | `harness/` | Build crate that compiles the zkVM guests in `harness/guest/` and `harness/check-guest/` and exposes their programs and image ids | S0, S1/S2 |
 | `harness/guest/` | A zkVM guest program that reads a name and publishes "hello, <name>" | S0 hello world |
 | `harness/check-guest/` | The zkVM guest that runs the patch checker on one candidate and commits the journal (hashes, seed, counts, PASS or FAIL); the secret crash input and salt stay inside | S1/S2 |

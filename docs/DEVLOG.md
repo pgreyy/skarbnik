@@ -2,7 +2,19 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
-## 2026-10-23 to 24: S2 proving cost, S1 inside the zkVM (S1 PASS, S2 measured), S3b fees (in progress)
+## 2026-10-24: S3b attempt fees and credit (PASS)
+
+- Contract: `deposit_credit`, `withdraw_credit` (1 yoctoNEAR), `get_credit`; rising attempt fee per commit from credit;
+  fees sent to the verifiers by `expire`. 39 unit tests pass. Wasm 243,866 bytes.
+- Moved to its own account `bounty.kintsugi-djloo.testnet` (3 NEAR from the main account). Six test accounts from the
+  testnet faucet. `scripts/s3b_setup.sh`, `scripts/s3b_testnet.sh`.
+- Testnet run: fees 0.01 and 0.015 NEAR taken from credit, commit without credit refused, PASS paid 0.5 NEAR, empty bounty
+  refunded 0.5 NEAR, 0.025 NEAR of fees split across three verifiers, credit withdrawn, second expire refused.
+- Failure on the way: setup stopped with exit 141 (broken pipe in the random suffix line under pipefail); fixed and re-run.
+- Found and fixed: the NEAR CLI prints its settings file path, which put a home folder path into one evidence file. All S3b
+  evidence was filtered, and `scripts/s3_lib.sh` now replaces home folder paths with `~` before saving.
+
+## 2026-10-23 to 24: S2 proving cost, S1 inside the zkVM (S1 PASS, S2 measured)
 
 - Pushed S0, S1 and S3 to the private repository after an audit of the full history (no keys, paths, emails or
   attribution; repository still private).

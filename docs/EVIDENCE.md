@@ -5,6 +5,61 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S3b: Attempt fees and credit, on a dedicated contract account
+
+Question: does a commit pay a rising attempt fee from prepaid credit, is a commit without credit refused, do the fees reach
+the verifiers at expiry, and can unspent credit be withdrawn (but not by a key that cannot attach 1 yoctoNEAR)?
+
+**Verdict: PASS (2026-10-24).** Full run output: `docs/evidence/S3b/` (`summary.txt`, `transactions.tsv`, `steps/`).
+
+Contract changes (`contract/src/lib.rs`): `deposit_credit` (attach NEAR, optionally for another account), `withdraw_credit`
+(needs exactly 1 yoctoNEAR attached, which a function call key cannot attach), `get_credit`; `create_bounty` takes
+`attempt_fee` (must be above zero) and `fee_step`; the n-th counted commit (n from 0) costs `attempt_fee + n * fee_step`,
+taken from the committer's credit; a commit beyond K is ignored and costs nothing; `expire` (after expiry) refunds an unpaid
+bounty and sends the collected fees to the registered verifiers in equal shares, the remainder to the first; a second
+`expire` with nothing left to do is refused.
+
+Unit tests: `cargo test -p kintsugi-contract --offline`: 39 passed, 0 failed.
+
+Wasm: 243,866 bytes, SHA-256 `4aa8d8614b4b9e914d981ca72ea298e2fb73cca9796a380a01fb04d34a64c7a2`, the same as the code on
+`bounty.kintsugi-djloo.testnet` (RPC `view_code`).
+
+Accounts (testnet only): contract `bounty.kintsugi-djloo.testnet`, created with 3 NEAR from `kintsugi-djloo.testnet`
+(`8BT7rhwtAc2cbe5cgMfocrxDc81SB9C6JJuzAnxPA6mM`), deployed with init (`72VTiMGEbBp1Hdk3AQHxgj5YznUsmqsBAb5uvHZQR32a`).
+Test accounts from the testnet faucet, 10 testnet NEAR each: `kintsugi-vendor-prnvm.testnet`, `kintsugi-res1-prnvm.testnet`,
+`kintsugi-res2-prnvm.testnet`, `kintsugi-ver1-prnvm.testnet`, `kintsugi-ver2-prnvm.testnet`, `kintsugi-ver3-prnvm.testnet`.
+
+Commands, from the repository root:
+
+```bash
+cd contract && cargo near build non-reproducible-wasm && cd ..
+./scripts/s3b_setup.sh
+./scripts/s3b_testnet.sh
+```
+
+Fee 0.01 NEAR, step 0.005 NEAR (explorer: `https://explorer.testnet.near.org/transactions/<hash>`):
+
+| Step | Transaction | Result |
+| --- | --- | --- |
+| register 3 verifiers | `8hoiajVKe6GYXNuRxm77yq7xait8MKJwW2pf6bBiqeMx`, `3GWZ3JLMpBfonwAuKMwdnoYKR39w3cj3PF1us61cFDX6`, `3jK6iQQQK8xhpC1gLyRb7HpmnZKTebYRAsQv7d2hufT2` | ok |
+| researchers 1 and 2 deposit 0.1 NEAR credit | `BthTa3YsgwqMaasY1Cfw8FbMLVFAqXUbPbvTuNoJsn3W`, `Foqzj6zNCk8aaGasq7r2SXGDjDnEcFiR16aemGiVWD9e` | credit 0.1 NEAR each |
+| bounty A created (0.5 NEAR) | `5aqPDbkryiLCGerajXMxpgmSyueRv5g9AtuDhD39EcU4` | ok |
+| researcher 1 commits | `W8AVDvxSFr9rjGUVjLKU2DkGr7289NHyaQ1GhNNkYmh` | fee 0.01 NEAR, credit 0.09 NEAR left |
+| researcher 2 commits | `HvErQztKDeAqezBKKADP8ZJA3GcWh7XHWCFmRnxJh5p3` | fee 0.015 NEAR, credit 0.085 NEAR left |
+| verifier 3 commits with no credit | `8E7u8BMebiY4SUMiWHgYGHM83UYjDzDbVc87EGyobo9y` | refused: "not enough credit for the attempt fee: call deposit_credit first" |
+| reveal, PASS, attest v1, attest v2 | `9HRPtPMWw9ikraFoNVGd6sJyYR8cBzMB7pAKdmQx1e4K`, `Bq35JYq9qzYHHhzcRfLJhmhvze3oSkknyGsDD79eJxzo`, `4JjzCpYCQjppcQHhQ9MEv9jj5trUunpgumAqvMtrmjEb`, `CMKG5ihUMBRsbHQG5Vj2kuaZnaaRrRk2qCdq3bZFUf4M` | researcher 1 balance +0.5 NEAR exactly |
+| bounty B created, no commits | `2VLLaPpRiWg4ghVDRJNxpbv1aLURKZdMATphhXytzYng` | ok |
+| researcher 2 withdraws its credit (1 yoctoNEAR attached) | `4DBFH8ZCbgtQEh984N8H369tsvUBPrDJeT3ddVj41aGe` | credit 0 |
+| expire bounty B | `C3hsfHVfhSQ9xWVhQBgjWpgXA3qG6F1noFNBMPhs5gbP` | vendor +0.5 NEAR exactly |
+| expire bounty A (already paid) | `EAomjDsQ41Z1Wt5XZLAZ6Abu6pGQv1nRFbeq4o9HGJew` | the 0.025 NEAR of fees to the verifiers: 8,333,333,333,333,333,333,334 / 8,333,333,333,333,333,333,333 / 8,333,333,333,333,333,333,333 yoctoNEAR |
+| expire bounty A again | `FLSQZWSQYjcf6QPGk2RDs5NyMPV5xFKJe9sfdEMfFE8Q` | refused: "nothing to do: bounty already closed and fees already swept" |
+
+Failures on the way: `scripts/s3b_setup.sh` stopped once with exit 141 after deploying: the random suffix pipe
+(`tr ... | head -c 5`) ended with a broken pipe under `set -o pipefail`. Replaced by a Python one-liner and re-run with
+`SKIP_DEPLOY=1`. Not tested yet: an AI agent's function call key spending credit (that is spike S7).
+
+The S3 contract on `kintsugi-djloo.testnet` (no fees) is left as it was; its S3 evidence above still describes it.
+
 ## S2: How slow and heavy is proving?
 
 Question: time to prove, peak memory, receipt size, cycle count and verification time for the checker inside RISC Zero at

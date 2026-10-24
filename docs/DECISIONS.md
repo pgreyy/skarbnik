@@ -8,7 +8,7 @@ Each decision with the date it was made and the reason. Open decisions say "open
 | D2 | What if verifiers are down after a verdict is posted? | Open. Default: counts as silence, so the researcher is paid | Anything unproven counts as no verdict |
 | D3 | Public name | Open. "Kintsugi" for the build | To be chosen later |
 | D4 | How many fresh inputs in the fairness check | Open. Set by spike S2 | Needs measured proving time |
-| D5 | Attempt fee shape | Open. Default: a flat fee that rises with each attempt, paid to the verifiers | Discourages flooding the attempt slots |
+| D5 | Attempt fee shape | Decided 2026-10-24: per bounty `attempt_fee + n * fee_step` for the n-th counted commit, paid from prepaid credit; fees go to the registered verifiers when `expire` runs after the bounty's expiry | Owner's decision; credit lets an AI agent's function call key pay fees without access to the wallet |
 | D6 | Who runs the three verifiers | Open. Default: one OutLayer job, one server run by us, one machine run by an independent party; a PASS needs two different registered verifier keys; the vendor is never a verifier | OutLayer runs its own workers behind one operator, so three OutLayer jobs are not independent |
 | D7 | Payout asset | Open. Default: NEAR | Simplest for a testnet demo |
 | D8 | Attempt sealed mode (vendor never sees the patch) | Open. Default: only if everything else is done | Stretch goal |

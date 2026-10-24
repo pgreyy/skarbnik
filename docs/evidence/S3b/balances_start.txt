@@ -1,0 +1,6 @@
+kintsugi-vendor-prnvm.testnet balance_yocto=10000000000000000000000000
+kintsugi-res1-prnvm.testnet balance_yocto=10000000000000000000000000
+kintsugi-res2-prnvm.testnet balance_yocto=10000000000000000000000000
+kintsugi-ver1-prnvm.testnet balance_yocto=10000000000000000000000000
+kintsugi-ver2-prnvm.testnet balance_yocto=10000000000000000000000000
+kintsugi-ver3-prnvm.testnet balance_yocto=10000000000000000000000000

@@ -1,0 +1,56 @@
+$ near contract call-function as-transaction bounty.kintsugi-djloo.testnet create_bounty json-args {"original_hash":"91efcfdfd027098f194fc7f4192124077ad39499925bc4df17451b206bf98a83","corpus_hash":"bc8b8847daa12f9b210cb5b0f45b341706f498b601e7a438e7899e810c5315e5","image_id":"13b1d103583e3bf205505641d10ff1de7b37ea8af97bb206f593936fd188dd47","exploit_commitment":"3da139c69c2b873e8f02455035091b1c212c0bf7b12be9476f81406850876e76","proof0_receipt_hash":"4a3aedb7210dd5519fdfd33b750186c1e4dd219b94029d4ebe7bd07f1ff57d9f","max_commits":3,"max_patch_bytes":1024,"reveal_gap_ns":"2000000000","verdict_window_ns":"600000000000","attest_window_ns":"600000000000","expiry_ns":"30000000000","attempt_fee":"10000000000000000000000","fee_step":"5000000000000000000000"} prepaid-gas 100 Tgas attached-deposit 0.5 NEAR sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T05:47:03.322745977Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  create_bounty
+│                       args:         {
+│                                       "attempt_fee": "10000000000000000000000",
+│                                       "attest_window_ns": "600000000000",
+│                                       "corpus_hash": "bc8b8847daa12f9b210cb5b0f45b341706f498b601e7a438e7899e810c5315e5",
+│                                       "expiry_ns": "30000000000",
+│                                       "exploit_commitment": "3da139c69c2b873e8f02455035091b1c212c0bf7b12be9476f81406850876e76",
+│                                       "fee_step": "5000000000000000000000",
+│                                       "image_id": "13b1d103583e3bf205505641d10ff1de7b37ea8af97bb206f593936fd188dd47",
+│                                       "max_commits": 3,
+│                                       "max_patch_bytes": 1024,
+│                                       "original_hash": "91efcfdfd027098f194fc7f4192124077ad39499925bc4df17451b206bf98a83",
+│                                       "proof0_receipt_hash": "4a3aedb7210dd5519fdfd33b750186c1e4dd219b94029d4ebe7bd07f1ff57d9f",
+│                                       "reveal_gap_ns": "2000000000",
+│                                       "verdict_window_ns": "600000000000"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0.5 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.341 Tgas
+│    Transaction fee: 0.000034010295648 NEAR
+│    Transaction ID: 2VLLaPpRiWg4ghVDRJNxpbv1aLURKZdMATphhXytzYng
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/2VLLaPpRiWg4ghVDRJNxpbv1aLURKZdMATphhXytzYng
+│     
+├  Function execution logs:
+│    Logs [bounty.kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_created","data":[{"bounty_id":"1","vendor":"kintsugi-vendor-prnvm.testnet","amount":"500000000000000000000000","image_id":"13b1d103583e3bf205505641d10ff1de7b37ea8af97bb206f593936fd188dd47","exploit_commitment":"3da139c69c2b873e8f02455035091b1c212c0bf7b12be9476f81406850876e76","max_commits":3,"attempt_fee":"10000000000000000000000","fee_step":"5000000000000000000000","expires_at_ns":"1792820854754144975"}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"1"
+
+
+The "create_bounty" call to <bounty.kintsugi-djloo.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction bounty.kintsugi-djloo.testnet create_bounty json-args '{"original_hash":"91efcfdfd027098f194fc7f4192124077ad39499925bc4df17451b206bf98a83","corpus_hash":"bc8b8847daa12f9b210cb5b0f45b341706f498b601e7a438e7899e810c5315e5","image_id":"13b1d103583e3bf205505641d10ff1de7b37ea8af97bb206f593936fd188dd47","exploit_commitment":"3da139c69c2b873e8f02455035091b1c212c0bf7b12be9476f81406850876e76","proof0_receipt_hash":"4a3aedb7210dd5519fdfd33b750186c1e4dd219b94029d4ebe7bd07f1ff57d9f","max_commits":3,"max_patch_bytes":1024,"reveal_gap_ns":"2000000000","verdict_window_ns":"600000000000","attest_window_ns":"600000000000","expiry_ns":"30000000000","attempt_fee":"10000000000000000000000","fee_step":"5000000000000000000000"}' prepaid-gas '100.0 Tgas' attached-deposit '0.5 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=4.49
