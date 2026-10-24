@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: GPU proof, final attempt (proof in 22.65 s, image id differs, stopped)
+
+- All build dependencies installed in one step; built `kintsugi-host` with a pod-only feature `cuda-prove-only` (the
+  circuits' cuda features, without RISC Zero's GPU Groth16 part that needs `circom-witnesscalc`): 57.10 s.
+- 16 input proof on the NVIDIA L40S: 22.65 s (laptop baseline 2,814.45 s), 26 segments, PASS, peak GPU memory 9,291 MiB.
+- Image id `dfd48a5e...` instead of `3edbc2e6...`, so the run stopped under the owner's rule (no verify, no compression).
+  Likely cause, not verified: the guest was compiled on the pod and embeds build paths. Total use of the pod: about
+  25.5 minutes (16:45:12 to 17:10:42 UTC).
+- Next, if the owner wants a like for like number: a reproducible guest build (`cargo risczero build`) on both machines.
+
 ## 2026-10-24: GPU proof on a rented RunPod pod (FAIL, no proof)
 
 - Owner rented a RunPod pod (NVIDIA L40S, 46 GB, CUDA 12.8). Setup over ssh from the laptop: check, rust, rzup and the

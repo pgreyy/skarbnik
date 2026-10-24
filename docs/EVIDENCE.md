@@ -10,9 +10,10 @@ by `<repo>` and `~`.
 Question: how long does the same 16 input proof take on an NVIDIA GPU, against the laptop baseline of **2,814.45 s
 (46.9 min), S2b, commit `5ba0298`**? The pod was to prove commit `1439e37` (same guest program, image id `3edbc2e6...`).
 
-**Verdict: FAIL (2026-10-24), no proof was made: the build with the `cuda` feature failed three times, and the run was
-stopped under the owner's cost guard. No GPU time, memory or cost-per-proof number exists yet. Fallback: the laptop CPU
-numbers (S2b) stay the only measured proving times.**
+**Verdict: the proof ran on the GPU in 22.65 s (laptop baseline 2,814.45 s), but it is NOT a like for like result: its
+image id is `dfd48a5e39296bf288baf8df898c8e8ab00d793a2d16ee3d9f3564f8804d7633`, not `3edbc2e6...`, so under the
+owner's rule the run stopped there (no verify, no compression).** The first attempt (three builds) failed; the owner's
+final attempt, with a changed build, made the proof. Details of both below.
 
 Machine (`docs/evidence/S2/gpu/01_check.log`): RunPod pod, NVIDIA L40S with 46,068 MiB, driver 595.91.07, nvcc 12.8.93
 already installed, Ubuntu 24.04.5, root. Every step was sent over ssh from the laptop and logged, stopping at the first
@@ -30,11 +31,39 @@ failure (IP address and port removed from the copies in `docs/evidence/S2/gpu/`)
 | apt with `protobuf-compiler` (owner's go) | 1,085 | ok, `libprotoc 3.21.12` |
 | build try 3 (setup fingerprint changed) | 1,110 | **failed**: same crate, bindgen: "Unable to find libclang" |
 
+### Final attempt (owner's go, hard limit 30 minutes from 17:06:55 UTC)
+
+What changed: (1) all build dependencies installed in one step (`04_deps_all.log`: `protobuf-compiler`, `libclang-dev`,
+`clang`, `cmake`, `pkg-config`, `libssl-dev`, `build-essential`; protoc 3.21.12, clang 18.1.3, cmake 3.28.3). (2) A build
+WITHOUT RISC Zero's GPU Groth16 part: `risc0-zkvm`'s `cuda` feature switches on `risc0-groth16/cuda`, which pulls in
+`circom-witnesscalc`; `risc0-zkvm` 3.0.6 uses its own `cuda` flag only in tests and docs, and the GPU prover is chosen in
+the circuit crates. So the pod's copy of `host/Cargo.toml` got a feature `cuda-prove-only` = `risc0-zkvm/prove` plus the
+`cuda` features of `risc0-zkp` 3.0.5, `risc0-circuit-rv32im` 4.0.5, `risc0-circuit-recursion` 4.0.5 and
+`risc0-circuit-keccak` 4.0.6 (the exact change: `docs/evidence/S2/gpu/cuda_prove_only.patch`; it was made only on the
+pod's copy of `1439e37` and is not in this repository's code). `cargo tree -p kintsugi-host --features cuda-prove-only
+-i circom-witnesscalc` answered "did not match any packages" (`05_patch.log`).
+
+| Step | Time (UTC) | Result |
+|---|---|---|
+| `cargo build --release -p kintsugi-host --features cuda-prove-only` | 17:08:26 to 17:09:23 | ok, 57.10 s (`06_build_prove_only.log`) |
+| prove, 16 inputs, 32 variants, `--po2 19`, `RISC0_PROVER=local` (`01_prove.log`, `prove_f16.log`, `gpu_samples.csv`) | 17:09:47 to 17:10:15 | **prove seconds 22.65** (wall 23.50 s), 26 segments, composite receipt 6,971,396 bytes, journal verdict PASS, peak GPU memory 9,291 MiB (sampled every 0.5 s), host `max_rss_kb` 513,324 |
+| image id check | | **`dfd48a5e...` instead of `3edbc2e6...`: stopped** |
+
+Against the baseline: 22.65 s on the GPU against 2,814.45 s on the laptop CPU, about 124 times faster, but only if the
+two proofs are of the same program, which the image id does not confirm. What does match: the journal fields
+(candidate hash `42edaaf5...`, original hash, exploit commitment, corpus hash, 16 inputs, 32 variants, PASS), the segment
+count (26) and the receipt size (6,971,396 bytes, the same as the laptop's S4 receipt of the same check). The likely
+cause of the different id, NOT verified: the guest program was compiled on the pod, and a compiled RISC Zero guest can
+embed its build paths (`/root/kintsugi` on the pod, the home folder on the laptop), which changes the image id even with
+the same source. RISC Zero's reproducible guest build (`cargo risczero build`, in Docker) would settle it; not tried.
+Not done because of the stop: `verify`, the succinct compression, and Groth16 (not possible in this build anyway).
+
+The receipt is in `target/gpu-results/receipt_f16.bin` on the laptop (SHA-256 `9cc7c4a5...d8ff`, not committed).
+Time on the pod for both attempts: 16:45:12 to 17:10:42 UTC, about 25.5 minutes of use.
+
 `circom-witnesscalc` comes in with RISC Zero's GPU Groth16 prover when `risc0-zkvm` is built with `cuda`. Its build needs
-`protoc` and `libclang`; neither is in the CUDA template. A next try would add both (on Ubuntu, `protobuf-compiler` and
-`libclang-dev` or `clang`) to the setup step before building; that is written into the private GPU guide and has not
-been run. Our use of the pod: 16:45:12 to 17:04 UTC (about 19 minutes); the pod ran from when the owner started it until
-the owner terminated it, and its cost is on RunPod's billing page.
+`protoc` and `libclang`; neither is in the CUDA template. The final attempt above installed both. The pod ran from when the owner started it until the owner terminated it; its
+cost is on RunPod's billing page.
 
 ## S13: Attack pass on the hardened contract and checker
 

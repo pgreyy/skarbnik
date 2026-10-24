@@ -1,0 +1,24 @@
+candidate: data/demo/fixed.wasm
+image id: dfd48a5e39296bf288baf8df898c8e8ab00d793a2d16ee3d9f3564f8804d7633
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 16 variants: 32
+total cycles: 13631488
+user cycles: 8588022
+segments: 26
+prove seconds: 22.65
+verify seconds (in process): 0.717
+receipt file: gpu-results/receipt_f16.bin (6971396 bytes)
+seal bytes: 6964880
+journal bytes: 780
+journal.verdict: PASS
+journal.candidate_hash: 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97
+journal.original_hash: fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8
+journal.exploit_commitment: 9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387
+journal.corpus_hash: 736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b
+journal.fuzz_seed: 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21
+journal.fuzz_count: 16
+journal.variant_count: 32
+journal.submission_id: 0000000000000000000000000000000000000000000000000000000000000000
+wall_seconds=23.50 max_rss_kb=513324
+peak GPU memory used (MiB): 9291

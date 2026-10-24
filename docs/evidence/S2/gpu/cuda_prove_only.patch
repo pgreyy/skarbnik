@@ -1,0 +1,9 @@
+8a9,12
+> risc0-zkp = { version = "=3.0.5", optional = true, default-features = false }
+> risc0-circuit-rv32im = { version = "=4.0.5", optional = true, default-features = false }
+> risc0-circuit-recursion = { version = "=4.0.5", optional = true, default-features = false }
+> risc0-circuit-keccak = { version = "=4.0.6", optional = true, default-features = false }
+17a22,24
+> # GPU proving without RISC Zero's GPU Groth16 part (which needs circom-witnesscalc): the circuits' own cuda
+> # features plus the local prover. Groth16 compression is not available in this build.
+> cuda-prove-only = ["risc0-zkvm/prove", "dep:risc0-zkp", "risc0-zkp/cuda", "dep:risc0-circuit-rv32im", "risc0-circuit-rv32im/cuda", "dep:risc0-circuit-recursion", "risc0-circuit-recursion/cuda", "dep:risc0-circuit-keccak", "risc0-circuit-keccak/cuda"]
