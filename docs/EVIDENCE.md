@@ -41,6 +41,8 @@ cause is on OutLayer's side and we cannot see it; Level 1 stays "not working on 
    | e6 | our verifier | jsDelivr | wasip1 | 5615 | **none**, 122 s |
    | e7 | OutLayer's probe, via its project (control) | FastFS | wasip2 | tx `G6NVynGvtTkJExKSZwu1i5DKHzUFKt4LA6CiNGTkwrhh` | yes, 12 s |
 
+   The e1 and e4 answers are in `e1_e4_answers_from_chain.txt`, read back from the testnet RPC: the evidence filter had
+   dropped them from the CLI copies because OutLayer's error text contains the word "secret".
    Each link served the exact bytes named by the hash (checked with `curl -sL <url> | sha256sum`), and both hosts pass the
    URL rule in OutLayer's worker code (https, default port; our file is 1,134,249 bytes, under its 10 MB limit).
 4. OutLayer's public worker list (`https://testnet-api.outlayer.ai/public/workers`, read only) shows two executor workers
