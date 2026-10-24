@@ -1,0 +1,10 @@
+$ docker pull risczero/risc0-groth16-prover:v2025-04-03.1
+2026-10-24T20:10:27Z
+v2025-04-03.1: Pulling from risczero/risc0-groth16-prover
+Digest: sha256:a4f80ce2e0b8e2bb7637a93c37136a6776ac00ec843a3fdf1c67b1d5ffea64ee
+Status: Downloaded newer image for risczero/risc0-groth16-prover:v2025-04-03.1
+docker.io/risczero/risc0-groth16-prover:v2025-04-03.1
+exit=0
+2026-10-24T20:41:25Z
+wall_seconds=1858.6
+size_bytes=2399163836 id=sha256:a4f80ce2e0b8e2bb7637a93c37136a6776ac00ec843a3fdf1c67b1d5ffea64ee

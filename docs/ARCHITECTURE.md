@@ -55,3 +55,45 @@ file serves every version; the S13 guest did not change it (rebuilt file identic
 | `3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d` | `harness/check-guest` at `8aead8c` (freeing allocator) | S2b, S4 bounty 2, S7 bounty 3 (`docs/evidence/S2b/`, `S4/`, `S7/`) |
 | `043ec633f68431f51b99cacd6a460560647a15916cdd0cb58762b61f9ede7f8d` | `harness/check-guest` with the S13 Proof 0 mode, plain build on the laptop | S13 Proof 0 and bounties on `kintsugi-s13-tlryo.testnet` (`docs/evidence/S13/`) |
 | `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc` | the same checker, reproducible build (`harness/build.rs`) | demo bounty 4 on `kintsugi-s13-tlryo.testnet` and its Proof 0 (`docs/evidence/demo/`) |
+
+## Design note: the contract checking the proof itself (Level 2, not built)
+
+Today the contract trusts its verifiers to check each receipt (Level 0). Level 2 would let the contract check a
+small proof itself. Nothing below is built; the gas figure is arithmetic on NEAR's configured prices, not a measurement.
+
+**What would be checked.** RISC Zero can shrink a receipt into a Groth16 proof: three curve points (A, B, C) on the
+BN254 curve. Its verifier checks one standard Groth16 equation with five public numbers: the control root split into
+two halves, the claim digest split into two halves, and the BN254 control id (`risc0-groth16` 3.0.5,
+`src/verifier.rs`, `Verifier::new`; the verifying key has six fixed points `IC0` to `IC5`). The claim digest is a
+tagged SHA-256 of the run's claim; for a normal successful run (`ReceiptClaim::ok`) it is built only from the image id
+and the journal (`risc0-zkvm` 3.0.6, `src/claim/receipt.rs`), so the contract can compute it from the bounty's image id
+and the journal the vendor posts, using NEAR's `env::sha256`.
+
+**What NEAR offers.** near-sdk 5.29.1 exposes three BN254 host functions: `env::alt_bn128_g1_multiexp` (sum of points
+times numbers), `env::alt_bn128_g1_sum` (add or subtract points) and `env::alt_bn128_pairing_check` (is a product of
+pairings equal to one) (docs.rs `near_sdk::env`; nearcore `runtime/near-vm-runner/src/logic/host.rs` and
+`alt_bn128.rs`). They were stabilized in nearcore 1.28.0 (nearcore CHANGELOG; PR #6824).
+
+**Are they enough?** Yes, on paper: the five public numbers go into one multiexp with the five `IC` points, `IC0` is
+added with a G1 sum (which can also negate A), and the equation becomes one pairing check over four pairs. What the
+contract must add itself: the claim digest (a few SHA-256 calls), and converting RISC Zero's big-endian encoding to
+NEAR's little-endian layout (nearcore `alt_bn128.rs`). Not confirmed by any source: an official statement comparing
+NEAR's encoding with Ethereum's (EIP-196/197), and an official Groth16 verifier crate for NEAR.
+
+**Gas, estimated from NEAR's configured prices** (nearcore `core/parameters/res/runtime_configs/parameters.yaml`):
+pairing check 9.686 TGas plus 5.102 TGas per pair; multiexp 0.713 TGas plus 0.32 TGas per element; G1 sum 0.003 TGas
+plus 0.005 TGas per element. For one proof: 9.686 + 4 x 5.102 = 30.094 TGas, plus 0.713 + 5 x 0.32 = 2.313 TGas, plus a
+small G1 sum: about 32.4 TGas for the curve work, before the cost of running the contract code and reading the input.
+That is well under the 1,000 TGas a transaction may attach (docs.near.org, Gas). The real number needs a measured
+testnet call.
+
+**What would stay trusted.**
+- RISC Zero's Groth16 trusted setup ceremony and the verifying key built from it; RISC Zero's security model lists
+  "Integrity of Groth16 Trusted Setup Ceremony" as an assumption and rates the Groth16 step 99+ bits, not quantum safe
+  (dev.risczero.com, security model and trusted setup ceremony pages).
+- The BN254 curve itself: NEAR's NEP-488 says recent research puts BN254 below 100-bit security.
+- The two fixed constants the contract would hold: RISC Zero's control root and BN254 control id
+  (`risc0-zkvm` 3.0.6, `src/receipt/groth16.rs`, `Groth16ReceiptVerifierParameters`).
+- The vendor, for keeping the secret and for running the proof; the contract would no longer need verifiers to say
+  whether a receipt is valid, only the math.
+- That the image id names the published checker: now checkable by anyone with `./scripts/check_image_id.sh`.

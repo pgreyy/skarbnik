@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Samples every 2 s until stopped: the laptop's available memory and the memory of any running Groth16 prover container.
+# Kills the container if available memory falls below 700 MiB. Writes samples and the peaks to its log.
+log=$1; peak=0; minavail=999999
+while true; do
+  avail=$(awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo)
+  [ "$avail" -lt "$minavail" ] && minavail=$avail
+  c=$(docker ps -q --filter ancestor=risczero/risc0-groth16-prover:v2025-04-03.1 | head -1)
+  if [ -n "$c" ]; then
+    m=$(docker stats --no-stream --format '{{.MemUsage}}' "$c" 2>/dev/null | awk '{print $1}')
+    mib=$(python3 -c "import re,sys; s='$m'; v=float(re.match(r'[\d.]+',s).group()) if s else 0; u=s[len(re.match(r'[\d.]+',s).group()):] if s else 'MiB'; print(int(v*{'B':1/1048576,'KiB':1/1024,'MiB':1,'GiB':1024}.get(u,1)))" 2>/dev/null || echo 0)
+    [ "$mib" -gt "$peak" ] && peak=$mib
+    echo "$(date -u +%T) avail_mib=$avail container_mib=$mib" >> "$log"
+    if [ "$avail" -lt 700 ]; then echo "$(date -u +%T) KILL: available memory below 700 MiB" >> "$log"; docker kill "$c" >> "$log" 2>&1; fi
+  fi
+  echo "peak_container_mib=$peak min_available_mib=$minavail" > "$log.peaks"
+  sleep 2
+done

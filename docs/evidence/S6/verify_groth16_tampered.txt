@@ -1,0 +1,4 @@
+$ ./target/release/kintsugi-host tamper target/s6/proof0_groth16.bin target/s6/proof0_groth16_tampered.bin seal && ./target/release/kintsugi-host verify target/s6/proof0_groth16_tampered.bin
+error: unsupported receipt kind
+error: target/s6/proof0_groth16_tampered.bin: No such file or directory (os error 2)
+exit=2

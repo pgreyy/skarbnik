@@ -1,0 +1,9 @@
+compress seconds: 187.91
+verify seconds: 0.007
+output receipt: target/s6/proof0_groth16.bin (2057 bytes)
+exit=0
+wall_seconds=189.07
+r0vm_peak_rss_mib=1410 (VmHWM, sampled every 5 s)
+min_available_mib=801
+result: finished
+exit=0

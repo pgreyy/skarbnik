@@ -5,6 +5,41 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S6 (Level 2, feasibility): Groth16 compression on the laptop
+
+Question: can this laptop shrink a receipt into a Groth16 proof (the small proof a contract could check itself), how
+long does it take, how much memory does it need, and does the result verify against the reproducible image id? No
+rental. Raw output: `docs/evidence/S6/`. The contract was not changed; the on-chain design is a note in
+docs/ARCHITECTURE.md ("Design note: the contract checking the proof itself").
+
+**Verdict: PASS (2026-10-24), feasibility only.** The demo Proof 0 receipt became a 2,057 byte Groth16 receipt in
+187.91 s, and it verifies off chain against `dd6c5f42...` (VALID). Memory was tight: the Groth16 container reached
+7,061 MiB and the laptop's available memory fell to 801 MiB.
+
+What RISC Zero's own sources say it needs: x86 and Docker ("Proving with Groth16 is currently only supported using
+Docker", `risc0-groth16` 3.0.5 `src/prove/docker.rs`; "requires an x86 architecture and Docker installed",
+`risc0-groth16` README). The Docker image is `risczero/risc0-groth16-prover:v2025-04-03.1` (same file). RISC Zero states
+no memory figure for it: checked the `groth16_proof` README and its `prover.Dockerfile` at v3.0.6 (copies in
+`docs/evidence/S6/`), the local-proving page on dev.risczero.com (its only memory note, "less than 10 GB", is about
+segment size in general), and issue #1749 ("the prover key required is rather large (many GB)"). So the number below
+is measured here, not quoted.
+
+| Step | Command | Result |
+|---|---|---|
+| this laptop | `free -h`, `df -h /`, `docker run --rm hello-world` | 10 GiB RAM for WSL (7.5 GiB available before the run), 8 GiB swap, 719 GB free disk, 16 CPUs, Docker 29.1.3 works |
+| prover image | `docker pull risczero/risc0-groth16-prover:v2025-04-03.1` (`docker_pull_groth16.log`) | 2.40 GB in 1,858.6 s, about 1.3 MB/s; digest `sha256:a4f80ce2...64ee` |
+| compress to Groth16, alone | `MIN_AVAIL_MIB=700 MAX_SECONDS=3600 scripts/s2_measure.sh target/s6/compress_groth16.log -- ./target/release/kintsugi-host compress target/demo/proof0_succinct.bin target/s6/proof0_groth16.bin groth16` (`compress_groth16.log`) | compress 187.91 s (wall 189.07 s); output 2,057 bytes (SHA-256 `06b8eac4...e003`); r0vm peak 1,410 MiB |
+| container memory, sampled about every 2 to 4 s by `watch_mem.sh` (`mem_samples.log`, 28 samples) | `docker stats` on the prover container, plus the laptop's available memory | container peak 7,061 MiB; laptop available memory at its lowest 801 MiB (the run would have been stopped below 700 MiB; it was not) |
+| verify off chain | `./target/release/kintsugi-host verify target/s6/proof0_groth16.bin` (`verify_groth16.txt`) | VALID, image id `dd6c5f42...`, journal SHA-256 `fb7939dc...` (the same journal as the succinct receipt), verdict PASS, 0.011 s |
+
+Notes:
+- The input was the reproducible-build Proof 0 of the demo bounty (`target/demo/proof0_succinct.bin`, 224,786 bytes).
+- The memory peak is a sample, so the true peak may be somewhat higher. With 10 GiB for WSL there was about 0.8 GiB
+  left; a machine with less memory, or other programs running, may not finish.
+- `kintsugi-host tamper` does not handle Groth16 receipts ("unsupported receipt kind", `verify_groth16_tampered.txt`),
+  so no tampered Groth16 receipt was tested.
+- Not done: any on-chain verification, any contract change, any gas measurement.
+
 ## Demo bounty with the reproducible image id: anyone can rebuild the checker and get a MATCH
 
 Question: can a judge rebuild the checker from this repository and get the exact image id a bounty on the contract

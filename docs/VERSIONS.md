@@ -76,6 +76,7 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | --- | --- | --- |
 | Docker buildx plugin | v0.38.1 (commit `0dbe87f3`), in `~/.docker/cli-plugins/docker-buildx`, binary SHA-256 `e25d5cd675092bb5d1d03632fdc46cdf3fede7b514dc5f023a105e00d3ce5ad4` (matches the release's checksums.txt) | `docker buildx version` |
 | RISC Zero guest builder image | `risczero/risc0-guest-builder:r0.1.97.0`, digest `sha256:7ae0a27fa72b10fb5c1066005bd949ae43dc4ead8a284f2d6572b99c82ab4468` (Rust 1.97.0) | `docker image inspect risczero/risc0-guest-builder:r0.1.97.0` |
+| RISC Zero Groth16 prover image (Docker, CPU path) | `risczero/risc0-groth16-prover:v2025-04-03.1`, digest `sha256:a4f80ce2e0b8e2bb7637a93c37136a6776ac00ec843a3fdf1c67b1d5ffea64ee` (the tag `risc0-groth16` 3.0.5 runs) | `docker image inspect risczero/risc0-groth16-prover:v2025-04-03.1` |
 | risc0-binfmt (build dependency of `harness`, prebuilt guest mode) | 3.0.5 (pinned `=3.0.5`, the version risc0-build 3.0.6 uses) | `harness/Cargo.toml` |
 
 ## Other

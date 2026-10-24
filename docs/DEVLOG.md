@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: S6 feasibility: Groth16 compression on the laptop (PASS), Level 2 design note
+
+- RISC Zero's CPU Groth16 path needs x86 and Docker; it states no memory figure (README, Dockerfile, local-proving page,
+  issue #1749 checked). Pulled `risczero/risc0-groth16-prover:v2025-04-03.1` (2.40 GB, 1,858.6 s, about 1.3 MB/s).
+- `kintsugi-host compress target/demo/proof0_succinct.bin target/s6/proof0_groth16.bin groth16`, alone, under
+  `scripts/s2_measure.sh` and a container memory sampler: 187.91 s, 2,057 bytes, container peak 7,061 MiB, laptop
+  available memory down to 801 MiB. `kintsugi-host verify`: VALID against `dd6c5f42...`.
+- Design note in docs/ARCHITECTURE.md: NEAR's three BN254 host functions are enough on paper; host-charge arithmetic
+  about 32.4 TGas per proof (not measured); what stays trusted. No contract change.
+- `kintsugi-host tamper` does not support Groth16 receipts; no tampered Groth16 receipt tested.
+
 ## 2026-10-24: Demo bounty with the reproducible image id (MATCH); prebuilt guests and cuda-prove-only
 
 - Proof 0 with the reproducible build: 4,312.55 s at peak 4,724 MiB, compressed in 1,388.17 s, VALID under
