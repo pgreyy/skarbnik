@@ -68,17 +68,17 @@ Each guard: what it stops, where it lives, and what shows it works.
 | 2026-10-24 | `f169bbb` | A stranger calls the private OutLayer callback; the owner registers the vendor as a verifier | `call_expect_fail` in `scripts/s3_lib.sh` | **blocked** on chain ("Method on_outlayer_result is private", "a vendor account cannot be a verifier") |
 | 2026-10-24 | `dbe874c` | An agent's function call key sends NEAR, attaches a deposit, calls another method | `scripts/s7_agent.sh limits` | **blocked** (CLI before sending; chain: `RequiresFullAccess`, `MethodNameMismatch`) |
 | 2026-10-24 | `1e7976f` | A probe agent tries to learn the secret; a fourth probe beyond K | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` | **accepted risk**: one bit per attempt, 3 bits with K = 3 (the vendor chooses K); with the variant check on, 0 bits; the fourth commit **blocked** (ignored) |
-| 2026-10-24 | pending | (3) Sub-accounts of one researcher fill the K = 3 slots of a bounty | `scripts/s13_attacks.sh misc` | **accepted risk**: allowed, each paying the rising fee (0.01, 0.015, 0.02 NEAR); a fourth commit was ignored and not charged; K is per bounty, so the leak stays at most K bits; blocking one reveal window costs 0.045 NEAR, the next 0.09 NEAR, and so on (section 3) |
-| 2026-10-24 | pending | (1) An unfixable bounty: a 300 byte secret (over the 256 byte limit) | `scripts/s13_attacks.sh open` | **not blocked before S13 (guard added)**, now **blocked**: Proof 0 refuses it; a commit before two Proof 0 attestations is refused on chain (EVIDENCE, S13) |
-| 2026-10-24 | pending | (2) Junk commits that are never revealed hold all K slots | `scripts/s13_attacks.sh misc` | **not blocked before S13 (guard added)**, now **blocked**: early release refused; after the reveal window the slot was freed and a new commit fitted (EVIDENCE, S13) |
-| 2026-10-24 | pending | (4) The vendor replays another submission's PASS receipt | `scripts/s13_attacks.sh bounty_b` | **blocked**: the verifier check fails on submission id and seed; no attestation; the researcher was paid by timeout (EVIDENCE, S13) |
-| 2026-10-24 | pending | (5) A verifier attests PASS while the vendor posted FAIL | `scripts/s13_attacks.sh attack_a` | **blocked** on chain ("attestation does not match the posted verdict") (EVIDENCE, S13) |
-| 2026-10-24 | pending | (6) An unregistered account attests Proof 0 | `scripts/s13_attacks.sh misc` | **blocked** on chain ("caller is not a registered verifier") (EVIDENCE, S13) |
-| 2026-10-24 | pending | (7) The same verifier attests Proof 0 twice | `scripts/s13_attacks.sh misc` | **blocked**: the bounty stays closed with one attestation (EVIDENCE, S13) |
-| 2026-10-24 | pending | (8) Timeout or expire too early, or again after payout | `scripts/s13_attacks.sh bounty_b, attack_a` | **blocked** on chain ("bounty has not expired", "deadline has not passed", "bounty is closed", "nothing to do") (EVIDENCE, S13) |
-| 2026-10-24 | pending | (9) A receipt made by another checker program | `scripts/s13_attacks.sh bounty_b` | **blocked**: does not verify with the bounty's image id (EVIDENCE, S13) |
-| 2026-10-24 | pending | (10) A reveal that does not match its commit | `scripts/s13_attacks.sh misc` | **blocked** on chain ("fingerprint does not match") (EVIDENCE, S13) |
-| 2026-10-24 | pending | (11) The vendor posts FAIL for a fix whose real receipt says PASS | `scripts/s13_attacks.sh attack_a` | **blocked**: both verifiers refuse (journal verdict differs); after the window the researcher was paid by timeout, +0.51 NEAR (bounty and own fee) (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (3) Sub-accounts of one researcher fill the K = 3 slots of a bounty | `scripts/s13_attacks.sh misc` | **accepted risk**: allowed, each paying the rising fee (0.01, 0.015, 0.02 NEAR); a fourth commit was ignored and not charged; K is per bounty, so the leak stays at most K bits; blocking one reveal window costs 0.045 NEAR, the next 0.09 NEAR, and so on (section 3) |
+| 2026-10-24 | `500469c` | (1) An unfixable bounty: a 300 byte secret (over the 256 byte limit) | `scripts/s13_attacks.sh open` | **not blocked before S13 (guard added)**, now **blocked**: Proof 0 refuses it; a commit before two Proof 0 attestations is refused on chain (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (2) Junk commits that are never revealed hold all K slots | `scripts/s13_attacks.sh misc` | **not blocked before S13 (guard added)**, now **blocked**: early release refused; after the reveal window the slot was freed and a new commit fitted (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (4) The vendor replays another submission's PASS receipt | `scripts/s13_attacks.sh bounty_b` | **blocked**: the verifier check fails on submission id and seed; no attestation; the researcher was paid by timeout (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (5) A verifier attests PASS while the vendor posted FAIL | `scripts/s13_attacks.sh attack_a` | **blocked** on chain ("attestation does not match the posted verdict") (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (6) An unregistered account attests Proof 0 | `scripts/s13_attacks.sh misc` | **blocked** on chain ("caller is not a registered verifier") (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (7) The same verifier attests Proof 0 twice | `scripts/s13_attacks.sh misc` | **blocked**: the bounty stays closed with one attestation (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (8) Timeout or expire too early, or again after payout | `scripts/s13_attacks.sh bounty_b, attack_a` | **blocked** on chain ("bounty has not expired", "deadline has not passed", "bounty is closed", "nothing to do") (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (9) A receipt made by another checker program | `scripts/s13_attacks.sh bounty_b` | **blocked**: does not verify with the bounty's image id (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (10) A reveal that does not match its commit | `scripts/s13_attacks.sh misc` | **blocked** on chain ("fingerprint does not match") (EVIDENCE, S13) |
+| 2026-10-24 | `500469c` | (11) The vendor posts FAIL for a fix whose real receipt says PASS | `scripts/s13_attacks.sh attack_a` | **blocked**: both verifiers refuse (journal verdict differs); after the window the researcher was paid by timeout, +0.51 NEAR (bounty and own fee) (EVIDENCE, S13) |
 
 ## 3. Known limits
 
@@ -115,12 +115,12 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
-- 2026-10-24 (pending commit): OutLayer second try: verifier published on FastFS as project
+- 2026-10-24 `500469c`: OutLayer second try: verifier published on FastFS as project
   `kintsugi-ol-hfoez.testnet/farbox-verifier` with OutLayer's tool; still no answer (requests 5618 to 5620). No guard changed.
-- 2026-10-24 (pending commit): OutLayer Level 1 diagnosis: no guard changed; the known limit now says what was found
+- 2026-10-24 `500469c`: OutLayer Level 1 diagnosis: no guard changed; the known limit now says what was found
   (testnet answers cached programs only; ours never answered). Measured verifier needs: 878,730,118 instructions, 3.4 MB.
-- 2026-10-24 (pending commit): S13 attack pass on testnet: attacks 1, 2, 4 to 11 blocked; attack 3 accepted risk.
-- 2026-10-24 (pending commit): S13 guards in code: Proof 0 refuses an over-long secret and needs a reference fix; bounties
+- 2026-10-24 `500469c`: S13 attack pass on testnet: attacks 1, 2, 4 to 11 blocked; attack 3 accepted risk.
+- 2026-10-24 `500469c`: S13 guards in code: Proof 0 refuses an over-long secret and needs a reference fix; bounties
   open only after two Proof 0 attestations; reveal window and `release_unrevealed`; winner's fee refunded.
 - 2026-10-24 `f169bbb`: OutLayer callback refusals on chain (private callback, vendor as verifier).
 - 2026-10-24 `6c24c1d`: OutLayer answer accepted only as the callback of the contract's own request, with every echoed value
