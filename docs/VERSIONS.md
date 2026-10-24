@@ -64,6 +64,12 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | wasmtime-wasi | 28.0.1 (pinned `=28.0.1`) | same |
 | tokio | 1.54.1 (from `Cargo.lock`) | async runner |
 
+## OutLayer command line tool (used for the FastFS upload and project deploy only)
+
+| Tool | Version | Command |
+| --- | --- | --- |
+| outlayer-cli | 0.2.1 (tag `v0.2.1`, commit `25d4e5448e630c73c700ecba92fe4bbe8778165f`), installed with `cargo install --git https://github.com/out-layer/outlayer-cli --tag v0.2.1 --locked` | `outlayer --version` |
+
 ## Other
 
 | Tool | Version | Command |

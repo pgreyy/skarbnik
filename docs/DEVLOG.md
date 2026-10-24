@@ -2,6 +2,21 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: OutLayer second try (FastFS project) and S13 Proof 0
+
+- Proof 0 for S13 (`./scripts/s13_attacks.sh proof0`): 4,984 s at peak 4,732 MiB, compressed in 1,274 s at peak
+  1,487 MiB, VALID, verdict PASS; new image id `043ec633...7f8d`.
+- With the owner's go: installed `outlayer-cli` 0.2.1, logged in with a throwaway faucet account, uploaded our verifier
+  to FastFS and deployed it as an OutLayer project. Direct jobs on the real S4 receipt (`./scripts/ol_job.sh`): link,
+  FastFS link and project name all got no answer (requests 5618 to 5620); OutLayer's probe answered in 14 s. The FastFS
+  gateway answered HTTP 502 for every file during the test, so the FastFS result is not conclusive. No proof was spent
+  on the contract path and no contract change was made. Testnet cost: 0.0136 NEAR (throwaway account) plus 0.003 NEAR
+  kept by OutLayer.
+- Mistake: my S13 script loaded two settings files in the wrong order and picked a vendor account that does not exist;
+  the first `open` run stopped at `create_bounty` before any transaction, the order is fixed in `scripts/s13_attacks.sh`.
+- S13 `open` and `commit_a` phases ran; proof A is running.
+- Next: retry the project job when FastFS serves our file; S13 attack phases after proof A.
+
 ## 2026-10-24: OutLayer (Level 1) diagnosis on testnet (one hour cap)
 
 - Ran OutLayer's documented call (Project source, 10 M instructions, 128 MB, 60 s, 0.1 NEAR) against their public test

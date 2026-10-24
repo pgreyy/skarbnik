@@ -1,0 +1,65 @@
+2026-10-24T14:29:42Z
+args file: target/outlayer-diag/args_project_s4b2.json sha256 3f9b190892b08c31c2f12705f4c1f64ebf482807b100fb55ce0453967182a988, 300248 bytes
+source: {"Project": {"project_id": "kintsugi-ol-hfoez.testnet/farbox-verifier", "version_key": null}}
+$ near contract call-function as-read-only outlayer.testnet estimate_execution_cost json-args '{"resource_limits": {"max_instructions": 2000000000, "max_memory_mb": 64, "max_execution_seconds": 20}, "input_len": 299979}' network-config testnet now
+"2675110200000000000000000"
+$ near contract call-function as-transaction outlayer.testnet request_execution file-args target/outlayer-diag/args_project_s4b2.json prepaid-gas '300.0 Tgas' attached-deposit '2.8 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  outlayer.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  request_execution
+│                       args:         {
+│                                       "resource_limits": {
+│                                         "max_execution_seconds": 20,
+│                                         "max_instructions": 2000000000,
+│                                         "max_memory_mb": 64
+│                                       },
+│                                       "response_format": "Json",
+│                                       "source": {
+│                                         "Project": {
+│                                           "project_id": "kintsugi-ol-hfoez.testnet/farbox-verifier",
+│                                           "version_key": null
+│                                         }
+│                                       }
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      2.8 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 14.7 Tgas
+│    Transaction fee: 0.0014625810184475 NEAR
+│    Transaction ID: AytFzgk96XQzSVFRU9Rpv6JFrxfDKmE3u7z2up8QCxUh
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/AytFzgk96XQzSVFRU9Rpv6JFrxfDKmE3u7z2up8QCxUh
+│     
+├  Function execution logs:
+│    Logs [outlayer.testnet]:
+│      Resolved project: kintsugi-ol-hfoez.testnet/farbox-verifier, version: "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8", source: WasmUrl { url: "https://test.fastfs.io/kintsugi-ol-hfoez.testnet/outlayer.testnet/e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8.wasm", hash: "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8", build_target: Some("wasm32-wasip1") }, uuid: p00000000000000a1
+│      EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_requested","data":[{"request_data":"{\ ...(cut)
+│    Logs [outlayer.testnet]:
+│      [[yNEAR charged: "1000000000000000000000"]]
+│      Execution promise failed: Failed. Refunded 2799000000000000000000000 yoctoNEAR
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+null
+
+
+The "request_execution" call to <outlayer.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction outlayer.testnet request_execution file-args target/outlayer-diag/args_project_s4b2.json prepaid-gas '300.0 Tgas' attached-deposit '2.8 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0 wall_s=133

@@ -1,0 +1,7 @@
+$ target/fuel-meter/release/fuel-meter target/verifier-publish/farbox-verifier.wasm target/outlayer-diag/s4_b2_input.json
+result=ok
+fuel_used=878725371
+peak_memory_bytes=3473408 (~3 MiB)
+compile_ms=1087 run_ms=335
+stdout={"ok":true,"verdict":"PASS","image_id":"3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d","submission_id":"fff09869506221aedcd1377d89d6815d07b85202c90b1fa5725efb059e984934","receipt_sha256":"8c316bd514edb018d5f06f61f1408c76464b3c767c667623f60d33744446cbbf","journal_sha256":"79b9d8a6e4f4d87cb2580413702bf18712161942063c867a5be861e550cb52fc","error":null}
+

@@ -1,0 +1,61 @@
+2026-10-24T14:34:37Z
+$ near contract call-function as-transaction outlayer.testnet request_execution json-args '{"source":{"Project":{"project_id":"connectors.outlayer.testnet/connector-probe","version_key":null}},"resource_limits":{"max_instructions":10000000,"max_memory_mb":128,"max_execution_seconds":60},"input_data":"{\"operation\":\"ping\"}"}' prepaid-gas '300.0 Tgas' attached-deposit '0.1 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  outlayer.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  request_execution
+│                       args:         {
+│                                       "input_data": "{\"operation\":\"ping\"}",
+│                                       "resource_limits": {
+│                                         "max_execution_seconds": 60,
+│                                         "max_instructions": 10000000,
+│                                         "max_memory_mb": 128
+│                                       },
+│                                       "source": {
+│                                         "Project": {
+│                                           "project_id": "connectors.outlayer.testnet/connector-probe",
+│                                           "version_key": null
+│                                         }
+│                                       }
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0.1 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.321 Tgas
+│    Transaction fee: 0.000032017116361 NEAR
+│    Transaction ID: EWK8qAUTa9R3tkZpmkMAjHHHFqiFuiReUYy8GWFmAmXd
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/EWK8qAUTa9R3tkZpmkMAjHHHFqiFuiReUYy8GWFmAmXd
+│     
+├  Function execution logs:
+│    Logs [outlayer.testnet]:
+│      Resolved project: connectors.outlayer.testnet/connector-probe, version: "2d406ed8005a422c38aec0616990989970e2c444c1386d4f09d54cce59468fb9", source: WasmUrl { url: "https://test.fastfs.io/outlayer-alice.testnet/outlayer.testnet/2d406ed8005a422c38aec0616990989970e2c444c1386d4f09d54cce59468fb9.wasm", hash: "2d406ed8005a422c38aec0616990989970e2c444c1386d4f09d54cce59468fb9", build_target: Some("wasm32-wasip2") }, uuid: p0000000000000020
+│    Logs [outlayer.testnet]:
+│      [[yNEAR charged: "1105000000000000000000"]]
+│      EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_completed","data":[{"sender_id":"kintsugi-res2-prnvm.testnet","code_source":{"WasmUrl":{"url":"https://test.fastfs.io/outlayer-alice.testnet/outlayer.testnet/2d406ed8005a422c38aec0616990989970e2c444c1386d4f09d54cce59468fb9.wasm","hash":"2d406ed8005a422c38aec0616990989970e2c444c1386d4f09d54cce59468fb9","build_target":"wasm32-wasip2"}},"resources_used":{"instructions":18152,"time_ms":1050,"compile_time_ms":null},"success":true,"error_message":null,"payment_charged":"1105000000000000000000","payment_refunded":"98895000000000000000000","compilation_note":"Cached WASM from 2026-10-02T18:51:14.651877+00:00","timestamp":1792852487502935812}]}
+│      Execution completed successfully. Output: Text(80 bytes), Resources: { instructions: 18152, time_ms: 1050 }, Cost: 1105000000000000000000 yoctoNEAR, Refund: 98895000000000000000000 yoctoNEAR, Cached WASM from 2026-10-02T18:51:14.651877+00:00
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"{\"ok\":true,\"operation\":\"ping\",\"detail\":\"the key could pay for a free operation\"}"
+
+
+The "request_execution" call to <outlayer.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction outlayer.testnet request_execution json-args '{"source":{"Project":{"project_id":"connectors.outlayer.testnet/connector-probe","version_key":null}},"resource_limits":{"max_instructions":10000000,"max_memory_mb":128,"max_execution_seconds":60},"input_data":"{\"operation\":\"ping\"}"}' prepaid-gas '300.0 Tgas' attached-deposit '0.1 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0 wall_s=14

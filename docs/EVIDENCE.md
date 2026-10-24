@@ -65,6 +65,41 @@ cause is on OutLayer's side and we cannot see it; Level 1 stays "not working on 
    `outlayer deploy`). That publishes the file in a new public place and needs OutLayer's command line tool, so it waits
    for the owner. OutLayer's HTTPS route with a payment key also waits for the owner. Nobody at OutLayer was contacted.
 
+### Second try: our verifier published on FastFS as an OutLayer project (owner approved, 2026-10-24 14:25 to 14:36 UTC)
+
+What changed: OutLayer's own tool, `outlayer-cli` 0.2.1 (installed with
+`cargo install --git https://github.com/out-layer/outlayer-cli --tag v0.2.1 --locked`, commit `25d4e544`, into the home
+folder), logged in with a new throwaway faucet account `kintsugi-ol-hfoez.testnet` (its credentials folder is kept in the
+private secrets folder, never in the repository). Then:
+
+- `outlayer upload target/verifier-publish/farbox-verifier.wasm` (`g0_fastfs_upload.txt`): 2 transactions,
+  `4dfG7rmFjPpuKEAGmfTX8FTiq2J9VNsJc45ahTkuYiE4` and `FqT2JdHb1ARejoh6oQPj4FpoxW3ef9WuPJ6ssbYLAVXB`; the file is the
+  published v0.1.0 (SHA-256 `e60647ec...46a8`). Both show "Failure" on chain: the tool sends them with almost no gas on
+  purpose, and FastFS reads the data from the transaction. Measured cost 0.0059 testnet NEAR.
+- `outlayer deploy farbox-verifier <FastFS URL> --hash e60647ec... --target wasm32-wasip1` (`g0_deploy.txt`): project
+  `kintsugi-ol-hfoez.testnet/farbox-verifier`, active version `e60647ec...`. The throwaway account spent 0.0136 testnet
+  NEAR in total for upload, project storage and gas (`g0_account_balance.txt`).
+- The FastFS link returned HTTP 502 ("error code: 502", 16 bytes) on every try from 14:26 to 14:34 UTC, and so did
+  OutLayer's own probe file on FastFS, which served fine earlier: the FastFS testnet gateway was down during this test.
+
+Direct jobs (no contract, no new proof) with the real S4 bounty 2 receipt and its public values from the chain
+(`image_id` `3edbc2e6...`, `submission_id` `fff09869...` from `get_submission_id`, `receipt_sha256` `8c316bd5...`),
+limits 2,000,000,000 instructions, 64 MB, 20 s, `estimate_execution_cost` = 2.6751 NEAR, 2.8 NEAR attached, sent with
+`./scripts/ol_job.sh <name> <args file> '2.8 NEAR'`:
+
+| Test | How the verifier is named | Request | Answer |
+|---|---|---|---|
+| local | `target/fuel-meter/release/fuel-meter ... s4_b2_input.json` (`local_s4_bounty2.txt`) | none | PASS, journal `79b9d8a6...` (equals the chain), 878,725,371 instructions |
+| f1 | link only (raw GitHub, as in S4) | 5618, tx `5CkkH6dr6x7ymCGSSdNYoK1xs4ieyJvV6dAUhCu1Zxg9` | **none**, 117 s |
+| g1 | project name `kintsugi-ol-hfoez.testnet/farbox-verifier` | 5619, tx `AytFzgk96XQzSVFRU9Rpv6JFrxfDKmE3u7z2up8QCxUh` | **none**, 133 s |
+| g2 | FastFS link | 5620, tx `Er5pYv8ijd7tbGVSPm9aRr2mgnbjEeJPPcCT3eesVBbT` | **none**, 127 s |
+| g3 | OutLayer's probe (control) | tx `EWK8qAUTa9R3tkZpmkMAjHHHFqiFuiReUYy8GWFmAmXd` | yes, 14 s |
+
+Each failed job kept 0.001 NEAR and refunded 2.799 NEAR. **Verdict: still no answer for our verifier, by link, by
+FastFS link or as a project, while a cached program answers. Not conclusive for FastFS, because the FastFS gateway was
+down during the test.** As the owner set out, no new proof was spent on the full contract path (that waits for a FastFS
+job that gets an answer), and no contract change was made (neither the project name nor the link worked).
+
 Small inconsistency in OutLayer's docs, for the record: the Pricing page says failed executions are not refunded; the NEAR
 Integration page and what we saw (0.099 of 0.1 NEAR refunded on every failed job) say the unused deposit is refunded.
 

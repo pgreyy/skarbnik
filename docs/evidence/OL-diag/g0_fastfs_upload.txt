@@ -1,0 +1,32 @@
+2026-10-24T14:25:55Z
+Uploading to FastFS...
+  File: target/verifier-publish/farbox-verifier.wasm
+  Size: 1134249 bytes
+  SHA256: e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8
+  Sender: kintsugi-ol-hfoez.testnet
+  Receiver: outlayer.testnet
+  Chunks: 2 x 1024KB max
+
+  Uploading chunk 1/2... tx: 4dfG7rmFjPpuKEAGmfTX8FTiq2J9VNsJc45ahTkuYiE4
+  Uploading chunk 2/2... tx: FqT2JdHb1ARejoh6oQPj4FpoxW3ef9WuPJ6ssbYLAVXB
+
+Upload complete!
+
+FastFS URL: https://test.fastfs.io/kintsugi-ol-hfoez.testnet/outlayer.testnet/e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8.wasm
+
+Run directly:
+  outlayer run --wasm https://test.fastfs.io/kintsugi-ol-hfoez.testnet/outlayer.testnet/e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8.wasm '{}' 
+
+Or deploy as project version:
+  outlayer deploy <name> --wasm-url https://test.fastfs.io/kintsugi-ol-hfoez.testnet/outlayer.testnet/e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8.wasm
+exit=0
+14:26:19 http=502 sha=bb2fb7b51f18478e3ccde6376dc39285b20472f0394e7034fd2e0bdf6a5716e2 size=16
+14:26:41 http=502 sha=bb2fb7b51f18478e3ccde6376dc39285b20472f0394e7034fd2e0bdf6a5716e2 size=16
+14:27:02 http=502 sha=bb2fb7b51f18478e3ccde6376dc39285b20472f0394e7034fd2e0bdf6a5716e2 size=16
+14:27:24 http=502 sha=bb2fb7b51f18478e3ccde6376dc39285b20472f0394e7034fd2e0bdf6a5716e2 size=16
+14:27:45 http=502 sha=bb2fb7b51f18478e3ccde6376dc39285b20472f0394e7034fd2e0bdf6a5716e2 size=16
+14:28:07 http=502 sha=bb2fb7b51f18478e3ccde6376dc39285b20472f0394e7034fd2e0bdf6a5716e2 size=16
+tx 4dfG7rmFjP tokens_burnt_NEAR 0.0053547004665248 status Failure
+tx FqT2JdHb1A tokens_burnt_NEAR 0.0005479224884201 status Failure
+14:29:40 our FastFS file: 502 16
+14:34:18 our FastFS file: 502 16

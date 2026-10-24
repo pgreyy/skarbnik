@@ -1,0 +1,20 @@
+2026-10-24T14:29:18Z
+$ outlayer deploy farbox-verifier https://test.fastfs.io/kintsugi-ol-hfoez.testnet/outlayer.testnet/e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8.wasm --hash e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8 --target wasm32-wasip1
+Deploying kintsugi-ol-hfoez.testnet/farbox-verifier...
+  Source: WasmUrl (https://test.fastfs.io/kintsugi-ol-hfoez.testnet/outlayer.testnet/e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8.wasm)
+  Creating new project...
+  Project deployed
+
+Run with: outlayer run kintsugi-ol-hfoez.testnet/farbox-verifier '{"command": "hello"}'
+exit=0
+{
+  "active_version": "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8",
+  "created_at": 1792852161111289148,
+  "name": "farbox-verifier",
+  "owner": "kintsugi-ol-hfoez.testnet",
+  "project_id": "kintsugi-ol-hfoez.testnet/farbox-verifier",
+  "storage_deposit": "2820000000000000000000",
+  "uuid": "p00000000000000a1"
+}
+
+
