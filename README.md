@@ -24,7 +24,7 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts, no proofs for the arena) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
 | End to end on testnet with a real proof: commit and reveal, proof bound to the on-chain seed and submission id, verdict, two verifiers check the receipt against the chain and attest, researcher paid | works at Level 0 (two registered verifier accounts) | `scripts/s4_testnet.sh` (EVIDENCE, S4/S5) |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) and two verifiers attest it; an over-long secret is refused; junk commits cannot hold the attempt slots after the reveal window; replayed, foreign or contradicted receipts are refused and the researcher is paid by timeout | works on testnet (10 of 11 attacks blocked; sub-accounts filling the slots is an accepted risk, the leak stays at most K bits) | `scripts/s13_attacks.sh <phase>` (EVIDENCE, S13; docs/SECURITY.md) |
-| Anyone can rebuild the checker and get the same image id: it is built inside RISC Zero's guest builder Docker image, so the id does not depend on the folder or the user | works on one laptop (two folders and two home folders give the same id); no bounty on chain uses this id yet | `./scripts/check_image_id.sh` (EVIDENCE, "Image id") |
+| Anyone can rebuild the checker and get the same image id: it is built inside RISC Zero's guest builder Docker image, so the id does not depend on the folder or the user | works: the demo bounty 4 on `kintsugi-s13-tlryo.testnet` holds the reproducible id and the rebuild prints MATCH (shown on one laptop; two folders and two home folders give the same id) | `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 4` (EVIDENCE, "Demo bounty" and "Image id") |
 | OutLayer (TEE) as one of the two verifiers | not confirmed on testnet yet: OutLayer accepts our jobs but none has been answered (8 of 8 timed out, by link and as an OutLayer project), while OutLayer's own cached test program answers; the contract recorded nothing, as designed | EVIDENCE, S4/S5 and "OutLayer (Level 1) on testnet" |
 
 ## Try it
@@ -43,8 +43,9 @@ All commands run from the repository root on Linux x86_64. Versions: [docs/VERSI
    PASS and the cycles per phase.
 6. Rebuild the checker and compare its image id with a bounty on the contract:
    `./scripts/check_image_id.sh <contract account> <bounty id>`. Without arguments it prints the rebuilt id, which for the
-   current checker is `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`. The bounties on testnet so far
-   were made with older, non-reproducible builds, so they show DIFFERENT (docs/SECURITY.md, known limits).
+   current checker is `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`. Try it on the demo bounty:
+   `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 4`. See MATCH (open until 2026-11-23). Older bounties were made
+   with non-reproducible builds and show DIFFERENT (docs/SECURITY.md, known limits).
 
 ## How NEAR fits in
 

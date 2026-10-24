@@ -2762,6 +2762,7 @@ dependencies = [
 name = "kintsugi-harness"
 version = "0.1.0"
 dependencies = [
+ "risc0-binfmt",
  "risc0-build",
 ]
 
@@ -2772,6 +2773,10 @@ dependencies = [
  "bincode",
  "kintsugi-check",
  "kintsugi-harness",
+ "risc0-circuit-keccak",
+ "risc0-circuit-recursion",
+ "risc0-circuit-rv32im",
+ "risc0-zkp",
  "risc0-zkvm",
 ]
 

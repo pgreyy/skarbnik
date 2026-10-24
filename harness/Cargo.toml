@@ -8,6 +8,8 @@ edition = "2021"
 
 [build-dependencies]
 risc0-build = "=3.0.6"
+# Image ids of prebuilt guests (KINTSUGI_PREBUILT_GUESTS, see build.rs); the version risc0-build 3.0.6 uses.
+risc0-binfmt = { version = "=3.0.5", default-features = false, features = ["std"] }
 
 [package.metadata.risc0]
 methods = ["guest", "check-guest"]

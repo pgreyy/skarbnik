@@ -1,0 +1,6 @@
+$ ./scripts/export_guests.sh
+78fdb721fe71f087c366b04be2a74d9ed36a72b3dad97afa5124b60cefcae3ca  hello_guest.bin
+4741ef156b297cc8d5a71ee8c181c437ad81845cfbb3459c801e3443f613eb0a  check_guest.bin
+HELLO_GUEST_ID a8bf1d826c34547b362646569c5d07ad62d678727a1b744d7038de0d7507ef2c
+CHECK_GUEST_ID dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+exit=0

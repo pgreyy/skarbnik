@@ -1,0 +1,4 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+demo_create	create_bounty	kintsugi-vendor-prnvm.testnet	EozokvC2Y6UZHMXpkHzajUdJwwdop86GhzZp2wGHitf5	0.351 Tgas	0.0000350641057495	0	6.45
+demo_attest_proof0_kintsugi-ver1-prnvm	attest_proof0	kintsugi-ver1-prnvm.testnet	Ax3Xrs5k6P81yWTzYB6VMTSN6eCTA9G5PscTxWKyCJL4	0.318 Tgas	0.000031731014071	0	6.27
+demo_attest_proof0_kintsugi-ver2-prnvm	attest_proof0	kintsugi-ver2-prnvm.testnet	4DiVnxn1UHoVVsT8HoNQVzHzEbi2TfYsWjTj1Ebfqcs4	0.318 Tgas	0.000031731014071	0	6.54

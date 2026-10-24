@@ -1,0 +1,2 @@
+$ r0vm --id --elf target/prebuilt-guests/check_guest.bin
+dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc

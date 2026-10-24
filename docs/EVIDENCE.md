@@ -5,6 +5,45 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Demo bounty with the reproducible image id: anyone can rebuild the checker and get a MATCH
+
+Question: can a judge rebuild the checker from this repository and get the exact image id a bounty on the contract
+holds? Raw output: `docs/evidence/demo/`.
+
+**Verdict: PASS (2026-10-24).** Bounty 4 on `kintsugi-s13-tlryo.testnet` holds the reproducible image id
+`dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`; its Proof 0 was made with that build, two
+verifiers checked it against the chain and attested it, and `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 4`
+prints MATCH.
+
+| Step | Command | Result |
+|---|---|---|
+| Proof 0 with the reproducible build (`harness/build.rs`), reference fix, 16 inputs, 32 variants, `--po2 19`, S1 seed | `scripts/s2_measure.sh ... kintsugi-host prove data/demo/fixed.wasm --proof0 ...` (`prove_proof0.log`) | 4,312.55 s, prover peak 4,724 MiB |
+| compress to succinct | `kintsugi-host compress ... succinct` (`compress_proof0.log`) | 1,388.17 s, peak 1,487 MiB, 224,786 bytes, SHA-256 `1175f615...f308` |
+| verify | `kintsugi-host verify target/demo/proof0_succinct.bin` (`verify_proof0.txt`) | VALID, image id `dd6c5f42...`, verdict PASS, journal SHA-256 `fb7939dc...3ec5` |
+| create bounty 4 (0.5 NEAR, K = 3, expires after 30 days) | `./scripts/demo_bounty.sh create` | tx `EozokvC2Y6UZHMXpkHzajUdJwwdop86GhzZp2wGHitf5`; created 2026-10-24 19:53 UTC, expires 2026-11-23 19:53 UTC (`bounty4.txt`) |
+| two verifiers check Proof 0 against the chain and attest | `./scripts/demo_bounty.sh open` (`steps/proof0_check_*.txt`: ATTEST) | txs `Ax3Xrs5k6P81yWTzYB6VMTSN6eCTA9G5PscTxWKyCJL4` (`kintsugi-ver1-prnvm.testnet`), `4DiVnxn1UHoVVsT8HoNQVzHzEbi2TfYsWjTj1Ebfqcs4` (`kintsugi-ver2-prnvm.testnet`); bounty opened |
+| rebuild and compare | `./scripts/demo_bounty.sh check` (`check_image_id.txt`) | below |
+
+```
+$ ./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 4
+rebuilt checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+image id of bounty 4 on kintsugi-s13-tlryo.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+MATCH
+```
+
+Notes:
+- The journal SHA-256 is the same as S13's Proof 0 (`fb7939dc...`): the journal holds the inputs and the verdict, not
+  the image id, so the same check with the same inputs gives the same journal under either build. The receipt verifies
+  only against its own image id.
+- This Proof 0 took 4,312.55 s; S13's (plain build) took 4,983.54 s. The cause of the difference was not measured.
+- The MATCH was shown on the laptop that made the proof; a rebuild on a second machine was not done.
+- Prebuilt guest mode (for a GPU machine without Docker), tested on the laptop: `./scripts/export_guests.sh` (guest file
+  SHA-256 `4741ef15...eb0a`), then `KINTSUGI_PREBUILT_GUESTS=target/prebuilt-guests CARGO_TARGET_DIR=target/prebuilt-test
+  cargo build --release -p kintsugi-harness` embedded the files with the same ids (`dd6c5f42...`, hello world
+  `a8bf1d82...`), compiled no guest, and finished in 26.72 s (`docs/evidence/repro/prebuilt_test.log`);
+  `r0vm --id --elf target/prebuilt-guests/check_guest.bin` gives `dd6c5f42...` too (`r0vm_id_check_guest.txt`). Not
+  run on a GPU machine yet.
+
 ## Image id: why the GPU build differed, and a reproducible build
 
 Question: the GPU pod's proof of commit `1439e37` had image id `dfd48a5e...`, not the laptop's `3edbc2e6...`. Does a
@@ -55,7 +94,7 @@ What this changes:
   those ids with `farbox-verifier` or `kintsugi-host verify` built the old way, but nobody can rebuild those ids from the
   source. `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 0` prints the rebuilt id, the bounty's id
   `043ec633...`, and DIFFERENT (`check_image_id_s13_bounty0.log`).
-- New bounties should be created with the reproducible id; that needs a new Proof 0 made with this build (not done).
+- New bounties should be created with the reproducible id: the demo bounty 4 is the first (section above).
 - The GPU result (22.65 s) used a plain build on the pod; a like for like number needs the reproducible build on both
   machines.
 - Docker downloads were slow: the `r0.1.88.0` image (1.60 GB) took 804 s, about 2.0 MB/s, and `r0.1.97.0` (1.73 GB)

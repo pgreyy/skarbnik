@@ -1,0 +1,13 @@
+$ KINTSUGI_PREBUILT_GUESTS=target/prebuilt-guests CARGO_TARGET_DIR=target/prebuilt-test cargo build --release -p kintsugi-harness
+2026-10-24T20:00:06Z
+   Compiling thiserror v2.0.21
+   Compiling thiserror-impl v2.0.21
+warning: kintsugi-harness@0.1.0: prebuilt guest hello_guest: image id a8bf1d826c34547b362646569c5d07ad62d678727a1b744d7038de0d7507ef2c
+warning: kintsugi-harness@0.1.0: prebuilt guest check_guest: image id dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+    Finished `release` profile [optimized] target(s) in 26.72s
+exit=0
+2026-10-24T20:00:33Z
+HELLO_GUEST_ID a8bf1d826c34547b362646569c5d07ad62d678727a1b744d7038de0d7507ef2c
+CHECK_GUEST_ID dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+r0vm --id: For more information, try '--help'.
+docker build ran in this build: 0 guest folders

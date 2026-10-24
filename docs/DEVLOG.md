@@ -2,6 +2,19 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: Demo bounty with the reproducible image id (MATCH); prebuilt guests and cuda-prove-only
+
+- Proof 0 with the reproducible build: 4,312.55 s at peak 4,724 MiB, compressed in 1,388.17 s, VALID under
+  `dd6c5f42...`.
+- `./scripts/demo_bounty.sh create`, `open`, `check`: bounty 4 on `kintsugi-s13-tlryo.testnet` (tx
+  `EozokvC2Y6UZHMXpkHzajUdJwwdop86GhzZp2wGHitf5`), Proof 0 attested by two verifiers, expires after 30 days;
+  `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 4` prints MATCH.
+- `harness/build.rs` gains a prebuilt mode (`KINTSUGI_PREBUILT_GUESTS`) and `scripts/export_guests.sh` copies the guest
+  files, for a GPU machine without Docker: tested on the laptop, same ids, no guest compiled, 26.72 s.
+- `host/Cargo.toml` gains `cuda-prove-only`, for GPU proving only (no GPU Groth16 part); not built here (needs CUDA).
+- README gains a short Roadmap section (`9af0b12`).
+- Next: owner's call.
+
 ## 2026-10-24: Image id mismatch explained; reproducible checker build made official
 
 - Plain guest builds embed the source folder and the user's home folder: the same commit `1439e37` gave `3edbc2e6...`
