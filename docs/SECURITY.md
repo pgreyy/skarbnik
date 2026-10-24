@@ -85,15 +85,15 @@ Each guard: what it stops, where it lives, and what shows it works.
 | 2026-10-24 | `500469c` | (10) A reveal that does not match its commit | `scripts/s13_attacks.sh misc` | **blocked** on chain ("fingerprint does not match") (EVIDENCE, S13) |
 | 2026-10-24 | `500469c` | (11) The vendor posts FAIL for a fix whose real receipt says PASS | `scripts/s13_attacks.sh attack_a` | **blocked**: both verifiers refuse (journal verdict differs); after the window the researcher was paid by timeout, +0.51 NEAR (bounty and own fee) (EVIDENCE, S13) |
 
-| 2026-10-25 | pending | (S6c) A valid PASS proof submitted for another attempt of the same bounty | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the journal belongs to another bounty or attempt (submission id)" (EVIDENCE, S6c) |
-| 2026-10-25 | pending | (S6c) A valid PASS proof submitted for an attempt on another bounty (same patch) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the journal belongs to another bounty or attempt (submission id)" |
-| 2026-10-25 | pending | (S6c) A FAIL proof's journal edited to say PASS | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the Groth16 proof does not verify ..." |
-| 2026-10-25 | pending | (S6c) One flipped bit in the seal | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "AltBn128 invalid input: invalid g1" |
-| 2026-10-25 | pending | (S6c) A changed journal (fuzz_count) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: the proof does not verify |
-| 2026-10-25 | pending | (S6c) A bounty naming another image id, opened with the real Proof 0 | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: the proof does not verify |
-| 2026-10-25 | pending | (S6c) The same proof submitted twice (FAIL, then PASS after payout) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "verdict already final", "bounty is closed" |
-| 2026-10-25 | pending | (S6c) A proof submitted after the bounty expired | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "bounty has expired" |
-| 2026-10-25 | pending | (S6c) The vendor blocks its own Level 2 bounty through a second account that takes all K slots and never reveals | `scripts/s6c_testnet.sh selfblock2` | **not blocked before S6c (guard added)**: the honest commit is still ignored for the reveal window, but the vendor side lost 0.045 NEAR in fees plus 0.000830 NEAR in gas and the pool gained exactly 0.045 NEAR; before, a Level 2 vendor would have got those fees back at expiry |
+| 2026-10-25 | `95915f2` | (S6c) A valid PASS proof submitted for another attempt of the same bounty | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the journal belongs to another bounty or attempt (submission id)" (EVIDENCE, S6c) |
+| 2026-10-25 | `95915f2` | (S6c) A valid PASS proof submitted for an attempt on another bounty (same patch) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the journal belongs to another bounty or attempt (submission id)" |
+| 2026-10-25 | `95915f2` | (S6c) A FAIL proof's journal edited to say PASS | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the Groth16 proof does not verify ..." |
+| 2026-10-25 | `95915f2` | (S6c) One flipped bit in the seal | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "AltBn128 invalid input: invalid g1" |
+| 2026-10-25 | `95915f2` | (S6c) A changed journal (fuzz_count) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: the proof does not verify |
+| 2026-10-25 | `95915f2` | (S6c) A bounty naming another image id, opened with the real Proof 0 | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: the proof does not verify |
+| 2026-10-25 | `95915f2` | (S6c) The same proof submitted twice (FAIL, then PASS after payout) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "verdict already final", "bounty is closed" |
+| 2026-10-25 | `95915f2` | (S6c) A proof submitted after the bounty expired | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "bounty has expired" |
+| 2026-10-25 | `95915f2` | (S6c) The vendor blocks its own Level 2 bounty through a second account that takes all K slots and never reveals | `scripts/s6c_testnet.sh selfblock2` | **not blocked before S6c (guard added)**: the honest commit is still ignored for the reveal window, but the vendor side lost 0.045 NEAR in fees plus 0.000830 NEAR in gas and the pool gained exactly 0.045 NEAR; before, a Level 2 vendor would have got those fees back at expiry |
 
 ## 3. Known limits
 
@@ -175,7 +175,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
-- 2026-10-25 (pending commit): S6c Level 2 path in the bounty contract (Groth16 proofs, journal binding, level marking,
+- 2026-10-25 `95915f2`: S6c Level 2 path in the bounty contract (Groth16 proofs, journal binding, level marking,
   check size), protocol fee pool for never-revealed fees, nine Level 2 attacks and the self-block test; trusted setup
   line corrected to confirmed facts; Level 0 check size gap found and closed for new bounties.
 - 2026-10-24 `bb4defb`: S6b Groth16 check on a spike contract (not the bounty contract); known limits for
