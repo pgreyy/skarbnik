@@ -136,7 +136,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
-- 2026-10-24 (pending commit): S6b Groth16 check on a spike contract (not the bounty contract); known limits for
+- 2026-10-24 `bb4defb`: S6b Groth16 check on a spike contract (not the bounty contract); known limits for
   BN254, the trusted setup and the two fixed constants.
 - 2026-10-24 `582b2d8`: demo bounty 4 with the reproducible image id; `check_image_id.sh` prints MATCH.
 - 2026-10-24 `582b2d8`: prebuilt guest mode and `cuda-prove-only` build option; known limit for the prebuilt mode.
