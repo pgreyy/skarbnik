@@ -1,0 +1,26 @@
+$ near tokens kintsugi-res2-prnvm.testnet send-near kintsugi-res1-prnvm.testnet '0.01 NEAR' network-config testnet sign-with-access-key-file <agent key file> save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+{
+ "tx_hash": null,
+ "outcome": "no_result",
+ "failure": "",
+ "total_gas_burnt": 0,
+ "logs": [],
+ "wall_seconds": 11.502,
+ "rpc_error": {
+  "name": "HANDLER_ERROR",
+  "cause": {
+   "info": {},
+   "name": "INVALID_TRANSACTION"
+  },
+  "code": -32000,
+  "message": "Server error",
+  "data": {
+   "TxExecutionError": {
+    "InvalidTxError": {
+     "InvalidAccessKeyError": "RequiresFullAccess"
+    }
+   }
+  }
+ }
+}

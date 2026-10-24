@@ -1,0 +1,6 @@
+agent public test check of its canned patch: 17 passed, 0 failed
+credit after the agent's commit: 40000000000000000000000
+s7_limit_send_near_via_contract: Error: 
+s7_limit_attach_deposit: Error: 
+s7_limit_other_method: Error: 
+s7_limit_transfer: Error: 

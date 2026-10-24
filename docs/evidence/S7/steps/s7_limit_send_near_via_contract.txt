@@ -1,0 +1,25 @@
+utc_start=2026-10-24T10:14:18.771114777Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  withdraw_credit
+│                       args:         {
+│                                       "amount": "1"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      1 yoctoNEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:2aPWxz2Yy7ZSD73pnxPRE24cbobYXF9MTvmDeJqy7U8y
+│     
+
+Here is your console command if you need to script it or re-run:
+
+Error: 
+   0: Error: Having a deposit with a function call action is not allowed with a function call access key.
+
+Location:
+exit=1
+wall_seconds=1.65

@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: S7 scripted agent with a function call key (key part PASS)
+
+- Fallback, labelled: scripted agent, canned patch; no language model (needs a NEAR AI Cloud account from the owner).
+- The agent key (methods `commit`, `reveal` on the bounty contract) committed and revealed on bounty 3 and paid the fee from
+  credit. Every forbidden attempt was refused: by near-cli-rs before sending, and for a method outside the list and for a
+  transfer also by the RPC node (`MethodNameMismatch`, `RequiresFullAccess`).
+- Caught before commit: the first run wrote the agent key file's local path into `docs/evidence/S7/run.env`. Moved to an
+  ignored file; the evidence is clean.
+- Next: prove the agent's submission and finish with two Level 0 verifiers.
+
 ## 2026-10-24: S4/S5 OutLayer as verifier 1 (in progress)
 
 - Contract: `set_outlayer`, `request_outlayer_check`, private callback `on_outlayer_result`, `get_submission_id`; 48 unit

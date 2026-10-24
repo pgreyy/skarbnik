@@ -1,0 +1,10 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+s7_add_agent_key	add-key	kintsugi-res2-prnvm.testnet	9dBx1aZpN8teuKA6b5ib7Jhq77kZX1ezNjpptyUodBSs	0.211 Tgas	0.0000210304079634	0	5.45
+s7_owner_deposit_credit	deposit_credit	kintsugi-res2-prnvm.testnet	BAh9RnZVXXYFMNBheheCkzatP5Dt8yN63skQmWBLrskL	0.309 Tgas	0.000030882243944	0	6.35
+s7_create_bounty	create_bounty	kintsugi-vendor-prnvm.testnet	8bth7Nc6v3cTVrzxA3GtYEVUajFqRkKxfcJkpQBmAZrj	0.341 Tgas	0.0000340436742485	0	5.86
+s7_agent_commit	commit	agent key of kintsugi-res2-prnvm.testnet	5rsexZzfttnJKwEGcS5a3TRvB3vMx6xUhT1jEpXhp3ki	0.315 Tgas	0.0000314878271245	0	5.11
+s7_agent_reveal	reveal	agent key of kintsugi-res2-prnvm.testnet	DFqQtJ2qREnAkB7tbRbNV8n1ZBv91cwZPbphyPcbv9Lz	0.350 Tgas	0.0000349210546045	0	5.05
+s7_limit_send_near_via_contract	withdraw_credit	agent key of kintsugi-res2-prnvm.testnet	-	-	-	1	1.65
+s7_limit_attach_deposit	commit	agent key of kintsugi-res2-prnvm.testnet	-	-	-	1	1.84
+s7_limit_other_method	expire	agent key of kintsugi-res2-prnvm.testnet	-	-	-	1	1.84
+s7_limit_transfer	send-near	agent key of kintsugi-res2-prnvm.testnet	-	-	-	1	2.38

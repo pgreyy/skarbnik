@@ -1,0 +1,19 @@
+utc_start=2026-10-24T10:14:29.372924338Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-res1-prnvm.testnet
+│    actions:
+│       -- transfer deposit:    0.01 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:2aPWxz2Yy7ZSD73pnxPRE24cbobYXF9MTvmDeJqy7U8y
+│     
+
+Here is your console command if you need to script it or re-run:
+
+Error: 
+   0: Error: Transaction requires a full permission access key.
+
+Location:
+exit=1
+wall_seconds=2.38

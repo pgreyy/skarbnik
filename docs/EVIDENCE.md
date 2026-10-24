@@ -5,6 +5,37 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S7: An agent that works only through a function call key
+
+Question: can a researcher agent commit and reveal using a key that cannot move its owner's money? Pass (blueprint): the
+agent's patch gets PASS and the key cannot transfer funds. Fallback used: **a scripted agent with a canned patch, labelled as
+scripted** (the model-driven agent needs a NEAR AI Cloud account and key from the owner, not available).
+
+**Verdict: key part PASS (2026-10-24); the agent's PASS verdict is in progress** (its proof runs after the S4 proof).
+
+Script: `./scripts/s7_agent.sh setup|bounty|limits|prove|finish`. Owner account: `kintsugi-res2-prnvm.testnet`.
+
+| Step | Transaction | Result |
+| --- | --- | --- |
+| owner adds the agent's function call key (receiver `bounty.kintsugi-djloo.testnet`, methods `commit, reveal`, allowance 0.25 NEAR) | `9dBx1aZpN8teuKA6b5ib7Jhq77kZX1ezNjpptyUodBSs` | public key `ed25519:2aPWxz2Yy7ZSD73pnxPRE24cbobYXF9MTvmDeJqy7U8y` |
+| owner deposits 0.05 NEAR credit with its full key | `BAh9RnZVXXYFMNBheheCkzatP5Dt8yN63skQmWBLrskL` | credit 0.05 NEAR |
+| vendor creates bounty 3 | `8bth7Nc6v3cTVrzxA3GtYEVUajFqRkKxfcJkpQBmAZrj` | ok |
+| agent checks its canned patch on the 17 public tests with the native checker (no secret input) | (local) | 17 passed, 0 failed |
+| agent commits, signed with the agent key only | `5rsexZzfttnJKwEGcS5a3TRvB3vMx6xUhT1jEpXhp3ki` | fee 0.01 NEAR from credit (0.05 to 0.04) |
+| agent reveals, signed with the agent key only | `DFqQtJ2qREnAkB7tbRbNV8n1ZBv91cwZPbphyPcbv9Lz` | ok |
+
+What the agent key must not do (`docs/evidence/S7/steps/s7_limit_*.txt`, `docs/evidence/S7/chain_refusal_*.txt`):
+
+| Attempt with the agent key | Refused by | Message |
+| --- | --- | --- |
+| `withdraw_credit` with 1 yoctoNEAR attached | near-cli-rs, before sending | "Having a deposit with a function call action is not allowed with a function call access key." |
+| `commit` with 0.01 NEAR attached | near-cli-rs, before sending | same as above |
+| `expire` (not an allowed method) | near-cli-rs; and the chain when sent directly over RPC | CLI: "Transaction method name <expire> isn't allowed by the access key."; RPC: `InvalidTxError` / `InvalidAccessKeyError` / `MethodNameMismatch` |
+| send 0.01 NEAR to another account | near-cli-rs; and the chain when sent directly over RPC | CLI: "Transaction requires a full permission access key."; RPC: `InvalidTxError` / `InvalidAccessKeyError` / `RequiresFullAccess` |
+
+The two direct RPC attempts were signed with the agent key, saved without sending, then sent to the RPC node, which refused
+them before execution (no transaction id, no gas).
+
 ## S4/S5: OutLayer as verifier 1 (Level 1)
 
 **Verdict: in progress (2026-10-24).** The contract side and the verifier program are built and tested on this machine. No
@@ -62,7 +93,17 @@ Outputs: `docs/evidence/S4/compress_succinct_f16.txt`, `docs/evidence/S4/verify_
 laptop. The succinct receipt fits NEAR's 1.5 MiB transaction size; its 299,987 byte input to OutLayer is above OutLayer's
 free 32 KB, which costs 0.00001 NEAR per extra byte, held while pending and returned (about 2.7 testnet NEAR).
 
-Still open: publishing the wasm at a public https URL (owner's go needed), then one testnet run through OutLayer.
+Published (owner's go, 2026-10-24): public repository https://github.com/pgreyy/farbox-verifier with three files only
+(`README.md`, `farbox-verifier.wasm`, `farbox-verifier.wasm.sha256`) and release v0.1.0. Before upload the file was scanned
+for /home, /Users, /root, the user name, pgreyy, email addresses, the project's working name and other listed names, long
+hex or base58 strings, tokens and key text: no names, paths, emails, tokens or keys; the only long hex is the public Rust
+1.99.1 commit id in standard library paths, and the rest are digit tables and decimal constants
+(`docs/evidence/S4/verifier_publish_scan.txt`). After upload, both
+`https://github.com/pgreyy/farbox-verifier/releases/download/v0.1.0/farbox-verifier.wasm` (HTTP 200, 1 redirect) and
+`https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm` (HTTP 200) downloaded a file with
+SHA-256 `e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8`, the same as before upload.
+
+Still open: one testnet run through OutLayer.
 
 ## S3b: Attempt fees and credit, on a dedicated contract account
 

@@ -1,0 +1,31 @@
+$ near account add-key kintsugi-res2-prnvm.testnet grant-function-call-access --allowance 0.25 NEAR --contract-account-id bounty.kintsugi-djloo.testnet --function-names commit, reveal autogenerate-new-keypair save-to-legacy-keychain network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T10:13:27.200394979Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-res2-prnvm.testnet
+│    actions:
+│       -- add access key:     
+│                       public key:   ed25519:2aPWxz2Yy7ZSD73pnxPRE24cbobYXF9MTvmDeJqy7U8y
+│                       nonce:        0
+│                       permission:   FunctionCall(FunctionCallPermission { allowance: Some(NearToken { inner: 250000000000000000000000 }), receiver_id: "bounty.kintsugi-djloo.testnet", method_names: ["commit", "reveal"] })
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.211 Tgas
+│    Transaction fee: 0.0000210304079634 NEAR
+│    Transaction ID: 9dBx1aZpN8teuKA6b5ib7Jhq77kZX1ezNjpptyUodBSs
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/9dBx1aZpN8teuKA6b5ib7Jhq77kZX1ezNjpptyUodBSs
+│     
+
+
+Added access key = ed25519:2aPWxz2Yy7ZSD73pnxPRE24cbobYXF9MTvmDeJqy7U8y to kintsugi-res2-prnvm.testnet.
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=5.45

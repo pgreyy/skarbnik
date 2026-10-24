@@ -1,0 +1,44 @@
+utc_start=2026-10-24T10:13:57.159793250Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  commit
+│                       args:         {
+│                                       "bounty_id": "3",
+│                                       "fingerprint": "4d70e9c8e26890e9225f13a3de454f644bbf2cdf1ae622cf534ff815884be78a",
+│                                       "payout": "kintsugi-res2-prnvm.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:2aPWxz2Yy7ZSD73pnxPRE24cbobYXF9MTvmDeJqy7U8y
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.315 Tgas
+│    Transaction fee: 0.0000314878271245 NEAR
+│    Transaction ID: 5rsexZzfttnJKwEGcS5a3TRvB3vMx6xUhT1jEpXhp3ki
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/5rsexZzfttnJKwEGcS5a3TRvB3vMx6xUhT1jEpXhp3ki
+│     
+├  Function execution logs:
+│    Logs [bounty.kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"committed","data":[{"bounty_id":"3","index":0,"committer":"kintsugi-res2-prnvm.testnet","payout":"kintsugi-res2-prnvm.testnet","fingerprint":"4d70e9c8e26890e9225f13a3de454f644bbf2cdf1ae622cf534ff815884be78a","fee":"10000000000000000000000"}]}
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+0
+
+
+The "commit" call to <bounty.kintsugi-djloo.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=5.11
