@@ -1,0 +1,2 @@
+tx EAYKT9uXAnPTNqESgvJ3UDkWAMW7PBA9TWChW6Md6gWj signer kintsugi-res2-prnvm.testnet method on_outlayer_result
+status: {"Failure": {"ActionError": {"index": 0, "kind": {"FunctionCallError": {"ExecutionError": "Smart contract panicked: Method on_outlayer_result is private"}}}}}

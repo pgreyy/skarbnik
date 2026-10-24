@@ -1,0 +1,16 @@
+final status: {"SuccessValue": "InJlamVjdGVkOiBubyBhbnN3ZXIgZnJvbSBPdXRMYXllciI="}
+- bounty.kintsugi-djloo.testnet gas 44.678 TGas status SuccessReceiptId
+    log: EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_requested","data":[{"bounty_id":"2","index":0,"outlayer":"outlayer.testnet"}]}
+- outlayer.testnet gas 22.606 TGas status SuccessReceiptId
+    log: EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_requested","data":[{"request_data":"{\"request_id\":5607,\"sender_id\":\"kintsugi-res2-prnvm.testnet\",\"predecessor_id\":\"bounty.kintsugi-djloo.testnet\",\"code_source\":{\"WasmUrl\"
+- outlayer.testnet gas 10.669 TGas status SuccessValue null
+    log: [[yNEAR charged: "1000000000000000000000"]]
+    log: Execution promise failed: Failed. Refunded 3199000000000000000000000 yoctoNEAR
+- kintsugi-res2-prnvm.testnet gas 0.223 TGas status SuccessValue 
+- kintsugi-res2-prnvm.testnet gas 0.223 TGas status SuccessValue 
+- kintsugi-res2-prnvm.testnet gas 0.223 TGas status SuccessValue 
+- kintsugi-res2-prnvm.testnet gas 0.223 TGas status SuccessValue 
+- bounty.kintsugi-djloo.testnet gas 1.565 TGas status SuccessValue "rejected: no answer from OutLayer"
+    log: EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_rejected","data":[{"bounty_id":"2","index":0,"reason":"no answer from OutLayer"}]}
+- kintsugi-res2-prnvm.testnet gas 0.223 TGas status SuccessValue 
+- kintsugi-res2-prnvm.testnet gas 0.223 TGas status SuccessValue 

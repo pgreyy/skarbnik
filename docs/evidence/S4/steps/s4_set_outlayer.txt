@@ -1,0 +1,52 @@
+$ near contract call-function as-transaction bounty.kintsugi-djloo.testnet set_outlayer json-args {"config":{"account_id":"outlayer.testnet","wasm_url":"https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm","wasm_sha256":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1","max_instructions":"100000000000","max_memory_mb":256,"max_execution_seconds":"60"}} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as bounty.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T11:02:21.374183302Z
+├  Unsigned transaction:
+│    signer_id:    bounty.kintsugi-djloo.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  set_outlayer
+│                       args:         {
+│                                       "config": {
+│                                         "account_id": "outlayer.testnet",
+│                                         "build_target": "wasm32-wasip1",
+│                                         "max_execution_seconds": "60",
+│                                         "max_instructions": "100000000000",
+│                                         "max_memory_mb": 256,
+│                                         "wasm_sha256": "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8",
+│                                         "wasm_url": "https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm"
+│                                       }
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:5PeFEXv1ZyR4mSo92n45KgJDenCxrxyNRK8SSS8BQyRX
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.0000308835369098 NEAR
+│    Transaction ID: EZkdf6oReaV97j3a6WboJgTwbVjGZnJA5gs9uMkbYJSD
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/EZkdf6oReaV97j3a6WboJgTwbVjGZnJA5gs9uMkbYJSD
+│     
+├  Function execution logs:
+│    Logs [bounty.kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_set","data":[{"config":{"account_id":"outlayer.testnet","wasm_url":"https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm","wasm_sha256":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1","max_instructions":"100000000000","max_memory_mb":256,"max_execution_seconds":"60"}}]}
+│    Logs [bounty.kintsugi-djloo.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "set_outlayer" call to <bounty.kintsugi-djloo.testnet> on behalf of <bounty.kintsugi-djloo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction bounty.kintsugi-djloo.testnet set_outlayer json-args '{"config":{"account_id":"outlayer.testnet","wasm_url":"https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm","wasm_sha256":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1","max_instructions":"100000000000","max_memory_mb":256,"max_execution_seconds":"60"}}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as bounty.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.0

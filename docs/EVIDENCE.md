@@ -73,8 +73,9 @@ them before execution (no transaction id, no gas).
 
 ## S4/S5: OutLayer as verifier 1 (Level 1)
 
-**Verdict: in progress (2026-10-24).** The contract side and the verifier program are built and tested on this machine. No
-OutLayer job has run yet.
+**Verdict: FAIL on testnet so far (2026-10-24): OutLayer accepted our jobs but no worker answered within NEAR's yield
+window, twice.** The contract handled it safely (no attestation recorded). Everything up to the OutLayer answer worked on
+testnet with a real proof; S5's refusals work on chain. Details at the end of this section.
 
 What exists:
 
@@ -138,7 +139,37 @@ hex or base58 strings, tokens and key text: no names, paths, emails, tokens or k
 `https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm` (HTTP 200) downloaded a file with
 SHA-256 `e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8`, the same as before upload.
 
-Still open: one testnet run through OutLayer.
+### End to end on testnet (`./scripts/s4_testnet.sh deploy|bounty|prove|verdict|outlayer`)
+
+| Step | Transaction or command | Result |
+| --- | --- | --- |
+| update contract code (no init, state kept), 269,910 bytes, SHA-256 `a4582062...4b77` | `7m7GH5Qg6BVHeDoPd9GMFiYUUDdgERz5PSVA3hUB4gJL` | ok |
+| register `outlayer.testnet` as verifier 1 ("trusts outlayer.testnet and its operator") | `CZYmfr7dGYoaYNLPnF6YF8c3GFTWiMQeJJfxTVZgGCFw` | ok |
+| bounty 2 with the real image id, exploit commitment, corpus and original hashes | `B7FEeaMnQ9Wv6gfY21sSsVL6vo1PRZKM1iN38LdHieNp` | ok |
+| researcher 1 commits and reveals `data/demo/fixed.wasm` | `DeothYh7Lzt3iRbpRtyCkGeE9e9YWKovkjqGJ6TXd99V`, `H3HuYThEtZb5oYWQqEgKcn8bjciNvtB8SxXLLPvA8ueR` | seed `4b102480...76b1`, submission id `fff09869...4934` |
+| prove with that seed and submission id (16 inputs, 32 variants, 2^19) | `kintsugi-host prove ... --seed <seed> --submission-id <id>` | 2,876.17 s, 26 segments, r0vm peak 4,724 MiB, verdict PASS, journal carries the seed and id |
+| compress to one succinct receipt | `kintsugi-host compress ... succinct` | 921.13 s, 224,786 bytes, r0vm peak 1,483 MiB; journal SHA-256 `79b9d8a6...52fc`, receipt SHA-256 `8c316bd5...cbbf` |
+| vendor posts PASS with those hashes | `GgrJSagJRpptMYNHnYAnUwKSQK7gRtiiCQwQSxcsBcEy` | ok |
+| owner sets OutLayer: `outlayer.testnet`, the public wasm URL and SHA-256, wasm32-wasip1 | `EZkdf6oReaV97j3a6WboJgTwbVjGZnJA5gs9uMkbYJSD` | ok |
+| anyone requests the check, 3.2 testnet NEAR attached, arguments 299,761 bytes | `FgieKEfSo2DE9WsuZSVMTBNMH4D48igNdwgEbLSnshS4` | **OutLayer log: "Execution promise failed: Failed. Refunded 3199000000000000000000000 yoctoNEAR"** (0.001 NEAR base fee kept); our callback returned "rejected: no answer from OutLayer", no attestation |
+
+The failure came 201 blocks (119 s) after OutLayer's `execution_requested` event (heights 274539805 to 274540006): the
+yield timed out, meaning no worker resumed the request. Second attempt, to tell size from availability: a direct
+`request_execution` to `outlayer.testnet` with the same pinned program and a tiny input `{}`
+(`Kx7kzdPwr6hHdtEmgDGeHhirA9LNVSG6fKwtai1B255`) failed the same way about 2 minutes later (refund 0.099 NEAR). The
+OutLayer coordinator's health endpoint answered `{"status":"ok"}`; we found no public endpoint that shows a request's status.
+
+Not known (UNCONFIRMED): whether testnet workers were down, whether they could not fetch or run our wasm, or whether they
+only serve registered projects. Raw outputs: `docs/evidence/S4/outlayer_tx_tree.txt`, `docs/evidence/S4/steps/`.
+
+### S5 on chain
+
+| Attempt | Transaction | Result |
+| --- | --- | --- |
+| a stranger calls the private callback `on_outlayer_result` | `EAYKT9uXAnPTNqESgvJ3UDkWAMW7PBA9TWChW6Md6gWj` | refused: "Smart contract panicked: Method on_outlayer_result is private" |
+| the owner registers the vendor as a verifier | `4caVWaHeWdecD5W7oQkCb3W3kGiPFZLUWwG6qoJSB6hP` | refused: "a vendor account cannot be a verifier" |
+
+Outputs: `docs/evidence/S5/`.
 
 ## S3b: Attempt fees and credit, on a dedicated contract account
 

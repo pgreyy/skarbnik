@@ -1,0 +1,13 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/s4/receipt.bin target/s4/receipt_succinct.bin succinct
+utc_start=2026-10-24T10:45:48Z
+limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=7200
+input receipt: target/s4/receipt.bin (6971396 bytes)
+compressed to: succinct
+compress seconds: 921.13
+verify seconds: 0.031
+output receipt: target/s4/receipt_succinct.bin (224786 bytes)
+exit=0
+wall_seconds=924.48
+r0vm_peak_rss_mib=1483 (VmHWM, sampled every 5 s)
+min_available_mib=6464
+result: finished

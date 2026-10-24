@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: S4 end to end on testnet (OutLayer did not answer)
+
+- Real proof for bounty 2 with the on-chain seed and submission id: 2,876 s, compressed to 224,786 bytes in 921 s; the
+  vendor posted PASS with its journal and receipt hashes.
+- `request_outlayer_check` reached OutLayer (request 5607) but the yield timed out after 201 blocks (119 s): "Execution
+  promise failed". A tiny direct job to `outlayer.testnet` with the same program timed out the same way. Two failures, so
+  moved on; the cause is unconfirmed. Our callback recorded nothing, as designed.
+- S5 refusals on chain: private callback called by a stranger, vendor registered as verifier.
+
 ## 2026-10-24: S8 arena (PASS)
 
 - Arena module with 4,096 crashing values; the vendor's secret is which one is committed. Scripted probe agent, K = 3,

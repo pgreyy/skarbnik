@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction bounty.kintsugi-djloo.testnet register_verifier json-args '{"account_id":"kintsugi-vendor-prnvm.testnet","label":"should be refused"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as bounty.kintsugi-djloo.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T10:24:16.148902487Z
+{
+ "tx_hash": "4caVWaHeWdecD5W7oQkCb3W3kGiPFZLUWwG6qoJSB6hP",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: a vendor account cannot be a verifier'}}}}",
+ "total_gas_burnt": 1902626554830,
+ "logs": [],
+ "wall_seconds": 3.405,
+ "rpc_error": null
+}

@@ -1,0 +1,3 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+s5_stranger_calls_private_callback	on_outlayer_result	kintsugi-res2-prnvm.testnet	EAYKT9uXAnPTNqESgvJ3UDkWAMW7PBA9TWChW6Md6gWj	-	-	rpc:failed	-
+s5_owner_registers_vendor_as_verifier	register_verifier	bounty.kintsugi-djloo.testnet	4caVWaHeWdecD5W7oQkCb3W3kGiPFZLUWwG6qoJSB6hP	-	-	rpc:failed	-
