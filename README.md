@@ -59,6 +59,25 @@ All commands run from the repository root on Linux x86_64. Versions: [docs/VERSI
 
 Track hints used: function call keys, agent security.
 
+## Roadmap
+
+Built today (each part has its proof in the table above):
+
+- A checker that runs a fix against the hidden crash input, the public tests and extra seeded inputs inside RISC Zero,
+  and gives PASS or FAIL with a receipt anyone can verify.
+- A NEAR contract on testnet that takes commits and reveals, collects the vendor's verdict and two verifiers'
+  attestations, and pays by rule, including by default when the vendor stays silent.
+- Guards against the attacks listed in [docs/SECURITY.md](docs/SECURITY.md).
+- A reproducible build of the checker, so anyone can rebuild it and compare its image id with the one a bounty names.
+
+Planned next:
+
+- OutLayer as one of the verifiers, once its testnet answers our jobs.
+- The contract checking the proof itself, so no verifier has to be trusted for the verdict.
+- An agent driven by a language model in place of the scripted one.
+- Faster proving on a GPU.
+- A small web page to follow a bounty.
+
 ## Limits
 
 - One verdict tells a researcher at most one bit about the secret; the vendor chooses the budget K.
