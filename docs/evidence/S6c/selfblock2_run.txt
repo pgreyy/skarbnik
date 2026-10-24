@@ -1,0 +1,18 @@
+== s2_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=F6mNreAXxDMNp9y6cHNtaHPhdFC3VkEWoc7aZnXUw9no gas=0.353 Tgas
+== s2_open_groth16 (open_with_groth16 by kintsugi-vendor-prnvm.testnet): exit=0 tx=6jMcTDJw1Nr3x7FXWNqFME573gXBvhUn9J3bZwu6xhD7 gas=0.377 Tgas
+self-block run 2 start: vendor 4785039037494011200000000, sybil 50000000000000000000000, sybil credit 45000000000000000000000, pool 10000000000000000000000 yoctoNEAR
+== s2_vendor_tops_up_sybil (send-near by kintsugi-vendor-prnvm.testnet): exit=0 tx=76We5GhHE5s2Zwdqgp7netymmVXW3urzKNdXxGeHJ8AR gas=0.224 Tgas
+== s2_sybil_junk_commit_0 (commit by sybil.kintsugi-vendor-prnvm.testnet): exit=0 tx=64epreebuQam5azfeBPJorLM3rQEZmFSzxzpRmsnqcjE gas=0.316 Tgas
+== s2_sybil_junk_commit_1 (commit by sybil.kintsugi-vendor-prnvm.testnet): exit=0 tx=BV8aHFzCuKWLm5Z1X1b4Qk2AnsyWCnMJnFtMcvCmzVL8 gas=0.316 Tgas
+== s2_sybil_junk_commit_2 (commit by sybil.kintsugi-vendor-prnvm.testnet): exit=0 tx=3hiPvqjJ18spcVwaP5qFwKmsB3tG8mcFtqhoYD3keKQ5 gas=0.316 Tgas
+== s2_honest_commit_ignored (commit by kintsugi-res1-prnvm.testnet): exit=0 tx=PjQBWCTmt4nAbwAQyT3Kn8UKt18nzpCzfKtbtn9HYpn gas=0.315 Tgas
+after the honest commit: commits 3, active 3
+== s2_release_unrevealed_0 (release_unrevealed by kintsugi-res2-prnvm.testnet): exit=0 tx=mpBhiyx6w9RxjpMSbcuKVty67hFZCTX7x6K3qQd57zg gas=0.311 Tgas
+after release_unrevealed(0): pool 20000000000000000000000
+== s2_expire (expire by kintsugi-res2-prnvm.testnet): exit=0 tx=8LxACsYPrMQ71kHCjDhcdt9uH9ATJNn9qrjbLMRjfVW8 gas=0.310 Tgas
+vendor 4.785039 -> 4.684994; sybil 0.050000 -> 0.249215; sybil credit 0.045000 -> 0.000000 NEAR
+held by the vendor side (vendor + sybil + sybil credit): 4.880039 -> 4.934209, change +0.054170 NEAR
+  = bounty refunded at expiry +0.100000 - attempt fees 0.045000 (credit spent) - gas 0.000830 (vendor 0.000045, sybil 0.000785; tokens burnt, from the RPC)
+  check: +0.054170 computed against +0.054170 measured, difference +0.000000 NEAR
+vendor side lost, not counting the bounty it got back: attempt fees 0.045000 + gas 0.000830 NEAR
+protocol fee pool 0.010000 -> 0.055000, gained 0.045000 NEAR; equal to the attempt fees the vendor side spent: True

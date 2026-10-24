@@ -1,0 +1,44 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args {"account_id":"sybil.kintsugi-vendor-prnvm.testnet"} prepaid-gas 100 Tgas attached-deposit 0.045 NEAR sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T23:15:32.669142231Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  deposit_credit
+│                       args:         {
+│                                       "account_id": "sybil.kintsugi-vendor-prnvm.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0.045 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.312 Tgas
+│    Transaction fee: 0.000031120662519 NEAR
+│    Transaction ID: 7ExJNdAi23TCE7DnANwkQ3WCiL3sZivFcLxyKDtUXAuS
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/7ExJNdAi23TCE7DnANwkQ3WCiL3sZivFcLxyKDtUXAuS
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"credit_deposited","data":[{"account_id":"sybil.kintsugi-vendor-prnvm.testnet","amount":"45000000000000000000000","total":"45000000000000000000000"}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"45000000000000000000000"
+
+
+The "deposit_credit" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args '{"account_id":"sybil.kintsugi-vendor-prnvm.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0.045 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=3.84

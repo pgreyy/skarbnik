@@ -1,0 +1,34 @@
+== atk_other_attempt (submit_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=3ULvszXnfJAF8sbFejCKvbxftPK2b13rT2fP8y4JEANT
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the journal belongs to another bounty or attempt (submission id)'}}}}"
+== atk_fail_as_pass (submit_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=JDZNSTe72dqrppmqye5gnTxfQ52GNaDEBJ9Z4hZa5HT
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the Groth16 proof does not verify for this bounty's image id and this journal'}}}}"
+== atk_flipped_seal_bit (submit_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=GibfrVyGKT2ymUs6W87aF5jwyRByAZ6StDxBFscy3ET7
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'AltBn128 invalid input: invalid g1: [38, E1, F0, F3, D1, 48, D8, 47, 63, 42, 6C, B6, 2D, D8, 44, 9A, D8, 15, 8F, 3E, 29, 3B, 2, 6F, 0, 76, 22, 49, 36, 68, F2, 1B, E9, 1F, 2F, 7, AA, 85, 3D, 35, F, B2, D0, D2, F0, 67, DB, E8, 9A, 41, C, 94, D0, 8, ED, F7, 48, 96, D4, 32, A2, 79, 2E, 4]'}}}}"
+== atk_changed_journal (submit_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=4Sde4NuTQobypV3x7uC8AgcnSNrZpuqG3NeuTVHkMYZG
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the Groth16 proof does not verify for this bounty's image id and this journal'}}}}"
+== d_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=B1MvhSYGPLHmLKjY3FvrKQcwk2msgBse8W9LYPxLp45T gas=0.353 Tgas
+== atk_wrong_image_id (open_with_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=4N6oi9MpDii4Vdf4uDLPSVegBsqPYYs4BQP1WzprAy2C
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the Groth16 proof does not verify for this bounty's image id and this journal'}}}}"
+== a1_fail (submit_groth16 by kintsugi-res2-prnvm.testnet): exit=0 tx=6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca gas=0.378 Tgas
+A1 outcome after its FAIL proof: Failed
+== atk_fail_second_submission (submit_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=EmKG8Sm96NZ7NzrD9DDQ5fm8ouAzn6Eg8vTPV4KRHhym
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: verdict already final'}}}}"
+== b_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=6V9zJEXHucFijSxp4yZsmyaSKXjRtdffy2XB5ZP5sYS8 gas=0.353 Tgas
+== b_open_groth16 (open_with_groth16 by kintsugi-res2-prnvm.testnet): exit=0 tx=QDgLcGz4ax9EBvu4VJHDKo642STgbnvvCyQMzY5PDyB gas=0.377 Tgas
+== b0_commit (commit by kintsugi-res1-prnvm.testnet): exit=0 tx=8L74wV4nin2aVrrb1wVSevnpfRucaT76zsSAonYu5S4h gas=0.315 Tgas
+== b0_reveal (reveal by kintsugi-res1-prnvm.testnet): exit=0 tx=HCh9BDszYBmJ7axyF4dZqGu2GePZJjPiZ79GX8Vmzdvt gas=0.350 Tgas
+== atk_other_bounty (submit_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=GfZXvdiG1mcRUK1NNTQxdCfBqHMMExLiFWYgoznaKFvS
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the journal belongs to another bounty or attempt (submission id)'}}}}"
+== a0_pass (submit_groth16 by kintsugi-res2-prnvm.testnet): exit=0 tx=CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY gas=0.378 Tgas
+A0 outcome after its PASS proof: Passed; bounty A state Paid; researcher 1 balance change 110000000000000000000000 yoctoNEAR (0.1 NEAR bounty + own 0.01 NEAR fee expected)
+== atk_second_submission (submit_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=GiHbmMMR7gsZNzKNbzU1eB9SSTreN4Up3JX4DSHotRGs
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: bounty is closed'}}}}"
+== c_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=5uETnw7Bd28GVJuXyczWa263h9nDoLrg566kXR7qeYzL gas=0.353 Tgas
+== c_open_groth16 (open_with_groth16 by kintsugi-res2-prnvm.testnet): exit=0 tx=J6WPRaRceZzMVkLygVLQ2sJuhkAdup9azGaPEKc5rJm6 gas=0.377 Tgas
+== c0_commit (commit by kintsugi-res1-prnvm.testnet): exit=0 tx=FYDcSCun67inudFMGFQdhhEFKU4PtaBfYrakUwrwgya3 gas=0.315 Tgas
+== c0_reveal (reveal by kintsugi-res1-prnvm.testnet): exit=0 tx=GcQ2EfWHH2X3oSw39Mw34XdiN3vz5sjhR3gj4hob6qLZ gas=0.350 Tgas
+== atk_after_expiry (submit_groth16 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=E5DFg1TVhtDoFQjL5GdpfsSeJRBrBobX6GprTirYnrwp
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: bounty has expired'}}}}"
+== c_claim_timeout (claim_timeout by kintsugi-res2-prnvm.testnet): exit=0 tx=2Ga3oSGcrgfMdbKoLCEUK8FwGrpnqMk9ex2Kp2oj6Tiq gas=0.310 Tgas
+== c_expire (expire by kintsugi-res2-prnvm.testnet): exit=1 tx=- gas=-
+bounty C after timeout and expire: {'state': 'Paid', 'level': 2, 'fees_collected': '0', 'fees_swept': False}; vendor balance change 0 yoctoNEAR (C's fee 0.01 NEAR expected; Level 2 fees go to the vendor)

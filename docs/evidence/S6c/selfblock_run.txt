@@ -1,0 +1,19 @@
+== s_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=Hx4PkTcAfArnFWTiQhVuYd9Bp1SR6ipHC9rad1bkoCwW gas=0.353 Tgas
+== s_open_groth16 (open_with_groth16 by kintsugi-vendor-prnvm.testnet): exit=0 tx=JAgnGrZKA5YjkQhF5KBo7KYavLtpfoZmiYq1oGSJQgcj gas=0.377 Tgas
+self-block start: vendor balance 4891118658488694500000000, pool 0 yoctoNEAR
+== s_create_sybil (create-account by kintsugi-vendor-prnvm.testnet): exit=0 tx=2FgNc4w2ov78sfnNKHsMpBjpindceKvbhVKTME4syMAs gas=0.825 Tgas
+== s_vendor_funds_sybil_credit (deposit_credit by kintsugi-vendor-prnvm.testnet): exit=0 tx=7ExJNdAi23TCE7DnANwkQ3WCiL3sZivFcLxyKDtUXAuS gas=0.312 Tgas
+== s_sybil_junk_commit_0 (commit by sybil.kintsugi-vendor-prnvm.testnet): exit=1 tx=- gas=-
+== s_sybil_junk_commit_1 (commit by sybil.kintsugi-vendor-prnvm.testnet): exit=1 tx=- gas=-
+== s_sybil_junk_commit_2 (commit by sybil.kintsugi-vendor-prnvm.testnet): exit=1 tx=- gas=-
+== s_honest_commit_ignored (commit by kintsugi-res1-prnvm.testnet): exit=0 tx=7wv55VszucJV6xGSSGJrgwvycVfwh7bHZkbV67gfPbHq gas=0.315 Tgas
+after the honest commit: commits 1, active 1
+== s_release_unrevealed_0 (release_unrevealed by kintsugi-res2-prnvm.testnet): exit=0 tx=BSuwfFeEuFYpMNxHPAgzA4N8SK1Vo6hgnsZvDKdcewrV gas=0.311 Tgas
+after release_unrevealed(0): pool 10000000000000000000000
+== s_expire (expire by kintsugi-res2-prnvm.testnet): exit=0 tx=8iC5Q9UMVAGD3WHfrHE2cVBGv1gHzhNdbc4RFgsQeLRU gas=0.310 Tgas
+vendor balance before the block 4.891119 NEAR, after 4.888797 NEAR, change -0.002322 NEAR
+  of which: bounty refunded at expiry +0.100000; sybil account funded -0.050000 (still held by sybil: 0.050000); credit for the three attempt fees -0.045000; gas of the vendor's own transactions in the block -0.007322 (tokens burnt, from the RPC)
+  check: 0.1 - 0.05 - 0.045 - gas = -0.002322 NEAR (difference from the measured change: +0.000000; storage refunds and rounding)
+  sybil account gas for its three commits: 0.000000 NEAR; its unspent credit left in the contract: 0.045000 NEAR
+vendor side in total (vendor + sybil + sybil credit), not counting the refunded bounty: lost attempt fees 0.045000 NEAR + gas 0.007322 NEAR
+protocol fee pool before 0.000000, after 0.010000, gained 0.010000 NEAR (the three attempt fees: 0.01 + 0.015 + 0.02 = 0.045)

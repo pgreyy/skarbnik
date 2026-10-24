@@ -1,0 +1,11 @@
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T23:11:13.475134349Z
+{
+ "tx_hash": "E5DFg1TVhtDoFQjL5GdpfsSeJRBrBobX6GprTirYnrwp",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: bounty has expired'}}}}",
+ "total_gas_burnt": 2103702624852,
+ "logs": [],
+ "wall_seconds": 3.571,
+ "rpc_error": null
+}

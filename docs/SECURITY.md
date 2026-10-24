@@ -44,12 +44,16 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Deadlines by block time: a late verdict is refused; with no final verdict the researcher can claim the timeout | A vendor that stays silent, or answers too late | `post_verdict`, `claim_timeout` | S3 testnet: early timeout refused, late verdict refused, timeout paid |
 | Expiry refunds an unpaid bounty only when no revealed submission is still waiting | A vendor taking back money owed to a researcher | `expire` | unit test `expire_waits_for_revealed_submission` |
 | At most K counted commits per bounty; later ones are ignored and cost nothing | Unlimited attempts, and so unlimited leakage | `commit` | S8 testnet: fourth commit ignored ("max_commits reached") |
-| Attempt fees, rising per attempt, paid from prepaid credit; fees go to the verifiers | Free flooding of attempts | `commit`, `deposit_credit`, `expire` | S3b testnet |
+| Attempt fees, rising per attempt, paid from prepaid credit; fees of revealed attempts go to the verifiers (Level 0) or the vendor (Level 2), fees of commits never revealed to the protocol fee pool | Free flooding of attempts | `commit`, `deposit_credit`, `expire` | S3b testnet |
 | Withdrawing credit needs 1 yoctoNEAR attached | An agent's function call key draining the credit | `withdraw_credit` | S7: refused for the agent key |
 | OutLayer's answer is accepted only as the callback of the contract's own request, and only if every echoed value matches | A forged OutLayer answer | `request_outlayer_check`, `on_outlayer_result` | 9 unit tests; S5 on chain ("Method on_outlayer_result is private") |
 | A bounty opens only after two different verifiers attest its Proof 0 (added in S13) | Attempts on a bounty that may be unfixable | `attest_proof0`, `commit` | unit tests `s13_commit_before_proof0_rejected` and others; S13 attacks 1, 6 and 7 on testnet |
 | A reveal window; anyone can free the slot of a commit never revealed (added in S13) | Junk commits holding all K slots forever | `reveal`, `release_unrevealed` | unit test `s13_unrevealed_junk_commits_can_be_released`; S13 attack 2 on testnet |
 | The winner's own attempt fee is refunded with the payout (added in S13) | Penalizing the honest winner | `record_attestation`, `claim_timeout` | unit test `s13_winner_fee_refunded_on_pass`; S13 attack 11 on testnet (+0.51 NEAR = bounty + own fee) |
+| Level 2 bounties: the contract checks a Groth16 proof itself (`groth16::verify`, NEAR's alt_bn128 host functions); no verifier signatures; every Level 0 call refuses a Level 2 bounty and the Level 2 calls refuse a Level 0 bounty; `get_bounty` shows the level (added in S6c) | Trusting verifiers for the verdict | `open_with_groth16`, `submit_groth16`, `contract/src/groth16.rs` | unit tests `tests_level2.rs`; S6c on testnet (EVIDENCE, S6c) |
+| A Level 2 proof's journal must belong to this bounty and this attempt: submission id (contract, bounty, index, patch hash), the seed recorded at reveal, the revealed patch hash, the bounty's original, exploit commitment, tests and check size; the verdict is read from the journal, never given by the caller (added in S6c) | Replaying a proof from another bounty or attempt; calling a FAIL a PASS | `submit_groth16`, `check_bounty_fields` | S6c attacks (EVIDENCE, S6c) |
+| Every new bounty records `fuzz_count` and `variant_count`; a proof must match them (Level 2: on chain; Level 0: `scripts/verifier_check.sh`) (added in S6c) | A vendor proving a weaker check than the bounty promises | `create_bounty`, `check_bounty_fields`, `verifier_check.sh` | unit test `level2_proof0_refused_with_other_counts`; S6c Level 0 check 12 of 12 |
+| Fees of commits never revealed go to the protocol fee pool by one rule (`release_to_pool`), at `release_unrevealed` or, if still unreleased, at `expire` before any fee is paid out; no code path pays such a fee to the vendor, a researcher or a verifier (added in S6c) | A vendor blocking its own bounty with junk commits for free (it would otherwise get the fees back) | `release_to_pool`, `release_unrevealed`, `expire` | unit tests `release_unrevealed_moves_the_fee_to_the_pool_and_pays_nobody`, `level2_unrevealed_fee_goes_to_the_pool_not_the_vendor`; S6c self-block test |
 
 ### Keys
 
@@ -81,6 +85,16 @@ Each guard: what it stops, where it lives, and what shows it works.
 | 2026-10-24 | `500469c` | (10) A reveal that does not match its commit | `scripts/s13_attacks.sh misc` | **blocked** on chain ("fingerprint does not match") (EVIDENCE, S13) |
 | 2026-10-24 | `500469c` | (11) The vendor posts FAIL for a fix whose real receipt says PASS | `scripts/s13_attacks.sh attack_a` | **blocked**: both verifiers refuse (journal verdict differs); after the window the researcher was paid by timeout, +0.51 NEAR (bounty and own fee) (EVIDENCE, S13) |
 
+| 2026-10-25 | pending | (S6c) A valid PASS proof submitted for another attempt of the same bounty | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the journal belongs to another bounty or attempt (submission id)" (EVIDENCE, S6c) |
+| 2026-10-25 | pending | (S6c) A valid PASS proof submitted for an attempt on another bounty (same patch) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the journal belongs to another bounty or attempt (submission id)" |
+| 2026-10-25 | pending | (S6c) A FAIL proof's journal edited to say PASS | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "the Groth16 proof does not verify ..." |
+| 2026-10-25 | pending | (S6c) One flipped bit in the seal | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "AltBn128 invalid input: invalid g1" |
+| 2026-10-25 | pending | (S6c) A changed journal (fuzz_count) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: the proof does not verify |
+| 2026-10-25 | pending | (S6c) A bounty naming another image id, opened with the real Proof 0 | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: the proof does not verify |
+| 2026-10-25 | pending | (S6c) The same proof submitted twice (FAIL, then PASS after payout) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "verdict already final", "bounty is closed" |
+| 2026-10-25 | pending | (S6c) A proof submitted after the bounty expired | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "bounty has expired" |
+| 2026-10-25 | pending | (S6c) The vendor blocks its own Level 2 bounty through a second account that takes all K slots and never reveals | `scripts/s6c_testnet.sh selfblock2` | **not blocked before S6c (guard added)**: the honest commit is still ignored for the reveal window, but the vendor side lost 0.045 NEAR in fees plus 0.000830 NEAR in gas and the pool gained exactly 0.045 NEAR; before, a Level 2 vendor would have got those fees back at expiry |
+
 ## 3. Known limits
 
 - A machine without Docker can embed guest files built elsewhere (`KINTSUGI_PREBUILT_GUESTS`, for the GPU test). It
@@ -102,10 +116,9 @@ Each guard: what it stops, where it lives, and what shows it works.
     program must be downloaded first) has been answered: 9 of 9 such jobs (8 of them ours) timed out, by link from two hosts and as an OutLayer project on
     FastFS, while OutLayer's own cached test program answered in 10 to 14 s (EVIDENCE, "OutLayer (Level 1) on testnet").
     The cause is inside OutLayer; the FastFS gateway was also down during the project test.
-  - Level 2 (spike only, not connected to payouts): a separate testnet contract, `kintsugi-g16-bkexe.testnet`, checks a
-    RISC Zero Groth16 proof itself with NEAR's alt_bn128 host functions (`verifier/groth16-near`); it accepted the real
-    proof and rejected a flipped seal bit, a changed journal and a wrong image id, at 34.569 Tgas per call (EVIDENCE,
-    S6b). The bounty contract does not use it yet, so the verdict still rests on Level 0.
+  - Level 2 (works on testnet, spike S6c): a bounty created with level 2 is opened and decided only by Groth16 proofs
+    that the bounty contract checks itself (`kintsugi-l2-cihdp.testnet`, 35 to 36 Tgas per proof, EVIDENCE S6c). No
+    verifier is trusted for those verdicts. The S13 contract and the demo bounty are Level 0.
 - At Level 0 the contract does not check a receipt; a dishonest majority of verifiers could attest a false verdict.
 - One verdict leaks at most one bit about the secret; K is the leak budget, chosen by the vendor. K is per bounty and
   counts every committer together, so sub-accounts cannot raise the total leak above K bits: a slot is freed only by
@@ -114,20 +127,46 @@ Each guard: what it stops, where it lives, and what shows it works.
   bounty.
 - Anyone, with as many accounts as they like, can hold all K slots with junk commits for one reveal window. With the
   test settings (K = 3, `attempt_fee` 0.01 NEAR, `fee_step` 0.005 NEAR) the first window costs 0.01 + 0.015 + 0.02 =
-  0.045 NEAR; the fees are kept (swept to the verifiers), and because `commits` never goes down, window w (from 0) costs
+  0.045 NEAR; the fees are kept (since S6c in the protocol fee pool), and because `commits` never goes down, window w (from 0) costs
   0.045 + 0.045 w NEAR, so W windows in a row cost 0.0225 W (W + 1) NEAR (10 windows: 2.475 NEAR). After each window
   anyone can free the slots and commit. **Accepted risk**: the cost of blocking grows with every window, the leak stays
   at most K bits, and the vendor sets K, both fees and the reveal window.
 - RISC Zero states its zero knowledge property is not formally proven.
-- A Groth16 check (Level 2, so far only the S6b spike) still trusts:
+- What Level 2 still trusts:
   - the BN254 curve: NEAR's own NEP-488 says recent research puts BN254 below 100-bit security, and RISC Zero's
-    security model rates its Groth16 step 99+ bits and not quantum safe;
-  - RISC Zero's Groth16 trusted setup ceremony and the verifying key made from it: if the ceremony's secret had
-    been kept by anyone, they could make proofs of false claims (RISC Zero's security model lists the integrity of
-    the ceremony as an assumption);
+    security model rates its Groth16 step 99+ bits and not quantum safe (dev.risczero.com, security model);
+  - RISC Zero's Groth16 trusted setup and the verifying key made from it. Confirmed from primary sources: RISC Zero ran
+    the ceremony with the open-source tools p0tion and DefinitelySetup, coordinated with the PSE team, on top of the
+    Hermez Powers of Tau with 2^23 powers (dev.risczero.com, trusted setup ceremony); that Powers of Tau file was
+    prepared with 54 contributions and a random beacon (snarkjs README); RISC Zero lists the "Integrity of Groth16
+    Trusted Setup Ceremony" as an assumption of this step (security model); the transcript can be checked with
+    `snarkjs zkey verify` (trusted setup page); the STARK-to-SNARK circuit was audited by Hexens (rz-security audits
+    list). Not confirmed from a primary source: the number of phase 2 participants (238 according to L2BEAT), the exact
+    condition under which the setup stays safe, and any audit of the ceremony itself. If the setup's secret were known
+    to someone, they could make Groth16 proofs of false claims; against this contract that means a fake PASS for any
+    revealed attempt (all journal fields are public), a fake FAIL that spends an honest attempt, and a fake Proof 0
+    that opens a bounty. It would not reveal the secret crash input, move money outside the contract's rules, or
+    affect Level 0 bounties;
   - two fixed constants written into the contract: RISC Zero's control root (`a54dc85a...`), which says which
     recursion programs are allowed, and its BN254 control id (`c07a6514...`). They come from risc0-zkvm 3.0.6's
-    defaults (`verifier/groth16-near/src/vk.rs`); a different RISC Zero version may need new values.
+    defaults (`contract/src/groth16_vk.rs`, also in `verifier/groth16-near/src/vk.rs`); a different RISC Zero version
+    may need new values;
+  - the vendor, for keeping the secret, choosing the reference fix and making each proof: a vendor who never submits a
+    proof cannot stop the timeout from paying the researcher.
+- What Level 2 does not trust: any verifier account, OutLayer, or the vendor's word on a verdict; the verdict is the
+  journal's, and the journal must match this bounty and this attempt.
+- Protocol fee pool: since S6c, the attempt fees of commits that are never revealed (released, or still unrevealed at
+  expiry) are kept in the contract as a pool, shown by `get_protocol_pool`. There is no function to take NEAR out of
+  it: its destination is deliberately left open, to be decided after the audit. If the pool ever pays Kintsugi (the
+  project), the project would gain from junk commits that block bounties, a conflict of interest that the decision
+  must address. Fees of revealed attempts still go to the verifiers (Level 0) or the vendor (Level 2) at expiry.
+- Found during S6c: the Level 0 verifier check did not compare the journal's `fuzz_count` and `variant_count` with
+  anything, so a vendor could prove a smaller check than the bounty implies and still be attested. Bounties created by
+  the S6c contract record both, and `scripts/verifier_check.sh` checks them; bounties on older contracts (S4, S7, S13,
+  the demo bounty) do not record them, so for those the gap remains.
+- A Proof 0 journal does not depend on the bounty (its id is sha256 of "kintsugi-proof0-v1" and the reference fix
+  hash), so one Proof 0 opens every bounty with the same original, secret commitment, tests, check size and reference
+  fix. S6c relied on this to reuse the demo's Groth16 Proof 0.
 - The vendor sees each patch before paying; the timeout path protects the researcher.
 - Arena verdicts (S8) come from the native checker, not proofs. Timing and other side channels are not measured.
 - Proving is slow on a laptop CPU (16 fairness inputs: 47 to 48 minutes, plus 15 to 16 minutes to compress).
@@ -136,6 +175,9 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
+- 2026-10-25 (pending commit): S6c Level 2 path in the bounty contract (Groth16 proofs, journal binding, level marking,
+  check size), protocol fee pool for never-revealed fees, nine Level 2 attacks and the self-block test; trusted setup
+  line corrected to confirmed facts; Level 0 check size gap found and closed for new bounties.
 - 2026-10-24 `bb4defb`: S6b Groth16 check on a spike contract (not the bounty contract); known limits for
   BN254, the trusted setup and the two fixed constants.
 - 2026-10-24 `582b2d8`: demo bounty 4 with the reproducible image id; `check_image_id.sh` prints MATCH.

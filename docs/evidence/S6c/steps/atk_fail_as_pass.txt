@@ -1,0 +1,11 @@
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T23:07:29.308427197Z
+{
+ "tx_hash": "JDZNSTe72dqrppmqye5gnTxfQ52GNaDEBJ9Z4hZa5HT",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the Groth16 proof does not verify for this bounty's image id and this journal'}}}}",
+ "total_gas_burnt": 34876561303027,
+ "logs": [],
+ "wall_seconds": 4.171,
+ "rpc_error": null
+}

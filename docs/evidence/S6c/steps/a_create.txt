@@ -1,0 +1,62 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet create_bounty json-args {"original_hash":"fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8","corpus_hash":"736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b","image_id":"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc","exploit_commitment":"9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387","proof0_receipt_hash":"1175f61502c45c3020da313fee1d3ce57a9320226dff22853b2e4a9d379af308","max_commits":3,"max_patch_bytes":1024,"reveal_gap_ns":"2000000000","verdict_window_ns":"43200000000000","attest_window_ns":"3600000000000","expiry_ns":"172800000000000","attempt_fee":"10000000000000000000000","fee_step":"5000000000000000000000","reference_fix_hash":"42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97","proof0_journal_hash":"fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5","reveal_window_ns":"3600000000000","fuzz_count":16,"variant_count":32,"level":2} prepaid-gas 100 Tgas attached-deposit 0.1 NEAR sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T21:43:42.613341230Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  create_bounty
+│                       args:         {
+│                                       "attempt_fee": "10000000000000000000000",
+│                                       "attest_window_ns": "3600000000000",
+│                                       "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+│                                       "expiry_ns": "172800000000000",
+│                                       "exploit_commitment": "9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387",
+│                                       "fee_step": "5000000000000000000000",
+│                                       "fuzz_count": 16,
+│                                       "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+│                                       "level": 2,
+│                                       "max_commits": 3,
+│                                       "max_patch_bytes": 1024,
+│                                       "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+│                                       "proof0_journal_hash": "fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5",
+│                                       "proof0_receipt_hash": "1175f61502c45c3020da313fee1d3ce57a9320226dff22853b2e4a9d379af308",
+│                                       "reference_fix_hash": "42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97",
+│                                       "reveal_gap_ns": "2000000000",
+│                                       "reveal_window_ns": "3600000000000",
+│                                       "variant_count": 32,
+│                                       "verdict_window_ns": "43200000000000"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0.1 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.353 Tgas
+│    Transaction fee: 0.000035269145724 NEAR
+│    Transaction ID: h2LfFz5N24AezQymZ5d6mshgS7VYN1XaND6sPQFEKMg
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/h2LfFz5N24AezQymZ5d6mshgS7VYN1XaND6sPQFEKMg
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_created","data":[{"bounty_id":"1","vendor":"kintsugi-vendor-prnvm.testnet","amount":"100000000000000000000000","image_id":"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc","exploit_commitment":"9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387","max_commits":3,"attempt_fee":"10000000000000000000000","fee_step":"5000000000000000000000","expires_at_ns":"1793051023889581943"}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"1"
+
+
+The "create_bounty" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet create_bounty json-args '{"original_hash":"fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8","corpus_hash":"736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b","image_id":"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc","exploit_commitment":"9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387","proof0_receipt_hash":"1175f61502c45c3020da313fee1d3ce57a9320226dff22853b2e4a9d379af308","max_commits":3,"max_patch_bytes":1024,"reveal_gap_ns":"2000000000","verdict_window_ns":"43200000000000","attest_window_ns":"3600000000000","expiry_ns":"172800000000000","attempt_fee":"10000000000000000000000","fee_step":"5000000000000000000000","reference_fix_hash":"42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97","proof0_journal_hash":"fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5","reveal_window_ns":"3600000000000","fuzz_count":16,"variant_count":32,"level":2}' prepaid-gas '100.0 Tgas' attached-deposit '0.1 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.43

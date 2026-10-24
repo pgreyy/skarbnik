@@ -1,0 +1,11 @@
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T23:09:21.729642870Z
+{
+ "tx_hash": "GfZXvdiG1mcRUK1NNTQxdCfBqHMMExLiFWYgoznaKFvS",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the journal belongs to another bounty or attempt (submission id)'}}}}",
+ "total_gas_burnt": 34899552147161,
+ "logs": [],
+ "wall_seconds": 3.931,
+ "rpc_error": null
+}

@@ -1,0 +1,30 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host prove data/attacks/reject_all.wasm --fuzz-count 16 --variants 32 --po2 19 --seed eb32253e5224d697019c9f0f2cb8b59446591769303b6ceb8ec1f8c05a4c2212 --submission-id 8b50c8e715904c52ac4acfbfbd9edcf9991a4915405df68de85a0eb020b23555 --out target/s6c/a1.bin
+utc_start=2026-10-24T21:44:59Z
+limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=10800
+candidate: data/attacks/reject_all.wasm
+image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 16 variants: 32
+total cycles: 1572864
+user cycles: 754789
+segments: 3
+prove seconds: 345.05
+verify seconds (in process): 0.110
+receipt file: target/s6c/a1.bin (805878 bytes)
+seal bytes: 803640
+journal bytes: 780
+journal.verdict: FAIL
+journal.candidate_hash: 0839953ef612b12a363319b4148bafb381630577f75129f06940392a1a9ea7ed
+journal.original_hash: fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8
+journal.exploit_commitment: 9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387
+journal.corpus_hash: 736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b
+journal.fuzz_seed: eb32253e5224d697019c9f0f2cb8b59446591769303b6ceb8ec1f8c05a4c2212
+journal.fuzz_count: 16
+journal.variant_count: 32
+journal.submission_id: 8b50c8e715904c52ac4acfbfbd9edcf9991a4915405df68de85a0eb020b23555
+exit=0
+wall_seconds=345.66
+r0vm_peak_rss_mib=4704 (VmHWM, sampled every 5 s)
+min_available_mib=3474
+result: finished

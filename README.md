@@ -27,6 +27,8 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 | Anyone can rebuild the checker and get the same image id: it is built inside RISC Zero's guest builder Docker image, so the id does not depend on the folder or the user | works: the demo bounty 4 on `kintsugi-s13-tlryo.testnet` holds the reproducible id and the rebuild prints MATCH (shown on one laptop; two folders and two home folders give the same id) | `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 4` (EVIDENCE, "Demo bounty" and "Image id") |
 | A receipt shrinks to a 2,057 byte Groth16 proof (the kind a contract could check itself) on the laptop CPU, and it verifies against the checker's image id | works on the laptop (187.91 s, about 7 GiB of memory); the contract does not check it yet (design note in docs/ARCHITECTURE.md) | `kintsugi-host compress <succinct receipt> <out> groth16`, then `kintsugi-host verify <out>` (EVIDENCE, S6) |
 | A NEAR contract checks a RISC Zero Groth16 proof itself with NEAR's alt_bn128 host functions: it accepts the real proof and rejects a flipped bit, a changed journal and a wrong image id | works on testnet as a separate spike contract (34.569 Tgas per call); not connected to the bounty contract or its payouts yet | `scripts/s6b_testnet.sh` and `cargo test -p kintsugi-groth16-spike` (EVIDENCE, S6b) |
+| Level 2 bounties: the bounty contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt, and replayed, changed, late or repeated proofs are refused | works on testnet (`kintsugi-l2-cihdp.testnet`: one PASS paid, one FAIL spent, nine attacks refused; 35 to 36 Tgas per proof); Level 0 bounties work as before; each bounty shows its level | `scripts/s6c_testnet.sh` and `cargo test -p kintsugi-contract --offline` (EVIDENCE, S6c) |
+| Fees of commits that are never revealed go to a protocol fee pool, never back to the vendor, so a vendor cannot block its own bounty for free | works on testnet: in the self-block test the vendor side lost 0.045 NEAR in fees and the pool gained exactly 0.045 NEAR; the pool cannot be paid out yet (destination open, docs/SECURITY.md) | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |
 | OutLayer (TEE) as one of the two verifiers | not confirmed on testnet yet: OutLayer accepts our jobs but none has been answered (8 of 8 timed out, by link and as an OutLayer project), while OutLayer's own cached test program answers; the contract recorded nothing, as designed | EVIDENCE, S4/S5 and "OutLayer (Level 1) on testnet" |
 
 ## Try it
@@ -39,7 +41,7 @@ All commands run from the repository root on Linux x86_64. Versions: [docs/VERSI
 3. Print the verdict table for the cheating patches:
    `target/debug/kintsugi-check table --manifest data/attacks/manifest.txt --seed 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21`.
    See the honest fix PASS and the cheats FAIL (`data/attacks/` holds inert test patches).
-4. Run the contract tests: `cargo test -p kintsugi-contract --offline`. See 59 tests pass (docs/evidence/S13/unit_tests.txt).
+4. Run the contract tests: `cargo test -p kintsugi-contract --offline`. See 71 tests pass (docs/evidence/S6c/contract_unit_tests.txt).
 5. Count the zkVM cycles of one check without proving it:
    `./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 32 --profile`. See the verdict
    PASS and the cycles per phase.

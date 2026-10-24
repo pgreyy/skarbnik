@@ -44,11 +44,23 @@
 //! and only the callback of that request (`on_outlayer_result`, private) can add OutLayer's attestation. The
 //! callback carries only the program's JSON answer (no signature, no program hash), so it is accepted only if
 //! every echoed value matches what this contract holds. This trusts the OutLayer contract and its operator.
+//!
+//! Level 2 (spike S6c): a bounty created with `level: 2` takes no verifier attestations at all. It opens when anyone
+//! submits a Groth16 proof of its Proof 0 (`open_with_groth16`), and each revealed attempt is decided when anyone
+//! submits a Groth16 proof of that attempt (`submit_groth16`). The contract checks the proof itself with NEAR's
+//! alt_bn128 host functions (module `groth16`), then checks that every field of the proof's journal belongs to THIS
+//! bounty and THIS attempt (original, exploit commitment, tests, counts, the seed recorded at reveal, the revealed
+//! patch hash and the submission id), and reads the verdict from the journal: PASS pays, FAIL spends the attempt.
+//! A proof must arrive before the bounty expires and within the verdict window after the reveal; without one, the
+//! researcher is paid by `claim_timeout` as for Level 0. Attempt fees of a Level 2 bounty go to the vendor at
+//! expiry. Every bounty records `fuzz_count` and `variant_count`, the check's size, which a proof must match.
 
 use near_sdk::json_types::{Base64VecU8, U128, U64};
 use near_sdk::serde_json::{Value, json};
 use near_sdk::store::{IterableMap, LookupMap, LookupSet};
 use near_sdk::{AccountId, BorshStorageKey, Gas, NearToken, PanicOnDefault, Promise, PromiseError, env, near, require};
+
+mod groth16;
 
 /// Name and version written into every event log line.
 const EVENT_STANDARD: &str = "kintsugi";
@@ -67,6 +79,16 @@ pub const SUBMISSION_DOMAIN: &[u8] = b"kintsugi-submission-v1";
 /// Storage key of the OutLayer settings. Kept outside the main state so adding them does not change
 /// the layout of contract state that is already deployed.
 const OUTLAYER_KEY: &[u8] = b"OUTLAYER";
+/// Raw storage key of the protocol fee pool (a u128 in yoctoNEAR, little-endian): the attempt fees of commits that were
+/// never revealed. Kept outside the contract's state struct so the stored layout does not change. There is no way to
+/// take NEAR out of the pool yet; its destination is deliberately left open (docs/SECURITY.md).
+const POOL_KEY: &[u8] = b"PROTOCOL_POOL";
+/// Domain tag of the submission id a Proof 0 journal carries: sha256(PROOF0_DOMAIN || reference fix hash), as in
+/// harness/checker/src/zk.rs.
+pub const PROOF0_DOMAIN: &[u8] = b"kintsugi-proof0-v1";
+/// Bounty levels: 0 = verdicts need two verifier attestations; 2 = verdicts come only from a Groth16 proof.
+pub const LEVEL_0: u8 = 0;
+pub const LEVEL_2: u8 = 2;
 /// Gas sent with the OutLayer request (it reserves its own callback gas from this) and kept for ours.
 const OUTLAYER_REQUEST_GAS: Gas = Gas::from_tgas(150);
 const OUTLAYER_CALLBACK_GAS: Gas = Gas::from_tgas(30);
@@ -100,6 +122,37 @@ pub fn submission_id(contract: &AccountId, bounty_id: u64, index: u32, patch_has
     buf.extend_from_slice(&index.to_le_bytes());
     buf.extend_from_slice(patch_hash);
     env::sha256_array(&buf)
+}
+
+/// The submission id a Proof 0 journal carries: sha256(PROOF0_DOMAIN || reference fix hash).
+pub fn proof0_id(reference_fix_hash: &[u8; 32]) -> [u8; 32] {
+    let mut b = PROOF0_DOMAIN.to_vec();
+    b.extend_from_slice(reference_fix_hash);
+    env::sha256_array(&b)
+}
+
+fn pool_balance() -> u128 {
+    env::storage_read(POOL_KEY).map(|b| u128::from_le_bytes(b.try_into().unwrap_or([0; 16]))).unwrap_or(0)
+}
+
+/// The one rule for the fee of a commit that was never revealed: the commit is released (its slot freed), and its fee
+/// leaves the bounty's collected fees for the protocol fee pool, so it is never paid to the vendor, a researcher or a
+/// verifier. Used by `release_unrevealed` and, for commits still unreleased at the end, by `expire`.
+fn release_to_pool(bounty_id: U64, index: u32, bounty: &mut Bounty, sub: &mut Submission) {
+    sub.outcome = Outcome::Released;
+    bounty.active = bounty.active.saturating_sub(1);
+    bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
+    let pool = pool_balance().saturating_add(sub.fee.as_yoctonear());
+    env::storage_write(POOL_KEY, &pool.to_le_bytes());
+    emit("fee_to_pool", json!({ "bounty_id": bounty_id, "index": index, "fee": U128(sub.fee.as_yoctonear()), "pool": U128(pool) }));
+}
+
+/// The journal fields that are the same for every proof of one bounty.
+fn check_bounty_fields(bounty: &Bounty, j: &groth16::Journal) {
+    require!(j.original_hash == bounty.original_hash, "the journal's original is not this bounty's");
+    require!(j.exploit_commitment == bounty.exploit_commitment, "the journal's exploit commitment is not this bounty's");
+    require!(j.corpus_hash == bounty.corpus_hash, "the journal's tests are not this bounty's");
+    require!(j.fuzz_count == bounty.fuzz_count && j.variant_count == bounty.variant_count, "the journal's check size is not this bounty's");
 }
 
 #[near(serializers = [borsh])]
@@ -185,6 +238,11 @@ pub struct Bounty {
     reveal_window_ns: u64,
     /// Slots in use (committed and not released). K (max_commits) applies to this.
     active: u32,
+    /// 0: verdicts need two verifier attestations; 2: verdicts come only from a Groth16 proof checked here.
+    level: u8,
+    /// The size of the check every proof for this bounty must have (fairness inputs, crash variants).
+    fuzz_count: u32,
+    variant_count: u32,
 }
 
 #[near(serializers = [borsh])]
@@ -252,6 +310,10 @@ pub struct BountyView {
     pub opened: bool,
     pub reveal_window_ns: U64,
     pub active: u32,
+    /// 0: verdicts need two verifier attestations; 2: verdicts come only from a Groth16 proof checked by this contract.
+    pub level: u8,
+    pub fuzz_count: u32,
+    pub variant_count: u32,
 }
 
 /// JSON view of a submission.
@@ -444,6 +506,9 @@ impl Contract {
         reference_fix_hash: String,
         proof0_journal_hash: String,
         reveal_window_ns: U64,
+        fuzz_count: u32,
+        variant_count: u32,
+        level: Option<u8>,
     ) -> U64 {
         let vendor = env::predecessor_account_id();
         let amount = env::attached_deposit();
@@ -454,6 +519,9 @@ impl Contract {
         require!(verdict_window_ns.0 > 0 && attest_window_ns.0 > 0 && expiry_ns.0 > 0, "windows must be above zero");
         require!(attempt_fee.0 > 0, "attempt_fee must be above zero");
         require!(reveal_window_ns.0 > reveal_gap_ns.0, "reveal_window_ns must be longer than reveal_gap_ns");
+        let level = level.unwrap_or(LEVEL_0);
+        require!(level == LEVEL_0 || level == LEVEL_2, "level must be 0 or 2");
+        require!(fuzz_count > 0 && variant_count > 0, "fuzz_count and variant_count must be above zero");
         let now = env::block_timestamp();
         let bounty = Bounty {
             vendor: vendor.clone(),
@@ -484,6 +552,9 @@ impl Contract {
             opened: false,
             reveal_window_ns: reveal_window_ns.0,
             active: 0,
+            level,
+            fuzz_count,
+            variant_count,
         };
         let id = self.next_bounty_id;
         self.next_bounty_id += 1;
@@ -511,6 +582,7 @@ impl Contract {
         let now = env::block_timestamp();
         let bounty = self.bounties.get(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(env::predecessor_account_id() == bounty.vendor, "only the vendor can post a verdict");
+        require!(bounty.level == LEVEL_0, "this is a Level 2 bounty: verdicts come only from a Groth16 proof");
         require!(bounty.state == BountyState::Open, "bounty is closed");
         let verdict_window = bounty.verdict_window_ns;
         let sub = self
@@ -660,8 +732,7 @@ impl Contract {
         require!(sub.outcome == Outcome::Open, "this submission is already final or released");
         require!(sub.revealed_at_ns.is_none(), "a revealed submission cannot be released");
         require!(now > sub.committed_at_ns.saturating_add(bounty.reveal_window_ns), "reveal window has not closed");
-        sub.outcome = Outcome::Released;
-        bounty.active = bounty.active.saturating_sub(1);
+        release_to_pool(bounty_id, index, bounty, sub);
         emit("released", json!({ "bounty_id": bounty_id, "index": index, "active": bounty.active, "caller": env::predecessor_account_id() }));
         bounty.active
     }
@@ -681,6 +752,7 @@ impl Contract {
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(verifier != bounty.vendor, "the vendor cannot attest");
+        require!(bounty.level == LEVEL_0, "this is a Level 2 bounty: it opens only with a Groth16 proof");
         require!(!bounty.opened, "bounty is already open");
         require!(
             bounty.proof0_journal_hash == journal && bounty.proof0_receipt_hash == receipt,
@@ -742,6 +814,7 @@ impl Contract {
         require!(self.verifiers.contains_key(&cfg.account_id), "the OutLayer account is not a registered verifier");
         let bounty = self.bounties.get(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.state == BountyState::Open, "bounty is closed");
+        require!(bounty.level == LEVEL_0, "this is a Level 2 bounty: verdicts come only from a Groth16 proof");
         let sub = self.submissions.get(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
         require!(sub.outcome == Outcome::Open, "verdict already final");
         let posted = sub.verdict.as_ref().unwrap_or_else(|| env::panic_str("no verdict posted"));
@@ -845,6 +918,7 @@ impl Contract {
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(verifier != bounty.vendor, "the vendor cannot attest");
+        require!(bounty.level == LEVEL_0, "this is a Level 2 bounty: verdicts come only from a Groth16 proof");
         let sub = self
             .submissions
             .get_mut(&(bounty_id.0, index))
@@ -878,6 +952,88 @@ impl Contract {
                 emit(
                     "paid",
                     json!({ "bounty_id": bounty_id, "index": index, "reason": "final_pass", "to": sub.payout, "amount": U128(bounty.amount.as_yoctonear()) }),
+                );
+                bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
+                Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
+                "final_pass".to_string()
+            }
+            Verdict::Fail => {
+                sub.outcome = Outcome::Failed;
+                emit("attempt_spent", json!({ "bounty_id": bounty_id, "index": index }));
+                "final_fail".to_string()
+            }
+        }
+    }
+
+    // ---------- Level 2: anyone submits a Groth16 proof ----------
+
+    /// Level 2 bounties only. Anyone: opens the bounty with a Groth16 proof of its Proof 0. The proof must verify for
+    /// the bounty's image id, and its journal must be the bounty's Proof 0 journal (sha256 fixed at creation): the
+    /// bounty's original, exploit commitment, tests and counts, the reference fix as candidate, the Proof 0 id, PASS.
+    pub fn open_with_groth16(&mut self, bounty_id: U64, seal: Base64VecU8, journal: Base64VecU8) -> String {
+        let now = env::block_timestamp();
+        let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        require!(bounty.level == LEVEL_2, "this is a Level 0 bounty: it opens with two verifier attestations");
+        require!(bounty.state == BountyState::Open, "bounty is closed");
+        require!(now < bounty.expires_at_ns, "bounty has expired");
+        require!(!bounty.opened, "bounty is already open");
+        let j = groth16::parse_journal(&journal.0);
+        require!(groth16::verify(&seal.0, &bounty.image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
+        check_bounty_fields(bounty, &j);
+        require!(env::sha256_array(&journal.0) == bounty.proof0_journal_hash, "the journal is not this bounty's Proof 0 journal");
+        require!(j.candidate_hash == bounty.reference_fix_hash, "the journal's candidate is not this bounty's reference fix");
+        require!(j.submission_id == proof0_id(&bounty.reference_fix_hash), "the journal is not a Proof 0 journal");
+        require!(j.verdict == 1, "the Proof 0 verdict is not PASS");
+        bounty.opened = true;
+        emit("bounty_opened", json!({ "bounty_id": bounty_id, "by": "groth16", "caller": env::predecessor_account_id() }));
+        "opened".to_string()
+    }
+
+    /// Level 2 bounties only. Anyone: decides a revealed attempt with a Groth16 proof of it, before the bounty expires
+    /// and within the verdict window after the reveal. The proof must verify for the bounty's image id, and its
+    /// journal must belong to THIS bounty and THIS attempt: the submission id (contract, bounty, index, patch hash),
+    /// the seed recorded at reveal, the revealed patch hash, and the bounty's original, exploit commitment, tests and
+    /// counts. The verdict is read from the journal: PASS pays the researcher (with the own fee refunded) and closes
+    /// the bounty; FAIL spends the attempt.
+    pub fn submit_groth16(&mut self, bounty_id: U64, index: u32, seal: Base64VecU8, journal: Base64VecU8) -> String {
+        let now = env::block_timestamp();
+        let contract = env::current_account_id();
+        let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        require!(bounty.level == LEVEL_2, "this is a Level 0 bounty: verdicts need two verifier attestations");
+        require!(bounty.state == BountyState::Open, "bounty is closed");
+        require!(now < bounty.expires_at_ns, "bounty has expired");
+        require!(bounty.opened, "bounty is not open: Proof 0 has not been proved");
+        let sub = self
+            .submissions
+            .get_mut(&(bounty_id.0, index))
+            .unwrap_or_else(|| env::panic_str("no such submission"));
+        require!(sub.outcome == Outcome::Open, "verdict already final");
+        let revealed = sub.revealed_at_ns.unwrap_or_else(|| env::panic_str("submission not revealed"));
+        require!(now <= revealed.saturating_add(bounty.verdict_window_ns), "verdict window has closed");
+        let j = groth16::parse_journal(&journal.0);
+        require!(groth16::verify(&seal.0, &bounty.image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
+        let patch_hash = sub.patch_hash.unwrap_or_else(|| env::panic_str("submission not revealed"));
+        require!(j.submission_id == submission_id(&contract, bounty_id.0, index, &patch_hash), "the journal belongs to another bounty or attempt (submission id)");
+        require!(Some(j.fuzz_seed) == sub.seed, "the journal's seed is not the seed recorded at reveal");
+        require!(j.candidate_hash == patch_hash, "the journal's candidate is not the revealed patch");
+        check_bounty_fields(bounty, &j);
+        let verdict = if j.verdict == 1 { Verdict::Pass } else { Verdict::Fail };
+        sub.verdict = Some(PostedVerdict {
+            verdict,
+            journal_hash: env::sha256_array(&journal.0),
+            receipt_hash: env::sha256_array(&seal.0),
+            posted_at_ns: now,
+        });
+        bounty.pending -= 1;
+        emit("groth16_verified", json!({ "bounty_id": bounty_id, "index": index, "verdict": verdict_str(verdict), "caller": env::predecessor_account_id() }));
+        match verdict {
+            Verdict::Pass => {
+                sub.outcome = Outcome::Passed;
+                bounty.state = BountyState::Paid;
+                bounty.winner = Some(index);
+                emit(
+                    "paid",
+                    json!({ "bounty_id": bounty_id, "index": index, "reason": "groth16_pass", "to": sub.payout, "amount": U128(bounty.amount.as_yoctonear()) }),
                 );
                 bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
                 Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
@@ -928,6 +1084,16 @@ impl Contract {
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(now >= bounty.expires_at_ns, "bounty has not expired");
         let mut acted = false;
+        // Commits that were never revealed and never released: the same rule as release_unrevealed, before any fee
+        // is paid out below.
+        for index in 0..bounty.commits {
+            if let Some(sub) = self.submissions.get_mut(&(bounty_id.0, index)) {
+                if sub.outcome == Outcome::Open && sub.revealed_at_ns.is_none() {
+                    release_to_pool(bounty_id, index, bounty, sub);
+                    acted = true;
+                }
+            }
+        }
         if bounty.state == BountyState::Open {
             require!(bounty.pending == 0, "a revealed submission is still unresolved");
             bounty.state = BountyState::Refunded;
@@ -939,7 +1105,12 @@ impl Contract {
             acted = true;
         }
         let fees = bounty.fees_collected.as_yoctonear();
-        if !bounty.fees_swept && fees > 0 && !self.verifiers.is_empty() {
+        if !bounty.fees_swept && fees > 0 && bounty.level == LEVEL_2 {
+            bounty.fees_swept = true;
+            emit("fees_swept", json!({ "bounty_id": bounty_id, "total": U128(fees), "to": bounty.vendor, "caller": caller }));
+            Promise::new(bounty.vendor.clone()).transfer(NearToken::from_yoctonear(fees)).detach();
+            acted = true;
+        } else if !bounty.fees_swept && fees > 0 && !self.verifiers.is_empty() {
             let verifiers: Vec<AccountId> = self.verifiers.keys().cloned().collect();
             let n = verifiers.len() as u128;
             let share = fees / n;
@@ -975,6 +1146,12 @@ impl Contract {
         U64(self.next_bounty_id)
     }
 
+    /// The protocol fee pool: attempt fees of commits that were never revealed, in yoctoNEAR. Nothing can take NEAR
+    /// out of it yet.
+    pub fn get_protocol_pool(&self) -> U128 {
+        U128(pool_balance())
+    }
+
     pub fn get_bounty(&self, bounty_id: U64) -> Option<BountyView> {
         self.bounties.get(&bounty_id.0).map(|b| BountyView {
             id: bounty_id,
@@ -1007,6 +1184,9 @@ impl Contract {
             opened: b.opened,
             reveal_window_ns: U64(b.reveal_window_ns),
             active: b.active,
+            level: b.level,
+            fuzz_count: b.fuzz_count,
+            variant_count: b.variant_count,
         })
     }
 
@@ -1045,3 +1225,5 @@ impl Contract {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod tests_level2;

@@ -1,0 +1,35 @@
+$ near account create-account fund-myself sybil.kintsugi-vendor-prnvm.testnet 0.05 NEAR autogenerate-new-keypair save-to-legacy-keychain sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T23:15:25.551487584Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  sybil.kintsugi-vendor-prnvm.testnet
+│    actions:
+│       -- create account:      sybil.kintsugi-vendor-prnvm.testnet
+│       -- transfer deposit:    0.05 NEAR
+│       -- add access key:     
+│                       public key:   ed25519:CVTx8Evn4ThmHDH8vYshMEpVzD6AYM7asFNHYqYuL5tz
+│                       nonce:        0
+│                       permission:   FullAccess
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.825 Tgas
+│    Transaction fee: 0.00008249476875 NEAR
+│    Transaction ID: 2FgNc4w2ov78sfnNKHsMpBjpindceKvbhVKTME4syMAs
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/2FgNc4w2ov78sfnNKHsMpBjpindceKvbhVKTME4syMAs
+│     
+
+
+New account <sybil.kintsugi-vendor-prnvm.testnet> has been successfully created.
+<kintsugi-vendor-prnvm.testnet> has transferred 0.05 NEAR to <sybil.kintsugi-vendor-prnvm.testnet> successfully.
+Added access key = ed25519:CVTx8Evn4ThmHDH8vYshMEpVzD6AYM7asFNHYqYuL5tz to sybil.kintsugi-vendor-prnvm.testnet.
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=5.57

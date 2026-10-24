@@ -5,6 +5,93 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S6c (Level 2 in the bounty contract): proofs decide bounties, no verifier signatures
+
+Question: can the bounty contract itself decide a bounty from a Groth16 proof, open it with a Groth16 Proof 0, refuse
+every replayed or changed proof, and keep the Level 0 path working? Contract `kintsugi-l2-cihdp.testnet` (new faucet
+account, tx `5u1X1pMWZZU66X6W82hJtmrbA8mMH58KnzgSLJUzrEiC`); not the S13 contract and not the S6b spike, both unchanged.
+Script `./scripts/s6c_testnet.sh <phase>`; every transaction in `docs/evidence/S6c/transactions.tsv` and `steps/`.
+
+**Verdict: PASS (2026-10-24 to 25).** With real Groth16 receipts under the reproducible image id `dd6c5f42...`: a Level 2
+bounty opened from its Groth16 Proof 0; a FAIL proof spent its attempt; a PASS proof paid its researcher; all nine
+attacks below were refused on chain; a Level 0 bounty still opened with two verifier attestations.
+
+Design (owner's choices, 2026-10-24): a Level 2 bounty takes ONLY Groth16 proofs (the Level 0 calls refuse it); its
+attempt fees from revealed attempts go to the vendor at expiry; every new bounty stores `fuzz_count` and
+`variant_count`, which the Level 2 path requires and the Level 0 verifier script now checks too; the demo's Groth16
+Proof 0 is reused (its journal does not depend on the bounty). Each method decodes the journal, checks the proof, then
+checks the journal's fields, so a changed proof or journal is caught by the proof check and a valid proof used in the
+wrong place by the field checks. The journal layout the contract relies on is in docs/ARCHITECTURE.md ("Level 2 path"),
+confirmed from the guest source and the real Proof 0 journal.
+
+Unit tests (`cargo test -p kintsugi-contract --offline`): 71 passed, including 10 Level 2 tests with the real Proof 0
+Groth16 receipt (`contract/src/tests_level2.rs`) and the protocol fee pool tests.
+
+Contract wasm: `cf61a43f...0121` (297,708 bytes) for the attack runs, then `396d14e0...5aad` (298,860 bytes, the fee pool)
+redeployed in place (tx `DwMvVopM2BGSWFb4PH1LvXhJC7cyiWdbJY8qcAua1uhL`; the pool is its own storage entry, the stored
+layout did not change; bounty A still read Paid afterwards).
+
+Level 0 keeps working (`level0`): bounty 0, level 0, opened after two verifiers checked Proof 0 (`verifier_check.sh`,
+12 of 12 checks, now including fuzz_count and variant_count) and attested (txs `4hh4VdCJ1NLnQTcMmgqacPPufAQfypv2jG8mMPrJJS7V`,
+`93GAVpjnvoocwQzN8HRncSMKGz8mYd5bqjLFj9SqETqm`).
+
+Level 2 bounty A (bounty 1, `bounty_a`): created (tx `h2LfFz5N24AezQymZ5d6mshgS7VYN1XaND6sPQFEKMg`), opened by
+`open_with_groth16` with the demo's Groth16 Proof 0 (tx `E3RTxNVVVGvV2NNTFcMgwNgKagpHPmMnsNBNbu1ZoCx8`, 35.225 Tgas). A
+verifier's `attest_proof0` (tx `Bv4py6KX8Cf5YaEdDBT6nELKrteuxEdB4CywRpxdAo9y`) and the vendor's `post_verdict` (tx
+`631e2mRUDmLigsGB8G5DbZySZeXzWYkbKrvQhHfvkww7`) were refused: "this is a Level 2 bounty". Attempt A0 (the honest fix,
+researcher 1) and A1 (`data/attacks/reject_all.wasm`, researcher 2) committed and revealed.
+
+Proofs on the laptop, each run alone (expected times from `kintsugi-host execute` cycle counts: A0 26 segments,
+A1 3 segments), Groth16 step memory sampled as in S6:
+
+| Attempt | Prove | Compress to succinct | Groth16 | Result |
+|---|---|---|---|---|
+| A1, `reject_all.wasm` | 345.05 s, 3 segments, peak 4,704 MiB | 89.83 s | 129.44 s, 2,057 bytes, container peak 7,325 MiB, laptop available at lowest 884 MiB | VALID under `dd6c5f42...`, FAIL, seed and submission id equal the chain's |
+| A0, `data/demo/fixed.wasm` | 3,150.11 s, 26 segments, peak 4,725 MiB | 1,016.71 s | 148.69 s, 2,057 bytes, container peak 6,832 MiB, lowest available 1,010 MiB | VALID under `dd6c5f42...`, PASS, seed and submission id equal the chain's |
+
+The decisions and the attacks (`attacks`; gas from the RPC, `gas_level2.txt`):
+
+| Call | Transaction | Result | Gas burnt |
+|---|---|---|---|
+| A1's real FAIL proof for A1 | `6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca` | accepted, attempt spent (outcome Failed) | 35.603 Tgas |
+| A0's real PASS proof for A0 | `CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY` | accepted, bounty Paid, researcher 1 +0.11 NEAR (0.1 NEAR bounty + own 0.01 NEAR fee) | 36.392 Tgas |
+| attack: A0's PASS proof for attempt A1 (another attempt) | `3ULvszXnfJAF8sbFejCKvbxftPK2b13rT2fP8y4JEANT` | refused: "the journal belongs to another bounty or attempt (submission id)" | 34.893 Tgas |
+| attack: A1's FAIL journal with the verdict set to PASS | `JDZNSTe72dqrppmqye5gnTxfQ52GNaDEBJ9Z4hZa5HT` | refused: "the Groth16 proof does not verify for this bounty's image id and this journal" | 34.877 Tgas |
+| attack: one flipped bit in A0's seal | `GibfrVyGKT2ymUs6W87aF5jwyRByAZ6StDxBFscy3ET7` | refused: "AltBn128 invalid input: invalid g1" | 34.852 Tgas |
+| attack: A0's journal with fuzz_count changed | `4Sde4NuTQobypV3x7uC8AgcnSNrZpuqG3NeuTVHkMYZG` | refused: the proof does not verify | 34.883 Tgas |
+| attack: wrong image id (bounty D names `043ec633...`; the real Proof 0 offered) | `4N6oi9MpDii4Vdf4uDLPSVegBsqPYYs4BQP1WzprAy2C` | refused: the proof does not verify | 34.777 Tgas |
+| attack: A1's FAIL proof again | `EmKG8Sm96NZ7NzrD9DDQ5fm8ouAzn6Eg8vTPV4KRHhym` | refused: "verdict already final" | 2.193 Tgas |
+| attack: A0's proof for bounty B's attempt (another bounty, same patch) | `GfZXvdiG1mcRUK1NNTQxdCfBqHMMExLiFWYgoznaKFvS` | refused: "the journal belongs to another bounty or attempt (submission id)" | 34.900 Tgas |
+| attack: A0's PASS proof again after payout | `GiHbmMMR7gsZNzKNbzU1eB9SSTreN4Up3JX4DSHotRGs` | refused: "bounty is closed" | 2.103 Tgas |
+| attack: A0's proof for bounty C after C expired | `E5DFg1TVhtDoFQjL5GdpfsSeJRBrBobX6GprTirYnrwp` | refused: "bounty has expired" | 2.104 Tgas |
+
+Bounty C then shows the Level 2 timeout: no proof came, so `claim_timeout` paid researcher 1 the 0.1 NEAR bounty and
+refunded the fee (tx `2Ga3oSGcrgfMdbKoLCEUK8FwGrpnqMk9ex2Kp2oj6Tiq`); the following `expire` had nothing left to do
+("nothing to do: bounty already closed and fees already swept", `steps/c_expire.txt`). My expectation that C's fee would
+reach the vendor was wrong: the timeout refunds it to the researcher.
+
+Protocol fee pool and the self-block test (owner's rule: fees of commits that are never revealed go to a pool that
+nobody can take out of yet). The rule is one function, `release_to_pool` in `contract/src/lib.rs`, used by
+`release_unrevealed` and, for commits still unreleased at the end, by `expire` before it pays out any fee; the pool is
+shown by `get_protocol_pool`. The test (`selfblock2`): the vendor funds a second account it controls
+(`sybil.kintsugi-vendor-prnvm.testnet`), which takes all K = 3 slots of Level 2 bounty S2 with commits it never
+reveals (txs `64epreebuQam5azfeBPJorLM3rQEZmFSzxzpRmsnqcjE`, `BV8aHFzCuKWLm5Z1X1b4Qk2AnsyWCnMJnFtMcvCmzVL8`,
+`3hiPvqjJ18spcVwaP5qFwKmsB3tG8mcFtqhoYD3keKQ5`); an honest commit is ignored (tx `PjQBWCTmt4nAbwAQyT3Kn8UKt18nzpCzfKtbtn9HYpn`,
+commits stay 3); one junk fee goes to the pool at `release_unrevealed` (tx `mpBhiyx6w9RxjpMSbcuKVty67hFZCTX7x6K3qQd57zg`),
+the other two at `expire` (tx `8LxACsYPrMQ71kHCjDhcdt9uH9ATJNn9qrjbLMRjfVW8`). Measured (`selfblock2_balances.txt`):
+
+| | Before | After |
+|---|---|---|
+| vendor + second account + its credit | 4.880039 NEAR | 4.934209 NEAR (+0.054170) |
+| of which | | +0.100000 bounty refunded at expiry, -0.045000 attempt fees, -0.000830 gas (vendor 0.000045, second account 0.000785) |
+| protocol fee pool | 0.010000 NEAR | 0.055000 NEAR (+0.045000, equal to the attempt fees spent) |
+
+The computed change equals the measured one (difference 0.000000 NEAR). The vendor side lost 0.045 NEAR in fees plus
+0.000830 NEAR in gas, and got nothing back from the block. A first self-block run (`selfblock`) stopped before any junk
+commit: I funded the second account with 0.05 NEAR and near-cli refused to send its commits ("does not have enough
+balance (0.05 NEAR) to cover TX cost (0.1009... NEAR)"); in that run the honest researcher's commit took the slot and,
+never revealed, was released: that is the pool's first 0.01 NEAR (tx `BSuwfFeEuFYpMNxHPAgzA4N8SK1Vo6hgnsZvDKdcewrV`).
+
 ## S6b (Level 2, spike): a NEAR contract checks the Groth16 proof itself
 
 Question: can a NEAR contract check a RISC Zero Groth16 proof with NEAR's own alt_bn128 host functions, accept the real

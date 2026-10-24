@@ -1,0 +1,13 @@
+OK   receipt verifies with the checker's image id (VALID)
+OK   image id = bounty image id
+OK   journal exploit commitment = bounty commitment
+OK   journal corpus hash = bounty corpus hash
+OK   journal original hash = bounty original hash
+OK   journal fuzz_count = bounty fuzz_count
+OK   journal variant_count = bounty variant_count
+OK   journal submission id = Proof 0 id of the reference fix
+OK   journal candidate hash = reference fix hash
+OK   receipt sha256 = bounty Proof 0 receipt hash
+OK   journal sha256 = bounty Proof 0 journal hash
+OK   journal verdict = PASS
+ATTEST

@@ -1,0 +1,24 @@
+$ near account create-account sponsor-by-faucet-service kintsugi-l2-cihdp.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
+utc_start=2026-10-24T21:42:02.216912785Z
+Migrating config.toml from V4 to V5...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+├  Your transaction:
+│    signer_id:    testnet
+│    actions:
+│       -- create account:      kintsugi-l2-cihdp.testnet
+│       -- add access key:     
+│                       public key:   ed25519:A1kuE8J7zaYKoErnxQpMLauqVmrp3UVvNiYuamXtLDjN
+│                       permission:   FullAccess
+│     
+├  Transaction Execution Info:
+│    Transaction ID: 5u1X1pMWZZU66X6W82hJtmrbA8mMH58KnzgSLJUzrEiC
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/5u1X1pMWZZU66X6W82hJtmrbA8mMH58KnzgSLJUzrEiC
+
+New account <kintsugi-l2-cihdp.testnet> created successfully.
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=3.52

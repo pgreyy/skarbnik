@@ -1,0 +1,11 @@
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T23:07:36.112571659Z
+{
+ "tx_hash": "GibfrVyGKT2ymUs6W87aF5jwyRByAZ6StDxBFscy3ET7",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'AltBn128 invalid input: invalid g1: [38, E1, F0, F3, D1, 48, D8, 47, 63, 42, 6C, B6, 2D, D8, 44, 9A, D8, 15, 8F, 3E, 29, 3B, 2, 6F, 0, 76, 22, 49, 36, 68, F2, 1B, E9, 1F, 2F, 7, AA, 85, 3D, 35, F, B2, D0, D2, F0, 67, DB, E8, 9A, 41, C, 94, D0, 8, ED, F7, 48, 96, D4, 32, A2, 79, 2E, 4]'}}}}",
+ "total_gas_burnt": 34851912532031,
+ "logs": [],
+ "wall_seconds": 36.245,
+ "rpc_error": null
+}

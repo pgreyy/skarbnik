@@ -2,6 +2,24 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24 to 25: S6c Level 2 in the bounty contract (PASS), protocol fee pool, self-block test
+
+- Owner's design choices: Level 2 bounties take only Groth16 proofs; their revealed attempts' fees go to the vendor;
+  every bounty records `fuzz_count` and `variant_count` (also checked by the Level 0 verifier script now); the demo's
+  Groth16 Proof 0 reused.
+- `contract/src/groth16.rs` (proof check and journal reader), `open_with_groth16`, `submit_groth16`, level gates on the
+  Level 0 calls; 71 contract tests pass. Deployed to the new account `kintsugi-l2-cihdp.testnet`.
+- Proofs on the laptop, alone: A1 (FAIL) 345 s + 90 s + 129 s; A0 (PASS) 3,150 s + 1,017 s + 149 s; Groth16 container
+  peaks 7,325 and 6,832 MiB.
+- On testnet: Level 2 bounty opened by its Groth16 Proof 0; FAIL spent, PASS paid (+0.11 NEAR); nine attacks refused;
+  Level 0 bounty still opens with two attestations. 35 to 36 Tgas per proof.
+- Protocol fee pool (owner's rule): one function `release_to_pool`, a view `get_protocol_pool`, no withdraw; redeployed
+  in place. Self-block test: vendor side lost 0.045 NEAR fees + 0.000830 NEAR gas, pool gained exactly 0.045 NEAR.
+- Mistakes: my first self-block run gave the second account too little NEAR for near-cli's cost check (no junk commit
+  was sent; kept in the evidence); my expectation that bounty C's fee would reach the vendor was wrong (the timeout
+  refunds it).
+- Found: the Level 0 verifier check did not compare the check size; closed for new bounties.
+
 ## 2026-10-24: S6b spike: a NEAR contract checks the Groth16 proof (PASS)
 
 - New `kintsugi-host groth16-args` writes the seal, image id, journal and RISC Zero's two fixed constants from a Groth16

@@ -94,7 +94,7 @@ fn setup() -> Contract {
         c.deposit_credit(None);
     }
     at(vendor(), T0, bounty_amount());
-    let id = c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW));
+    let id = c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
     assert_eq!(id.0, 0);
     // Proof 0: two different verifiers attest it, which opens the bounty.
     call(v1(), T0);
@@ -217,23 +217,22 @@ fn expire_waits_for_revealed_submission() {
 }
 
 #[test]
-fn expire_after_payout_only_sweeps_fees() {
+fn expire_after_payout_moves_unrevealed_fee_to_pool() {
     let mut c = setup();
     let idx = commit_and_reveal(&mut c, T0 + SEC);
-    // A second commit that is never revealed: its fee (FEE + STEP) stays with the contract.
+    // A second commit that is never revealed: its fee (FEE + STEP) goes to the protocol fee pool at expiry.
     call(acc("r0.testnet"), T0 + 2 * SEC);
     c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
     call(researcher(), T0 + SEC + GAP + W + 1);
     c.claim_timeout(U64(0), idx);
     call(acc("stranger.testnet"), T0 + E + 1);
     c.expire(U64(0));
-    // The winner's own fee was refunded with the payout; the other fee goes to the two verifiers, half each.
-    let mut t = transfers();
-    t.sort();
-    assert_eq!(t, vec![(v1(), (FEE + STEP) / 2), (v2(), (FEE + STEP) / 2)]);
+    // The winner's own fee was refunded with the payout; the unrevealed fee is paid to nobody.
+    assert_eq!(transfers(), vec![]);
+    assert_eq!(c.get_protocol_pool().0, FEE + STEP);
     let b = c.get_bounty(U64(0)).unwrap();
-    assert_eq!(b.state, BountyState::Paid);
-    assert!(b.fees_swept);
+    assert_eq!((b.state, b.fees_collected.0, b.fees_swept), (BountyState::Paid, 0, false));
+    assert_eq!(c.get_submission(U64(0), 1).unwrap().outcome, Outcome::Released);
 }
 
 #[test]
@@ -261,10 +260,46 @@ fn timeout_after_payout_rejected() {
 }
 
 #[test]
-fn expire_refunds_vendor_and_sweeps_fees() {
+fn expire_refunds_vendor_and_moves_unrevealed_fee_to_pool() {
     let mut c = setup();
     call(researcher(), T0 + SEC);
     c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
+    call(acc("stranger.testnet"), T0 + E);
+    c.expire(U64(0));
+    // The vendor gets the bounty back; the never-revealed fee goes to the pool, not to the vendor or the verifiers.
+    assert_eq!(transfers(), vec![(vendor(), bounty_amount().as_yoctonear())]);
+    assert_eq!(c.get_protocol_pool().0, FEE);
+    assert_eq!(c.get_bounty(U64(0)).unwrap().state, BountyState::Refunded);
+}
+
+#[test]
+fn release_unrevealed_moves_the_fee_to_the_pool_and_pays_nobody() {
+    let mut c = setup();
+    call(researcher(), T0 + SEC);
+    let idx = c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
+    assert_eq!(c.get_protocol_pool().0, 0);
+    call(acc("stranger.testnet"), T0 + SEC + RW + 1);
+    c.release_unrevealed(U64(0), idx);
+    assert_eq!(transfers(), vec![]);
+    assert_eq!(c.get_protocol_pool().0, FEE);
+    assert_eq!(c.get_bounty(U64(0)).unwrap().fees_collected.0, 0);
+    // At expiry nothing more moves: the fee is in the pool once, and nobody is paid it.
+    call(acc("stranger.testnet"), T0 + E);
+    c.expire(U64(0));
+    assert_eq!(transfers(), vec![(vendor(), bounty_amount().as_yoctonear())]);
+    assert_eq!(c.get_protocol_pool().0, FEE);
+}
+
+#[test]
+fn revealed_failed_attempt_fee_still_goes_to_the_verifiers() {
+    let mut c = setup();
+    let idx = commit_and_reveal(&mut c, T0 + SEC);
+    call(vendor(), T0 + SEC + GAP + 1);
+    c.post_verdict(U64(0), idx, Verdict::Fail, H1.into(), H2.into());
+    call(v1(), T0 + SEC + GAP + 2);
+    c.attest(U64(0), idx, Verdict::Fail, H1.into(), H2.into());
+    call(v2(), T0 + SEC + GAP + 3);
+    c.attest(U64(0), idx, Verdict::Fail, H1.into(), H2.into());
     call(acc("stranger.testnet"), T0 + E);
     c.expire(U64(0));
     let mut t = transfers();
@@ -272,7 +307,7 @@ fn expire_refunds_vendor_and_sweeps_fees() {
     let mut want = vec![(vendor(), bounty_amount().as_yoctonear()), (v1(), FEE / 2), (v2(), FEE / 2)];
     want.sort();
     assert_eq!(t, want);
-    assert_eq!(c.get_bounty(U64(0)).unwrap().state, BountyState::Refunded);
+    assert_eq!(c.get_protocol_pool().0, 0);
 }
 
 #[test]
@@ -330,7 +365,7 @@ fn withdraw_returns_unspent_credit() {
 fn zero_fee_bounty_rejected() {
     let mut c = setup();
     at(acc("vendor2.testnet"), T0, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(0), U128(0), H3.into(), P0J.into(), U64(RW));
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(0), U128(0), H3.into(), P0J.into(), U64(RW), 16, 32, None);
 }
 
 #[test]
@@ -363,7 +398,7 @@ fn vendor_cannot_be_verifier() {
 fn verifier_cannot_be_vendor() {
     let mut c = setup();
     at(v1(), T0 + SEC, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW));
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
 }
 
 #[test]
@@ -566,7 +601,7 @@ fn researcher_cannot_attest_own_submission() {
 fn tiny_bounty_rejected() {
     let mut c = setup();
     at(acc("vendor2.testnet"), T0, NearToken::from_millinear(99));
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW));
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
 }
 
 #[test]
@@ -766,7 +801,7 @@ fn only_owner_sets_outlayer() {
 /// A second bounty (id 1) from another vendor, created closed (no Proof 0 attestations yet).
 fn closed_bounty(c: &mut Contract) -> U64 {
     at(acc("vendor2.testnet"), T0, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW))
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None)
 }
 
 #[test]

@@ -1,0 +1,45 @@
+$ near contract deploy kintsugi-l2-cihdp.testnet use-file target/near/kintsugi_contract/kintsugi_contract.wasm with-init-call new json-args {"owner":"kintsugi-l2-cihdp.testnet"} prepaid-gas 100 Tgas attached-deposit 0 NEAR network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T21:42:07.280601625Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-l2-cihdp.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- deploy code <ExXkPpbCBAtdmVBCDEjy5kQ1EYZ2wZjTTxiDmLMscoya> to a account <kintsugi-l2-cihdp.testnet>
+│       -- function call:      
+│                       method name:  new
+│                       args:         {
+│                                       "owner": "kintsugi-l2-cihdp.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:A1kuE8J7zaYKoErnxQpMLauqVmrp3UVvNiYuamXtLDjN
+│     
+├  Transaction Execution Info:
+│    Gas burned: 2.6 Tgas
+│    Transaction fee: 0.0002521198993652 NEAR
+│    Transaction ID: 6iJ6MUvBG6AzBYrYHoo3yYezHJiGEGgoRMYnxRRXTdBi
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/6iJ6MUvBG6AzBYrYHoo3yYezHJiGEGgoRMYnxRRXTdBi
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"init","data":[{"owner":"kintsugi-l2-cihdp.testnet"}]}
+│    Logs [kintsugi-l2-cihdp.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+Contract code has been successfully deployed.
+The "new" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-l2-cihdp.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract deploy kintsugi-l2-cihdp.testnet use-file target/near/kintsugi_contract/kintsugi_contract.wasm with-init-call new json-args '{"owner":"kintsugi-l2-cihdp.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.44

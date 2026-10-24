@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet post_verdict json-args '{"bounty_id":"1","index":0,"verdict":"PASS","journal_hash":"fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5","receipt_hash":"1175f61502c45c3020da313fee1d3ce57a9320226dff22853b2e4a9d379af308"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T21:44:44.259159307Z
+{
+ "tx_hash": "631e2mRUDmLigsGB8G5DbZySZeXzWYkbKrvQhHfvkww7",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: this is a Level 2 bounty: verdicts come only from a Groth16 proof'}}}}",
+ "total_gas_burnt": 1985574619788,
+ "logs": [],
+ "wall_seconds": 3.381,
+ "rpc_error": null
+}

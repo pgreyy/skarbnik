@@ -1,0 +1,29 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args {"bounty_id":"5","fingerprint":"7ec49b3b725ae6ef05974175ed18acbc488da26cb6f7f42b2f2009f5ebd5e35e","payout":"sybil.kintsugi-vendor-prnvm.testnet"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as sybil.kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T23:15:43.387081154Z
+├  Unsigned transaction:
+│    signer_id:    sybil.kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  commit
+│                       args:         {
+│                                       "bounty_id": "5",
+│                                       "fingerprint": "7ec49b3b725ae6ef05974175ed18acbc488da26cb6f7f42b2f2009f5ebd5e35e",
+│                                       "payout": "sybil.kintsugi-vendor-prnvm.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:CVTx8Evn4ThmHDH8vYshMEpVzD6AYM7asFNHYqYuL5tz
+│     
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"5","fingerprint":"7ec49b3b725ae6ef05974175ed18acbc488da26cb6f7f42b2f2009f5ebd5e35e","payout":"sybil.kintsugi-vendor-prnvm.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as sybil.kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: Account <sybil.kintsugi-vendor-prnvm.testnet> does not have enough balance (0.05 NEAR) to cover TX cost (0.1009199231001305 NEAR).
+
+Location:
+exit=1
+wall_seconds=1.5

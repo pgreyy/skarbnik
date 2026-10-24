@@ -1,0 +1,61 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+create_s6c_account	create-account	faucet	5u1X1pMWZZU66X6W82hJtmrbA8mMH58KnzgSLJUzrEiC	-	-	0	3.52
+deploy	deploy+new	kintsugi-l2-cihdp.testnet	6iJ6MUvBG6AzBYrYHoo3yYezHJiGEGgoRMYnxRRXTdBi	2.6 Tgas	0.0002521198993652	0	6.44
+register_kintsugi-ver1-prnvm	register_verifier	kintsugi-l2-cihdp.testnet	AMGtKUULE1ZbJozWEEVmCNWgasdDbTSdwHS5iuV1tjwY	0.309 Tgas	0.0000308300980872	0	4.93
+register_kintsugi-ver2-prnvm	register_verifier	kintsugi-l2-cihdp.testnet	6kJXJ59VA1n99UDXWZMU8c8hvBRpqzgYmKXUfFjQNAhU	0.309 Tgas	0.0000308300980872	0	5.0
+register_kintsugi-ver3-prnvm	register_verifier	kintsugi-l2-cihdp.testnet	6rboEBaKXKUKy6avSPg6aFFAD9jeCEhUAYh7HN2b9YFU	0.309 Tgas	0.0000308300980872	0	4.66
+credit_r1	deposit_credit	kintsugi-res1-prnvm.testnet	5RPQBK5sLZjd8mtTQZsPs6aTMybWaJSfdDEwtCHz6tbK	0.309 Tgas	0.000030882243944	0	5.08
+credit_r2	deposit_credit	kintsugi-res2-prnvm.testnet	3SDd3ZE4ooNB3K3gHCoWjxGRig6GFrajFSjLG6t6XbA5	0.309 Tgas	0.000030882243944	0	5.71
+l0_create	create_bounty	kintsugi-vendor-prnvm.testnet	4w4TzsJuzdiGfbYkgAktZhDzBoRCNUQvpR486uQThnXb	0.353 Tgas	0.0000352548406095	0	4.46
+l0_attest_proof0_kintsugi-ver1-prnvm	attest_proof0	kintsugi-ver1-prnvm.testnet	4hh4VdCJ1NLnQTcMmgqacPPufAQfypv2jG8mMPrJJS7V	0.318 Tgas	0.000031731014071	0	5.61
+l0_attest_proof0_kintsugi-ver2-prnvm	attest_proof0	kintsugi-ver2-prnvm.testnet	93GAVpjnvoocwQzN8HRncSMKGz8mYd5bqjLFj9SqETqm	0.318 Tgas	0.000031731014071	0	5.46
+a_create	create_bounty	kintsugi-vendor-prnvm.testnet	h2LfFz5N24AezQymZ5d6mshgS7VYN1XaND6sPQFEKMg	0.353 Tgas	0.000035269145724	0	5.43
+a_open_groth16	open_with_groth16	kintsugi-res2-prnvm.testnet	E3RTxNVVVGvV2NNTFcMgwNgKagpHPmMnsNBNbu1ZoCx8	0.377 Tgas	0.0000376771733315	0	4.71
+a_attest_proof0_refused	attest_proof0	kintsugi-ver1-prnvm.testnet	Bv4py6KX8Cf5YaEdDBT6nELKrteuxEdB4CywRpxdAo9y	-	-	rpc:failed	-
+a0_commit	commit	kintsugi-res1-prnvm.testnet	2UBpn8FvhAZJ3Z8d1NQWRzzMrm2xFNnozk4Tt5FVFNYK	0.315 Tgas	0.0000314878271245	0	5.23
+a0_reveal	reveal	kintsugi-res1-prnvm.testnet	9j1Hbs52Q49rijKHQvvm415jhrpFVJYPyFtDzohwubsA	0.350 Tgas	0.0000349210546045	0	5.09
+a1_commit	commit	kintsugi-res2-prnvm.testnet	FX677eNJN368qmy7HE5ngrESeZKrqiNcYURF5Uho32ey	0.315 Tgas	0.0000314878271245	0	4.61
+a1_reveal	reveal	kintsugi-res2-prnvm.testnet	No4vSFxHk1DiN4VWpjrKGAeRoMotnmL3gX2EoeRRNLk	0.319 Tgas	0.0000318883703305	0	4.12
+a_post_verdict_refused	post_verdict	kintsugi-vendor-prnvm.testnet	631e2mRUDmLigsGB8G5DbZySZeXzWYkbKrvQhHfvkww7	-	-	rpc:failed	-
+atk_other_attempt	submit_groth16	kintsugi-res2-prnvm.testnet	3ULvszXnfJAF8sbFejCKvbxftPK2b13rT2fP8y4JEANT	-	-	rpc:failed	-
+atk_fail_as_pass	submit_groth16	kintsugi-res2-prnvm.testnet	JDZNSTe72dqrppmqye5gnTxfQ52GNaDEBJ9Z4hZa5HT	-	-	rpc:failed	-
+atk_flipped_seal_bit	submit_groth16	kintsugi-res2-prnvm.testnet	GibfrVyGKT2ymUs6W87aF5jwyRByAZ6StDxBFscy3ET7	-	-	rpc:failed	-
+atk_changed_journal	submit_groth16	kintsugi-res2-prnvm.testnet	4Sde4NuTQobypV3x7uC8AgcnSNrZpuqG3NeuTVHkMYZG	-	-	rpc:failed	-
+d_create	create_bounty	kintsugi-vendor-prnvm.testnet	B1MvhSYGPLHmLKjY3FvrKQcwk2msgBse8W9LYPxLp45T	0.353 Tgas	0.0000352548406095	0	5.21
+atk_wrong_image_id	open_with_groth16	kintsugi-res2-prnvm.testnet	4N6oi9MpDii4Vdf4uDLPSVegBsqPYYs4BQP1WzprAy2C	-	-	rpc:failed	-
+a1_fail	submit_groth16	kintsugi-res2-prnvm.testnet	6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca	0.378 Tgas	0.000037710551932	0	5.55
+atk_fail_second_submission	submit_groth16	kintsugi-res2-prnvm.testnet	EmKG8Sm96NZ7NzrD9DDQ5fm8ouAzn6Eg8vTPV4KRHhym	-	-	rpc:failed	-
+b_create	create_bounty	kintsugi-vendor-prnvm.testnet	6V9zJEXHucFijSxp4yZsmyaSKXjRtdffy2XB5ZP5sYS8	0.353 Tgas	0.0000352548406095	0	4.74
+b_open_groth16	open_with_groth16	kintsugi-res2-prnvm.testnet	QDgLcGz4ax9EBvu4VJHDKo642STgbnvvCyQMzY5PDyB	0.377 Tgas	0.0000376771733315	0	4.65
+b0_commit	commit	kintsugi-res1-prnvm.testnet	8L74wV4nin2aVrrb1wVSevnpfRucaT76zsSAonYu5S4h	0.315 Tgas	0.0000314878271245	0	4.69
+b0_reveal	reveal	kintsugi-res1-prnvm.testnet	HCh9BDszYBmJ7axyF4dZqGu2GePZJjPiZ79GX8Vmzdvt	0.350 Tgas	0.0000349210546045	0	4.81
+atk_other_bounty	submit_groth16	kintsugi-res2-prnvm.testnet	GfZXvdiG1mcRUK1NNTQxdCfBqHMMExLiFWYgoznaKFvS	-	-	rpc:failed	-
+a0_pass	submit_groth16	kintsugi-res2-prnvm.testnet	CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY	0.378 Tgas	0.000037710551932	0	5.6
+atk_second_submission	submit_groth16	kintsugi-res2-prnvm.testnet	GiHbmMMR7gsZNzKNbzU1eB9SSTreN4Up3JX4DSHotRGs	-	-	rpc:failed	-
+c_create	create_bounty	kintsugi-vendor-prnvm.testnet	5uETnw7Bd28GVJuXyczWa263h9nDoLrg566kXR7qeYzL	0.353 Tgas	0.0000352262303805	0	4.45
+c_open_groth16	open_with_groth16	kintsugi-res2-prnvm.testnet	J6WPRaRceZzMVkLygVLQ2sJuhkAdup9azGaPEKc5rJm6	0.377 Tgas	0.0000376771733315	0	4.13
+c0_commit	commit	kintsugi-res1-prnvm.testnet	FYDcSCun67inudFMGFQdhhEFKU4PtaBfYrakUwrwgya3	0.315 Tgas	0.0000314878271245	0	4.12
+c0_reveal	reveal	kintsugi-res1-prnvm.testnet	GcQ2EfWHH2X3oSw39Mw34XdiN3vz5sjhR3gj4hob6qLZ	0.350 Tgas	0.0000349210546045	0	4.33
+atk_after_expiry	submit_groth16	kintsugi-res2-prnvm.testnet	E5DFg1TVhtDoFQjL5GdpfsSeJRBrBobX6GprTirYnrwp	-	-	rpc:failed	-
+c_claim_timeout	claim_timeout	kintsugi-res2-prnvm.testnet	2Ga3oSGcrgfMdbKoLCEUK8FwGrpnqMk9ex2Kp2oj6Tiq	0.310 Tgas	0.00003099668486	0	5.34
+c_expire	expire	kintsugi-res2-prnvm.testnet	-	-	-	1	4.69
+redeploy_pool	deploy	kintsugi-l2-cihdp.testnet	DwMvVopM2BGSWFb4PH1LvXhJC7cyiWdbJY8qcAua1uhL	2.4 Tgas	0.000232895813114	0	5.46
+s_create	create_bounty	kintsugi-vendor-prnvm.testnet	Hx4PkTcAfArnFWTiQhVuYd9Bp1SR6ipHC9rad1bkoCwW	0.353 Tgas	0.000035230998752	0	4.67
+s_open_groth16	open_with_groth16	kintsugi-vendor-prnvm.testnet	JAgnGrZKA5YjkQhF5KBo7KYavLtpfoZmiYq1oGSJQgcj	0.377 Tgas	0.0000376771733315	0	3.96
+s_create_sybil	create-account	kintsugi-vendor-prnvm.testnet	2FgNc4w2ov78sfnNKHsMpBjpindceKvbhVKTME4syMAs	0.825 Tgas	0.00008249476875	0	5.57
+s_vendor_funds_sybil_credit	deposit_credit	kintsugi-vendor-prnvm.testnet	7ExJNdAi23TCE7DnANwkQ3WCiL3sZivFcLxyKDtUXAuS	0.312 Tgas	0.000031120662519	0	3.84
+s_sybil_junk_commit_0	commit	sybil.kintsugi-vendor-prnvm.testnet	-	-	-	1	1.08
+s_sybil_junk_commit_1	commit	sybil.kintsugi-vendor-prnvm.testnet	-	-	-	1	1.04
+s_sybil_junk_commit_2	commit	sybil.kintsugi-vendor-prnvm.testnet	-	-	-	1	1.5
+s_honest_commit_ignored	commit	kintsugi-res1-prnvm.testnet	7wv55VszucJV6xGSSGJrgwvycVfwh7bHZkbV67gfPbHq	0.315 Tgas	0.0000314878271245	0	4.39
+s_release_unrevealed_0	release_unrevealed	kintsugi-res2-prnvm.testnet	BSuwfFeEuFYpMNxHPAgzA4N8SK1Vo6hgnsZvDKdcewrV	0.311 Tgas	0.0000310205267175	0	4.73
+s_expire	expire	kintsugi-res2-prnvm.testnet	8iC5Q9UMVAGD3WHfrHE2cVBGv1gHzhNdbc4RFgsQeLRU	0.310 Tgas	0.0000309156225445	0	5.31
+s2_create	create_bounty	kintsugi-vendor-prnvm.testnet	F6mNreAXxDMNp9y6cHNtaHPhdFC3VkEWoc7aZnXUw9no	0.353 Tgas	0.000035230998752	0	4.97
+s2_open_groth16	open_with_groth16	kintsugi-vendor-prnvm.testnet	6jMcTDJw1Nr3x7FXWNqFME573gXBvhUn9J3bZwu6xhD7	0.377 Tgas	0.0000376771733315	0	4.92
+s2_vendor_tops_up_sybil	send-near	kintsugi-vendor-prnvm.testnet	76We5GhHE5s2Zwdqgp7netymmVXW3urzKNdXxGeHJ8AR	0.224 Tgas	0.00002231825625	0	5.1
+s2_sybil_junk_commit_0	commit	sybil.kintsugi-vendor-prnvm.testnet	64epreebuQam5azfeBPJorLM3rQEZmFSzxzpRmsnqcjE	0.316 Tgas	0.0000315259740965	0	5.21
+s2_sybil_junk_commit_1	commit	sybil.kintsugi-vendor-prnvm.testnet	BV8aHFzCuKWLm5Z1X1b4Qk2AnsyWCnMJnFtMcvCmzVL8	0.316 Tgas	0.0000315259740965	0	4.94
+s2_sybil_junk_commit_2	commit	sybil.kintsugi-vendor-prnvm.testnet	3hiPvqjJ18spcVwaP5qFwKmsB3tG8mcFtqhoYD3keKQ5	0.316 Tgas	0.0000315259740965	0	4.72
+s2_honest_commit_ignored	commit	kintsugi-res1-prnvm.testnet	PjQBWCTmt4nAbwAQyT3Kn8UKt18nzpCzfKtbtn9HYpn	0.315 Tgas	0.0000314878271245	0	4.86
+s2_release_unrevealed_0	release_unrevealed	kintsugi-res2-prnvm.testnet	mpBhiyx6w9RxjpMSbcuKVty67hFZCTX7x6K3qQd57zg	0.311 Tgas	0.0000310205267175	0	4.8
+s2_expire	expire	kintsugi-res2-prnvm.testnet	8LxACsYPrMQ71kHCjDhcdt9uH9ATJNn9qrjbLMRjfVW8	0.310 Tgas	0.0000309156225445	0	5.39

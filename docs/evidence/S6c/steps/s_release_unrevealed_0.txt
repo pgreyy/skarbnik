@@ -1,0 +1,46 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet release_unrevealed json-args {"bounty_id":"5","index":0} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T23:16:53.826810750Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  release_unrevealed
+│                       args:         {
+│                                       "bounty_id": "5",
+│                                       "index": 0
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.311 Tgas
+│    Transaction fee: 0.0000310205267175 NEAR
+│    Transaction ID: BSuwfFeEuFYpMNxHPAgzA4N8SK1Vo6hgnsZvDKdcewrV
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/BSuwfFeEuFYpMNxHPAgzA4N8SK1Vo6hgnsZvDKdcewrV
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"fee_to_pool","data":[{"bounty_id":"5","index":0,"fee":"10000000000000000000000","pool":"10000000000000000000000"}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"released","data":[{"bounty_id":"5","index":0,"active":0,"caller":"kintsugi-res2-prnvm.testnet"}]}
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+0
+
+
+The "release_unrevealed" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet release_unrevealed json-args '{"bounty_id":"5","index":0}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=4.73

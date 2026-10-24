@@ -29,6 +29,10 @@ c = {
     "journal corpus hash = bounty corpus hash": j.get("journal.corpus_hash") == b["corpus_hash"],
     "journal original hash = bounty original hash": j.get("journal.original_hash") == b["original_hash"],
 }
+# Bounties created by the S6c contract record the size of the check; older contracts do not have these fields.
+if "fuzz_count" in b:
+    c["journal fuzz_count = bounty fuzz_count"] = j.get("journal.fuzz_count") == str(b["fuzz_count"])
+    c["journal variant_count = bounty variant_count"] = j.get("journal.variant_count") == str(b["variant_count"])
 if kind == "submission":
     c.update({
         "journal submission id = contract submission id": j.get("journal.submission_id") == sid,

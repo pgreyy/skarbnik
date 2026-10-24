@@ -1,0 +1,6 @@
+vendor balance before the block 4.891119 NEAR, after 4.888797 NEAR, change -0.002322 NEAR
+  of which: bounty refunded at expiry +0.100000; sybil account funded -0.050000 (still held by sybil: 0.050000); credit for the three attempt fees -0.045000; gas of the vendor's own transactions in the block -0.007322 (tokens burnt, from the RPC)
+  check: 0.1 - 0.05 - 0.045 - gas = -0.002322 NEAR (difference from the measured change: +0.000000; storage refunds and rounding)
+  sybil account gas for its three commits: 0.000000 NEAR; its unspent credit left in the contract: 0.045000 NEAR
+vendor side in total (vendor + sybil + sybil credit), not counting the refunded bounty: lost attempt fees 0.045000 NEAR + gas 0.007322 NEAR
+protocol fee pool before 0.000000, after 0.010000, gained 0.010000 NEAR (the three attempt fees: 0.01 + 0.015 + 0.02 = 0.045)

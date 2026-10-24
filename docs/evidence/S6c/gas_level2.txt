@@ -1,0 +1,12 @@
+a_open_groth16: tx E3RTxNVVVGvV2NNTFcMgwNgKagpHPmMnsNBNbu1ZoCx8 | ok | gas burnt 35.225 Tgas
+a1_fail: tx 6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca | ok | gas burnt 35.603 Tgas
+a0_pass: tx CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY | ok | gas burnt 36.392 Tgas
+atk_other_attempt: tx 3ULvszXnfJAF8sbFejCKvbxftPK2b13rT2fP8y4JEANT | failed | gas burnt 34.893 Tgas
+atk_fail_as_pass: tx JDZNSTe72dqrppmqye5gnTxfQ52GNaDEBJ9Z4hZa5HT | failed | gas burnt 34.877 Tgas
+atk_flipped_seal_bit: tx GibfrVyGKT2ymUs6W87aF5jwyRByAZ6StDxBFscy3ET7 | failed | gas burnt 34.852 Tgas
+atk_changed_journal: tx 4Sde4NuTQobypV3x7uC8AgcnSNrZpuqG3NeuTVHkMYZG | failed | gas burnt 34.883 Tgas
+atk_wrong_image_id: tx 4N6oi9MpDii4Vdf4uDLPSVegBsqPYYs4BQP1WzprAy2C | failed | gas burnt 34.777 Tgas
+atk_other_bounty: tx GfZXvdiG1mcRUK1NNTQxdCfBqHMMExLiFWYgoznaKFvS | failed | gas burnt 34.900 Tgas
+atk_second_submission: tx GiHbmMMR7gsZNzKNbzU1eB9SSTreN4Up3JX4DSHotRGs | failed | gas burnt 2.103 Tgas
+atk_after_expiry: tx E5DFg1TVhtDoFQjL5GdpfsSeJRBrBobX6GprTirYnrwp | failed | gas burnt 2.104 Tgas
+atk_fail_second_submission: tx EmKG8Sm96NZ7NzrD9DDQ5fm8ouAzn6Eg8vTPV4KRHhym | failed | gas burnt 2.193 Tgas

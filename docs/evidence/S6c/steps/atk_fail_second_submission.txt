@@ -1,0 +1,11 @@
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T23:08:44.016293296Z
+{
+ "tx_hash": "EmKG8Sm96NZ7NzrD9DDQ5fm8ouAzn6Eg8vTPV4KRHhym",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: verdict already final'}}}}",
+ "total_gas_burnt": 2193030250931,
+ "logs": [],
+ "wall_seconds": 4.481,
+ "rpc_error": null
+}

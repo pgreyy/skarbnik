@@ -1,0 +1,6 @@
+vendor 4.785039 -> 4.684994; sybil 0.050000 -> 0.249215; sybil credit 0.045000 -> 0.000000 NEAR
+held by the vendor side (vendor + sybil + sybil credit): 4.880039 -> 4.934209, change +0.054170 NEAR
+  = bounty refunded at expiry +0.100000 - attempt fees 0.045000 (credit spent) - gas 0.000830 (vendor 0.000045, sybil 0.000785; tokens burnt, from the RPC)
+  check: +0.054170 computed against +0.054170 measured, difference +0.000000 NEAR
+vendor side lost, not counting the bounty it got back: attempt fees 0.045000 + gas 0.000830 NEAR
+protocol fee pool 0.010000 -> 0.055000, gained 0.045000 NEAR; equal to the attempt fees the vendor side spent: True

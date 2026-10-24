@@ -6,8 +6,8 @@ This file describes only what is in the repository now. It grows as parts are bu
 
 | Folder | What is there | Status |
 | --- | --- | --- |
-| `contract/` | The bounty contract: create a bounty (with the vendor's reference fix hash and Proof 0 journal hash), open it after two different verifiers attest Proof 0, register verifiers, credit (deposit, withdraw), commit with a rising attempt fee from credit, reveal within a reveal window, free an unrevealed slot after it (`release_unrevealed`), verdict, attest (two different verifiers), OutLayer request and callback, timeout, expire (refund and fee sweep to verifiers); the winner's own fee is refunded; unit tests in `contract/src/tests.rs` | S3b to S13. The S13 version is deployed on `kintsugi-s13-tlryo.testnet`; the S4/S7 version stays on `bounty.kintsugi-djloo.testnet` (bounties 0 to 4 readable as evidence) |
-| `scripts/` | `build_all.sh` (builds everything); testnet runs: `s3_*.sh`, `s3b_*.sh`, `s4_testnet.sh`, `s7_agent.sh`, `s8_arena.sh`, `s8_chain.sh`, `s13_attacks.sh`, `ol_diag.sh` (OutLayer test jobs); `verifier_check.sh` (a Level 0 verifier's checks); `check_image_id.sh` (rebuild the checker, compare its image id with a bounty); `export_guests.sh` (copy the reproducible guest files for another machine); `demo_bounty.sh` (the demo bounty with the reproducible id); `s6b_testnet.sh` (deploy and call the Groth16 spike); `gen_groth16_vk.py` (the Groth16 constants for it); `build_verifier_wasm.sh` (build and scan the OutLayer program); `s2_measure.sh` (proof memory and time) | S0 to S13 |
+| `contract/` | The bounty contract: create a bounty (with the vendor's reference fix hash and Proof 0 journal hash), open it after two different verifiers attest Proof 0, register verifiers, credit (deposit, withdraw), commit with a rising attempt fee from credit, reveal within a reveal window, free an unrevealed slot after it (`release_unrevealed`), verdict, attest (two different verifiers), OutLayer request and callback, timeout, expire (refund and fee sweep to verifiers); the winner's own fee is refunded; Level 2 bounties opened and decided by Groth16 proofs the contract checks (`contract/src/groth16.rs`); every bounty records its level and check size; fees of never-revealed commits go to a protocol fee pool (`get_protocol_pool`); unit tests in `contract/src/tests.rs` and `contract/src/tests_level2.rs` | S3b to S6c. The S6c version (Level 2, fee pool) is deployed on `kintsugi-l2-cihdp.testnet`; the S13 version on `kintsugi-s13-tlryo.testnet`; the S4/S7 version stays on `bounty.kintsugi-djloo.testnet` (bounties 0 to 4 readable as evidence) |
+| `scripts/` | `build_all.sh` (builds everything); testnet runs: `s3_*.sh`, `s3b_*.sh`, `s4_testnet.sh`, `s7_agent.sh`, `s8_arena.sh`, `s8_chain.sh`, `s13_attacks.sh`, `ol_diag.sh` (OutLayer test jobs); `verifier_check.sh` (a Level 0 verifier's checks); `check_image_id.sh` (rebuild the checker, compare its image id with a bounty); `export_guests.sh` (copy the reproducible guest files for another machine); `demo_bounty.sh` (the demo bounty with the reproducible id); `s6b_testnet.sh` (deploy and call the Groth16 spike); `gen_groth16_vk.py` (the Groth16 constants for it and for the contract); `s6c_testnet.sh` (Level 2 on the bounty contract, attacks, self-block test); `build_verifier_wasm.sh` (build and scan the OutLayer program); `s2_measure.sh` (proof memory and time) | S0 to S13 |
 | `harness/` | Build crate that compiles the zkVM guests in `harness/guest/` and `harness/check-guest/` reproducibly (inside RISC Zero's guest builder Docker image `r0.1.97.0`) and exposes their programs and image ids; with `KINTSUGI_PREBUILT_GUESTS` set it embeds guest files built elsewhere instead (for a GPU machine without Docker) | S0, S1/S2; reproducible since 2026-10-24 |
 | `harness/guest/` | A zkVM guest program that reads a name and publishes "hello, <name>" | S0 hello world |
 | `harness/check-guest/` | The zkVM guest that runs the patch checker on one candidate and commits the journal (hashes, seed, counts, submission id, PASS or FAIL); the secret crash input and salt stay inside. A Proof 0 mode checks the vendor's reference fix and refuses an over-long secret | S1/S2, S2b (freeing allocator), S13 (Proof 0 mode) |
@@ -99,3 +99,32 @@ contract `verifier/groth16-near`: 34.569 Tgas burnt per call (EVIDENCE, S6b).
 - The vendor, for keeping the secret and for running the proof; the contract would no longer need verifiers to say
   whether a receipt is valid, only the math.
 - That the image id names the published checker: now checkable by anyone with `./scripts/check_image_id.sh`.
+
+## Level 2 path in the bounty contract (spike S6c)
+
+A bounty created with `level: 2` takes no verifier attestations. `open_with_groth16` opens it with a Groth16 proof of
+its Proof 0, and `submit_groth16` decides a revealed attempt with a Groth16 proof of that attempt; anyone may call
+them. The contract checks the proof itself (`contract/src/groth16.rs`, the check tested in spike S6b) and then checks
+that the journal belongs to this bounty and this attempt. Level 0 bounties work as before; the Level 0 calls
+(`post_verdict`, `attest`, `attest_proof0`, `request_outlayer_check`) refuse a Level 2 bounty, and the Level 2 calls
+refuse a Level 0 bounty. `get_bounty` shows `level`, so a page can show which rule decides each bounty.
+
+The journal the contract reads (`harness/checker/src/zk.rs`, `Journal`, committed by the guest with `env::commit` in
+`harness/check-guest/src/main.rs`). RISC Zero's serializer writes each field as 32 bit little-endian words and each
+byte of a 32 byte array as one word, so the journal is 195 words (780 bytes); the layout was checked by decoding the
+real Proof 0 journal and comparing every field with `kintsugi-host verify` (`contract/src/tests_level2.rs`,
+`journal_layout_matches_the_real_proof0`):
+
+| Words | Field | What the contract requires |
+|---|---|---|
+| 0 to 31 | `candidate_hash` | attempt: the revealed patch's sha256; Proof 0: the bounty's reference fix hash |
+| 32 to 63 | `original_hash` | the bounty's original program hash |
+| 64 to 95 | `exploit_commitment` | the bounty's commitment to the secret |
+| 96 to 127 | `corpus_hash` | the bounty's public tests hash |
+| 128 to 159 | `fuzz_seed` | attempt: the seed recorded at reveal |
+| 160 | `fuzz_count` | the bounty's `fuzz_count` |
+| 161 | `variant_count` | the bounty's `variant_count` |
+| 162 to 193 | `submission_id` | attempt: sha256 of the contract account, bounty id, index and patch hash; Proof 0: sha256 of "kintsugi-proof0-v1" followed by the reference fix hash |
+| 194 | `verdict` | 1 = PASS (pays), 0 = FAIL (spends the attempt); Proof 0 must be PASS |
+
+For Proof 0 the contract also requires the journal's sha256 to equal the `proof0_journal_hash` fixed at creation.

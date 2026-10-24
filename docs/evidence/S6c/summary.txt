@@ -1,0 +1,12 @@
+Level 0 bounty 0: level 0, opened True
+bounty A 1: level 2, opened True
+A1 outcome after its FAIL proof: Failed
+A0 outcome after its PASS proof: Passed; bounty A state Paid; researcher 1 balance change 110000000000000000000000 yoctoNEAR (0.1 NEAR bounty + own 0.01 NEAR fee expected)
+bounty C after timeout and expire: {'state': 'Paid', 'level': 2, 'fees_collected': '0', 'fees_swept': False}; vendor balance change 0 yoctoNEAR (C's fee 0.01 NEAR expected; Level 2 fees go to the vendor)
+after redeploy: bounty A state Paid, pool 0 yoctoNEAR
+self-block start: vendor balance 4891118658488694500000000, pool 0 yoctoNEAR
+after the honest commit: commits 1, active 1
+after release_unrevealed(0): pool 10000000000000000000000
+self-block run 2 start: vendor 4785039037494011200000000, sybil 50000000000000000000000, sybil credit 45000000000000000000000, pool 10000000000000000000000 yoctoNEAR
+after the honest commit: commits 3, active 3
+after release_unrevealed(0): pool 20000000000000000000000
