@@ -1,0 +1,31 @@
+$ docker pull risczero/risc0-guest-builder:r0.1.88.0
+2026-10-24T17:20:32Z
+r0.1.88.0: Pulling from risczero/risc0-guest-builder
+f84c079c9faf: Pulling fs layer
+442f5be68f8a: Pulling fs layer
+6f810b40eaa5: Pulling fs layer
+36f3b5122e20: Pulling fs layer
+3c2cd199c711: Pulling fs layer
+c0a8f4879267: Pulling fs layer
+7007490126ef: Pulling fs layer
+3c2cd199c711: Download complete
+7007490126ef: Download complete
+7007490126ef: Pull complete
+36f3b5122e20: Download complete
+36f3b5122e20: Pull complete
+442f5be68f8a: Download complete
+442f5be68f8a: Pull complete
+f84c079c9faf: Download complete
+f84c079c9faf: Pull complete
+3c2cd199c711: Pull complete
+c0a8f4879267: Download complete
+c0a8f4879267: Pull complete
+6f810b40eaa5: Download complete
+6f810b40eaa5: Pull complete
+Digest: sha256:3e12f71bacd27527a61dea96fa0e53e468c99aa261d3a1019b593f6dbd943eb3
+Status: Downloaded newer image for risczero/risc0-guest-builder:r0.1.88.0
+docker.io/risczero/risc0-guest-builder:r0.1.88.0
+exit=0
+2026-10-24T17:33:55Z
+wall_seconds=804.0
+size_bytes=1598622320 id=sha256:3e12f71bacd27527a61dea96fa0e53e468c99aa261d3a1019b593f6dbd943eb3

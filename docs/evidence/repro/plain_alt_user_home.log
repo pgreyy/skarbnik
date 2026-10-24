@@ -1,0 +1,10 @@
+$ (same folder <repo>/target/gpu-src) HOME=<repo>/target/alt-home RUSTUP_HOME=~/.rustup RISC0_HOME=~/.risc0 cargo build --release -p kintsugi-harness   (another user's home folder: the guest's cargo registry moves to <alt-home>/.cargo)
+2026-10-24T17:30:31Z
+   Compiling risc0-build v3.0.6
+   Compiling kintsugi-harness v0.1.0 (~/kintsugi/target/gpu-src/harness)
+    Finished `release` profile [optimized] target(s) in 5m 13s
+exit=0
+2026-10-24T17:35:45Z
+HELLO_GUEST_ID e9b7926cdb68d9d6840f4e30926ee834314275cf58b96763ac5c5fa277c37a42
+CHECK_GUEST_ID 4b1947dd04070b3d3ebe99d3a6db47edc008edb2642ab0b63bde2cfb407e3021
+guest strings with alt-home: 72  with the normal home registry: 0

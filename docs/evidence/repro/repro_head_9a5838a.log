@@ -1,0 +1,7 @@
+$ (in ~/kintsugi/target/repro/s13-src)  RISC0_DOCKER_CONTAINER_TAG=r0.1.97.0 cargo risczero build --manifest-path harness/check-guest/Cargo.toml
+2026-10-24T18:01:36Z
+Building guest package: check_guest
+Building ELF binaries in check_guest for riscv32im-risc0-zkvm-elf target...
+#8 62.20     Finished `release` profile [optimized] target(s) in 1m 01s
+ImageID: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc - ~/kintsugi/target/repro/s13-src/harness/check-guest/target/riscv32im-risc0-zkvm-elf/docker/check_guest.bin
+exit=0 wall_s=87

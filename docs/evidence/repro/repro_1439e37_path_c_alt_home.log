@@ -1,0 +1,6 @@
+$ (in ~/kintsugi/target/repro/other-place/a) HOME=~/kintsugi/target/alt-home DOCKER_CONFIG=~/.docker RUSTUP_HOME=~/.rustup RISC0_HOME=~/.risc0 PATH=~/.cargo/bin:/usr/bin:/bin RISC0_DOCKER_CONTAINER_TAG=r0.1.97.0 cargo risczero build --manifest-path harness/check-guest/Cargo.toml
+2026-10-24T18:01:24Z
+Building guest package: check_guest
+Building ELF binaries in check_guest for riscv32im-risc0-zkvm-elf target...
+ImageID: 24c33bc557180e894a3d2ffe3ac19b35bbe9d04ab2bcbdedf6a03723f64c66bf - ~/kintsugi/target/repro/other-place/a/harness/check-guest/target/riscv32im-risc0-zkvm-elf/docker/check_guest.bin
+exit=0 wall_s=1

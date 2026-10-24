@@ -1,0 +1,7 @@
+$ cargo build --release -p kintsugi-harness -p kintsugi-host   (guests built by harness/build.rs inside risczero/risc0-guest-builder:r0.1.97.0)
+2026-10-24T18:04:15Z
+    Finished `release` profile [optimized] target(s) in 3m 07s
+exit=0
+2026-10-24T18:07:22Z
+HELLO_GUEST_ID a8bf1d826c34547b362646569c5d07ad62d678727a1b744d7038de0d7507ef2c
+CHECK_GUEST_ID dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc

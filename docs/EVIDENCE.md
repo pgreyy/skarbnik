@@ -5,6 +5,62 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Image id: why the GPU build differed, and a reproducible build
+
+Question: the GPU pod's proof of commit `1439e37` had image id `dfd48a5e...`, not the laptop's `3edbc2e6...`. Does a
+plain guest build depend on the folder or the user that builds it, and does RISC Zero's reproducible (Docker) build give
+one stable id? Logs: `docs/evidence/repro/`. All on the laptop, no rental.
+
+**Verdict: yes and yes (2026-10-24).** A plain build embeds the source folder and the user's home folder in the guest,
+so its image id changes with either. The reproducible build gives one id regardless of folder and user. It is now the
+official way to build the checker (`harness/build.rs`), and `./scripts/check_image_id.sh` rebuilds it and compares the
+id with a bounty on the contract.
+
+Plain build (`cargo build --release -p kintsugi-harness`, ids read from the generated `methods.rs` with
+`python3 scripts/image_ids.py`), commit `1439e37`:
+
+| Where it was built | Checker image id | Hello world image id |
+|---|---|---|
+| repository root on the laptop (S2b, S4, S7) | `3edbc2e6...` | `2cf67c95...` |
+| `<repo>/target/gpu-src` on the laptop (`plain_path_b.log`) | `e4f79e003398c0d0e1b48eb35d64272cc1c188919d48630652ce62cbe274d4e3` | `2cf67c95...` |
+| the same folder, with another home folder (`HOME` moved; `plain_alt_user_home.log`) | `4b1947dd04070b3d3ebe99d3a6db47edc008edb2642ab0b63bde2cfb407e3021` | `e9b7926cdb68d9d6840f4e30926ee834314275cf58b96763ac5c5fa277c37a42` |
+| `/root/kintsugi` on the GPU pod | `dfd48a5e...` | not read |
+
+Why: the compiled checker guest holds 74 strings with full paths (`strings` on the ELF): source file paths under the
+build folder and paths into the user's cargo download folder (`~/.cargo/registry/...`), kept for panic messages. A
+first try to imitate another user by moving only `CARGO_HOME` did not change anything, because risc0-build removes every
+`CARGO...` variable before it builds a guest; moving `HOME` did (`plain_alt_home.log` is that first, invalid try).
+
+Reproducible build: `cargo risczero build --manifest-path harness/check-guest/Cargo.toml` with
+`RISC0_DOCKER_CONTAINER_TAG=r0.1.97.0` (`repro_*.log`). It needs Docker's buildx plugin (installed into the home folder,
+v0.38.1, SHA-256 checked, on the owner's go). RISC Zero's default builder image for 3.0.6, `r0.1.88.0`, could not build
+this code ("rustc 1.88.0-dev is not supported": `ruint` 1.21.1 needs Rust 1.90); `r0.1.97.0` matches the guest Rust
+1.97.0 used on the laptop.
+
+| Source | Folder, user | Checker image id |
+|---|---|---|
+| `1439e37` | `<repo>/target/gpu-src` | `24c33bc557180e894a3d2ffe3ac19b35bbe9d04ab2bcbdedf6a03723f64c66bf` |
+| `1439e37` | `<repo>/target/repro/other-place/a` | `24c33bc5...` (output file SHA-256 `1fc93b50...` in both folders) |
+| `1439e37` | the same, with another home folder | `24c33bc5...` |
+| current code (`9a5838a`, the S13 checker) | `<repo>/target/repro/s13-src` | `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc` |
+| current code, built by `harness/build.rs` | repository root | `dd6c5f42...` (`official_build_repo.log`) |
+
+The second and third `1439e37` builds were served from Docker's build cache: the files sent to Docker were the same,
+and the folder and home are not inputs to it. The reproducible guest holds no laptop path at all (0 strings with
+the laptop's home folder; only `/src` and `/root/.cargo`, fixed inside the image). Not tried: a reproducible build on a second machine.
+
+What this changes:
+- S13's checker has id `043ec633...` from a plain build on the laptop; under the reproducible build the same code has
+  `dd6c5f42...`. Bounties already on chain (S4, S7, S13) keep their old ids. Their receipts can still be checked against
+  those ids with `farbox-verifier` or `kintsugi-host verify` built the old way, but nobody can rebuild those ids from the
+  source. `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 0` prints the rebuilt id, the bounty's id
+  `043ec633...`, and DIFFERENT (`check_image_id_s13_bounty0.log`).
+- New bounties should be created with the reproducible id; that needs a new Proof 0 made with this build (not done).
+- The GPU result (22.65 s) used a plain build on the pod; a like for like number needs the reproducible build on both
+  machines.
+- Docker downloads were slow: the `r0.1.88.0` image (1.60 GB) took 804 s, about 2.0 MB/s, and `r0.1.97.0` (1.73 GB)
+  took 1,116 s, about 1.5 MB/s (`docker_pull*.log`; sizes are unpacked, so the network speed was lower).
+
 ## S2 on a GPU: the 16 input proof on a rented RunPod pod (S6 preparation)
 
 Question: how long does the same 16 input proof take on an NVIDIA GPU, against the laptop baseline of **2,814.45 s

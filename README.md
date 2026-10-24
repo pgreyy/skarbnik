@@ -24,21 +24,27 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts, no proofs for the arena) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
 | End to end on testnet with a real proof: commit and reveal, proof bound to the on-chain seed and submission id, verdict, two verifiers check the receipt against the chain and attest, researcher paid | works at Level 0 (two registered verifier accounts) | `scripts/s4_testnet.sh` (EVIDENCE, S4/S5) |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) and two verifiers attest it; an over-long secret is refused; junk commits cannot hold the attempt slots after the reveal window; replayed, foreign or contradicted receipts are refused and the researcher is paid by timeout | works on testnet (10 of 11 attacks blocked; sub-accounts filling the slots is an accepted risk, the leak stays at most K bits) | `scripts/s13_attacks.sh <phase>` (EVIDENCE, S13; docs/SECURITY.md) |
+| Anyone can rebuild the checker and get the same image id: it is built inside RISC Zero's guest builder Docker image, so the id does not depend on the folder or the user | works on one laptop (two folders and two home folders give the same id); no bounty on chain uses this id yet | `./scripts/check_image_id.sh` (EVIDENCE, "Image id") |
 | OutLayer (TEE) as one of the two verifiers | not confirmed on testnet yet: OutLayer accepts our jobs but none has been answered (8 of 8 timed out, by link and as an OutLayer project), while OutLayer's own cached test program answers; the contract recorded nothing, as designed | EVIDENCE, S4/S5 and "OutLayer (Level 1) on testnet" |
 
 ## Try it
 
 All commands run from the repository root on Linux x86_64. Versions: [docs/VERSIONS.md](docs/VERSIONS.md).
 
-1. Build everything: `./scripts/build_all.sh`. See it finish with the sizes of the host binary and the contract wasm.
-2. Run the checker tests: `cargo test -p kintsugi-check --offline`. See 16 tests pass.
+1. Build everything: `./scripts/build_all.sh` (needs Docker with the buildx plugin: the checker is built inside RISC Zero's
+   guest builder image). See it finish with the sizes of the host binary and the contract wasm.
+2. Run the checker tests: `cargo test -p kintsugi-check --offline`. See 6 and 13 tests pass (docs/evidence/S13/unit_tests.txt).
 3. Print the verdict table for the cheating patches:
    `target/debug/kintsugi-check table --manifest data/attacks/manifest.txt --seed 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21`.
    See the honest fix PASS and the cheats FAIL (`data/attacks/` holds inert test patches).
-4. Run the contract tests: `cargo test -p kintsugi-contract --offline`. See 48 tests pass.
+4. Run the contract tests: `cargo test -p kintsugi-contract --offline`. See 59 tests pass (docs/evidence/S13/unit_tests.txt).
 5. Count the zkVM cycles of one check without proving it:
    `./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 32 --profile`. See the verdict
    PASS and the cycles per phase.
+6. Rebuild the checker and compare its image id with a bounty on the contract:
+   `./scripts/check_image_id.sh <contract account> <bounty id>`. Without arguments it prints the rebuilt id, which for the
+   current checker is `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`. The bounties on testnet so far
+   were made with older, non-reproducible builds, so they show DIFFERENT (docs/SECURITY.md, known limits).
 
 ## How NEAR fits in
 

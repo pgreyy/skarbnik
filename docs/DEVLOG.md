@@ -2,6 +2,20 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: Image id mismatch explained; reproducible checker build made official
+
+- Plain guest builds embed the source folder and the user's home folder: the same commit `1439e37` gave `3edbc2e6...`
+  at the repo root, `e4f79e00...` in another folder, `4b1947dd...` with another home folder (`dfd48a5e...` on the pod).
+- RISC Zero's reproducible build (`cargo risczero build`, Docker image `r0.1.97.0`; buildx v0.38.1 installed in the
+  home folder on the owner's go) gave `24c33bc5...` for `1439e37` in every folder and home tried. The default image
+  `r0.1.88.0` could not build this code (needs Rust 1.90). Docker downloads ran at about 1.5 to 2.0 MB/s.
+- `harness/build.rs` now builds the guests that way: the current checker's id is `dd6c5f42...` (S13's plain id was
+  `043ec633...`). New `scripts/check_image_id.sh` rebuilds and compares with a bounty: for S13 bounty 0 it says
+  DIFFERENT, as expected. New bounties need a new Proof 0 with this build (not done).
+- Mistakes: moving only `CARGO_HOME` was not a valid "other user" test (risc0-build removes `CARGO...` variables);
+  the first alt-home reproducible run failed because Docker could not find buildx with `HOME` moved (fixed with
+  `DOCKER_CONFIG`). The task took about one hour (17:13 to 18:12 UTC), most of it waiting for Docker downloads.
+
 ## 2026-10-24: GPU proof, final attempt (proof in 22.65 s, image id differs, stopped)
 
 - All build dependencies installed in one step; built `kintsugi-host` with a pod-only feature `cuda-prove-only` (the

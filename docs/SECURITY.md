@@ -27,6 +27,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Guard | What it stops | Code | Shown by |
 | --- | --- | --- | --- |
 | The receipt is checked against the checker program's image id | A receipt from another program | `host/src/main.rs` (`verify`), `scripts/verifier_check.sh` | verifying with another image id fails (EVIDENCE, S4 native verifier tests) |
+| The checker is built reproducibly (inside RISC Zero's guest builder image, fixed folder and toolchain), so anyone can rebuild it and get the same image id (added 2026-10-24) | A vendor naming an image id that does not come from the published checker source | `harness/build.rs`, `scripts/check_image_id.sh` | the same id from two folders and two home folders, and no laptop path inside the guest (EVIDENCE, "Image id") |
 | Changing the journal or one bit of the proof breaks verification | Forged or edited receipts | RISC Zero verification | `kintsugi-host tamper ... journal` and `... seal`, then `verify`: both INVALID, exit 1 (S1 zkVM part) |
 | The journal binds the candidate hash, the original hash, sha256(salt || secret), the public tests' hash, the seed, the counts and the submission id | Reusing a receipt for another patch, bounty, secret, test set or seed | `zk.rs`, `harness/check-guest/src/main.rs` | the Level 0 check compares all of them with the chain (S4, 11 of 11 checks) |
 | The submission id is sha256 of the contract account, bounty id, index and patch hash | Replaying a receipt on another bounty or attempt | `contract/src/lib.rs` (`submission_id`) | S4 Level 0 check; S13 attack 4 |
@@ -82,6 +83,10 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 3. Known limits
 
+- All bounties created so far (S4, S7 and S13, ids `3edbc2e6...` and `043ec633...`) use image ids from
+  plain builds, which embed the build folder and the user's home folder. Nobody can rebuild those ids from the source;
+  their receipts still verify against those ids. Only bounties created with the reproducible id (`dd6c5f42...` for the
+  current checker) can be checked with `./scripts/check_image_id.sh`; none exists on chain yet.
 - **Verification levels and what each trusts.**
   - Level 0 (works on testnet): the contract trusts its registered verifier accounts to check each receipt before attesting
     (`scripts/verifier_check.sh`). **On testnet all three verifier accounts are run by us**, including the third; a real
@@ -115,6 +120,8 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
+- 2026-10-24 (pending commit): reproducible checker build made official; new guard row; known limit for older bounties'
+  image ids.
 - 2026-10-24 `500469c`: OutLayer second try: verifier published on FastFS as project
   `kintsugi-ol-hfoez.testnet/farbox-verifier` with OutLayer's tool; still no answer (requests 5618 to 5620). No guard changed.
 - 2026-10-24 `500469c`: OutLayer Level 1 diagnosis: no guard changed; the known limit now says what was found

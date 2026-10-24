@@ -1,0 +1,10 @@
+$ docker pull risczero/risc0-guest-builder:r0.1.97.0
+2026-10-24T17:40:16Z
+r0.1.97.0: Pulling from risczero/risc0-guest-builder
+Digest: sha256:7ae0a27fa72b10fb5c1066005bd949ae43dc4ead8a284f2d6572b99c82ab4468
+Status: Downloaded newer image for risczero/risc0-guest-builder:r0.1.97.0
+docker.io/risczero/risc0-guest-builder:r0.1.97.0
+exit=0
+2026-10-24T17:58:51Z
+wall_seconds=1115.8
+size_bytes=1725863221 id=sha256:7ae0a27fa72b10fb5c1066005bd949ae43dc4ead8a284f2d6572b99c82ab4468

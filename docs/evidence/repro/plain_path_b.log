@@ -1,0 +1,11 @@
+$ (in <repo>/target/gpu-src, an unpacked git archive of 1439e37) cargo build --release -p kintsugi-harness
+2026-10-24T17:20:44Z
+   Compiling toml v0.8.23
+   Compiling rzup v0.5.2
+   Compiling risc0-build v3.0.6
+   Compiling kintsugi-harness v0.1.0 (~/kintsugi/target/gpu-src/harness)
+    Finished `release` profile [optimized] target(s) in 1m 27s
+exit=0
+2026-10-24T17:22:12Z
+HELLO_GUEST_ID 2cf67c95daf4745939443d2c3772891a0e0e02d04fb0a5196cc9508e917f31fc
+CHECK_GUEST_ID e4f79e003398c0d0e1b48eb35d64272cc1c188919d48630652ce62cbe274d4e3

@@ -70,6 +70,13 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | --- | --- | --- |
 | outlayer-cli | 0.2.1 (tag `v0.2.1`, commit `25d4e5448e630c73c700ecba92fe4bbe8778165f`), installed with `cargo install --git https://github.com/out-layer/outlayer-cli --tag v0.2.1 --locked` | `outlayer --version` |
 
+## Reproducible guest build
+
+| Tool | Version | Command |
+| --- | --- | --- |
+| Docker buildx plugin | v0.38.1 (commit `0dbe87f3`), in `~/.docker/cli-plugins/docker-buildx`, binary SHA-256 `e25d5cd675092bb5d1d03632fdc46cdf3fede7b514dc5f023a105e00d3ce5ad4` (matches the release's checksums.txt) | `docker buildx version` |
+| RISC Zero guest builder image | `risczero/risc0-guest-builder:r0.1.97.0`, digest `sha256:7ae0a27fa72b10fb5c1066005bd949ae43dc4ead8a284f2d6572b99c82ab4468` (Rust 1.97.0) | `docker image inspect risczero/risc0-guest-builder:r0.1.97.0` |
+
 ## Other
 
 | Tool | Version | Command |
