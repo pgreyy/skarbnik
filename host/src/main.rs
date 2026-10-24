@@ -267,6 +267,8 @@ fn verify(args: &[String]) -> ExitCode {
         Ok(()) => match receipt.journal.decode::<Journal>() {
             Ok(j) => {
                 println!("VALID");
+                let digest = <risc0_zkvm::sha::Impl as risc0_zkvm::sha::Sha256>::hash_bytes(&receipt.journal.bytes);
+                println!("journal sha256: {}", to_hex(digest.as_bytes()));
                 print_journal(&j);
                 ExitCode::SUCCESS
             }

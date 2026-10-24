@@ -1,0 +1,7 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+deploy_code	deploy	bounty.kintsugi-djloo.testnet	7m7GH5Qg6BVHeDoPd9GMFiYUUDdgERz5PSVA3hUB4gJL	2.2 Tgas	0.000213172181009	0	9.35
+register_outlayer	register_verifier	bounty.kintsugi-djloo.testnet	CZYmfr7dGYoaYNLPnF6YF8c3GFTWiMQeJJfxTVZgGCFw	0.309 Tgas	0.0000308343463618	0	5.31
+s4_create_bounty	create_bounty	kintsugi-vendor-prnvm.testnet	B7FEeaMnQ9Wv6gfY21sSsVL6vo1PRZKM1iN38LdHieNp	0.341 Tgas	0.0000340436742485	0	5.77
+s4_credit_r1	deposit_credit	kintsugi-res1-prnvm.testnet	5rhrHanLaNJX8QoiJZge43qB44p9f8GDrz5Sv2KUt1C5	0.309 Tgas	0.000030882243944	0	6.75
+s4_commit	commit	kintsugi-res1-prnvm.testnet	DeothYh7Lzt3iRbpRtyCkGeE9e9YWKovkjqGJ6TXd99V	0.315 Tgas	0.0000314878271245	0	5.62
+s4_reveal	reveal	kintsugi-res1-prnvm.testnet	H3HuYThEtZb5oYWQqEgKcn8bjciNvtB8SxXLLPvA8ueR	0.350 Tgas	0.0000349210546045	0	5.4

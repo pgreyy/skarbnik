@@ -1,0 +1,31 @@
+$ near contract deploy bounty.kintsugi-djloo.testnet use-file target/near/kintsugi_contract/kintsugi_contract.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T09:56:38.551442454Z
+Migrating config.toml from V4 to V5...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+├  Unsigned transaction:
+│    signer_id:    bounty.kintsugi-djloo.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- deploy code <C4XoWoZoYjmpsBwj6bwtH23625HP1boYYKtrBw7qjP7t> to a account <bounty.kintsugi-djloo.testnet>
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:5PeFEXv1ZyR4mSo92n45KgJDenCxrxyNRK8SSS8BQyRX
+│     
+├  Transaction Execution Info:
+│    Gas burned: 2.2 Tgas
+│    Transaction fee: 0.000213172181009 NEAR
+│    Transaction ID: 7m7GH5Qg6BVHeDoPd9GMFiYUUDdgERz5PSVA3hUB4gJL
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/7m7GH5Qg6BVHeDoPd9GMFiYUUDdgERz5PSVA3hUB4gJL
+│     
+
+Contract code has been successfully deployed.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract deploy bounty.kintsugi-djloo.testnet use-file target/near/kintsugi_contract/kintsugi_contract.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=9.35
