@@ -120,7 +120,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
-- 2026-10-24 (pending commit): reproducible checker build made official; new guard row; known limit for older bounties'
+- 2026-10-24 `0409a3c`: reproducible checker build made official; new guard row; known limit for older bounties'
   image ids.
 - 2026-10-24 `500469c`: OutLayer second try: verifier published on FastFS as project
   `kintsugi-ol-hfoez.testnet/farbox-verifier` with OutLayer's tool; still no answer (requests 5618 to 5620). No guard changed.
