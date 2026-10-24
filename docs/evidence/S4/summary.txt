@@ -1,2 +1,5 @@
 request args bytes: 299761
 attestations after the OutLayer callback: []
+researcher 1 (payout) balance change: 500000000000000000000000 yoctoNEAR
+{'outcome': 'Passed', 'attestations': ['kintsugi-ver1-prnvm.testnet', 'kintsugi-ver2-prnvm.testnet'], 'verdict': 'PASS'}
+{'state': 'Paid', 'winner': 0}

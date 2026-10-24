@@ -1,0 +1,51 @@
+$ near contract call-function as-transaction bounty.kintsugi-djloo.testnet attest json-args {"bounty_id":"2","index":0,"verdict":"PASS","journal_hash":"79b9d8a6e4f4d87cb2580413702bf18712161942063c867a5be861e550cb52fc","receipt_hash":"8c316bd514edb018d5f06f61f1408c76464b3c767c667623f60d33744446cbbf"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-ver2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T11:10:01.102336980Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-ver2-prnvm.testnet
+│    receiver_id:  bounty.kintsugi-djloo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  attest
+│                       args:         {
+│                                       "bounty_id": "2",
+│                                       "index": 0,
+│                                       "journal_hash": "79b9d8a6e4f4d87cb2580413702bf18712161942063c867a5be861e550cb52fc",
+│                                       "receipt_hash": "8c316bd514edb018d5f06f61f1408c76464b3c767c667623f60d33744446cbbf",
+│                                       "verdict": "PASS"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:4nv1reQgS2pwwXvukGqLDTBzm1D6iSeuAvUZa2aseydT
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.319 Tgas
+│    Transaction fee: 0.000031826381501 NEAR
+│    Transaction ID: F4aYNF5atUZSnxegrQFNnAnYs9Vc8HQHKVPKSmmRjX9x
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/F4aYNF5atUZSnxegrQFNnAnYs9Vc8HQHKVPKSmmRjX9x
+│     
+├  Function execution logs:
+│    Logs [bounty.kintsugi-djloo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"attested","data":[{"bounty_id":"2","index":0,"verifier":"kintsugi-ver2-prnvm.testnet","verdict":"PASS","count":2}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"paid","data":[{"bounty_id":"2","index":0,"reason":"final_pass","to":"kintsugi-res1-prnvm.testnet","amount":"500000000000000000000000"}]}
+│    Logs [kintsugi-res1-prnvm.testnet]:   No logs
+│    Logs [kintsugi-ver2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-ver2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"final_pass"
+
+
+The "attest" call to <bounty.kintsugi-djloo.testnet> on behalf of <kintsugi-ver2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction bounty.kintsugi-djloo.testnet attest json-args '{"bounty_id":"2","index":0,"verdict":"PASS","journal_hash":"79b9d8a6e4f4d87cb2580413702bf18712161942063c867a5be861e550cb52fc","receipt_hash":"8c316bd514edb018d5f06f61f1408c76464b3c767c667623f60d33744446cbbf"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-ver2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.87

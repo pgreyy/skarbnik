@@ -73,9 +73,10 @@ them before execution (no transaction id, no gas).
 
 ## S4/S5: OutLayer as verifier 1 (Level 1)
 
-**Verdict: FAIL on testnet so far (2026-10-24): OutLayer accepted our jobs but no worker answered within NEAR's yield
-window, twice.** The contract handled it safely (no attestation recorded). Everything up to the OutLayer answer worked on
-testnet with a real proof; S5's refusals work on chain. Details at the end of this section.
+**Verdict (2026-10-24): Level 1 FAIL on testnet, fallback Level 0 PASS.** OutLayer accepted our jobs but no worker answered
+within NEAR's yield window, twice; the contract recorded nothing, as designed. Fallback as the blueprint says (stay at
+Level 0): two registered verifier accounts checked the real receipt against the chain and attested; the bounty finalized
+and the researcher was paid. S5's refusals work on chain.
 
 What exists:
 
@@ -158,6 +159,16 @@ yield timed out, meaning no worker resumed the request. Second attempt, to tell 
 `request_execution` to `outlayer.testnet` with the same pinned program and a tiny input `{}`
 (`Kx7kzdPwr6hHdtEmgDGeHhirA9LNVSG6fKwtai1B255`) failed the same way about 2 minutes later (refund 0.099 NEAR). The
 OutLayer coordinator's health endpoint answered `{"status":"ok"}`; we found no public endpoint that shows a request's status.
+
+Fallback, Level 0: each verifier first ran `kintsugi-host verify target/s4/receipt_succinct.bin` and compared the journal
+with the chain (`docs/evidence/S4/level0_check.txt`): receipt VALID; image id, submission id, seed, candidate hash, exploit
+commitment, corpus hash and original hash equal the bounty and submission records; receipt and journal SHA-256 equal the
+posted hashes; verdict PASS. All 11 checks passed.
+
+| Step | Transaction | Result |
+| --- | --- | --- |
+| verifier 1 attests | `4LQrz15ma6qbdX5QUJprVbxicZC2fEThP7d7TtAMygm7` | recorded |
+| verifier 2 attests | `F4aYNF5atUZSnxegrQFNnAnYs9Vc8HQHKVPKSmmRjX9x` | final PASS: outcome Passed, bounty Paid, event `paid` reason `final_pass`; researcher 1 balance +0.5 NEAR exactly |
 
 Not known (UNCONFIRMED): whether testnet workers were down, whether they could not fetch or run our wasm, or whether they
 only serve registered projects. Raw outputs: `docs/evidence/S4/outlayer_tx_tree.txt`, `docs/evidence/S4/steps/`.

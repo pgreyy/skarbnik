@@ -9,3 +9,5 @@ s4_post_verdict	post_verdict	kintsugi-vendor-prnvm.testnet	GgrJSagJRpptMYNHnYAnU
 s4_set_outlayer	set_outlayer	bounty.kintsugi-djloo.testnet	EZkdf6oReaV97j3a6WboJgTwbVjGZnJA5gs9uMkbYJSD	0.309 Tgas	0.0000308835369098	0	6.0
 s4_request_outlayer	request_outlayer_check	kintsugi-res2-prnvm.testnet	FgieKEfSo2DE9WsuZSVMTBNMH4D48igNdwgEbLSnshS4	14.7 Tgas	0.0014602826633845	0	127.98
 s4_direct_small_job	request_execution	kintsugi-res2-prnvm.testnet	Kx7kzdPwr6hHdtEmgDGeHhirA9LNVSG6fKwtai1B255	0.327 Tgas	0.000032608394427	0	122.87
+s4_level0_attest_v1	attest	kintsugi-ver1-prnvm.testnet	4LQrz15ma6qbdX5QUJprVbxicZC2fEThP7d7TtAMygm7	0.319 Tgas	0.000031826381501	0	5.44
+s4_level0_attest_v2	attest	kintsugi-ver2-prnvm.testnet	F4aYNF5atUZSnxegrQFNnAnYs9Vc8HQHKVPKSmmRjX9x	0.319 Tgas	0.000031826381501	0	6.87

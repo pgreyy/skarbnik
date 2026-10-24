@@ -10,6 +10,8 @@ One dated entry per work block: what was done, the exact commands, the results, 
   promise failed". A tiny direct job to `outlayer.testnet` with the same program timed out the same way. Two failures, so
   moved on; the cause is unconfirmed. Our callback recorded nothing, as designed.
 - S5 refusals on chain: private callback called by a stranger, vendor registered as verifier.
+- Fallback Level 0: two verifier accounts checked the real receipt against the chain (11 checks pass) and attested;
+  bounty 2 finalized PASS and researcher 1 was paid 0.5 NEAR.
 
 ## 2026-10-24: S8 arena (PASS)
 
