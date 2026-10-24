@@ -102,7 +102,10 @@ Each guard: what it stops, where it lives, and what shows it works.
     program must be downloaded first) has been answered: 9 of 9 such jobs (8 of them ours) timed out, by link from two hosts and as an OutLayer project on
     FastFS, while OutLayer's own cached test program answered in 10 to 14 s (EVIDENCE, "OutLayer (Level 1) on testnet").
     The cause is inside OutLayer; the FastFS gateway was also down during the project test.
-  - Level 2 (not built): the contract would check the proof itself; no outside party trusted for the verdict.
+  - Level 2 (spike only, not connected to payouts): a separate testnet contract, `kintsugi-g16-bkexe.testnet`, checks a
+    RISC Zero Groth16 proof itself with NEAR's alt_bn128 host functions (`verifier/groth16-near`); it accepted the real
+    proof and rejected a flipped seal bit, a changed journal and a wrong image id, at 34.569 Tgas per call (EVIDENCE,
+    S6b). The bounty contract does not use it yet, so the verdict still rests on Level 0.
 - At Level 0 the contract does not check a receipt; a dishonest majority of verifiers could attest a false verdict.
 - One verdict leaks at most one bit about the secret; K is the leak budget, chosen by the vendor. K is per bounty and
   counts every committer together, so sub-accounts cannot raise the total leak above K bits: a slot is freed only by
@@ -115,8 +118,16 @@ Each guard: what it stops, where it lives, and what shows it works.
   0.045 + 0.045 w NEAR, so W windows in a row cost 0.0225 W (W + 1) NEAR (10 windows: 2.475 NEAR). After each window
   anyone can free the slots and commit. **Accepted risk**: the cost of blocking grows with every window, the leak stays
   at most K bits, and the vendor sets K, both fees and the reveal window.
-- RISC Zero states its zero knowledge property is not formally proven. Its Groth16 step is not quantum safe and rests on a
-  trusted setup; NEAR's own NEP-488 rates the BN254 curve below 100-bit security (only relevant once Level 2 exists).
+- RISC Zero states its zero knowledge property is not formally proven.
+- A Groth16 check (Level 2, so far only the S6b spike) still trusts:
+  - the BN254 curve: NEAR's own NEP-488 says recent research puts BN254 below 100-bit security, and RISC Zero's
+    security model rates its Groth16 step 99+ bits and not quantum safe;
+  - RISC Zero's Groth16 trusted setup ceremony and the verifying key made from it: if the ceremony's secret had
+    been kept by anyone, they could make proofs of false claims (RISC Zero's security model lists the integrity of
+    the ceremony as an assumption);
+  - two fixed constants written into the contract: RISC Zero's control root (`a54dc85a...`), which says which
+    recursion programs are allowed, and its BN254 control id (`c07a6514...`). They come from risc0-zkvm 3.0.6's
+    defaults (`verifier/groth16-near/src/vk.rs`); a different RISC Zero version may need new values.
 - The vendor sees each patch before paying; the timeout path protects the researcher.
 - Arena verdicts (S8) come from the native checker, not proofs. Timing and other side channels are not measured.
 - Proving is slow on a laptop CPU (16 fairness inputs: 47 to 48 minutes, plus 15 to 16 minutes to compress).
@@ -125,6 +136,8 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
+- 2026-10-24 (pending commit): S6b Groth16 check on a spike contract (not the bounty contract); known limits for
+  BN254, the trusted setup and the two fixed constants.
 - 2026-10-24 `582b2d8`: demo bounty 4 with the reproducible image id; `check_image_id.sh` prints MATCH.
 - 2026-10-24 `582b2d8`: prebuilt guest mode and `cuda-prove-only` build option; known limit for the prebuilt mode.
 - 2026-10-24 `0409a3c`: reproducible checker build made official; new guard row; known limit for older bounties'

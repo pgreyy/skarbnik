@@ -1,0 +1,4 @@
+$ ./target/release/kintsugi-host groth16-args target/s6/proof0_groth16.bin target/s6b/args.json
+seal bytes: 256
+wrote target/s6b/args_check.json
+same output as the file used

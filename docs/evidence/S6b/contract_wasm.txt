@@ -1,0 +1,2 @@
+wasm_bytes=86084
+wasm_sha256=34469c50395c837ec2bd200ffb62495068735de8aeab2ce54ddf1adcb2c994b0

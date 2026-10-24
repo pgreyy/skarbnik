@@ -1,0 +1,23 @@
+# Spike S6b: a NEAR contract that checks a RISC Zero Groth16 proof with NEAR's alt_bn128 host functions. Not the bounty
+# contract; deployed only to a throwaway testnet account.
+[package]
+name = "kintsugi-groth16-spike"
+description = "Kintsugi spike S6b: Groth16 check of a RISC Zero receipt on NEAR"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.93"
+repository = "https://github.com/pgreyy/farbox"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = "5.29.1"
+
+[dev-dependencies]
+near-sdk = { version = "5.29.1", features = ["unit-testing"] }
+
+# `cfg(near)` is set by near-sdk when building for the chain.
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ['cfg(near)']

@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: S6b spike: a NEAR contract checks the Groth16 proof (PASS)
+
+- New `kintsugi-host groth16-args` writes the seal, image id, journal and RISC Zero's two fixed constants from a Groth16
+  receipt; `scripts/gen_groth16_vk.py` turns RISC Zero's verifying key into NEAR's byte layout.
+- New spike contract `verifier/groth16-near` (`verify_groth16`), following RISC Zero's verifier; claim digest formula
+  checked against RISC Zero's (equal); `cargo test -p kintsugi-groth16-spike`: 3 passed.
+- On testnet, `kintsugi-g16-bkexe.testnet`: the real receipt accepted (tx `Drcc1yqp...ZSEa`); a flipped seal bit
+  (call fails, "invalid g1"), a changed journal (false) and a wrong image id (false) rejected. 34.569 Tgas per call,
+  about 7% above the 32.4 TGas estimate.
+- Not done: no change to the bounty contract or payouts. A flipped-bit unit test is not possible natively (the host
+  error aborts near-sdk's mocked environment).
+
 ## 2026-10-24: S6 feasibility: Groth16 compression on the laptop (PASS), Level 2 design note
 
 - RISC Zero's CPU Groth16 path needs x86 and Docker; it states no memory figure (README, Dockerfile, local-proving page,

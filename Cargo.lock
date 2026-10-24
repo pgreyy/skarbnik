@@ -2759,6 +2759,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "kintsugi-groth16-spike"
+version = "0.1.0"
+dependencies = [
+ "near-sdk",
+]
+
+[[package]]
 name = "kintsugi-harness"
 version = "0.1.0"
 dependencies = [

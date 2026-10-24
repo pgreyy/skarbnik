@@ -7,13 +7,14 @@ This file describes only what is in the repository now. It grows as parts are bu
 | Folder | What is there | Status |
 | --- | --- | --- |
 | `contract/` | The bounty contract: create a bounty (with the vendor's reference fix hash and Proof 0 journal hash), open it after two different verifiers attest Proof 0, register verifiers, credit (deposit, withdraw), commit with a rising attempt fee from credit, reveal within a reveal window, free an unrevealed slot after it (`release_unrevealed`), verdict, attest (two different verifiers), OutLayer request and callback, timeout, expire (refund and fee sweep to verifiers); the winner's own fee is refunded; unit tests in `contract/src/tests.rs` | S3b to S13. The S13 version is deployed on `kintsugi-s13-tlryo.testnet`; the S4/S7 version stays on `bounty.kintsugi-djloo.testnet` (bounties 0 to 4 readable as evidence) |
-| `scripts/` | `build_all.sh` (builds everything); testnet runs: `s3_*.sh`, `s3b_*.sh`, `s4_testnet.sh`, `s7_agent.sh`, `s8_arena.sh`, `s8_chain.sh`, `s13_attacks.sh`, `ol_diag.sh` (OutLayer test jobs); `verifier_check.sh` (a Level 0 verifier's checks); `check_image_id.sh` (rebuild the checker, compare its image id with a bounty); `export_guests.sh` (copy the reproducible guest files for another machine); `demo_bounty.sh` (the demo bounty with the reproducible id); `build_verifier_wasm.sh` (build and scan the OutLayer program); `s2_measure.sh` (proof memory and time) | S0 to S13 |
+| `scripts/` | `build_all.sh` (builds everything); testnet runs: `s3_*.sh`, `s3b_*.sh`, `s4_testnet.sh`, `s7_agent.sh`, `s8_arena.sh`, `s8_chain.sh`, `s13_attacks.sh`, `ol_diag.sh` (OutLayer test jobs); `verifier_check.sh` (a Level 0 verifier's checks); `check_image_id.sh` (rebuild the checker, compare its image id with a bounty); `export_guests.sh` (copy the reproducible guest files for another machine); `demo_bounty.sh` (the demo bounty with the reproducible id); `s6b_testnet.sh` (deploy and call the Groth16 spike); `gen_groth16_vk.py` (the Groth16 constants for it); `build_verifier_wasm.sh` (build and scan the OutLayer program); `s2_measure.sh` (proof memory and time) | S0 to S13 |
 | `harness/` | Build crate that compiles the zkVM guests in `harness/guest/` and `harness/check-guest/` reproducibly (inside RISC Zero's guest builder Docker image `r0.1.97.0`) and exposes their programs and image ids; with `KINTSUGI_PREBUILT_GUESTS` set it embeds guest files built elsewhere instead (for a GPU machine without Docker) | S0, S1/S2; reproducible since 2026-10-24 |
 | `harness/guest/` | A zkVM guest program that reads a name and publishes "hello, <name>" | S0 hello world |
 | `harness/check-guest/` | The zkVM guest that runs the patch checker on one candidate and commits the journal (hashes, seed, counts, submission id, PASS or FAIL); the secret crash input and salt stay inside. A Proof 0 mode checks the vendor's reference fix and refuses an over-long secret | S1/S2, S2b (freeing allocator), S13 (Proof 0 mode) |
 | `harness/checker/` | Native patch checker (`kintsugi-check`): runs a candidate wasm patch on the crash input, the public tests, seeded fairness inputs and seeded crash variants; verdict PASS or FAIL; `proof0` with `--reference-fix` | S1, S13; runs natively and inside the zkVM guest |
-| `host/` | `kintsugi-host`: `hello`, `execute` (cycles, `--profile` for the phase split), `prove` (receipt file; `--proof0`, `--submission-id`, `--seed`), `verify` (separate process check of a receipt file), `tamper` (changed copy for tests), `compress` (succinct receipt); build features `cuda` and `cuda-prove-only` (GPU proving only, without the GPU Groth16 part) | S0 to S13 |
+| `host/` | `kintsugi-host`: `hello`, `execute` (cycles, `--profile` for the phase split), `prove` (receipt file; `--proof0`, `--submission-id`, `--seed`), `verify` (separate process check of a receipt file), `tamper` (changed copy for tests), `compress` (succinct or Groth16 receipt), `groth16-args` (the values a contract needs to check a Groth16 receipt); build features `cuda` and `cuda-prove-only` (GPU proving only, without the GPU Groth16 part) | S0 to S13 |
 | `verifier/outlayer/` | `farbox-verifier`: reads a receipt and the values it must match (image id, submission id, receipt sha256) from stdin, verifies it with RISC Zero's verify-only code, prints a short JSON answer; built for wasm32-wasip1 to run on OutLayer; published at github.com/pgreyy/farbox-verifier (v0.1.0) | S4; works locally; not answered on OutLayer testnet (EVIDENCE, "OutLayer (Level 1) on testnet") |
+| `verifier/groth16-near/` | Spike S6b: a NEAR contract with one method, `verify_groth16(seal, image_id, journal)`, that checks a RISC Zero Groth16 proof with NEAR's alt_bn128 host functions; its fixed values are generated into `src/vk.rs` by `scripts/gen_groth16_vk.py` | Spike on `kintsugi-g16-bkexe.testnet`; not connected to the bounty contract |
 | `verifier/fuel-meter/` | Runs a wasip1 file the way OutLayer's worker does (wasmtime 28 with fuel metering) and prints instructions, peak memory and time | OutLayer diagnosis |
 | `web/` | Empty placeholder for the dashboard | Not started |
 | `data/demo/` | Demo parser with a hidden crash (`original`), honest fix (`fixed`), demo crash input, public tests | S1 demo data |
@@ -59,7 +60,8 @@ file serves every version; the S13 guest did not change it (rebuilt file identic
 ## Design note: the contract checking the proof itself (Level 2, not built)
 
 Today the contract trusts its verifiers to check each receipt (Level 0). Level 2 would let the contract check a
-small proof itself. Nothing below is built; the gas figure is arithmetic on NEAR's configured prices, not a measurement.
+small proof itself. A spike contract does the check on testnet (`verifier/groth16-near`, EVIDENCE S6b); the bounty
+contract does not use it yet.
 
 **What would be checked.** RISC Zero can shrink a receipt into a Groth16 proof: three curve points (A, B, C) on the
 BN254 curve. Its verifier checks one standard Groth16 equation with five public numbers: the control root split into
@@ -84,8 +86,8 @@ NEAR's encoding with Ethereum's (EIP-196/197), and an official Groth16 verifier 
 pairing check 9.686 TGas plus 5.102 TGas per pair; multiexp 0.713 TGas plus 0.32 TGas per element; G1 sum 0.003 TGas
 plus 0.005 TGas per element. For one proof: 9.686 + 4 x 5.102 = 30.094 TGas, plus 0.713 + 5 x 0.32 = 2.313 TGas, plus a
 small G1 sum: about 32.4 TGas for the curve work, before the cost of running the contract code and reading the input.
-That is well under the 1,000 TGas a transaction may attach (docs.near.org, Gas). The real number needs a measured
-testnet call.
+That is well under the 1,000 TGas a transaction may attach (docs.near.org, Gas). Measured on testnet with the spike
+contract `verifier/groth16-near`: 34.569 Tgas burnt per call (EVIDENCE, S6b).
 
 **What would stay trusted.**
 - RISC Zero's Groth16 trusted setup ceremony and the verifying key built from it; RISC Zero's security model lists

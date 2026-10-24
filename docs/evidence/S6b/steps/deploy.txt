@@ -1,0 +1,29 @@
+$ near contract deploy kintsugi-g16-bkexe.testnet use-file target/near/kintsugi_groth16_spike/kintsugi_groth16_spike.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T21:03:38.973168520Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-g16-bkexe.testnet
+│    receiver_id:  kintsugi-g16-bkexe.testnet
+│    actions:
+│       -- deploy code <4X4ed5TFCVhcyHSTq6KXLDomHv8Fq919qv5ctGadKtt7> to a account <kintsugi-g16-bkexe.testnet>
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DaCFR9qkftW2Ey3AUz868cPjAPbWNM2Z2ciuDgVq1Jx3
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.880 Tgas
+│    Transaction fee: 0.0000879315455916 NEAR
+│    Transaction ID: ERq3KynSwJknoGucZU2EZhRnSrYSFFPN3qHeMBSFdd1D
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/ERq3KynSwJknoGucZU2EZhRnSrYSFFPN3qHeMBSFdd1D
+│     
+
+Contract code has been successfully deployed.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract deploy kintsugi-g16-bkexe.testnet use-file target/near/kintsugi_groth16_spike/kintsugi_groth16_spike.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=7.94

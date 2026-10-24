@@ -1,0 +1,7 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+create_s6b_account	create-account	faucet	9YyVb9bEWD4YAnHHUBnbGb6Cu4X68TiBXNxndMPSzdP6	-	-	0	3.71
+deploy	deploy	kintsugi-g16-bkexe.testnet	ERq3KynSwJknoGucZU2EZhRnSrYSFFPN3qHeMBSFdd1D	0.880 Tgas	0.0000879315455916	0	7.94
+s6b_real	verify_groth16	kintsugi-res2-prnvm.testnet	Drcc1yqpnRvqNpijG7yFAnum2JL7fEC8WqN5hJL8ZSEa	0.413 Tgas	0.000041239146842	0	5.4
+s6b_flipped_seal_bit	verify_groth16	kintsugi-res2-prnvm.testnet	27apv9ycc5tusMnkNZp4fhSxKiygsRv7rvyUpFsALAon	-	-	rpc:failed	-
+s6b_changed_journal	verify_groth16	kintsugi-res2-prnvm.testnet	8rNyroUjHytT6YBXiAVANibDWtwVS8z24vcsVPpmRKYA	0.413 Tgas	0.000041239146842	0	5.16
+s6b_wrong_image_id	verify_groth16	kintsugi-res2-prnvm.testnet	EstMiDDSzX6b32XSNBV6cBNc4r19qramBauAeSCPst7Q	0.413 Tgas	0.000041239146842	0	5.32

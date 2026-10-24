@@ -7,6 +7,9 @@
 //!   tamper  <in.bin> <out.bin> <journal|seal>   write a changed copy of a receipt, to show it no longer verifies
 //!   compress <in.bin> <out.bin> <succinct|groth16>   compress a receipt to one proof and time it
 //!                                      (groth16 needs Docker, or an NVIDIA GPU with the cuda feature)
+//!   groth16-args <groth16 receipt.bin> <out.json>   write the values a contract needs to check a Groth16 receipt:
+//!                                      the 256 byte seal, the image id, the journal, RISC Zero's control root and
+//!                                      BN254 control id, and the claim digest (for cross-checking), all in hex
 //!
 //! Options for execute and prove: --fuzz-count N (default 64), --variants N (default 32),
 //! --seed <64 hex chars> (default: the S1 demo seed), --succinct (prove only: compress to one succinct receipt),
@@ -39,6 +42,7 @@ fn main() -> ExitCode {
         Some("verify") => return verify(&args[1..]),
         Some("tamper") => tamper(&args[1..]),
         Some("compress") => compress(&args[1..]),
+        Some("groth16-args") => groth16_args(&args[1..]),
         None => hello("kintsugi".to_string()),
         Some(other) => Err(format!("unknown command {other}; see the comment at the top of host/src/main.rs")),
     };
@@ -353,5 +357,36 @@ fn tamper(args: &[String]) -> Result<(), String> {
     }
     std::fs::write(output, bincode::serialize(&receipt).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
     println!("wrote {output}");
+    Ok(())
+}
+
+/// Writes the values a contract needs to check a Groth16 receipt, as hex in a JSON file. The verifier parameters
+/// (control root, BN254 control id) are the ones `receipt.verify` uses by default, and the claim digest is RISC Zero's
+/// own, so a contract's computation can be compared with it.
+fn groth16_args(args: &[String]) -> Result<(), String> {
+    use risc0_zkvm::sha::Digestible;
+    let [input, out] = args else { return Err("usage: groth16-args <groth16 receipt.bin> <out.json>".into()) };
+    let receipt: Receipt = bincode::deserialize(&read(input)?).map_err(|e| format!("receipt does not decode: {e}"))?;
+    receipt.verify(CHECK_GUEST_ID).map_err(|e| format!("receipt does not verify: {e}"))?;
+    let groth16 = receipt.inner.groth16().map_err(|e| format!("not a Groth16 receipt: {e}"))?;
+    let ctx = risc0_zkvm::VerifierContext::default();
+    let params = ctx.groth16_verifier_parameters.as_ref().ok_or("no Groth16 verifier parameters")?;
+    let defaults = risc0_zkvm::Groth16ReceiptVerifierParameters::default();
+    let claim = risc0_zkvm::ReceiptClaim::ok(Digest::from(CHECK_GUEST_ID), receipt.journal.bytes.clone());
+    let hex = |b: &[u8]| b.iter().map(|x| format!("{x:02x}")).collect::<String>();
+    let json = format!(
+        "{{\"seal\":\"{}\",\"image_id\":\"{}\",\"journal\":\"{}\",\"control_root\":\"{}\",\"bn254_control_id\":\"{}\",\"claim_digest\":\"{}\",\"default_control_root\":\"{}\",\"default_bn254_control_id\":\"{}\"}}\n",
+        hex(&groth16.seal),
+        hex(Digest::from(CHECK_GUEST_ID).as_bytes()),
+        hex(&receipt.journal.bytes),
+        hex(params.control_root.as_bytes()),
+        hex(params.bn254_control_id.as_bytes()),
+        hex(claim.digest().as_bytes()),
+        hex(defaults.control_root.as_bytes()),
+        hex(defaults.bn254_control_id.as_bytes()),
+    );
+    std::fs::write(out, &json).map_err(|e| e.to_string())?;
+    println!("seal bytes: {}", groth16.seal.len());
+    println!("wrote {out}");
     Ok(())
 }
