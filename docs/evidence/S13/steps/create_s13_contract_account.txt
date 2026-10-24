@@ -1,0 +1,24 @@
+$ near account create-account sponsor-by-faucet-service kintsugi-s13-tlryo.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
+utc_start=2026-10-24T12:34:53.694260055Z
+Migrating config.toml from V4 to V5...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+├  Your transaction:
+│    signer_id:    testnet
+│    actions:
+│       -- create account:      kintsugi-s13-tlryo.testnet
+│       -- add access key:     
+│                       public key:   ed25519:CV6jjhtZVt3mV7JwCaWjHbX1cz5nfjRzXD29shutGHca
+│                       permission:   FullAccess
+│     
+├  Transaction Execution Info:
+│    Transaction ID: 69vjwmiwyH3J1oy9MiGkkAqSzB7KqmY3cBXBVeMBHe4s
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/69vjwmiwyH3J1oy9MiGkkAqSzB7KqmY3cBXBVeMBHe4s
+
+New account <kintsugi-s13-tlryo.testnet> created successfully.
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=3.57

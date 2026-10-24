@@ -1,0 +1,38 @@
+$ near contract call-function as-read-only kintsugi-s13-tlryo.testnet get_bounty json-args '{"bounty_id":"1"}' network-config testnet now
+{
+  "active": 3,
+  "amount": "500000000000000000000000",
+  "attempt_fee": "10000000000000000000000",
+  "attest_window_ns": "300000000000",
+  "commits": 4,
+  "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+  "created_at_ns": "1792856064118467600",
+  "expires_at_ns": "1792859664118467600",
+  "exploit_commitment": "9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387",
+  "fee_step": "5000000000000000000000",
+  "fees_collected": "70000000000000000000000",
+  "fees_swept": false,
+  "id": "1",
+  "image_id": "043ec633f68431f51b99cacd6a460560647a15916cdd0cb58762b61f9ede7f8d",
+  "max_commits": 3,
+  "max_patch_bytes": 1024,
+  "next_fee": "30000000000000000000000",
+  "opened": true,
+  "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+  "pending": 0,
+  "proof0_attestations": [
+    "kintsugi-ver1-prnvm.testnet",
+    "kintsugi-ver2-prnvm.testnet"
+  ],
+  "proof0_journal_hash": "fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5",
+  "proof0_receipt_hash": "14de49854482f0468dfc121a146841626590fe14de2d05b5ec0fb52a231f2c33",
+  "reference_fix_hash": "42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97",
+  "reveal_gap_ns": "2000000000",
+  "reveal_window_ns": "120000000000",
+  "state": "Open",
+  "vendor": "kintsugi-vendor-prnvm.testnet",
+  "verdict_window_ns": "600000000000",
+  "winner": null
+}
+
+

@@ -13,7 +13,7 @@
 //! --out <file> (prove only: receipt file, default target/s2/receipt.bin), --po2 N (segment size limit as a
 //! power of two, smaller uses less memory per segment; default: RISC Zero's default of 20), --profile (execute
 //! only: the guest prints its cycles per phase), --submission-id <64 hex> (the id the contract gives the submission,
-//! see `get_submission_id`; default all zeros).
+//! see `get_submission_id`; default all zeros), --proof0 (Proof 0 mode: the candidate is the vendor's reference fix).
 //! The bounty files are the demo files in data/demo/. Proving runs on this machine through the installed
 //! r0vm; nothing is sent to a remote prover.
 
@@ -81,6 +81,7 @@ struct Opts {
     po2: Option<u32>,
     profile: bool,
     submission_id: [u8; 32],
+    proof0: bool,
 }
 
 fn parse_opts(args: &[String]) -> Result<Opts, String> {
@@ -95,6 +96,7 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
         po2: None,
         profile: false,
         submission_id: [0u8; 32],
+        proof0: false,
     };
     let mut i = 1;
     while i < args.len() {
@@ -113,6 +115,11 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
             }
             "--profile" => {
                 opts.profile = true;
+                i += 1;
+                continue;
+            }
+            "--proof0" => {
+                opts.proof0 = true;
                 i += 1;
                 continue;
             }
@@ -142,6 +149,7 @@ fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
         variant_count: opts.variants,
         submission_id: opts.submission_id,
         profile: opts.profile,
+        mode: if opts.proof0 { kintsugi_check::zk::MODE_PROOF0 } else { kintsugi_check::zk::MODE_CHECK },
     })
 }
 

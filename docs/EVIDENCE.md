@@ -5,6 +5,75 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S13: Attack pass on the hardened contract and checker
+
+Question: do the S13 guards hold on testnet against the attacks listed in docs/SECURITY.md? Contract
+`kintsugi-s13-tlryo.testnet` (wasm SHA-256 `faddf08d...4f95`, `docs/evidence/S13/contract_wasm.txt`), checker guest image
+id `043ec633...7f8d`. Script `./scripts/s13_attacks.sh <phase>`; every transaction is in
+`docs/evidence/S13/transactions.tsv` and `docs/evidence/S13/steps/`.
+
+**Verdict: PASS (2026-10-24).** Every attack below is blocked on testnet, except attack 3, which is an accepted risk
+(reasoning in its own subsection). Two weaknesses found while reading the code before this pass were fixed first
+(docs/SECURITY.md, changelog): an over-long secret that made every bounty unfixable, and junk commits holding the K slots
+for ever.
+
+Unit tests (`docs/evidence/S13/unit_tests.txt`): `cargo test -p kintsugi-check --offline` (6 and 13 passed, including
+3 new S13 tests), `cargo test -p kintsugi-contract --offline` (59 passed, including 11 new S13 tests), and
+`cargo build --release -p kintsugi-host` (exit 0).
+
+Proofs (measured with `scripts/s2_measure.sh`, segment size 2^19, 16 fairness inputs, 32 crash variants):
+
+| Proof | Command | Prove time, peak memory | Compress to succinct | Result |
+|---|---|---|---|---|
+| Proof 0 (vendor's reference fix) | `./scripts/s13_attacks.sh proof0` (`prove_proof0.log`, `compress_proof0.log`) | 4,983.54 s, 4,732 MiB | 1,273.92 s, 1,487 MiB | VALID, PASS, image id `043ec633...7f8d` (`verify_proof0.txt`) |
+| Bounty A, researcher 1's fix | `./scripts/s13_attacks.sh prove_a` (`prove_a.log`, `compress_a.log`) | 3,031.98 s, 4,725 MiB | 1,048.19 s, 1,483 MiB | VALID, PASS, submission id equals `get_submission_id` (`verify_a.txt`) |
+
+Proof 0 took longer than a researcher's proof: it is the same check, plus the guest's Proof 0 mode; why it took 64% more
+time was not measured. Both receipts are 224,786 bytes after compression.
+
+| # | Attack | Phase (log in `docs/evidence/S13/`) | What happened | Result |
+|---|---|---|---|---|
+| 1 | Unfixable bounty: a 300 byte secret (limit 256) makes every patch fail | `open` (`atk1_unfixable_native.txt`, `open_run.txt`) | Proof 0 with the reference fix refuses it: "exploit too long: 300 bytes, at most 256 allowed"; with the real secret, PASS. A commit before two Proof 0 attestations: "bounty is not open: Proof 0 needs two verifier attestations" (tx `EyrXqFFULpbNr1B1GjzY23Ps6hiSeL45pzs7kcynmjG6`) | blocked (guard added in S13) |
+| 2 | Junk commits fill the K slots for ever | `misc` (`misc_run.txt`) | Release before the reveal window closes: "reveal window has not closed" (tx `ChBJcD4PdwyhrzXRrQnESTaYfaBjYcC9Gt6kCVUx7TSc`); after it, `release_unrevealed` freed a slot (tx `GJSN5P1dhRRK7ktaarKCY4XaPsJXdfYytsX6M1Yex1rZ`) and a new commit fitted (tx `7kBnwJH6DTAsxKfHvg46TSbhu1imiVpcxRU4r8DQgq3W`) | blocked (guard added in S13) |
+| 3 | Sub-accounts of one researcher fill K | `misc` | Allowed, each pays the rising fee; see the subsection below | accepted risk |
+| 4 | The vendor replays bounty A's PASS receipt for a new submission on bounty B | `bounty_b` (`bounty_b_run.txt`, `steps/atk4_check.txt`) | The verifier check fails on "journal submission id = contract submission id" and "journal seed = seed recorded at reveal"; no attestation; after the window the researcher was paid 0.5 NEAR by timeout (tx `GKBtL4nK5X5Btci4sn6mKswa7Bos1NQ2LcsLUK5MEJKr`) | blocked |
+| 5 | A third verifier attests PASS while the vendor posted FAIL | `attack_a` (`attack_a_run.txt`) | "attestation does not match the posted verdict" (tx `QRaDTjR6LP25F4qXFWHftuV7jobRw4bvMnAim8NZMMK`) | blocked |
+| 6 | An unregistered account attests Proof 0 | `misc` | "caller is not a registered verifier" (tx `B8bPiAkv2ScPECg2GRUDwRTzXqsUZa1f9MVoKrQhriZf`) | blocked |
+| 7 | The same verifier attests Proof 0 twice | `misc` | Bounty D stays closed; one attestation recorded (txs `877nL69v68Ez5MyWgJtEgzupWofiBkoVi8abyRa8ckHW`, `B538b9MfGNGT8j8epqXoQrfXwNLY1VCF3yb8m9r1BmU8`) | blocked |
+| 8 | Timeout or expire too early, or again after payout | `bounty_b`, `attack_a` | "bounty has not expired" (tx `Fooh4qPGP1LoxcACL9qQDb3DMD4SUdiKaTW3vt5qrwos`); "deadline has not passed" (tx `As3Fjbq7Tp34GXywL5SCFamCY8qUsXZHSm7S1BisRW1L`); after payout "bounty is closed" (tx `9bMb4swFQ7QaQbyHYMAMhoaYg1kv4fvapwSWc8tNKEMB`) and "nothing to do: bounty already closed and fees already swept" (`steps/atk8_expire_late_after_payout.txt`; the script used the plain call wrapper there, so no tx id was recorded) | blocked |
+| 9 | A receipt made by another checker program (the S4 receipt, image id `3edbc2e6...`) | `bounty_b` (`steps/atk9_check.txt`) | Fails "receipt verifies with the checker's image id"; every later check fails with it | blocked |
+| 10 | A reveal that does not match its commit | `misc` | "fingerprint does not match" (tx `CKDTYfF4gtBrtV12BbxZMpxXkhcexGmogs1ZGZctjmqV`) | blocked |
+| 11 | The vendor posts FAIL for a fix whose real receipt says PASS | `attack_a` | Vendor's FAIL posted (tx `2nRfsMdmwuh63CYBZtJA3X8Wfmhchxeit9FXGyft7bRy`); both verifiers refuse on "journal verdict = posted verdict"; after the window a timeout claim (tx `Embs5uMx85QXqUHzkVMURnGcae8NBCJBb5c9Z6eaKWNN`) paid researcher 1: balance +0.51 NEAR = 0.5 NEAR bounty + own 0.01 NEAR fee refunded | blocked: the researcher is paid by default |
+
+Mistake on the way: the first `open` run picked a vendor account that does not exist (settings files loaded in the
+wrong order in `scripts/s13_attacks.sh`); it stopped at `create_bounty` before any transaction; fixed and rerun.
+
+### Attack 3: one researcher's sub-accounts fill the K slots
+
+Run: `./scripts/s13_attacks.sh misc` (`docs/evidence/S13/misc_run.txt`), bounty C with K = 3, `attempt_fee`
+10000000000000000000000 yoctoNEAR (0.01 NEAR), `fee_step` 5000000000000000000000 (0.005 NEAR), reveal window 120 s
+(read back with `get_bounty`, `docs/evidence/S13/bounty_c_after_misc.txt`).
+
+- `kintsugi-res2-prnvm.testnet` and its sub-accounts `sa.` and `sb.` committed junk and took all 3 slots, paying 0.01,
+  0.015 and 0.02 NEAR (the `fee` field of each `committed` event, `steps/atk2_junk_commit_*.txt`). A fourth commit by
+  another account was ignored ("max_commits reached") and charged nothing.
+- After the reveal window, `release_unrevealed` freed a slot and a new commit fitted; it paid 0.025 NEAR, because the fee
+  counts all commits so far (`commits` = 4) and never goes down. `fees_collected` = 0.07 NEAR = 0.01 + 0.015 + 0.02 +
+  0.025, as the formula says.
+- The rule in the code (`contract/src/lib.rs`, `next_fee` and `commit`): the n-th counted commit costs
+  `attempt_fee + n * fee_step`; a commit is ignored, and not charged, while `active` (slots in use) is K; only
+  `release_unrevealed` lowers `active`, and only for a commit that was never revealed.
+
+Cost to block one bounty for one full reveal window with these settings: K slots at n = 0, 1, 2 cost
+0.01 + 0.015 + 0.02 = **0.045 NEAR**, all kept by the contract (swept to the verifiers). Holding the slots for the next
+window costs 0.025 + 0.03 + 0.035 = 0.09 NEAR; window w (from 0) costs 0.045 + 0.045 w NEAR, so W windows in a row cost
+0.0225 W (W + 1) NEAR (10 windows: 2.475 NEAR). The cost does not depend on how long the window is; the vendor sets K,
+both fees and the window.
+
+K is per bounty and counts every committer together, so sub-accounts cannot raise the total leak above K bits: at most K
+submissions per bounty are ever revealed and get a verdict, and each verdict leaks at most one bit. **Verdict: accepted
+risk**, for that reason and because blocking costs more with every window.
+
 ## OutLayer (Level 1) on testnet: why did no worker answer?
 
 Question: in S4 our OutLayer jobs (requests 5607 and 5608) were accepted by `outlayer.testnet` but ended about 120 s later

@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-s13-tlryo.testnet attest json-args '{"bounty_id":"0","index":0,"verdict":"PASS","journal_hash":"c322c169d085bedd775aaa3de8fdfa66a69afeb5845d5f0236044b57662b632d","receipt_hash":"7bb89b7655880ae2b45c5f9c89a461af65198daa313fea5e42172cb3e0d1a104"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-ver3-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T16:09:32.967488120Z
+{
+ "tx_hash": "QRaDTjR6LP25F4qXFWHftuV7jobRw4bvMnAim8NZMMK",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: attestation does not match the posted verdict'}}}}",
+ "total_gas_burnt": 2143192142633,
+ "logs": [],
+ "wall_seconds": 4.708,
+ "rpc_error": null
+}

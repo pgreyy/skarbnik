@@ -3,13 +3,16 @@
 //! tool, and commits a journal with hashes, the seed, the counts and PASS or FAIL. The secret crash
 //! input and the salt never leave the guest; only sha256(salt || exploit) is published.
 //! With `profile` set in the input it also prints where its cycles went (to standard output, not
-//! the journal).
+//! the journal). In Proof 0 mode the candidate is the vendor's reference fix: the guest checks that the
+//! original really crashes on the secret and passes the tests, and that the reference fix passes the full
+//! check, and sets the journal's submission id to sha256("kintsugi-proof0-v1" || fix hash) itself.
 
 use kintsugi_check::zk::{
-    corpus_bytes, exploit_commitment_bytes, test_cases, GuestInput, Journal, VERDICT_FAIL, VERDICT_PASS,
+    corpus_bytes, exploit_commitment_bytes, proof0_submission_bytes, test_cases, GuestInput, Journal, MODE_CHECK,
+    MODE_PROOF0, VERDICT_FAIL, VERDICT_PASS,
 };
 use kintsugi_check::exec::profile;
-use kintsugi_check::{check, Bounty, Limits, Round, Verdict};
+use kintsugi_check::{check, proof0_with_reference, Bounty, Limits, Round, Verdict};
 use risc0_zkvm::guest::env;
 use risc0_zkvm::sha::{Impl, Sha256};
 
@@ -35,18 +38,28 @@ fn main() {
         fuzz_count: input.fuzz_count,
         variant_count: input.variant_count,
     };
-    let verdict = check(&input.candidate, &bounty, &round, &Limits::default());
+    let candidate_hash = sha256(&input.candidate);
+    let proof0_id = sha256(&proof0_submission_bytes(&candidate_hash));
+    let (verdict, submission_id) = match input.mode {
+        MODE_PROOF0 => (proof0_with_reference(&bounty, &round, &Limits::default(), &input.candidate).verdict, proof0_id),
+        MODE_CHECK => {
+            // A normal check may never carry the id reserved for Proof 0, so a check cannot pose as one.
+            assert!(input.submission_id != proof0_id, "submission id is reserved for Proof 0");
+            (check(&input.candidate, &bounty, &round, &Limits::default()), input.submission_id)
+        }
+        _ => panic!("unknown mode"),
+    };
     let c_check = env::cycle_count();
 
     let journal = Journal {
-        candidate_hash: sha256(&input.candidate),
+        candidate_hash,
         original_hash: sha256(&input.original),
         exploit_commitment: sha256(&exploit_commitment_bytes(&input.salt, &input.exploit)),
         corpus_hash: sha256(&corpus_bytes(&input.public_tests)),
         fuzz_seed: input.fuzz_seed,
         fuzz_count: input.fuzz_count,
         variant_count: input.variant_count,
-        submission_id: input.submission_id,
+        submission_id,
         verdict: match verdict {
             Verdict::Pass => VERDICT_PASS,
             Verdict::Fail => VERDICT_FAIL,

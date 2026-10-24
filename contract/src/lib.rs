@@ -13,6 +13,14 @@
 //! 5. `attest`: registered verifiers confirm the same verdict, journal hash and receipt hash. The verdict
 //!    is final only with attestations from two different registered verifiers. A final PASS pays the
 //!    researcher's payout account and closes the bounty; a final FAIL spends that attempt.
+//! Guards added in spike S13 (attack pass):
+//! - Proof 0 before any attempt: a new bounty is created closed. It opens for commits only after two
+//!   different registered verifiers attest its Proof 0 (`attest_proof0`): a proof that the original really
+//!   crashes on the committed secret AND that the vendor's reference fix (whose sha256 is fixed at creation)
+//!   passes the full check. This stops a bounty whose secret no patch can ever fix.
+//! - Junk commits: each commit must be revealed within `reveal_window_ns`. After that, anyone may call
+//!   `release_unrevealed` to free its slot. K counts slots in use; the fee of a released commit is kept.
+//! - The winning researcher's own attempt fee is refunded with the payout.
 //! 6. `claim_timeout`: anyone may call it once the deadline has passed with no final verdict; it pays the
 //!    researcher. `expire`: anyone may call it after the bounty's expiry; if nothing was paid it refunds
 //!    the vendor, and it sends the bounty's collected attempt fees to the registered verifiers.
@@ -134,6 +142,8 @@ pub enum Outcome {
     Failed,
     /// Deadline passed without a final verdict: the payout account was paid.
     TimedOut,
+    /// Not revealed within the reveal window; its slot was freed by `release_unrevealed`.
+    Released,
 }
 
 #[near(serializers = [borsh])]
@@ -164,6 +174,17 @@ pub struct Bounty {
     /// Attempt fees taken so far, held by the contract until `expire` sends them to the verifiers.
     fees_collected: NearToken,
     fees_swept: bool,
+    /// sha256 of the vendor's reference fix, fixed at creation; Proof 0 must show it passes.
+    reference_fix_hash: [u8; 32],
+    /// Hashes of the Proof 0 journal and receipt that verifiers attest before the bounty opens.
+    proof0_journal_hash: [u8; 32],
+    proof0_attestations: Vec<AccountId>,
+    /// True once two different registered verifiers attested Proof 0. Commits need it.
+    opened: bool,
+    /// A commit must be revealed within this many nanoseconds, or its slot can be released.
+    reveal_window_ns: u64,
+    /// Slots in use (committed and not released). K (max_commits) applies to this.
+    active: u32,
 }
 
 #[near(serializers = [borsh])]
@@ -187,6 +208,8 @@ pub struct Submission {
     verdict: Option<PostedVerdict>,
     attestations: Vec<AccountId>,
     outcome: Outcome,
+    /// The attempt fee this commit paid (refunded to the payout account if this submission is paid).
+    fee: NearToken,
 }
 
 #[near(serializers = [borsh])]
@@ -223,6 +246,12 @@ pub struct BountyView {
     pub fees_swept: bool,
     /// The fee the next counted commit will cost.
     pub next_fee: U128,
+    pub reference_fix_hash: String,
+    pub proof0_journal_hash: String,
+    pub proof0_attestations: Vec<AccountId>,
+    pub opened: bool,
+    pub reveal_window_ns: U64,
+    pub active: u32,
 }
 
 /// JSON view of a submission.
@@ -246,6 +275,8 @@ pub struct SubmissionView {
     pub outcome: Outcome,
     /// After this time (if the outcome is still Open) anyone may call `claim_timeout`.
     pub deadline_ns: Option<U64>,
+    /// The attempt fee this commit paid, in yoctoNEAR.
+    pub fee: U128,
 }
 
 #[near(serializers = [json])]
@@ -410,6 +441,9 @@ impl Contract {
         expiry_ns: U64,
         attempt_fee: U128,
         fee_step: U128,
+        reference_fix_hash: String,
+        proof0_journal_hash: String,
+        reveal_window_ns: U64,
     ) -> U64 {
         let vendor = env::predecessor_account_id();
         let amount = env::attached_deposit();
@@ -419,6 +453,7 @@ impl Contract {
         require!((1..=MAX_PATCH_BYTES_CAP).contains(&max_patch_bytes), "max_patch_bytes must be 1 to 4096");
         require!(verdict_window_ns.0 > 0 && attest_window_ns.0 > 0 && expiry_ns.0 > 0, "windows must be above zero");
         require!(attempt_fee.0 > 0, "attempt_fee must be above zero");
+        require!(reveal_window_ns.0 > reveal_gap_ns.0, "reveal_window_ns must be longer than reveal_gap_ns");
         let now = env::block_timestamp();
         let bounty = Bounty {
             vendor: vendor.clone(),
@@ -443,6 +478,12 @@ impl Contract {
             fee_step: NearToken::from_yoctonear(fee_step.0),
             fees_collected: NearToken::from_yoctonear(0),
             fees_swept: false,
+            reference_fix_hash: parse_hash("reference_fix_hash", &reference_fix_hash),
+            proof0_journal_hash: parse_hash("proof0_journal_hash", &proof0_journal_hash),
+            proof0_attestations: Vec::new(),
+            opened: false,
+            reveal_window_ns: reveal_window_ns.0,
+            active: 0,
         };
         let id = self.next_bounty_id;
         self.next_bounty_id += 1;
@@ -504,7 +545,8 @@ impl Contract {
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(now < bounty.expires_at_ns, "bounty has expired");
         require!(committer != bounty.vendor, "the vendor cannot commit to its own bounty");
-        if bounty.commits >= bounty.max_commits {
+        require!(bounty.opened, "bounty is not open: Proof 0 needs two verifier attestations");
+        if bounty.active >= bounty.max_commits {
             emit("commit_ignored", json!({ "bounty_id": bounty_id, "committer": committer, "reason": "max_commits reached" }));
             return None;
         }
@@ -515,6 +557,7 @@ impl Contract {
         bounty.fees_collected = bounty.fees_collected.saturating_add(fee);
         let index = bounty.commits;
         bounty.commits += 1;
+        bounty.active += 1;
         emit(
             "committed",
             json!({ "bounty_id": bounty_id, "index": index, "committer": committer, "payout": payout, "fingerprint": to_hex(&fp), "fee": U128(fee.as_yoctonear()) }),
@@ -533,6 +576,7 @@ impl Contract {
                 verdict: None,
                 attestations: Vec::new(),
                 outcome: Outcome::Open,
+                fee,
             },
         );
         Some(index)
@@ -552,6 +596,8 @@ impl Contract {
             .unwrap_or_else(|| env::panic_str("no such submission"));
         require!(env::predecessor_account_id() == sub.committer, "only the committer can reveal");
         require!(sub.revealed_at_ns.is_none(), "already revealed");
+        require!(sub.outcome == Outcome::Open, "this commit was released");
+        require!(now <= sub.committed_at_ns.saturating_add(bounty.reveal_window_ns), "reveal window has closed");
         require!(now >= sub.committed_at_ns.saturating_add(bounty.reveal_gap_ns), "reveal gap has not passed");
         let bytes = patch.0;
         require!(!bytes.is_empty(), "patch is empty");
@@ -602,7 +648,57 @@ impl Contract {
         U128(left.as_yoctonear())
     }
 
+    /// Anyone, after the reveal window of a commit that was never revealed: frees its slot (K counts slots in
+    /// use). The attempt fee is kept. Returns the number of slots now in use.
+    pub fn release_unrevealed(&mut self, bounty_id: U64, index: u32) -> u32 {
+        let now = env::block_timestamp();
+        let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        let sub = self
+            .submissions
+            .get_mut(&(bounty_id.0, index))
+            .unwrap_or_else(|| env::panic_str("no such submission"));
+        require!(sub.outcome == Outcome::Open, "this submission is already final or released");
+        require!(sub.revealed_at_ns.is_none(), "a revealed submission cannot be released");
+        require!(now > sub.committed_at_ns.saturating_add(bounty.reveal_window_ns), "reveal window has not closed");
+        sub.outcome = Outcome::Released;
+        bounty.active = bounty.active.saturating_sub(1);
+        emit("released", json!({ "bounty_id": bounty_id, "index": index, "active": bounty.active, "caller": env::predecessor_account_id() }));
+        bounty.active
+    }
+
     // ---------- verifiers ----------
+
+    /// A registered verifier (never the vendor) confirms the bounty's Proof 0: it checked the Proof 0 receipt
+    /// (its sha256 is `proof0_receipt_hash`) and journal (`proof0_journal_hash`): mode Proof 0, the candidate is
+    /// the reference fix (`reference_fix_hash`), verdict PASS, and the image id, exploit commitment, corpus and
+    /// original hashes equal the bounty's. Two different verifiers open the bounty. Returns "recorded",
+    /// "duplicate" or "opened".
+    pub fn attest_proof0(&mut self, bounty_id: U64, journal_hash: String, receipt_hash: String) -> String {
+        let verifier = env::predecessor_account_id();
+        require!(self.verifiers.contains_key(&verifier), "caller is not a registered verifier");
+        let journal = parse_hash("journal_hash", &journal_hash);
+        let receipt = parse_hash("receipt_hash", &receipt_hash);
+        let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        require!(bounty.state == BountyState::Open, "bounty is closed");
+        require!(verifier != bounty.vendor, "the vendor cannot attest");
+        require!(!bounty.opened, "bounty is already open");
+        require!(
+            bounty.proof0_journal_hash == journal && bounty.proof0_receipt_hash == receipt,
+            "attestation does not match the bounty's Proof 0"
+        );
+        if bounty.proof0_attestations.contains(&verifier) {
+            emit("proof0_attest_duplicate", json!({ "bounty_id": bounty_id, "verifier": verifier }));
+            return "duplicate".to_string();
+        }
+        bounty.proof0_attestations.push(verifier.clone());
+        emit("proof0_attested", json!({ "bounty_id": bounty_id, "verifier": verifier, "count": bounty.proof0_attestations.len() }));
+        if bounty.proof0_attestations.len() < ATTESTATIONS_TO_FINALIZE {
+            return "recorded".to_string();
+        }
+        bounty.opened = true;
+        emit("bounty_opened", json!({ "bounty_id": bounty_id }));
+        "opened".to_string()
+    }
 
     /// A registered verifier confirms the posted verdict, journal hash and receipt hash. The verdict
     /// becomes final with matching attestations from two different registered verifiers; a repeat
@@ -783,7 +879,8 @@ impl Contract {
                     "paid",
                     json!({ "bounty_id": bounty_id, "index": index, "reason": "final_pass", "to": sub.payout, "amount": U128(bounty.amount.as_yoctonear()) }),
                 );
-                Promise::new(sub.payout.clone()).transfer(bounty.amount).detach();
+                bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
+                Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
                 "final_pass".to_string()
             }
             Verdict::Fail => {
@@ -817,7 +914,8 @@ impl Contract {
             "paid",
             json!({ "bounty_id": bounty_id, "index": index, "reason": "timeout", "to": sub.payout, "amount": U128(bounty.amount.as_yoctonear()), "caller": env::predecessor_account_id() }),
         );
-        Promise::new(sub.payout.clone()).transfer(bounty.amount).detach();
+        bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
+        Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
     }
 
     /// Anyone. After the bounty's expiry: if nothing was paid and no revealed submission is still waiting
@@ -903,6 +1001,12 @@ impl Contract {
             fees_collected: U128(b.fees_collected.as_yoctonear()),
             fees_swept: b.fees_swept,
             next_fee: U128(b.next_fee().as_yoctonear()),
+            reference_fix_hash: to_hex(&b.reference_fix_hash),
+            proof0_journal_hash: to_hex(&b.proof0_journal_hash),
+            proof0_attestations: b.proof0_attestations.clone(),
+            opened: b.opened,
+            reveal_window_ns: U64(b.reveal_window_ns),
+            active: b.active,
         })
     }
 
@@ -926,6 +1030,7 @@ impl Contract {
             verdict_posted_at_ns: s.verdict.as_ref().map(|v| U64(v.posted_at_ns)),
             attestations: s.attestations.clone(),
             outcome: s.outcome,
+            fee: U128(s.fee.as_yoctonear()),
             deadline_ns: s.deadline_ns(bounty).map(U64),
         })
     }

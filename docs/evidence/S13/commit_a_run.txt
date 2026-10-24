@@ -1,0 +1,2 @@
+== a_r1_commit (commit by kintsugi-res1-prnvm.testnet): exit=0 tx=6GrYma7mw8PT1V2odSPrDJrDZrpS5Wjw78qjiFVq3kTt gas=0.315 Tgas
+== a_r1_reveal (reveal by kintsugi-res1-prnvm.testnet): exit=0 tx=7y9HmLz97HfF5GVwY8ob2Pf5KVP53akCNdXY6ETvH4pL gas=0.350 Tgas

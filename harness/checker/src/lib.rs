@@ -83,6 +83,10 @@ pub enum Reason {
     OriginalDoesNotCrash(Outcome),
     OriginalOnlyRanOutOfFuel,
     OriginalFailsPublicTest { index: usize, expected: i32, actual: Outcome },
+    /// The secret input is longer than any module may be given, so every candidate would "crash" on it.
+    ExploitTooLong { len: usize, max: usize },
+    /// The vendor's reference fix does not pass the full check, so the bounty may be unfixable.
+    ReferenceFixFails(Box<Reason>),
 }
 
 impl Reason {
@@ -98,6 +102,8 @@ impl Reason {
             Reason::OriginalDoesNotCrash(_) => "proof0: no crash",
             Reason::OriginalOnlyRanOutOfFuel => "proof0: only out of fuel",
             Reason::OriginalFailsPublicTest { .. } => "proof0: public tests",
+            Reason::ExploitTooLong { .. } => "proof0: exploit too long",
+            Reason::ReferenceFixFails(_) => "proof0: reference fix fails",
         }
     }
 }
@@ -223,6 +229,11 @@ pub fn check_report(candidate: &[u8], bounty: &Bounty, round: &Round, limits: &L
 /// is genuine.
 pub fn proof0_report(bounty: &Bounty, limits: &Limits) -> Report {
     let mut stats = Stats::default();
+    // An over-long secret input is refused for every module before it runs, which would look like a crash
+    // for every patch: such a bounty could never be fixed.
+    if bounty.exploit.len() > limits.max_input_len {
+        return fail(Reason::ExploitTooLong { len: bounty.exploit.len(), max: limits.max_input_len }, stats);
+    }
     let original = match Loaded::load(bounty.original, limits) {
         Ok(m) => m,
         Err(e) => return fail(Reason::OriginalInvalid(e), stats),
@@ -250,4 +261,25 @@ pub fn proof0_report(bounty: &Bounty, limits: &Limits) -> Report {
         }
     }
     Report { verdict: Verdict::Pass, reason: None, stats }
+}
+
+/// Proof 0 with a reference fix (guard against unfixable bounties): the original must really crash on the
+/// secret and pass the public tests, and the vendor's own reference fix must pass the full check (secret,
+/// public tests, fairness inputs, variants). This shows that a fix exists before researchers spend attempts.
+pub fn proof0_with_reference(bounty: &Bounty, round: &Round, limits: &Limits, reference_fix: &[u8]) -> Report {
+    let first = proof0_report(bounty, limits);
+    if first.verdict == Verdict::Fail {
+        return first;
+    }
+    let fix = check_report(reference_fix, bounty, round, limits);
+    let mut stats = first.stats.clone();
+    stats.runs += fix.stats.runs;
+    stats.max_fuel_candidate = fix.stats.max_fuel_candidate;
+    match fix.verdict {
+        Verdict::Pass => Report { verdict: Verdict::Pass, reason: None, stats },
+        Verdict::Fail => {
+            let why = fix.reason.unwrap_or(Reason::CandidateInvalid(LoadError::DoesNotParse("unknown".into())));
+            fail(Reason::ReferenceFixFails(Box::new(why)), stats)
+        }
+    }
 }

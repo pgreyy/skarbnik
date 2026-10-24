@@ -1,0 +1,10 @@
+$ target/debug/kintsugi-check proof0 --exploit target/s13/overlong_exploit.hex --reference-fix data/demo/fixed.wasm --seed <S1 seed> --fuzz-count 16 --variants 32
+proof0: FAIL
+reason (internal): proof0: exploit too long: 300 bytes, at most 256 allowed
+stats: runs=0 max_fuel_candidate=0 max_fuel_original=0 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+exit=1
+$ target/debug/kintsugi-check proof0 --reference-fix data/demo/fixed.wasm --seed <S1 seed> --fuzz-count 16 --variants 32   (the real secret)
+proof0: PASS
+reason (internal): -
+stats: runs=132 max_fuel_candidate=1625 max_fuel_original=722 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+exit=0

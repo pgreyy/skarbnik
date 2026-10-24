@@ -1,0 +1,14 @@
+== b_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=12RDbRf7df5byDjAy1DGTYp4Chd4kJ2xPkjBWzWwHetK gas=0.351 Tgas
+== b_attest_proof0_kintsugi-ver1-prnvm (attest_proof0 by kintsugi-ver1-prnvm.testnet): exit=0 tx=3SjdxnvYubhrtuyRQs6j3q1v6VbCq2RhcimQqm6yQayo gas=0.318 Tgas
+== b_attest_proof0_kintsugi-ver2-prnvm (attest_proof0 by kintsugi-ver2-prnvm.testnet): exit=0 tx=42xQQWWSyPyTf4EvKHwJD7UVcSAAXvtiotgTZzTEYJ12 gas=0.318 Tgas
+== b_r2_commit (commit by kintsugi-res2-prnvm.testnet): exit=0 tx=FquY9KtEdpB7n17Q3oFFWBXos49gDU2K5SQWySYqrGN1 gas=0.315 Tgas
+== b_r2_reveal (reveal by kintsugi-res2-prnvm.testnet): exit=0 tx=CszHaDmLk5TF9iYkfkiF5GdhqisgoauM9EzhWe7nhvps gas=0.350 Tgas
+== atk4_vendor_replays_receipt_a (post_verdict by kintsugi-vendor-prnvm.testnet): exit=0 tx=9omNdEtNDB1RMtoaQ4AHeDXfjEE5dB13Uw8CfFhFfKrg gas=0.319 Tgas
+atk4: verifier refuses the replayed receipt (FAIL journal submission id = contract submission id;FAIL journal seed = seed recorded at reveal;)
+atk9: verifier refuses a receipt of another program (FAIL receipt verifies with the checker's image id (VALID);FAIL journal exploit commitment = bounty commitment;FAIL journal corpus hash = bounty corpus hash;)
+== atk8_expire_early (expire by kintsugi-res1-prnvm.testnet, expected to fail): outcome=failed tx=Fooh4qPGP1LoxcACL9qQDb3DMD4SUdiKaTW3vt5qrwos
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: bounty has not expired'}}}}"
+== b_claim_timeout (claim_timeout by kintsugi-res1-prnvm.testnet): exit=0 tx=GKBtL4nK5X5Btci4sn6mKswa7Bos1NQ2LcsLUK5MEJKr gas=0.310 Tgas
+== atk8_expire_late_after_payout (expire by kintsugi-res1-prnvm.testnet): exit=1 tx=- gas=-
+bounty B after expire: {'state': 'Paid', 'fees_collected': '0', 'fees_swept': False}
+bounty_b_exit=0

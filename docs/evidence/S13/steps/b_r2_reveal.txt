@@ -1,0 +1,47 @@
+$ near contract call-function as-transaction kintsugi-s13-tlryo.testnet reveal json-args {"bounty_id":"3","index":0,"patch":"AGFzbQEAAAABCgJgAAF/YAF/AX8DAwIAAQUEAQECAgceAwZtZW1vcnkCAAlpbnB1dF9idWYAAAVwYXJzZQABCuoDAggAQYDAgIAAC94DAQl/AkAgAEGAAk0NAEF/DwtBxbvyiHghAUEAIQJBACEDAkADQAJAIAAgAksNACABIANzQZODgAhsQf////8HcSEEDAILQX8hBCAAIAJrQQJJDQEgACACQQJqIgVrIAItAIHAgIAAIgZJDQECQAJAIAUgBmoiByAASw0AIAVBgMCAgABqIQUgASACLQCAwICAACIIc0GTg4AIbCEJQX4hBAJAAkACQAJAIAhBf2oOAwADAQcLIAZBe2pB/wFxQfwBTw0BQX0PC0F8IQQgBkUNBSAFLQAAIgVBAXQgBk8NBSACQYTAgIAAaiEEIAZBAXYhAiAJIAVzIQEgBkF/akEBdiEGA0AgAUGTg4AIbCEBIAVFDQQgAkUNAyAGRQ0DIAVBf2ohBSACQX9qIQIgBkF/aiEGIARBf2ovAAAgAXMhASAEQQJqIQQMAAsLIAZBA3QhAkEAIQFBACEGAkADQCACIAFGDQEgBS0AACABQRhxdCAGciEGIAFBCGohASAFQQFqIQUMAAsLIAYgCXNBk4OACGwhAQwCCyAJIAZzIQEDQCABQZODgAhsIQEgBkUNAiAGQX9qIQYgASAFLQAAcyEBIAVBAWohBQwACwsACyADQQFqIQMgByECDAALCyAECw==","nonce":"04d45c2acc7bc3abca44f88b14081383790adcc466bc10e2c81c0639636d7d2b"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T15:39:12.356968766Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-s13-tlryo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  reveal
+│                       args:         {
+│                                       "bounty_id": "3",
+│                                       "index": 0,
+│                                       "nonce": "04d45c2acc7bc3abca44f88b14081383790adcc466bc10e2c81c0639636d7d2b",
+│                                       "patch": "AGFzbQEAAAABCgJgAAF/YAF/AX8DAwIAAQUEAQECAgceAwZtZW1vcnkCAAlpbnB1dF9idWYAAAVwYXJzZQABCuoDAggAQYDAgIAAC94DAQl/AkAgAEGAAk0NAEF/DwtBxbvyiHghAUEAIQJBACEDAkADQAJAIAAgAksNACABIANzQZODgAhsQf////8HcSEEDAILQX8hBCAAIAJrQQJJDQEgACACQQJqIgVrIAItAIHAgIAAIgZJDQECQAJAIAUgBmoiByAASw0AIAVBgMCAgABqIQUgASACLQCAwICAACIIc0GTg4AIbCEJQX4hBAJAAkACQAJAIAhBf2oOAwADAQcLIAZBe2pB/wFxQfwBTw0BQX0PC0F8IQQgBkUNBSAFLQAAIgVBAXQgBk8NBSACQYTAgIAAaiEEIAZBAXYhAiAJIAVzIQEgBkF/akEBdiEGA0AgAUGTg4AIbCEBIAVFDQQgAkUNAyAGRQ0DIAVBf2ohBSACQX9qIQIgBkF/aiEGIARBf2ovAAAgAXMhASAEQQJqIQQMAAsLIAZBA3QhAkEAIQFBACEGAkADQCACIAFGDQEgBS0AACABQRhxdCAGciEGIAFBCGohASAFQQFqIQUMAAsLIAYgCXNBk4OACGwhAQwCCyAJIAZzIQEDQCABQZODgAhsIQEgBkUNAiAGQX9qIQYgASAFLQAAcyEBIAVBAWohBQwACwsACyADQQFqIQMgByECDAALCyAECw=="
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.350 Tgas
+│    Transaction fee: 0.0000349210546045 NEAR
+│    Transaction ID: CszHaDmLk5TF9iYkfkiF5GdhqisgoauM9EzhWe7nhvps
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/CszHaDmLk5TF9iYkfkiF5GdhqisgoauM9EzhWe7nhvps
+│     
+├  Function execution logs:
+│    Logs [kintsugi-s13-tlryo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"revealed","data":[{"bounty_id":"3","index":0,"patch_hash":"42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97","patch_len":556,"seed":"2d06f97f94744e6c66a64adb91d80cdd04ae627a0536275b4ca094fd2317481a","revealed_at_ns":"1792856354259930145"}]}
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "reveal" call to <kintsugi-s13-tlryo.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-s13-tlryo.testnet reveal json-args '{"bounty_id":"3","index":0,"patch":"AGFzbQEAAAABCgJgAAF/YAF/AX8DAwIAAQUEAQECAgceAwZtZW1vcnkCAAlpbnB1dF9idWYAAAVwYXJzZQABCuoDAggAQYDAgIAAC94DAQl/AkAgAEGAAk0NAEF/DwtBxbvyiHghAUEAIQJBACEDAkADQAJAIAAgAksNACABIANzQZODgAhsQf////8HcSEEDAILQX8hBCAAIAJrQQJJDQEgACACQQJqIgVrIAItAIHAgIAAIgZJDQECQAJAIAUgBmoiByAASw0AIAVBgMCAgABqIQUgASACLQCAwICAACIIc0GTg4AIbCEJQX4hBAJAAkACQAJAIAhBf2oOAwADAQcLIAZBe2pB/wFxQfwBTw0BQX0PC0F8IQQgBkUNBSAFLQAAIgVBAXQgBk8NBSACQYTAgIAAaiEEIAZBAXYhAiAJIAVzIQEgBkF/akEBdiEGA0AgAUGTg4AIbCEBIAVFDQQgAkUNAyAGRQ0DIAVBf2ohBSACQX9qIQIgBkF/aiEGIARBf2ovAAAgAXMhASAEQQJqIQQMAAsLIAZBA3QhAkEAIQFBACEGAkADQCACIAFGDQEgBS0AACABQRhxdCAGciEGIAFBCGohASAFQQFqIQUMAAsLIAYgCXNBk4OACGwhAQwCCyAJIAZzIQEDQCABQZODgAhsIQEgBkUNAiAGQX9qIQYgASAFLQAAcyEBIAVBAWohBQwACwsACyADQQFqIQMgByECDAALCyAECw==","nonce":"04d45c2acc7bc3abca44f88b14081383790adcc466bc10e2c81c0639636d7d2b"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.69

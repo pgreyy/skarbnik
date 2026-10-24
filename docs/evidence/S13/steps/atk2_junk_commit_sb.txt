@@ -1,0 +1,46 @@
+$ near contract call-function as-transaction kintsugi-s13-tlryo.testnet commit json-args {"bounty_id":"1","fingerprint":"243510f1bc5d7412d2aa7336743c20d038535deda94fb5b5ed6b630b11368f60","payout":"sb.kintsugi-res2-prnvm.testnet"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as sb.kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T15:36:08.452030346Z
+├  Unsigned transaction:
+│    signer_id:    sb.kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-s13-tlryo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  commit
+│                       args:         {
+│                                       "bounty_id": "1",
+│                                       "fingerprint": "243510f1bc5d7412d2aa7336743c20d038535deda94fb5b5ed6b630b11368f60",
+│                                       "payout": "sb.kintsugi-res2-prnvm.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:ESoRRPjwbcFoLyFit8tKhS61NsodrVzRMo3EDFbN8uLZ
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.316 Tgas
+│    Transaction fee: 0.000031502132239 NEAR
+│    Transaction ID: 96bL7SvpMQj8brDDcPjRBcGWx1r7EofbtGvTtuXrBuwK
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/96bL7SvpMQj8brDDcPjRBcGWx1r7EofbtGvTtuXrBuwK
+│     
+├  Function execution logs:
+│    Logs [kintsugi-s13-tlryo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"committed","data":[{"bounty_id":"1","index":2,"committer":"sb.kintsugi-res2-prnvm.testnet","payout":"sb.kintsugi-res2-prnvm.testnet","fingerprint":"243510f1bc5d7412d2aa7336743c20d038535deda94fb5b5ed6b630b11368f60","fee":"20000000000000000000000"}]}
+│    Logs [sb.kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+2
+
+
+The "commit" call to <kintsugi-s13-tlryo.testnet> on behalf of <sb.kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-s13-tlryo.testnet commit json-args '{"bounty_id":"1","fingerprint":"243510f1bc5d7412d2aa7336743c20d038535deda94fb5b5ed6b630b11368f60","payout":"sb.kintsugi-res2-prnvm.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as sb.kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.34

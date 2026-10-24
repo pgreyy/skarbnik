@@ -1,0 +1,15 @@
+atk1 native Proof 0: proof0: FAIL reason (internal): proof0: exploit too long: 300 bytes, at most 256 allowed proof0: PASS reason (internal): - 
+atk1 native Proof 0: proof0: FAIL reason (internal): proof0: exploit too long: 300 bytes, at most 256 allowed proof0: PASS reason (internal): - 
+bounty A opened: True
+atk7: bounty D opened after the same verifier twice: False, attestations ['kintsugi-ver1-prnvm.testnet']
+after a commit by kintsugi-res2-prnvm.testnet: commits=1 active=1
+after a commit by sa.kintsugi-res2-prnvm.testnet: commits=2 active=2
+after a commit by sb.kintsugi-res2-prnvm.testnet: commits=3 active=3
+after a commit by kintsugi-res1-prnvm.testnet: commits=3 active=3
+after the release and a new commit: {'commits': 4, 'active': 3, 'fees_collected': '70000000000000000000000'}
+atk4: verifier refuses the replayed receipt (FAIL journal submission id = contract submission id;FAIL journal seed = seed recorded at reveal;)
+atk9: verifier refuses a receipt of another program (FAIL receipt verifies with the checker's image id (VALID);FAIL journal exploit commitment = bounty commitment;FAIL journal corpus hash = bounty corpus hash;)
+bounty B after expire: {'state': 'Paid', 'fees_collected': '0', 'fees_swept': False}
+atk11: kintsugi-ver1-prnvm refuses (1 failed checks)
+atk11: kintsugi-ver2-prnvm refuses (1 failed checks)
+atk11: researcher 1 balance change after the timeout: 510000000000000000000000 yoctoNEAR (bounty 0.5 NEAR + own fee 0.01 NEAR expected)

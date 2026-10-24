@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-s13-tlryo.testnet attest_proof0 json-args '{"bounty_id":"2","journal_hash":"fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5","receipt_hash":"14de49854482f0468dfc121a146841626590fe14de2d05b5ec0fb52a231f2c33"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T15:35:13.220020504Z
+{
+ "tx_hash": "B8bPiAkv2ScPECg2GRUDwRTzXqsUZa1f9MVoKrQhriZf",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: caller is not a registered verifier'}}}}",
+ "total_gas_burnt": 1941613079994,
+ "logs": [],
+ "wall_seconds": 4.189,
+ "rpc_error": null
+}

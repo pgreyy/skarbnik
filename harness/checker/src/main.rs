@@ -5,8 +5,9 @@
 //!   check  --candidate F --seed HEX [common options] [--explain]
 //!          Prints PASS or FAIL. Exit code 0 for PASS, 1 for FAIL. --explain also prints the
 //!          internal reason (for our own testing only; a published result carries only the verdict).
-//!   proof0 [common options]
-//!          Checks that the original really crashes on the secret input and passes its tests.
+//!   proof0 [common options] [--reference-fix F --seed HEX]
+//!          Checks that the original really crashes on the secret input and passes its tests. With
+//!          --reference-fix it also checks that the vendor's reference fix passes the full check.
 //!   run    --module F --input HEX
 //!          Runs one module on one input and prints the outcome and fuel used.
 //!   table  --manifest F --seed HEX [common options]
@@ -132,6 +133,8 @@ fn reason(r: &Option<Reason>) -> String {
         Reason::OriginalFailsPublicTest { index, expected, actual } => {
             format!("test #{index}: expected {expected}, {}", outcome(actual))
         }
+        Reason::ExploitTooLong { len, max } => format!("{len} bytes, at most {max} allowed"),
+        Reason::ReferenceFixFails(inner) => reason(&Some((**inner).clone())),
     };
     format!("{}: {}", r.step(), detail)
 }
@@ -159,7 +162,13 @@ fn cmd_check(args: &Args) -> Result<ExitCode, String> {
 
 fn cmd_proof0(args: &Args) -> Result<ExitCode, String> {
     let setup = Setup::load(args)?;
-    let rep = proof0_report(&setup.bounty(), &Limits::default());
+    let rep = match args.0.get("reference-fix") {
+        Some(f) => {
+            let fix = read(Path::new(f))?;
+            kintsugi_check::proof0_with_reference(&setup.bounty(), &round(args)?, &Limits::default(), &fix)
+        }
+        None => proof0_report(&setup.bounty(), &Limits::default()),
+    };
     println!("proof0: {}", rep.verdict.as_str());
     println!("reason (internal): {}", reason(&rep.reason));
     print_stats(&rep);

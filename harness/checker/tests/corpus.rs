@@ -203,3 +203,34 @@ fn fairness_inputs_are_mostly_well_formed_for_the_original() {
         .count();
     assert!(ok >= 700, "only {ok} of 1000 fairness inputs were accepted by the original");
 }
+
+// ---------- S13 attack 1: an unfixable bounty ----------
+
+/// Before the S13 guard, a secret input longer than any module may receive made every run report a trap,
+/// so Proof 0 passed and no patch could ever pass. Now Proof 0 refuses it.
+#[test]
+fn s13_overlong_exploit_is_refused_by_proof0() {
+    let f = Fixture::new();
+    let long = vec![0x03u8; Limits::default().max_input_len + 44];
+    let b = Bounty { original: &f.original, exploit: &long, public_tests: &f.tests };
+    let rep = proof0_report(&b, &Limits::default());
+    assert_eq!(rep.verdict, Verdict::Fail);
+    assert_eq!(rep.reason, Some(Reason::ExploitTooLong { len: long.len(), max: Limits::default().max_input_len }));
+    // The attack it stops: with such a secret even the honest fix fails the check.
+    assert_eq!(check(&bytes("demo/fixed.wasm"), &b, &round(7), &Limits::default()), Verdict::Fail);
+}
+
+#[test]
+fn s13_proof0_with_reference_fix_passes_for_the_honest_fix() {
+    let f = Fixture::new();
+    let rep = kintsugi_check::proof0_with_reference(&f.bounty(), &round(7), &Limits::default(), &bytes("demo/fixed.wasm"));
+    assert_eq!(rep.verdict, Verdict::Pass, "{:?}", rep.reason);
+}
+
+#[test]
+fn s13_proof0_with_reference_fix_refuses_a_fix_that_does_not_fix() {
+    let f = Fixture::new();
+    let rep = kintsugi_check::proof0_with_reference(&f.bounty(), &round(7), &Limits::default(), &bytes("demo/original.wasm"));
+    assert_eq!(rep.verdict, Verdict::Fail);
+    assert!(matches!(rep.reason, Some(Reason::ReferenceFixFails(_))));
+}

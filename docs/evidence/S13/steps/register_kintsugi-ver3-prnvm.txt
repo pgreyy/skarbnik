@@ -1,0 +1,45 @@
+$ near contract call-function as-transaction kintsugi-s13-tlryo.testnet register_verifier json-args {"account_id":"kintsugi-ver3-prnvm.testnet","label":"S13 test verifier run by the project"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-s13-tlryo.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T12:35:21.673040765Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-s13-tlryo.testnet
+│    receiver_id:  kintsugi-s13-tlryo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  register_verifier
+│                       args:         {
+│                                       "account_id": "kintsugi-ver3-prnvm.testnet",
+│                                       "label": "S13 test verifier run by the project"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:CV6jjhtZVt3mV7JwCaWjHbX1cz5nfjRzXD29shutGHca
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.0000308300980872 NEAR
+│    Transaction ID: 3VLvqyXdWMqz9EaACAfp1id2YziA4nyBts4couKotRHo
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/3VLvqyXdWMqz9EaACAfp1id2YziA4nyBts4couKotRHo
+│     
+├  Function execution logs:
+│    Logs [kintsugi-s13-tlryo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"verifier_registered","data":[{"account_id":"kintsugi-ver3-prnvm.testnet","label":"S13 test verifier run by the project"}]}
+│    Logs [kintsugi-s13-tlryo.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "register_verifier" call to <kintsugi-s13-tlryo.testnet> on behalf of <kintsugi-s13-tlryo.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-s13-tlryo.testnet register_verifier json-args '{"account_id":"kintsugi-ver3-prnvm.testnet","label":"S13 test verifier run by the project"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-s13-tlryo.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.58

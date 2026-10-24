@@ -1,0 +1,12 @@
+== atk11_vendor_posts_fail (post_verdict by kintsugi-vendor-prnvm.testnet): exit=0 tx=2nRfsMdmwuh63CYBZtJA3X8Wfmhchxeit9FXGyft7bRy gas=0.319 Tgas
+atk11: kintsugi-ver1-prnvm refuses (1 failed checks)
+atk11: kintsugi-ver2-prnvm refuses (1 failed checks)
+== atk5_attest_pass_against_posted_fail (attest by kintsugi-ver3-prnvm.testnet, expected to fail): outcome=failed tx=QRaDTjR6LP25F4qXFWHftuV7jobRw4bvMnAim8NZMMK
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: attestation does not match the posted verdict'}}}}"
+== atk8_timeout_early (claim_timeout by kintsugi-res1-prnvm.testnet, expected to fail): outcome=failed tx=As3Fjbq7Tp34GXywL5SCFamCY8qUsXZHSm7S1BisRW1L
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: deadline has not passed'}}}}"
+== atk11_researcher_claims_timeout (claim_timeout by kintsugi-res2-prnvm.testnet): exit=0 tx=Embs5uMx85QXqUHzkVMURnGcae8NBCJBb5c9Z6eaKWNN gas=0.310 Tgas
+atk11: researcher 1 balance change after the timeout: 510000000000000000000000 yoctoNEAR (bounty 0.5 NEAR + own fee 0.01 NEAR expected)
+== atk8_timeout_late_after_payout (claim_timeout by kintsugi-res1-prnvm.testnet, expected to fail): outcome=failed tx=9bMb4swFQ7QaQbyHYMAMhoaYg1kv4fvapwSWc8tNKEMB
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: bounty is closed'}}}}"
+attack_a_exit=0

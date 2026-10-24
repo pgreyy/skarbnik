@@ -10,6 +10,13 @@ use crate::TestCase;
 pub const VERDICT_PASS: u8 = 1;
 /// Journal value for a FAIL verdict.
 pub const VERDICT_FAIL: u8 = 0;
+/// `GuestInput::mode` for checking a researcher's candidate.
+pub const MODE_CHECK: u8 = 0;
+/// `GuestInput::mode` for Proof 0: the candidate is the vendor's reference fix.
+pub const MODE_PROOF0: u8 = 1;
+/// Domain tag of the submission id a Proof 0 journal carries: sha256(PROOF0_DOMAIN || candidate hash).
+/// The guest sets it itself in Proof 0 mode and refuses it in check mode.
+pub const PROOF0_DOMAIN: &[u8] = b"kintsugi-proof0-v1";
 
 /// Everything the guest needs for one check. `exploit` and `salt` are private: they never appear
 /// in the journal, only their commitment does.
@@ -28,6 +35,15 @@ pub struct GuestInput {
     /// When true the guest prints a cycle profile (load, setup, run, hashing, rest) to its standard
     /// output. It changes nothing in the journal. Used for measuring only.
     pub profile: bool,
+    /// `MODE_CHECK` or `MODE_PROOF0`.
+    pub mode: u8,
+}
+
+/// Bytes hashed for a Proof 0 submission id: the domain tag, then the reference fix's sha256.
+pub fn proof0_submission_bytes(candidate_hash: &[u8; 32]) -> Vec<u8> {
+    let mut out = PROOF0_DOMAIN.to_vec();
+    out.extend_from_slice(candidate_hash);
+    out
 }
 
 /// The public output of one check. Fixed fields only; the verdict is PASS or FAIL, never a reason.

@@ -1,0 +1,28 @@
+== c_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=8gqd8Ujo9wD4o4FQVXkq4VnA9R2U5mS8L3BYCeFbmVua gas=0.351 Tgas
+== c_attest_proof0_kintsugi-ver1-prnvm (attest_proof0 by kintsugi-ver1-prnvm.testnet): exit=0 tx=2SdNrtxbjCZydJ6xoK42K5FNKpf2EmysoZziHxFEfmWD gas=0.318 Tgas
+== c_attest_proof0_kintsugi-ver2-prnvm (attest_proof0 by kintsugi-ver2-prnvm.testnet): exit=0 tx=5ZWKxahUGf6WBmwuthFbcjmyu4jFtdsvKFTkHEVeUBGd gas=0.318 Tgas
+== d_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=FYkpiPKr4zkHz968uFuXX5YqYAxmXm6PJb5nmcYeW9zy gas=0.351 Tgas
+== atk7_same_verifier_1 (attest_proof0 by kintsugi-ver1-prnvm.testnet): exit=0 tx=877nL69v68Ez5MyWgJtEgzupWofiBkoVi8abyRa8ckHW gas=0.318 Tgas
+== atk7_same_verifier_2 (attest_proof0 by kintsugi-ver1-prnvm.testnet): exit=0 tx=B538b9MfGNGT8j8epqXoQrfXwNLY1VCF3yb8m9r1BmU8 gas=0.318 Tgas
+atk7: bounty D opened after the same verifier twice: False, attestations ['kintsugi-ver1-prnvm.testnet']
+== atk6_unregistered_attests (attest_proof0 by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=B8bPiAkv2ScPECg2GRUDwRTzXqsUZa1f9MVoKrQhriZf
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: caller is not a registered verifier'}}}}"
+== create_sa (create-account by kintsugi-res2-prnvm.testnet): exit=0 tx=6WjEVK3JkEfpUiKgGxPPvmvekuCqs56CsN4FNAQkCGxB gas=0.825 Tgas
+== credit_sa (deposit_credit by sa.kintsugi-res2-prnvm.testnet): exit=0 tx=HM7VrAy5W4km7pPp7THXizRAApAGptmX9BPD3FWpdg7N gas=0.309 Tgas
+== create_sb (create-account by kintsugi-res2-prnvm.testnet): exit=0 tx=EtzdcUzMY5PCq5Gf3D2TmeobQeECA17ALnDe5nXhkZTQ gas=0.825 Tgas
+== credit_sb (deposit_credit by sb.kintsugi-res2-prnvm.testnet): exit=0 tx=3Y1RbTg19XwC4myv8CZcEZpCxRCbFUtpkQpkD5V8GSbV gas=0.309 Tgas
+== atk2_junk_commit_kintsugi-res2-prnvm (commit by kintsugi-res2-prnvm.testnet): exit=0 tx=An8co5HPMukUNW7G3WDSwJf7fEm31iXUQaG2Ua7mWqia gas=0.315 Tgas
+after a commit by kintsugi-res2-prnvm.testnet: commits=1 active=1
+== atk2_junk_commit_sa (commit by sa.kintsugi-res2-prnvm.testnet): exit=0 tx=mqMkHy2RSVPSbBCZumFpGt97Wk5cVK7PDWRrgaHG49u gas=0.316 Tgas
+after a commit by sa.kintsugi-res2-prnvm.testnet: commits=2 active=2
+== atk2_junk_commit_sb (commit by sb.kintsugi-res2-prnvm.testnet): exit=0 tx=96bL7SvpMQj8brDDcPjRBcGWx1r7EofbtGvTtuXrBuwK gas=0.316 Tgas
+after a commit by sb.kintsugi-res2-prnvm.testnet: commits=3 active=3
+== atk2_junk_commit_kintsugi-res1-prnvm (commit by kintsugi-res1-prnvm.testnet): exit=0 tx=C7jcGnqVSfF2xEVPDbvPk3EbRDu3UMPaM9GytmpfYQaB gas=0.315 Tgas
+after a commit by kintsugi-res1-prnvm.testnet: commits=3 active=3
+== atk10_mismatched_reveal (reveal by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=CKDTYfF4gtBrtV12BbxZMpxXkhcexGmogs1ZGZctjmqV
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: fingerprint does not match'}}}}"
+== atk2_release_too_early (release_unrevealed by kintsugi-res1-prnvm.testnet, expected to fail): outcome=failed tx=ChBJcD4PdwyhrzXRrQnESTaYfaBjYcC9Gt6kCVUx7TSc
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: reveal window has not closed'}}}}"
+== atk2_release_unrevealed (release_unrevealed by kintsugi-res1-prnvm.testnet): exit=0 tx=GJSN5P1dhRRK7ktaarKCY4XaPsJXdfYytsX6M1Yex1rZ gas=0.311 Tgas
+== atk2_commit_after_release (commit by kintsugi-res1-prnvm.testnet): exit=0 tx=7kBnwJH6DTAsxKfHvg46TSbhu1imiVpcxRU4r8DQgq3W gas=0.315 Tgas
+after the release and a new commit: {'commits': 4, 'active': 3, 'fees_collected': '70000000000000000000000'}

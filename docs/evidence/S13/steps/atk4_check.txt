@@ -1,0 +1,12 @@
+OK   receipt verifies with the checker's image id (VALID)
+OK   image id = bounty image id
+OK   journal exploit commitment = bounty commitment
+OK   journal corpus hash = bounty corpus hash
+OK   journal original hash = bounty original hash
+FAIL journal submission id = contract submission id
+FAIL journal seed = seed recorded at reveal
+OK   journal candidate hash = revealed patch hash
+OK   receipt sha256 = posted receipt hash
+OK   journal sha256 = posted journal hash
+OK   journal verdict = posted verdict
+REFUSE

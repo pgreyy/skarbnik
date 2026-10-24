@@ -1,0 +1,42 @@
+$ near contract call-function as-transaction kintsugi-s13-tlryo.testnet deposit_credit json-args {} prepaid-gas 100 Tgas attached-deposit 0.2 NEAR sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T12:35:28.823325269Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res1-prnvm.testnet
+│    receiver_id:  kintsugi-s13-tlryo.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  deposit_credit
+│                       args:         {}
+│                       gas:          100.0 Tgas
+│                       deposit:      0.2 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:4nab7LQVFF5XAGQdk3SACm2PQCmbBJXGcWqL37PiyNxy
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.000030882243944 NEAR
+│    Transaction ID: 7A8Gn4qo4TY4hfvMV6obUBSSk8YkG15Wwrxi9RKmhjrJ
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/7A8Gn4qo4TY4hfvMV6obUBSSk8YkG15Wwrxi9RKmhjrJ
+│     
+├  Function execution logs:
+│    Logs [kintsugi-s13-tlryo.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"credit_deposited","data":[{"account_id":"kintsugi-res1-prnvm.testnet","amount":"200000000000000000000000","total":"200000000000000000000000"}]}
+│    Logs [kintsugi-res1-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"200000000000000000000000"
+
+
+The "deposit_credit" call to <kintsugi-s13-tlryo.testnet> on behalf of <kintsugi-res1-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-s13-tlryo.testnet deposit_credit json-args {} prepaid-gas '100.0 Tgas' attached-deposit '0.2 NEAR' sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.85

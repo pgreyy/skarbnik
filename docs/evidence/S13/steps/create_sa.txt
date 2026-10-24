@@ -1,0 +1,35 @@
+$ near account create-account fund-myself sa.kintsugi-res2-prnvm.testnet 0.3 NEAR autogenerate-new-keypair save-to-legacy-keychain sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-24T15:35:19.997073348Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  sa.kintsugi-res2-prnvm.testnet
+│    actions:
+│       -- create account:      sa.kintsugi-res2-prnvm.testnet
+│       -- transfer deposit:    0.3 NEAR
+│       -- add access key:     
+│                       public key:   ed25519:GWWZK9fk9Ni48FFZ788XUjFTVnUEmQE2mscCGb3HDPiU
+│                       nonce:        0
+│                       permission:   FullAccess
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.825 Tgas
+│    Transaction fee: 0.00008249476875 NEAR
+│    Transaction ID: 6WjEVK3JkEfpUiKgGxPPvmvekuCqs56CsN4FNAQkCGxB
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/6WjEVK3JkEfpUiKgGxPPvmvekuCqs56CsN4FNAQkCGxB
+│     
+
+
+New account <sa.kintsugi-res2-prnvm.testnet> has been successfully created.
+<kintsugi-res2-prnvm.testnet> has transferred 0.3 NEAR to <sa.kintsugi-res2-prnvm.testnet> successfully.
+Added access key = ed25519:GWWZK9fk9Ni48FFZ788XUjFTVnUEmQE2mscCGb3HDPiU to sa.kintsugi-res2-prnvm.testnet.
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=6.49

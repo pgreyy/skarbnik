@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: S13 attack pass on testnet (PASS)
+
+- Phases run with `./scripts/s13_attacks.sh <phase>`: setup, proof0, open, commit_a, prove_a, misc, bounty_b, attack_a.
+- Proof A: 3,031.98 s at peak 4,725 MiB, compressed in 1,048.19 s, VALID, PASS, bound to the on-chain submission id.
+- Attacks 1, 2, 4 to 11 blocked on chain or by the verifier check; attack 3 (sub-accounts fill K) is an accepted risk:
+  blocking one reveal window costs 0.045 NEAR with the test fees and more each window, and the leak stays at most K bits.
+- Attack 11: the vendor's false FAIL was refused by both verifiers, and the researcher was paid by timeout (+0.51 NEAR).
+- Order choice (owner): bounty A's receipt was used for attack 11, not kept for an OutLayer contract test.
+- Files: docs/SECURITY.md (new), README claim row, ARCHITECTURE (image id `043ec633...`), EVIDENCE section S13.
+- Next: OutLayer retry when FastFS serves our file; audit only when the owner says so.
+
 ## 2026-10-24: OutLayer second try (FastFS project) and S13 Proof 0
 
 - Proof 0 for S13 (`./scripts/s13_attacks.sh proof0`): 4,984 s at peak 4,732 MiB, compressed in 1,274 s at peak

@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-s13-tlryo.testnet reveal json-args '{"bounty_id":"1","index":0,"patch":"AGFzbQEAAAABCgJgAAF/YAF/AX8DAwIAAQUEAQECAgceAwZtZW1vcnkCAAlpbnB1dF9idWYAAAVwYXJzZQABCuoDAggAQYDAgIAAC94DAQl/AkAgAEGAAk0NAEF/DwtBxbvyiHghAUEAIQJBACEDAkADQAJAIAAgAksNACABIANzQZODgAhsQf////8HcSEEDAILQX8hBCAAIAJrQQJJDQEgACACQQJqIgVrIAItAIHAgIAAIgZJDQECQAJAIAUgBmoiByAASw0AIAVBgMCAgABqIQUgASACLQCAwICAACIIc0GTg4AIbCEJQX4hBAJAAkACQAJAIAhBf2oOAwADAQcLIAZBe2pB/wFxQfwBTw0BQX0PC0F8IQQgBkUNBSAFLQAAIgVBAXQgBk8NBSACQYTAgIAAaiEEIAZBAXYhAiAJIAVzIQEgBkF/akEBdiEGA0AgAUGTg4AIbCEBIAVFDQQgAkUNAyAGRQ0DIAVBf2ohBSACQX9qIQIgBkF/aiEGIARBf2ovAAAgAXMhASAEQQJqIQQMAAsLIAZBA3QhAkEAIQFBACEGAkADQCACIAFGDQEgBS0AACABQRhxdCAGciEGIAFBCGohASAFQQFqIQUMAAsLIAYgCXNBk4OACGwhAQwCCyAJIAZzIQEDQCABQZODgAhsIQEgBkUNAiAGQX9qIQYgASAFLQAAcyEBIAVBAWohBQwACwsACyADQQFqIQMgByECDAALCyAECw==","nonce":"9673e2647bd9f19f919907dc4714f037e7fd4f86e236ef10b65072492f2df4e4"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-24T15:36:27.280277743Z
+{
+ "tx_hash": "CKDTYfF4gtBrtV12BbxZMpxXkhcexGmogs1ZGZctjmqV",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: fingerprint does not match'}}}}",
+ "total_gas_burnt": 2150735910062,
+ "logs": [],
+ "wall_seconds": 4.053,
+ "rpc_error": null
+}

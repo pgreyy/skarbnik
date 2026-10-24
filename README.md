@@ -5,6 +5,8 @@ agents, submit a patched WebAssembly module. The vendor checks each patch agains
 knowledge virtual machine; the proof says only PASS or FAIL. A NEAR contract holds the bounty and pays by rule, and pays the
 researcher by default if the vendor stays silent.
 
+Security: what protects a bounty, the attacks we tried and the known limits are in [docs/SECURITY.md](docs/SECURITY.md).
+
 Status: a hackathon build on NEAR testnet. Everything below says what works today, with the file and command that show it.
 Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); the work log is
 [docs/DEVLOG.md](docs/DEVLOG.md).
@@ -21,7 +23,8 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 | An agent key that can only `commit` and `reveal` cannot move its owner's money | works on testnet (scripted agent, no language model yet) | `scripts/s7_agent.sh` (phases setup, bounty, limits) (EVIDENCE, S7) |
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts, no proofs for the arena) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
 | End to end on testnet with a real proof: commit and reveal, proof bound to the on-chain seed and submission id, verdict, two verifiers check the receipt against the chain and attest, researcher paid | works at Level 0 (two registered verifier accounts) | `scripts/s4_testnet.sh` (EVIDENCE, S4/S5) |
-| OutLayer (TEE) as one of the two verifiers | not working yet: OutLayer accepted the jobs but no testnet worker answered within NEAR's yield window (twice); the contract recorded nothing, as designed | EVIDENCE, S4/S5 |
+| A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) and two verifiers attest it; an over-long secret is refused; junk commits cannot hold the attempt slots after the reveal window; replayed, foreign or contradicted receipts are refused and the researcher is paid by timeout | works on testnet (10 of 11 attacks blocked; sub-accounts filling the slots is an accepted risk, the leak stays at most K bits) | `scripts/s13_attacks.sh <phase>` (EVIDENCE, S13; docs/SECURITY.md) |
+| OutLayer (TEE) as one of the two verifiers | not confirmed on testnet yet: OutLayer accepts our jobs but none has been answered (8 of 8 timed out, by link and as an OutLayer project), while OutLayer's own cached test program answers; the contract recorded nothing, as designed | EVIDENCE, S4/S5 and "OutLayer (Level 1) on testnet" |
 
 ## Try it
 
