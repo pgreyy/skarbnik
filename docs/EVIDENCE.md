@@ -59,11 +59,14 @@ the same source. RISC Zero's reproducible guest build (`cargo risczero build`, i
 Not done because of the stop: `verify`, the succinct compression, and Groth16 (not possible in this build anyway).
 
 The receipt is in `target/gpu-results/receipt_f16.bin` on the laptop (SHA-256 `9cc7c4a5...d8ff`, not committed).
-Time on the pod for both attempts: 16:45:12 to 17:10:42 UTC, about 25.5 minutes of use.
+Time on the pod for both attempts: 16:45:12 to 17:10:42 UTC, about 25.5 minutes of use by the test steps.
+
+**Cost (reported by the owner from RunPod):** the pod ran about 30 minutes in total, from when the owner started it
+until it was stopped and terminated; the RunPod balance went from $10.00 to $9.52, so the whole GPU test (both
+attempts) cost about **$0.48**. The pod is terminated.
 
 `circom-witnesscalc` comes in with RISC Zero's GPU Groth16 prover when `risc0-zkvm` is built with `cuda`. Its build needs
-`protoc` and `libclang`; neither is in the CUDA template. The final attempt above installed both. The pod ran from when the owner started it until the owner terminated it; its
-cost is on RunPod's billing page.
+`protoc` and `libclang`; neither is in the CUDA template. The final attempt above installed both. Total cost of the GPU test: about $0.48 (see the final attempt).
 
 ## S13: Attack pass on the hardened contract and checker
 

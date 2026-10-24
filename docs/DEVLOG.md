@@ -10,6 +10,7 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - Image id `dfd48a5e...` instead of `3edbc2e6...`, so the run stopped under the owner's rule (no verify, no compression).
   Likely cause, not verified: the guest was compiled on the pod and embeds build paths. Total use of the pod: about
   25.5 minutes (16:45:12 to 17:10:42 UTC).
+- Cost (owner, from RunPod): the pod ran about 30 minutes in total; balance $10.00 to $9.52, about $0.48. Pod terminated.
 - Next, if the owner wants a like for like number: a reproducible guest build (`cargo risczero build`) on both machines.
 
 ## 2026-10-24: GPU proof on a rented RunPod pod (FAIL, no proof)
