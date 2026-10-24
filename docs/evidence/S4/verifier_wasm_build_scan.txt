@@ -1,0 +1,10 @@
+file: target/verifier-publish/farbox-verifier.wasm (1134249 bytes)
+e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8  farbox-verifier.wasm
+== scan (strings, case-insensitive): any line below is a finding
+(no findings)
+== other paths still in the file (for review)
+     58 /cargo/registry
+     48 /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67
+      3 /rust/deps
+      1 /outlayer/src
+      1 /checker/src

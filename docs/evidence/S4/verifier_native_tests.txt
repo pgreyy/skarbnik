@@ -1,0 +1,15 @@
+== correct values
+{"ok":true,"verdict":"PASS","image_id":"3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d","submission_id":"0000000000000000000000000000000000000000000000000000000000000000","receipt_sha256":"bd32bbe3c79f54babd05ca8b8157b2fcc679611834ea1e228d6dcaa3e55af704","journal_sha256":"ca847eadaeb1032ada6942ca3042e3bd15cda8a4499edf8b24c2205754722bbe","error":null}
+wall_seconds=1.23 max_rss_kb=36300
+== wrong image id
+{"ok":false,"verdict":null,"image_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","submission_id":"0000000000000000000000000000000000000000000000000000000000000000","receipt_sha256":"bd32bbe3c79f54babd05ca8b8157b2fcc679611834ea1e228d6dcaa3e55af704","journal_sha256":null,"error":"receipt is invalid: claim digest does not match the expected digest d28ab2fc3818af184f7950da348ee9da69c7371a50313902d8899cceb938cd42; expected a2070706f65a3591be71bc91deec561843d5b38c095facdd77e1153bc"}
+wall_seconds=1.22 max_rss_kb=36508
+== wrong receipt hash
+{"ok":false,"verdict":null,"image_id":"3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d","submission_id":"0000000000000000000000000000000000000000000000000000000000000000","receipt_sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","journal_sha256":null,"error":"receipt bytes do not match receipt_sha256"}
+wall_seconds=0.15 max_rss_kb=28148
+== journal changed (receipt hash of the changed file)
+{"ok":false,"verdict":null,"image_id":"3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d","submission_id":"0000000000000000000000000000000000000000000000000000000000000000","receipt_sha256":"c81acad3a30917b4808573739a13906d72a7736f18ad5488938698b159198885","journal_sha256":null,"error":"receipt is invalid: claim digest does not match the expected digest d28ab2fc3818af184f7950da348ee9da69c7371a50313902d8899cceb938cd42; expected 7cfb76a5f00d497dcfd256db276a4e97ce046c863503c791417502c8a"}
+wall_seconds=1.18 max_rss_kb=36304
+== wrong submission id
+{"ok":false,"verdict":null,"image_id":"3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d","submission_id":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","receipt_sha256":"bd32bbe3c79f54babd05ca8b8157b2fcc679611834ea1e228d6dcaa3e55af704","journal_sha256":"ca847eadaeb1032ada6942ca3042e3bd15cda8a4499edf8b24c2205754722bbe","error":"journal submission_id differs"}
+wall_seconds=1.17 max_rss_kb=36408

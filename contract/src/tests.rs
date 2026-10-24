@@ -580,3 +580,170 @@ fn fingerprint_layout_is_stable() {
     buf.extend_from_slice(&[0u8; 32]);
     assert_eq!(fp, env::sha256_array(&buf));
 }
+
+// ---------- OutLayer as verifier 1 (S5) ----------
+
+fn outlayer() -> AccountId {
+    acc("outlayer.testnet")
+}
+
+fn outlayer_config() -> OutLayerConfig {
+    OutLayerConfig {
+        account_id: outlayer(),
+        wasm_url: "https://example.invalid/kintsugi-outlayer-verifier.wasm".into(),
+        wasm_sha256: H3.into(),
+        build_target: "wasm32-wasip1".into(),
+        max_instructions: U64(10_000_000_000),
+        max_memory_mb: 256,
+        max_execution_seconds: U64(60),
+    }
+}
+
+/// Bounty 0 with a revealed submission and a posted PASS (journal H1, receipt H2), OutLayer set and
+/// registered as a verifier. Returns the contract and the submission index.
+fn setup_outlayer() -> (Contract, u32) {
+    let mut c = setup();
+    call(owner(), T0 + SEC);
+    c.set_outlayer(outlayer_config());
+    c.register_verifier(outlayer(), "verifier 1: OutLayer job, trusts outlayer.testnet and its operator".into());
+    let idx = commit_and_reveal(&mut c, T0 + 2 * SEC);
+    call(vendor(), T0 + 10 * SEC);
+    c.post_verdict(U64(0), idx, Verdict::Pass, H1.into(), H2.into());
+    (c, idx)
+}
+
+fn answer(c: &Contract, idx: u32) -> Value {
+    json!({
+        "ok": true,
+        "verdict": "PASS",
+        "image_id": H3,
+        "submission_id": c.get_submission_id(U64(0), idx).unwrap(),
+        "receipt_sha256": H2,
+        "journal_sha256": H1,
+        "error": null,
+    })
+}
+
+#[test]
+fn outlayer_answer_counts_as_one_verifier() {
+    let (mut c, idx) = setup_outlayer();
+    call(owner(), T0 + 11 * SEC);
+    let a = answer(&c, idx);
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Ok(Some(a))), "recorded");
+    assert_eq!(c.get_submission(U64(0), idx).unwrap().attestations, vec![outlayer()]);
+    call(v1(), T0 + 12 * SEC);
+    assert_eq!(c.attest(U64(0), idx, Verdict::Pass, H1.into(), H2.into()), "final_pass");
+    assert_eq!(transfers(), vec![(payout(), bounty_amount().as_yoctonear())]);
+}
+
+#[test]
+fn outlayer_answer_twice_counts_once() {
+    let (mut c, idx) = setup_outlayer();
+    call(owner(), T0 + 11 * SEC);
+    let a = answer(&c, idx);
+    c.on_outlayer_result(U64(0), idx, Ok(Some(a.clone())));
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Ok(Some(a))), "duplicate");
+    assert_eq!(c.get_submission(U64(0), idx).unwrap().outcome, Outcome::Open);
+}
+
+#[test]
+fn outlayer_answer_with_other_image_id_rejected() {
+    let (mut c, idx) = setup_outlayer();
+    call(owner(), T0 + 11 * SEC);
+    let mut a = answer(&c, idx);
+    a["image_id"] = json!(H1);
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Ok(Some(a))), "rejected: image_id differs");
+    assert!(c.get_submission(U64(0), idx).unwrap().attestations.is_empty());
+}
+
+#[test]
+fn outlayer_answer_with_other_submission_or_receipt_rejected() {
+    let (mut c, idx) = setup_outlayer();
+    call(owner(), T0 + 11 * SEC);
+    let mut a = answer(&c, idx);
+    a["submission_id"] = json!(H1);
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Ok(Some(a))), "rejected: submission_id differs");
+    let mut a = answer(&c, idx);
+    a["receipt_sha256"] = json!(H3);
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Ok(Some(a))), "rejected: receipt_sha256 differs");
+    let mut a = answer(&c, idx);
+    a["verdict"] = json!("FAIL");
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Ok(Some(a))), "rejected: verdict differs from the posted verdict");
+    assert!(c.get_submission(U64(0), idx).unwrap().attestations.is_empty());
+}
+
+#[test]
+fn outlayer_not_ok_or_failed_records_nothing() {
+    let (mut c, idx) = setup_outlayer();
+    call(owner(), T0 + 11 * SEC);
+    let mut a = answer(&c, idx);
+    a["ok"] = json!(false);
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Ok(Some(a))), "rejected: answer is not ok");
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Ok(None)), "rejected: no answer from OutLayer");
+    assert_eq!(c.on_outlayer_result(U64(0), idx, Err(PromiseError::Failed)), "rejected: no answer from OutLayer");
+    assert!(c.get_submission(U64(0), idx).unwrap().attestations.is_empty());
+}
+
+#[test]
+#[should_panic(expected = "is private")]
+fn outlayer_callback_is_private() {
+    let (mut c, idx) = setup_outlayer();
+    call(acc("stranger.testnet"), T0 + 11 * SEC);
+    let a = answer(&c, idx);
+    c.on_outlayer_result(U64(0), idx, Ok(Some(a)));
+}
+
+#[test]
+fn request_sends_job_to_outlayer_with_pinned_program() {
+    let (mut c, idx) = setup_outlayer();
+    at(acc("anyone.testnet"), T0 + 11 * SEC, NearToken::from_millinear(500));
+    let _ = c.request_outlayer_check(U64(0), idx, "cmVjZWlwdA==".into());
+    let calls: Vec<(AccountId, String, String, u128)> = get_created_receipts()
+        .into_iter()
+        .flat_map(|r| {
+            let to = r.receiver_id.clone();
+            r.actions.into_iter().filter_map(move |a| match a {
+                MockAction::FunctionCallWeight { method_name, args, attached_deposit, .. } => Some((
+                    to.clone(),
+                    String::from_utf8(method_name).unwrap(),
+                    String::from_utf8(args).unwrap(),
+                    attached_deposit.as_yoctonear(),
+                )),
+                _ => None,
+            })
+        })
+        .collect();
+    let (to, method, args, deposit) = &calls[0];
+    assert_eq!(to, &outlayer());
+    assert_eq!(method, "request_execution");
+    assert_eq!(*deposit, NearToken::from_millinear(500).as_yoctonear());
+    let v: Value = near_sdk::serde_json::from_str(args).unwrap();
+    assert_eq!(v["source"]["WasmUrl"]["hash"], json!(H3));
+    assert_eq!(v["response_format"], json!("Json"));
+    let input: Value = near_sdk::serde_json::from_str(v["input_data"].as_str().unwrap()).unwrap();
+    assert_eq!(input["image_id"], json!(H3));
+    assert_eq!(input["receipt_sha256"], json!(H2));
+    assert_eq!(input["submission_id"], json!(c.get_submission_id(U64(0), idx).unwrap()));
+    assert!(calls.iter().any(|(_, m, _, _)| m == "on_outlayer_result"));
+}
+
+#[test]
+#[should_panic(expected = "the OutLayer account is not a registered verifier")]
+fn request_needs_outlayer_registered() {
+    let mut c = setup();
+    call(owner(), T0 + SEC);
+    c.set_outlayer(outlayer_config());
+    let idx = commit_and_reveal(&mut c, T0 + 2 * SEC);
+    call(vendor(), T0 + 10 * SEC);
+    c.post_verdict(U64(0), idx, Verdict::Pass, H1.into(), H2.into());
+    call(acc("anyone.testnet"), T0 + 11 * SEC);
+    let _ = c.request_outlayer_check(U64(0), idx, "cmVjZWlwdA==".into());
+}
+
+#[test]
+#[should_panic(expected = "only the owner can set OutLayer")]
+fn only_owner_sets_outlayer() {
+    let mut c = setup();
+    call(acc("stranger.testnet"), T0 + SEC);
+    c.set_outlayer(outlayer_config());
+}

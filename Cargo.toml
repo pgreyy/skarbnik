@@ -2,7 +2,7 @@
 # (which compiles the zkVM guest) and the host that proves and verifies. scripts/build_all.sh builds all of it.
 [workspace]
 resolver = "3"
-members = ["contract", "harness", "host", "harness/checker"]
+members = ["contract", "harness", "host", "harness/checker", "verifier/outlayer"]
 # near-sdk refuses a plain native `cargo build` of a contract, so a bare `cargo build` builds only
 # the proof side. scripts/build_all.sh builds everything: this, then `cargo near build` for the contract.
 default-members = ["harness", "host", "harness/checker"]

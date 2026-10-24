@@ -5,12 +5,15 @@
 //!   prove   <candidate.wasm> [opts]    prove the checker guest; writes the receipt and prints timings and sizes
 //!   verify  <receipt.bin>              verify a receipt file against the checker image id (exit 0 = valid, 1 = invalid)
 //!   tamper  <in.bin> <out.bin> <journal|seal>   write a changed copy of a receipt, to show it no longer verifies
+//!   compress <in.bin> <out.bin> <succinct|groth16>   compress a receipt to one proof and time it
+//!                                      (groth16 needs Docker, or an NVIDIA GPU with the cuda feature)
 //!
 //! Options for execute and prove: --fuzz-count N (default 64), --variants N (default 32),
 //! --seed <64 hex chars> (default: the S1 demo seed), --succinct (prove only: compress to one succinct receipt),
 //! --out <file> (prove only: receipt file, default target/s2/receipt.bin), --po2 N (segment size limit as a
 //! power of two, smaller uses less memory per segment; default: RISC Zero's default of 20), --profile (execute
-//! only: the guest prints its cycles per phase).
+//! only: the guest prints its cycles per phase), --submission-id <64 hex> (the id the contract gives the submission,
+//! see `get_submission_id`; default all zeros).
 //! The bounty files are the demo files in data/demo/. Proving runs on this machine through the installed
 //! r0vm; nothing is sent to a remote prover.
 
@@ -35,6 +38,7 @@ fn main() -> ExitCode {
         Some("prove") => prove(&args[1..]),
         Some("verify") => return verify(&args[1..]),
         Some("tamper") => tamper(&args[1..]),
+        Some("compress") => compress(&args[1..]),
         None => hello("kintsugi".to_string()),
         Some(other) => Err(format!("unknown command {other}; see the comment at the top of host/src/main.rs")),
     };
@@ -76,6 +80,7 @@ struct Opts {
     out: String,
     po2: Option<u32>,
     profile: bool,
+    submission_id: [u8; 32],
 }
 
 fn parse_opts(args: &[String]) -> Result<Opts, String> {
@@ -89,6 +94,7 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
         out: "target/s2/receipt.bin".to_string(),
         po2: None,
         profile: false,
+        submission_id: [0u8; 32],
     };
     let mut i = 1;
     while i < args.len() {
@@ -98,6 +104,7 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
             "--variants" => opts.variants = value()?.parse().map_err(|e| format!("--variants: {e}"))?,
             "--seed" => opts.seed = parse_seed(value()?)?,
             "--out" => opts.out = value()?.clone(),
+            "--submission-id" => opts.submission_id = parse_seed(value()?)?,
             "--po2" => opts.po2 = Some(value()?.parse().map_err(|e| format!("--po2: {e}"))?),
             "--succinct" => {
                 opts.succinct = true;
@@ -133,7 +140,7 @@ fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
         fuzz_seed: opts.seed,
         fuzz_count: opts.fuzz_count,
         variant_count: opts.variants,
-        submission_id: [0u8; 32],
+        submission_id: opts.submission_id,
         profile: opts.profile,
     })
 }
@@ -273,6 +280,34 @@ fn verify(args: &[String]) -> ExitCode {
             ExitCode::from(1)
         }
     }
+}
+
+/// Compresses a receipt (composite to succinct, or to Groth16), times it, verifies the result and writes it.
+fn compress(args: &[String]) -> Result<(), String> {
+    let [input, output, kind] = args else {
+        return Err("usage: compress <in.bin> <out.bin> <succinct|groth16>".to_string());
+    };
+    let opts = match kind.as_str() {
+        "succinct" => ProverOpts::succinct(),
+        "groth16" => ProverOpts::groth16(),
+        other => return Err(format!("unknown kind {other}")),
+    };
+    let in_bytes = read(input)?;
+    let receipt: Receipt = bincode::deserialize(&in_bytes).map_err(|e| e.to_string())?;
+    let started = Instant::now();
+    let compressed = default_prover().compress(&opts, &receipt).map_err(|e| e.to_string())?;
+    let secs = started.elapsed().as_secs_f64();
+    let started = Instant::now();
+    compressed.verify(CHECK_GUEST_ID).map_err(|e| format!("verification failed: {e}"))?;
+    let verify_secs = started.elapsed().as_secs_f64();
+    let out_bytes = bincode::serialize(&compressed).map_err(|e| e.to_string())?;
+    std::fs::write(output, &out_bytes).map_err(|e| format!("{output}: {e}"))?;
+    println!("input receipt: {input} ({} bytes)", in_bytes.len());
+    println!("compressed to: {kind}");
+    println!("compress seconds: {secs:.2}");
+    println!("verify seconds: {verify_secs:.3}");
+    println!("output receipt: {output} ({} bytes)", out_bytes.len());
+    Ok(())
 }
 
 /// Writes a changed copy of a receipt. "journal": flips the published verdict (PASS <-> FAIL).

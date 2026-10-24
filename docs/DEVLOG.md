@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: S4/S5 OutLayer as verifier 1 (in progress)
+
+- Contract: `set_outlayer`, `request_outlayer_check`, private callback `on_outlayer_result`, `get_submission_id`; 48 unit
+  tests pass. One test first failed because calling a callback directly in a unit test skips the `#[private]` entry check;
+  the method now checks its caller itself.
+- Verifier program `verifier/outlayer` (`farbox-verifier`), native tests correct on the 16 input receipt; wasm32-wasip1 build
+  1,134,249 bytes, strings scan clean. Installed the wasm32-wasip1 Rust target (owner approved).
+- Host: `compress`, `--submission-id`, `cuda` feature. GPU test plan written (private notes).
+- Waiting: the owner's go to publish the verifier wasm in a separate public repository; compression of the 16 input receipt
+  is running (2 hour cap).
+
 ## 2026-10-24: S2b cutting the proving cost
 
 - Added a cycle profile to the guest (`--profile`): 74 to 77% of the guest's cycles are interpreter setup per input, mostly

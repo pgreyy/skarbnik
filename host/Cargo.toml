@@ -13,3 +13,8 @@ kintsugi-check = { path = "../harness/checker", features = ["zk"] }
 risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["client"] }
 # Receipt files on disk.
 bincode = "=1.3.3"
+
+[features]
+# For a machine with an NVIDIA GPU (see notes on the GPU test): proves inside this process with CUDA
+# instead of through the r0vm program. Needs the CUDA toolkit to build. Off by default.
+cuda = ["risc0-zkvm/cuda"]

@@ -29,11 +29,18 @@
 //! Verifiers are registered accounts (by the owner); an attestation is a call to `attest` signed by that
 //! verifier account's own access key, so NEAR's transaction signature check is the signature check.
 //! Every state change writes a NEP-297 style `EVENT_JSON:` log line.
+//!
+//! OutLayer as one verifier (spike S5, Level 1): the owner sets the OutLayer contract account and the exact
+//! verifier program (URL and sha256) with `set_outlayer`, and registers that OutLayer account as a verifier.
+//! Anyone may call `request_outlayer_check` with the receipt; this contract itself sends the job to OutLayer,
+//! and only the callback of that request (`on_outlayer_result`, private) can add OutLayer's attestation. The
+//! callback carries only the program's JSON answer (no signature, no program hash), so it is accepted only if
+//! every echoed value matches what this contract holds. This trusts the OutLayer contract and its operator.
 
 use near_sdk::json_types::{Base64VecU8, U128, U64};
 use near_sdk::serde_json::{Value, json};
 use near_sdk::store::{IterableMap, LookupMap, LookupSet};
-use near_sdk::{AccountId, BorshStorageKey, NearToken, PanicOnDefault, Promise, env, near, require};
+use near_sdk::{AccountId, BorshStorageKey, Gas, NearToken, PanicOnDefault, Promise, PromiseError, env, near, require};
 
 /// Name and version written into every event log line.
 const EVENT_STANDARD: &str = "kintsugi";
@@ -47,6 +54,45 @@ pub const MAX_COMMITS_CAP: u32 = 16;
 pub const MIN_BOUNTY: NearToken = NearToken::from_millinear(100);
 /// Number of different registered verifiers whose matching attestations make a verdict final.
 pub const ATTESTATIONS_TO_FINALIZE: usize = 2;
+/// Domain tag of the submission id that the proof's journal must carry.
+pub const SUBMISSION_DOMAIN: &[u8] = b"kintsugi-submission-v1";
+/// Storage key of the OutLayer settings. Kept outside the main state so adding them does not change
+/// the layout of contract state that is already deployed.
+const OUTLAYER_KEY: &[u8] = b"OUTLAYER";
+/// Gas sent with the OutLayer request (it reserves its own callback gas from this) and kept for ours.
+const OUTLAYER_REQUEST_GAS: Gas = Gas::from_tgas(150);
+const OUTLAYER_CALLBACK_GAS: Gas = Gas::from_tgas(30);
+
+/// Where OutLayer runs and which exact program it must run.
+#[near(serializers = [borsh, json])]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OutLayerConfig {
+    /// The OutLayer contract, for example `outlayer.testnet`. Must also be a registered verifier.
+    pub account_id: AccountId,
+    /// https URL of the verifier wasm and its sha256 (64 hex); OutLayer's worker refuses other bytes.
+    pub wasm_url: String,
+    pub wasm_sha256: String,
+    /// For example `wasm32-wasip1`.
+    pub build_target: String,
+    pub max_instructions: U64,
+    pub max_memory_mb: u32,
+    pub max_execution_seconds: U64,
+}
+
+/// The submission id a proof's journal must carry:
+/// sha256( "kintsugi-submission-v1" || len(contract account) as u32 LE || contract account || bounty id as
+/// u64 LE || index as u32 LE || sha256(patch) ).
+pub fn submission_id(contract: &AccountId, bounty_id: u64, index: u32, patch_hash: &[u8; 32]) -> [u8; 32] {
+    let c = contract.as_str().as_bytes();
+    let mut buf = Vec::with_capacity(SUBMISSION_DOMAIN.len() + 4 + c.len() + 12 + 32);
+    buf.extend_from_slice(SUBMISSION_DOMAIN);
+    buf.extend_from_slice(&(c.len() as u32).to_le_bytes());
+    buf.extend_from_slice(c);
+    buf.extend_from_slice(&bounty_id.to_le_bytes());
+    buf.extend_from_slice(&index.to_le_bytes());
+    buf.extend_from_slice(patch_hash);
+    env::sha256_array(&buf)
+}
 
 #[near(serializers = [borsh])]
 #[derive(BorshStorageKey)]
@@ -563,11 +609,143 @@ impl Contract {
     /// attestation by the same verifier counts once. Returns "recorded", "duplicate", "final_pass" or
     /// "final_fail".
     pub fn attest(&mut self, bounty_id: U64, index: u32, verdict: Verdict, journal_hash: String, receipt_hash: String) -> String {
-        let now = env::block_timestamp();
         let verifier = env::predecessor_account_id();
-        require!(self.verifiers.contains_key(&verifier), "caller is not a registered verifier");
         let journal = parse_hash("journal_hash", &journal_hash);
         let receipt = parse_hash("receipt_hash", &receipt_hash);
+        self.record_attestation(bounty_id, index, verifier, verdict, journal, receipt)
+    }
+
+    // ---------- OutLayer (verifier 1) ----------
+
+    /// Owner only. Sets the OutLayer contract and the exact verifier program it must run.
+    pub fn set_outlayer(&mut self, config: OutLayerConfig) {
+        require!(env::predecessor_account_id() == self.owner, "only the owner can set OutLayer");
+        parse_hash("wasm_sha256", &config.wasm_sha256);
+        require!(config.wasm_url.starts_with("https://"), "wasm_url must be https");
+        emit("outlayer_set", json!({ "config": config }));
+        env::storage_write(OUTLAYER_KEY, &near_sdk::borsh::to_vec(&config).expect("config serializes"));
+    }
+
+    pub fn get_outlayer(&self) -> Option<OutLayerConfig> {
+        env::storage_read(OUTLAYER_KEY).map(|b| near_sdk::borsh::from_slice(&b).expect("stored config decodes"))
+    }
+
+    /// The submission id the journal of a proof for this submission must carry (64 hex), once revealed.
+    pub fn get_submission_id(&self, bounty_id: U64, index: u32) -> Option<String> {
+        let sub = self.submissions.get(&(bounty_id.0, index))?;
+        let patch_hash = sub.patch_hash?;
+        Some(to_hex(&submission_id(&env::current_account_id(), bounty_id.0, index, &patch_hash)))
+    }
+
+    /// Anyone. Sends the posted verdict's receipt (bincode, base64) to OutLayer to be checked by the pinned
+    /// verifier program. Attach NEAR for OutLayer's fee; OutLayer refunds what it does not use to the caller.
+    /// The answer comes back to `on_outlayer_result`.
+    #[payable]
+    pub fn request_outlayer_check(&mut self, bounty_id: U64, index: u32, receipt_b64: String) -> Promise {
+        let cfg = self.get_outlayer().unwrap_or_else(|| env::panic_str("OutLayer is not set"));
+        require!(self.verifiers.contains_key(&cfg.account_id), "the OutLayer account is not a registered verifier");
+        let bounty = self.bounties.get(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        require!(bounty.state == BountyState::Open, "bounty is closed");
+        let sub = self.submissions.get(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
+        require!(sub.outcome == Outcome::Open, "verdict already final");
+        let posted = sub.verdict.as_ref().unwrap_or_else(|| env::panic_str("no verdict posted"));
+        let patch_hash = sub.patch_hash.unwrap_or_else(|| env::panic_str("submission not revealed"));
+        let sid = submission_id(&env::current_account_id(), bounty_id.0, index, &patch_hash);
+        let input = json!({
+            "receipt_b64": receipt_b64,
+            "image_id": to_hex(&bounty.image_id),
+            "submission_id": to_hex(&sid),
+            "receipt_sha256": to_hex(&posted.receipt_hash),
+        })
+        .to_string();
+        let args = json!({
+            "source": { "WasmUrl": { "url": cfg.wasm_url, "hash": cfg.wasm_sha256, "build_target": cfg.build_target } },
+            "resource_limits": {
+                "max_instructions": cfg.max_instructions.0,
+                "max_memory_mb": cfg.max_memory_mb,
+                "max_execution_seconds": cfg.max_execution_seconds.0,
+            },
+            "input_data": input,
+            "response_format": "Json",
+            "payer_account_id": env::predecessor_account_id(),
+        });
+        emit("outlayer_requested", json!({ "bounty_id": bounty_id, "index": index, "outlayer": cfg.account_id }));
+        Promise::new(cfg.account_id)
+            .function_call(
+                "request_execution".to_string(),
+                args.to_string().into_bytes(),
+                env::attached_deposit(),
+                OUTLAYER_REQUEST_GAS,
+            )
+            .then(Self::ext(env::current_account_id()).with_static_gas(OUTLAYER_CALLBACK_GAS).on_outlayer_result(bounty_id, index))
+    }
+
+    /// Private: only this contract can call it, as the callback of its own OutLayer request. Accepts OutLayer's
+    /// answer as an attestation only if it says ok and every echoed value matches this contract's record.
+    /// Returns what happened; a rejected answer records nothing.
+    #[private]
+    pub fn on_outlayer_result(
+        &mut self,
+        bounty_id: U64,
+        index: u32,
+        #[callback_result] answer: Result<Option<Value>, PromiseError>,
+    ) -> String {
+        // `#[private]` already enforces this in the on-chain entry point; checked here too so the rule
+        // also holds (and is tested) when the method is called directly.
+        require!(env::predecessor_account_id() == env::current_account_id(), "on_outlayer_result is private");
+        let reject = |why: &str| -> String {
+            emit("outlayer_rejected", json!({ "bounty_id": bounty_id, "index": index, "reason": why }));
+            format!("rejected: {why}")
+        };
+        let Ok(Some(a)) = answer else { return reject("no answer from OutLayer") };
+        let Some(cfg) = self.get_outlayer() else { return reject("OutLayer is not set") };
+        let Some(bounty) = self.bounties.get(&bounty_id.0) else { return reject("no such bounty") };
+        let Some(sub) = self.submissions.get(&(bounty_id.0, index)) else { return reject("no such submission") };
+        let (Some(posted), Some(patch_hash)) = (sub.verdict.as_ref(), sub.patch_hash) else {
+            return reject("no verdict posted");
+        };
+        let field = |k: &str| a.get(k).and_then(Value::as_str).map(str::to_lowercase);
+        if a.get("ok").and_then(Value::as_bool) != Some(true) {
+            return reject("answer is not ok");
+        }
+        let sid = submission_id(&env::current_account_id(), bounty_id.0, index, &patch_hash);
+        let checks = [
+            ("image_id", to_hex(&bounty.image_id)),
+            ("submission_id", to_hex(&sid)),
+            ("receipt_sha256", to_hex(&posted.receipt_hash)),
+            ("journal_sha256", to_hex(&posted.journal_hash)),
+        ];
+        for (k, want) in checks {
+            if field(k).as_deref() != Some(want.as_str()) {
+                return reject(&format!("{k} differs"));
+            }
+        }
+        let verdict = match a.get("verdict").and_then(Value::as_str) {
+            Some("PASS") => Verdict::Pass,
+            Some("FAIL") => Verdict::Fail,
+            _ => return reject("verdict is not PASS or FAIL"),
+        };
+        if verdict != posted.verdict {
+            return reject("verdict differs from the posted verdict");
+        }
+        let (journal, receipt) = (posted.journal_hash, posted.receipt_hash);
+        self.record_attestation(bounty_id, index, cfg.account_id, verdict, journal, receipt)
+    }
+
+    /// Shared by `attest` and `on_outlayer_result` (not callable from outside): adds one registered
+    /// verifier's attestation if it matches the posted verdict, journal hash and receipt hash, and finalizes
+    /// on the second different verifier.
+    fn record_attestation(
+        &mut self,
+        bounty_id: U64,
+        index: u32,
+        verifier: AccountId,
+        verdict: Verdict,
+        journal: [u8; 32],
+        receipt: [u8; 32],
+    ) -> String {
+        let now = env::block_timestamp();
+        require!(self.verifiers.contains_key(&verifier), "caller is not a registered verifier");
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(verifier != bounty.vendor, "the vendor cannot attest");

@@ -5,6 +5,44 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S4/S5: OutLayer as verifier 1 (Level 1)
+
+**Verdict: in progress (2026-10-24).** The contract side and the verifier program are built and tested on this machine. No
+OutLayer job has run yet.
+
+What exists:
+
+- `contract/src/lib.rs`: `set_outlayer` (owner sets the OutLayer contract, the verifier program's https URL and sha256, the
+  build target and limits), `request_outlayer_check` (anyone; this contract sends `request_execution` to OutLayer with the
+  pinned program and the receipt), `on_outlayer_result` (private callback). The callback records OutLayer's attestation only
+  if the answer says `ok` and its image id, submission id, receipt sha256, journal sha256 and verdict all equal this
+  contract's record; a second verifier is still needed to finalize. `get_submission_id` gives the id the journal must carry:
+  sha256("kintsugi-submission-v1" || contract account || bounty id || index || sha256(patch)). The OutLayer settings use their
+  own storage key, so the deployed state layout is unchanged.
+- `verifier/outlayer/` (`farbox-verifier`): reads `{receipt_b64, image_id, submission_id, receipt_sha256}` from stdin,
+  checks the receipt hash, verifies the receipt with RISC Zero's verify-only code, checks the journal's submission id, and
+  prints one JSON answer (largest seen: 505 bytes, under OutLayer's 900 byte limit).
+- `kintsugi-host`: `compress` (receipt to succinct or Groth16), `--submission-id`, and a `cuda` feature for a GPU machine.
+
+Tests:
+
+- `cargo test -p kintsugi-contract --offline`: 48 passed (9 new OutLayer tests: answer counts as one verifier and a second
+  verifier finalizes; repeat counts once; wrong image id, submission id, receipt hash or verdict rejected; not ok, null or
+  failed promise rejected; callback private; the request goes to the OutLayer account with the pinned program and input;
+  OutLayer must be a registered verifier; only the owner sets OutLayer). One test first failed: calling the callback
+  directly in a unit test skips near-sdk's `#[private]` entry check, so the method now also checks the caller itself.
+- Native verifier on the 16 input receipt (`docs/evidence/S4/verifier_native_tests.txt`): correct values give `ok: true`,
+  PASS; a wrong image id, a wrong receipt hash, a changed journal, and a wrong submission id each give `ok: false`. About
+  1.2 s per check.
+
+Wasm for OutLayer (`./scripts/build_verifier_wasm.sh`, wasm32-wasip1, paths remapped, symbols stripped):
+1,134,249 bytes, SHA-256 `e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8`. The strings scan found no home
+paths, user names, project names or keys (`docs/evidence/S4/verifier_wasm_build_scan.txt`). Not run as wasm yet: no WASI
+runtime is installed here.
+
+Still open: the composite receipts (7 to 33 MB) are far above NEAR's 1.5 MiB transaction size, so the OutLayer check needs
+a compressed receipt; publishing the wasm at a public https URL; then one testnet run.
+
 ## S3b: Attempt fees and credit, on a dedicated contract account
 
 Question: does a commit pay a rising attempt fee from prepaid credit, is a commit without credit refused, do the fees reach
