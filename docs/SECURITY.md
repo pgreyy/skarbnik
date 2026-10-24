@@ -125,8 +125,8 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
-- 2026-10-24 (pending commit): demo bounty 4 with the reproducible image id; `check_image_id.sh` prints MATCH.
-- 2026-10-24 (pending commit): prebuilt guest mode and `cuda-prove-only` build option; known limit for the prebuilt mode.
+- 2026-10-24 `582b2d8`: demo bounty 4 with the reproducible image id; `check_image_id.sh` prints MATCH.
+- 2026-10-24 `582b2d8`: prebuilt guest mode and `cuda-prove-only` build option; known limit for the prebuilt mode.
 - 2026-10-24 `0409a3c`: reproducible checker build made official; new guard row; known limit for older bounties'
   image ids.
 - 2026-10-24 `500469c`: OutLayer second try: verifier published on FastFS as project
