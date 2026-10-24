@@ -1,0 +1,7 @@
+[
+{"attempt":1,"mask":2048,"value":2048,"verdict":"FAIL","candidates_left":2048,"bits_learned":1.0,"budget":3,"probe_sha256":"57a0ed4f2052e1166c383a82e30bb5081eee4001bbab45737b326745faf4471e"}
+,
+{"attempt":2,"mask":3072,"value":1024,"verdict":"FAIL","candidates_left":1024,"bits_learned":2.0,"budget":3,"probe_sha256":"abeebd6a7e5f1ac0bdea118b1b4571c6f4b9c31df887f56f34b12d59977cd7ee"}
+,
+{"attempt":3,"mask":3584,"value":512,"verdict":"PASS","candidates_left":512,"bits_learned":3.0,"budget":3,"probe_sha256":"351c8bb8e587bcfa65a1af31b3b8661d9b0afad43261d2fda1b758ba33d34b8a"}
+]

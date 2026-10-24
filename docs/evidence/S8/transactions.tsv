@@ -1,0 +1,6 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+s8_create_arena_bounty	create_bounty	kintsugi-vendor-prnvm.testnet	ANCqPZzLAwdybq2qriGQhnquenC9kqqF36oyAMg13q3U	0.341 Tgas	0.000034029369134	0	5.74
+s8_commit_probe_1	commit	kintsugi-res1-prnvm.testnet	FpUpVqQyfYRGPtcv9ZTgaWHQMHefpXDUtsy7bAf9FEDi	0.315 Tgas	0.0000314878271245	0	5.57
+s8_commit_probe_2	commit	kintsugi-res1-prnvm.testnet	8jMLwGnYP4w9CjYPgExt1oLXu1e3SRwWsnAvQWk6S3yU	0.315 Tgas	0.0000314878271245	0	6.05
+s8_commit_probe_3	commit	kintsugi-res1-prnvm.testnet	AGSSeET6zNB1UomHumPhHD1tHroxCqfcHi8Kk6EdEDm1	0.315 Tgas	0.0000314878271245	0	5.72
+s8_commit_probe_4	commit	kintsugi-res1-prnvm.testnet	2NuDyLV6pX83LFZcV67fR3AMzaC2BZEwY7dRQvDvpohX	0.315 Tgas	0.0000314878271245	0	5.86

@@ -1,0 +1,44 @@
+// An arena probe (spike S8), generated from data/arena/probe.rs.template by scripts/s8_arena.sh. Inert test data.
+// It behaves exactly like data/arena/original.rs, except that a fragile record whose 12 bit value v satisfies
+// (v & MASK) == VALUE is fixed (returns a value) instead of crashing. So its verdict is PASS only if the
+// secret's value matches the pattern: at most one bit of information per attempt.
+#![no_std]
+
+const MASK: u32 = 2048;
+const VALUE: u32 = 2048;
+const MAX_INPUT: usize = 256;
+static mut INPUT: [u8; MAX_INPUT] = [0; MAX_INPUT];
+
+#[no_mangle]
+pub extern "C" fn input_buf() -> i32 {
+    core::ptr::addr_of_mut!(INPUT) as i32
+}
+
+#[no_mangle]
+pub extern "C" fn parse(len: i32) -> i32 {
+    if len < 0 || len as usize > MAX_INPUT {
+        return -1;
+    }
+    let input = unsafe { core::slice::from_raw_parts(core::ptr::addr_of!(INPUT) as *const u8, len as usize) };
+    if input.len() >= 3 && input[0] == 0xA5 {
+        let v = (((input[1] as u32) << 8) | input[2] as u32) & 0x0FFF;
+        if (v & MASK) == VALUE {
+            return (fingerprint(&v.to_le_bytes()) & 0x3fff_ffff) | 0x4000_0000;
+        }
+        core::arch::wasm32::unreachable()
+    }
+    fingerprint(input)
+}
+
+fn fingerprint(input: &[u8]) -> i32 {
+    let mut h: u32 = 0x811c_9dc5;
+    for b in input {
+        h = (h ^ *b as u32).wrapping_mul(16_777_619);
+    }
+    (h & 0x7fff_ffff) as i32
+}
+
+#[panic_handler]
+fn panic(_: &core::panic::PanicInfo) -> ! {
+    core::arch::wasm32::unreachable()
+}

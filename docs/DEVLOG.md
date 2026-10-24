@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: S8 arena (PASS)
+
+- Arena module with 4,096 crashing values; the vendor's secret is which one is committed. Scripted probe agent, K = 3,
+  binary search: 3 bits learned, never above the budget; secret revealed after the game, commitment and log consistent.
+- With the crash-variant check on, every partial-fix probe FAILs, so the agent learns 0 bits.
+- On testnet, the fourth probe commit on an arena bounty with `max_commits` 3 was ignored at no cost.
+- Verdicts from the native checker, not proofs (labelled). First build failed: the no_std modules needed a panic handler.
+
 ## 2026-10-24: S7 scripted agent with a function call key (key part PASS)
 
 - Fallback, labelled: scripted agent, canned patch; no language model (needs a NEAR AI Cloud account from the owner).

@@ -1,0 +1,6 @@
+after probe commit 1: commits=1, credit=120000000000000000000000
+after probe commit 2: commits=2, credit=105000000000000000000000
+after probe commit 3: commits=3, credit=85000000000000000000000
+after probe commit 4: commits=3, credit=85000000000000000000000
+"event":"commit_ignored","data":[{"bounty_id":"4","committer":"kintsugi-res1-prnvm.testnet","reason":"max_commits reached"
+credit before: 130000000000000000000000; fees taken: 45000000000000000000000

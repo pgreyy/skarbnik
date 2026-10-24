@@ -1,0 +1,22 @@
+modules: original 199 bytes, fixed 312 bytes; public tests: 14
+secret space: 4096 values; exploit commitment sha256(salt || exploit): 708696244c29c9384546608cf8bdf02a65e6d76f80248540e3ab7566863ae62b; fairness seed: bf64b5affd164a871895d0b5a0af82b8d98daf5da0d3ebb5e3cd0e9c6948f4ab
+proof0: stats: runs=15 max_fuel_candidate=0 max_fuel_original=162 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+
+| attempt | probe pattern (bits of v) | verdict | candidates left | bits learned | budget K |
+| --- | --- | --- | --- | --- | --- |
+| 1 | (v & 0x800) == 0x800 | FAIL | 2048 | 1.0 | 3 |
+| 2 | (v & 0xc00) == 0x400 | FAIL | 1024 | 2.0 | 3 |
+| 3 | (v & 0xe00) == 0x200 | PASS | 512 | 3.0 | 3 |
+attempt 4: refused, the budget K = 3 is spent (on chain the contract ignores commits beyond max_commits)
+
+control with the crash-variant check on (32 variants), same probes:
+  probe_1: FAIL
+  probe_2: FAIL
+  probe_3: FAIL
+honest fix, variants 0: PASS; variants 32: PASS
+unpatched original: FAIL
+
+reveal (after the game): exploit a5333f, value 831, salt 61ddd70489cb14ab75bd2d9cf48dc9e2096e2289e491151fed691cb7622266e8
+commitment matches the revealed salt and exploit: True
+the secret value lies in the candidate set the log describes ((v & 0xe00) == 0x200): True
+bits learned by the probe agent: 3, budget K = 3, within budget: True

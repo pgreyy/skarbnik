@@ -5,6 +5,41 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S8: How many bits can a probe agent extract?
+
+Question: in an arena bounty with a known, small secret space, how much does a scripted probe agent learn from PASS or FAIL
+verdicts with a budget of K attempts? Pass (blueprint): extracted bits never exceed K; the counter matches the log.
+
+**Verdict: PASS (2026-10-24).** Verdicts come from the native checker (the same checker code the zkVM guest runs); no proofs
+were made for the arena probes. The secret was revealed only after the game, to check the log.
+
+Arena (`data/arena/`): the module crashes on every input starting with byte `0xA5` (4,096 crashing 12 bit values). The
+vendor's secret is which one of them the committed exploit is. A probe fixes the crash only for values matching a bit
+pattern, so its verdict says whether the secret matches: at most one bit per attempt. Script: `./scripts/s8_arena.sh`
+(full output `docs/evidence/S8/arena_run.txt`, per attempt `docs/evidence/S8/arena_log.json`).
+
+- Proof 0 for the arena: PASS (the original crashes on the secret and passes its 14 public tests).
+- Game, K = 3, crash-variant check off, binary search over the top bits:
+
+| attempt | probe pattern (bits of v) | verdict | candidates left | bits learned | budget K |
+| --- | --- | --- | --- | --- | --- |
+| 1 | (v & 0x800) == 0x800 | FAIL | 2048 | 1.0 | 3 |
+| 2 | (v & 0xc00) == 0x400 | FAIL | 1024 | 2.0 | 3 |
+| 3 | (v & 0xe00) == 0x200 | PASS | 512 | 3.0 | 3 |
+
+- A fourth attempt is refused (budget spent). After the game the vendor revealed exploit `a5333f` (value 831) and the salt:
+  the commitment matches, and the secret lies in the set the log describes. 3 bits learned, budget 3.
+- Control with the crash-variant check on (32 variants): all three probes FAIL whatever the secret, because a probe that
+  fixes only part of the crash family still crashes on nearby variants of the secret. With that check on, this probe agent
+  learns 0 bits. The honest fix passes with and without it.
+- On testnet (`./scripts/s8_chain.sh`, `docs/evidence/S8/chain_summary.txt`): arena bounty 4 with `max_commits` 3
+  (`ANCqPZzLAwdybq2qriGQhnquenC9kqqF36oyAMg13q3U`). Probe commits 1 to 3 counted, fees 0.01, 0.015 and 0.02 NEAR
+  (`FpUpVqQyfYRGPtcv9ZTgaWHQMHefpXDUtsy7bAf9FEDi`, `8jMLwGnYP4w9CjYPgExt1oLXu1e3SRwWsnAvQWk6S3yU`,
+  `AGSSeET6zNB1UomHumPhHD1tHroxCqfcHi8Kk6EdEDm1`); the fourth (`2NuDyLV6pX83LFZcV67fR3AMzaC2BZEwY7dRQvDvpohX`) was ignored:
+  still 3 commits, credit unchanged, event `commit_ignored` with reason "max_commits reached".
+
+Not measured: timing or other side channels; a model-driven probe agent (needs NEAR AI Cloud).
+
 ## S7: An agent that works only through a function call key
 
 Question: can a researcher agent commit and reveal using a key that cannot move its owner's money? Pass (blueprint): the
