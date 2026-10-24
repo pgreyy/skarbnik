@@ -2,6 +2,22 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: OutLayer (Level 1) diagnosis on testnet (one hour cap)
+
+- Ran OutLayer's documented call (Project source, 10 M instructions, 128 MB, 60 s, 0.1 NEAR) against their public test
+  project `connectors.outlayer.testnet/connector-probe`: answered in 13 s. So testnet workers work.
+- Changed one thing at a time with `./scripts/ol_diag.sh` (requests 5610 to 5615 plus a control): the probe file by link
+  (FastFS, wasip1 or wasip2) is answered, because OutLayer has it cached; our verifier from raw GitHub or jsDelivr, and a
+  file from OutLayer's own GitHub repo, are never answered. Worker counters on OutLayer's public worker list do not move
+  for those jobs, and do move for the control.
+- Measured our verifier with wasmtime 28.0.1 fuel metering (`verifier/fuel-meter`, new): 878,730,118 instructions, 3.4 MB,
+  71 ms on the real receipt. Limits and deposit were not the cause.
+- Result: the cause is inside OutLayer (a job whose program must be downloaded first never reaches a worker). Level 1 stays
+  "not confirmed on testnet"; Level 0 remains the working path. A ready-to-send question for OutLayer is drafted for the
+  owner; nothing was sent. Details: EVIDENCE, "OutLayer (Level 1) on testnet".
+- Mistake: my first worker counter readout had a quoting error, so the counters during e6 were read again right after.
+- Next: S13 testnet phases.
+
 ## 2026-10-24: S4 end to end on testnet (OutLayer did not answer)
 
 - Real proof for bounty 2 with the on-chain seed and submission id: 2,876 s, compressed to 224,786 bytes in 921 s; the

@@ -8,7 +8,7 @@ members = ["contract", "harness", "host", "harness/checker", "verifier/outlayer"
 default-members = ["harness", "host", "harness/checker"]
 
 # The zkVM guests are built by harness/build.rs with the RISC Zero toolchain, not by this workspace.
-exclude = ["harness/guest", "harness/check-guest"]
+exclude = ["harness/guest", "harness/check-guest", "verifier/fuel-meter"]
 
 # Always optimize; building and running zkVM code is very slow without it.
 [profile.dev]

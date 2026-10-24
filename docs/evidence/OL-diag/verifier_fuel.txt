@@ -1,0 +1,15 @@
+$ /usr/bin/time -v target/fuel-meter/release/fuel-meter target/verifier-publish/farbox-verifier.wasm target/s4-logs/succinct_input.json
+result=ok
+fuel_used=878730118
+peak_memory_bytes=3473408 (~3 MiB)
+compile_ms=115 run_ms=71
+stdout={"ok":true,"verdict":"PASS","image_id":"3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d","submission_id":"0000000000000000000000000000000000000000000000000000000000000000","receipt_sha256":"6dcf09d015ae8e3b6088f012e6b8982f4e46aea2984825868261c18e70847b24","journal_sha256":"ca847eadaeb1032ada6942ca3042e3bd15cda8a4499edf8b24c2205754722bbe","error":null}
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.19
+	Maximum resident set size (kbytes): 78552
+$ ... with input {}
+result=ok
+fuel_used=20105
+peak_memory_bytes=1835008 (~1 MiB)
+compile_ms=110 run_ms=0
+stdout={"ok":false,"verdict":null,"image_id":"","submission_id":"","receipt_sha256":"","journal_sha256":null,"error":"input is not the expected JSON: missing field `receipt_b64` at line 1 column 2"}
+

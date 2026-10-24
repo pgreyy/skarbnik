@@ -1,0 +1,4 @@
+estimate_execution_cost (yoctoNEAR), 2026-10-24T12:28:33Z
+{"resource_limits":{"max_instructions":2000000000,"max_memory_mb":64,"max_execution_seconds":20},"input_len":299987} -> "2675190200000000000000000"
+{"resource_limits":{"max_instructions":100000000000,"max_memory_mb":256,"max_execution_seconds":60},"input_len":299987} -> "2679200000000000000000000"
+{"resource_limits":{"max_instructions":10000000,"max_memory_mb":128,"max_execution_seconds":60},"input_len":2} -> "7000001000000000000000"

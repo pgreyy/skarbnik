@@ -1,0 +1,16 @@
+# Measures how many wasmtime "fuel" units (OutLayer's instruction count) and how much
+# memory the published verifier wasm uses on a given input. Standalone crate, not part
+# of the main workspace; the wasmtime version matches the one OutLayer's worker pins.
+[package]
+name = "fuel-meter"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+wasmtime = { version = "=28.0.1", features = ["async"] }
+wasmtime-wasi = "=28.0.1"
+tokio = { version = "1", features = ["rt", "macros"] }
+anyhow = "1"

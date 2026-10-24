@@ -1,0 +1,5 @@
+12:25 UTC reading (before E6, from testnet_workers.json): executor-2ebb done=180 failed=20; executor-8237 done=13 failed=1
+12:28 UTC reading (after E6, request 5615):
+testnet-executor-2ebb053d22438 status=online done=180 failed=20 task=None hb=2026-10-24T12:28:08.616Z
+testnet-executor-8237392e4947e status=online done=13 failed=1 task=None hb=2026-10-24T12:28:06.809Z
+testnet-keystore status=online done=0 failed=0 task=None hb=2026-10-24T12:27:52.267Z

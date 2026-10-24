@@ -5,6 +5,67 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## OutLayer (Level 1) on testnet: why did no worker answer?
+
+Question: in S4 our OutLayer jobs (requests 5607 and 5608) were accepted by `outlayer.testnet` but ended about 120 s later
+with "Execution promise failed": no worker answered within NEAR's yield window. Is it our job, our program, or OutLayer?
+One hour cap, 2026-10-24 12:10 to 13:10 UTC. Raw output: `docs/evidence/OL-diag/`. Each test job was sent with
+`./scripts/ol_diag.sh <name> '<request_execution args>'` from the testnet account `kintsugi-res2-prnvm.testnet`, 0.1 NEAR
+attached, 300 Tgas; OutLayer kept at most 0.0011 NEAR per job and refunded the rest.
+
+**Verdict: OutLayer's testnet workers are up and answer jobs whose program file is already in OutLayer's cache. Every job
+whose program file OutLayer had to download first got no answer, from two different hosts. Ours are all of that kind. The
+cause is on OutLayer's side and we cannot see it; Level 1 stays "not working on testnet yet". Fallback: Level 0 (unchanged).**
+
+1. Where the jobs went. Request 5607 (tx `FgieKEfSo2DE9WsuZSVMTBNMH4D48igNdwgEbLSnshS4`) was sent by our contract to
+   `outlayer.testnet` (`docs/evidence/S4/outlayer_tx_tree.txt.txt`); the direct job 5608
+   (tx `Kx7kzdPwr6hHdtEmgDGeHhirA9LNVSG6fKwtai1B255`) was sent to `outlayer.testnet` directly. Both correct.
+   `outlayer.testnet` is not paused (`is_paused` = false), has no pending requests, and names `worker.outlayer.testnet` as
+   its operator (`get_config`).
+2. OutLayer's own documented call. Their docs call a registered project with `"source": {"Project": ...}`, limits
+   10,000,000 instructions, 128 MB, 60 s, and 0.1 NEAR. We ran exactly that against OutLayer's public test project
+   `connectors.outlayer.testnet/connector-probe` with `{"operation":"ping"}` (`probe_ping.txt`,
+   tx `6zrCoq46Cx5WZFRsK14c2yC65oJR2B9eLwHmDZitoC8a`): answered in 13 s with
+   `{"ok":true,"operation":"ping",...}`, 18,152 instructions, 0.0011053 NEAR charged. OutLayer's event says the program
+   came from its cache ("Cached WASM from 2026-10-02").
+3. One change at a time from that working call (all with the same small limits):
+
+   | Test | Program file | Link | Build target | Request | Answer |
+   |---|---|---|---|---|---|
+   | probe_ping | OutLayer's probe, via its project | FastFS | wasip2 | (tx above) | yes, 13 s, success |
+   | e1 | OutLayer's probe, same file by link | FastFS | wasip2 | 5610 | yes, 10 s (an error from the probe itself: it needs a project) |
+   | e4 | OutLayer's probe, same file by link | FastFS | wasip1 | 5613 | yes, 11 s (same error) |
+   | e2 | our verifier | raw GitHub | wasip1 | 5611 | **none**, 123 s, "Execution promise failed" |
+   | e3 | a file from OutLayer's own GitHub repo | raw GitHub | wasip1 | 5612 | **none**, 127 s |
+   | e5 | our verifier | jsDelivr (mirror of our public repo) | wasip1 | 5614 | **none**, 127 s |
+   | e6 | our verifier | jsDelivr | wasip1 | 5615 | **none**, 122 s |
+   | e7 | OutLayer's probe, via its project (control) | FastFS | wasip2 | tx `G6NVynGvtTkJExKSZwu1i5DKHzUFKt4LA6CiNGTkwrhh` | yes, 12 s |
+
+   Each link served the exact bytes named by the hash (checked with `curl -sL <url> | sha256sum`), and both hosts pass the
+   URL rule in OutLayer's worker code (https, default port; our file is 1,134,249 bytes, under its 10 MB limit).
+4. OutLayer's public worker list (`https://testnet-api.outlayer.ai/public/workers`, read only) shows two executor workers
+   and a keystore worker online, heartbeats seconds old. During e6 neither executor's "completed" or "failed" counter moved
+   (`e6_worker_counters.txt`); during the control e7 one executor's "completed" went from 180 to 181
+   (`e7_control_counters.txt`). So a job whose file must be downloaded first never reaches a worker, or is dropped before
+   it is counted. Which part of OutLayer does this (their coordinator holds the task queue and the program cache, and its
+   code is private) we cannot tell from outside.
+5. Our program's real needs, measured locally with the same wasmtime version and engine settings OutLayer's worker uses
+   (wasmtime 28.0.1, fuel metering): `verifier/fuel-meter`, command
+   `target/fuel-meter/release/fuel-meter target/verifier-publish/farbox-verifier.wasm target/s4-logs/succinct_input.json`
+   (`verifier_fuel.txt`). On the S4 succinct receipt (input 299,987 bytes): **878,730,118 instructions, peak memory
+   3.4 MB, 71 ms**, answer `PASS`, 384 bytes (OutLayer's limit for an on-chain answer is 900 bytes). On the input `{}` used
+   in e2 to e6: 20,105 instructions. So the limits in e2 to e6 (10 million) and in S4 (10 and 100 billion) were not the
+   cause. Limits with margin for the next try: 2,000,000,000 instructions, 64 MB, 20 s.
+6. Deposit. `estimate_execution_cost` (`estimates.txt`): 2.6752 NEAR for those limits with our 299,987 byte input, of which
+   about 2.67 NEAR is OutLayer's hold for input above 32 KB (returned at settlement); 2.6792 NEAR for S4's limits. S4
+   attached 3.2 NEAR, so the deposit was not the cause either.
+7. Not tried, and why: putting our file on FastFS and registering it as an OutLayer project (`outlayer upload`,
+   `outlayer deploy`). That publishes the file in a new public place and needs OutLayer's command line tool, so it waits
+   for the owner. OutLayer's HTTPS route with a payment key also waits for the owner. Nobody at OutLayer was contacted.
+
+Small inconsistency in OutLayer's docs, for the record: the Pricing page says failed executions are not refunded; the NEAR
+Integration page and what we saw (0.099 of 0.1 NEAR refunded on every failed job) say the unused deposit is refunded.
+
 ## S8: How many bits can a probe agent extract?
 
 Question: in an arena bounty with a known, small secret space, how much does a scripted probe agent learn from PASS or FAIL

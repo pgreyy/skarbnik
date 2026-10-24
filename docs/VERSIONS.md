@@ -56,6 +56,14 @@ CARGO_NET_GIT_FETCH_WITH_CLI=true`, which only change how crates are downloaded.
 The demo program and patches in `data/` are built to wasm32-unknown-unknown with plain `rustc` 1.99.1 by
 `harness/checker/build_modules.sh`.
 
+## OutLayer fuel meter (`verifier/fuel-meter`, standalone crate with its own `Cargo.lock`)
+
+| Crate | Version | Why this version |
+| --- | --- | --- |
+| wasmtime | 28.0.1 (pinned `=28.0.1`) | OutLayer's worker pins wasmtime 28 (`worker/Cargo.toml` at out-layer/outlayer `aaf60a2`) |
+| wasmtime-wasi | 28.0.1 (pinned `=28.0.1`) | same |
+| tokio | 1.54.1 (from `Cargo.lock`) | async runner |
+
 ## Other
 
 | Tool | Version | Command |
