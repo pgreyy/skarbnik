@@ -21,7 +21,8 @@ RUN="$OUT/run.env"; touch "$RUN"; source "$RUN"
 # The agent key file's local path is kept out of the repository (target/ is ignored).
 KEYENV=target/s7/agent_key.env; [ -f "$KEYENV" ] && source "$KEYENV"
 OWNER=$RES2                                   # the agent's owner (a faucet test account)
-CREDS="$HOME/.kintsugi-secrets/near-credentials/testnet"
+# The legacy keychain folder, read from near-cli-rs's own settings (not written into this script).
+CREDS="$(sed -n 's/^credentials_home_dir = "\(.*\)"$/\1/p' "$HOME/.config/near-cli/config.toml")/testnet"
 SEC=1000000000
 HOST=./target/release/kintsugi-host
 CHECK=./target/debug/kintsugi-check
