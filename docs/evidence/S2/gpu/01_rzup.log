@@ -1,0 +1,56 @@
+step=rzup utc_start=2026-10-24T16:46:21Z elapsed_since_start_s=69
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    15    0    15    0     0    121      0 --:--:-- --:--:-- --:--:--   121
+100  5947  100  5947    0     0  17219      0 --:--:-- --:--:-- --:--:-- 17219
+→ Starting rzup installation...
+→ Downloading rzup...
+#=#=#                                                                                                                                                     0.1%                                                                           0.3%#                                                                          1.8%#####                                                                      7.7%#############################                                             40.7%######################################################                    75.4%###################################################################       94.4%####################################################################      94.5%####################################################################      94.6%####################################################################      95.1%####################################################################      95.8%#####################################################################     96.8%######################################################################    98.3%######################################################################## 100.0%
+→ Configuring shell...
+
+To get started:
+1. Restart your shell or run:
+   source "/root/.bashrc"
+2. Verify the installation:
+   rzup --help
+
+✓ Updated shell profile
+✓ Installation complete! rzup is installed in /root/.risc0/bin
+Installing cargo-risczero version 3.0.6
+Downloading cargo-risczero version 3.0.6
+✓ Downloaded cargo-risczero version 3.0.6
+Installing cargo-risczero version 3.0.6
+✓ Installed cargo-risczero version 3.0.6
+✓ Setting cargo-risczero version 3.0.6 as default
+! Version 3.0.6 of r0vm is already installed
+✓ Setting r0vm version 3.0.6 as default
+Installing rust version 1.97.0
+Downloading rust version 1.97.0
+✓ Downloaded rust version 1.97.0
+Installing rust version 1.97.0
+✓ Installed rust version 1.97.0
+✓ Setting rust version 1.97.0 as default
+Installing risc0-groth16 version 0.1.0
+Downloading risc0-groth16 version 0.1.0
+✓ Downloaded risc0-groth16 version 0.1.0
+Installing risc0-groth16 version 0.1.0
+✓ Installed risc0-groth16 version 0.1.0
+✓ Setting risc0-groth16 version 0.1.0 as default
+Installed components:
+--------------------
+
+cargo-risczero
+* 3.0.6
+
+r0vm
+* 3.0.6
+
+rust
+* 1.97.0
+
+risc0-groth16
+* 0.1.0
+
+rzup home: /root/.risc0
+cargo-risczero 3.0.6
+exit=0

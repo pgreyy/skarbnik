@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-24: GPU proof on a rented RunPod pod (FAIL, no proof)
+
+- Owner rented a RunPod pod (NVIDIA L40S, 46 GB, CUDA 12.8). Setup over ssh from the laptop: check, rust, rzup and the
+  code archive of `1439e37` all passed in 607 s.
+- `cargo build --release -p kintsugi-host --features cuda` failed three times in `circom-witnesscalc` (pulled in by
+  RISC Zero's GPU Groth16 prover): twice "Could not find `protoc`" (my script's second try repeated an unchanged setup:
+  fixed, a retry now needs a changed setup), then, with `protobuf-compiler` installed on the owner's go, "Unable to find
+  libclang". Stopped for good under the owner's rule; no GPU number exists. About 19 minutes of use (16:45 to 17:04 UTC).
+- Next: a future rental adds `libclang-dev` and `clang` before building (in the private guide, not run).
+
 ## 2026-10-24: S13 attack pass on testnet (PASS)
 
 - Phases run with `./scripts/s13_attacks.sh <phase>`: setup, proof0, open, commit_a, prove_a, misc, bounty_b, attack_a.

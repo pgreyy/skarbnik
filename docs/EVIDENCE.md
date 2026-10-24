@@ -5,6 +5,37 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S2 on a GPU: the 16 input proof on a rented RunPod pod (S6 preparation)
+
+Question: how long does the same 16 input proof take on an NVIDIA GPU, against the laptop baseline of **2,814.45 s
+(46.9 min), S2b, commit `5ba0298`**? The pod was to prove commit `1439e37` (same guest program, image id `3edbc2e6...`).
+
+**Verdict: FAIL (2026-10-24), no proof was made: the build with the `cuda` feature failed three times, and the run was
+stopped under the owner's cost guard. No GPU time, memory or cost-per-proof number exists yet. Fallback: the laptop CPU
+numbers (S2b) stay the only measured proving times.**
+
+Machine (`docs/evidence/S2/gpu/01_check.log`): RunPod pod, NVIDIA L40S with 46,068 MiB, driver 595.91.07, nvcc 12.8.93
+already installed, Ubuntu 24.04.5, root. Every step was sent over ssh from the laptop and logged, stopping at the first
+failure (IP address and port removed from the copies in `docs/evidence/S2/gpu/`).
+
+| Step | Seconds since start (16:45:12 UTC) | Result |
+|---|---|---|
+| check | 5 | ok |
+| cuda | 24 | nvcc present, nothing installed |
+| apt, rust (1.99.1) | 48 | ok |
+| rzup (cargo-risczero 3.0.6, r0vm 3.0.6, guest Rust 1.97.0, risc0-groth16 0.1.0) | 557 | ok |
+| code (git archive of `1439e37`, scp, unpack) | 607 | ok |
+| build try 1 | 667 | **failed**: `circom-witnesscalc v0.2.1` build script: "Could not find `protoc`" |
+| build try 2 | 991 | **failed**, same error: my script retried without changing anything (a flaw, now fixed: a failed try saves a fingerprint of the setup and the next try refuses to start until it has changed) |
+| apt with `protobuf-compiler` (owner's go) | 1,085 | ok, `libprotoc 3.21.12` |
+| build try 3 (setup fingerprint changed) | 1,110 | **failed**: same crate, bindgen: "Unable to find libclang" |
+
+`circom-witnesscalc` comes in with RISC Zero's GPU Groth16 prover when `risc0-zkvm` is built with `cuda`. Its build needs
+`protoc` and `libclang`; neither is in the CUDA template. A next try would add both (on Ubuntu, `protobuf-compiler` and
+`libclang-dev` or `clang`) to the setup step before building; that is written into the private GPU guide and has not
+been run. Our use of the pod: 16:45:12 to 17:04 UTC (about 19 minutes); the pod ran from when the owner started it until
+the owner terminated it, and its cost is on RunPod's billing page.
+
 ## S13: Attack pass on the hardened contract and checker
 
 Question: do the S13 guards hold on testnet against the attacks listed in docs/SECURITY.md? Contract

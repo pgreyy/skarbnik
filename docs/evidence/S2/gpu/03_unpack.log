@@ -1,0 +1,13 @@
+step=unpack utc_start=2026-10-24T16:55:16Z elapsed_since_start_s=604
+Cargo.lock
+Cargo.toml
+contract
+data
+docs
+harness
+host
+scripts
+verifier
+web
+237df8ff2a4f11e513f3401b59941692a0957eba74f5be52a95bbc47c4031adc  kintsugi-src.tar.gz
+exit=0
