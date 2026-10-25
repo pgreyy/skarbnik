@@ -70,7 +70,10 @@ Level 0 versus Level 2 call confusion, rounding, double payouts, and the credit 
   pending it keeps half. What remains, stated plainly: a vendor that reveals m junk attempts from its own accounts keeps
   m/(m+1) (m is at most K - 1, K at most 16), and its fees come back with the shares, so the cost to it is only gas.
   S7 also gives a copy of a revealed fix an equal share when the vendor is silent (before S7 a later copy got nothing,
-  fix 3). Both apply only to a silent vendor; a PASS still pays only the earliest passing reveal.
+  fix 3). Both apply only to a silent vendor; a PASS still pays only the earliest passing reveal. Worst case, kept by the
+  owner's decision (2026-10-25): under a silent vendor an honest fix may get as little as 1/K of the bounty, and copiers
+  share equally. This is still better than the old rule, under which a vendor's junk revealed first took the whole
+  bounty and the honest researcher got nothing.
 - Finding 8: payouts are detached transfers; a payout account that does not exist loses the payout into the contract.
   S4 (pull payments) is the fix and is deliberately not built in this round (owner's decision, 2026-10-25).
   `scripts/agent_preflight.sh` (S16) refuses a payout account that does not exist; a researcher who skips it can still
@@ -216,7 +219,7 @@ Evidence: EVIDENCE, "Audit hardening round"; raw output `docs/evidence/hardening
 | S2 | applied | negative tests: journals of 779, 781 and 0 bytes, a byte word of 256, verdict 2, a 255 byte seal, Proof 0 and attempt journals swapped, one changed byte of the control root | unit tests `s2_*` |
 | S1 | applied | the two real attempt proofs of the S6c run as unit test vectors (`contract/src/groth16_attempt_vectors.rs`), with the mock set to the deployed account and the recorded seeds | unit tests `s1_*` |
 | S16 | applied | `scripts/agent_preflight.sh` (payout account exists, image id on a non-empty allowlist, windows, fees, K), wired into `scripts/s7_agent.sh` | `docs/evidence/hardening/preflight.txt` |
-| S18 | done | bounty 12, Level 2, private salt, secret kept outside the repository, opened by its own Proof 0; `check_image_id.sh` MATCH. The original and the fix are the public demo files | EVIDENCE, S18; txs `ByJpYtUh5QJcgeVnYuroFFvMWnCGncRc7bMM5T1dTFQw`, `AwktYGNHGijdv2LWwQYeuc7yFyLoDs41AuJckxUQuPSJ` |
+| S18 | done | bounty 12, Level 2, private salt, secret kept outside the repository, opened by its own Proof 0; `check_image_id.sh` MATCH. It uses the public demo bug: anyone can submit the public `fixed.wasm`, and a silent vendor's timeout can pay without any proof. Possible later improvement: a new original module with its own bug | EVIDENCE, S18; txs `ByJpYtUh5QJcgeVnYuroFFvMWnCGncRc7bMM5T1dTFQw`, `AwktYGNHGijdv2LWwQYeuc7yFyLoDs41AuJckxUQuPSJ` |
 | S4 | not built (owner's decision) | known limit, finding 8; S16 refuses a missing payout account | |
 | S14 | not done yet | planned as the last step before submission | |
 | Pool | decided: locked (option A) | no withdraw method | section "Where the protocol fee pool's fees should go" |
@@ -230,7 +233,7 @@ pairing check. Its findings and what was done:
 
 | # | Severity | Finding | Reproduced | Done |
 | --- | --- | --- | --- | --- |
-| 1 | high | With the S7 split, a silent vendor's puppet accounts that reveal junk (before or after the honest fix) share the timeout: with K slots the honest fix can get as little as 1/K, and the puppets' fees come back, so it costs the vendor only gas | yes: `review_s7_puppets_revealed_after_the_honest_fix_share_a_silent_vendors_timeout` (K = 3, honest payout gets a third) | not changed: it is the consequence of the chosen rule. Before S7 the worst case was worse (a puppet revealed first took the whole bounty). Stated as a known limit; a different split is the owner's decision |
+| 1 | high | With the S7 split (kept by the owner, 2026-10-25), a silent vendor's puppet accounts that reveal junk (before or after the honest fix) share the timeout: with K slots the honest fix can get as little as 1/K, and the puppets' fees come back, so it costs the vendor only gas | yes: `review_s7_puppets_revealed_after_the_honest_fix_share_a_silent_vendors_timeout` (K = 3, honest payout gets a third) | not changed: it is the consequence of the chosen rule. Before S7 the worst case was worse (a puppet revealed first took the whole bounty). Stated as a known limit; a different split is the owner's decision |
 | 2 | medium | A sharer is paid although its own verdict window is still open, or although a FAIL is posted for it (Level 0, one attestation) | yes: `review_s7_a_sharer_with_a_posted_fail_and_an_open_window_is_still_paid` | not changed: excluding those attempts would let a Level 0 vendor post false FAILs to cut honest attempts out, and excluding open windows brings back "junk revealed first takes all". Stated as a known limit |
 | 3 | low | After a PASS, other revealed undecided attempts were refunded but stayed counted in `pending` (the second review's open point) | yes: the extra assertion in `audit_f4_pass_refunds_the_fee_of_an_undecided_revealed_attempt` | fixed: `refund_undecided_revealed` no longer counts them as pending; they still show `Open` (there is no final outcome for them, and adding one would change the stored type) |
 | 4 | low | `max_fee_per_commit` bounds one commit, not the total | by reading | docs already say the credit can still be spent over many attempts; a test now also checks the credit taken |

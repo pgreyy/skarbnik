@@ -85,8 +85,8 @@ prove() { # prove <name> <patch> <seed> <submission id>
   MAX_SECONDS=10800 scripts/s2_measure.sh "target/s6c/prove_$1.log" -- $HOST prove "$2" --demo-salt --fuzz-count 16 --variants 32 --po2 19 \
     --seed "$3" --submission-id "$4" --out "target/s6c/$1.bin"
   MAX_SECONDS=3600 scripts/s2_measure.sh "target/s6c/compress_$1.log" -- $HOST compress "target/s6c/$1.bin" "target/s6c/$1_succinct.bin" succinct
-  rm -f "target/s6c/mem_$1.log"*; (target/s6/watch_mem.sh "target/s6c/mem_$1.log" & echo $! > "target/s6c/watch_$1.pid")
-  MIN_AVAIL_MIB=700 MAX_SECONDS=3600 scripts/s2_measure.sh "target/s6c/groth16_$1.log" -- $HOST compress "target/s6c/$1_succinct.bin" "target/s6c/$1_groth16.bin" groth16 || true
+  rm -f "target/s6c/mem_$1.log"*; (scripts/watch_mem.sh "target/s6c/mem_$1.log" & echo $! > "target/s6c/watch_$1.pid")
+  MIN_AVAIL_MIB=500 MAX_SECONDS=3600 scripts/s2_measure.sh "target/s6c/groth16_$1.log" -- $HOST compress "target/s6c/$1_succinct.bin" "target/s6c/$1_groth16.bin" groth16 || true
   kill "$(cat "target/s6c/watch_$1.pid")" 2>/dev/null || true
   $HOST verify "target/s6c/$1_groth16.bin" > "target/s6c/verify_$1.txt"
   grep -q '^VALID' "target/s6c/verify_$1.txt" || { echo "the $1 Groth16 receipt does not verify"; exit 1; }

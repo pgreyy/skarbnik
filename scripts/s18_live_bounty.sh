@@ -38,9 +38,10 @@ prove)
   ;;
 groth16)
   # Separate phase so it can be rerun alone: the first two tries were stopped by the memory guard (available memory
-  # 576 and 566 MiB). GUARD_MIB lowers the guard (the default is 700 MiB) so the system may use swap.
-  rm -f target/s18/mem_groth16.log*; (KILL_BELOW_MIB="${GUARD_MIB:-700}" target/s6/watch_mem.sh target/s18/mem_groth16.log & echo $! > target/s18/watch.pid)
-  MIN_AVAIL_MIB="${GUARD_MIB:-700}" MAX_SECONDS=1800 scripts/s2_measure.sh target/s18/groth16_proof0.log -- $HOST compress \
+  # 576 and 566 MiB; the guard was 700 MiB then, the third try ran with 300). GUARD_MIB sets the guard; the default is
+  # 500 MiB (owner's setting). scripts/watch_mem.sh prints a reminder to close editor windows first.
+  rm -f target/s18/mem_groth16.log*; (KILL_BELOW_MIB="${GUARD_MIB:-500}" scripts/watch_mem.sh target/s18/mem_groth16.log & echo $! > target/s18/watch.pid)
+  MIN_AVAIL_MIB="${GUARD_MIB:-500}" MAX_SECONDS=1800 scripts/s2_measure.sh target/s18/groth16_proof0.log -- $HOST compress \
     target/s18/proof0_succinct.bin target/s18/proof0_groth16.bin groth16 || true
   kill "$(cat target/s18/watch.pid)" 2>/dev/null || true
   keep target/s18/groth16_proof0.log; cp target/s18/mem_groth16.log.peaks "$OUTDIR/" 2>/dev/null || true

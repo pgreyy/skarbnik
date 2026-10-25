@@ -200,6 +200,16 @@ Each guard: what it stops, where it lives, and what shows it works.
   still open, or for which a FAIL is posted but not yet confirmed: once the earliest reveal times out, the vendor has lost
   the chance to decide the others (unit tests `review_s7_*`). A vendor that answers is not affected: a PASS pays only the
   earliest passing reveal.
+- Worst case of the timeout split, kept by the owner's decision (2026-10-25): under a silent vendor an honest fix may get
+  as little as 1/K of the bounty (the vendor's own accounts reveal junk in the other K - 1 slots and take the rest, their
+  fees refunded), and anyone who copies a revealed fix shares equally. This is still better than the old rule, under which
+  a vendor's junk revealed first took the whole bounty and the honest researcher got nothing (unit test
+  `review_s7_puppets_revealed_after_the_honest_fix_share_a_silent_vendors_timeout`: K = 3, the honest payout gets a third).
+- Live bounty 12 (S18) proves that the secret crashing input stays with the vendor: it is not in the repository and its
+  commitment uses a private salt. It does not prove that the bug is unknown: it uses the public demo bug (the original
+  module and its fix are `data/demo/original.wasm` and `data/demo/fixed.wasm`), so anyone can submit the public
+  `fixed.wasm`. If the vendor stays silent, the timeout rule can pay out without any proof at all. A new original module
+  with its own bug is a possible later improvement.
 - Payouts are detached transfers. A payout account that does not exist makes the transfer fail after the state says
   Paid; the NEAR stays in the contract with no record and no way out (audit finding 8, shown on testnet). Pull payments
   (S4) are the fix and are deliberately not built in this round (owner's decision, 2026-10-25). The mitigation is
@@ -230,6 +240,9 @@ Each guard: what it stops, where it lives, and what shows it works.
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-25 (owner's decisions on the hardening round): the S7 split kept, its worst case stated; bounty 12's limits
+  stated; Groth16 memory guard 500 MiB with a reminder to close editor windows (`scripts/watch_mem.sh`).
 
 - 2026-10-25 (audit hardening): S7 timeout split among revealed undecided attempts; S6 agent limits
   (`set_agent_limits`); S3 cheap binding checks before the pairing check; S2 parser and mode-confusion tests; S1 real

@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Owner's decisions on the hardening round
+
+- S7 split kept; its worst case (an honest fix may get 1/K, copiers share equally, still better than the old rule) stated
+  in README, SECURITY and AUDIT. Bounty 12 kept; README, EVIDENCE and SECURITY say it proves the secret stays private, uses
+  the public demo bug (anyone can submit the public `fixed.wasm`), and can pay by timeout without any proof; a new original
+  module with its own bug recorded as a possible later improvement.
+- Groth16 memory guard set to 500 MiB: the watcher moved into the repository (`scripts/watch_mem.sh`, it was an untracked
+  copy in `target/s6/`), prints a reminder to close editor windows, and `s18_live_bounty.sh`, `audit1_testnet.sh` and
+  `s6c_testnet.sh` use it with `MIN_AVAIL_MIB=500`. Check: `timeout 3 scripts/watch_mem.sh <log>` printed the reminder.
+  No proof was run.
+
 ## 2026-10-25: Audit hardening round (S1, S2, S3, S6, S7, S16, S18)
 
 - Owner's decisions: S7 split the silent-vendor timeout; the protocol pool stays locked as a storage reserve (no

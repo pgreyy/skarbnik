@@ -32,8 +32,13 @@ salt, and a Proof 0 that opens a live Level 2 bounty? Raw output: `docs/evidence
   (`bounty.json`). `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 12`: MATCH (`check_image_id.txt`).
   `./scripts/agent_preflight.sh kintsugi-l2-cihdp.testnet 12 <researcher>`: PREFLIGHT OK (`preflight.txt`).
 
-Verdict: PASS. Limit: the original module and its reference fix are the public demo files, so this bounty shows that the
-secret input stays with the vendor, not that the bug is unknown; anyone can submit `data/demo/fixed.wasm`.
+Verdict: PASS. What bounty 12 proves and what it does not: it proves the secret input stays with the vendor (not in the
+repository, private salt). It uses the public demo bug: the original module and its fix are the public demo files, so
+anyone can submit the public `data/demo/fixed.wasm`, and if the vendor stays silent the timeout rule can pay out without
+any proof. A new original module with its own bug is a possible later improvement.
+
+Memory guard for Groth16 runs after this: 500 MiB (owner's setting), in the tracked `scripts/watch_mem.sh` (earlier runs
+used a 700 MiB copy kept outside the repository), which also prints a reminder to close editor windows before the run.
 
 ## Audit hardening round: S1, S2, S3, S6, S7, S16 (S18 above)
 

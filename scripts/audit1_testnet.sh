@@ -54,8 +54,8 @@ SEED_J=$(json_field "$(view get_submission "{\"bounty_id\":\"$X\",\"index\":$J}"
 # the FAIL proof for J, on the laptop (expected about 6 min prove + 2 min compress + 3 min Groth16)
 MAX_SECONDS=3600 scripts/s2_measure.sh target/audit1/prove_j.log -- $HOST prove data/attacks/reject_all.wasm --demo-salt --fuzz-count 16 --variants 32 --po2 19 --seed "$SEED_J" --submission-id "$SID_J" --out target/audit1/j.bin
 MAX_SECONDS=1800 scripts/s2_measure.sh target/audit1/compress_j.log -- $HOST compress target/audit1/j.bin target/audit1/j_succinct.bin succinct
-rm -f target/audit1/mem_j.log*; (target/s6/watch_mem.sh target/audit1/mem_j.log & echo $! > target/audit1/watch_j.pid)
-MIN_AVAIL_MIB=700 MAX_SECONDS=1800 scripts/s2_measure.sh target/audit1/groth16_j.log -- $HOST compress target/audit1/j_succinct.bin target/audit1/j_groth16.bin groth16 || true
+rm -f target/audit1/mem_j.log*; (scripts/watch_mem.sh target/audit1/mem_j.log & echo $! > target/audit1/watch_j.pid)
+MIN_AVAIL_MIB=500 MAX_SECONDS=1800 scripts/s2_measure.sh target/audit1/groth16_j.log -- $HOST compress target/audit1/j_succinct.bin target/audit1/j_groth16.bin groth16 || true
 kill "$(cat target/audit1/watch_j.pid)" 2>/dev/null || true
 $HOST verify target/audit1/j_groth16.bin > target/audit1/verify_j.txt; grep -q '^VALID' target/audit1/verify_j.txt
 $HOST groth16-args target/audit1/j_groth16.bin target/audit1/j_args.json

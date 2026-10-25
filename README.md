@@ -29,7 +29,7 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 | A NEAR contract checks a RISC Zero Groth16 proof itself with NEAR's alt_bn128 host functions: it accepts the real proof and rejects a flipped bit, a changed journal and a wrong image id | works on testnet as a separate spike contract (34.569 Tgas per call); not connected to the bounty contract or its payouts yet | `scripts/s6b_testnet.sh` and `cargo test -p kintsugi-groth16-spike` (EVIDENCE, S6b) |
 | Level 2 bounties: the bounty contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt, and replayed, changed, late or repeated proofs are refused | works on testnet (`kintsugi-l2-cihdp.testnet`: one PASS paid, one FAIL spent, nine attacks refused; 35 to 36 Tgas per proof); Level 0 bounties work as before; each bounty shows its level | `scripts/s6c_testnet.sh` and `cargo test -p kintsugi-contract --offline` (EVIDENCE, S6c) |
 | Fees of commits that are never revealed go to a protocol fee pool, never back to the vendor, so a vendor cannot block its own bounty for free | works on testnet: in the self-block test the vendor side lost 0.045 NEAR in fees and the pool gained exactly 0.045 NEAR; the pool cannot be paid out yet (destination open, docs/SECURITY.md) | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |
-| A live Level 2 bounty whose secret crashing input is not in the repository and whose commitment uses a private salt (the original module and its fix are the public demo files) | works on testnet: bounty 12 on `kintsugi-l2-cihdp.testnet`, opened by its own Proof 0; `check_image_id.sh` prints MATCH | `scripts/s18_live_bounty.sh` (EVIDENCE, S18) |
+| A live Level 2 bounty whose secret crashing input is not in the repository and whose commitment uses a private salt. It proves the secret stays private; it uses the public demo bug, so anyone can submit the public `fixed.wasm`, and if the vendor stays silent the timeout rule can pay out without any proof | works on testnet: bounty 12 on `kintsugi-l2-cihdp.testnet`, opened by its own Proof 0; `check_image_id.sh` prints MATCH | `scripts/s18_live_bounty.sh` (EVIDENCE, S18) |
 | OutLayer (TEE) as one of the two verifiers | not confirmed on testnet yet: OutLayer accepts our jobs but none has been answered (8 of 8 timed out, by link and as an OutLayer project), while OutLayer's own cached test program answers; the contract recorded nothing, as designed | EVIDENCE, S4/S5 and "OutLayer (Level 1) on testnet" |
 
 ## Try it
@@ -98,8 +98,12 @@ Planned next:
 - One verdict tells a researcher at most one bit about the secret; the vendor chooses the budget K.
 - RISC Zero states its zero knowledge property is not formally proven.
 - The vendor sees each patch before paying. If it stays silent, the bounty is split equally among every revealed
-  attempt still waiting for a verdict. A vendor that reveals m junk attempts from its own accounts keeps m/(m+1) of the
-  bounty, and a copy of a revealed fix gets an equal share (docs/AUDIT.md, finding 3 and hardening S7). A review of the
+  attempt still waiting for a verdict. In the worst case an honest fix gets only 1/K of the bounty (the vendor's own
+  accounts fill the other slots with junk), and a copy of a revealed fix gets an equal share. This is still better than
+  the old rule, under which the honest researcher could get nothing (docs/AUDIT.md, finding 3 and hardening S7).
+- Live bounty 12 keeps its secret private but uses the public demo bug: anyone can submit the public `fixed.wasm`, and a
+  silent vendor's timeout can pay without any proof. A new original module with its own bug is a possible later
+  improvement. A review of the
   contract found and fixed six problems; its report, with the unfixed ones stated as known limits, is
   [docs/AUDIT.md](docs/AUDIT.md).
 - Narrow scope: crash bugs in a small module that compiles to WebAssembly.
