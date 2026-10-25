@@ -1,0 +1,44 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args {"account_id":null} prepaid-gas 30 Tgas attached-deposit 0.05 NEAR sign-as kintsugi-agent-d9410f.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-25T21:00:31.278726232Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-agent-d9410f.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  deposit_credit
+│                       args:         {
+│                                       "account_id": null
+│                                     }
+│                       gas:          30.0 Tgas
+│                       deposit:      0.05 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:9CVQk7u22hwHnbwubbFK4uEni66RYQaW6bqQ6aSgFPhs
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.310 Tgas
+│    Transaction fee: 0.0000309633062595 NEAR
+│    Transaction ID: 5tiP6LNMr9LpYHwFRB7gEPhMg6AUXT1m3wvfQJVj9LPa
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/5tiP6LNMr9LpYHwFRB7gEPhMg6AUXT1m3wvfQJVj9LPa
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"credit_deposited","data":[{"account_id":"kintsugi-agent-d9410f.testnet","amount":"50000000000000000000000","total":"50000000000000000000000"}]}
+│    Logs [kintsugi-agent-d9410f.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"50000000000000000000000"
+
+
+The "deposit_credit" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-agent-d9410f.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args '{"account_id":null}' prepaid-gas '30.0 Tgas' attached-deposit '0.05 NEAR' sign-as kintsugi-agent-d9410f.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=7.41

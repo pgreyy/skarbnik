@@ -1,0 +1,36 @@
+# Settings for agent/kintsugi_agent.py: the chain, the agent's account and limits, and the model providers.
+# No key goes in this file. The model's API key is read from the environment variable or the file named below,
+# outside the repository. The limited key file is near-cli's own key file for a key limited to commit and reveal.
+
+[agent]
+network = "testnet"
+contract = "kintsugi-l2-cihdp.testnet"
+rpc = "https://test.rpc.fastnear.com"
+feed = "web/feed.json"                       # a path in this repository, or the address of a site's feed.json
+account = "your-agent.testnet"               # the agent's account (it pays fees from its credit in the contract)
+payout = "your-agent.testnet"                # must equal the account's fixed_payout (set_agent_limits)
+limited_key_file = "~/.near-credentials/testnet/your-agent.testnet/ed25519_REPLACE.json"
+max_fee_yocto = "20000000000000000000000"    # 0.02 NEAR: never commit when the next fee is higher
+max_attempts = 1                             # commits per run, at most
+max_model_tries = 2                          # model answers per bounty (each later try sees why the last was not used)
+require_onchain_limits = true                # refuse to send unless set_agent_limits was called for the account
+include_test_bounties = false                # test bounties are tried only when named with --bounty
+checker = "target/debug/kintsugi-check"      # the local checker, for the public tests
+state_dir = "target/agent-runs"              # run logs and attempt records (ignored by git)
+provider = "nearai"                          # the default model provider, one of the [provider.*] entries
+
+# NEAR AI Cloud (docs.near.ai/cloud/quickstart): an OpenAI compatible chat completions API; the key is sent as
+# "Authorization: Bearer <key>". Any other OpenAI compatible provider works the same way: add a [provider.<name>] entry.
+[provider.nearai]
+type = "openai-compatible"
+base_url = "https://cloud-api.near.ai/v1"
+model = "z-ai/glm-5.3-flash"                 # on GET /v1/models, checked 2026-10-25; runs in a TEE
+api_key_env = "NEARAI_API_KEY"
+api_key_file = "~/.kintsugi-secrets/nearai_api_key"
+temperature = 0.2
+max_tokens = 4000
+
+# A stand-in for tests: answers with the bounty's known reference fix, no network and no key.
+[provider.standin]
+type = "standin"
+response_file = "data/demo/fixed.rs"

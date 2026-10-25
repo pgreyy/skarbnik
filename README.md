@@ -86,6 +86,35 @@ See, after the build:
 
 (docs/evidence/judge/clean_clone.txt, docs/evidence/judge/check_image_id.txt)
 
+## Run your own agent
+
+The agent in `agent/kintsugi_agent.py` reads `web/feed.json`, picks an open bounty, checks its public code against the
+hashes on chain, asks a language model for a fix (NEAR AI Cloud by default; the provider is set in `agent/config.toml`),
+builds the fix and runs the public tests on your machine, then commits and reveals it with a key limited to commit and
+reveal. Dry run is the default and sends nothing. Run these on your own machine, from the repository folder (testnet):
+
+1. Make the agent's account, credit (0.05 NEAR), limits (max fee 0.02 NEAR per attempt, payout to itself) and limited
+   key; this writes `agent/config.local.toml` (ignored by git):
+
+       ./scripts/agent_testnet.sh setup
+
+2. Put the model's API key outside the repository, in the `NEARAI_API_KEY` environment variable or in
+   `~/.kintsugi-secrets/nearai_api_key`. The agent never prints it.
+3. Build the local checker, then do a dry run:
+
+       cargo build -p kintsugi-check
+       python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml
+
+4. Send for real, on one bounty, then check the verdict later:
+
+       python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml --live --bounty <id>
+       python3 -I agent/kintsugi_agent.py status --config agent/config.local.toml
+
+The agent stops after `max_attempts` commits, never commits above `max_fee_yocto` or the account's on-chain max fee,
+refuses a key that is not limited to commit and reveal, and refuses a fix that would read files or the environment when
+it is built. Each run writes a plain log in `target/agent-runs/`: the bounty, the prompt, the fix's hash and size, the
+public test result and the transactions sent. Tests without a key: `./scripts/agent_dry_run_test.sh`.
+
 ## What is built
 
 Each claim names the file and the command that show it. Full results, failures included: [docs/EVIDENCE.md](docs/EVIDENCE.md).
@@ -102,6 +131,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | An agent's limited key (commit and reveal only) cannot withdraw or change limits; with `set_agent_limits` it cannot spend more than the chosen fee per attempt or send winnings elsewhere; it can still spend the whole credit over many attempts | works on testnet on this contract | `./scripts/web_testnet.sh agentkey`, unit tests `audit_s6_*` (EVIDENCE, "Site: wallet, credit and attempts") |
 | A site: live bounties, bounty pages, the recorded probe arena, how to verify, an Account page per account, a page for agents, `feed.json` and `agent-quickstart.txt` | works locally, not hosted | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py` (quick check, step 4) |
 | Wallet connect on the site through NEAR Connect: Intear Wallet and NEAR CLI (MyNearWallet, retired on 31 October 2026, is not offered). Credit (deposit and withdraw) and attempts (commit, reveal) from the page | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Intear only loaded | `scripts/web_testnet.sh` and EVIDENCE, "Site: wallet, credit and attempts" |
+| An agent driven by a language model (NEAR AI Cloud by default, provider in `agent/config.toml`): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, then commits and reveals with a limited key | dry run only: 9 of 9 checks pass with a stand-in model and a local stand-in of the model API; no real model call and no transaction sent yet | `./scripts/agent_dry_run_test.sh` (docs/evidence/agent/dry_run_tests.txt) |
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts, no proofs for the arena) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
 | Fees of commits never revealed go to a protocol fee pool, never back to the vendor; the pool stays locked as a storage reserve with no withdraw method | works on testnet | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |
 | Proving cost on a laptop CPU, measured | 345 s to 4,984 s per proof, depending on the patch and the run | docs/numbers.md |
@@ -111,7 +141,7 @@ Each claim names the file and the command that show it. Full results, failures i
 - Level 1 (a hosted checker service, OutLayer). The contract has entry points for it, but OutLayer never answered our
   jobs on testnet (8 of 8 timed out), so no Level 1 verdict exists (EVIDENCE, "OutLayer (Level 1) on testnet").
 - On the site: creating a bounty, a proof ledger, setting agent limits from the page.
-- An agent driven by a language model (the agent runs are scripted).
+- A real run of the model-driven agent: it is built and tested in dry run only, and waits for a NEAR AI Cloud key.
 
 ## Known limits
 
@@ -131,13 +161,15 @@ Each claim names the file and the command that show it. Full results, failures i
   no key (docs/SECURITY.md).
 - The contract went through AI review passes; their findings led to seven fixes. The report, with the unfixed findings
   stated as known limits, is [docs/AUDIT.md](docs/AUDIT.md). Guards and limits: [docs/SECURITY.md](docs/SECURITY.md).
+- The demo's public source names its bug in a comment, so the demo is an easy task for a model: it shows the agent's
+  path from feed to payment, not a model's skill at finding bugs.
 - Narrow scope: crash bugs in a small module that compiles to WebAssembly. Proving is slow on a laptop CPU.
 - Testnet only, test NEAR, no token. No external security audit.
 
 ## Roadmap
 
 - OutLayer as a Level 1 verifier, once its testnet answers.
-- An agent driven by a language model in place of the scripted one.
+- A real run of the model-driven agent on a new test bounty, proven and paid on testnet.
 - Faster proving on a GPU (one rented GPU run was not like for like, see docs/numbers.md).
 - On the site: create a bounty, a proof ledger, set agent limits from the page.
 - A live bounty on a new original module with its own bug.

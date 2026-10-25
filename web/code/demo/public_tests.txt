@@ -1,0 +1,23 @@
+# Public tests for the demo record parser (data/demo/original.rs).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+# The expected values were produced by running the original module:
+#   target/debug/kintsugi-check run --module data/demo/original.wasm --input <hex>
+# Proof 0 (`kintsugi-check proof0`) re-checks that the original returns every one of them.
+
+-                              84696351     # no records
+010105                         415421342    # int, 1 byte
+0103010203                     454224706    # int, 3 bytes
+01047856340002026f6b           548193080    # int, 4 bytes (top byte 0), then text "ok"
+020568656c6c6f                 1102269947   # text "hello"
+0200                           1199463610   # empty text
+030100                         177712277    # empty list
+03050201000200                 708925078    # list of 2 items
+030703010002000300             1479802836   # list of 3 items
+0102ffff02026f6b0303012a00     1917760368   # int, text, list
+01                             -1           # truncated header
+02046162                       -1           # text payload cut short
+0900                           -2           # unknown tag
+0100                           -3           # int with 0 bytes
+01050102030405                 -3           # int with 5 bytes
+0300                           -4           # list with no count byte
+03020500                       -4           # list too short for its count

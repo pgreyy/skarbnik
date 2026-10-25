@@ -1,0 +1,3 @@
+agent account kintsugi-agent-d9410f.testnet, balance 10000000000000000000000000 yoctoNEAR
+agent account kintsugi-agent-d9410f.testnet, balance 9949542575878063699999999 yoctoNEAR
+agent kintsugi-agent-d9410f.testnet: credit "50000000000000000000000", limits {"max_fee_per_commit":"20000000000000000000000","fixed_payout":"kintsugi-agent-d9410f.testnet"}, limited key ed25519:C7VqRG6cyoqX...

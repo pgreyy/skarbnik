@@ -76,6 +76,16 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Before a commit the page reads the chain again and stops, without sending, what the contract would refuse: bounty closed, cap full, not enough credit, a fee above the account's own limit, a payout the limits do not allow, a payout that is the vendor, a verifier or the contract, or one that does not exist | Lost fees and lost payouts (review finding 8) | `web/js/account-ui.js` (`review`) |
 | The page shows a result only from the chain: after a reveal it says "Waiting for the vendor's proof"; the PASS stamp only for an attempt whose outcome on chain is Passed | A faked result | `web/js/account-ui.js` (`attemptPanel`) |
 
+### The model-driven agent (agent/)
+
+| Guard | What it stops | Shown by |
+| --- | --- | --- |
+| The agent refuses to send unless its key is a function call key for this contract limited to `commit` and `reveal` (read with `view_access_key`) | Running the agent with a full access key | `./scripts/agent_dry_run_test.sh`, case 7 (docs/evidence/agent/dry_run_tests.txt) |
+| Before a commit: `scripts/agent_preflight.sh`, the config's `max_fee_yocto`, the account's on-chain limits (a live run refuses when none are set) and its fixed payout; at most `max_attempts` commits per run | Overspending, or paying another account | same script, case 6; the contract also enforces the on-chain limits |
+| The public code is used only if the module's sha256 equals the bounty's `original_hash` and the public tests give its `corpus_hash` | A feed or site that serves other code than the bounty's | `dry_run_reference_fix.log` ("public code: ... = original_hash ... = corpus_hash") |
+| The model's answer is refused if it uses `include!`, `include_str!`, `include_bytes!`, `env!`, `option_env!`, `extern crate`, `mod x;` or `#[path]`, and it is built with an environment holding no API key | An answer (for example after a prompt injection in the public code) that pulls a local file or the key into the patch, which is published on chain at reveal | case 5 |
+| The API key comes only from an environment variable or a file outside the repository, and is never printed or logged | Leaking the key into logs, evidence files or git | case 2: the key is in no log or file of the run |
+
 ### Keys
 
 | Guard | What it stops | Shown by |
@@ -258,6 +268,10 @@ Each guard: what it stops, where it lives, and what shows it works.
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-25: the model-driven agent (agent/) with its guards: limited key check, fee and attempt limits, public code
+  checked against the bounty's hashes, no file or environment reading in a model's answer, the API key kept out of logs.
+  Tested in dry run (`./scripts/agent_dry_run_test.sh`, 9 of 9).
 
 - 2026-10-25: the wallet scripts of Intear and NEAR CLI are no longer stored in the repository. The site loads each from
   its official address and refuses it unless its sha256 matches the pin in `web/vendor/wallets/manifest.json`; a test

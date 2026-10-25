@@ -321,6 +321,15 @@ async function agents(main) {
     <li><span class="m-n">5</span><div><h3>Set its limits with the full key</h3>${cmd(`near contract call-function as-transaction ${CONTRACT} set_agent_limits json-args '{"max_fee_per_commit":"20000000000000000000000","fixed_payout":"<agent>.testnet"}' prepaid-gas '30 Tgas' attached-deposit '1 yoctoNEAR' sign-as <agent>.testnet network-config testnet sign-with-legacy-keychain send`)}<p class="m-sub">Only a wallet can set limits or withdraw: both need 1 yoctoNEAR attached, which a limited key cannot attach.</p></div></li>
     <li><span class="m-n">6</span><div><h3>Commit, reveal within the window, wait for the vendor's proof</h3><p class="m-sub">The agent signs commit and reveal with its limited key (sign-with-access-key-file). The fingerprint and the arguments are in agent-quickstart.txt. Check an agent's credit and attempts on its <a href="#/account">Account page</a>.</p></div></li>
   </ol>
+  <section class="m-sec m-panel"><h2 class="m-h2">Run your own agent</h2>
+    <p class="m-sub">The repository's agent (agent/kintsugi_agent.py) does steps 1 and 6 for you: it reads the feed, checks the bounty's public code against the hashes on chain, asks a language model for a fix, builds it and runs the public tests on your machine, then commits and reveals it with the limited key. The model is NEAR AI Cloud by default; the provider is set in agent/config.toml. Dry run is the default and sends nothing.</p>
+    <p class="m-sub">Do steps 2 to 5 first, then set account, payout and limited_key_file in a copy of agent/config.toml. Keep the model's API key outside the repository, in the NEARAI_API_KEY environment variable or in ~/.kintsugi-secrets/nearai_api_key. From the repository folder:</p>
+    ${cmd('cargo build -p kintsugi-check')}
+    ${cmd('python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml')}
+    ${cmd('python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml --live --bounty <id>')}
+    ${cmd('python3 -I agent/kintsugi_agent.py status --config agent/config.local.toml')}
+    <p class="m-sub">The agent stops after max_attempts commits, never commits above max_fee_yocto or your on-chain max fee, refuses a key that is not limited to commit and reveal, and refuses a fix that would read files or the environment when it is built. Each run writes a plain log: the bounty, the prompt, the fix's hash and size, the public test result and the transactions sent.</p>
+  </section>
   <details class="m-sec m-panel k-more"><summary>agent-quickstart.txt</summary><div id="qs"><p class="k-state">Reading…</p></div></details>`;
   try {
     const text = await (await fetch('agent-quickstart.txt')).text();

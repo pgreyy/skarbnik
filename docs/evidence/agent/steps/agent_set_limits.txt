@@ -1,0 +1,48 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_agent_limits json-args {"max_fee_per_commit":"20000000000000000000000","fixed_payout":"kintsugi-agent-d9410f.testnet"} prepaid-gas 30 Tgas attached-deposit 1 yoctoNEAR sign-as kintsugi-agent-d9410f.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-25T21:00:40.238900854Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-agent-d9410f.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  set_agent_limits
+│                       args:         {
+│                                       "fixed_payout": "kintsugi-agent-d9410f.testnet",
+│                                       "max_fee_per_commit": "20000000000000000000000"
+│                                     }
+│                       gas:          30.0 Tgas
+│                       deposit:      1 yoctoNEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:9CVQk7u22hwHnbwubbFK4uEni66RYQaW6bqQ6aSgFPhs
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.314 Tgas
+│    Transaction fee: 0.0000313352392365 NEAR
+│    Transaction ID: HkRojc7ryoqz52eriziGFAvciDTQ8bfLQm39djnDyPgg
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/HkRojc7ryoqz52eriziGFAvciDTQ8bfLQm39djnDyPgg
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"agent_limits_set","data":[{"account_id":"kintsugi-agent-d9410f.testnet","max_fee_per_commit":"20000000000000000000000","fixed_payout":"kintsugi-agent-d9410f.testnet"}]}
+│    Logs [kintsugi-agent-d9410f.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+{
+  "fixed_payout": "kintsugi-agent-d9410f.testnet",
+  "max_fee_per_commit": "20000000000000000000000"
+}
+
+
+The "set_agent_limits" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-agent-d9410f.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_agent_limits json-args '{"max_fee_per_commit":"20000000000000000000000","fixed_payout":"kintsugi-agent-d9410f.testnet"}' prepaid-gas '30.0 Tgas' attached-deposit '1 yoctoNEAR' sign-as kintsugi-agent-d9410f.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.61

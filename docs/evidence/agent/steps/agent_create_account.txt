@@ -1,0 +1,22 @@
+$ near account create-account sponsor-by-faucet-service kintsugi-agent-d9410f.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
+utc_start=2026-10-25T21:00:20.778550196Z
+├  Your transaction:
+│    signer_id:    testnet
+│    actions:
+│       -- create account:      kintsugi-agent-d9410f.testnet
+│       -- add access key:     
+│                       public key:   ed25519:9CVQk7u22hwHnbwubbFK4uEni66RYQaW6bqQ6aSgFPhs
+│                       permission:   FullAccess
+│     
+├  Transaction Execution Info:
+│    Transaction ID: 7HwRHvepH4PtuMZxekwjyqg7u9vFxFniaasZJtBc5FXm
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/7HwRHvepH4PtuMZxekwjyqg7u9vFxFniaasZJtBc5FXm
+
+New account <kintsugi-agent-d9410f.testnet> created successfully.
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=5.1

@@ -5,6 +5,23 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## The model-driven agent (dry run)
+
+Question: does the agent go from the feed to a ready commit and reveal, using only checked public code, a fix that
+passes the public tests, and a limited key, while refusing bad answers, high fees and a full access key? No real model
+key exists yet, so the model is a stand-in that answers with the reference fix (`data/demo/fixed.rs`), and in case 2 a
+local stand-in of an OpenAI compatible API exercises the NEAR AI Cloud code path.
+
+- Agent account (testnet, `./scripts/agent_testnet.sh setup`): `kintsugi-agent-d9410f.testnet`, created
+  `7HwRHvepH4PtuMZxekwjyqg7u9vFxFniaasZJtBc5FXm`; credit 0.05 NEAR `5tiP6LNMr9LpYHwFRB7gEPhMg6AUXT1m3wvfQJVj9LPa`; limits
+  (max fee 0.02 NEAR, fixed payout itself) `HkRojc7ryoqz52eriziGFAvciDTQ8bfLQm39djnDyPgg`; key limited to commit and
+  reveal `2vuutbSc7rHi2NeGtzeiuhngDUo6KFj3KFb5az9Po6Um` (`docs/evidence/agent/transactions.tsv`, `steps/`).
+- Command: `./scripts/agent_dry_run_test.sh`. Output: `docs/evidence/agent/dry_run_tests.txt`: 9 of 9 PASS. One full run
+  log: `docs/evidence/agent/dry_run_reference_fix.log` (bounty 7: preflight passed, public code matched the bounty's
+  hashes, fix sha256 `42edaaf5...` = the reference fix, 556 bytes, 17 of 17 public tests, commit prepared, nothing sent).
+- Verdict: PASS for the dry run. Not done yet: a call to the real NEAR AI Cloud API and a live run on chain.
+- Note: the demo's public source names its bug in a comment, so this shows the agent's path, not a model's skill.
+
 ## Site: wallet, credit and attempts on testnet
 
 Question: do the calls the site builds for credit and attempts work on the live contract, with the commit fingerprint

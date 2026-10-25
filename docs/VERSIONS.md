@@ -89,6 +89,14 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | Intear Wallet script (not stored; loaded from https://wallet.intear.tech/near-selector.js, no versioned address; checked 2026-10-25) | pinned by sha256 in the wallet list | `6decc283352af197feff4988628899d19e05f4168a4277fe699bd8a0d6178e34` |
 | NEAR CLI script (not stored; loaded from raw.githubusercontent.com, near/near-cli-connect at commit `dc5cb123e3a8e42ed095739f4ea058b767a80ad2`, `dist/near-cli.js`) | pinned by sha256 in the wallet list | `522f2a52403f6da84384a409718c54b49ed4432cdfd583363d35109be8c8e318` |
 
+## Agent model provider (agent/config.toml)
+
+| Item | Value | Checked |
+| --- | --- | --- |
+| NEAR AI Cloud base URL | `https://cloud-api.near.ai/v1` (chat completions, `Authorization: Bearer`) | docs.near.ai/cloud/quickstart, 2026-10-25 |
+| Default model | `z-ai/glm-5.3-flash` | listed by `curl -s https://cloud-api.near.ai/v1/models`, 2026-10-25 (61 models) |
+| Python (the agent, standard library only) | 3.14.4 | `python3 --version` |
+
 ## Other
 
 | Tool | Version | Command |

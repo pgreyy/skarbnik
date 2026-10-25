@@ -1,0 +1,13 @@
+$ ./scripts/agent_dry_run_test.sh
+utc=2026-10-25T21:05:10Z
+PASS 1 reference fix: checked, built, 17/17 public tests, commit prepared, not sent, stops after 1
+PASS 2 model API: request to /v1/chat/completions with the key from the environment; key in no log or file
+PASS 3 broken answer: not used, nothing prepared
+PASS 4 wrong answer (reject_all): public tests fail, not used
+PASS 5 include_str! in the answer: refused before building
+PASS 6 max fee 0.001 NEAR below the next fee: skipped
+PASS 7 full access key: refused
+PASS 7b the real limited key: accepted (commit, reveal on the contract)
+PASS 8 fingerprint equals the site's (85533fe22abfa893ef81e91472eb2da05e1ad638346c3b591d29c7c90f185fc4)
+agent dry run tests: 9 passed, 0 failed
+exit=0

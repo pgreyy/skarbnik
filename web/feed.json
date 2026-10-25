@@ -1,7 +1,7 @@
 {
  "contract": "kintsugi-l2-cihdp.testnet",
  "network": "testnet",
- "generated_at_utc": "2026-10-25T19:46:01Z",
+ "generated_at_utc": "2026-10-25T21:04:55Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -25,7 +25,16 @@
    "bounty_amount": "0.1 NEAR",
    "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
    "image_id_allowed": true,
-   "test_bounty": false
+   "test_bounty": false,
+   "max_patch_bytes": 1024,
+   "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+   "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+   "public_code": {
+    "source": "code/demo/original.rs",
+    "module": "code/demo/original.wasm",
+    "tests": "code/demo/public_tests.txt",
+    "build": "code/demo/BUILD.txt"
+   }
   },
   {
    "bounty_id": 7,
@@ -39,7 +48,16 @@
    "bounty_amount": "0.5 NEAR",
    "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
    "image_id_allowed": true,
-   "test_bounty": false
+   "test_bounty": false,
+   "max_patch_bytes": 1024,
+   "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+   "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+   "public_code": {
+    "source": "code/demo/original.rs",
+    "module": "code/demo/original.wasm",
+    "tests": "code/demo/public_tests.txt",
+    "build": "code/demo/BUILD.txt"
+   }
   },
   {
    "bounty_id": 12,
@@ -53,7 +71,16 @@
    "bounty_amount": "0.5 NEAR",
    "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
    "image_id_allowed": true,
-   "test_bounty": false
+   "test_bounty": false,
+   "max_patch_bytes": 1024,
+   "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+   "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+   "public_code": {
+    "source": "code/demo/original.rs",
+    "module": "code/demo/original.wasm",
+    "tests": "code/demo/public_tests.txt",
+    "build": "code/demo/BUILD.txt"
+   }
   },
   {
    "bounty_id": 14,
@@ -67,8 +94,18 @@
    "bounty_amount": "0.1 NEAR",
    "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
    "image_id_allowed": true,
-   "test_bounty": true
+   "test_bounty": true,
+   "max_patch_bytes": 1024,
+   "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+   "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+   "public_code": {
+    "source": "code/demo/original.rs",
+    "module": "code/demo/original.wasm",
+    "tests": "code/demo/public_tests.txt",
+    "build": "code/demo/BUILD.txt"
+   }
   }
  ],
+ "public_code_note": "public_code paths are relative to this file. Check sha256(module) == original_hash and the tests' corpus_hash before you use them.",
  "quickstart": "/agent-quickstart.txt"
 }

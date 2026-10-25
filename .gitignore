@@ -37,3 +37,11 @@ node_modules/
 .vscode/
 .idea/
 .DS_Store
+
+# The agent: local config with the agent's account, and any model API key file (keys live outside the repo)
+agent/config.local.toml
+nearai_api_key*
+*.api_key
+api_key*.txt
+__pycache__/
+*.pyc

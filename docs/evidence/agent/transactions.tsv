@@ -1,0 +1,5 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+agent_create_account	create-account	kintsugi-agent-d9410f.testnet	7HwRHvepH4PtuMZxekwjyqg7u9vFxFniaasZJtBc5FXm	-	-	0	5.1
+agent_deposit_credit	deposit_credit	kintsugi-agent-d9410f.testnet	5tiP6LNMr9LpYHwFRB7gEPhMg6AUXT1m3wvfQJVj9LPa	0.310 Tgas	0.0000309633062595	0	7.41
+agent_set_limits	set_agent_limits	kintsugi-agent-d9410f.testnet	HkRojc7ryoqz52eriziGFAvciDTQ8bfLQm39djnDyPgg	0.314 Tgas	0.0000313352392365	0	6.61
+agent_add_limited_key	add-key	kintsugi-agent-d9410f.testnet	2vuutbSc7rHi2NeGtzeiuhngDUo6KFj3KFb5az9Po6Um	0.211 Tgas	0.0000210304079634	0	5.67

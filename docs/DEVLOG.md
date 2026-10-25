@@ -2,6 +2,21 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Agent driven by a language model, dry run (branch ui-preview)
+
+- `agent/kintsugi_agent.py` and `agent/config.toml`: feed, preflight, limits and key checks, public code checked
+  against `original_hash` and `corpus_hash`, prompt, model (NEAR AI Cloud by default, a stand-in for tests), local build
+  with the program's flags, public tests with the local checker, commit and reveal with the limited key (`--live`
+  only), attempt records, `status`. Standard library Python; signing through near-cli-rs `sign-with-access-key-file`.
+- `scripts/gen_feed.py` now publishes the public code in `web/code/demo/` and names it per bounty in the feed.
+- `./scripts/agent_testnet.sh setup`: agent account `kintsugi-agent-d9410f.testnet` with credit, limits and a limited
+  key (transaction ids in docs/EVIDENCE.md).
+- `./scripts/agent_dry_run_test.sh`: 9 of 9 PASS (docs/evidence/agent/dry_run_tests.txt).
+- Found while building: the first default model id I wrote (`deepseek-ai/DeepSeek-V3.1`) is not on NEAR AI Cloud's
+  model list; the default is now `z-ai/glm-5.3-flash`, which is (checked with `GET /v1/models`).
+- Research notes on NEAR AI Cloud, Intents, the Agent Market, OutLayer and others are private (not in the repo).
+- Next: the owner's NEAR AI Cloud key, then `./scripts/agent_testnet.sh bounty`, a live agent run, `prove`, `submit`.
+
 ## 2026-10-25: Wallet scripts loaded from their official addresses, pinned by sha256 (branch ui-preview)
 
 - The copies of the Intear Wallet script (AGPL-3.0) and the NEAR CLI wallet script (no licence declared) are removed from

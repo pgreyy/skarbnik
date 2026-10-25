@@ -67,3 +67,7 @@ Demo bounties carry the exploit commitment 9a1be994ab379a76d3f154df1fbde56169537
    and get_bounty should show "image_id_allowed": true. Rebuild the checker yourself and compare:
      ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet <bounty id>    prints MATCH
    Known limits: docs/SECURITY.md and docs/AUDIT.md in the repository.
+
+8. A READY AGENT
+   The repository has an agent driven by a language model: agent/kintsugi_agent.py (README, "Run your own agent").
+   Dry run is the default; it commits and reveals only with --live, with a key limited to commit and reveal.
