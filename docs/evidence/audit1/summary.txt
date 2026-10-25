@@ -1,0 +1,9 @@
+== audit1 rerun start 2026-10-25T01:19:45Z; contract wasm 2e798b7051e2876ef66b8874d2e85c117404ad4ade3d0e00481ebcad11ddf9d7
+== audit1 part b 2026-10-25T01:31:13Z: bounty 9 state Open, commits 2, pending 2
+R paid by timeout: researcher 1 balance change 0.0 NEAR (0.11 expected: bounty + own fee); J's fee refunded as credit to researcher 2: credit change 0.0 NEAR (0.015 expected)
+bounty 9 after the payout: {'state': 'Open', 'winner': None, 'fees_collected': '45000000000000000000000', 'fees_swept': False, 'pending': 2}
+J after its FAIL proof: Failed (a FAIL is not held back by the ordering rule)
+R paid by timeout: researcher 1 balance change 0.11 NEAR (0.11 expected: bounty + own fee); K's fee refunded as credit to researcher 2: credit change 0.024999999999999998 NEAR (0.02 expected, the third commit's fee)
+bounty 9 after the payout: {'state': 'Paid', 'winner': 0, 'fees_collected': '35000000000000000000000', 'fees_swept': False, 'pending': 1}
+expire: pool change 0.035 NEAR (0.015 expected: J's fee), vendor balance change 0.0 NEAR (0 expected)
+== audit1 rerun end 2026-10-25T02:00:06Z

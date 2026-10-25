@@ -1,0 +1,45 @@
+utc_start=2026-10-25T01:34:32.588614073Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  submit_groth16
+│                       args:         {
+│                                       "bounty_id": "9",
+│                                       "index": 1,
+│                                       "seal": "A1eJMMZ6B8UVgwY1Idhfshtl3rIZqJ8zx5QXTLlIZPopgTFxuFICZgOi+81FZUb70/D0GH7E4Kblt7B4aa6f0RPDRQicNLmxVXfI05O/1BE999Qy4biTDONrcmHYPbqgIryxJDvaPXMk0bZiWguJcPWZA10joXArzOsGol1/LX0Dr9GxU42ZT5wbJUVRtt9qEelXJ/rcatFi5kE+ohIE/yYPuAqoRioyoNVRzf3SzIUZ6Z3Q255+0Oha4+7tD8YGB/zB6q/7UnFQA4RbEE4gpv0SDZThAxgTsUs02I4W/dAhE/aF05TC3vrX4HLE880CKgl0xweiriSc88urWGNdSA=="
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.378 Tgas
+│    Transaction fee: 0.000037710551932 NEAR
+│    Transaction ID: 7AbUjtucJ7e5Mex3pQtwyCXEV6VG1oxD6Q3HRfKSrmXs
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/7AbUjtucJ7e5Mex3pQtwyCXEV6VG1oxD6Q3HRfKSrmXs
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"groth16_verified","data":[{"bounty_id":"9","index":1,"verdict":"FAIL","caller":"kintsugi-res2-prnvm.testnet"}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"attempt_spent","data":[{"bounty_id":"9","index":1}]}
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"final_fail"
+
+
+The "submit_groth16" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=4.65

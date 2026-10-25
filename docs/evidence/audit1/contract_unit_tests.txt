@@ -1,0 +1,93 @@
+test tests::audit_f3_unbounded_attest_window_is_refused - should panic ... ok
+test tests::audit_f3_expiry_shorter_than_the_windows_is_refused - should panic ... ok
+test tests::audit_h2_verifier_as_payout_is_refused - should panic ... ok
+test tests::audit_f1_commit_that_cannot_be_decided_before_expiry_is_refused - should panic ... ok
+test tests::audit_f1_every_reveal_leaves_a_full_verdict_window_before_expiry ... ok
+test tests::audit_c2_a_lower_index_revealed_later_does_not_block_an_earlier_reveal ... ok
+test tests::commits_beyond_k_are_ignored ... ok
+test tests::commit_without_credit_rejected - should panic ... ok
+test tests::audit_h2_vendor_as_payout_is_refused - should panic ... ok
+test tests::audit_c2_first_reveal_is_paid_by_timeout_then_the_copier_gets_nothing ... ok
+test tests::expire_refunds_vendor ... ok
+test tests::audit_c2_pass_for_a_copied_later_reveal_is_refused_while_the_first_reveal_is_undecided - should panic ... ok
+test tests::audit_c2_later_pass_goes_through_once_the_earlier_reveal_is_decided ... ok
+test tests::fingerprint_layout_is_stable ... ok
+test tests::audit_f1_reveal_that_leaves_less_than_a_verdict_window_is_refused - should panic ... ok
+test tests::audit_c2_copier_cannot_claim_its_timeout_before_the_first_reveal_is_decided - should panic ... ok
+test tests::init_replaces_hello_world_state ... ok
+test tests::audit_h2_verifier_cannot_commit - should panic ... ok
+test tests::expire_too_early_rejected - should panic ... ok
+test tests::audit_f4_pass_refunds_the_fee_of_an_undecided_revealed_attempt ... ok
+test tests::audit_f4_timeout_refunds_the_fee_of_an_undecided_revealed_attempt ... ok
+test tests::deposit_credit_for_another_account ... ok
+test tests::fingerprint_binds_payout_account - should panic ... ok
+test tests::expire_waits_for_revealed_submission - should panic ... ok
+test tests::expire_refunds_vendor_and_moves_unrevealed_fee_to_pool ... ok
+test tests::final_fail_spends_attempt_and_later_pass_pays ... ok
+test tests::fee_rises_with_each_attempt_and_comes_from_credit ... ok
+test tests::only_owner_registers_verifiers - should panic ... ok
+test tests::mismatched_attestation_rejected - should panic ... ok
+test tests::happy_path_two_verifiers_pay_researcher ... ok
+test tests::expire_after_payout_moves_unrevealed_fee_to_pool ... ok
+test tests::late_verdict_rejected - should panic ... ok
+test tests::only_committer_reveals - should panic ... ok
+test tests::outlayer_callback_is_private - should panic ... ok
+test tests::outlayer_answer_with_other_image_id_rejected ... ok
+test tests::only_owner_sets_outlayer - should panic ... ok
+test tests::late_attestation_rejected - should panic ... ok
+test tests::no_second_payout_after_pass - should panic ... ok
+test tests::outlayer_answer_with_other_submission_or_receipt_rejected ... ok
+test tests::only_vendor_posts_verdict - should panic ... ok
+test tests::outlayer_answer_twice_counts_once ... ok
+test tests::request_sends_job_to_outlayer_with_pinned_program ... ok
+test tests::researcher_cannot_attest_own_submission - should panic ... ok
+test tests::s13_commit_before_proof0_rejected - should panic ... ok
+test tests::outlayer_answer_counts_as_one_verifier ... ok
+test tests::oversized_patch_rejected - should panic ... ok
+test tests::revealed_failed_attempt_fee_still_goes_to_the_verifiers ... ok
+test tests::release_unrevealed_moves_the_fee_to_the_pool_and_pays_nobody ... ok
+test tests::s13_revealed_submission_cannot_be_released - should panic ... ok
+test tests::request_needs_outlayer_registered - should panic ... ok
+test tests::outlayer_not_ok_or_failed_records_nothing ... ok
+test tests::s13_release_before_window_rejected - should panic ... ok
+test tests::s13_proof0_attestation_with_other_hashes_rejected - should panic ... ok
+test tests::reveal_before_gap_rejected - should panic ... ok
+test tests::s13_timeout_after_final_pass_rejected - should panic ... ok
+test tests::s13_vendor_fail_without_attestations_times_out_and_pays ... ok
+test tests::vendor_cannot_be_verifier - should panic ... ok
+test tests::s13_unrevealed_junk_commits_can_be_released ... ok
+test tests::s13_same_verifier_twice_does_not_open_a_bounty ... ok
+test tests::same_verifier_twice_counts_once ... ok
+test tests::timeout_before_deadline_rejected - should panic ... ok
+test tests::second_expire_after_sweep_rejected - should panic ... ok
+test tests::verdict_without_two_attestations_times_out ... ok
+test tests::timeout_after_payout_rejected - should panic ... ok
+test tests::silent_vendor_timeout_pays_researcher ... ok
+test tests::tiny_bounty_rejected - should panic ... ok
+test tests::s13_reveal_after_window_rejected - should panic ... ok
+test tests::unregistered_attester_rejected - should panic ... ok
+test tests_level2::journal_layout_matches_the_real_proof0 ... ok
+test tests_level2::audit_f5_only_the_owner_allows_image_ids - should panic ... ok
+test tests_level2::audit_f5_allowlist_pins_the_checker ... ok
+test tests::s13_winner_fee_refunded_on_pass ... ok
+test tests::wrong_nonce_rejected - should panic ... ok
+test tests_level2::audit_f5_an_existing_bounty_with_an_unlisted_id_is_shown_as_not_allowed ... ok
+test tests_level2::audit_f5_unlisted_image_id_is_refused_once_the_list_is_set - should panic ... ok
+test tests::verifier_cannot_be_vendor - should panic ... ok
+test tests::s13_unregistered_account_cannot_attest_proof0 - should panic ... ok
+test tests_level2::level2_open_refused_after_expiry - should panic ... ok
+test tests_level2::level0_refuses_groth16_opening - should panic ... ok
+test tests::withdraw_needs_one_yocto - should panic ... ok
+test tests_level2::level2_proof0_refused_under_another_image_id - should panic ... ok
+test tests_level2::level2_bounty_is_marked_and_starts_closed ... ok
+test tests::wrong_patch_rejected - should panic ... ok
+test tests::withdraw_returns_unspent_credit ... ok
+test tests_level2::level2_changed_journal_refused - should panic ... ok
+test tests_level2::audit_f1_level2_last_minute_commit_is_refused - should panic ... ok
+test tests_level2::level2_proof0_refused_with_other_counts - should panic ... ok
+test tests_level2::level2_unrevealed_fee_goes_to_the_pool_not_the_vendor ... ok
+test tests_level2::level2_refuses_verifier_attestation_of_proof0 - should panic ... ok
+test tests::zero_fee_bounty_rejected - should panic ... ok
+test tests_level2::level2_opens_with_the_real_proof0 ... ok
+test result: ok. 91 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.94s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1,0 +1,13 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/audit1/j.bin target/audit1/j_succinct.bin succinct
+utc_start=2026-10-25T01:29:08Z
+limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=1800
+input receipt: target/audit1/j.bin (805878 bytes)
+compressed to: succinct
+compress seconds: 119.59
+verify seconds: 0.037
+output receipt: target/audit1/j_succinct.bin (224786 bytes)
+exit=0
+wall_seconds=123.58
+r0vm_peak_rss_mib=1465 (VmHWM, sampled every 5 s)
+min_available_mib=6590
+result: finished

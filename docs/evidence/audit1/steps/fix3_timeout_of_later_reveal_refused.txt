@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet claim_timeout json-args '{"bounty_id":"9","index":3}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T01:54:34.910657328Z
+{
+ "tx_hash": "CbKbvza1haqTm1uBtCfuA8RevdGMHzgrBE9Jtz9cxsxM",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: an attempt revealed earlier is still undecided: decide it or time it out first'}}}}",
+ "total_gas_burnt": 2148588135319,
+ "logs": [],
+ "wall_seconds": 3.359,
+ "rpc_error": null
+}

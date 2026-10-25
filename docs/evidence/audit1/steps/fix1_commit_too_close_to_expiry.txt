@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"9","fingerprint":"5ea18d4dcc2eed3853b8cc1b97adaab061c8d23095dc655e9f22c5be3203639a","payout":"kintsugi-res1-prnvm.testnet"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T01:36:00.686155903Z
+{
+ "tx_hash": "5bBwtSrE1gfULKLKcBgvLZA2rEjSz9Mv8d5NtzTkwPU3",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: too close to expiry: a commit must leave time for the reveal window and the verdict window'}}}}",
+ "total_gas_burnt": 1997146818888,
+ "logs": [],
+ "wall_seconds": 3.877,
+ "rpc_error": null
+}

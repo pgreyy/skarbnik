@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"9","fingerprint":"f94df26c77c427c96241513a185980ddfe4023fbef99f2d83a164c6318ec0ba6","payout":"kintsugi-ver1-prnvm.testnet"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T01:19:59.076632747Z
+{
+ "tx_hash": "E7hEJfRcvS5Kzyoatkb43KcLqk33vTsRzeXaXQyPxTyg",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the payout account cannot be a registered verifier, the vendor or this contract'}}}}",
+ "total_gas_burnt": 2149045538112,
+ "logs": [],
+ "wall_seconds": 3.482,
+ "rpc_error": null
+}

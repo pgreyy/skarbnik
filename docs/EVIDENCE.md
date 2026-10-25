@@ -5,6 +5,24 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Contract audit (round 1) and the fixes
+
+Question: does the bounty contract at commit `bab84c5` hold up against three independent reviewers briefed to break it
+(money flow; proof checking; griefing, economics and NEAR traps), and do the fixes hold on testnet? The full report, with
+every finding, its status, the fix commits and the suggested hardening, is docs/AUDIT.md. Raw output: `docs/evidence/audit1/`.
+
+**Verdict: two critical and several high findings were confirmed and fixed (commits `dfd04c3`, `c8c7566`, `3377348`,
+`a968fa5`, `5cb277c`, `affaa5a`, `8762144`); the Groth16 verification and the journal binding were found sound; the
+unfixed findings are stated as known limits in docs/SECURITY.md.** Reproductions before the fixes ran on a copy of the
+contract; after the fixes, 94 unit tests pass (`contract_unit_tests.txt`). One finding (a payout to a payout account that
+does not exist is lost silently) was shown on testnet: bounty 8 on `kintsugi-l2-cihdp.testnet`, tx
+`AKU4pVTmS3uwmLcGyHAXTekiBELoV5GRMqJeSPMq1BVk`, receipt `AccountDoesNotExist`, contract balance unchanged; not fixed.
+
+The fixed contract was redeployed in place (stored layout unchanged, bounty 7 untouched) and the owner's allowlist set to
+the reproducible checker id (`contract_wasm.txt`, txs `Gr63BrfkdxGDcnvQGBrtrpu4rtRsF1ZYVorsCqFk4Qjq`,
+`BLQoFNQ7Vz3Le4TruAgU4YkeKDtexYquQSTcZALpRvWM`). The rerun of the fixed attacks on testnet is in docs/AUDIT.md
+("Testnet rerun of the fixed attacks") and `docs/evidence/audit1/summary.txt`.
+
 ## Official demo: Level 2 bounty 7 on `kintsugi-l2-cihdp.testnet`
 
 This is the main demo. Bounty 7 on the S6c contract `kintsugi-l2-cihdp.testnet` is a Level 2 bounty: it is opened and

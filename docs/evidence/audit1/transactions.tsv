@@ -1,0 +1,21 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+redeploy_audit1	deploy	kintsugi-l2-cihdp.testnet	Gr63BrfkdxGDcnvQGBrtrpu4rtRsF1ZYVorsCqFk4Qjq	2.4 Tgas	0.0002376110897219	0	4.77
+allow_image_id	allow_image_id	kintsugi-l2-cihdp.testnet	BLQoFNQ7Vz3Le4TruAgU4YkeKDtexYquQSTcZALpRvWM	0.309 Tgas	0.0000308267441862	0	4.06
+x_create	create_bounty	kintsugi-vendor-prnvm.testnet	CZoxvPY79dihH8PR5X2neP8TfGWgUPuPW7GDPfzYjtC	0.353 Tgas	0.000035240535495	0	3.77
+x_open_groth16	open_with_groth16	kintsugi-res2-prnvm.testnet	BYxHMjZG4A19AB9tKQjMifVdWNimHf6AhHt48cHn6stj	0.377 Tgas	0.0000376771733315	0	4.65
+fix2_payout_is_a_verifier	commit	kintsugi-res1-prnvm.testnet	E7hEJfRcvS5Kzyoatkb43KcLqk33vTsRzeXaXQyPxTyg	-	-	rpc:failed	-
+x_r_commit	commit	kintsugi-res1-prnvm.testnet	2NqpjD6Y27dg3KC4QmhwTprjFrwoyLtsxWRTdRG3Fjgm	0.315 Tgas	0.0000314878271245	0	4.15
+x_r_reveal	reveal	kintsugi-res1-prnvm.testnet	HGNkEKSyQ24TerT5KUMwgJYjiKDjzNLZjiCQDRA9vXp2	0.350 Tgas	0.0000349210546045	0	3.89
+x_j_commit	commit	kintsugi-res2-prnvm.testnet	2P96uiKRzoarJU4syDXAA5z3Sg9HVUPzyGydMFa2EpSM	0.315 Tgas	0.0000314878271245	0	4.34
+x_j_reveal	reveal	kintsugi-res2-prnvm.testnet	6k58gVqXBPnX4K5G9M9LfjHGPZfsCxCxERzKsCAs8aRC	0.319 Tgas	0.0000318883703305	0	4.37
+fix1_commit_too_close_to_expiry	commit	kintsugi-res1-prnvm.testnet	2PQDNpAY45XgYuxVUCXBFmjg5hofrr47CFe8bAKWcGs6	-	-	rpc:ok	-
+fix3_timeout_of_later_reveal_refused	claim_timeout	kintsugi-res2-prnvm.testnet	9K9xCr4SaYs1ZigJVXGZuyVuhDj3Uv4Er6eAf4QJinSx	-	-	rpc:failed	-
+fix3_timeout_of_first_reveal	claim_timeout	kintsugi-res2-prnvm.testnet	-	-	-	1	5.41
+x_k_commit	commit	kintsugi-res2-prnvm.testnet	FJvoaAkjrYLAePqJtRVhQFcsVpRaFCsPkG9X2jcEMc1k	0.315 Tgas	0.0000314878271245	0	5.07
+x_k_reveal	reveal	kintsugi-res2-prnvm.testnet	Gc8tyFedm4L9jv1h5U4R4XGz3vYuVPJKL3LoQACVeKcy	0.319 Tgas	0.0000318883703305	0	4.19
+x_submit_fail_j	submit_groth16	kintsugi-res2-prnvm.testnet	7AbUjtucJ7e5Mex3pQtwyCXEV6VG1oxD6Q3HRfKSrmXs	0.378 Tgas	0.000037710551932	0	4.65
+fix1_commit_too_close_to_expiry	commit	kintsugi-res1-prnvm.testnet	5bBwtSrE1gfULKLKcBgvLZA2rEjSz9Mv8d5NtzTkwPU3	-	-	rpc:failed	-
+fix3_timeout_of_later_reveal_refused	claim_timeout	kintsugi-res2-prnvm.testnet	CbKbvza1haqTm1uBtCfuA8RevdGMHzgrBE9Jtz9cxsxM	-	-	rpc:failed	-
+fix3_timeout_of_first_reveal	claim_timeout	kintsugi-res2-prnvm.testnet	82M2gLJ5qzs6MB7ArPwPNrcTwDVzUNvCE9wSWA7NJQD3	0.310 Tgas	0.00003099668486	0	5.22
+fix4_expire_fees_to_pool	expire	kintsugi-res2-prnvm.testnet	E2vgNWQJccjApwuLxys5XZSKxiQHAymyZ7V3mRMKNCvD	0.310 Tgas	0.0000309156225445	0	4.81
+redeploy_fix6	deploy	kintsugi-l2-cihdp.testnet	7EL7CrM2iGs6cbBXa9QXCDLcSDFPNeRxz9Rb9U75nSLK	2.4 Tgas	0.000237746668402	0	4.61

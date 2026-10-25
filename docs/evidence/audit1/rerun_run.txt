@@ -1,0 +1,50 @@
+== audit1 rerun start 2026-10-25T01:19:45Z; contract wasm 2e798b7051e2876ef66b8874d2e85c117404ad4ade3d0e00481ebcad11ddf9d7
+== x_create (create_bounty by kintsugi-vendor-prnvm.testnet): exit=0 tx=CZoxvPY79dihH8PR5X2neP8TfGWgUPuPW7GDPfzYjtC gas=0.353 Tgas
+== x_open_groth16 (open_with_groth16 by kintsugi-res2-prnvm.testnet): exit=0 tx=BYxHMjZG4A19AB9tKQjMifVdWNimHf6AhHt48cHn6stj gas=0.377 Tgas
+== fix2_payout_is_a_verifier (commit by kintsugi-res1-prnvm.testnet, expected to fail): outcome=failed tx=E7hEJfRcvS5Kzyoatkb43KcLqk33vTsRzeXaXQyPxTyg
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the payout account cannot be a registered verifier, the vendor or this contract'}}}}"
+== x_r_commit (commit by kintsugi-res1-prnvm.testnet): exit=0 tx=2NqpjD6Y27dg3KC4QmhwTprjFrwoyLtsxWRTdRG3Fjgm gas=0.315 Tgas
+== x_r_reveal (reveal by kintsugi-res1-prnvm.testnet): exit=0 tx=HGNkEKSyQ24TerT5KUMwgJYjiKDjzNLZjiCQDRA9vXp2 gas=0.350 Tgas
+== x_j_commit (commit by kintsugi-res2-prnvm.testnet): exit=0 tx=2P96uiKRzoarJU4syDXAA5z3Sg9HVUPzyGydMFa2EpSM gas=0.315 Tgas
+== x_j_reveal (reveal by kintsugi-res2-prnvm.testnet): exit=0 tx=6k58gVqXBPnX4K5G9M9LfjHGPZfsCxCxERzKsCAs8aRC gas=0.319 Tgas
+journal.fuzz_count: 16
+journal.variant_count: 32
+journal.submission_id: d34f912cdcb6fd09d0b8c22109802b481bfa734b4fe9f56467d7f6c10119c955
+exit=0
+wall_seconds=511.49
+r0vm_peak_rss_mib=4703 (VmHWM, sampled every 5 s)
+min_available_mib=3169
+result: finished
+compress seconds: 119.59
+verify seconds: 0.037
+output receipt: target/audit1/j_succinct.bin (224786 bytes)
+exit=0
+wall_seconds=123.58
+r0vm_peak_rss_mib=1465 (VmHWM, sampled every 5 s)
+min_available_mib=6590
+result: finished
+compress seconds: 181.64
+verify seconds: 0.015
+output receipt: target/audit1/j_groth16.bin (2057 bytes)
+exit=0
+wall_seconds=182.87
+r0vm_peak_rss_mib=1410 (VmHWM, sampled every 5 s)
+min_available_mib=967
+result: finished
+seal bytes: 256
+wrote target/audit1/j_args.json
+== x_k_commit (commit by kintsugi-res2-prnvm.testnet): exit=0 tx=FJvoaAkjrYLAePqJtRVhQFcsVpRaFCsPkG9X2jcEMc1k gas=0.315 Tgas
+== x_k_reveal (reveal by kintsugi-res2-prnvm.testnet): exit=0 tx=Gc8tyFedm4L9jv1h5U4R4XGz3vYuVPJKL3LoQACVeKcy gas=0.319 Tgas
+== x_submit_fail_j (submit_groth16 by kintsugi-res2-prnvm.testnet): exit=0 tx=7AbUjtucJ7e5Mex3pQtwyCXEV6VG1oxD6Q3HRfKSrmXs gas=0.378 Tgas
+J after its FAIL proof: Failed (a FAIL is not held back by the ordering rule)
+== fix1_commit_too_close_to_expiry (commit by kintsugi-res1-prnvm.testnet, expected to fail): outcome=failed tx=5bBwtSrE1gfULKLKcBgvLZA2rEjSz9Mv8d5NtzTkwPU3
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: too close to expiry: a commit must leave time for the reveal window and the verdict window'}}}}"
+== fix3_timeout_of_later_reveal_refused (claim_timeout by kintsugi-res2-prnvm.testnet, expected to fail): outcome=failed tx=CbKbvza1haqTm1uBtCfuA8RevdGMHzgrBE9Jtz9cxsxM
+"failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: an attempt revealed earlier is still undecided: decide it or time it out first'}}}}"
+== fix3_timeout_of_first_reveal (claim_timeout by kintsugi-res2-prnvm.testnet): exit=0 tx=82M2gLJ5qzs6MB7ArPwPNrcTwDVzUNvCE9wSWA7NJQD3 gas=0.310 Tgas
+R paid by timeout: researcher 1 balance change 0.11 NEAR (0.11 expected: bounty + own fee); K's fee refunded as credit to researcher 2: credit change 0.024999999999999998 NEAR (0.02 expected, the third commit's fee)
+bounty 9 after the payout: {'state': 'Paid', 'winner': 0, 'fees_collected': '35000000000000000000000', 'fees_swept': False, 'pending': 1}
+== fix4_expire_fees_to_pool (expire by kintsugi-res2-prnvm.testnet): exit=0 tx=E2vgNWQJccjApwuLxys5XZSKxiQHAymyZ7V3mRMKNCvD gas=0.310 Tgas
+expire: pool change 0.035 NEAR (0.015 expected: J's fee), vendor balance change 0.0 NEAR (0 expected)
+== audit1 rerun end 2026-10-25T02:00:06Z
+exit=0

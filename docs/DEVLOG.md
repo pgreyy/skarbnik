@@ -2,6 +2,20 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Contract audit, six fixes, second review
+
+- Froze `bab84c5`; three independent reviewers (money flow; proof checking; griefing and economics) got the code and the
+  design docs only. Every finding reproduced on a scratch copy of the contract or on testnet (docs/AUDIT.md).
+- Fixes, one commit each with regression tests: reveals leave a full verdict window and windows are capped (`dfd04c3`);
+  payout cannot be a verifier, the vendor or the contract (`c8c7566`); the earliest reveal has priority (`3377348`,
+  test fix `a968fa5`); Level 2 decided fees to the pool, undecided fees refunded (`5cb277c`); owner allowlist of checker
+  image ids (`affaa5a`); from the second review, a tie-break for same-block reveals and a reveal gap above zero
+  (`8762144`). 94 unit tests pass. Redeployed in place on `kintsugi-l2-cihdp.testnet`; bounty 7 untouched.
+- Mistakes: one commit (`3377348`) went in with a test that did not compile, because my command chain took a pipeline's
+  exit code; fixed forward in `a968fa5` and the chain corrected. During the testnet rerun I misread a step's `exit=0` line
+  as the end of the run and started a second script against the same bounty; its extra commit is explained in the evidence.
+- Docs: docs/AUDIT.md (new), README and SECURITY corrections of the overclaims the reviewers found, EVIDENCE section.
+
 ## 2026-10-25: Official Level 2 demo bounty, private salt by default
 
 - Bounty 7 on `kintsugi-l2-cihdp.testnet`: Level 2, open for 30 days (until 2026-11-24 00:19 UTC), opened with the
