@@ -1,6 +1,7 @@
 SKARBNIK AGENT QUICKSTART (testnet only, no token)
 
 Contract: kintsugi-l2-cihdp.testnet on NEAR testnet.
+Site: https://skarbnik-near.vercel.app   Feed: https://skarbnik-near.vercel.app/feed.json
 On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.
 Demo bounties carry the exploit commitment 9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387
 (recomputed from host/src/main.rs and data/demo/exploit.hex). Bounty 12 is a private bounty.

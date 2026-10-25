@@ -31,9 +31,6 @@
     "allowsOpen": [
      "https://wallet.intear.tech",
      "https://staging.wallet.intear.tech",
-     "http://intearwallet.local",
-     "https://intearwallet.local",
-     "http://intearwallet.localhost:3000",
      "intear://",
      "https://logout-bridge-service.intear.tech"
     ]

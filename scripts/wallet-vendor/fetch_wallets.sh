@@ -27,6 +27,11 @@ for w in src["wallets"]:
         url, local = keep[w["id"]]
         h = hashlib.sha256(open(t + "/" + local, "rb").read()).hexdigest()
         w = dict(w); w["executor"] = url; w["sha256"] = h; w["version"] = w["version"] + "+sha256-" + h[:16]
+        # Drop the wallet's own development addresses (localhost and .local) from the pages it may open.
+        perms = dict(w.get("permissions", {}))
+        if isinstance(perms.get("allowsOpen"), list):
+            perms["allowsOpen"] = [u for u in perms["allowsOpen"] if "localhost" not in u and ".local" not in u]
+        w["permissions"] = perms
         out.append(w)
         print(h, url)
 order = ["intear-wallet", "near-cli"]
