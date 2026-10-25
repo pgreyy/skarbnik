@@ -72,7 +72,7 @@ setup)
   call credit_r1 "$RES1" deposit_credit '{}' "0.2 NEAR"; call credit_r2 "$RES2" deposit_credit '{}' "0.2 NEAR"
   ;;
 proof0)
-  MAX_SECONDS=10800 scripts/s2_measure.sh target/s13/prove_proof0.log -- $HOST prove data/demo/fixed.wasm --proof0 \
+  MAX_SECONDS=10800 scripts/s2_measure.sh target/s13/prove_proof0.log -- $HOST prove data/demo/fixed.wasm --proof0 --demo-salt \
     --fuzz-count 16 --variants 32 --po2 19 --seed "$SEED_P0" --out target/s13/proof0.bin
   MAX_SECONDS=3600 scripts/s2_measure.sh target/s13/compress_proof0.log -- $HOST compress target/s13/proof0.bin target/s13/proof0_succinct.bin succinct
   V=$($HOST verify target/s13/proof0_succinct.bin); echo "$V" > target/s13/verify_proof0.txt
@@ -106,7 +106,7 @@ commit_a)
   save SEED_A "$(json_field "$SUB" seed)"; save SID_A "$(json_field "$(view get_submission_id "{\"bounty_id\":\"$BOUNTY_A\",\"index\":$IA}")" "")"
   ;;
 prove_a)
-  MAX_SECONDS=10800 scripts/s2_measure.sh target/s13/prove_a.log -- $HOST prove data/demo/fixed.wasm --fuzz-count 16 \
+  MAX_SECONDS=10800 scripts/s2_measure.sh target/s13/prove_a.log -- $HOST prove data/demo/fixed.wasm --demo-salt --fuzz-count 16 \
     --variants 32 --po2 19 --seed "$SEED_A" --submission-id "$SID_A" --out target/s13/a.bin
   MAX_SECONDS=3600 scripts/s2_measure.sh target/s13/compress_a.log -- $HOST compress target/s13/a.bin target/s13/a_succinct.bin succinct
   V=$($HOST verify target/s13/a_succinct.bin); echo "$V" > target/s13/verify_a.txt

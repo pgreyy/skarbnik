@@ -16,7 +16,9 @@
 //! --out <file> (prove only: receipt file, default target/s2/receipt.bin), --po2 N (segment size limit as a
 //! power of two, smaller uses less memory per segment; default: RISC Zero's default of 20), --profile (execute
 //! only: the guest prints its cycles per phase), --submission-id <64 hex> (the id the contract gives the submission,
-//! see `get_submission_id`; default all zeros), --proof0 (Proof 0 mode: the candidate is the vendor's reference fix).
+//! see `get_submission_id`; default all zeros), --proof0 (Proof 0 mode: the candidate is the vendor's reference fix),
+//! and one of --bounty <name> (a private random salt for the secret's commitment, made once per bounty in
+//! ~/.kintsugi-salts/, the normal choice) or --demo-salt (the public demo salt of the demo bounties).
 //! The bounty files are the demo files in data/demo/. Proving runs on this machine through the installed
 //! r0vm; nothing is sent to a remote prover.
 
@@ -30,7 +32,9 @@ use risc0_zkvm::{default_executor, default_prover, sha::Digest, ExecutorEnv, Inn
 
 /// The S1 demo seed ("kintsugi S1 demo seed A........!").
 const DEMO_SEED: &str = "6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21";
-/// A fixed demo salt for the exploit commitment. A real vendor picks a random secret salt.
+/// The fixed, PUBLIC demo salt for the exploit commitment, used only with `--demo-salt` (the demo bounties were made
+/// with it). With a public salt the commitment is a plain fingerprint of the secret, which can be guessed when the
+/// secret is short or predictable; a real vendor uses `--bounty <name>`, a private random salt per bounty.
 const DEMO_SALT: [u8; 32] = *b"kintsugi demo salt, not a secret";
 
 fn main() -> ExitCode {
@@ -86,6 +90,8 @@ struct Opts {
     profile: bool,
     submission_id: [u8; 32],
     proof0: bool,
+    demo_salt: bool,
+    bounty: Option<String>,
 }
 
 fn parse_opts(args: &[String]) -> Result<Opts, String> {
@@ -101,6 +107,8 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
         profile: false,
         submission_id: [0u8; 32],
         proof0: false,
+        demo_salt: false,
+        bounty: None,
     };
     let mut i = 1;
     while i < args.len() {
@@ -127,6 +135,12 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
                 i += 1;
                 continue;
             }
+            "--demo-salt" => {
+                opts.demo_salt = true;
+                i += 1;
+                continue;
+            }
+            "--bounty" => opts.bounty = Some(value()?.clone()),
             other => return Err(format!("unknown option {other}")),
         }
         i += 2;
@@ -138,6 +152,48 @@ fn read(path: &str) -> Result<Vec<u8>, String> {
     std::fs::read(path).map_err(|e| format!("{path}: {e}"))
 }
 
+/// The salt of the exploit commitment. `--demo-salt`: the public demo salt. Otherwise `--bounty <name>`: a private random
+/// salt for that bounty, made on first use in ~/.kintsugi-salts/<name>.salt (folder mode 700, file mode 600)
+/// and read again for every later proof of the same bounty. The salt itself is never printed.
+fn salt_for(opts: &Opts) -> Result<[u8; 32], String> {
+    use std::io::{Read, Write};
+    use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt, PermissionsExt};
+    if opts.demo_salt {
+        if opts.bounty.is_some() {
+            return Err("--demo-salt and --bounty cannot be used together".into());
+        }
+        eprintln!("salt: the PUBLIC demo salt (--demo-salt); for a real bounty use --bounty <name>");
+        return Ok(DEMO_SALT);
+    }
+    let name = opts.bounty.as_deref().ok_or(
+        "choose the salt of the secret's commitment: --bounty <name> (a private random salt for that bounty, the normal \
+         choice) or --demo-salt (the public demo salt of the demo bounties)",
+    )?;
+    if name.is_empty() || name.len() > 64 || !name.chars().all(|c| c.is_ascii_alphanumeric() || "._-".contains(c)) {
+        return Err("--bounty: use 1 to 64 letters, digits, '.', '_' or '-'".into());
+    }
+    let home = std::env::var("HOME").map_err(|_| "HOME is not set")?;
+    let dir = std::path::Path::new(&home).join(".kintsugi-salts");
+    std::fs::DirBuilder::new().recursive(true).mode(0o700).create(&dir).map_err(|e| format!("salt folder: {e}"))?;
+    let path = dir.join(format!("{name}.salt"));
+    let mut salt = [0u8; 32];
+    if path.exists() {
+        let mode = std::fs::metadata(&path).map_err(|e| format!("salt file: {e}"))?.permissions().mode();
+        if mode & 0o077 != 0 {
+            return Err(format!("the salt file of bounty {name} can be read by other users (mode {:o}); run chmod 600 on it", mode & 0o777));
+        }
+        let mut f = std::fs::File::open(&path).map_err(|e| format!("salt file: {e}"))?;
+        f.read_exact(&mut salt).map_err(|e| format!("salt file of bounty {name}: {e}"))?;
+        eprintln!("salt: the private salt of bounty {name} (existing)");
+    } else {
+        std::fs::File::open("/dev/urandom").and_then(|mut r| r.read_exact(&mut salt)).map_err(|e| format!("random salt: {e}"))?;
+        let mut f = std::fs::OpenOptions::new().write(true).create_new(true).mode(0o600).open(&path).map_err(|e| format!("salt file: {e}"))?;
+        f.write_all(&salt).map_err(|e| format!("salt file: {e}"))?;
+        eprintln!("salt: a new private salt for bounty {name}, kept in ~/.kintsugi-salts/ (never printed)");
+    }
+    Ok(salt)
+}
+
 fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
     let exploit_text = String::from_utf8(read("data/demo/exploit.hex")?).map_err(|e| e.to_string())?;
     let tests_text = String::from_utf8(read("data/demo/public_tests.txt")?).map_err(|e| e.to_string())?;
@@ -145,7 +201,7 @@ fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
     Ok(GuestInput {
         original: read("data/demo/original.wasm")?,
         exploit: parse_hex(exploit_text.trim())?,
-        salt: DEMO_SALT,
+        salt: salt_for(opts)?,
         public_tests: tests.into_iter().map(|t| (t.input, t.expected)).collect(),
         candidate: read(&opts.candidate)?,
         fuzz_seed: opts.seed,

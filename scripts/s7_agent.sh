@@ -108,7 +108,7 @@ limits)
   done | tee -a "$OUT/summary.txt"
   ;;
 prove)
-  MAX_SECONDS=10800 scripts/s2_measure.sh target/s7-logs/prove_s7.log -- $HOST prove "$PATCH_FILE" \
+  MAX_SECONDS=10800 scripts/s2_measure.sh target/s7-logs/prove_s7.log -- $HOST prove "$PATCH_FILE" --demo-salt \
     --fuzz-count 16 --variants 32 --po2 19 --seed "$SEED" --submission-id "$SID" --out target/s7/receipt.bin
   MAX_SECONDS=3600 scripts/s2_measure.sh target/s7-logs/compress_s7.log -- $HOST compress target/s7/receipt.bin \
     target/s7/receipt_succinct.bin succinct

@@ -5,6 +5,35 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Official demo: Level 2 bounty 7 on `kintsugi-l2-cihdp.testnet`
+
+This is the main demo. Bounty 7 on the S6c contract `kintsugi-l2-cihdp.testnet` is a Level 2 bounty: it is opened and
+decided only by Groth16 proofs the contract checks itself (section S6c). It reuses the demo's Groth16 Proof 0 (image
+id `dd6c5f42...`, journal `fb7939dc...`) and is open for 30 days. **It is a demo**: Proof 0 was made with the public
+fixed demo salt, so the secret's commitment (`9a1be994...`) is a plain fingerprint of the secret (docs/SECURITY.md,
+known limits). The older bounties (S4, S7, S13 and demo bounty 4 on `kintsugi-s13-tlryo.testnet`) stay as history.
+
+| Step | Command | Result |
+|---|---|---|
+| create (0.5 NEAR, level 2, K = 3, check size 16 / 32, expires after 30 days) | `./scripts/s6c_testnet.sh demo` | tx `CRoeYBpDgULtH32NeZNAtb3xWvswnoSRZFmYDUDFrtd3`; expires 2026-11-24 00:19 UTC (`docs/evidence/S6c/demo_bounty.json`) |
+| open with the reused Groth16 Proof 0 | (same phase) | tx `DxutukERDxo3DwhgSXueD5NWpJKySbnpuhVPdHadcS8R`; opened |
+| rebuild the checker and compare | `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 7` (`docs/evidence/S6c/demo_check_image_id.txt`) | below |
+
+```
+$ ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 7
+rebuilt checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+image id of bounty 7 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+MATCH
+```
+
+Private salt by default (since this demo): `kintsugi-host execute` and `prove` now need `--bounty <name>` (a private
+random 32 byte salt per bounty, made on first use in ~/.kintsugi-salts/<name>.salt with mode 600 and reused for
+every proof of that bounty) or `--demo-salt` (the public demo salt; every demo script passes it). Tested with
+`execute` (`docs/evidence/salt/salt_selftest.txt`): no flag and both flags are refused; `--demo-salt` gives the demo
+commitment `9a1be994...`; a new bounty name gives a new commitment (`fe5e6cc9...`), the same name gives it again, a
+second name gives another (`5c1ab049...`); folder mode 700, file mode 600, 32 bytes; a salt file readable by others
+(mode 644) is refused; the salt value appears in no output.
+
 ## S6c (Level 2 in the bounty contract): proofs decide bounties, no verifier signatures
 
 Question: can the bounty contract itself decide a bounty from a Groth16 proof, open it with a Groth16 Proof 0, refuse
@@ -177,6 +206,8 @@ Notes:
 - Not done: any on-chain verification, any contract change, any gas measurement.
 
 ## Demo bounty with the reproducible image id: anyone can rebuild the checker and get a MATCH
+
+History: this was the first demo bounty (Level 0). The main demo is now Level 2 bounty 7 (section "Official demo").
 
 Question: can a judge rebuild the checker from this repository and get the exact image id a bounty on the contract
 holds? Raw output: `docs/evidence/demo/`.

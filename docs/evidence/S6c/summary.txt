@@ -10,3 +10,4 @@ after release_unrevealed(0): pool 10000000000000000000000
 self-block run 2 start: vendor 4785039037494011200000000, sybil 50000000000000000000000, sybil credit 45000000000000000000000, pool 10000000000000000000000 yoctoNEAR
 after the honest commit: commits 3, active 3
 after release_unrevealed(0): pool 20000000000000000000000
+demo bounty 7: level 2 opened True expires 2026-11-24 00:19 UTC

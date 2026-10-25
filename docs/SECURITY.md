@@ -53,6 +53,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Level 2 bounties: the contract checks a Groth16 proof itself (`groth16::verify`, NEAR's alt_bn128 host functions); no verifier signatures; every Level 0 call refuses a Level 2 bounty and the Level 2 calls refuse a Level 0 bounty; `get_bounty` shows the level (added in S6c) | Trusting verifiers for the verdict | `open_with_groth16`, `submit_groth16`, `contract/src/groth16.rs` | unit tests `tests_level2.rs`; S6c on testnet (EVIDENCE, S6c) |
 | A Level 2 proof's journal must belong to this bounty and this attempt: submission id (contract, bounty, index, patch hash), the seed recorded at reveal, the revealed patch hash, the bounty's original, exploit commitment, tests and check size; the verdict is read from the journal, never given by the caller (added in S6c) | Replaying a proof from another bounty or attempt; calling a FAIL a PASS | `submit_groth16`, `check_bounty_fields` | S6c attacks (EVIDENCE, S6c) |
 | Every new bounty records `fuzz_count` and `variant_count`; a proof must match them (Level 2: on chain; Level 0: `scripts/verifier_check.sh`) (added in S6c) | A vendor proving a weaker check than the bounty promises | `create_bounty`, `check_bounty_fields`, `verifier_check.sh` | unit test `level2_proof0_refused_with_other_counts`; S6c Level 0 check 12 of 12 |
+| The vendor tools use a private random salt per bounty for the secret's commitment unless `--demo-salt` is given; they refuse a salt file other users can read and never print the salt (added 2026-10-25) | Guessing the secret from its commitment | `host/src/main.rs` (`salt_for`) | `docs/evidence/salt/salt_selftest.txt` |
 | Fees of commits never revealed go to the protocol fee pool by one rule (`release_to_pool`), at `release_unrevealed` or, if still unreleased, at `expire` before any fee is paid out; no code path pays such a fee to the vendor, a researcher or a verifier (added in S6c) | A vendor blocking its own bounty with junk commits for free (it would otherwise get the fees back) | `release_to_pool`, `release_unrevealed`, `expire` | unit tests `release_unrevealed_moves_the_fee_to_the_pool_and_pays_nobody`, `level2_unrevealed_fee_goes_to_the_pool_not_the_vendor`; S6c self-block test |
 
 ### Keys
@@ -167,6 +168,16 @@ Each guard: what it stops, where it lives, and what shows it works.
 - A Proof 0 journal does not depend on the bounty (its id is sha256 of "kintsugi-proof0-v1" and the reference fix
   hash), so one Proof 0 opens every bounty with the same original, secret commitment, tests, check size and reference
   fix. S6c relied on this to reuse the demo's Groth16 Proof 0.
+- The demo bounties use a public fixed salt (`--demo-salt`; `DEMO_SALT` in `host/src/main.rs`) for the secret's
+  commitment, sha256(salt || secret). With a public salt the commitment is a plain fingerprint of the secret, which
+  anyone can match by guessing when the secret is short or predictable. The vendor tools' default is a private random
+  salt per bounty (`kintsugi-host ... --bounty <name>`: 32 bytes from /dev/urandom in
+  ~/.kintsugi-salts/<name>.salt, mode 600, reused for every proof of that bounty, never printed or committed);
+  a real vendor must use it.
+- Proof 0 needs a reference fix: the vendor must already hold a fix that passes every check of the bounty, and it
+  proves that fix in Proof 0. A vendor who has found a crash but has no fix at all is not supported yet. The reference
+  fix stays private (only its sha256 is public) and may be crude; it cannot simply recognise the exact secret bytes,
+  because the variants step (copies of the secret with one or two bytes changed) would then fail.
 - The vendor sees each patch before paying; the timeout path protects the researcher.
 - Arena verdicts (S8) come from the native checker, not proofs. Timing and other side channels are not measured.
 - Proving is slow on a laptop CPU (16 fairness inputs: 47 to 48 minutes, plus 15 to 16 minutes to compress).
@@ -175,6 +186,8 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
+- 2026-10-25 (this commit): private random salt per bounty by default (`--bounty`), the public demo salt only with
+  `--demo-salt`; known limits for the demo salt and for the reference fix requirement.
 - 2026-10-25 `95915f2`: S6c Level 2 path in the bounty contract (Groth16 proofs, journal binding, level marking,
   check size), protocol fee pool for never-revealed fees, nine Level 2 attacks and the self-block test; trusted setup
   line corrected to confirmed facts; Level 0 check size gap found and closed for new bounties.

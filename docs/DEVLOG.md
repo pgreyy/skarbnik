@@ -2,6 +2,21 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Official Level 2 demo bounty, private salt by default
+
+- Bounty 7 on `kintsugi-l2-cihdp.testnet`: Level 2, open for 30 days (until 2026-11-24 00:19 UTC), opened with the
+  reused Groth16 Proof 0; `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 7` prints MATCH. README "Try it" and
+  EVIDENCE point at it; it is labelled a demo (public demo salt).
+- `kintsugi-host`: `--bounty <name>` makes and reuses a private random salt per bounty in ~/.kintsugi-salts/
+  (folder mode 700, file mode 600, never printed); `--demo-salt` keeps the public demo salt; neither flag is refused.
+  Every demo script passes `--demo-salt`. Tested with `execute` (7 cases).
+- The first version kept the salts inside the private secrets folder; the commit gate stopped on that folder's name in
+  the code, so the salts now have their own folder, ~/.kintsugi-salts/. The tests left four salt files outside the
+  project (two from the first version, two in ~/.kintsugi-salts/); not deleted.
+- SECURITY known limits: the demo salt, and the reference fix requirement (a vendor with no fix is not supported yet).
+- Not changed: the README Roadmap still lists "the contract checking the proof itself" as planned; that is now built
+  (S6c); left for the owner, who decides roadmap changes.
+
 ## 2026-10-24 to 25: S6c Level 2 in the bounty contract (PASS), protocol fee pool, self-block test
 
 - Owner's design choices: Level 2 bounties take only Groth16 proofs; their revealed attempts' fees go to the vendor;

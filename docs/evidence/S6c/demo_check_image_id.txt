@@ -1,0 +1,4 @@
+$ ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 7
+rebuilt checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+image id of bounty 7 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+MATCH

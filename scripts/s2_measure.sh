@@ -5,7 +5,7 @@
 # r0vm and the host by their exact PIDs, so the rest of the machine keeps running. If MAX_SECONDS is set and
 # the run is still going after that many seconds, it is stopped the same way (a time limit).
 # Usage, from the repo root:
-#   scripts/s2_measure.sh <log file> -- ./target/release/kintsugi-host prove data/demo/fixed.wasm --fuzz-count 16 --po2 19 --out target/s2/receipt_f16.bin
+#   scripts/s2_measure.sh <log file> -- ./target/release/kintsugi-host prove data/demo/fixed.wasm --demo-salt --fuzz-count 16 --po2 19 --out target/s2/receipt_f16.bin
 # Writes the host output plus wall_seconds, r0vm_peak_rss_mib, min_available_mib and a stop reason to the log.
 set -uo pipefail
 LOG="$1"; shift; [ "$1" = "--" ] && shift

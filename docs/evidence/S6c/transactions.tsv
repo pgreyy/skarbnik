@@ -59,3 +59,5 @@ s2_sybil_junk_commit_2	commit	sybil.kintsugi-vendor-prnvm.testnet	3hiPvqjJ18spcV
 s2_honest_commit_ignored	commit	kintsugi-res1-prnvm.testnet	PjQBWCTmt4nAbwAQyT3Kn8UKt18nzpCzfKtbtn9HYpn	0.315 Tgas	0.0000314878271245	0	4.86
 s2_release_unrevealed_0	release_unrevealed	kintsugi-res2-prnvm.testnet	mpBhiyx6w9RxjpMSbcuKVty67hFZCTX7x6K3qQd57zg	0.311 Tgas	0.0000310205267175	0	4.8
 s2_expire	expire	kintsugi-res2-prnvm.testnet	8LxACsYPrMQ71kHCjDhcdt9uH9ATJNn9qrjbLMRjfVW8	0.310 Tgas	0.0000309156225445	0	5.39
+demo_create	create_bounty	kintsugi-vendor-prnvm.testnet	CRoeYBpDgULtH32NeZNAtb3xWvswnoSRZFmYDUDFrtd3	0.353 Tgas	0.0000352739140955	0	5.45
+demo_open_groth16	open_with_groth16	kintsugi-res2-prnvm.testnet	DxutukERDxo3DwhgSXueD5NWpJKySbnpuhVPdHadcS8R	0.377 Tgas	0.0000376771733315	0	4.46

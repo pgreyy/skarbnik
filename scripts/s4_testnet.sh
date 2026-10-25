@@ -63,7 +63,7 @@ PY
   echo "bounty $ID index $IDX seed $SEED submission_id $SID"
   ;;
 prove)
-  MAX_SECONDS=7200 scripts/s2_measure.sh target/s4-logs/prove_s4.log -- $HOST prove data/demo/fixed.wasm \
+  MAX_SECONDS=7200 scripts/s2_measure.sh target/s4-logs/prove_s4.log -- $HOST prove data/demo/fixed.wasm --demo-salt \
     --fuzz-count 16 --variants 32 --po2 19 --seed "$SEED" --submission-id "$SID" --out target/s4/receipt.bin
   MAX_SECONDS=7200 scripts/s2_measure.sh target/s4-logs/compress_s4.log -- $HOST compress target/s4/receipt.bin \
     target/s4/receipt_succinct.bin succinct

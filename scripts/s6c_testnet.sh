@@ -12,6 +12,8 @@
 #   attacks   the attack list (another attempt, FAIL as PASS, flipped bit, changed journal, wrong image id, another
 #             bounty, second submission, after expiry), the real FAIL and PASS decisions, timeout and fee rules
 #   redeploy  deploy the protocol fee pool version (no state change: the pool is its own storage entry)
+#   demo      the official demo bounty: Level 2, open for 30 days, opened with the reused Groth16 Proof 0, then
+#             ./scripts/check_image_id.sh against it (DEMO: its secret's commitment uses the public fixed demo salt)
 #   selfblock the vendor blocks its own Level 2 bounty: a second account it funds takes all K slots with commits it
 #             never reveals; an honest commit is ignored; the never-revealed fees go to the pool, not back to the vendor
 # Usage, from the repo root: ./scripts/s6c_testnet.sh <phase>. State: docs/evidence/S6c/run.env.
@@ -80,7 +82,7 @@ submit() { # submit <step> <bounty> <index> <args.json> <variant> [expect_fail]
 open_l2() { call "$1" "$RES2" open_with_groth16 "{\"bounty_id\":\"$2\",$(proof_args "$P0_ARGS" real)}" "0 NEAR" "300 Tgas"; }
 outcome() { json_field "$(view get_submission "{\"bounty_id\":\"$1\",\"index\":$2}")" outcome; }
 prove() { # prove <name> <patch> <seed> <submission id>
-  MAX_SECONDS=10800 scripts/s2_measure.sh "target/s6c/prove_$1.log" -- $HOST prove "$2" --fuzz-count 16 --variants 32 --po2 19 \
+  MAX_SECONDS=10800 scripts/s2_measure.sh "target/s6c/prove_$1.log" -- $HOST prove "$2" --demo-salt --fuzz-count 16 --variants 32 --po2 19 \
     --seed "$3" --submission-id "$4" --out "target/s6c/$1.bin"
   MAX_SECONDS=3600 scripts/s2_measure.sh "target/s6c/compress_$1.log" -- $HOST compress "target/s6c/$1.bin" "target/s6c/$1_succinct.bin" succinct
   rm -f "target/s6c/mem_$1.log"*; (target/s6/watch_mem.sh "target/s6c/mem_$1.log" & echo $! > "target/s6c/watch_$1.pid")
@@ -245,5 +247,16 @@ print(f"vendor side lost, not counting the bounty it got back: attempt fees {(c0
 print(f"protocol fee pool {p0/N:.6f} -> {p1/N:.6f}, gained {(p1-p0)/N:.6f} NEAR; equal to the attempt fees the vendor side spent: {p1-p0 == c0-c1}")
 PY
   ;;
-*) echo "usage: $0 setup|level0|bounty_a|prove_a1|prove_a0|attacks|redeploy|selfblock|selfblock2"; exit 2 ;;
+demo)
+  id=$(json_field "$(view get_next_bounty_id '{}')" "")
+  call demo_create "$VENDOR" create_bounty "{\"original_hash\":\"$(sha data/demo/original.wasm)\",\"corpus_hash\":\"736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b\",\"image_id\":\"$IMAGE\",\"exploit_commitment\":\"9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387\",\"proof0_receipt_hash\":\"$P0_RECEIPT\",\"max_commits\":3,\"max_patch_bytes\":1024,\"reveal_gap_ns\":\"$(( 2 * SEC ))\",\"verdict_window_ns\":\"$(( 4 * 3600 * SEC ))\",\"attest_window_ns\":\"$(( 3600 * SEC ))\",\"expiry_ns\":\"$(( 30 * 24 * 3600 * SEC ))\",\"attempt_fee\":\"10000000000000000000000\",\"fee_step\":\"5000000000000000000000\",\"reference_fix_hash\":\"$(sha data/demo/fixed.wasm)\",\"proof0_journal_hash\":\"$P0_JOURNAL\",\"reveal_window_ns\":\"$(( 3600 * SEC ))\",\"fuzz_count\":16,\"variant_count\":32,\"level\":2}" "0.5 NEAR"
+  [ "$(view get_bounty "{\"bounty_id\":\"$id\"}")" != "null" ] || { echo "create_bounty failed"; exit 1; }
+  save DEMO_L2_BOUNTY "$id"
+  open_l2 demo_open_groth16 "$id"
+  view get_bounty "{\"bounty_id\":\"$id\"}" > "$OUTDIR/demo_bounty.json"
+  note "demo bounty $id: $(python3 -c 'import json,sys,datetime; d=json.load(open(sys.argv[1])); print("level", d["level"], "opened", d["opened"], "expires", datetime.datetime.fromtimestamp(int(d["expires_at_ns"])/1e9, datetime.UTC).strftime("%Y-%m-%d %H:%M UTC"))' "$OUTDIR/demo_bounty.json")"
+  { echo "\$ ./scripts/check_image_id.sh $CONTRACT $id"; ./scripts/check_image_id.sh "$CONTRACT" "$id" 2>&1 | grep -vE '^\s+(Compiling|Finished)'; } | sed -E 's#/home/[^/ "]+#~#g' | tee "$OUTDIR/demo_check_image_id.txt"
+  grep -q '^MATCH' "$OUTDIR/demo_check_image_id.txt"
+  ;;
+*) echo "usage: $0 setup|level0|bounty_a|prove_a1|prove_a0|attacks|redeploy|selfblock|selfblock2|demo"; exit 2 ;;
 esac

@@ -35,6 +35,12 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 
 All commands run from the repository root on Linux x86_64. Versions: [docs/VERSIONS.md](docs/VERSIONS.md).
 
+**The demo bounty** is bounty 7 on `kintsugi-l2-cihdp.testnet` (NEAR testnet): a Level 2 bounty, decided only by
+Groth16 proofs the contract checks itself, open until 2026-11-24 00:19 UTC (EVIDENCE, "Official demo"). It is a
+DEMO: its secret's commitment uses the public fixed demo salt (`--demo-salt`), which makes the secret's fingerprint
+guessable when the secret is short or predictable. A real vendor uses the default, a private random salt per bounty
+(`kintsugi-host prove ... --bounty <name>`). Older bounties (S4, S7, S13, demo bounty 4) are kept as history.
+
 1. Build everything: `./scripts/build_all.sh` (needs Docker with the buildx plugin: the checker is built inside RISC Zero's
    guest builder image). See it finish with the sizes of the host binary and the contract wasm.
 2. Run the checker tests: `cargo test -p kintsugi-check --offline`. See 6 and 13 tests pass (docs/evidence/S13/unit_tests.txt).
@@ -43,18 +49,20 @@ All commands run from the repository root on Linux x86_64. Versions: [docs/VERSI
    See the honest fix PASS and the cheats FAIL (`data/attacks/` holds inert test patches).
 4. Run the contract tests: `cargo test -p kintsugi-contract --offline`. See 71 tests pass (docs/evidence/S6c/contract_unit_tests.txt).
 5. Count the zkVM cycles of one check without proving it:
-   `./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 32 --profile`. See the verdict
+   `./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 32 --profile --demo-salt`. See the verdict
    PASS and the cycles per phase.
 6. Rebuild the checker and compare its image id with a bounty on the contract:
    `./scripts/check_image_id.sh <contract account> <bounty id>`. Without arguments it prints the rebuilt id, which for the
    current checker is `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`. Try it on the demo bounty:
-   `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 4`. See MATCH (open until 2026-11-23). Older bounties were made
-   with non-reproducible builds and show DIFFERENT (docs/SECURITY.md, known limits).
+   `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 7`. See MATCH (open until 2026-11-24). Bounties made before the
+   reproducible build (S4, S7, S13) show DIFFERENT (docs/SECURITY.md, known limits).
 
 ## How NEAR fits in
 
 - A Rust contract (near-sdk 5.29.1) holds each bounty, counts attempts (K), applies the deadlines by block time, and pays
-  only after two different registered verifiers confirm a verdict, or after a timeout. `contract/src/lib.rs`
+  by rule: on a Level 2 bounty only after a Groth16 proof that the contract checks itself with NEAR's alt_bn128 host
+  functions; on a Level 0 bounty after two different registered verifiers confirm a verdict; on either, after a timeout.
+  `contract/src/lib.rs`, `contract/src/groth16.rs`
 - Function call keys let an agent commit and reveal without access to its owner's wallet; attempt fees come from credit held
   in the contract. `scripts/s7_agent.sh`
 - OutLayer (TEE) as one verifier is built into the contract (`request_outlayer_check`, `on_outlayer_result` in
