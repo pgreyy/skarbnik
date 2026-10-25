@@ -52,8 +52,9 @@
 //! bounty and THIS attempt (original, exploit commitment, tests, counts, the seed recorded at reveal, the revealed
 //! patch hash and the submission id), and reads the verdict from the journal: PASS pays, FAIL spends the attempt.
 //! A proof must arrive before the bounty expires and within the verdict window after the reveal; without one, the
-//! researcher is paid by `claim_timeout` as for Level 0. Attempt fees of a Level 2 bounty go to the vendor at
-//! expiry. Every bounty records `fuzz_count` and `variant_count`, the check's size, which a proof must match.
+//! researcher is paid by `claim_timeout` as for Level 0. Attempt fees of a Level 2 bounty's decided attempts go to
+//! the protocol fee pool at expiry (never to the vendor); fees of attempts still undecided when a bounty closes are
+//! refunded as credit. Every bounty records `fuzz_count` and `variant_count`, the check's size, which a proof must match.
 
 use near_sdk::json_types::{Base64VecU8, U128, U64};
 use near_sdk::serde_json::{Value, json};
@@ -146,8 +147,7 @@ fn release_to_pool(bounty_id: U64, index: u32, bounty: &mut Bounty, sub: &mut Su
     sub.outcome = Outcome::Released;
     bounty.active = bounty.active.saturating_sub(1);
     bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
-    let pool = pool_balance().saturating_add(sub.fee.as_yoctonear());
-    env::storage_write(POOL_KEY, &pool.to_le_bytes());
+    let pool = add_to_pool(sub.fee);
     emit("fee_to_pool", json!({ "bounty_id": bounty_id, "index": index, "fee": U128(sub.fee.as_yoctonear()), "pool": U128(pool) }));
 }
 
@@ -159,6 +159,39 @@ fn earlier_reveal_undecided(subs: &LookupMap<(u64, u32), Submission>, bounty_id:
         subs.get(&(bounty_id, k))
             .is_some_and(|o| o.outcome == Outcome::Open && o.revealed_at_ns.is_some_and(|t| t < revealed_at))
     })
+}
+
+/// Adds `amount` to the protocol fee pool (see `POOL_KEY`).
+fn add_to_pool(amount: NearToken) -> u128 {
+    let pool = pool_balance().saturating_add(amount.as_yoctonear());
+    env::storage_write(POOL_KEY, &pool.to_le_bytes());
+    pool
+}
+
+/// Audit round 1, fix 4: when a bounty closes (a PASS or a timeout paid `winner`), every other revealed attempt that is
+/// still undecided gets its attempt fee back as credit: it was never judged, so its fee is neither kept nor swept.
+fn refund_undecided_revealed(
+    subs: &mut LookupMap<(u64, u32), Submission>,
+    credits: &mut LookupMap<AccountId, NearToken>,
+    bounty_id: u64,
+    bounty: &mut Bounty,
+    winner: u32,
+) {
+    for k in 0..bounty.commits {
+        if k == winner {
+            continue;
+        }
+        if let Some(o) = subs.get_mut(&(bounty_id, k)) {
+            if o.outcome == Outcome::Open && o.revealed_at_ns.is_some() && o.fee.as_yoctonear() > 0 {
+                let fee = o.fee;
+                o.fee = NearToken::from_yoctonear(0);
+                bounty.fees_collected = bounty.fees_collected.saturating_sub(fee);
+                let had = credits.get(&o.committer).copied().unwrap_or(NearToken::from_yoctonear(0));
+                credits.insert(o.committer.clone(), had.saturating_add(fee));
+                emit("fee_refunded", json!({ "bounty_id": U64(bounty_id), "index": k, "to": o.committer, "fee": U128(fee.as_yoctonear()), "reason": "undecided when the bounty closed" }));
+            }
+        }
+    }
 }
 
 /// The journal fields that are the same for every proof of one bounty.
@@ -996,6 +1029,7 @@ impl Contract {
                 );
                 bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
                 Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
+                refund_undecided_revealed(&mut self.submissions, &mut self.credits, bounty_id.0, bounty, index);
                 "final_pass".to_string()
             }
             Verdict::Fail => {
@@ -1084,6 +1118,7 @@ impl Contract {
                 );
                 bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
                 Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
+                refund_undecided_revealed(&mut self.submissions, &mut self.credits, bounty_id.0, bounty, index);
                 "final_pass".to_string()
             }
             Verdict::Fail => {
@@ -1123,6 +1158,7 @@ impl Contract {
         );
         bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
         Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
+        refund_undecided_revealed(&mut self.submissions, &mut self.credits, bounty_id.0, bounty, index);
     }
 
     /// Anyone. After the bounty's expiry: if nothing was paid and no revealed submission is still waiting
@@ -1157,9 +1193,12 @@ impl Contract {
         }
         let fees = bounty.fees_collected.as_yoctonear();
         if !bounty.fees_swept && fees > 0 && bounty.level == LEVEL_2 {
+            // Level 2 has no verifiers to pay, and paying the vendor would reward unfixable or fee-farming bounties
+            // (audit round 1, fix 4): the fees of decided attempts go to the protocol fee pool.
             bounty.fees_swept = true;
-            emit("fees_swept", json!({ "bounty_id": bounty_id, "total": U128(fees), "to": bounty.vendor, "caller": caller }));
-            Promise::new(bounty.vendor.clone()).transfer(NearToken::from_yoctonear(fees)).detach();
+            bounty.fees_collected = NearToken::from_yoctonear(0);
+            let pool = add_to_pool(NearToken::from_yoctonear(fees));
+            emit("fees_swept", json!({ "bounty_id": bounty_id, "total": U128(fees), "to": "protocol fee pool", "pool": U128(pool), "caller": caller }));
             acted = true;
         } else if !bounty.fees_swept && fees > 0 && !self.verifiers.is_empty() {
             let verifiers: Vec<AccountId> = self.verifiers.keys().cloned().collect();

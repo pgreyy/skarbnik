@@ -1080,3 +1080,42 @@ fn audit_c2_a_lower_index_revealed_later_does_not_block_an_earlier_reveal() {
     call(vendor(), T0 + 21 * SEC);
     c.post_verdict(U64(0), r, Verdict::Pass, H1.into(), H2.into()); // allowed: nothing was revealed before index 1
 }
+
+// Audit round 1, fix 4: fees of revealed attempts that were still undecided when the bounty closed are refunded as credit.
+#[test]
+fn audit_f4_pass_refunds_the_fee_of_an_undecided_revealed_attempt() {
+    let mut c = setup();
+    let r = commit_and_reveal(&mut c, T0 + SEC);
+    at(acc("other.testnet"), T0 + 4 * SEC, start_credit());
+    c.deposit_credit(None);
+    call(acc("other.testnet"), T0 + 5 * SEC);
+    let o = c.commit(U64(0), fingerprint_hex(b"other", &acc("other.testnet")), acc("other.testnet")).unwrap();
+    call(acc("other.testnet"), T0 + 5 * SEC + GAP);
+    c.reveal(U64(0), o, Base64VecU8(b"other".to_vec()), NONCE.into());
+    let before = c.get_credit(acc("other.testnet")).0;
+    call(vendor(), T0 + 10 * SEC);
+    c.post_verdict(U64(0), r, Verdict::Pass, H1.into(), H2.into());
+    call(v1(), T0 + 11 * SEC);
+    c.attest(U64(0), r, Verdict::Pass, H1.into(), H2.into());
+    call(v2(), T0 + 12 * SEC);
+    assert_eq!(c.attest(U64(0), r, Verdict::Pass, H1.into(), H2.into()), "final_pass");
+    assert_eq!(c.get_credit(acc("other.testnet")).0, before + FEE + STEP); // the undecided attempt's fee is back
+    assert_eq!(c.get_bounty(U64(0)).unwrap().fees_collected.0, 0); // nothing left to sweep
+}
+
+#[test]
+fn audit_f4_timeout_refunds_the_fee_of_an_undecided_revealed_attempt() {
+    let mut c = setup();
+    let r = commit_and_reveal(&mut c, T0 + SEC);
+    at(acc("other.testnet"), T0 + 4 * SEC, start_credit());
+    c.deposit_credit(None);
+    call(acc("other.testnet"), T0 + 5 * SEC);
+    let o = c.commit(U64(0), fingerprint_hex(b"other", &acc("other.testnet")), acc("other.testnet")).unwrap();
+    call(acc("other.testnet"), T0 + 5 * SEC + GAP);
+    c.reveal(U64(0), o, Base64VecU8(b"other".to_vec()), NONCE.into());
+    let before = c.get_credit(acc("other.testnet")).0;
+    call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(0), r);
+    assert_eq!(c.get_credit(acc("other.testnet")).0, before + FEE + STEP);
+    assert_eq!(c.get_bounty(U64(0)).unwrap().fees_collected.0, 0); // nothing is left for the verifiers to be paid from
+}

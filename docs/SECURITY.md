@@ -59,6 +59,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Windows are capped: reveal, verdict and attestation windows at most 30 days, expiry at most 366 days and at least the sum of the gap and the three windows (audit round 1, fix 1) | A vendor choosing a window so long that a deadline never comes, freezing a researcher's timeout and the refund forever (audit finding, high) | `create_bounty`, `MAX_WINDOW_NS`, `MAX_EXPIRY_NS` | unit tests `audit_f3_*` |
 | The payout account cannot be a registered verifier, the vendor or the contract; a registered verifier cannot commit (audit round 1, fix 2) | Blocking a verifier by naming it as payout (the "cannot attest its own submission" rule turned into a weapon), so no verdict could become final and the timeout paid the researcher | `commit` | unit tests `audit_h2_*` |
 | The earliest reveal has priority: a PASS (posted verdict or Groth16 proof) or a timeout for an attempt is refused while an attempt revealed earlier is still undecided (audit round 1, fix 3) | The vendor, or anyone, copying a revealed passing patch into a second account and getting paid for it first; a copier timing out first against a slow researcher | `earlier_reveal_undecided`, `post_verdict`, `submit_groth16`, `claim_timeout` | unit tests `audit_c2_*` |
+| Level 2 fees of decided attempts go to the protocol fee pool at expiry, never to the vendor; when a bounty closes, the fees of other revealed attempts still undecided are refunded as credit (audit round 1, fix 4) | A vendor earning the fees of attempts it failed (fee farming with an unfixable or fake bounty); honest losers' fees swept to the vendor or the verifiers although they were never judged | `expire`, `refund_undecided_revealed` | unit tests `audit_f4_*`; S6c rerun on testnet |
 
 ### Keys
 
@@ -164,7 +165,8 @@ Each guard: what it stops, where it lives, and what shows it works.
   expiry) are kept in the contract as a pool, shown by `get_protocol_pool`. There is no function to take NEAR out of
   it: its destination is deliberately left open, to be decided after the audit. If the pool ever pays Kintsugi (the
   project), the project would gain from junk commits that block bounties, a conflict of interest that the decision
-  must address. Fees of revealed attempts still go to the verifiers (Level 0) or the vendor (Level 2) at expiry.
+  must address. Fees of decided attempts go to the verifiers (Level 0) or the pool (Level 2) at expiry; fees of attempts
+  still undecided when a bounty closes are refunded as credit (audit round 1).
 - Found during S6c: the Level 0 verifier check did not compare the journal's `fuzz_count` and `variant_count` with
   anything, so a vendor could prove a smaller check than the bounty implies and still be attested. Bounties created by
   the S6c contract record both, and `scripts/verifier_check.sh` checks them; bounties on older contracts (S4, S7, S13,
@@ -190,6 +192,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
+- 2026-10-25 (audit fix 4): Level 2 decided fees to the pool, never the vendor; undecided revealed attempts refunded at closure.
 - 2026-10-25 (audit fix 3): the earliest reveal has priority for a PASS and for a timeout.
 - 2026-10-25 (audit fix 2): payout cannot be a verifier, the vendor or the contract; verifiers cannot commit.
 - 2026-10-25 (audit fix 1): commit and reveal must leave time for a decision before expiry; a Level 2 proof is no longer
