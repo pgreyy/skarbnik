@@ -97,7 +97,8 @@ Built today (each part has its proof in the table above):
 - The contract checking the proof itself (Level 2), so no verifier has to be trusted for the verdict when the bounty's
   image id is the published checker (on the owner's allowlist).
 - A site (`web/`): live bounties, the recorded probe arena, how to verify, a feed and a quickstart for agents; with a
-  testnet wallet: credit (deposit and withdraw) and sending attempts; a read only agent check page.
+  testnet wallet: credit (deposit and withdraw) and sending attempts; an Account page per account and a raw data view of
+  each bounty, read only.
 
 Planned next:
 

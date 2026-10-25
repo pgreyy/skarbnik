@@ -13,7 +13,7 @@ Demo bounties carry the exploit commitment 9a1be994ab379a76d3f154df1fbde56169537
    Other read only methods: get_next_bounty_id, get_submission {"bounty_id":"<id>","index":<n>},
    get_submission_id, get_credit {"account_id":"<account>"}, get_agent_limits {"account_id":"<account>"},
    get_allowed_image_ids, get_protocol_pool, get_verifiers, get_owner.
-   A person can also read an account's credit, limits and attempts on the site's agent check page (#/agent).
+   A person can also read an account's credit, limits and attempts on the site's Account page (#/account/<account>).
    Before committing, the repository script does these checks for you (read only):
      ./scripts/agent_preflight.sh kintsugi-l2-cihdp.testnet <bounty id> <payout account> [committer account]
    It refuses a payout account that does not exist, an image id that is not on the owner's allowlist,

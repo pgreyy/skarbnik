@@ -2,6 +2,20 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Site polish round (branch ui-preview)
+
+- Account page `#/account/<name>` replaces the agent check page: credit, agent limits, a table of the account's attempts
+  (bounty, attempt, state, fee, time, commit transaction from the FastNEAR transaction index, matched by bounty and
+  fingerprint), bounties it created. Every account name on the site links to it; the wallet menu has "My activity".
+- Tables: key facts as a two column table with shortened hashes (Copy, Show full); attempts and transactions as tables
+  (What happened, Result, Transaction, Time from the evidence step files); stacked rows on a phone.
+- How to verify: six steps with their commands; the rest in "More detail".
+- Each bounty shows "Contract" (explorer) and "Raw data" (`#/raw/<id>`, the live get_bounty result).
+- The attempt panel says what commit and reveal do, and shows the reveal and verdict deadlines in UTC and local time,
+  with plain words when close or passed.
+- Checked: every page at 1280 and 390 px wide in Light and Night, with reduced motion: no script errors, nothing wider
+  than the window. Not pushed.
+
 ## 2026-10-25: Test bounty 14 for trying the wallet flow by hand
 
 - `./scripts/web_testnet.sh userbounty`: bounty 14 (K = 3, 0.1 NEAR, expires 2026-10-28 17:10 UTC), same vendor account

@@ -2,10 +2,10 @@
 // panel (deposit_credit, withdraw_credit), the attempt panel on a bounty page (commit, reveal, then waiting for the
 // vendor's proof), and the read only agent page. Every payment goes through a confirm step and then the wallet; the
 // page shows only what the chain says. Attempt fees are taken from credit deposited in the contract first.
-import { CONTRACT, view, near, utc, commitBy, nsToDate, allBounties, submissions } from './chain.js';
+import { CONTRACT, EXPLORER_ACCOUNT, view, near, utc, span, commitBy, nsToDate, allBounties, submissions } from './chain.js';
 import * as W from './wallet.js';
 import { fingerprint, newNonce, hex, b64, sha256, putAttempt, attemptsFor, dropAttempt, downloadRecord, toYocto } from './attempt.js';
-import { $, esc, badge, tx, acct, toast, passStamp } from './ui.js';
+import { $, esc, badge, tx, acct, toast, passStamp, table, facts, bothTimes } from './ui.js';
 
 let credit = null; // the connected account's contract credit, yoctoNEAR string
 const short = (a) => (a.length > 22 ? `${a.slice(0, 12)}…${a.slice(-8)}` : a);
@@ -27,6 +27,7 @@ function renderWallet() {
     el.innerHTML = `<button class="k-chip" type="button" id="creditChip" aria-haspopup="dialog">Credit <b>${credit === null ? '…' : esc(near(credit))}</b></button>
       <div class="k-acct"><button class="m-btn sec sm" type="button" id="acctBtn" aria-haspopup="true" aria-expanded="false" aria-controls="acctMenu" title="${esc(s.account)}">${esc(short(s.account))}</button>
       <ul class="k-menu" id="acctMenu" hidden>
+        <li><button type="button" data-act="activity">My activity</button></li>
         <li><button type="button" data-act="copy">Copy account name</button></li>
         <li><button type="button" data-act="credit">View credit</button></li>
         <li><button type="button" data-act="out">Disconnect</button></li></ul></div>`;
@@ -39,6 +40,7 @@ function renderWallet() {
       show(false);
       if (b.dataset.act === 'copy') { try { await navigator.clipboard.writeText(s.account); toast('Account name copied.'); } catch { toast('Copy was blocked. Select the name instead.'); } }
       if (b.dataset.act === 'credit') openCredit();
+      if (b.dataset.act === 'activity') location.hash = `#/account/${encodeURIComponent(s.account)}`;
       if (b.dataset.act === 'out') { await W.disconnect(); toast('Disconnected.'); }
     }));
   } else if (s.status === 'connecting') {
@@ -99,7 +101,7 @@ async function drawCredit() {
   } else if (v.phase === 'confirm') {
     const dep = v.mode === 'deposit';
     body = `<div class="k-confirm"><p>${dep ? `Deposit <b class="k-mono">${esc(near(v.yocto))}</b> from ${esc(s.account)} as credit in ${esc(CONTRACT)}.` : `Withdraw <b class="k-mono">${esc(near(v.yocto))}</b> of credit to ${esc(s.account)}. The wallet attaches 1 yoctoNEAR, which only a wallet approval can do.`}</p>
-      <div class="m-cta"><button class="m-btn" type="button" id="doIt">Confirm in wallet</button><button class="m-btn sec" type="button" data-mode="${v.mode}">Change amount</button></div></div>`;
+      <div class="m-cta"><button class="m-btn" type="button" id="doIt">Approve in wallet</button><button class="m-btn sec" type="button" data-mode="${v.mode}">Change amount</button></div></div>`;
   } else if (v.phase === 'wait') {
     body = '<p class="k-state" role="status" aria-busy="true">Waiting for the wallet. Approve or reject the request in the wallet window.</p>';
   } else if (v.phase === 'done') {
@@ -161,14 +163,19 @@ export function attemptPanel(el, b, subs, verifiers) {
       if (m.index === null) line = '<p>Commit sent, result not known yet. Reload the page; the record is kept.</p>';
       else if (!sub) line = '<p>Could not read this attempt from the chain.</p>';
       else if (OUTCOME[sub.outcome]) line = `<p>${sub.outcome === 'Passed' ? passStamp() : ''} ${badge(...OUTCOME[sub.outcome])} The chain says this attempt is final.</p>`;
-      else if (sub.revealed_at_ns) line = `<p>${badge('wait', '… Waiting')} Waiting for the vendor’s proof. Only the vendor can prove an attempt; the deadline for a verdict is ${esc(utc(sub.deadline_ns))}. After it, anyone can claim the timeout.</p>`;
+      else if (sub.revealed_at_ns) {
+        const dl = Number(BigInt(sub.deadline_ns) / 1000000n);
+        line = now > dl ? `<p>${badge('info', 'Vendor’s time is up')} The vendor did not prove it by ${esc(bothTimes(dl))}. Anyone can now claim the timeout.</p>`
+          : `<p>${badge('wait', '… Waiting for the vendor’s proof')} Only the vendor can prove an attempt. Deadline: ${esc(bothTimes(dl))}.</p>`;
+      }
       else {
         const from = Number(BigInt(sub.committed_at_ns) / 1000000n) + Number(BigInt(b.reveal_gap_ns) / 1000000n), until = Number(BigInt(sub.committed_at_ns) / 1000000n) + Number(BigInt(b.reveal_window_ns) / 1000000n);
-        line = now < from ? `<p>Reveal opens at ${esc(new Date(from).toISOString().slice(11, 19))} UTC.</p>`
-          : now > until ? `<p>${badge('bad', '✕ Reveal window closed')} This commit was not revealed in time. Its fee stays with the contract.</p>`
-          : `<p>Committed. Reveal before ${esc(new Date(until).toISOString().slice(0, 16).replace('T', ' '))} UTC.</p><button class="m-btn" type="button" data-reveal="${esc(m.fingerprint)}">Reveal attempt #${m.index}</button>`;
+        const soon = until - now < 10 * 60000;
+        line = now < from ? `<p>Reveal opens at ${esc(bothTimes(from))}.</p>`
+          : now > until ? `<p>${badge('bad', '✕ Too late to reveal')} The reveal deadline, ${esc(bothTimes(until))}, has passed. This commit can no longer be revealed and its fee stays with the contract.</p>`
+          : `<p>Reveal by ${esc(bothTimes(until))}.${soon ? ' <b>Less than 10 minutes left.</b>' : ''}</p><button class="m-btn" type="button" data-reveal="${esc(m.fingerprint)}">Reveal attempt #${m.index}</button>`;
       }
-      mineHtml += `<li class="k-mine"><p><b>Attempt #${m.index ?? '?'}</b> <span class="k-src">payout ${esc(m.payout)} · patch sha256 ${esc(m.patchHash.slice(0, 16))}…</span></p>${line}
+      mineHtml += `<li class="k-mine"><p><b>Your attempt #${m.index ?? '?'}</b> <span class="k-src">payout ${esc(m.payout)}</span></p>${line}
         <button class="m-link" type="button" data-file="${esc(m.fingerprint)}">Download the attempt record</button></li>`;
     }
     let body;
@@ -176,7 +183,7 @@ export function attemptPanel(el, b, subs, verifiers) {
       body = `<p>${badge('info', 'No new attempts')} This bounty does not take new attempts now.</p>`;
     } else if (s.status !== 'on') {
       body = s.status === 'wrongnet' ? '<p role="alert">This wallet account is not on testnet. Attempts are testnet only.</p>'
-        : '<p>You can read everything without a wallet. To send an attempt, connect a testnet wallet.</p><button class="m-btn" type="button" id="connSubmit">Connect to submit</button>';
+        : '<button class="m-btn" type="button" id="connSubmit">Connect to submit</button>';
     } else {
       const fixed = el.dataset.fixed || '';
       body = `<form class="m-form" id="attForm" novalidate>
@@ -186,10 +193,12 @@ export function attemptPanel(el, b, subs, verifiers) {
         <p class="m-sub">Next fee <b class="k-mono">${esc(near(b.next_fee))}</b>, taken from your credit (${credit === null ? 'reading…' : esc(near(credit))}). ${slotsLeft} of ${b.max_commits} slots left.</p>
         <button class="m-btn" type="submit" ${busy ? 'disabled' : ''}>Review attempt</button></form>`;
     }
+    el.hidden = closed && !mine.length; // a closed bounty with nothing of yours to follow needs no attempt panel
+    if (el.hidden) return;
     el.innerHTML = `<h2 class="m-h2" id="sendT">Send an attempt</h2>${stepper}
+      <p class="m-sub k-lines">Commit locks a sealed fingerprint of your fix. Reveal sends the fix itself so it can be tested. Reveal within ${esc(span(b.reveal_window_ns))} of your commit.<br>After you reveal, the vendor has ${esc(span(b.verdict_window_ns))} to prove the result.</p>
       ${msg ? `<div class="k-msg ${msgKind}" role="${msgKind === 'bad' ? 'alert' : 'status'}">${msg}</div>` : ''}
-      ${mine.length ? `<ul class="k-mines">${mineHtml}</ul>` : ''}${body}
-      <p class="m-note">Each attempt returns one yes or no. Attempt fees are taken from credit you deposit in the contract first.</p>`;
+      ${mine.length ? `<ul class="k-mines">${mineHtml}</ul>` : ''}${body}`;
     const cs = $('#connSubmit', el); if (cs) cs.onclick = () => W.connect();
     el.querySelectorAll('[data-file]').forEach((x) => (x.onclick = () => downloadRecord(mine.find((m) => m.fingerprint === x.dataset.file))));
     el.querySelectorAll('[data-reveal]').forEach((x) => (x.onclick = () => reveal(mine.find((m) => m.fingerprint === x.dataset.reveal))));
@@ -268,42 +277,76 @@ function confirmSheet(info, onYes) {
     <div><dt>Slots left</dt><dd>${info.left} of ${info.cap}</dd></div>
     <div><dt>Payout account</dt><dd class="k-hash">${esc(info.payout)}</dd></div><div><dt>Patch sha256</dt><dd class="k-mono k-hash">${esc(info.patchHash)}</dd></div></dl>
     <p><b>Each attempt returns one yes or no.</b></p>
-    <div class="m-cta"><button class="m-btn" type="button" id="confYes">Commit in wallet</button><button class="m-btn sec" type="button" id="confNo">Cancel</button></div>`;
+    <div class="m-cta"><button class="m-btn" type="button" id="confYes">Approve in wallet</button><button class="m-btn sec" type="button" id="confNo">Cancel</button></div>`;
   d.showModal(); $('#confYes', d).focus();
   $('#confNo', d).onclick = () => d.close();
   $('#confYes', d).onclick = () => { d.close(); onYes(); };
 }
 
-// ---------- agent page ----------
-export async function agentPage(main) {
-  const q = new URLSearchParams(location.hash.split('?')[1] || '').get('account') || '';
-  main.innerHTML = `<h1 class="m-h1" tabindex="-1">Agent check</h1>
-    <p class="m-lead">Read only. Type an account name to see its credit, its agent limits and its attempts on ${esc(CONTRACT)}. Only a wallet can set limits or withdraw.</p>
-    <form class="m-panel m-form" id="agForm" novalidate><div class="m-field"><label for="agAcc">Account name</label>
-      <input id="agAcc" autocomplete="off" value="${esc(q)}" aria-describedby="agErr"></div><p id="agErr" class="m-err" role="alert" hidden></p>
-      <button class="m-btn" type="submit">Check</button></form>
-    <div id="agOut" class="m-sec"></div>
-    <section class="m-sec m-panel"><h2 class="m-h2">For agents</h2><p>Machine readable: <a href="feed.json">feed.json</a> (open bounties) and <a href="agent-quickstart.txt">agent-quickstart.txt</a> (how to commit, reveal and use limits).</p></section>`;
-  const run = async (a) => {
-    const out = $('#agOut'); out.innerHTML = '<p class="k-state">Reading from testnet…</p>';
-    try {
-      const [c, lim, bs] = await Promise.all([view('get_credit', { account_id: a }), view('get_agent_limits', { account_id: a }), allBounties()]);
-      const rows = [];
-      for (const b of bs.filter(Boolean)) { (await submissions(b)).forEach((s, i) => { if (s && (s.committer === a || s.payout === a)) rows.push({ b, s, i }); }); }
-      rows.sort((x, y) => Number(BigInt(y.s.committed_at_ns) - BigInt(x.s.committed_at_ns)));
-      out.innerHTML = `<div class="m-two"><section class="m-panel"><h2 class="m-h2">Credit and limits</h2>
-        <dl class="m-facts" style="grid-template-columns:1fr"><div><dt>Credit</dt><dd class="k-mono">${esc(near(String(c)))}</dd></div>
-        <div><dt>Max fee per attempt</dt><dd>${lim.max_fee_per_commit ? `<span class="k-mono">${esc(near(lim.max_fee_per_commit))}</span>` : 'not set'}</dd></div>
-        <div><dt>Fixed payout account</dt><dd>${lim.fixed_payout ? acct(lim.fixed_payout) : 'not set'}</dd></div></dl>
-        <p class="m-note">Only a wallet can set limits (set_agent_limits) or withdraw: both need 1 yoctoNEAR attached, which an agent's commit only key cannot attach.</p></section>
-        <section class="m-panel"><h2 class="m-h2">Attempts (${rows.length})</h2>${rows.length ? `<ul class="k-txs">${rows.slice(0, 20).map(({ b, s, i }) => `<li><span><a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a> #${i} · ${esc(s.outcome)}${s.revealed_at_ns ? '' : ', not revealed'} · fee ${s.fee === '0' ? 'refunded' : esc(near(s.fee))}<br><span class="k-src">${s.committer === a ? 'committed by this account' : 'payout to this account'}, ${esc(utc(s.committed_at_ns))}</span></span></li>`).join('')}</ul>` : '<p>No attempts by or for this account.</p>'}
-        <p class="m-note">Found by reading every bounty's attempts from the chain.</p></section></div>`;
-    } catch (e) { out.innerHTML = `<p class="k-err" role="alert">Could not read: ${esc(e.message)}</p>`; }
-  };
-  $('#agForm').onsubmit = (e) => {
-    e.preventDefault(); const a = $('#agAcc').value.trim(), err = $('#agErr');
-    if (!/^[a-z0-9._-]{2,64}$/.test(a)) { err.textContent = 'Enter a NEAR account name, for example name.testnet.'; err.hidden = false; $('#agAcc').setAttribute('aria-invalid', 'true'); $('#agAcc').focus(); return; }
-    err.hidden = true; $('#agAcc').removeAttribute('aria-invalid'); run(a);
-  };
-  if (q) run(q);
+// ---------- Account page ----------
+const OUT_LABEL = { Passed: ['ok', '✓ PASS'], Failed: ['bad', '✕ FAIL'], TimedOut: ['info', 'TIMEOUT'], Released: ['info', 'RELEASED'] };
+const FASTNEAR_TX = 'https://tx.test.fastnear.com/v0';
+
+// Commit transactions of an account on this contract, keyed by bounty id and fingerprint, from the FastNEAR transaction
+// index (the contract's views do not keep transaction ids). Empty if the index does not answer.
+async function commitTxs(account) {
+  const out = new Map();
+  try {
+    const post = async (path, body) => (await fetch(`${FASTNEAR_TX}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json();
+    const list = ((await post('account', { account_id: account })).account_txs || []).filter((t) => t.is_signer).map((t) => t.transaction_hash).slice(0, 200);
+    for (let i = 0; i < list.length; i += 20) {
+      const res = await post('transactions', { tx_hashes: list.slice(i, i + 20) });
+      for (const t of res.transactions || []) {
+        const x = t.transaction; if (!x || x.receiver_id !== CONTRACT) continue;
+        for (const a of x.actions || []) {
+          const fc = a.FunctionCall; if (!fc || fc.method_name !== 'commit') continue;
+          try { const args = JSON.parse(atob(fc.args)); out.set(`${args.bounty_id}:${args.fingerprint}`, x.hash); } catch { /* not JSON */ }
+        }
+      }
+    }
+  } catch { /* index unavailable: no links */ }
+  return out;
+}
+
+export async function accountPage(main, name) {
+  if (!name) {
+    main.innerHTML = `<h1 class="m-h1" tabindex="-1">Account</h1>
+      <form class="m-panel m-form k-acform" id="agForm" novalidate><div class="m-field"><label for="agAcc">Account name</label>
+      <input id="agAcc" autocomplete="off" aria-describedby="agErr"><p id="agErr" class="m-err" role="alert" hidden></p></div>
+      <button class="m-btn" type="submit">Show account</button></form>`;
+    $('#agForm').onsubmit = (e) => {
+      e.preventDefault(); const a = $('#agAcc').value.trim(), err = $('#agErr');
+      if (!/^[a-z0-9._-]{2,64}$/.test(a)) { err.textContent = 'Enter a NEAR account name, for example name.testnet.'; err.hidden = false; $('#agAcc').setAttribute('aria-invalid', 'true'); $('#agAcc').focus(); return; }
+      location.hash = `#/account/${encodeURIComponent(a)}`;
+    };
+    return;
+  }
+  main.innerHTML = `<a class="m-back" href="#/bounties">← All bounties</a><h1 class="m-h1 k-acname" tabindex="-1">${esc(name)}</h1>
+    <p class="m-lead">Activity on ${esc(CONTRACT)}, read from testnet. <a href="${EXPLORER_ACCOUNT}${encodeURIComponent(name)}" rel="noopener" target="_blank">All transactions on the explorer</a></p>
+    <div id="acOut"><p class="k-state">Reading from testnet…</p></div>`;
+  try {
+    const [c, lim, bs, txs] = await Promise.all([view('get_credit', { account_id: name }), view('get_agent_limits', { account_id: name }), allBounties(), commitTxs(name)]);
+    const mine = [], created = [];
+    for (const b of bs.filter(Boolean)) {
+      if (b.vendor === name) created.push(b);
+      (await submissions(b)).forEach((s, i) => { if (s && s.committer === name) mine.push({ b, s, i }); });
+    }
+    mine.sort((x, y) => Number(BigInt(y.s.committed_at_ns) - BigInt(x.s.committed_at_ns)));
+    const state = (b, s) => OUT_LABEL[s.outcome] || (s.revealed_at_ns ? (b.state === 'Open' ? ['wait', '… WAITING'] : ['info', 'UNDECIDED']) : ['info', 'COMMITTED']);
+    $('#acOut').innerHTML = `
+      <section class="m-panel"><h2 class="m-h2">Credit and limits</h2>${facts([
+        ['Contract credit', `<span class="k-mono">${esc(near(String(c)))}</span>`],
+        lim.max_fee_per_commit ? ['Max fee per attempt', `<span class="k-mono">${esc(near(lim.max_fee_per_commit))}</span>`] : null,
+        lim.fixed_payout ? ['Fixed payout account', acct(lim.fixed_payout)] : null,
+        (!lim.max_fee_per_commit && !lim.fixed_payout) ? ['Agent limits', 'none set'] : null])}</section>
+      <section class="m-sec m-panel k-tablepanel"><h2 class="m-h2 k-pad">Attempts (${mine.length})</h2>
+        ${mine.length ? table(['Bounty', 'Attempt', 'State', 'Fee', 'Time', 'Transaction'], mine.map(({ b, s, i }) => [
+          `<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, `#${i}`, badge(...state(b, s)),
+          s.fee === '0' ? 'refunded' : `<span class="k-mono k-nw">${esc(near(s.fee))}</span>`, esc(utc(s.committed_at_ns)),
+          txs.get(`${b.id}:${s.fingerprint}`) ? tx(txs.get(`${b.id}:${s.fingerprint}`)) : '<span class="k-dim">not found</span>'])) +
+          '<p class="m-sub k-pad">Transaction ids from the FastNEAR transaction index; the attempts themselves from the contract.</p>' : '<p class="m-sub k-pad">No attempts yet.</p>'}
+      </section>
+      ${created.length ? `<section class="m-sec m-panel k-tablepanel"><h2 class="m-h2 k-pad">Bounties created (${created.length})</h2>
+        ${table(['Bounty', 'State', 'Amount', 'Created'], created.slice().reverse().map((b) => [`<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(b.state), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`, esc(utc(b.created_at_ns))]))}</section>` : ''}`;
+  } catch (e) { $('#acOut').innerHTML = `<p class="k-err" role="alert">Could not read: ${esc(e.message)}</p>`; }
 }

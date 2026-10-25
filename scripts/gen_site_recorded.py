@@ -21,6 +21,37 @@ def tsv(path):
     return rows
 
 
+# What a step did, in plain words, by contract method (a few steps get their own words below)
+WHAT = {"create_bounty": "Bounty created", "open_with_groth16": "Opened with its Proof 0", "attest_proof0": "Proof 0 attested by a verifier",
+        "commit": "Attempt committed", "reveal": "Attempt revealed", "submit_groth16": "Proof of an attempt sent",
+        "post_verdict": "Vendor posted a verdict", "attest": "Verifier attested a verdict", "claim_timeout": "Timeout claimed",
+        "expire": "Expired", "release_unrevealed": "Unrevealed slot released", "deposit_credit": "Credit deposited",
+        "withdraw_credit": "Credit withdrawn", "set_agent_limits": "Agent limits set", "create-account": "Test account created"}
+WHAT_STEP = {"web_commit_cap_full": "Commit with every slot in use (ignored, nothing taken)",
+             "fix1_commit_too_close_to_expiry": "Commit close to expiry", "s3_proof_of_another_bounty": "Proof of another bounty sent",
+             "web_commit_no_credit": "Commit with no credit", "a_attest_proof0_refused": "Verifier attestation on a Level 2 bounty",
+             "a_post_verdict_refused": "Vendor verdict on a Level 2 bounty", "fix2_payout_is_a_verifier": "Commit naming a verifier as payout"}
+
+
+def what(row):
+    return WHAT_STEP.get(row["step"], WHAT.get(row["method"], row["method"]))
+
+
+def when(path, step, rows):
+    """The start time of a step from its saved output (docs/evidence/<spike>/steps/<step>.txt), as YYYY-MM-DD HH:MM UTC.
+    A step name used twice in one run has one output file, so its time is not known for certain and is left out."""
+    if sum(1 for r in rows if r["step"] == step) != 1:
+        return None
+    f = os.path.join(ROOT, os.path.dirname(path), "steps", step + ".txt")
+    try:
+        for ln in open(f):
+            if ln.startswith("utc_start="):
+                return ln[10:26].replace("T", " ") + " UTC"
+    except OSError:
+        return None
+    return None
+
+
 def ok(row):
     # exit 0 (sent by near-cli) or rpc:ok means the transaction succeeded; rpc:failed means the contract refused it.
     return row["exit"] in ("0", "rpc:ok")
@@ -47,7 +78,8 @@ EXCLUDE = {13: {"web_commit_no_credit"}}
 out = {"contract": CONTRACT, "network": "testnet", "bounties": {}, "notes": {}}
 
 for path, script, rules in BOUNTY_STEPS:
-    for row in tsv(path):
+    rows_all = tsv(path)
+    for row in rows_all:
         if row["tx_hash"] in ("", "-"):
             continue
         for bid, prefixes in rules.items():
@@ -58,7 +90,8 @@ for path, script, rules in BOUNTY_STEPS:
                 if not (ok(row) or refused(row)) or row["step"] in EXCLUDE.get(bid, set()):
                     continue
                 out["bounties"].setdefault(str(bid), []).append({
-                    "step": row["step"], "method": row["method"], "tx": row["tx_hash"],
+                    "step": row["step"], "method": row["method"], "tx": row["tx_hash"], "what": what(row),
+                    "time": when(path, row["step"], rows_all),
                     "result": "succeeded" if ok(row) else "refused by the contract", "source": path, "script": script})
 
 # Bounty 8: its only transaction is named in docs/AUDIT.md (finding 8), not in a transactions file
@@ -70,9 +103,16 @@ out["bounty_notes"] = {"8": {
     "tx": _re.search(r"tx `([1-9A-HJ-NP-Za-km-z]{43,44})`", row).group(1), "source": "docs/AUDIT.md, finding 8"}}
 
 # S6c attacks on Level 2 proofs (all refused on testnet)
+ATTACK = {"atk_other_attempt": "Proof of another attempt", "atk_fail_as_pass": "A FAIL proof presented as a PASS",
+          "atk_flipped_seal_bit": "Proof with one bit flipped", "atk_changed_journal": "Proof with a changed journal",
+          "atk_wrong_image_id": "Proof under another checker image id", "atk_fail_second_submission": "Second proof for a decided attempt",
+          "atk_other_bounty": "Proof of another bounty", "atk_second_submission": "Second proof after a PASS",
+          "atk_after_expiry": "Proof after the bounty expired"}
+S6C = tsv("docs/evidence/S6c/transactions.tsv")
 out["attacks_s6c"] = [
-    {"step": r["step"], "tx": r["tx_hash"], "result": "refused by the contract", "source": "docs/evidence/S6c/transactions.tsv"}
-    for r in tsv("docs/evidence/S6c/transactions.tsv") if r["step"].startswith("atk_") and refused(r)]
+    {"step": r["step"], "tx": r["tx_hash"], "result": "refused by the contract", "source": "docs/evidence/S6c/transactions.tsv",
+     "what": ATTACK.get(r["step"], r["step"][4:].replace("_", " ").capitalize()), "time": when("docs/evidence/S6c/transactions.tsv", r["step"], S6C)}
+    for r in S6C if r["step"].startswith("atk_") and refused(r)]
 
 # The hardening check: a real proof bound to another bounty, refused at the cheap check
 for r in tsv("docs/evidence/hardening/transactions.tsv"):
@@ -99,7 +139,10 @@ out["arena"] = {
     "control_variants": next((int(ln.split("(")[1].split()[0]) for ln in run if ln.startswith("control with the crash-variant check on")), None),
     "chain": {"contract": "bounty.kintsugi-djloo.testnet", "source": "docs/evidence/S8/transactions.tsv",
               "script": "scripts/s8_chain.sh",
-              "steps": [{"step": r["step"], "tx": r["tx_hash"]} for r in tsv("docs/evidence/S8/transactions.tsv") if ok(r)],
+              "steps": [{"step": r["step"], "tx": r["tx_hash"], "result": "succeeded",
+                         "what": "Arena bounty created" if r["method"] == "create_bounty" else f"Probe commit {r['step'][-1]}" + (" (over the cap: ignored, nothing taken)" if r["step"].endswith("_4") else ""),
+                         "time": when("docs/evidence/S8/transactions.tsv", r["step"], tsv("docs/evidence/S8/transactions.tsv"))}
+                        for r in tsv("docs/evidence/S8/transactions.tsv") if ok(r)],
               "note": "the fourth probe commit was ignored: still 3 commits, credit unchanged (docs/evidence/S8/chain_summary.txt)"},
 }
 

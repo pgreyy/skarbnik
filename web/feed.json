@@ -1,7 +1,7 @@
 {
  "contract": "kintsugi-l2-cihdp.testnet",
  "network": "testnet",
- "generated_at_utc": "2026-10-25T17:11:15Z",
+ "generated_at_utc": "2026-10-25T18:02:45Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -66,9 +66,9 @@
   {
    "bounty_id": 14,
    "level": 2,
-   "next_fee_yocto": "10000000000000000000000",
-   "next_fee": "0.01 NEAR",
-   "slots_left": 3,
+   "next_fee_yocto": "15000000000000000000000",
+   "next_fee": "0.015 NEAR",
+   "slots_left": 2,
    "max_commits": 3,
    "commit_deadline_utc": "2026-10-28T12:10:18Z",
    "expires_at_utc": "2026-10-28T17:10:18Z",

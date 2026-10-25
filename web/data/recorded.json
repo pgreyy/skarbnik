@@ -7,6 +7,8 @@
     "step": "l0_create",
     "method": "create_bounty",
     "tx": "4w4TzsJuzdiGfbYkgAktZhDzBoRCNUQvpR486uQThnXb",
+    "what": "Bounty created",
+    "time": "2026-10-24 21:43 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -15,6 +17,8 @@
     "step": "l0_attest_proof0_kintsugi-ver1-prnvm",
     "method": "attest_proof0",
     "tx": "4hh4VdCJ1NLnQTcMmgqacPPufAQfypv2jG8mMPrJJS7V",
+    "what": "Proof 0 attested by a verifier",
+    "time": "2026-10-24 21:43 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -23,6 +27,8 @@
     "step": "l0_attest_proof0_kintsugi-ver2-prnvm",
     "method": "attest_proof0",
     "tx": "93GAVpjnvoocwQzN8HRncSMKGz8mYd5bqjLFj9SqETqm",
+    "what": "Proof 0 attested by a verifier",
+    "time": "2026-10-24 21:43 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -33,6 +39,8 @@
     "step": "a_create",
     "method": "create_bounty",
     "tx": "h2LfFz5N24AezQymZ5d6mshgS7VYN1XaND6sPQFEKMg",
+    "what": "Bounty created",
+    "time": "2026-10-24 21:43 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -41,6 +49,8 @@
     "step": "a_open_groth16",
     "method": "open_with_groth16",
     "tx": "E3RTxNVVVGvV2NNTFcMgwNgKagpHPmMnsNBNbu1ZoCx8",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-24 21:43 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -49,6 +59,8 @@
     "step": "a_attest_proof0_refused",
     "method": "attest_proof0",
     "tx": "Bv4py6KX8Cf5YaEdDBT6nELKrteuxEdB4CywRpxdAo9y",
+    "what": "Verifier attestation on a Level 2 bounty",
+    "time": "2026-10-24 21:43 UTC",
     "result": "refused by the contract",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -57,6 +69,8 @@
     "step": "a0_commit",
     "method": "commit",
     "tx": "2UBpn8FvhAZJ3Z8d1NQWRzzMrm2xFNnozk4Tt5FVFNYK",
+    "what": "Attempt committed",
+    "time": "2026-10-24 21:44 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -65,6 +79,8 @@
     "step": "a0_reveal",
     "method": "reveal",
     "tx": "9j1Hbs52Q49rijKHQvvm415jhrpFVJYPyFtDzohwubsA",
+    "what": "Attempt revealed",
+    "time": "2026-10-24 21:44 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -73,6 +89,8 @@
     "step": "a1_commit",
     "method": "commit",
     "tx": "FX677eNJN368qmy7HE5ngrESeZKrqiNcYURF5Uho32ey",
+    "what": "Attempt committed",
+    "time": "2026-10-24 21:44 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -81,6 +99,8 @@
     "step": "a1_reveal",
     "method": "reveal",
     "tx": "No4vSFxHk1DiN4VWpjrKGAeRoMotnmL3gX2EoeRRNLk",
+    "what": "Attempt revealed",
+    "time": "2026-10-24 21:44 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -89,6 +109,8 @@
     "step": "a_post_verdict_refused",
     "method": "post_verdict",
     "tx": "631e2mRUDmLigsGB8G5DbZySZeXzWYkbKrvQhHfvkww7",
+    "what": "Vendor verdict on a Level 2 bounty",
+    "time": "2026-10-24 21:44 UTC",
     "result": "refused by the contract",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -97,6 +119,8 @@
     "step": "a1_fail",
     "method": "submit_groth16",
     "tx": "6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca",
+    "what": "Proof of an attempt sent",
+    "time": "2026-10-24 23:08 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -105,6 +129,8 @@
     "step": "a0_pass",
     "method": "submit_groth16",
     "tx": "CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY",
+    "what": "Proof of an attempt sent",
+    "time": "2026-10-24 23:09 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -115,6 +141,8 @@
     "step": "d_create",
     "method": "create_bounty",
     "tx": "B1MvhSYGPLHmLKjY3FvrKQcwk2msgBse8W9LYPxLp45T",
+    "what": "Bounty created",
+    "time": "2026-10-24 23:08 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -125,6 +153,8 @@
     "step": "b_create",
     "method": "create_bounty",
     "tx": "6V9zJEXHucFijSxp4yZsmyaSKXjRtdffy2XB5ZP5sYS8",
+    "what": "Bounty created",
+    "time": "2026-10-24 23:08 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -133,6 +163,8 @@
     "step": "b_open_groth16",
     "method": "open_with_groth16",
     "tx": "QDgLcGz4ax9EBvu4VJHDKo642STgbnvvCyQMzY5PDyB",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-24 23:08 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -141,6 +173,8 @@
     "step": "b0_commit",
     "method": "commit",
     "tx": "8L74wV4nin2aVrrb1wVSevnpfRucaT76zsSAonYu5S4h",
+    "what": "Attempt committed",
+    "time": "2026-10-24 23:09 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -149,6 +183,8 @@
     "step": "b0_reveal",
     "method": "reveal",
     "tx": "HCh9BDszYBmJ7axyF4dZqGu2GePZJjPiZ79GX8Vmzdvt",
+    "what": "Attempt revealed",
+    "time": "2026-10-24 23:09 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -159,6 +195,8 @@
     "step": "c_create",
     "method": "create_bounty",
     "tx": "5uETnw7Bd28GVJuXyczWa263h9nDoLrg566kXR7qeYzL",
+    "what": "Bounty created",
+    "time": "2026-10-24 23:09 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -167,6 +205,8 @@
     "step": "c_open_groth16",
     "method": "open_with_groth16",
     "tx": "J6WPRaRceZzMVkLygVLQ2sJuhkAdup9azGaPEKc5rJm6",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-24 23:09 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -175,6 +215,8 @@
     "step": "c0_commit",
     "method": "commit",
     "tx": "FYDcSCun67inudFMGFQdhhEFKU4PtaBfYrakUwrwgya3",
+    "what": "Attempt committed",
+    "time": "2026-10-24 23:10 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -183,6 +225,8 @@
     "step": "c0_reveal",
     "method": "reveal",
     "tx": "GcQ2EfWHH2X3oSw39Mw34XdiN3vz5sjhR3gj4hob6qLZ",
+    "what": "Attempt revealed",
+    "time": "2026-10-24 23:10 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -191,6 +235,8 @@
     "step": "c_claim_timeout",
     "method": "claim_timeout",
     "tx": "2Ga3oSGcrgfMdbKoLCEUK8FwGrpnqMk9ex2Kp2oj6Tiq",
+    "what": "Timeout claimed",
+    "time": "2026-10-24 23:11 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -201,6 +247,8 @@
     "step": "s_create",
     "method": "create_bounty",
     "tx": "Hx4PkTcAfArnFWTiQhVuYd9Bp1SR6ipHC9rad1bkoCwW",
+    "what": "Bounty created",
+    "time": "2026-10-24 23:15 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -209,6 +257,8 @@
     "step": "s_open_groth16",
     "method": "open_with_groth16",
     "tx": "JAgnGrZKA5YjkQhF5KBo7KYavLtpfoZmiYq1oGSJQgcj",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-24 23:15 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -217,6 +267,8 @@
     "step": "s_create_sybil",
     "method": "create-account",
     "tx": "2FgNc4w2ov78sfnNKHsMpBjpindceKvbhVKTME4syMAs",
+    "what": "Test account created",
+    "time": "2026-10-24 23:15 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -225,6 +277,8 @@
     "step": "s_vendor_funds_sybil_credit",
     "method": "deposit_credit",
     "tx": "7ExJNdAi23TCE7DnANwkQ3WCiL3sZivFcLxyKDtUXAuS",
+    "what": "Credit deposited",
+    "time": "2026-10-24 23:15 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -233,6 +287,8 @@
     "step": "s_honest_commit_ignored",
     "method": "commit",
     "tx": "7wv55VszucJV6xGSSGJrgwvycVfwh7bHZkbV67gfPbHq",
+    "what": "Attempt committed",
+    "time": "2026-10-24 23:15 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -241,6 +297,8 @@
     "step": "s_release_unrevealed_0",
     "method": "release_unrevealed",
     "tx": "BSuwfFeEuFYpMNxHPAgzA4N8SK1Vo6hgnsZvDKdcewrV",
+    "what": "Unrevealed slot released",
+    "time": "2026-10-24 23:16 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -249,6 +307,8 @@
     "step": "s_expire",
     "method": "expire",
     "tx": "8iC5Q9UMVAGD3WHfrHE2cVBGv1gHzhNdbc4RFgsQeLRU",
+    "what": "Expired",
+    "time": "2026-10-24 23:19 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -259,6 +319,8 @@
     "step": "s2_create",
     "method": "create_bounty",
     "tx": "F6mNreAXxDMNp9y6cHNtaHPhdFC3VkEWoc7aZnXUw9no",
+    "what": "Bounty created",
+    "time": "2026-10-24 23:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -267,6 +329,8 @@
     "step": "s2_open_groth16",
     "method": "open_with_groth16",
     "tx": "6jMcTDJw1Nr3x7FXWNqFME573gXBvhUn9J3bZwu6xhD7",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-24 23:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -275,6 +339,8 @@
     "step": "s2_vendor_tops_up_sybil",
     "method": "send-near",
     "tx": "76We5GhHE5s2Zwdqgp7netymmVXW3urzKNdXxGeHJ8AR",
+    "what": "send-near",
+    "time": "2026-10-24 23:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -283,6 +349,8 @@
     "step": "s2_sybil_junk_commit_0",
     "method": "commit",
     "tx": "64epreebuQam5azfeBPJorLM3rQEZmFSzxzpRmsnqcjE",
+    "what": "Attempt committed",
+    "time": "2026-10-24 23:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -291,6 +359,8 @@
     "step": "s2_sybil_junk_commit_1",
     "method": "commit",
     "tx": "BV8aHFzCuKWLm5Z1X1b4Qk2AnsyWCnMJnFtMcvCmzVL8",
+    "what": "Attempt committed",
+    "time": "2026-10-24 23:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -299,6 +369,8 @@
     "step": "s2_sybil_junk_commit_2",
     "method": "commit",
     "tx": "3hiPvqjJ18spcVwaP5qFwKmsB3tG8mcFtqhoYD3keKQ5",
+    "what": "Attempt committed",
+    "time": "2026-10-24 23:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -307,6 +379,8 @@
     "step": "s2_honest_commit_ignored",
     "method": "commit",
     "tx": "PjQBWCTmt4nAbwAQyT3Kn8UKt18nzpCzfKtbtn9HYpn",
+    "what": "Attempt committed",
+    "time": "2026-10-24 23:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -315,6 +389,8 @@
     "step": "s2_release_unrevealed_0",
     "method": "release_unrevealed",
     "tx": "mpBhiyx6w9RxjpMSbcuKVty67hFZCTX7x6K3qQd57zg",
+    "what": "Unrevealed slot released",
+    "time": "2026-10-24 23:21 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -323,6 +399,8 @@
     "step": "s2_expire",
     "method": "expire",
     "tx": "8LxACsYPrMQ71kHCjDhcdt9uH9ATJNn9qrjbLMRjfVW8",
+    "what": "Expired",
+    "time": "2026-10-24 23:24 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -333,6 +411,8 @@
     "step": "demo_create",
     "method": "create_bounty",
     "tx": "CRoeYBpDgULtH32NeZNAtb3xWvswnoSRZFmYDUDFrtd3",
+    "what": "Bounty created",
+    "time": "2026-10-25 00:19 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -341,6 +421,8 @@
     "step": "demo_open_groth16",
     "method": "open_with_groth16",
     "tx": "DxutukERDxo3DwhgSXueD5NWpJKySbnpuhVPdHadcS8R",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-25 00:19 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
@@ -349,6 +431,8 @@
     "step": "web_commit_no_credit",
     "method": "commit",
     "tx": "BQUH7nKfAy67ncH5rqPNxEq3Shtvix58YYf7E75zAJ4c",
+    "what": "Commit with no credit",
+    "time": "2026-10-25 16:55 UTC",
     "result": "refused by the contract",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -359,6 +443,8 @@
     "step": "x_create",
     "method": "create_bounty",
     "tx": "CZoxvPY79dihH8PR5X2neP8TfGWgUPuPW7GDPfzYjtC",
+    "what": "Bounty created",
+    "time": "2026-10-25 01:19 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -367,6 +453,8 @@
     "step": "x_open_groth16",
     "method": "open_with_groth16",
     "tx": "BYxHMjZG4A19AB9tKQjMifVdWNimHf6AhHt48cHn6stj",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-25 01:19 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -375,6 +463,8 @@
     "step": "fix2_payout_is_a_verifier",
     "method": "commit",
     "tx": "E7hEJfRcvS5Kzyoatkb43KcLqk33vTsRzeXaXQyPxTyg",
+    "what": "Commit naming a verifier as payout",
+    "time": "2026-10-25 01:19 UTC",
     "result": "refused by the contract",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -383,6 +473,8 @@
     "step": "x_r_commit",
     "method": "commit",
     "tx": "2NqpjD6Y27dg3KC4QmhwTprjFrwoyLtsxWRTdRG3Fjgm",
+    "what": "Attempt committed",
+    "time": "2026-10-25 01:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -391,6 +483,8 @@
     "step": "x_r_reveal",
     "method": "reveal",
     "tx": "HGNkEKSyQ24TerT5KUMwgJYjiKDjzNLZjiCQDRA9vXp2",
+    "what": "Attempt revealed",
+    "time": "2026-10-25 01:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -399,6 +493,8 @@
     "step": "x_j_commit",
     "method": "commit",
     "tx": "2P96uiKRzoarJU4syDXAA5z3Sg9HVUPzyGydMFa2EpSM",
+    "what": "Attempt committed",
+    "time": "2026-10-25 01:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -407,6 +503,8 @@
     "step": "x_j_reveal",
     "method": "reveal",
     "tx": "6k58gVqXBPnX4K5G9M9LfjHGPZfsCxCxERzKsCAs8aRC",
+    "what": "Attempt revealed",
+    "time": "2026-10-25 01:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -415,6 +513,8 @@
     "step": "fix1_commit_too_close_to_expiry",
     "method": "commit",
     "tx": "2PQDNpAY45XgYuxVUCXBFmjg5hofrr47CFe8bAKWcGs6",
+    "what": "Commit close to expiry",
+    "time": null,
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -423,6 +523,8 @@
     "step": "fix3_timeout_of_later_reveal_refused",
     "method": "claim_timeout",
     "tx": "9K9xCr4SaYs1ZigJVXGZuyVuhDj3Uv4Er6eAf4QJinSx",
+    "what": "Timeout claimed",
+    "time": null,
     "result": "refused by the contract",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -431,6 +533,8 @@
     "step": "x_k_commit",
     "method": "commit",
     "tx": "FJvoaAkjrYLAePqJtRVhQFcsVpRaFCsPkG9X2jcEMc1k",
+    "what": "Attempt committed",
+    "time": "2026-10-25 01:34 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -439,6 +543,8 @@
     "step": "x_k_reveal",
     "method": "reveal",
     "tx": "Gc8tyFedm4L9jv1h5U4R4XGz3vYuVPJKL3LoQACVeKcy",
+    "what": "Attempt revealed",
+    "time": "2026-10-25 01:34 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -447,6 +553,8 @@
     "step": "x_submit_fail_j",
     "method": "submit_groth16",
     "tx": "7AbUjtucJ7e5Mex3pQtwyCXEV6VG1oxD6Q3HRfKSrmXs",
+    "what": "Proof of an attempt sent",
+    "time": "2026-10-25 01:34 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -455,6 +563,8 @@
     "step": "fix1_commit_too_close_to_expiry",
     "method": "commit",
     "tx": "5bBwtSrE1gfULKLKcBgvLZA2rEjSz9Mv8d5NtzTkwPU3",
+    "what": "Commit close to expiry",
+    "time": null,
     "result": "refused by the contract",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -463,6 +573,8 @@
     "step": "fix3_timeout_of_later_reveal_refused",
     "method": "claim_timeout",
     "tx": "CbKbvza1haqTm1uBtCfuA8RevdGMHzgrBE9Jtz9cxsxM",
+    "what": "Timeout claimed",
+    "time": null,
     "result": "refused by the contract",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -471,6 +583,8 @@
     "step": "fix3_timeout_of_first_reveal",
     "method": "claim_timeout",
     "tx": "82M2gLJ5qzs6MB7ArPwPNrcTwDVzUNvCE9wSWA7NJQD3",
+    "what": "Timeout claimed",
+    "time": null,
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -479,6 +593,8 @@
     "step": "fix4_expire_fees_to_pool",
     "method": "expire",
     "tx": "E2vgNWQJccjApwuLxys5XZSKxiQHAymyZ7V3mRMKNCvD",
+    "what": "Expired",
+    "time": "2026-10-25 01:59 UTC",
     "result": "succeeded",
     "source": "docs/evidence/audit1/transactions.tsv",
     "script": "scripts/audit1_testnet.sh"
@@ -489,6 +605,8 @@
     "step": "lim_create",
     "method": "create_bounty",
     "tx": "8brBv43w18nHv5uNhJWGGKTuWCmNixfKemuFP6vcGjhw",
+    "what": "Bounty created",
+    "time": "2026-10-25 02:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -497,6 +615,8 @@
     "step": "lim_open_groth16",
     "method": "open_with_groth16",
     "tx": "H7g4L1rzzEgoaZDdyGSUZEuoGzGLWZFB2HpXMn5xNi36",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-25 02:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -505,6 +625,8 @@
     "step": "s6_set_limits_without_one_yocto",
     "method": "set_agent_limits",
     "tx": "G1eDFEEUs5VSN4PiU3UFnYYipe1tpbvoCFkcQGz3arRE",
+    "what": "Agent limits set",
+    "time": "2026-10-25 02:20 UTC",
     "result": "refused by the contract",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -513,6 +635,8 @@
     "step": "s6_set_limits",
     "method": "set_agent_limits",
     "tx": "AtpD1aUaxuWaoU1CFvQpyJDNMewfsSoUpFuvn8uX7LM1",
+    "what": "Agent limits set",
+    "time": "2026-10-25 02:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -521,6 +645,8 @@
     "step": "s6_fee_above_limit",
     "method": "commit",
     "tx": "G119Q3L9jpsB6qn24A96Ygt6V4BHG1rzGGYjMGmjp6At",
+    "what": "Attempt committed",
+    "time": "2026-10-25 02:20 UTC",
     "result": "refused by the contract",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -529,6 +655,8 @@
     "step": "s6_raise_limit",
     "method": "set_agent_limits",
     "tx": "BWAS5Q2rmm1D6jz5PoBpZqphqBWA9JH7ZBYGShXpb9iQ",
+    "what": "Agent limits set",
+    "time": "2026-10-25 02:20 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -537,6 +665,8 @@
     "step": "s6_other_payout",
     "method": "commit",
     "tx": "5LaTEQ8kzndLHjTEtbRewE8xtXVWe1tVsx22EkT9isRn",
+    "what": "Attempt committed",
+    "time": "2026-10-25 02:21 UTC",
     "result": "refused by the contract",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -545,6 +675,8 @@
     "step": "s6_commit_within_limits",
     "method": "commit",
     "tx": "B3HTj1PiZ8vbMRJzFtRdyNzKn7bPCsA6UJoSgGSwb2ZW",
+    "what": "Attempt committed",
+    "time": "2026-10-25 02:21 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -553,6 +685,8 @@
     "step": "s6_clear_limits",
     "method": "set_agent_limits",
     "tx": "AJ3BHMD2Eqqw3r8wEK1tyST1LXDK4MytfeunRKracAos",
+    "what": "Agent limits set",
+    "time": "2026-10-25 02:21 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -563,6 +697,8 @@
     "step": "split_create",
     "method": "create_bounty",
     "tx": "DcwxnyAMNKyEf7RECpvoXGXKq884E2p6Wmsd7XG3C8fM",
+    "what": "Bounty created",
+    "time": "2026-10-25 02:21 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -571,6 +707,8 @@
     "step": "split_open_groth16",
     "method": "open_with_groth16",
     "tx": "4LhXkBqDDCt41ch54KDSSA1avZYvFbbPd62mtLLZNmYy",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-25 02:21 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -579,6 +717,8 @@
     "step": "s7_r_commit",
     "method": "commit",
     "tx": "D8o2aPLjCUy57o7QwaieyvGi1y2ZFCVRZ3QxzNAc8hAm",
+    "what": "Attempt committed",
+    "time": "2026-10-25 02:21 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -587,6 +727,8 @@
     "step": "s7_r_reveal",
     "method": "reveal",
     "tx": "BaKK2pS8rCn31QRzWZKttcw1LVoVQ38SQUvsKcKJDF9G",
+    "what": "Attempt revealed",
+    "time": "2026-10-25 02:21 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -595,6 +737,8 @@
     "step": "s7_j_commit",
     "method": "commit",
     "tx": "6s7EFMriY7N27nujZQLtAUY5czWjyfcfycRjhu9dxTSa",
+    "what": "Attempt committed",
+    "time": "2026-10-25 02:21 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -603,6 +747,8 @@
     "step": "s7_j_reveal",
     "method": "reveal",
     "tx": "EfZnodB7bAP8hkxUyvuDNdYwScsDD5ik4qmyYQuhb8N2",
+    "what": "Attempt revealed",
+    "time": "2026-10-25 02:22 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -611,6 +757,8 @@
     "step": "s3_proof_of_another_bounty",
     "method": "submit_groth16",
     "tx": "8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM",
+    "what": "Proof of another bounty sent",
+    "time": "2026-10-25 02:22 UTC",
     "result": "refused by the contract",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -619,6 +767,8 @@
     "step": "s7_claim_timeout",
     "method": "claim_timeout",
     "tx": "6uem1gWAymCr2VzL3FofpQfVoqZGrzvXA2wERXnvaYpP",
+    "what": "Timeout claimed",
+    "time": "2026-10-25 02:24 UTC",
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
@@ -629,6 +779,8 @@
     "step": "s18_create",
     "method": "create_bounty",
     "tx": "ByJpYtUh5QJcgeVnYuroFFvMWnCGncRc7bMM5T1dTFQw",
+    "what": "Bounty created",
+    "time": "2026-10-25 03:49 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S18/transactions.tsv",
     "script": "scripts/s18_live_bounty.sh"
@@ -637,6 +789,8 @@
     "step": "s18_open_groth16",
     "method": "open_with_groth16",
     "tx": "AwktYGNHGijdv2LWwQYeuc7yFyLoDs41AuJckxUQuPSJ",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-25 03:49 UTC",
     "result": "succeeded",
     "source": "docs/evidence/S18/transactions.tsv",
     "script": "scripts/s18_live_bounty.sh"
@@ -647,6 +801,8 @@
     "step": "web_bounty_create",
     "method": "create_bounty",
     "tx": "FES2dBwk3EbwCeZjB96P7FzXadCZ4iSdQgnNavPf9d5L",
+    "what": "Bounty created",
+    "time": "2026-10-25 16:54 UTC",
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -655,6 +811,8 @@
     "step": "web_bounty_open",
     "method": "open_with_groth16",
     "tx": "4M2VuVB9ZtMg13ew9TKCtXqogHsNzbVBU6a2pKktpcy7",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-25 16:54 UTC",
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -663,6 +821,8 @@
     "step": "web_commit",
     "method": "commit",
     "tx": "5zWv1CAx54SSJJTJNppkUAX1iZQJoB35kYsasCwN6WZo",
+    "what": "Attempt committed",
+    "time": "2026-10-25 16:54 UTC",
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -671,6 +831,8 @@
     "step": "web_commit_cap_full",
     "method": "commit",
     "tx": "CuF5BT4acSdA14Y6mFUxL4Nc2mqj14ZquukVaGW5aQHH",
+    "what": "Commit with every slot in use (ignored, nothing taken)",
+    "time": "2026-10-25 16:55 UTC",
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -679,6 +841,8 @@
     "step": "web_reveal",
     "method": "reveal",
     "tx": "GUezy4icBnX83yJ5wbZ7sUYFHUKHGVVEB1Evuox7f5Ee",
+    "what": "Attempt revealed",
+    "time": "2026-10-25 16:55 UTC",
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -687,6 +851,8 @@
     "step": "web_claim_timeout",
     "method": "claim_timeout",
     "tx": "BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC",
+    "what": "Timeout claimed",
+    "time": null,
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -697,6 +863,8 @@
     "step": "user_bounty_create",
     "method": "create_bounty",
     "tx": "GFDKa5dSbChMciB7CZ2dQw1VxZE4ojt3RGtXE2LkqwMU",
+    "what": "Bounty created",
+    "time": "2026-10-25 17:10 UTC",
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -705,6 +873,8 @@
     "step": "user_bounty_open",
     "method": "open_with_groth16",
     "tx": "DhvXT4FjT1ox1nM91CvvYaqiMNdaSVgLTFyPwbjGaC62",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-25 17:10 UTC",
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
@@ -743,55 +913,73 @@
    "step": "atk_other_attempt",
    "tx": "3ULvszXnfJAF8sbFejCKvbxftPK2b13rT2fP8y4JEANT",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "Proof of another attempt",
+   "time": "2026-10-24 23:07 UTC"
   },
   {
    "step": "atk_fail_as_pass",
    "tx": "JDZNSTe72dqrppmqye5gnTxfQ52GNaDEBJ9Z4hZa5HT",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "A FAIL proof presented as a PASS",
+   "time": "2026-10-24 23:07 UTC"
   },
   {
    "step": "atk_flipped_seal_bit",
    "tx": "GibfrVyGKT2ymUs6W87aF5jwyRByAZ6StDxBFscy3ET7",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "Proof with one bit flipped",
+   "time": "2026-10-24 23:07 UTC"
   },
   {
    "step": "atk_changed_journal",
    "tx": "4Sde4NuTQobypV3x7uC8AgcnSNrZpuqG3NeuTVHkMYZG",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "Proof with a changed journal",
+   "time": "2026-10-24 23:08 UTC"
   },
   {
    "step": "atk_wrong_image_id",
    "tx": "4N6oi9MpDii4Vdf4uDLPSVegBsqPYYs4BQP1WzprAy2C",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "Proof under another checker image id",
+   "time": "2026-10-24 23:08 UTC"
   },
   {
    "step": "atk_fail_second_submission",
    "tx": "EmKG8Sm96NZ7NzrD9DDQ5fm8ouAzn6Eg8vTPV4KRHhym",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "Second proof for a decided attempt",
+   "time": "2026-10-24 23:08 UTC"
   },
   {
    "step": "atk_other_bounty",
    "tx": "GfZXvdiG1mcRUK1NNTQxdCfBqHMMExLiFWYgoznaKFvS",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "Proof of another bounty",
+   "time": "2026-10-24 23:09 UTC"
   },
   {
    "step": "atk_second_submission",
    "tx": "GiHbmMMR7gsZNzKNbzU1eB9SSTreN4Up3JX4DSHotRGs",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "Second proof after a PASS",
+   "time": "2026-10-24 23:09 UTC"
   },
   {
    "step": "atk_after_expiry",
    "tx": "E5DFg1TVhtDoFQjL5GdpfsSeJRBrBobX6GprTirYnrwp",
    "result": "refused by the contract",
-   "source": "docs/evidence/S6c/transactions.tsv"
+   "source": "docs/evidence/S6c/transactions.tsv",
+   "what": "Proof after the bounty expired",
+   "time": "2026-10-24 23:11 UTC"
   }
  ],
  "wrong_bounty_refused": {
@@ -854,23 +1042,38 @@
    "steps": [
     {
      "step": "s8_create_arena_bounty",
-     "tx": "ANCqPZzLAwdybq2qriGQhnquenC9kqqF36oyAMg13q3U"
+     "tx": "ANCqPZzLAwdybq2qriGQhnquenC9kqqF36oyAMg13q3U",
+     "result": "succeeded",
+     "what": "Arena bounty created",
+     "time": "2026-10-24 10:22 UTC"
     },
     {
      "step": "s8_commit_probe_1",
-     "tx": "FpUpVqQyfYRGPtcv9ZTgaWHQMHefpXDUtsy7bAf9FEDi"
+     "tx": "FpUpVqQyfYRGPtcv9ZTgaWHQMHefpXDUtsy7bAf9FEDi",
+     "result": "succeeded",
+     "what": "Probe commit 1",
+     "time": "2026-10-24 10:22 UTC"
     },
     {
      "step": "s8_commit_probe_2",
-     "tx": "8jMLwGnYP4w9CjYPgExt1oLXu1e3SRwWsnAvQWk6S3yU"
+     "tx": "8jMLwGnYP4w9CjYPgExt1oLXu1e3SRwWsnAvQWk6S3yU",
+     "result": "succeeded",
+     "what": "Probe commit 2",
+     "time": "2026-10-24 10:22 UTC"
     },
     {
      "step": "s8_commit_probe_3",
-     "tx": "AGSSeET6zNB1UomHumPhHD1tHroxCqfcHi8Kk6EdEDm1"
+     "tx": "AGSSeET6zNB1UomHumPhHD1tHroxCqfcHi8Kk6EdEDm1",
+     "result": "succeeded",
+     "what": "Probe commit 3",
+     "time": "2026-10-24 10:23 UTC"
     },
     {
      "step": "s8_commit_probe_4",
-     "tx": "2NuDyLV6pX83LFZcV67fR3AMzaC2BZEwY7dRQvDvpohX"
+     "tx": "2NuDyLV6pX83LFZcV67fR3AMzaC2BZEwY7dRQvDvpohX",
+     "result": "succeeded",
+     "what": "Probe commit 4 (over the cap: ignored, nothing taken)",
+     "time": "2026-10-24 10:23 UTC"
     }
    ],
    "note": "the fourth probe commit was ignored: still 3 commits, credit unchanged (docs/evidence/S8/chain_summary.txt)"
