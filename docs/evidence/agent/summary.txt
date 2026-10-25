@@ -1,3 +1,7 @@
 agent account kintsugi-agent-d9410f.testnet, balance 10000000000000000000000000 yoctoNEAR
 agent account kintsugi-agent-d9410f.testnet, balance 9949542575878063699999999 yoctoNEAR
 agent kintsugi-agent-d9410f.testnet: credit "50000000000000000000000", limits {"max_fee_per_commit":"20000000000000000000000","fixed_payout":"kintsugi-agent-d9410f.testnet"}, limited key ed25519:C7VqRG6cyoqX...
+test bounty 16 for the agent's real run: opened True K 2 next fee 10000000000000000000000
+proving bounty 16 attempt 0: patch sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97 (read from the chain), seed 167cbd5a3483c03273ac45d62d42010a02e4ca44d1ff6d34e4e2dfaa91876fbc
+proof for attempt 0 ready: receipt file: target/agent-test/a0_groth16.bin (2057 bytes) image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc verify seconds: 0.008 
+bounty 16 attempt 0: verdict PASS, outcome Passed; bounty state Paid; agent balance 9949000091068983399999999 -> 10059000091068983399999999 yoctoNEAR

@@ -19,8 +19,29 @@ local stand-in of an OpenAI compatible API exercises the NEAR AI Cloud code path
 - Command: `./scripts/agent_dry_run_test.sh`. Output: `docs/evidence/agent/dry_run_tests.txt`: 9 of 9 PASS. One full run
   log: `docs/evidence/agent/dry_run_reference_fix.log` (bounty 7: preflight passed, public code matched the bounty's
   hashes, fix sha256 `42edaaf5...` = the reference fix, 556 bytes, 17 of 17 public tests, commit prepared, nothing sent).
-- Verdict: PASS for the dry run. Not done yet: a call to the real NEAR AI Cloud API and a live run on chain.
+- Verdict: PASS for the dry run.
 - Note: the demo's public source names its bug in a comment, so this shows the agent's path, not a model's skill.
+
+### Live run on test bounty 16 (NEAR AI Cloud, `z-ai/glm-5.3-flash`)
+
+- Bounty 16 (demo module, K = 2, 0.1 NEAR), made for this run by the vendor account: create
+  `54yXGiNTkLZYhZCYLG9ZyZDR4Ed1ZBZfpoqW2QwnVMbe`, open with the Groth16 Proof 0 `CGvpXLc1Dtg7nP5LaoxNUQyutr7NEs57jzdETQCvkcfA`.
+- Command: `python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml --live --bounty 16`. Log:
+  `docs/evidence/agent/live_bounty16/run.log` (prompt, model reply, fix and token use in the same folder).
+- The model answered in 403 s (6,798 output tokens, of which 5,739 reasoning; 1,881 prompt tokens). Its fix builds to
+  sha256 `42edaaf5...`, the same bytes as the reference fix, and passed 17 of 17 public tests on the laptop.
+- The agent sent, with its limited key: commit `CDJsxmiuTAYbYF25DhRC5Ws7hcSXeBX5WsGrUBPh2tSG` (index 0, fee 0.01 NEAR
+  from credit) and reveal `A8zW8CDS7RcGKUBdNMt6c6jXDzVZKYweA4MMExbNBXug`.
+- The vendor proved the revealed patch against the secret on the laptop CPU (`./scripts/agent_testnet.sh prove 0`):
+  prove 3,644.77 s, peak 4,713 MiB (`prove_0.log`); succinct (`compress_0.log`); Groth16 182.85 s, container peak
+  6,524 MiB (`groth16_0.log`, `mem_groth16_0.log.peaks`); `verify_0.txt`: VALID, verdict PASS.
+- `submit_groth16` by the vendor account: `5NH9rhRMdLxRtKBtjxAsqQwFWejtu2tU9oNf69G2yUq9`. Outcome Passed, bounty 16 Paid;
+  the agent's account balance rose by 0.11 NEAR (bounty plus its own fee back), `summary.txt`.
+- Failures on the way, kept: the first dry run crashed when the model returned no text (it spent its 4,000 token budget
+  reasoning, finish reason "length"); the first live try timed out after 300 s waiting for the model and sent nothing.
+  The agent now treats both as an unused try; the budget is 12,000 tokens and the time limit 1,200 s.
+- Verdict: PASS. The full path works on testnet: feed, model, local tests, commit and reveal with a limited key, the
+  vendor's proof checked by the contract, payment. Easy task: the demo source names its bug.
 
 ## Site: wallet, credit and attempts on testnet
 

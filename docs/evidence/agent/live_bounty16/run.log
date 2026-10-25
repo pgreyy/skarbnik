@@ -1,0 +1,27 @@
+2026-10-25T21:56:12Z kintsugi agent: LIVE, contract kintsugi-l2-cihdp.testnet (testnet), account kintsugi-agent-d9410f.testnet, payout kintsugi-agent-d9410f.testnet, max fee 0.02 NEAR, max attempts 1, run folder target/agent-runs/run-20261025T215612Z-live
+2026-10-25T21:56:13Z key ed25519:C7VqRG6c... of kintsugi-agent-d9410f.testnet: limited to commit, reveal on kintsugi-l2-cihdp.testnet, allowance 0.25 NEAR
+2026-10-25T21:56:13Z feed: 5 open bounties, made 2026-10-25T21:38:44Z
+2026-10-25T21:56:13Z == bounty 16: level 2, 0.1 NEAR, next fee 0.01 NEAR, 2 of 2 slots free
+2026-10-25T21:56:18Z   preflight: PASS payout account kintsugi-agent-d9410f.testnet exists
+2026-10-25T21:56:18Z   preflight: PASS bounty state is Open (is Open)
+2026-10-25T21:56:18Z   preflight: PASS the bounty is opened (Proof 0 accepted)
+2026-10-25T21:56:18Z   preflight: PASS a commit now leaves the reveal and verdict windows before expiry (85318 s left)
+2026-10-25T21:56:18Z   preflight: PASS image id dd6c5f42c117ce3a... is on a non-empty allowlist (1 ids)
+2026-10-25T21:56:18Z   preflight: PASS next attempt fee 0.0100 NEAR is at most MAX_FEE 0.0200 NEAR
+2026-10-25T21:56:18Z   preflight: PASS next fee is within kintsugi-agent-d9410f.testnet's max_fee_per_commit
+2026-10-25T21:56:18Z   preflight: PASS payout equals kintsugi-agent-d9410f.testnet's fixed payout kintsugi-agent-d9410f.testnet
+2026-10-25T21:56:18Z   preflight: PASS kintsugi-agent-d9410f.testnet's credit 0.0500 NEAR covers the fee
+2026-10-25T21:56:18Z   preflight: PASS reveal window 3600 s >= 60 s
+2026-10-25T21:56:18Z   preflight: PASS verdict window 14400 s >= 7200 s
+2026-10-25T21:56:18Z   preflight: PASS K = 2 is at most MAX_K 16
+2026-10-25T21:56:18Z   preflight: PASS a slot is free (0 of 2 in use)
+2026-10-25T21:56:18Z   preflight: level 2, bounty 0.1000 NEAR, fee step 0.0050 NEAR
+2026-10-25T21:56:18Z   preflight: PREFLIGHT OK
+2026-10-25T21:56:19Z   public code: module sha256 fce3c7f281fed2bf... = original_hash, 17 public tests = corpus_hash, source rebuilds to the same module: yes
+2026-10-25T21:56:19Z   prompt: 6455 characters, saved as prompt_16.txt; provider nearai (openai-compatible, model z-ai/glm-5.3-flash)
+2026-10-25T22:03:02Z   model try 1: 403.0 s, model z-ai/glm-5.3-flash, finish stop, usage {'completion_tokens': 6798, 'completion_tokens_details': {'reasoning_tokens': 5739}, 'prompt_tokens': 1881, 'prompt_tokens_details': None, 'reasoning_tokens': 5739, 'total_tokens': 8679}
+2026-10-25T22:03:02Z   fix: sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97, 556 bytes; public tests 17 of 17 pass
+2026-10-25T22:03:02Z   commit: fingerprint d8c2c76d001ff41c192daddf542d39dd2fe3dbe045d987145340f4aa1ae842dd, fee 0.01 NEAR
+2026-10-25T22:03:09Z   commit tx CDJsxmiuTAYbYF25DhRC5Ws7hcSXeBX5WsGrUBPh2tSG: ok, index 0
+2026-10-25T22:03:17Z   reveal tx A8zW8CDS7RcGKUBdNMt6c6jXDzVZKYweA4MMExbNBXug: ok
+2026-10-25T22:03:17Z done: 1 attempt(s) sent. Check verdicts later with: python3 -I agent/kintsugi_agent.py status

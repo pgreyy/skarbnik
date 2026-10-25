@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: The agent's live run on test bounty 16 (PASS, paid)
+
+- `./scripts/agent_testnet.sh bounty` made test bounty 16; the agent ran live with NEAR AI Cloud
+  (`z-ai/glm-5.3-flash`), committed and revealed the model's fix with its limited key; the vendor proved it
+  (`./scripts/agent_testnet.sh prove 0`, 3,644.77 s, then succinct and Groth16) and submitted it: PASS, paid.
+  Transaction ids: docs/EVIDENCE.md, "Live run on test bounty 16".
+- Found: the model is a reasoning model. With a 4,000 token budget it once returned no text; one answer took 403 s.
+  Fixed: empty answers and timeouts count as an unused try; budget 12,000 tokens, time limit 1,200 s.
+
 ## 2026-10-25: Live site on Vercel (branch ui-preview)
 
 - The repository is now github.com/pgreyy/skarbnik (renamed by the owner); the git remote follows it.

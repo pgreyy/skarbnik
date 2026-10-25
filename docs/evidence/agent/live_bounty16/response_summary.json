@@ -1,0 +1,15 @@
+{
+ "model": "z-ai/glm-5.3-flash",
+ "finish_reason": "stop",
+ "usage": {
+  "completion_tokens": 6798,
+  "completion_tokens_details": {
+   "reasoning_tokens": 5739
+  },
+  "prompt_tokens": 1881,
+  "prompt_tokens_details": null,
+  "reasoning_tokens": 5739,
+  "total_tokens": 8679
+ },
+ "reasoning_characters": 18928
+}

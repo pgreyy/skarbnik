@@ -1,0 +1,13 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/agent-test/a0.bin target/agent-test/a0_succinct.bin succinct
+utc_start=2026-10-25T23:04:31Z
+limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=3600
+input receipt: target/agent-test/a0.bin (6971396 bytes)
+compressed to: succinct
+compress seconds: 995.87
+verify seconds: 0.027
+output receipt: target/agent-test/a0_succinct.bin (224786 bytes)
+exit=0
+wall_seconds=999.69
+r0vm_peak_rss_mib=1484 (VmHWM, sampled every 5 s)
+min_available_mib=5268
+result: finished

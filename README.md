@@ -134,7 +134,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | An agent's limited key (commit and reveal only) cannot withdraw or change limits; with `set_agent_limits` it cannot spend more than the chosen fee per attempt or send winnings elsewhere; it can still spend the whole credit over many attempts | works on testnet on this contract | `./scripts/web_testnet.sh agentkey`, unit tests `audit_s6_*` (EVIDENCE, "Site: wallet, credit and attempts") |
 | A site: live bounties, bounty pages, the recorded probe arena, how to verify, an Account page per account, a page for agents, `feed.json` and `agent-quickstart.txt` | live at https://skarbnik-near.vercel.app (Vercel, built from branch ui-preview with no build step); checked in a browser on the live domain (docs/evidence/web/live_site.txt) | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py` (quick check, step 4) |
 | Wallet connect on the site through NEAR Connect: Intear Wallet and NEAR CLI (MyNearWallet, retired on 31 October 2026, is not offered). Credit (deposit and withdraw) and attempts (commit, reveal) from the page | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Intear only loaded | `scripts/web_testnet.sh` and EVIDENCE, "Site: wallet, credit and attempts" |
-| An agent driven by a language model (NEAR AI Cloud by default, provider in `agent/config.toml`): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, then commits and reveals with a limited key | dry run only: 9 of 9 checks pass with a stand-in model and a local stand-in of the model API; no real model call and no transaction sent yet | `./scripts/agent_dry_run_test.sh` (docs/evidence/agent/dry_run_tests.txt) |
+| An agent driven by a language model (NEAR AI Cloud by default, provider in `agent/config.toml`): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, then commits and reveals with a limited key | works on testnet: on test bounty 16 the model's fix was committed and revealed with the limited key, proven PASS by the vendor and paid (0.1 NEAR plus the fee back); dry run tests 9 of 9 | `./scripts/agent_testnet.sh`, `agent/kintsugi_agent.py` (docs/evidence/agent/live_bounty16/, EVIDENCE "The model-driven agent") |
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts, no proofs for the arena) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
 | Fees of commits never revealed go to a protocol fee pool, never back to the vendor; the pool stays locked as a storage reserve with no withdraw method | works on testnet | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |
 | Proving cost on a laptop CPU, measured | 345 s to 4,984 s per proof, depending on the patch and the run | docs/numbers.md |
@@ -144,7 +144,6 @@ Each claim names the file and the command that show it. Full results, failures i
 - Level 1 (a hosted checker service, OutLayer). The contract has entry points for it, but OutLayer never answered our
   jobs on testnet (8 of 8 timed out), so no Level 1 verdict exists (EVIDENCE, "OutLayer (Level 1) on testnet").
 - On the site: creating a bounty, a proof ledger, setting agent limits from the page.
-- A real run of the model-driven agent: it is built and tested in dry run only, and waits for a NEAR AI Cloud key.
 
 ## Known limits
 
@@ -172,7 +171,6 @@ Each claim names the file and the command that show it. Full results, failures i
 ## Roadmap
 
 - OutLayer as a Level 1 verifier, once its testnet answers.
-- A real run of the model-driven agent on a new test bounty, proven and paid on testnet.
 - Faster proving on a GPU (one rented GPU run was not like for like, see docs/numbers.md).
 - On the site: create a bounty, a proof ledger, set agent limits from the page.
 - A live bounty on a new original module with its own bug.

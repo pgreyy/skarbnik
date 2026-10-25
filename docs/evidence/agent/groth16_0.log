@@ -1,0 +1,13 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/agent-test/a0_succinct.bin target/agent-test/a0_groth16.bin groth16
+utc_start=2026-10-25T23:21:10Z
+limits: max_rss_mib=6144 min_avail_mib=500 max_seconds=3600
+input receipt: target/agent-test/a0_succinct.bin (224786 bytes)
+compressed to: groth16
+compress seconds: 178.95
+verify seconds: 0.028
+output receipt: target/agent-test/a0_groth16.bin (2057 bytes)
+exit=0
+wall_seconds=182.85
+r0vm_peak_rss_mib=1411 (VmHWM, sampled every 5 s)
+min_available_mib=628
+result: finished
