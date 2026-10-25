@@ -11,6 +11,7 @@
 #   close     after the verdict window, claim_timeout closes the test bounty
 #   userbounty a second test bounty (K = 3, 3 days) for the owner to try the wallet flow by hand
 #   clibounty  a third test bounty (K = 2, 1 day) for the scripted run of the page with the NEAR CLI wallet
+#   agentkey   a limited key (commit and reveal only) on this contract: refused payout, withdrawal, limits; commit and reveal
 # Usage, from the repo root: ./scripts/web_testnet.sh <phase>. Testnet only. Output: docs/evidence/web/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -69,6 +70,54 @@ clibounty)
   call cli_bounty_open "$RES2" open_with_groth16 "{\"bounty_id\":\"$T\",$(proof_args "$P0_ARGS")}" "0 NEAR" "300 Tgas"
   save CBOUNTY "$T"; note "test bounty $T for the NEAR CLI wallet run of the page: $(view get_bounty "{\"bounty_id\":\"$T\"}" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("opened", d["opened"], "K", d["max_commits"])')"
   ;;
+agentkey)
+  # A limited key on this contract (commit and reveal only), tested with the throwaway account: the owner (full key) sets
+  # agent limits; the limited key is refused another payout, a withdrawal and a limits change, then commits and reveals
+  # on test bounty CBOUNTY. The key file stays in near-cli's keychain folder; its path is kept in target/ (not in git).
+  CREDS="$(sed -n 's/^credentials_home_dir = "\(.*\)"$/\1/p' "$HOME/.config/near-cli/config.toml")/testnet"
+  KEYENV=target/web-test/agent_key.env
+  if [ ! -f "$KEYENV" ]; then
+    cp -p "$CREDS/$WEB.json" "$CREDS/$WEB.json.before-agent-key"
+    before=$(ls "$CREDS/$WEB/" 2>/dev/null | sort)
+    run_near agentkey_add_limited_key add-key "$WEB" account add-key "$WEB" grant-function-call-access \
+      --allowance '0.25 NEAR' --contract-account-id "$CONTRACT" --function-names 'commit, reveal' \
+      autogenerate-new-keypair save-to-legacy-keychain network-config testnet sign-with-legacy-keychain send
+    if ! cmp -s "$CREDS/$WEB.json" "$CREDS/$WEB.json.before-agent-key"; then
+      mkdir -p "$CREDS/$WEB"; mv "$CREDS/$WEB.json" "$CREDS/$WEB/agent-key-from-main-file.json"; mv "$CREDS/$WEB.json.before-agent-key" "$CREDS/$WEB.json"
+    else rm "$CREDS/$WEB.json.before-agent-key"; fi
+    after=$(ls "$CREDS/$WEB/" | sort); newf=$(comm -13 <(echo "$before") <(echo "$after") | head -1); [ -n "$newf" ] || newf=agent-key-from-main-file.json
+    chmod 600 "$CREDS/$WEB/$newf"; echo "AGENT_KEY_FILE=$CREDS/$WEB/$newf" > "$KEYENV"; chmod 600 "$KEYENV"
+    save AGENT_PUBLIC_KEY "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["public_key"])' "$CREDS/$WEB/$newf")"
+  fi
+  source "$KEYENV"
+  # Sign with the limited key into a file, then send over RPC, so a refusal still has a transaction id.
+  limited() { local step="$1" method="$2" args="$3" dep="${4:-0 NEAR}" signed="target/web-test/signed_$1.json"; rm -f "$signed"
+    near contract call-function as-transaction "$CONTRACT" "$method" json-args "$args" prepaid-gas '100 Tgas' attached-deposit "$dep" \
+      sign-as "$WEB" network-config testnet sign-with-access-key-file "$AGENT_KEY_FILE" save-to-file "$signed" > "target/web-test/sign_$1.log" 2>&1 || true
+    if [ -s "$signed" ]; then run_near_py "$step" "$method" "limited key of $WEB" "$signed" "$args"; rm -f "$signed"
+    else { echo "\$ near contract call-function as-transaction $CONTRACT $method json-args '$args' attached-deposit '$dep' sign-as $WEB network-config testnet sign-with-access-key-file <limited key file> save-to-file <file>"; filter_private < "target/web-test/sign_$1.log"; } > "$OUTDIR/steps/$step.txt"
+      printf '%s\t%s\t%s\t-\t-\t-\tnot signed\t-\n' "$step" "$method" "limited key of $WEB" >> "$OUTDIR/transactions.tsv"
+      echo "== $step: not signed: $(grep -i -m1 -E 'error|deposit|not allowed|function call' "target/web-test/sign_$1.log" | cut -c1-200)"; fi; }
+  call agentkey_owner_deposit "$WEB" deposit_credit '{"account_id":null}' "0.03 NEAR" "30 Tgas"
+  call agentkey_owner_set_limits "$WEB" set_agent_limits "{\"max_fee_per_commit\":\"20000000000000000000000\",\"fixed_payout\":\"$WEB\"}" "1 yoctoNEAR" "30 Tgas"
+  note "limits of $WEB: $(view get_agent_limits "{\"account_id\":\"$WEB\"}")"
+  PATCH=data/attacks/reject_all.wasm; N=$(python3 -c 'import secrets;print(secrets.token_hex(32))')
+  limited agentkey_commit_other_payout commit "{\"bounty_id\":\"$CBOUNTY\",\"fingerprint\":\"$(node scripts/web_fingerprint.mjs "$PATCH" "$RES2" "$N")\",\"payout\":\"$RES2\"}"
+  limited agentkey_withdraw_with_deposit withdraw_credit '{"amount":"1"}' "1 yoctoNEAR"
+  limited agentkey_withdraw_without_deposit withdraw_credit '{"amount":"1"}'
+  limited agentkey_set_limits set_agent_limits '{"max_fee_per_commit":null,"fixed_payout":null}' "1 yoctoNEAR"
+  C0=$(json_field "$(view get_credit "{\"account_id\":\"$WEB\"}")" "")
+  limited agentkey_commit commit "{\"bounty_id\":\"$CBOUNTY\",\"fingerprint\":\"$(node scripts/web_fingerprint.mjs "$PATCH" "$WEB" "$N")\",\"payout\":\"$WEB\"}"
+  sleep 4
+  IDX=$(json_field "$(view get_bounty "{\"bounty_id\":\"$CBOUNTY\"}")" commits); IDX=$((IDX - 1))
+  limited agentkey_reveal reveal "{\"bounty_id\":\"$CBOUNTY\",\"index\":$IDX,\"patch\":\"$(base64 -w0 "$PATCH")\",\"nonce\":\"$N\"}"
+  S=$(view get_submission "{\"bounty_id\":\"$CBOUNTY\",\"index\":$IDX}")
+  note "limited key: commit index $IDX, credit $C0 -> $(json_field "$(view get_credit "{\"account_id\":\"$WEB\"}")" ""), committer $(json_field "$S" committer), revealed $([ "$(json_field "$S" revealed_at_ns)" != None ] && echo yes || echo no)"
+  call agentkey_owner_clear_limits "$WEB" set_agent_limits '{"max_fee_per_commit":null,"fixed_payout":null}' "1 yoctoNEAR" "30 Tgas"
+  C=$(json_field "$(view get_credit "{\"account_id\":\"$WEB\"}")" "")
+  [ "$C" != 0 ] && call agentkey_owner_withdraw "$WEB" withdraw_credit "{\"amount\":\"$C\"}" "1 yoctoNEAR" "30 Tgas"
+  note "after cleanup: credit $(json_field "$(view get_credit "{\"account_id\":\"$WEB\"}")" ""), limits $(view get_agent_limits "{\"account_id\":\"$WEB\"}")"
+  ;;
 credit)
   C0=$(json_field "$(view get_credit "{\"account_id\":\"$WEB\"}")" "")
   call web_deposit_credit "$WEB" deposit_credit '{"account_id":null}' "0.05 NEAR" "30 Tgas"
@@ -107,5 +156,5 @@ close)
   sleep 5
   note "claim_timeout on test bounty $TBOUNTY: state $(json_field "$(view get_bounty "{\"bounty_id\":\"$TBOUNTY\"}")" state), $WEB +$(python3 -c "print($(balance "$WEB")-$B0)") yoctoNEAR"
   ;;
-*) echo "usage: $0 account|bounty|credit|attempt|refusals|close|userbounty|clibounty"; exit 2 ;;
+*) echo "usage: $0 account|bounty|credit|attempt|refusals|close|userbounty|clibounty|agentkey"; exit 2 ;;
 esac

@@ -308,6 +308,26 @@ async function verify(main) {
   </details>`;
 }
 
+async function agents(main) {
+  const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class="k-mini" type="button" data-copy-text="${esc(text)}">Copy</button></div>`;
+  const feed = new URL('feed.json', location.href).href;
+  main.innerHTML = `<h1 class="m-h1" tabindex="-1">For agents</h1>
+  <p class="m-lead">Run an agent against a bounty on ${esc(CONTRACT)}. Testnet only. Replace &lt;agent&gt; with the agent's account.</p>
+  <ol class="k-ol k-steplist m-panel k-agents-steps">
+    <li><span class="m-n">1</span><div><h3>Read the open bounties</h3><p class="m-sub"><a href="feed.json">feed.json</a> lists bounty id, next fee, slots left, deadlines and level. Read get_bounty before you commit. <button class="k-mini" type="button" data-copy-text="${esc(feed)}">Copy link</button></p></div></li>
+    <li><span class="m-n">2</span><div><h3>Create a testnet account and fund it from the faucet</h3>${cmd(`near account create-account sponsor-by-faucet-service <agent>.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create`)}</div></li>
+    <li><span class="m-n">3</span><div><h3>Deposit credit; attempt fees are taken from it</h3>${cmd(`near contract call-function as-transaction ${CONTRACT} deposit_credit json-args '{"account_id":null}' prepaid-gas '30 Tgas' attached-deposit '0.1 NEAR' sign-as <agent>.testnet network-config testnet sign-with-legacy-keychain send`)}</div></li>
+    <li><span class="m-n">4</span><div><h3>Give the agent a limited key: commit and reveal only</h3>${cmd(`near account add-key <agent>.testnet grant-function-call-access --allowance '0.25 NEAR' --contract-account-id ${CONTRACT} --function-names 'commit, reveal' autogenerate-new-keypair save-to-legacy-keychain network-config testnet sign-with-legacy-keychain send`)}<p class="m-sub">Tested on this contract: commit ${tx('HiPPkXptEo1WwGZgh6VJEvyjHt3ZjUo6BiyqJDPfvA5X')} and reveal ${tx('AGLDxjCxsD1uMvJCVAwJNYZYRH4Y1mBgQvFTLW8my9BD')} accepted; withdrawing and changing limits were rejected by the network.</p></div></li>
+    <li><span class="m-n">5</span><div><h3>Set its limits with the full key</h3>${cmd(`near contract call-function as-transaction ${CONTRACT} set_agent_limits json-args '{"max_fee_per_commit":"20000000000000000000000","fixed_payout":"<agent>.testnet"}' prepaid-gas '30 Tgas' attached-deposit '1 yoctoNEAR' sign-as <agent>.testnet network-config testnet sign-with-legacy-keychain send`)}<p class="m-sub">Only a wallet can set limits or withdraw: both need 1 yoctoNEAR attached, which a limited key cannot attach.</p></div></li>
+    <li><span class="m-n">6</span><div><h3>Commit, reveal within the window, wait for the vendor's proof</h3><p class="m-sub">The agent signs commit and reveal with its limited key (sign-with-access-key-file). The fingerprint and the arguments are in agent-quickstart.txt. Check an agent's credit and attempts on its <a href="#/account">Account page</a>.</p></div></li>
+  </ol>
+  <details class="m-sec m-panel k-more"><summary>agent-quickstart.txt</summary><div id="qs"><p class="k-state">Reading…</p></div></details>`;
+  try {
+    const text = await (await fetch('agent-quickstart.txt')).text();
+    $('#qs').innerHTML = `<button class="m-btn sec sm" type="button" data-copy-text="${esc(text)}">Copy</button> <a href="agent-quickstart.txt">Open as a file</a><pre class="k-pre k-qs">${esc(text)}</pre>`;
+  } catch (e) { $('#qs').innerHTML = `<p class="k-err">Could not read agent-quickstart.txt: ${esc(e.message)}</p>`; }
+}
+
 // ---------- tabs, theme, menu, router ----------
 function tabs(root, sel, onSelect) {
   const list = [...root.querySelectorAll(sel)];
@@ -352,6 +372,7 @@ async function route() {
     else if (page === 'account') await accountPage(main, decodeURIComponent(rest[0] || ''), rest[1]);
     else if (page === 'arena') await arena(main, rest[0]);
     else if (page === 'verify') await verify(main);
+    else if (page === 'agents') await agents(main);
     else main.innerHTML = '<h1 class="m-h1" tabindex="-1">Page not found</h1><p class="m-lead"><a href="#/">Go to the home page</a></p>';
   } catch (e) { main.innerHTML = `<h1 class="m-h1" tabindex="-1">Something went wrong</h1><div class="k-state" role="alert"><p class="k-err">This page could not be shown.</p><p class="m-note">${esc(e.message)}</p></div>`; }
   const h1 = main.querySelector('h1');

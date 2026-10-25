@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: For agents page and a limited key on this contract (branch ui-preview)
+
+- `#/agents` is back in the navigation: six steps with exact commands (feed, faucet account, deposit, limited key,
+  limits, commit and reveal), agent-quickstart.txt with Copy, a link to the Account page.
+- The limited key was tested on kintsugi-l2-cihdp.testnet for the first time (S7 tested it on the older contract):
+  commit and reveal accepted; another payout refused by the contract; withdrawal and a limits change rejected by the
+  network (EVIDENCE, "Site: wallet, credit and attempts").
+
 ## 2026-10-25: Wallets after MyNearWallet's retirement; pages split into tabs (branch ui-preview)
 
 - kintt.testnet (the owner's MyNearWallet testnet account): 5.999 NEAR and 3.99 NEAR of contract credit, so no funding

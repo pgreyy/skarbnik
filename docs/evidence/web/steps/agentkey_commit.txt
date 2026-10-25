@@ -1,0 +1,14 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"15","fingerprint":"f414363f82981b52c42e1e4a14bfbcbcda9907de13b1af8c11330e49abf6d503","payout":"kintsugi-web-1e80c1.testnet"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as limited key of kintsugi-web-1e80c1.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T19:43:29.680856770Z
+{
+ "tx_hash": "HiPPkXptEo1WwGZgh6VJEvyjHt3ZjUo6BiyqJDPfvA5X",
+ "outcome": "ok",
+ "failure": "",
+ "total_gas_burnt": 3022852944319,
+ "logs": [
+  "EVENT_JSON:{\"standard\":\"kintsugi\",\"version\":\"1.0.0\",\"event\":\"committed\",\"data\":[{\"bounty_id\":\"15\",\"index\":1,\"committer\":\"kintsugi-web-1e80c1.testnet\",\"payout\":\"kintsugi-web-1e80c1.testnet\",\"fingerprint\":\"f414363f82981b52c42e1e4a14bfbcbcda9907de13b1af8c11330e49abf6d503\",\"fee\":\"15000000000000000000000\"}]}"
+ ],
+ "wall_seconds": 4.181,
+ "rpc_error": null
+}

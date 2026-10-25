@@ -1,0 +1,14 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet reveal json-args '{"bounty_id":"15","index":1,"patch":"AGFzbQEAAAABCgJgAAF/YAF/AX8DAwIAAQUEAQECAgceAwZtZW1vcnkCAAlpbnB1dF9idWYAAAVwYXJzZQABCg8CCABBgMCAgAALBABBfws=","nonce":"cad3fa7bbc84f2749aa56ecc33fe5ec2228c613049a48db7323794702b46bb73"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as limited key of kintsugi-web-1e80c1.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T19:43:41.631389407Z
+{
+ "tx_hash": "AGLDxjCxsD1uMvJCVAwJNYZYRH4Y1mBgQvFTLW8my9BD",
+ "outcome": "ok",
+ "failure": "",
+ "total_gas_burnt": 2754905634027,
+ "logs": [
+  "EVENT_JSON:{\"standard\":\"kintsugi\",\"version\":\"1.0.0\",\"event\":\"revealed\",\"data\":[{\"bounty_id\":\"15\",\"index\":1,\"patch_hash\":\"0839953ef612b12a363319b4148bafb381630577f75129f06940392a1a9ea7ed\",\"patch_len\":80,\"seed\":\"4a89a46e12eb19217c11e6576f9dcf6c816e63ea6ba8f371a8d9f180a164e025\",\"revealed_at_ns\":\"1792957421869346593\"}]}"
+ ],
+ "wall_seconds": 3.836,
+ "rpc_error": null
+}

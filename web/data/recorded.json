@@ -940,6 +940,36 @@
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "agentkey_commit_other_payout",
+    "method": "commit",
+    "tx": "9Bp6K1R3sSF9iQ4T6WqG1dEUWsQav1e7v2zqrm5ChrSG",
+    "what": "Limited agent key: commit naming another payout",
+    "time": "2026-10-25 19:42 UTC",
+    "result": "refused by the contract",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "agentkey_commit",
+    "method": "commit",
+    "tx": "HiPPkXptEo1WwGZgh6VJEvyjHt3ZjUo6BiyqJDPfvA5X",
+    "what": "Limited agent key: attempt committed",
+    "time": "2026-10-25 19:43 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "agentkey_reveal",
+    "method": "reveal",
+    "tx": "AGLDxjCxsD1uMvJCVAwJNYZYRH4Y1mBgQvFTLW8my9BD",
+    "what": "Limited agent key: attempt revealed",
+    "time": "2026-10-25 19:43 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
    }
   ]
  },

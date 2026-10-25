@@ -1,0 +1,31 @@
+$ near account add-key kintsugi-web-1e80c1.testnet grant-function-call-access --allowance 0.25 NEAR --contract-account-id kintsugi-l2-cihdp.testnet --function-names commit, reveal autogenerate-new-keypair save-to-legacy-keychain network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-25T19:42:12.199985200Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-web-1e80c1.testnet
+│    receiver_id:  kintsugi-web-1e80c1.testnet
+│    actions:
+│       -- add access key:     
+│                       public key:   ed25519:7QGYQDxdeUURmNQKd7JtP8mY53719dJMwVq48Z7WJpaa
+│                       nonce:        0
+│                       permission:   FunctionCall(FunctionCallPermission { allowance: Some(NearToken { inner: 250000000000000000000000 }), receiver_id: "kintsugi-l2-cihdp.testnet", method_names: ["commit", "reveal"] })
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:G88SCpfSkrSLARdaGnaYYyuUdVgVbDt1AGjShuJdGGBa
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.211 Tgas
+│    Transaction fee: 0.0000210304079634 NEAR
+│    Transaction ID: Ae8vf5TfnzUmmSBi1ehVZZBXsdg2kfL7K5jxzwXxfjf8
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/Ae8vf5TfnzUmmSBi1ehVZZBXsdg2kfL7K5jxzwXxfjf8
+│     
+
+
+Added access key = ed25519:7QGYQDxdeUURmNQKd7JtP8mY53719dJMwVq48Z7WJpaa to kintsugi-web-1e80c1.testnet.
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=5.88

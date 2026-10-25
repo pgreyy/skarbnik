@@ -455,3 +455,8 @@ a.m-bid,a.m-link,a.m-back{text-decoration:underline}
 .k-table.k-stack td::before{content:attr(data-label);font-family:'Space Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--smut);padding-top:3px}
 .k-recent .k-tw{overflow:visible}
 .k-cv{min-width:0}
+.k-agents-steps h3{font-size:17px;margin-bottom:6px}
+.k-agents-steps>li{padding:10px 0}
+.k-agents-steps .m-cmd{margin:0 0 4px}
+.k-agents-steps .m-cmd code{padding:8px 10px;font-size:13px}
+.k-qs{margin-top:12px;max-height:60vh}

@@ -14,3 +14,7 @@ background) was still waiting for the deadline. The background copy sent claim_t
 first copy, so its cause is not recorded). Both lines measured the same single payout of 0.11 NEAR (0.1 bounty + 0.01 fee).
 test bounty 14 for trying the wallet flow by hand: level 2 opened True K 3 expires 2026-10-28 17:10 UTC
 test bounty 15 for the NEAR CLI wallet run of the page: opened True K 2
+limits of kintsugi-web-1e80c1.testnet: {"max_fee_per_commit":"20000000000000000000000","fixed_payout":"kintsugi-web-1e80c1.testnet"}
+limited key: commit index 1, credit 30000000000000000000000 -> 15000000000000000000000, committer kintsugi-web-1e80c1.testnet, revealed yes
+after cleanup: credit 0, limits {"max_fee_per_commit":null,"fixed_payout":null}
+limited key on kintsugi-l2-cihdp.testnet: withdraw_credit with 1 yoctoNEAR rejected by the network (DepositWithFunctionCall); withdraw_credit with no deposit rejected (MethodNameMismatch); set_agent_limits rejected (DepositWithFunctionCall); commit naming another payout refused by the contract (fixed payout); commit and reveal accepted.

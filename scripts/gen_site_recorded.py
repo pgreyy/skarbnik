@@ -28,7 +28,9 @@ WHAT = {"create_bounty": "Bounty created", "open_with_groth16": "Opened with its
         "expire": "Expired", "release_unrevealed": "Unrevealed slot released", "deposit_credit": "Credit deposited",
         "withdraw_credit": "Credit withdrawn", "set_agent_limits": "Agent limits set", "create-account": "Test account created"}
 WHAT_CLI = {"cli_deposit_credit": "Credit deposited through the site (NEAR CLI wallet)", "cli_commit": "Attempt committed through the site (NEAR CLI wallet)",
-            "cli_reveal": "Attempt revealed through the site (NEAR CLI wallet)", "cli_withdraw_credit": "Credit withdrawn through the site (NEAR CLI wallet)"}
+            "cli_reveal": "Attempt revealed through the site (NEAR CLI wallet)", "cli_withdraw_credit": "Credit withdrawn through the site (NEAR CLI wallet)",
+            "agentkey_commit_other_payout": "Limited agent key: commit naming another payout", "agentkey_commit": "Limited agent key: attempt committed",
+            "agentkey_reveal": "Limited agent key: attempt revealed"}
 WHAT_STEP = {"web_commit_cap_full": "Commit with every slot in use (ignored, nothing taken)",
              "fix1_commit_too_close_to_expiry": "Commit close to expiry", "s3_proof_of_another_bounty": "Proof of another bounty sent",
              "web_commit_no_credit": "Commit with no credit", "a_attest_proof0_refused": "Verifier attestation on a Level 2 bounty",
@@ -72,7 +74,7 @@ BOUNTY_STEPS = [
     ("docs/evidence/hardening/transactions.tsv", "scripts/hardening_testnet.sh", {10: ["lim_", "s6_"], 11: ["split_", "s7_", "s3_"]}),
     ("docs/evidence/S18/transactions.tsv", "scripts/s18_live_bounty.sh", {12: ["s18_"]}),
     ("docs/evidence/web/transactions.tsv", "scripts/web_testnet.sh", {13: ["web_bounty_", "web_commit", "web_reveal", "web_claim_"],
-                                                                      7: ["web_commit_no_credit"], 14: ["user_bounty_"], 15: ["cli_"]}),
+                                                                      7: ["web_commit_no_credit"], 14: ["user_bounty_"], 15: ["cli_", "agentkey_commit", "agentkey_reveal"]}),
 ]
 # Steps whose name starts like another bounty's prefix but belong elsewhere
 EXCLUDE = {13: {"web_commit_no_credit"}}

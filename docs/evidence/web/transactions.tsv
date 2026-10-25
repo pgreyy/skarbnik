@@ -18,3 +18,14 @@ cli_deposit_credit	deposit_credit	kintsugi-web-1e80c1.testnet	8msX8Rj7WiErUZ3AZu
 cli_commit	commit	kintsugi-web-1e80c1.testnet	2SvC7HPsbBfZEMmvSoksYLLzDp4EFrX1zbsuz8jjPXf7	-	-	0	-
 cli_reveal	reveal	kintsugi-web-1e80c1.testnet	E5ZwA8ciZVaWotfc4GM2yZyBx5ZbqbgN1826GWJBSED6	-	-	0	-
 cli_withdraw_credit	withdraw_credit	kintsugi-web-1e80c1.testnet	8u7iHfRZ5Jk4HKQgVD822apvk9eZ8hw5vv5fVHySKfrF	-	-	0	-
+agentkey_add_limited_key	add-key	kintsugi-web-1e80c1.testnet	Ae8vf5TfnzUmmSBi1ehVZZBXsdg2kfL7K5jxzwXxfjf8	0.211 Tgas	0.0000210304079634	0	5.88
+agentkey_owner_deposit	deposit_credit	kintsugi-web-1e80c1.testnet	3qEDcDSMHbb3Vd1q11kghuxYHeFurs4G5LinxPHiYS72	0.310 Tgas	0.0000309633062595	0	5.23
+agentkey_owner_set_limits	set_agent_limits	kintsugi-web-1e80c1.testnet	GXh2y2zhWmWZ91PNkZugAuCXSksZwEeHNSEoLbqVjpVk	0.314 Tgas	0.0000313257024935	0	5.3
+agentkey_commit_other_payout	commit	limited key of kintsugi-web-1e80c1.testnet	9Bp6K1R3sSF9iQ4T6WqG1dEUWsQav1e7v2zqrm5ChrSG	-	-	rpc:failed	-
+agentkey_withdraw_with_deposit	withdraw_credit	limited key of kintsugi-web-1e80c1.testnet	-	-	-	rpc:rejected	-
+agentkey_withdraw_without_deposit	withdraw_credit	limited key of kintsugi-web-1e80c1.testnet	-	-	-	rpc:rejected	-
+agentkey_set_limits	set_agent_limits	limited key of kintsugi-web-1e80c1.testnet	-	-	-	rpc:rejected	-
+agentkey_commit	commit	limited key of kintsugi-web-1e80c1.testnet	HiPPkXptEo1WwGZgh6VJEvyjHt3ZjUo6BiyqJDPfvA5X	-	-	rpc:ok	-
+agentkey_reveal	reveal	limited key of kintsugi-web-1e80c1.testnet	AGLDxjCxsD1uMvJCVAwJNYZYRH4Y1mBgQvFTLW8my9BD	-	-	rpc:ok	-
+agentkey_owner_clear_limits	set_agent_limits	kintsugi-web-1e80c1.testnet	4N6K4G52jdnYGymfqkk4EVrr4e3rUgasNPUeVBLYkSTb	0.312 Tgas	0.0000311063574045	0	5.38
+agentkey_owner_withdraw	withdraw_credit	kintsugi-web-1e80c1.testnet	8P4s9FvPVXWpgtjzuhm9XiPQ1rKFzMxWhocP4N7aGnUj	0.311 Tgas	0.0000310491369465	0	6.47

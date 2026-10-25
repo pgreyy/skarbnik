@@ -1,0 +1,35 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet withdraw_credit json-args '{"amount":"1"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as limited key of kintsugi-web-1e80c1.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T19:42:59.148233614Z
+{
+ "tx_hash": null,
+ "outcome": "no_result",
+ "failure": "",
+ "total_gas_burnt": 0,
+ "logs": [],
+ "wall_seconds": 11.602,
+ "rpc_error": {
+  "name": "HANDLER_ERROR",
+  "cause": {
+   "info": {},
+   "name": "INVALID_TRANSACTION"
+  },
+  "code": -32000,
+  "message": "Server error",
+  "data": {
+   "TxExecutionError": {
+    "InvalidTxError": {
+     "InvalidAccessKeyError": {
+      "MethodNameMismatch": {
+       "method_name": "withdraw_credit"
+      }
+     }
+    }
+   }
+  }
+ }
+}
+
+# The send above returned no result because the RPC refused the transaction before it reached the chain.
+# Signed again with the same limited key and sent with RPC send_tx (wait_until INCLUDED): HANDLER_ERROR INVALID_TRANSACTION,
+# InvalidAccessKeyError: MethodNameMismatch {method_name: withdraw_credit} (the key may call only commit and reveal). No transaction id exists, because the network never accepted the transaction.

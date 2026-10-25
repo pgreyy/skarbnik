@@ -59,6 +59,17 @@ using near-cli's legacy keychain, where the throwaway key is), and pasted the tr
 | reveal | `E5ZwA8ciZVaWotfc4GM2yZyBx5ZbqbgN1826GWJBSED6` | "Revealed. … Waiting for the vendor's proof." |
 | withdraw the rest, 0.02 NEAR | `8u7iHfRZ5Jk4HKQgVD822apvk9eZ8hw5vv5fVHySKfrF` | "Withdrawn 0.02 NEAR. Credit is now 0 NEAR." |
 
+Limited agent key on this contract (`./scripts/web_testnet.sh agentkey`, throwaway account): a key that may call only
+commit and reveal (`Ae8vf5TfnzUmmSBi1ehVZZBXsdg2kfL7K5jxzwXxfjf8`); the full key deposited 0.03 NEAR
+(`3qEDcDSMHbb3Vd1q11kghuxYHeFurs4G5LinxPHiYS72`) and set limits of 0.02 NEAR per attempt and a fixed payout
+(`GXh2y2zhWmWZ91PNkZugAuCXSksZwEeHNSEoLbqVjpVk`). With the limited key: a commit naming another payout was refused by the
+contract (`9Bp6K1R3sSF9iQ4T6WqG1dEUWsQav1e7v2zqrm5ChrSG`, "this account's commits must use its fixed payout account");
+withdraw_credit with 1 yoctoNEAR and set_agent_limits were rejected by the network before reaching the chain
+(`DepositWithFunctionCall`, no transaction id), withdraw_credit with no deposit too (`MethodNameMismatch`); a commit on test
+bounty 15 was accepted (`HiPPkXptEo1WwGZgh6VJEvyjHt3ZjUo6BiyqJDPfvA5X`, fee 0.015 NEAR from credit) and revealed
+(`AGLDxjCxsD1uMvJCVAwJNYZYRH4Y1mBgQvFTLW8my9BD`). Cleanup with the full key: limits cleared
+(`4N6K4G52jdnYGymfqkk4EVrr4e3rUgasNPUeVBLYkSTb`), credit withdrawn (`8P4s9FvPVXWpgtjzuhm9XiPQ1rKFzMxWhocP4N7aGnUj`).
+
 Clicked through: NEAR CLI (all four steps above). Only loaded: Intear Wallet (its "Connect Intear Wallet" window from
 wallet.intear.tech opens; signing in needs an Intear account, not made here) and MyNearWallet (opens
 testnet.mynearwallet.com). Sources for the wallet choice: NEAR's announcement that MyNearWallet is sunset on 31 October
