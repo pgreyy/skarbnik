@@ -634,6 +634,11 @@ impl Contract {
             "too close to expiry: a commit must leave time for the reveal window and the verdict window"
         );
         require!(committer != bounty.vendor, "the vendor cannot commit to its own bounty");
+        require!(!self.verifiers.contains_key(&committer), "a registered verifier cannot commit");
+        require!(
+            !self.verifiers.contains_key(&payout) && payout != bounty.vendor && payout != env::current_account_id(),
+            "the payout account cannot be a registered verifier, the vendor or this contract"
+        );
         require!(bounty.opened, "bounty is not open: Proof 0 needs two verifier attestations");
         if bounty.active >= bounty.max_commits {
             emit("commit_ignored", json!({ "bounty_id": bounty_id, "committer": committer, "reason": "max_commits reached" }));

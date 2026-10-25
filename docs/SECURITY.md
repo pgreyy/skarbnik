@@ -57,6 +57,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Fees of commits never revealed go to the protocol fee pool by one rule (`release_to_pool`), at `release_unrevealed` or, if still unreleased, at `expire` before any fee is paid out; no code path pays such a fee to the vendor, a researcher or a verifier (added in S6c) | A vendor blocking its own bounty with junk commits for free (it would otherwise get the fees back) | `release_to_pool`, `release_unrevealed`, `expire` | unit tests `release_unrevealed_moves_the_fee_to_the_pool_and_pays_nobody`, `level2_unrevealed_fee_goes_to_the_pool_not_the_vendor`; S6c self-block test |
 | Every commit must leave time for the reveal window and the verdict window before expiry, and every reveal a full verdict window; a Level 2 proof is no longer refused after expiry (the window alone bounds it) (audit round 1, fix 1) | A junk reveal just before expiry paid by timeout because the vendor's proof was refused after expiry (audit finding F1, critical) | `commit`, `reveal`, `submit_groth16` | unit tests `audit_f1_*` |
 | Windows are capped: reveal, verdict and attestation windows at most 30 days, expiry at most 366 days and at least the sum of the gap and the three windows (audit round 1, fix 1) | A vendor choosing a window so long that a deadline never comes, freezing a researcher's timeout and the refund forever (audit finding, high) | `create_bounty`, `MAX_WINDOW_NS`, `MAX_EXPIRY_NS` | unit tests `audit_f3_*` |
+| The payout account cannot be a registered verifier, the vendor or the contract; a registered verifier cannot commit (audit round 1, fix 2) | Blocking a verifier by naming it as payout (the "cannot attest its own submission" rule turned into a weapon), so no verdict could become final and the timeout paid the researcher | `commit` | unit tests `audit_h2_*` |
 
 ### Keys
 
@@ -188,6 +189,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
+- 2026-10-25 (audit fix 2): payout cannot be a verifier, the vendor or the contract; verifiers cannot commit.
 - 2026-10-25 (audit fix 1): commit and reveal must leave time for a decision before expiry; a Level 2 proof is no longer
   refused after expiry; windows capped at 30 days and expiry at 366 days (docs/AUDIT.md once written).
 - 2026-10-25 `3043452`: private random salt per bounty by default (`--bounty`), the public demo salt only with

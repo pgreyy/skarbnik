@@ -583,8 +583,9 @@ fn no_second_payout_after_pass() {
     c.claim_timeout(U64(0), b);
 }
 
+// Since audit fix 2 a verifier is refused at commit, before the self-attestation guard in record_attestation can apply.
 #[test]
-#[should_panic(expected = "a researcher cannot attest its own submission")]
+#[should_panic(expected = "a registered verifier cannot commit")]
 fn researcher_cannot_attest_own_submission() {
     let mut c = setup();
     call(v1(), T0 + SEC);
@@ -976,4 +977,32 @@ fn audit_f1_every_reveal_leaves_a_full_verdict_window_before_expiry() {
     call(researcher(), T0 + E - W); // the last moment a reveal is allowed: its verdict window ends exactly at expiry
     c.reveal(U64(0), idx, Base64VecU8(PATCH.to_vec()), NONCE.into());
     assert_eq!(c.get_submission(U64(0), idx).unwrap().revealed_at_ns, Some(U64(T0 + E - W)));
+}
+
+// Audit round 1, fix 2 (auditor finding: the self-attestation rule as a weapon). Naming a verifier as payout blocked that
+// verifier from attesting; with few verifiers no verdict could become final and the timeout paid the researcher.
+#[test]
+#[should_panic(expected = "the payout account cannot be a registered verifier")]
+fn audit_h2_verifier_as_payout_is_refused() {
+    let mut c = setup();
+    call(researcher(), T0 + SEC);
+    c.commit(U64(0), fingerprint_hex(PATCH, &v1()), v1());
+}
+
+#[test]
+#[should_panic(expected = "a registered verifier cannot commit")]
+fn audit_h2_verifier_cannot_commit() {
+    let mut c = setup();
+    at(v1(), T0 + SEC, start_credit());
+    c.deposit_credit(None);
+    call(v1(), T0 + 2 * SEC);
+    c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout());
+}
+
+#[test]
+#[should_panic(expected = "the payout account cannot be a registered verifier, the vendor")]
+fn audit_h2_vendor_as_payout_is_refused() {
+    let mut c = setup();
+    call(researcher(), T0 + SEC);
+    c.commit(U64(0), fingerprint_hex(PATCH, &vendor()), vendor());
 }
