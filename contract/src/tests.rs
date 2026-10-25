@@ -1063,7 +1063,7 @@ fn audit_c2_later_pass_goes_through_once_the_earlier_reveal_is_decided() {
     assert_eq!(c.attest(U64(0), r, Verdict::Fail, H1.into(), H2.into()), "final_fail");
     call(vendor(), T0 + 13 * SEC);
     c.post_verdict(U64(0), s, Verdict::Pass, H1.into(), H2.into()); // now allowed
-    assert_eq!(c.get_submission(U64(0), s).unwrap().verdict.map(|v| v.verdict), Some(Verdict::Pass));
+    assert_eq!(c.get_submission(U64(0), s).unwrap().verdict, Some(Verdict::Pass));
 }
 
 #[test]
