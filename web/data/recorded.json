@@ -691,6 +691,24 @@
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
    }
+  ],
+  "14": [
+   {
+    "step": "user_bounty_create",
+    "method": "create_bounty",
+    "tx": "GFDKa5dSbChMciB7CZ2dQw1VxZE4ojt3RGtXE2LkqwMU",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "user_bounty_open",
+    "method": "open_with_groth16",
+    "tx": "DhvXT4FjT1ox1nM91CvvYaqiMNdaSVgLTFyPwbjGaC62",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   }
   ]
  },
  "notes": {
@@ -857,5 +875,9 @@
    ],
    "note": "the fourth probe commit was ignored: still 3 commits, credit unchanged (docs/evidence/S8/chain_summary.txt)"
   }
+ },
+ "test_bounties": {
+  "13": "Test bounty: made for the scripted testnet run of the site's wallet features.",
+  "14": "Test bounty: made for trying the wallet flow by hand. Not a demo."
  }
 }

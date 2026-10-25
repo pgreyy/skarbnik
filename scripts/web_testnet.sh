@@ -9,6 +9,7 @@
 #   attempt   commit (index 0), a second commit (cap full: null, nothing taken), reveal
 #   refusals  withdraw_credit of the rest (1 yoctoNEAR), then a commit with no credit (refused)
 #   close     after the verdict window, claim_timeout closes the test bounty
+#   userbounty a second test bounty (K = 3, 3 days) for the owner to try the wallet flow by hand
 # Usage, from the repo root: ./scripts/web_testnet.sh <phase>. Testnet only. Output: docs/evidence/web/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -46,6 +47,16 @@ bounty)
   call web_bounty_create "$VENDOR" create_bounty "{\"original_hash\":\"$(sha data/demo/original.wasm)\",\"corpus_hash\":\"736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b\",\"image_id\":\"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc\",\"exploit_commitment\":\"9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387\",\"proof0_receipt_hash\":\"$P0_RECEIPT\",\"max_commits\":1,\"max_patch_bytes\":1024,\"reveal_gap_ns\":\"$(( 2 * SEC ))\",\"verdict_window_ns\":\"$(( 180 * SEC ))\",\"attest_window_ns\":\"$(( 60 * SEC ))\",\"expiry_ns\":\"$(( 900 * SEC ))\",\"attempt_fee\":\"10000000000000000000000\",\"fee_step\":\"5000000000000000000000\",\"reference_fix_hash\":\"$(sha data/demo/fixed.wasm)\",\"proof0_journal_hash\":\"fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5\",\"reveal_window_ns\":\"$(( 120 * SEC ))\",\"fuzz_count\":16,\"variant_count\":32,\"level\":2}" "0.1 NEAR"
   call web_bounty_open "$RES2" open_with_groth16 "{\"bounty_id\":\"$T\",$(proof_args "$P0_ARGS")}" "0 NEAR" "300 Tgas"
   save TBOUNTY "$T"; note "test bounty $T: $(view get_bounty "{\"bounty_id\":\"$T\"}" | python3 -c 'import json,sys; d=json.load(sys.stdin); print({k:d[k] for k in ("level","opened","max_commits","next_fee")})')"
+  ;;
+userbounty)
+  # A test bounty for the owner to try the wallet flow by hand: K = 3, 0.1 NEAR, reveal window 1 h, verdict window 4 h,
+  # attestation window 1 h, expiry 3 days. Same vendor account and calls as the bounty phase.
+  [ -n "${UBOUNTY:-}" ] && { echo "already made: bounty $UBOUNTY"; exit 0; }
+  T=$(json_field "$(view get_next_bounty_id '{}')" "")
+  P0_ARGS=target/s6b/args.json; P0_RECEIPT=$(sha target/demo/proof0_succinct.bin)
+  call user_bounty_create "$VENDOR" create_bounty "{\"original_hash\":\"$(sha data/demo/original.wasm)\",\"corpus_hash\":\"736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b\",\"image_id\":\"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc\",\"exploit_commitment\":\"9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387\",\"proof0_receipt_hash\":\"$P0_RECEIPT\",\"max_commits\":3,\"max_patch_bytes\":1024,\"reveal_gap_ns\":\"$(( 2 * SEC ))\",\"verdict_window_ns\":\"$(( 4 * 3600 * SEC ))\",\"attest_window_ns\":\"$(( 3600 * SEC ))\",\"expiry_ns\":\"$(( 3 * 24 * 3600 * SEC ))\",\"attempt_fee\":\"10000000000000000000000\",\"fee_step\":\"5000000000000000000000\",\"reference_fix_hash\":\"$(sha data/demo/fixed.wasm)\",\"proof0_journal_hash\":\"fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5\",\"reveal_window_ns\":\"$(( 3600 * SEC ))\",\"fuzz_count\":16,\"variant_count\":32,\"level\":2}" "0.1 NEAR"
+  call user_bounty_open "$RES2" open_with_groth16 "{\"bounty_id\":\"$T\",$(proof_args "$P0_ARGS")}" "0 NEAR" "300 Tgas"
+  save UBOUNTY "$T"; note "test bounty $T for trying the wallet flow by hand: $(view get_bounty "{\"bounty_id\":\"$T\"}" | python3 -c 'import json,sys,datetime; d=json.load(sys.stdin); print("level", d["level"], "opened", d["opened"], "K", d["max_commits"], "expires", datetime.datetime.fromtimestamp(int(d["expires_at_ns"])/1e9, datetime.UTC).strftime("%Y-%m-%d %H:%M UTC"))')"
   ;;
 credit)
   C0=$(json_field "$(view get_credit "{\"account_id\":\"$WEB\"}")" "")
@@ -85,5 +96,5 @@ close)
   sleep 5
   note "claim_timeout on test bounty $TBOUNTY: state $(json_field "$(view get_bounty "{\"bounty_id\":\"$TBOUNTY\"}")" state), $WEB +$(python3 -c "print($(balance "$WEB")-$B0)") yoctoNEAR"
   ;;
-*) echo "usage: $0 account|bounty|credit|attempt|refusals|close"; exit 2 ;;
+*) echo "usage: $0 account|bounty|credit|attempt|refusals|close|userbounty"; exit 2 ;;
 esac

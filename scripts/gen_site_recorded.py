@@ -39,7 +39,7 @@ BOUNTY_STEPS = [
     ("docs/evidence/hardening/transactions.tsv", "scripts/hardening_testnet.sh", {10: ["lim_", "s6_"], 11: ["split_", "s7_", "s3_"]}),
     ("docs/evidence/S18/transactions.tsv", "scripts/s18_live_bounty.sh", {12: ["s18_"]}),
     ("docs/evidence/web/transactions.tsv", "scripts/web_testnet.sh", {13: ["web_bounty_", "web_commit", "web_reveal", "web_claim_"],
-                                                                      7: ["web_commit_no_credit"]}),
+                                                                      7: ["web_commit_no_credit"], 14: ["user_bounty_"]}),
 ]
 # Steps whose name starts like another bounty's prefix but belong elsewhere
 EXCLUDE = {13: {"web_commit_no_credit"}}
@@ -121,6 +121,14 @@ salt = re.search(r'const DEMO_SALT: \[u8; 32\] = \*b"([^"]{32})";', open(os.path
 exploit = bytes.fromhex("".join(open(os.path.join(ROOT, "data/demo/exploit.hex")).read().split()))
 out["notes"]["demo_exploit_commitment"] = {"commitment": hashlib.sha256(salt + exploit).hexdigest(),
                                            "source": "host/src/main.rs (DEMO_SALT) and data/demo/exploit.hex"}
+
+# Test bounties made by scripts/web_testnet.sh (TBOUNTY: the scripted run; UBOUNTY: for trying the wallet flow by hand)
+runenv = dict(l.strip().split("=", 1) for l in open(os.path.join(ROOT, "docs/evidence/web/run.env")) if "=" in l)
+out["test_bounties"] = {}
+if "TBOUNTY" in runenv:
+    out["test_bounties"][runenv["TBOUNTY"]] = "Test bounty: made for the scripted testnet run of the site's wallet features."
+if "UBOUNTY" in runenv:
+    out["test_bounties"][runenv["UBOUNTY"]] = "Test bounty: made for trying the wallet flow by hand. Not a demo."
 
 dst = os.path.join(ROOT, "web/data/recorded.json")
 with open(dst, "w") as f:

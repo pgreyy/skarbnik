@@ -41,6 +41,10 @@ then holds only the wallet selector's two preference entries. No script errors o
 Not run: the wallet's approval window (a person must approve in MyNearWallet); a PASS on the page (only the vendor can
 prove an attempt).
 
+For trying the wallet flow by hand, `./scripts/web_testnet.sh userbounty` made test bounty 14 (K = 3, 0.1 NEAR, Level 2,
+expires 2026-10-28 17:10 UTC): created `GFDKa5dSbChMciB7CZ2dQw1VxZE4ojt3RGtXE2LkqwMU`, opened with the demo Proof 0
+`DhvXT4FjT1ox1nM91CvvYaqiMNdaSVgLTFyPwbjGaC62`. The site and the feed mark bounties 13 and 14 as test bounties.
+
 ## S18: a live Level 2 bounty whose secret is not in the repository
 
 Question: can the vendor side run with a secret crashing input that exists only on the vendor's machine, a private random

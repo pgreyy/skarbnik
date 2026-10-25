@@ -15,6 +15,8 @@ const getRecorded = async () => recorded || (recorded = await (await fetch('data
 const rec = (src) => `<span class="k-rec">Recorded</span> <span class="k-src">${esc(src)}</span>`;
 const levelText = (l) => (l === 2 ? 'The contract checks a Groth16 proof of the RISC Zero result itself.' : 'Two registered verifiers sign the same verdict.');
 const isDemo = (b) => recorded && b.exploit_commitment === recorded.notes.demo_exploit_commitment.commitment;
+const testNote = (b) => recorded && recorded.test_bounties && recorded.test_bounties[String(b.id)];
+const inputLabel = (b) => (testNote(b) ? 'Test bounty' : isDemo(b) ? 'Demo input' : 'Private secret input');
 
 function bountyState(b, now = Date.now()) {
   if (b.state === 'Paid') return { key: 'closed', v: 'ok', t: '✓ PAID' };
@@ -129,7 +131,7 @@ async function bounties(main) {
     <div class="m-panel m-tw k-only-wide"><table class="m-table">
       <thead><tr><th scope="col">Bounty</th><th scope="col">State</th><th scope="col">Amount</th><th scope="col">Attempts</th><th scope="col">Next fee</th><th scope="col">Deadline</th><th scope="col">Checked by</th></tr></thead>
       <tbody>${rows.map((b) => { const c = cell(b); return `<tr>
-        <td><a class="m-bid" href="#/bounties/${b.id}">Bounty ${esc(b.id)}</a><span class="m-sub">${isDemo(b) ? 'Demo input' : 'Private secret input'}</span></td>
+        <td><a class="m-bid" href="#/bounties/${b.id}">Bounty ${esc(b.id)}</a>${testNote(b) ? ' <span class="m-tag">Test bounty</span>' : ''}<span class="m-sub">${isDemo(b) ? 'Demo input' : 'Private secret input'}</span></td>
         <td>${badge(c.st.v, c.st.t)}</td>
         <td class="k-mono">${esc(near(b.amount))}</td>
         <td><span class="k-mono">${esc(attemptsText(b))}</span>${pips(b)}</td>
@@ -140,7 +142,7 @@ async function bounties(main) {
         <span class="m-crow"><span class="k-mono" style="font-weight:700">Bounty ${esc(b.id)}</span>${badge(c.st.v, c.st.t)}</span>
         <span class="m-ct2">${esc(near(b.amount))}, Level ${b.level}</span>
         <span class="m-crow"><span class="k-mono">${esc(attemptsText(b))}</span><span>${b.state === 'Open' ? 'next fee ' + esc(near(b.next_fee)) : ''}</span></span>
-        <span class="m-sub">${esc(c.time)} · ${isDemo(b) ? 'Demo input' : 'Private secret input'}</span>${pips(b)}</a>`; }).join('')}</div>`;
+        <span class="m-sub">${esc(c.time)} · ${esc(inputLabel(b))}</span>${pips(b)}</a>`; }).join('')}</div>`;
   };
   draw();
   tabs(main, '[data-f]', (btn) => { filter = btn.dataset.f; draw(); });
@@ -161,10 +163,11 @@ async function bounty(main, id) {
   const fact = (t, v) => `<div><dt>${t}</dt><dd>${v}</dd></div>`;
   const cl = left(commitBy(b));
   $('#b').innerHTML = `
-  <div class="m-line">${badge(st.v, st.t)}<span class="m-tok">Checked by Level ${b.level}</span><span class="m-tag">Testnet</span><span class="m-tag">Live</span></div>
+  <div class="m-line">${badge(st.v, st.t)}${testNote(b) ? '<span class="m-tag">Test bounty</span>' : ''}<span class="m-tok">Checked by Level ${b.level}</span><span class="m-tag">Testnet</span><span class="m-tag">Live</span></div>
   ${rd.bounty_notes && rd.bounty_notes[String(b.id)] ? `<p class="m-note"><b>Note.</b> ${esc(rd.bounty_notes[String(b.id)].text)} ${tx(rd.bounty_notes[String(b.id)].tx)} <span class="k-src">${esc(rd.bounty_notes[String(b.id)].source)}</span></p>` : ''}
   <p class="m-note">On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p>
   <p class="m-line"><span class="m-tok">${demo ? 'Demo input' : 'Private secret input'}</span></p>
+  ${testNote(b) ? `<p class="m-note"><b>${esc(testNote(b))}</b></p>` : ''}
   ${demo ? `<p class="m-note">The exploit commitment below equals the demo commitment recomputed from data/demo/exploit.hex and the public demo salt.</p>`
     : `<p class="m-note">${Number(b.id) === 12 ? 'Bounty 12 uses the public demo bug: anyone can submit the public fixed.wasm, and if the vendor stays silent the timeout rule can pay out without any proof.' : ''}</p>`}
   <div class="m-grid3" style="margin-top:18px">

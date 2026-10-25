@@ -64,7 +64,8 @@ guessable when the secret is short or predictable. A real vendor uses the defaul
 
 7. Open the site: `python3 -m http.server 8000 --directory web`, then open http://localhost:8000 in a browser. See the
    intro, then the live bounties read from `kintsugi-l2-cihdp.testnet` (internet needed). "Connect wallet" signs in
-   with a MyNearWallet testnet account. To refresh the agent feed:
+   with a MyNearWallet testnet account. Test bounty 14 on `kintsugi-l2-cihdp.testnet` (cap 3, 0.1 NEAR, expires
+   2026-10-28 17:10 UTC) is for trying the wallet flow; it is marked "Test bounty" on the site and is not a demo. To refresh the agent feed:
    `python3 -I scripts/gen_feed.py`; to rebuild the recorded data from the evidence files:
    `python3 -I scripts/gen_site_recorded.py`.
 

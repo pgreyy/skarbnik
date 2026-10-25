@@ -2,6 +2,12 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Test bounty 14 for trying the wallet flow by hand
+
+- `./scripts/web_testnet.sh userbounty`: bounty 14 (K = 3, 0.1 NEAR, expires 2026-10-28 17:10 UTC), same vendor account
+  and calls as test bounty 13. Bounties 13 and 14 are marked "Test bounty" on the site (list and bounty page) and in
+  feed.json (`test_bounty`), from `docs/evidence/web/run.env` through `scripts/gen_site_recorded.py`. Not pushed.
+
 ## 2026-10-25: Site, wallet, credit and attempts (branch ui-preview)
 
 - Wallet: NEAR wallet selector 10.1.4 with the MyNearWallet module, testnet only, bundled once into

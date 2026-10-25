@@ -12,3 +12,4 @@ note on the two claim_timeout lines above: I started the close phase a second ti
 background) was still waiting for the deadline. The background copy sent claim_timeout BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC
 (succeeded); the second copy's call was not sent (near-cli exit 1, no transaction id; its output file was overwritten by the
 first copy, so its cause is not recorded). Both lines measured the same single payout of 0.11 NEAR (0.1 bounty + 0.01 fee).
+test bounty 14 for trying the wallet flow by hand: level 2 opened True K 3 expires 2026-10-28 17:10 UTC

@@ -38,6 +38,11 @@ def utc(ns):
 
 
 now_ns = int(datetime.datetime.now(datetime.UTC).timestamp() * 1e9)
+# Test bounties (made for trying the site), from web/data/recorded.json (scripts/gen_site_recorded.py)
+try:
+    test_ids = set(json.load(open(os.path.join(ROOT, "web/data/recorded.json"))).get("test_bounties", {}))
+except (OSError, ValueError):
+    test_ids = set()
 n = int(view("get_next_bounty_id", {}))
 allowed = view("get_allowed_image_ids", {})
 open_bounties = []
@@ -62,6 +67,7 @@ for i in range(n):
         "bounty_amount": near(b["amount"]),
         "image_id": b["image_id"],
         "image_id_allowed": b["image_id_allowed"],
+        "test_bounty": str(b["id"]) in test_ids,
     })
 
 feed = {
