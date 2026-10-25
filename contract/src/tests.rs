@@ -211,7 +211,8 @@ fn expire_too_early_rejected() {
 #[should_panic(expected = "a revealed submission is still unresolved")]
 fn expire_waits_for_revealed_submission() {
     let mut c = setup();
-    commit_and_reveal(&mut c, T0 + E - 10 * SEC);
+    // Revealed early (a reveal must leave a full verdict window before expiry); nobody claims its timeout.
+    commit_and_reveal(&mut c, T0 + 100 * SEC);
     call(vendor(), T0 + E + 1);
     c.expire(U64(0));
 }
@@ -928,4 +929,51 @@ fn s13_vendor_fail_without_attestations_times_out_and_pays() {
     c.claim_timeout(U64(0), idx);
     assert_eq!(transfers(), vec![(payout(), bounty_amount().as_yoctonear() + FEE)]);
     assert_eq!(c.get_submission(U64(0), idx).unwrap().outcome, Outcome::TimedOut);
+}
+
+// Audit round 1, fix 1: windows are capped and every commit and reveal must leave time for a decision before expiry.
+#[test]
+#[should_panic(expected = "a window may be at most 30 days")]
+fn audit_f3_unbounded_attest_window_is_refused() {
+    call(owner(), T0 - 10);
+    let mut c = Contract::new(owner());
+    at(vendor(), T0, bounty_amount());
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(u64::MAX), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+}
+
+#[test]
+#[should_panic(expected = "expiry_ns must cover")]
+fn audit_f3_expiry_shorter_than_the_windows_is_refused() {
+    call(owner(), T0 - 10);
+    let mut c = Contract::new(owner());
+    at(vendor(), T0, bounty_amount());
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(W), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+}
+
+#[test]
+#[should_panic(expected = "too close to expiry: a commit")]
+fn audit_f1_commit_that_cannot_be_decided_before_expiry_is_refused() {
+    let mut c = setup();
+    call(researcher(), T0 + E - RW - W + 1); // one nanosecond too late for reveal window + verdict window
+    c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout());
+}
+
+#[test]
+#[should_panic(expected = "too close to expiry: a reveal")]
+fn audit_f1_reveal_that_leaves_less_than_a_verdict_window_is_refused() {
+    let mut c = setup();
+    call(researcher(), T0 + E - RW - W); // the last moment a commit is allowed
+    let idx = c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
+    call(researcher(), T0 + E - W + 1); // inside the reveal window, but less than a verdict window before expiry
+    c.reveal(U64(0), idx, Base64VecU8(PATCH.to_vec()), NONCE.into());
+}
+
+#[test]
+fn audit_f1_every_reveal_leaves_a_full_verdict_window_before_expiry() {
+    let mut c = setup();
+    call(researcher(), T0 + E - RW - W);
+    let idx = c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
+    call(researcher(), T0 + E - W); // the last moment a reveal is allowed: its verdict window ends exactly at expiry
+    c.reveal(U64(0), idx, Base64VecU8(PATCH.to_vec()), NONCE.into());
+    assert_eq!(c.get_submission(U64(0), idx).unwrap().revealed_at_ns, Some(U64(T0 + E - W)));
 }

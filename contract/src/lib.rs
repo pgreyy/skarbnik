@@ -72,6 +72,10 @@ pub const MAX_PATCH_BYTES_CAP: u32 = 4096;
 pub const MAX_COMMITS_CAP: u32 = 16;
 /// Smallest bounty accepted, so empty bounties cannot fill storage for free.
 pub const MIN_BOUNTY: NearToken = NearToken::from_millinear(100);
+/// Longest reveal, verdict or attestation window (30 days) and longest life of a bounty (366 days). Without caps a
+/// vendor could choose a window so long that a deadline never comes (audit round 1).
+pub const MAX_WINDOW_NS: u64 = 30 * 24 * 3600 * 1_000_000_000;
+pub const MAX_EXPIRY_NS: u64 = 366 * 24 * 3600 * 1_000_000_000;
 /// Number of different registered verifiers whose matching attestations make a verdict final.
 pub const ATTESTATIONS_TO_FINALIZE: usize = 2;
 /// Domain tag of the submission id that the proof's journal must carry.
@@ -517,6 +521,15 @@ impl Contract {
         require!((1..=MAX_COMMITS_CAP).contains(&max_commits), "max_commits must be 1 to 16");
         require!((1..=MAX_PATCH_BYTES_CAP).contains(&max_patch_bytes), "max_patch_bytes must be 1 to 4096");
         require!(verdict_window_ns.0 > 0 && attest_window_ns.0 > 0 && expiry_ns.0 > 0, "windows must be above zero");
+        require!(
+            reveal_window_ns.0 <= MAX_WINDOW_NS && verdict_window_ns.0 <= MAX_WINDOW_NS && attest_window_ns.0 <= MAX_WINDOW_NS,
+            "a window may be at most 30 days"
+        );
+        require!(expiry_ns.0 <= MAX_EXPIRY_NS, "expiry_ns may be at most 366 days");
+        require!(
+            expiry_ns.0 >= reveal_gap_ns.0.saturating_add(reveal_window_ns.0).saturating_add(verdict_window_ns.0).saturating_add(attest_window_ns.0),
+            "expiry_ns must cover the reveal gap, the reveal window, the verdict window and the attestation window"
+        );
         require!(attempt_fee.0 > 0, "attempt_fee must be above zero");
         require!(reveal_window_ns.0 > reveal_gap_ns.0, "reveal_window_ns must be longer than reveal_gap_ns");
         let level = level.unwrap_or(LEVEL_0);
@@ -616,6 +629,10 @@ impl Contract {
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(now < bounty.expires_at_ns, "bounty has expired");
+        require!(
+            now.saturating_add(bounty.reveal_window_ns).saturating_add(bounty.verdict_window_ns) <= bounty.expires_at_ns,
+            "too close to expiry: a commit must leave time for the reveal window and the verdict window"
+        );
         require!(committer != bounty.vendor, "the vendor cannot commit to its own bounty");
         require!(bounty.opened, "bounty is not open: Proof 0 needs two verifier attestations");
         if bounty.active >= bounty.max_commits {
@@ -662,6 +679,10 @@ impl Contract {
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(now < bounty.expires_at_ns, "bounty has expired");
+        require!(
+            now.saturating_add(bounty.verdict_window_ns) <= bounty.expires_at_ns,
+            "too close to expiry: a reveal must leave a full verdict window"
+        );
         let sub = self
             .submissions
             .get_mut(&(bounty_id.0, index))
@@ -1001,7 +1022,8 @@ impl Contract {
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.level == LEVEL_2, "this is a Level 0 bounty: verdicts need two verifier attestations");
         require!(bounty.state == BountyState::Open, "bounty is closed");
-        require!(now < bounty.expires_at_ns, "bounty has expired");
+        // No expiry check here: a reveal always leaves a full verdict window before expiry, and the window alone bounds
+        // the proof. Refusing a proof after expiry while the timeout still paid was audit finding F1.
         require!(bounty.opened, "bounty is not open: Proof 0 has not been proved");
         let sub = self
             .submissions

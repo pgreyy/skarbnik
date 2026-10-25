@@ -142,3 +142,16 @@ fn level2_unrevealed_fee_goes_to_the_pool_not_the_vendor() {
         .sum();
     assert_eq!(to_vendor, NearToken::from_near(1).as_yoctonear());
 }
+
+// Audit round 1, fix 1 (auditor finding F1): a junk reveal just before expiry can no longer be paid by timeout.
+#[test]
+#[should_panic(expected = "too close to expiry: a commit")]
+fn audit_f1_level2_last_minute_commit_is_refused() {
+    let mut c = with_bounty(LEVEL_2, v::IMAGE_ID, 16, 32); // expiry T0 + 3600 s, reveal window 120 s, verdict window 600 s
+    at("anyone.testnet", T0 + SEC, NearToken::from_yoctonear(0));
+    c.open_with_groth16(U64(0), bytes(v::SEAL), bytes(v::JOURNAL));
+    at("thief.testnet", T0 + 2 * SEC, NearToken::from_near(1));
+    c.deposit_credit(None);
+    at("thief.testnet", T0 + 3590 * SEC, NearToken::from_yoctonear(0));
+    c.commit(U64(0), "aa".repeat(32), acc("thief.testnet"));
+}
