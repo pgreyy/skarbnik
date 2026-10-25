@@ -38,7 +38,11 @@ BOUNTY_STEPS = [
     ("docs/evidence/audit1/transactions.tsv", "scripts/audit1_testnet.sh", {9: ["x_", "fix1_", "fix2_", "fix3_", "fix4_"]}),
     ("docs/evidence/hardening/transactions.tsv", "scripts/hardening_testnet.sh", {10: ["lim_", "s6_"], 11: ["split_", "s7_", "s3_"]}),
     ("docs/evidence/S18/transactions.tsv", "scripts/s18_live_bounty.sh", {12: ["s18_"]}),
+    ("docs/evidence/web/transactions.tsv", "scripts/web_testnet.sh", {13: ["web_bounty_", "web_commit", "web_reveal", "web_claim_"],
+                                                                      7: ["web_commit_no_credit"]}),
 ]
+# Steps whose name starts like another bounty's prefix but belong elsewhere
+EXCLUDE = {13: {"web_commit_no_credit"}}
 
 out = {"contract": CONTRACT, "network": "testnet", "bounties": {}, "notes": {}}
 
@@ -51,7 +55,7 @@ for path, script, rules in BOUNTY_STEPS:
             if any(row["step"].startswith(p) for p in prefixes) and not (
                     "s_" in prefixes and row["step"][:3] in ("s2_", "s6_", "s7_", "s3_") or
                     "s_" in prefixes and row["step"].startswith("s18_")):
-                if not (ok(row) or refused(row)):
+                if not (ok(row) or refused(row)) or row["step"] in EXCLUDE.get(bid, set()):
                     continue
                 out["bounties"].setdefault(str(bid), []).append({
                     "step": row["step"], "method": row["method"], "tx": row["tx_hash"],

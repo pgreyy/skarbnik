@@ -1,0 +1,46 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args {"bounty_id":"13","fingerprint":"b7b063d1dbe8b5b099e7dc191fd4a6973ea1a61e4b8c4b5f6f20c6cc25352835","payout":"kintsugi-web-1e80c1.testnet"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-web-1e80c1.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-25T16:55:08.061894526Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-web-1e80c1.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  commit
+│                       args:         {
+│                                       "bounty_id": "13",
+│                                       "fingerprint": "b7b063d1dbe8b5b099e7dc191fd4a6973ea1a61e4b8c4b5f6f20c6cc25352835",
+│                                       "payout": "kintsugi-web-1e80c1.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:G88SCpfSkrSLARdaGnaYYyuUdVgVbDt1AGjShuJdGGBa
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.315 Tgas
+│    Transaction fee: 0.000031492595496 NEAR
+│    Transaction ID: CuF5BT4acSdA14Y6mFUxL4Nc2mqj14ZquukVaGW5aQHH
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/CuF5BT4acSdA14Y6mFUxL4Nc2mqj14ZquukVaGW5aQHH
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"commit_ignored","data":[{"bounty_id":"13","committer":"kintsugi-web-1e80c1.testnet","reason":"max_commits reached"}]}
+│    Logs [kintsugi-web-1e80c1.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+null
+
+
+The "commit" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-web-1e80c1.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"13","fingerprint":"b7b063d1dbe8b5b099e7dc191fd4a6973ea1a61e4b8c4b5f6f20c6cc25352835","payout":"kintsugi-web-1e80c1.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-web-1e80c1.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=6.46

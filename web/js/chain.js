@@ -26,11 +26,11 @@ async function rpc(url, method, args) {
   }
 }
 
-// One view call, trying the second RPC if the first fails. Results are kept for 20 seconds.
-export async function view(method, args = {}) {
+// One view call, trying the second RPC if the first fails. Results are kept for 20 seconds unless opts.fresh is set.
+export async function view(method, args = {}, opts = {}) {
   const key = method + JSON.stringify(args);
   const hit = cache.get(key);
-  if (hit && Date.now() - hit.t < 20000) return hit.v;
+  if (!opts.fresh && hit && Date.now() - hit.t < 20000) return hit.v;
   let last;
   for (const url of RPCS) {
     try {

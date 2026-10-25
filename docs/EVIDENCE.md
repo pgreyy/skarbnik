@@ -5,6 +5,42 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Site: wallet, credit and attempts on testnet
+
+Question: do the calls the site builds for credit and attempts work on the live contract, with the commit fingerprint
+computed by the page's own browser code? Script: `scripts/web_testnet.sh` (phases account, bounty, credit, attempt,
+refusals, close). Raw output: `docs/evidence/web/` (`summary.txt`, `transactions.tsv`, `steps/`).
+
+The throwaway account `kintsugi-web-1e80c1.testnet
+` was made by the testnet faucet (its key stays in the near-cli keychain outside the
+repository; never printed). The runs send the same method names and arguments the page sends; the fingerprint comes from
+`web/js/attempt.js` (`node scripts/web_fingerprint.mjs`). The wallet's own approval window needs a person and is not part
+of this run.
+
+| Step | Transaction | Result |
+| --- | --- | --- |
+| throwaway account from the faucet | `Btvxspzt7PgwCjsYSgz1vdDrFF3WmQFiavYHCCZSbXzG` | 10 NEAR test balance |
+| test bounty 13 (K = 1, Level 2) created and opened with the demo Proof 0 | `FES2dBwk3EbwCeZjB96P7FzXadCZ4iSdQgnNavPf9d5L`, `4M2VuVB9ZtMg13ew9TKCtXqogHsNzbVBU6a2pKktpcy7` | opened |
+| deposit_credit 0.05 NEAR | `CEuQ1KxQQYciRvNa2W9QRRnHscmpYd5wcMV9mF4Sc6Hg` | credit 0 to 0.05 NEAR |
+| commit (fingerprint from the page's code) | `5zWv1CAx54SSJJTJNppkUAX1iZQJoB35kYsasCwN6WZo` | returned 0; credit 0.05 to 0.04 NEAR (fee 0.01 NEAR taken from credit) |
+| a second commit, cap full | `CuF5BT4acSdA14Y6mFUxL4Nc2mqj14ZquukVaGW5aQHH` | returned null; credit unchanged (nothing taken) |
+| reveal with the page's nonce and the patch | `GUezy4icBnX83yJ5wbZ7sUYFHUKHGVVEB1Evuox7f5Ee` | accepted: the contract recomputed the same fingerprint; patch hash matches the file |
+| withdraw_credit of the rest, 1 yoctoNEAR attached | `GJpu5K5hD4vQZWKwV6cjzNbTNiLQNmfNwQwFzMqEkrx4` | credit 0.04 NEAR to 0 |
+| commit on bounty 7 with no credit | `BQUH7nKfAy67ncH5rqPNxEq3Shtvix58YYf7E75zAJ4c` | refused: "not enough credit for the attempt fee: call deposit_credit first"; bounty 7 unchanged |
+| claim_timeout of the junk attempt after its deadline (vendor silent) | `BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC` | test bounty 13 Paid; the throwaway account received 0.11 NEAR (0.1 bounty + 0.01 fee) |
+
+Mistake: I started the close phase a second time while the first copy was still waiting in the background; the second
+copy's call was not sent (no transaction id). Details in `summary.txt`.
+
+Browser checks (headless browser, local server): the real outcomes of the commit, the cap full commit, the refused commit
+and the withdrawal, fetched from the RPC, read correctly by the page's own `readOutcome` (attempt index 0, null, the
+contract's refusal text, success). Clicking "Connect wallet" opens https://testnet.mynearwallet.com/login/ with only
+`success_url` and `failure_url`: no `contract_id` and no `public_key`, so no key is made for the site; browser storage
+then holds only the wallet selector's two preference entries. No script errors on the bounty and agent pages.
+
+Not run: the wallet's approval window (a person must approve in MyNearWallet); a PASS on the page (only the vendor can
+prove an attempt).
+
 ## S18: a live Level 2 bounty whose secret is not in the repository
 
 Question: can the vendor side run with a secret crashing input that exists only on the vendor's machine, a private random

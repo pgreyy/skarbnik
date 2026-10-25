@@ -1,7 +1,8 @@
 <!doctype html>
-<!-- Kintsugi site, first version (read only). The page shell: strip, header, main view, footer with the theme switcher,
-     toast, live region and the intro layer. js/app.js renders each screen into <main> from live testnet data and from
-     the recorded files in data/. Nothing on this site can sign or send a transaction. -->
+<!-- Kintsugi site (testnet). The page shell: strip, header with the wallet control, main view, footer with the theme
+     switcher, the credit and confirm dialogs, toast, live region and the intro layer. js/app.js renders each screen into
+     <main> from live testnet data and from the recorded files in data/. Transactions are only ever signed in the
+     visitor's wallet after a confirm step (js/wallet.js); this page holds no key. -->
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
@@ -21,19 +22,20 @@
 <body>
 <div class="m-app" id="app">
   <a class="k-skip" href="#main">Skip to content</a>
-  <div class="m-strip"><span>Live data from kintsugi-l2-cihdp.testnet, read only. Testnet only, no token.</span></div>
+  <div class="m-strip"><span>Live data from kintsugi-l2-cihdp.testnet. Testnet only, test NEAR, no token.</span></div>
   <header class="m-hd">
     <a class="m-brand" href="#/" id="brand"></a>
-    <span class="m-pills"><span class="m-tag">Testnet</span><span class="m-tag">Read only</span></span>
+    <span class="m-pills"><span class="m-tag">Testnet</span></span>
     <button class="m-menu" type="button" aria-expanded="false" aria-controls="sheet" id="menuBtn">Menu</button>
     <div class="m-sheet" id="sheet">
       <nav class="m-nav" aria-label="Main">
         <a href="#/bounties" data-nav="bounties">Bounties</a>
         <a href="#/arena" data-nav="arena">Arena</a>
         <a href="#/verify" data-nav="verify">How to verify</a>
-        <a href="agent-quickstart.txt">For agents</a>
+        <a href="#/agent" data-nav="agent">For agents</a>
       </nav>
     </div>
+    <div class="k-wallet" id="walletArea" aria-live="polite"></div>
   </header>
   <main class="m-view" id="main" tabindex="-1"><p class="k-state">Loading…</p></main>
   <footer class="m-view" style="min-height:0;padding-top:0">
@@ -52,6 +54,8 @@
       </div>
     </div>
   </footer>
+  <dialog class="k-sheet" id="creditDlg" aria-labelledby="creditTitle"></dialog>
+  <dialog class="k-sheet k-conf" id="confirmDlg" aria-labelledby="confTitle"></dialog>
   <div class="m-toast" role="status" id="toast" hidden></div>
   <div class="sr-only" role="status" aria-live="polite" id="live"></div>
 </div>

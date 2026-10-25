@@ -67,6 +67,15 @@ Each guard: what it stops, where it lives, and what shows it works.
 | A Level 2 proof's cheap binding checks (submission id, seed, candidate, bounty fields; for Proof 0 the journal hash, reference fix and verdict) run before the pairing check (audit hardening S3) | An honest mistake or a replayed proof burning the whole proof check; unclear errors | `submit_groth16`, `open_with_groth16` | unit tests `s1_*`, `s2_*`, `level2_changed_journal_refused`; testnet `s3_proof_of_another_bounty` |
 | The journal parser refuses every malformed journal (wrong length, a byte word above 255, a verdict other than 0 or 1) and a seal that is not 256 bytes; a Proof 0 journal is refused as an attempt and an attempt journal as Proof 0; one changed byte of the control root fails the check (audit hardening S2) | Malformed or mixed-up proofs | `groth16::parse_journal`, `groth16::verify` | unit tests `s2_*` in `contract/src/tests_level2_attempts.rs` |
 
+### The site (web/)
+
+| Guard | What it stops | Shown by |
+| --- | --- | --- |
+| Wallet sign in asks for no contract key; every transaction is approved in the visitor's wallet (MyNearWallet) | The page, or anyone who reads its storage, signing for the visitor | `docs/evidence/web/`: the sign in address carries no `contract_id` or `public_key`; browser storage holds only the selector's preferences |
+| A confirm step before every payment (deposit, withdraw, commit), showing the amount with its unit; a commit's confirm shows the fee, slots left of the cap and "Each attempt returns one yes or no." | Paying by accident | `web/js/account-ui.js` |
+| Before a commit the page reads the chain again and stops, without sending, what the contract would refuse: bounty closed, cap full, not enough credit, a fee above the account's own limit, a payout the limits do not allow, a payout that is the vendor, a verifier or the contract, or one that does not exist | Lost fees and lost payouts (review finding 8) | `web/js/account-ui.js` (`review`) |
+| The page shows a result only from the chain: after a reveal it says "Waiting for the vendor's proof"; the PASS stamp only for an attempt whose outcome on chain is Passed | A faked result | `web/js/account-ui.js` (`attemptPanel`) |
+
 ### Keys
 
 | Guard | What it stops | Shown by |
@@ -231,6 +240,12 @@ Each guard: what it stops, where it lives, and what shows it works.
 - The protocol fee pool (fees of commits never revealed, and Level 2 fees of decided attempts) stays locked in the
   contract as a reserve for storage. No method withdraws it, by design (owner's decision, 2026-10-25): it pays no one,
   so no one profits from junk or missed reveals. `get_protocol_pool` shows its size.
+- The site keeps an attempt's record (bounty, index, payout, nonce, patch) in the browser's local storage for this site and
+  offers it as a file. It holds no key and cannot move money, but without it the attempt cannot be revealed, and an
+  attempt not revealed in time loses its fee. Clearing the browser's site data before revealing loses it.
+- The site's wallet code is a third party bundle (`web/vendor/near-wallet.js`, exact versions and sha256 in
+  docs/VERSIONS.md); sign in and approvals happen on testnet.mynearwallet.com. The wallet's approval window was not run
+  by a script, only by hand.
 - Agent limits are stored per account under a raw storage key with no storage deposit, like the rest of the contract
   (audit finding 12).
 - The contract audit (docs/AUDIT.md) lists every finding, its status and the suggested hardening.
@@ -240,6 +255,8 @@ Each guard: what it stops, where it lives, and what shows it works.
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-25 (site, branch ui-preview): wallet connection, credit panel and sending attempts; guards for the site.
 
 - 2026-10-25 (owner's decisions on the hardening round): the S7 split kept, its worst case stated; bounty 12's limits
   stated; Groth16 memory guard 500 MiB with a reminder to close editor windows (`scripts/watch_mem.sh`).

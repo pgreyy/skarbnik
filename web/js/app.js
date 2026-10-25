@@ -1,20 +1,17 @@
 // The Kintsugi site app: routes (#/, #/bounties, #/bounties/<id>, #/arena, #/verify), the theme switcher, the mobile
 // menu, and the five screens. Live screens read the testnet contract with view calls (js/chain.js); recorded screens
 // read data/recorded.json, which scripts/gen_site_recorded.py builds from files in the repository. No sample data.
-import { CONTRACT, EXPLORER_TX, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, allBounties, submissions, near, utc, span, left, commitBy, nsToDate } from './chain.js';
+import { CONTRACT, PUBLISHED_IMAGE_ID, view, allBounties, submissions, near, utc, span, left, commitBy, nsToDate } from './chain.js';
 import { logo, NAME } from './logo.js';
 import { startIntro, introWanted } from './intro.js';
+import { $, esc, badge, tx, acct, toast } from './ui.js';
+import { initAccountUi, attemptPanel, agentPage } from './account-ui.js';
 
-const $ = (s, el = document) => el.querySelector(s);
-const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 let recorded = null;
 const getRecorded = async () => recorded || (recorded = await (await fetch('data/recorded.json')).json());
 
 // ---------- shared pieces ----------
-const badge = (variant, text) => `<span class="m-badge b-${variant}">${esc(text)}</span>`;
-const tx = (hash) => `<a href="${EXPLORER_TX}${encodeURIComponent(hash)}" rel="noopener" target="_blank">${esc(hash)}</a>`;
-const acct = (a) => `<a class="m-a k-mono k-hash" style="padding:0" href="${EXPLORER_ACCOUNT}${encodeURIComponent(a)}" rel="noopener" target="_blank">${esc(a)}</a>`;
 const rec = (src) => `<span class="k-rec">Recorded</span> <span class="k-src">${esc(src)}</span>`;
 const levelText = (l) => (l === 2 ? 'The contract checks a Groth16 proof of the RISC Zero result itself.' : 'Two registered verifiers sign the same verdict.');
 const isDemo = (b) => recorded && b.exploit_commitment === recorded.notes.demo_exploit_commitment.commitment;
@@ -151,12 +148,13 @@ async function bounties(main) {
 
 async function bounty(main, id) {
   main.innerHTML = `<a class="m-back" href="#/bounties">← All bounties</a><h1 class="m-h1" tabindex="-1">Bounty ${esc(id)}</h1><div id="b"><p class="k-state">Reading bounty ${esc(id)} from testnet…</p></div>`;
-  let b, subs, rd;
+  let b, subs, rd, verifiers;
   try {
     rd = await getRecorded();
     b = await view('get_bounty', { bounty_id: String(id) });
     if (!b) { $('#b').innerHTML = `<div class="m-panel"><p>There is no bounty ${esc(id)} on ${esc(CONTRACT)}.</p></div>`; return; }
     subs = await submissions(b);
+    verifiers = (await view('get_verifiers')).map((v) => v.account_id);
   } catch (e) { $('#b').innerHTML = failBox(e); return; }
   const st = bountyState(b), slots = slotList(b, subs), txs = rd.bounties[String(b.id)] || [];
   const demo = isDemo(b), imgOk = b.image_id === PUBLISHED_IMAGE_ID;
@@ -180,9 +178,10 @@ async function bounty(main, id) {
       </section>
     </div>
     <div class="m-col m-mid">
+      <section class="m-panel" id="sendPanel" aria-labelledby="sendT"></section>
       <section class="m-panel" aria-labelledby="kf"><h2 class="m-h2" id="kf">Key facts, live</h2>
         <dl class="m-facts">
-          ${fact('Amount held', `<span class="k-mono">${esc(near(b.amount))}</span>`)}
+          ${fact('Bounty amount', `<span class="k-mono">${esc(near(b.amount))}</span>`)}
           ${fact('State on chain', esc(b.state) + (b.opened ? ', opened' : ', not opened'))}
           ${b.state === 'Open' ? fact('Next attempt fee', `<span class="k-mono">${esc(near(b.next_fee))}</span> (from credit)`) : ''}
           ${fact('Fee rule', `${esc(near(b.attempt_fee))} + ${esc(near(b.fee_step))} per earlier attempt`)}
@@ -204,7 +203,7 @@ async function bounty(main, id) {
         </dl>
       </section>
       <section class="m-panel" aria-labelledby="tx"><h2 class="m-h2" id="tx">Transactions</h2>
-        ${txs.length ? `<p class="m-sub">${rec(txs[0].source)}</p><ul class="k-txs">${txs.map((t) => `<li><span><b>${esc(t.step)}</b> <span class="k-src">${esc(t.method)}, ${esc(t.result)}</span><br>${tx(t.tx)}</span></li>`).join('')}</ul>`
+        ${txs.length ? `<p class="m-sub">${rec([...new Set(txs.map((t) => t.source))].join(', '))}</p><ul class="k-txs">${txs.map((t) => `<li><span><b>${esc(t.step)}</b> <span class="k-src">${esc(t.method)}, ${esc(t.result)}</span><br>${tx(t.tx)}</span></li>`).join('')}</ul>`
           : '<p class="m-sub">No transactions for this bounty are recorded in the repository. The chain view above is still live.</p>'}
       </section>
     </div>
@@ -226,6 +225,7 @@ async function bounty(main, id) {
       </section>
     </div>
   </div>`;
+  attemptPanel($('#sendPanel'), b, subs, verifiers);
 }
 
 async function arena(main) {
@@ -354,8 +354,6 @@ function tabs(root, sel, onSelect) {
   });
 }
 
-let toastTimer;
-function toast(text) { const t = $('#toast'); t.textContent = text; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2200); }
 
 let pref = 'system';
 const dark = matchMedia('(prefers-color-scheme: dark)');
@@ -375,7 +373,7 @@ $('#brand').innerHTML = `${logo(28)}<span>${NAME}</span>`;
 
 async function route() {
   const main = $('#main'), h = location.hash.replace(/^#\/?/, '');
-  const [page, id] = h.split('/');
+  const [page, id] = h.split('?')[0].split('/');
   setMenu(false);
   document.querySelectorAll('[data-nav]').forEach((a) => a.toggleAttribute('aria-current', false));
   const cur = page === 'bounties' ? 'bounties' : page;
@@ -386,6 +384,7 @@ async function route() {
     else if (page === 'bounties') await bounties(main);
     else if (page === 'arena') await arena(main);
     else if (page === 'verify') await verify(main);
+    else if (page === 'agent') await agentPage(main);
     else main.innerHTML = '<h1 class="m-h1" tabindex="-1">Page not found</h1><p class="m-lead"><a class="m-a" href="#/">Go to the home page</a></p>';
   } catch (e) { main.innerHTML = `<h1 class="m-h1" tabindex="-1">Something went wrong</h1><div class="k-state" role="alert"><p class="k-err">This page could not be shown.</p><p class="m-note">${esc(e.message)}</p></div>`; }
   const h1 = main.querySelector('h1');
@@ -398,4 +397,5 @@ async function route() {
 window.addEventListener('hashchange', async () => { const h1 = await route(); if (h1) h1.focus({ preventScroll: true }); });
 $('#replayIntro').addEventListener('click', () => { if (location.hash && location.hash !== '#/') location.hash = '#/'; startIntro(true); });
 applyTheme();
+initAccountUi();
 route().then(() => { if (introWanted()) startIntro(false); });

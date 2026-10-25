@@ -2,6 +2,22 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Site, wallet, credit and attempts (branch ui-preview)
+
+- Wallet: NEAR wallet selector 10.1.4 with the MyNearWallet module, testnet only, bundled once into
+  `web/vendor/near-wallet.js` by `scripts/wallet-vendor/build.sh` (exact versions in its lockfile; sha256 in
+  docs/VERSIONS.md). Sign in asks for no contract key, so the page holds no key; every transaction opens the wallet.
+- Header: Connect wallet, connecting, connected (account menu: copy name, view credit, disconnect), not a testnet
+  account, failed with a retry; the credit chip. Credit panel: credit and wallet balance, deposit and withdraw with a
+  confirm step, waiting, done or failed; "No credit yet". Bounty page: Commit, Reveal, Wait for the vendor's proof, a
+  confirm sheet before the commit, checks before sending, plain result states. Agent check page (#/agent), read only.
+- Testnet run with a faucet throwaway account (`scripts/web_testnet.sh`): deposit, commit (fingerprint from the page's
+  code), a commit past the cap (null, nothing taken), reveal (accepted), withdraw, a commit with no credit (refused), and
+  the timeout of the test bounty. EVIDENCE, "Site: wallet, credit and attempts".
+- Mistakes: my own test harness showed "could not read" for credit (the panels now load credit themselves); the phone
+  header overflowed (the wallet control moved to a second row); I started a testnet phase twice, the second copy sent
+  nothing.
+
 ## 2026-10-25: Site, first version (read only), branch ui-preview
 
 - Built `web/` from the Gilt Arena design handoff: Light, Night and System themes, desktop and phone layouts, Young

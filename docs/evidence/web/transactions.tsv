@@ -1,0 +1,12 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+web_create_account	create-account	kintsugi-web-1e80c1.testnet	Btvxspzt7PgwCjsYSgz1vdDrFF3WmQFiavYHCCZSbXzG	-	-	0	4.37
+web_bounty_create	create_bounty	kintsugi-vendor-prnvm.testnet	FES2dBwk3EbwCeZjB96P7FzXadCZ4iSdQgnNavPf9d5L	0.353 Tgas	0.000035230998752	0	6.84
+web_bounty_open	open_with_groth16	kintsugi-res2-prnvm.testnet	4M2VuVB9ZtMg13ew9TKCtXqogHsNzbVBU6a2pKktpcy7	0.377 Tgas	0.000037681941703	0	5.65
+web_deposit_credit	deposit_credit	kintsugi-web-1e80c1.testnet	CEuQ1KxQQYciRvNa2W9QRRnHscmpYd5wcMV9mF4Sc6Hg	0.310 Tgas	0.0000309633062595	0	6.43
+web_commit	commit	kintsugi-web-1e80c1.testnet	5zWv1CAx54SSJJTJNppkUAX1iZQJoB35kYsasCwN6WZo	0.315 Tgas	0.000031492595496	0	5.51
+web_commit_cap_full	commit	kintsugi-web-1e80c1.testnet	CuF5BT4acSdA14Y6mFUxL4Nc2mqj14ZquukVaGW5aQHH	0.315 Tgas	0.000031492595496	0	6.46
+web_reveal	reveal	kintsugi-web-1e80c1.testnet	GUezy4icBnX83yJ5wbZ7sUYFHUKHGVVEB1Evuox7f5Ee	0.319 Tgas	0.000031893138702	0	5.53
+web_withdraw_credit	withdraw_credit	kintsugi-web-1e80c1.testnet	GJpu5K5hD4vQZWKwV6cjzNbTNiLQNmfNwQwFzMqEkrx4	0.311 Tgas	0.0000310491369465	0	5.83
+web_commit_no_credit	commit	kintsugi-web-1e80c1.testnet	BQUH7nKfAy67ncH5rqPNxEq3Shtvix58YYf7E75zAJ4c	-	-	rpc:failed	-
+web_claim_timeout	claim_timeout	kintsugi-ver3-prnvm.testnet	-	-	-	1	2.72
+web_claim_timeout	claim_timeout	kintsugi-ver3-prnvm.testnet	BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC	0.311 Tgas	0.0000310014532315	0	6.97

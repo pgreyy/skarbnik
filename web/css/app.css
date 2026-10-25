@@ -322,3 +322,41 @@ a.m-bid,a.m-link,a.m-back{text-decoration:underline}
 .m-app .m-nav a{color:var(--mut)}
 .m-app .m-nav a[aria-current=page]{color:var(--ink)}
 .m-app a.m-brand{color:var(--ink)}
+/* Wallet control in the header */
+.k-wallet{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.k-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;background:var(--surface);color:var(--sink);border:2px solid var(--bd);border-radius:var(--r);font-family:'Space Mono',ui-monospace,monospace;font-size:13px}
+.k-chip b{font-weight:700}
+.k-acct{position:relative}
+.k-acct .m-btn{text-transform:none;letter-spacing:0;font-family:'Space Mono',ui-monospace,monospace;font-weight:700}
+.k-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:220px;padding:6px;background:var(--surface);border:2.5px solid var(--bd);border-radius:var(--r);box-shadow:5px 5px 0 var(--shd);--ink:var(--sink)}
+.k-menu button{display:block;width:100%;min-height:44px;padding:0 12px;text-align:left;background:none;border:0;color:var(--sink);font-weight:600}
+.k-menu button:hover{background:var(--line)}
+.k-werr{font-size:14px;color:var(--bad);font-weight:700;max-width:320px}
+/* Dialogs: a sheet on the right on desktop, full screen on a phone */
+.k-sheet{--ink:var(--sink);--mut:var(--smut);--link:var(--slink);color:var(--sink);background:var(--surface);border:2.5px solid var(--bd);border-radius:var(--r);box-shadow:5px 5px 0 var(--shd);padding:20px;font-family:'Archivo',system-ui,sans-serif;font-size:16px;line-height:1.5;margin:0 0 0 auto;width:min(460px,100vw);max-height:100vh;height:100vh;overflow:auto}
+.k-sheet.k-conf{margin:auto;height:auto;max-height:90vh}
+.k-sheet::backdrop{background:rgba(18,4,3,.55)}
+.k-sheet :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.k-sheet a{color:var(--slink)}
+.k-sheet .m-facts{margin:12px 0}
+.k-confirm{padding:12px;border:2px solid var(--bd);border-radius:var(--r);margin-top:8px}
+/* Messages and attempt records */
+.k-msg{padding:12px 14px;margin:10px 0;border:2px solid currentColor;border-radius:var(--r);font-size:15px}
+.k-msg.ok{color:var(--ok);background:var(--okbg)}
+.k-msg.bad{color:var(--bad);background:var(--badbg)}
+.k-msg.info{color:var(--sink);border-style:dashed}
+.k-msg a{color:inherit}
+.k-mines{display:flex;flex-direction:column;gap:10px;margin:10px 0}
+.k-mine{padding:12px;border:1.5px solid var(--line);border-radius:var(--r)}
+.m-sstep{list-style:none;padding:0}
+.m-sstep li{font-size:14px;font-weight:600}
+/* The PASS stamp: shown only when the chain says an attempt passed */
+.k-stamp{display:inline-block;margin:4px 12px 8px 0;padding:6px 18px;background:#E3B341;color:#2A0805;border:3px solid #2A0805;box-shadow:5px 5px 0 var(--shd);font-family:'Archivo',system-ui,sans-serif;font-weight:800;font-size:28px;letter-spacing:.04em;transform:rotate(-8deg)}
+@media (max-width:760px){
+  .m-hd .k-wallet{order:1;margin-left:auto}
+  .m-hd .m-menu{order:2}
+  .k-chip{font-size:12px;padding:0 8px}
+  .k-sheet,.k-sheet.k-conf{width:100vw;max-width:100vw;height:100vh;max-height:100vh;margin:0;border-radius:0}
+}
+@media (max-width:760px){.m-hd .m-pills{display:flex;order:0}.m-hd .m-pills .m-tag{font-size:11px;padding:1px 6px;min-height:22px}}
+@media (max-width:760px){.m-hd{flex-wrap:wrap}.m-hd .m-menu{order:1;margin-left:auto}.m-hd .k-wallet{order:3;width:100%;margin:0 0 4px;justify-content:flex-end}}

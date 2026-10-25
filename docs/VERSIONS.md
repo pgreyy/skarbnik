@@ -79,6 +79,17 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | RISC Zero Groth16 prover image (Docker, CPU path) | `risczero/risc0-groth16-prover:v2025-04-03.1`, digest `sha256:a4f80ce2e0b8e2bb7637a93c37136a6776ac00ec843a3fdf1c67b1d5ffea64ee` (the tag `risc0-groth16` 3.0.5 runs) | `docker image inspect risczero/risc0-groth16-prover:v2025-04-03.1` |
 | risc0-binfmt (build dependency of `harness`, prebuilt guest mode) | 3.0.5 (pinned `=3.0.5`, the version risc0-build 3.0.6 uses) | `harness/Cargo.toml` |
 
+## Site wallet (bundled once into web/vendor/near-wallet.js by scripts/wallet-vendor/build.sh)
+
+| Package | Version | Where |
+| --- | --- | --- |
+| @near-wallet-selector/core | 10.1.4 | `scripts/wallet-vendor/package.json`, `package-lock.json` |
+| @near-wallet-selector/my-near-wallet | 10.1.4 | same; sign in and approvals at https://testnet.mynearwallet.com |
+| @near-js/* (accounts, crypto, providers, signers, transactions, types, utils) | 2.5.1 | `package-lock.json` |
+| buffer, events, util (browser versions of Node modules) | 6.0.3, 3.3.0, 0.12.5 | `package-lock.json` |
+| esbuild (bundler, build time only) | 0.25.10 | `package-lock.json` |
+| Bundle | sha256 `eb8559631cb93c556d5e1a55f28cae05ef0de1e3b7352696b7607b495e5707aa` | `sha256sum web/vendor/near-wallet.js` |
+
 ## Other
 
 | Tool | Version | Command |

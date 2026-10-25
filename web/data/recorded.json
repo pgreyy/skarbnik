@@ -344,6 +344,14 @@
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "web_commit_no_credit",
+    "method": "commit",
+    "tx": "BQUH7nKfAy67ncH5rqPNxEq3Shtvix58YYf7E75zAJ4c",
+    "result": "refused by the contract",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
    }
   ],
   "9": [
@@ -632,6 +640,56 @@
     "result": "succeeded",
     "source": "docs/evidence/S18/transactions.tsv",
     "script": "scripts/s18_live_bounty.sh"
+   }
+  ],
+  "13": [
+   {
+    "step": "web_bounty_create",
+    "method": "create_bounty",
+    "tx": "FES2dBwk3EbwCeZjB96P7FzXadCZ4iSdQgnNavPf9d5L",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "web_bounty_open",
+    "method": "open_with_groth16",
+    "tx": "4M2VuVB9ZtMg13ew9TKCtXqogHsNzbVBU6a2pKktpcy7",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "web_commit",
+    "method": "commit",
+    "tx": "5zWv1CAx54SSJJTJNppkUAX1iZQJoB35kYsasCwN6WZo",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "web_commit_cap_full",
+    "method": "commit",
+    "tx": "CuF5BT4acSdA14Y6mFUxL4Nc2mqj14ZquukVaGW5aQHH",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "web_reveal",
+    "method": "reveal",
+    "tx": "GUezy4icBnX83yJ5wbZ7sUYFHUKHGVVEB1Evuox7f5Ee",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "web_claim_timeout",
+    "method": "claim_timeout",
+    "tx": "BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC",
+    "result": "succeeded",
+    "source": "docs/evidence/web/transactions.tsv",
+    "script": "scripts/web_testnet.sh"
    }
   ]
  },

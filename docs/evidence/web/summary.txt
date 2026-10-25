@@ -1,0 +1,14 @@
+throwaway account kintsugi-web-1e80c1.testnet, balance 10000000000000000000000000 yoctoNEAR
+test bounty 13: {'level': 2, 'opened': True, 'max_commits': 1, 'next_fee': '10000000000000000000000'}
+deposit_credit 0.05 NEAR: credit 0 -> 50000000000000000000000 yoctoNEAR
+commit: returned 0, credit 50000000000000000000000 -> 40000000000000000000000 yoctoNEAR
+second commit (K = 1): returned null, credit 40000000000000000000000 -> 40000000000000000000000 yoctoNEAR
+reveal: patch_hash matches the file: yes, outcome Open, fingerprint matches the page's: yes
+withdraw_credit 40000000000000000000000 yoctoNEAR with 1 yoctoNEAR: credit now 0
+commit on bounty 7 with no credit: panicked: not enough credit for the attempt fee: call deposit_credit first; bounty 7 commits still 0
+claim_timeout on test bounty 13: state Paid, kintsugi-web-1e80c1.testnet +110000000000000000000000 yoctoNEAR
+claim_timeout on test bounty 13: state Paid, kintsugi-web-1e80c1.testnet +110000000000000000000000 yoctoNEAR
+note on the two claim_timeout lines above: I started the close phase a second time by mistake while the first copy (in the
+background) was still waiting for the deadline. The background copy sent claim_timeout BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC
+(succeeded); the second copy's call was not sent (near-cli exit 1, no transaction id; its output file was overwritten by the
+first copy, so its cause is not recorded). Both lines measured the same single payout of 0.11 NEAR (0.1 bounty + 0.01 fee).

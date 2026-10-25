@@ -32,7 +32,8 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 | Level 2 bounties: the bounty contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt, and replayed, changed, late or repeated proofs are refused | works on testnet (`kintsugi-l2-cihdp.testnet`: one PASS paid, one FAIL spent, nine attacks refused; 35 to 36 Tgas per proof); Level 0 bounties work as before; each bounty shows its level | `scripts/s6c_testnet.sh` and `cargo test -p kintsugi-contract --offline` (EVIDENCE, S6c) |
 | Fees of commits that are never revealed go to a protocol fee pool, never back to the vendor, so a vendor cannot block its own bounty for free | works on testnet: in the self-block test the vendor side lost 0.045 NEAR in fees and the pool gained exactly 0.045 NEAR; the pool stays locked in the contract as a storage reserve, with no withdraw method (owner's decision, docs/SECURITY.md) | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |
 | A live Level 2 bounty whose secret crashing input is not in the repository and whose commitment uses a private salt. It proves the secret stays private; it uses the public demo bug, so anyone can submit the public `fixed.wasm`, and if the vendor stays silent the timeout rule can pay out without any proof | works on testnet: bounty 12 on `kintsugi-l2-cihdp.testnet`, opened by its own Proof 0; `check_image_id.sh` prints MATCH | `scripts/s18_live_bounty.sh` (EVIDENCE, S18) |
-| A read only site that shows every bounty of the testnet contract live (state, level, attempts used of the cap, next fee, deadlines, image id, slots), the recorded probe agent runs, and the steps to verify a result; a machine readable feed and a plain text quickstart for agents. No wallet: it cannot sign or send anything | works locally (not hosted yet) | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py`; Try it, step 7 |
+| A site that shows every bounty of the testnet contract live (state, level, attempts used of the cap, next fee, deadlines, image id, slots), the recorded probe agent runs, and the steps to verify a result; a machine readable feed and a plain text quickstart for agents | works locally (not hosted yet) | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py`; Try it, step 7 |
+| On the site, with a testnet wallet (MyNearWallet): connect, see and use credit (deposit_credit, withdraw_credit), and send an attempt (commit, then reveal, then wait for the vendor's proof); each payment has a confirm step and is approved in the wallet; the page holds no key | the contract calls and the page's commit fingerprint work on testnet with a throwaway account; the wallet approval window itself was not run by a script | `scripts/web_testnet.sh` (EVIDENCE, "Site: wallet, credit and attempts") |
 | OutLayer (TEE) as one of the two verifiers | not confirmed on testnet yet: OutLayer accepts our jobs but none has been answered (8 of 8 timed out, by link and as an OutLayer project), while OutLayer's own cached test program answers; the contract recorded nothing, as designed | EVIDENCE, S4/S5 and "OutLayer (Level 1) on testnet" |
 
 ## Try it
@@ -62,7 +63,8 @@ guessable when the secret is short or predictable. A real vendor uses the defaul
    reproducible build (S4, S7, S13) show DIFFERENT (docs/SECURITY.md, known limits).
 
 7. Open the site: `python3 -m http.server 8000 --directory web`, then open http://localhost:8000 in a browser. See the
-   intro, then the live bounties read from `kintsugi-l2-cihdp.testnet` (internet needed). To refresh the agent feed:
+   intro, then the live bounties read from `kintsugi-l2-cihdp.testnet` (internet needed). "Connect wallet" signs in
+   with a MyNearWallet testnet account. To refresh the agent feed:
    `python3 -I scripts/gen_feed.py`; to rebuild the recorded data from the evidence files:
    `python3 -I scripts/gen_site_recorded.py`.
 
@@ -93,7 +95,8 @@ Built today (each part has its proof in the table above):
 - A reproducible build of the checker, so anyone can rebuild it and compare its image id with the one a bounty names.
 - The contract checking the proof itself (Level 2), so no verifier has to be trusted for the verdict when the bounty's
   image id is the published checker (on the owner's allowlist).
-- A read only site (`web/`): live bounties, the recorded probe arena, how to verify, a feed and a quickstart for agents.
+- A site (`web/`): live bounties, the recorded probe arena, how to verify, a feed and a quickstart for agents; with a
+  testnet wallet: credit (deposit and withdraw) and sending attempts; a read only agent check page.
 
 Planned next:
 
@@ -101,12 +104,9 @@ Planned next:
 - An agent driven by a language model in place of the scripted one.
 - Faster proving on a GPU.
 - On the site (planned, not built):
-  - connect a wallet;
-  - deposit credit, and take unspent credit back with `withdraw_credit` (it needs 1 yoctoNEAR attached, so it is a
-    wallet action only, never an agent key);
-  - send attempts from the page;
   - create a bounty;
-  - a proof ledger.
+  - a proof ledger;
+  - set agent limits from the page (set_agent_limits; today only by command line).
 - A live bounty on a new original module with its own bug (bounty 12 reuses the public demo bug).
 - After the audit: a "crash proven only" mode, for a vendor who can prove the crash but has no fix yet.
 
