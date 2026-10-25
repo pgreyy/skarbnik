@@ -979,7 +979,7 @@ fn audit_f1_every_reveal_leaves_a_full_verdict_window_before_expiry() {
     assert_eq!(c.get_submission(U64(0), idx).unwrap().revealed_at_ns, Some(U64(T0 + E - W)));
 }
 
-// Audit round 1, fix 2 (auditor finding: the self-attestation rule as a weapon). Naming a verifier as payout blocked that
+// Audit round 1, fix 2 (review finding: the self-attestation rule as a weapon). Naming a verifier as payout blocked that
 // verifier from attesting; with few verifiers no verdict could become final and the timeout paid the researcher.
 #[test]
 #[should_panic(expected = "the payout account cannot be a registered verifier")]
@@ -1007,7 +1007,7 @@ fn audit_h2_vendor_as_payout_is_refused() {
     c.commit(U64(0), fingerprint_hex(PATCH, &vendor()), vendor());
 }
 
-// Audit round 1, fix 3 (auditor finding C2, critical): the earliest reveal has priority for a PASS and for a timeout.
+// Audit round 1, fix 3 (review finding C2, critical): the earliest reveal has priority for a PASS and for a timeout.
 fn second_account_copies(c: &mut Contract, who: &str, t: u64) -> u32 {
     at(acc(who), t, start_credit());
     c.deposit_credit(None);

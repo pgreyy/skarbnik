@@ -1,11 +1,11 @@
-# Contract audit (round 1 and a second review of the fixes)
+# Contract review: AI review passes (round 1 and a second review of the fixes)
 
-Audited commit: `bab84c5f4482801e0a08f5dca2f24947cfabe688` (frozen 2026-10-25 00:44 UTC; no code changed until every
-finding was in). Three independent reviewers, each briefed on one angle (money flow; proof checking; griefing, economics
+Reviewed commit: `bab84c5f4482801e0a08f5dca2f24947cfabe688` (frozen 2026-10-25 00:44 UTC; no code changed until every
+finding was in). Three AI review passes, each briefed on one angle (money flow; proof checking; griefing, economics
 and NEAR-specific traps), were given the code and the design documents only: not the project's own attack table or
 conclusions. Every reported finding was then reproduced by the project with a failing unit test on a copy of the contract
 or with a testnet transaction, or marked unconfirmed. Six fixes followed, one commit each with regression tests; a fourth
-reviewer then checked only the changed code. NEAR testnet only. The reviewers' full reports are private working material;
+AI review pass then checked only the changed code. NEAR testnet only. The full reports of the review passes are private working material;
 this file holds everything that bears on the code.
 
 ## Scope
@@ -36,7 +36,7 @@ allowlist set to the reproducible id with `BLQoFNQ7Vz3Le4TruAgU4YkeKDtexYquQSTcZ
 
 ## Findings
 
-Severity is the reviewers' rating (the highest where they overlapped). "Shown by" names the reproduction (a unit test in
+Severity is the review passes' rating (the highest where they overlapped). "Shown by" names the reproduction (a unit test in
 `contract/src/tests*.rs` after the fix; the pre-fix reproductions are described in the text) or the testnet transaction.
 
 | # | Severity | Finding | Found by | Status | Fix | Shown by |
@@ -58,7 +58,7 @@ Severity is the reviewers' rating (the highest where they overlapped). "Shown by
 | 16 | medium | Second review: the earliest-reveal rule compared reveal times with a strict "earlier than", so two reveals in one block tied and neither blocked the other; with a reveal gap of zero (allowed) a copier who sees a reveal before inclusion could land commit and reveal in one transaction and reproduce finding 2. | second review | fixed | `8762144` | `audit_r2_*` (3 tests); this fix was written after the second review and was not itself independently reviewed |
 | 15 | low | A commit too close to expiry could never be revealed and lost its fee for certain; the vendor cannot cancel an unopened bounty; copycat bounties from the public Proof 0; no chain tag in the submission id. | A, B, C | the first is fixed by fix 1; the rest noted (S11, S13) | `dfd04c3` | `audit_f1_commit_that_cannot_be_decided_before_expiry_is_refused` |
 
-Categories where the reviewers looked and found nothing: the Groth16 verification itself (claim digest, public inputs,
+Categories where the review passes looked and found nothing: the Groth16 verification itself (claim digest, public inputs,
 point negation, byte order), the journal parser (every malformed shape refused before the expensive check), the field
 binding of attempts (all nine fields), replay across bounties, attempts, contracts, levels and Proof 0 versus attempt,
 Level 0 versus Level 2 call confusion, rounding, double payouts, and the credit and fee bookkeeping inside the contract.
@@ -92,9 +92,9 @@ Level 0 versus Level 2 call confusion, rounding, double payouts, and the credit 
 Owner's decision: the pool stays locked in the contract as a declared reserve for storage. There is no method that
 withdraws it and none is planned; it pays no one, so no one (the project included) profits from junk commits or missed
 reveals. `get_protocol_pool` shows its size (0.09 NEAR on `kintsugi-l2-cihdp.testnet` before and after the hardening
-redeploy, `docs/evidence/hardening/summary.txt`). The reviewers' views that led to the decision:
+redeploy, `docs/evidence/hardening/summary.txt`). The review passes' views that led to the decision:
 
-All three reviewers reject paying the pool to the project or owner (conflict of interest: the project would earn from
+All three review passes reject paying the pool to the project or owner (conflict of interest: the project would earn from
 griefing and from agents that miss a reveal window), to the vendor (free self-blocking) and to the verifiers (no work,
 and none at Level 2). They differ on the positive answer:
 
@@ -114,7 +114,7 @@ The contract account's full access key can replace the code; removing or escrowi
 before submission and is not done. Nothing else is owner-only; in particular the owner cannot move bounties, credit or
 the pool.
 
-## The skeptical judge (reviewers' views)
+## The skeptical judge (review passes' views)
 
 The first attacks all three expect: "the vendor picks the program, so your zero knowledge verdict is 'trust the vendor's
 wasm'" (now answered by the allowlist and `check_image_id.sh ... MATCH`); "your timeout pays junk" (fix 1, with tests
@@ -126,8 +126,8 @@ commit and reveal with the payout bound before reveal, and the reproducible chec
 
 ## Suggested hardening (not applied; sorted by value over effort)
 
-From the three reviewers' lists, merged where they overlap; "source" names the reviewer (A money flow, B proof checking,
-C griefing and economics). Value and effort are the reviewers' ratings; where they differed, the higher value and the
+From the three review passes' lists, merged where they overlap; "source" names the review pass (A money flow, B proof checking,
+C griefing and economics). Value and effort are the review passes' ratings; where they differed, the higher value and the
 larger effort are kept. "Judges" marks items that would help the project stand out to a skeptical judge.
 
 | # | Suggestion | Value | Effort | Stored layout | Image id | Source | Judges |
@@ -148,11 +148,11 @@ larger effort are kept. "Judges" marks items that would help the project stand o
 | S14 | Document and operate: remove or escrow the contract account's full access key (a timelock or DAO); state the owner's powers in SECURITY. | high for trust | small (operational) | no | no | A14, C16 | yes |
 | S15 | Simplify the audited surface: remove the Level 1 OutLayer entry points until OutLayer answers on testnet (two methods, one money path and one config key fewer). | low | medium | no | no | A15 | |
 | S16 | Docs and agent script: say that a Level 2 verdict is only as good as the bounty's image id, that `check_image_id.sh` must print MATCH before committing (now also `image_id_allowed` in `get_bounty`), and that the five windows, the fees and K must be read before committing; make the agent script check them. | medium | small | no | no | B10, C17 | yes |
-| S17 | Tests the reviewers found missing and this round did not add: a Level 2 FAIL sweep to the pool in `cargo test` (needs S1), `fee_step = 0`, expire with no verifiers, a storage growth estimate per bounty, and a check that `transfers()` is empty whenever the state does not change. | medium | small to medium | no | no | A16, C15 | |
+| S17 | Tests the review passes found missing and this round did not add: a Level 2 FAIL sweep to the pool in `cargo test` (needs S1), `fee_step = 0`, expire with no verifiers, a storage growth estimate per bounty, and a check that `transfers()` is empty whenever the state does not change. | medium | small to medium | no | no | A16, C15 | |
 | S18 | A live bounty with a private salt and a secret that is not in the repository, so the "fix a bug you are not allowed to see" story is a live instance, not a demonstration. | high | small (one vendor run) | no | no | B judge 3 | yes |
 | S19 | Size the Level 2 verdict window to K times the measured proving time, with the arithmetic in the docs; or run the vendor side on a GPU. | medium | small (docs) | no | no | B5, A8, C M1 | |
 
-### Overclaims the reviewers found (corrected in this round unless noted)
+### Overclaims the review passes found (corrected in this round unless noted)
 
 - README "no verifier has to be trusted for the verdict" and SECURITY "does not trust the vendor's word on a verdict": true only if the bounty's image id is a published checker. Now: the allowlist (fix 5) and `image_id_allowed`; the docs say so.
 - "Stops a bounty whose secret no patch can ever fix": true for the vendor's chosen Proof 0 seed only (S8 open).
@@ -163,7 +163,7 @@ larger effort are kept. "Judges" marks items that would help the project stand o
 
 ## Second review of the changed code
 
-A fourth reviewer read only the diff of the five fixes and the current contract files. Verdict: all five fixes are
+A fourth AI review pass read only the diff of the five fixes and the current contract files. Verdict: all five fixes are
 implemented where they claim and close the stated problems; fee accounting is sound (each fee leaves a bounty exactly once,
 refunds are zeroed before credit is added, no path pays a refunded or closed submission again); the time boundaries are
 consistent at the expiry instant. One medium finding (finding 16 above: the tie in the earliest-reveal rule) became fix 6.
@@ -173,7 +173,7 @@ has an open submission (operational: register verifiers before bounties exist); 
 refunded submissions stay `Open` and counted in `pending` (harmless, misleading in the view); the Level 2 `fees_swept`
 event carries the text "protocol fee pool" where an account id used to be; the three Level 2 paths touched by fixes 1, 3
 and 4 cannot be exercised natively (no attempt proof vector in the unit tests) and rest on the testnet rerun below. The
-reviewer also wrote down a consequence of fix 3: a griefer who reveals junk early forces the vendor to decide it (two
+review pass also wrote down a consequence of fix 3: a griefer who reveals junk early forces the vendor to decide it (two
 attestations at Level 0, one proof at Level 2) before any later PASS is paid, and if the vendor does not, the junk is paid
 by timeout, as a silent vendor is treated today; the honest researcher can only wait, never lose, and no deadlock exists
 because windows are capped.
@@ -227,7 +227,7 @@ Evidence: EVIDENCE, "Audit hardening round"; raw output `docs/evidence/hardening
 
 ## Final review of the code changed since `bab84c5`
 
-One reviewer read only the diff since the audited commit (fixes 1 to 6 and the hardening round) and the files around it,
+One more AI review pass read only the diff since the reviewed commit (fixes 1 to 6 and the hardening round) and the files around it,
 without the project's own conclusions. It found no path that pays twice, strands funds, or lets a cheap check replace the
 pairing check. Its findings and what was done:
 

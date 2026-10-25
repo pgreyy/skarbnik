@@ -143,7 +143,7 @@ fn level2_unrevealed_fee_goes_to_the_pool_not_the_vendor() {
     assert_eq!(to_vendor, NearToken::from_near(1).as_yoctonear());
 }
 
-// Audit round 1, fix 1 (auditor finding F1): a junk reveal just before expiry can no longer be paid by timeout.
+// Audit round 1, fix 1 (review finding F1): a junk reveal just before expiry can no longer be paid by timeout.
 #[test]
 #[should_panic(expected = "too close to expiry: a commit")]
 fn audit_f1_level2_last_minute_commit_is_refused() {
@@ -156,7 +156,7 @@ fn audit_f1_level2_last_minute_commit_is_refused() {
     c.commit(U64(0), "aa".repeat(32), acc("thief.testnet"));
 }
 
-// Audit round 1, fix 5 (auditor finding: the vendor chose the checker program): the owner's allowlist of image ids.
+// Audit round 1, fix 5 (review finding: the vendor chose the checker program): the owner's allowlist of image ids.
 #[test]
 fn audit_f5_allowlist_pins_the_checker() {
     let mut c = with_bounty(LEVEL_2, v::IMAGE_ID, 16, 32); // created while the list is empty: any id is accepted

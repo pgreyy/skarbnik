@@ -1,7 +1,7 @@
-$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host prove data/demo/fixed.wasm --proof0 --exploit ~/.kintsugi-vendor/s18/exploit.hex --bounty s18 --fuzz-count 16 --variants 32 --po2 19 --seed b0f665265248dfb827159a24a7c7cde52b6deaf7ea8460aeafaf7696d4f47927 --out target/s18/proof0.bin
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host prove data/demo/fixed.wasm --proof0 --exploit [a private folder outside the repo] --bounty s18 --fuzz-count 16 --variants 32 --po2 19 --seed b0f665265248dfb827159a24a7c7cde52b6deaf7ea8460aeafaf7696d4f47927 --out target/s18/proof0.bin
 utc_start=2026-10-25T02:27:45Z
 limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=10800
-salt: a new private salt for bounty s18, kept in ~/.kintsugi-salts/ (never printed)
+salt: a new private salt for bounty s18, kept in [a private folder outside the repo] (never printed)
 candidate: data/demo/fixed.wasm
 image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
 receipt kind: composite
@@ -29,3 +29,4 @@ wall_seconds=3404.47
 r0vm_peak_rss_mib=4721 (VmHWM, sampled every 5 s)
 min_available_mib=2042
 result: finished
+# 2026-10-25: the path of the private folder outside the repo was replaced by "[a private folder outside the repo]" in this copy.

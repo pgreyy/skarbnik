@@ -4,14 +4,15 @@ exit=2 error: choose the salt of the secret's commitment: --bounty <name> (a pri
 2 --demo-salt:
 exit=0 salt: the PUBLIC demo salt (--demo-salt); for a real bounty use --bounty <name> journal.exploit_commitment: 9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387 
 3 --bounty selftest-a (new):
-exit=0 salt: a new private salt for bounty selftest-a, kept in ~/.kintsugi-salts/ (never printed) journal.exploit_commitment: fe5e6cc92bb47eaec332f98e9220a9714d9ad1cc2b7660ac7c2680903c68be0d 
+exit=0 salt: a new private salt for bounty selftest-a, kept in [a private folder outside the repo] (never printed) journal.exploit_commitment: fe5e6cc92bb47eaec332f98e9220a9714d9ad1cc2b7660ac7c2680903c68be0d 
    perms: folder 700 file 600 size 32
 4 --bounty selftest-a (again):
 exit=0 salt: the private salt of bounty selftest-a (existing) journal.exploit_commitment: fe5e6cc92bb47eaec332f98e9220a9714d9ad1cc2b7660ac7c2680903c68be0d 
 5 salt file readable by others:
 exit=2 error: the salt file of bounty selftest-a can be read by other users (mode 644); run chmod 600 on it 
 6 --bounty selftest-b:
-exit=0 salt: a new private salt for bounty selftest-b, kept in ~/.kintsugi-salts/ (never printed) journal.exploit_commitment: 5c1ab0497a713007c5414a4b43cf70b907c71bf2fc724c92a66dde8bbdc7edf9 
+exit=0 salt: a new private salt for bounty selftest-b, kept in [a private folder outside the repo] (never printed) journal.exploit_commitment: 5c1ab0497a713007c5414a4b43cf70b907c71bf2fc724c92a66dde8bbdc7edf9 
 7 both flags:
 exit=2 error: --demo-salt and --bounty cannot be used together 
 salt value in any output: False
+# 2026-10-25: the path of the private folder outside the repo was replaced by "[a private folder outside the repo]" in this copy.

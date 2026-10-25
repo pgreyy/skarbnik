@@ -71,7 +71,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 | Guard | What it stops | Shown by |
 | --- | --- | --- |
-| Wallets through NEAR Connect (Intear Wallet, NEAR CLI, MyNearWallet until 31 October 2026), each wallet's script a pinned local copy run in a sandboxed frame; sign in asks for no contract key; every transaction is approved in the wallet | The page signing for the visitor; wallet code changing under the site | `web/vendor/wallets/SHA256SUMS`; `docs/evidence/web/` (NEAR CLI run through the page) |
+| Wallets through NEAR Connect (Intear Wallet and NEAR CLI), each wallet's script a pinned local copy run in a sandboxed frame; sign in asks for no contract key; every transaction is approved in the wallet | The page signing for the visitor; wallet code changing under the site | `web/vendor/wallets/SHA256SUMS`; `docs/evidence/web/` (NEAR CLI run through the page) |
 | A confirm step before every payment (deposit, withdraw, commit), showing the amount with its unit; a commit's confirm shows the fee, slots left of the cap and "Each attempt returns one yes or no." | Paying by accident | `web/js/account-ui.js` |
 | Before a commit the page reads the chain again and stops, without sending, what the contract would refuse: bounty closed, cap full, not enough credit, a fee above the account's own limit, a payout the limits do not allow, a payout that is the vendor, a verifier or the contract, or one that does not exist | Lost fees and lost payouts (review finding 8) | `web/js/account-ui.js` (`review`) |
 | The page shows a result only from the chain: after a reveal it says "Waiting for the vendor's proof"; the PASS stamp only for an attempt whose outcome on chain is Passed | A faked result | `web/js/account-ui.js` (`attemptPanel`) |
@@ -195,7 +195,7 @@ Each guard: what it stops, where it lives, and what shows it works.
   commitment, sha256(salt || secret). With a public salt the commitment is a plain fingerprint of the secret, which
   anyone can match by guessing when the secret is short or predictable. The vendor tools' default is a private random
   salt per bounty (`kintsugi-host ... --bounty <name>`: 32 bytes from /dev/urandom in
-  ~/.kintsugi-salts/<name>.salt, mode 600, reused for every proof of that bounty, never printed or committed);
+  a private folder outside the repo, file mode 600, reused for every proof of that bounty, never printed or committed);
   a real vendor must use it.
 - Proof 0 needs a reference fix: the vendor must already hold a fix that passes every check of the bounty, and it
   proves that fix in Proof 0. A vendor who has found a crash but has no fix at all is not supported yet. The reference
@@ -246,17 +246,20 @@ Each guard: what it stops, where it lives, and what shows it works.
 - The site's wallet code is third party: NEAR Connect and the wallets' own scripts (exact versions and sha256 in
   docs/VERSIONS.md). The page's own code holds no key, but Intear Wallet's script keeps a wallet session key in the
   browser's storage for this site (it cannot spend on chain; owner's decision, 2026-10-25). Intear's script has no
-  versioned address, so the copy is pinned by sha256 and must be refreshed by hand if Intear changes it. MyNearWallet is
-  retired on 31 October 2026. Intear's sign in was only loaded, not clicked through by a script.
+  versioned address, so the copy is pinned by sha256 and must be refreshed by hand if Intear changes it. MyNearWallet was
+  removed from the site (it is retired on 31 October 2026). Intear's sign in was only loaded, not clicked through by a
+  script. Licences of the vendored files: THIRD_PARTY_NOTICES.
 - Agent limits are stored per account under a raw storage key with no storage deposit, like the rest of the contract
   (audit finding 12).
-- The contract audit (docs/AUDIT.md) lists every finding, its status and the suggested hardening.
+- The AI review passes (docs/AUDIT.md) list every finding, its status and the suggested hardening.
 - Arena verdicts (S8) come from the native checker, not proofs. Timing and other side channels are not measured.
 - Proving is slow on a laptop CPU (16 fairness inputs: 47 to 48 minutes, plus 15 to 16 minutes to compress).
 - Narrow scope: crash bugs in a small module that compiles to WebAssembly; the fairness generator knows only the demo format.
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-25: MyNearWallet removed from the site's wallets (retired on 31 October 2026); THIRD_PARTY_NOTICES added.
 
 - 2026-10-25 (site, branch ui-preview): wallet connection, credit panel and sending attempts; guards for the site.
 

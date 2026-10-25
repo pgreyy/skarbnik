@@ -25,55 +25,66 @@ On private bounties, researchers and the public never see the secret input. Demo
 
 ## Judge quick check
 
-Run from the root of a clone of this repository (Linux or macOS with `curl` and `python3`; steps 4 to 6 need the Rust
-toolchain; step 7 also needs Docker). Steps 1 to 6 take a few minutes.
+### Fast check (a few minutes, no large download)
 
-1. Read the live demo bounty from the chain:
+Run from the root of a clone of this repository. Steps 1 to 4 need only `curl` and `python3`; steps 5 and 6 need the
+Rust toolchain (cargo downloads the contract's crates, about 3 minutes the first time).
 
-       curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiIxMiJ9"}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["level"], b["opened"], b["image_id"], b["image_id_allowed"])'
+1. Read the official demo bounty, bounty 7, live from the chain:
 
-   See: `12 2 True dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc True` (bounty 12, Level 2, opened by
-   its own Proof 0, the published checker, on the allowlist).
-2. Open the accepted proof on the explorer:
-   https://testnet.nearblocks.io/txns/CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY
-   See: a successful `submit_groth16` call to `kintsugi-l2-cihdp.testnet`: a real PASS proof the contract checked itself
-   and paid (36.392 Tgas).
-3. Open the proof for the wrong bounty on the explorer:
-   https://testnet.nearblocks.io/txns/8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM
-   See: a failed `submit_groth16` call: "the journal belongs to another bounty or attempt (submission id)".
-4. Replay both stored receipts offline (docs/evidence/receipts/README.md):
+       curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiI3In0="}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["level"], b["state"], b["opened"], b["image_id"], b["image_id_allowed"])'
+
+   See: `7 2 Open True dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc True` (Level 2, open, opened by
+   its Proof 0, the published checker id, on the allowlist).
+2. Compare the checker id on chain with the published one:
+
+       curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_allowed_image_ids","args_base64":"e30="}}' | python3 -c 'import json,sys; ids=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(ids, "MATCH" if ids == ["dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"] else "DIFFERENT")'
+
+   See: `['dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc'] MATCH` (the contract's allowlist holds only
+   the published checker, so a bounty can only name that checker).
+3. Read the stored receipts in docs/evidence/receipts/README.md and open their transactions on the explorer:
+   - the valid receipt, accepted and paid:
+     https://testnet.nearblocks.io/txns/CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY
+     See: a successful `submit_groth16` call (36.392 Tgas).
+   - the same receipt sent for the wrong bounty:
+     https://testnet.nearblocks.io/txns/8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM
+     See: a failed `submit_groth16` call, "the journal belongs to another bounty or attempt (submission id)".
+4. Open the site:
+
+       python3 -m http.server 8000 --directory web
+
+   Then open http://localhost:8000/#/bounties/7 (internet needed). See: "Bounty 7", the state OPEN, "Checked by Level 2"
+   and "Demo input", read live. http://localhost:8000/#/bounties/12 shows "Private secret input"; the list at
+   http://localhost:8000/#/bounties tags test bounties 14 and 15 "Test bounty".
+5. Replay both stored receipts offline:
 
        cargo test -p kintsugi-contract s1_
 
    See: `test result: ok. 5 passed`, including `s1_real_attempt_proofs_fail_then_pass ... ok` and
    `s1_the_same_proof_is_refused_on_another_bounty - should panic ... ok`.
-5. Run every contract test:
+6. Run every contract test:
 
        cargo test -p kintsugi-contract
 
    See: `test result: ok. 119 passed; 0 failed`.
-6. Open the site:
 
-       python3 -m http.server 8000 --directory web
+### Full rebuild (optional)
 
-   Then open http://localhost:8000/#/bounties/12 (internet needed). See: "Bounty 12", the state OPEN, "Checked by
-   Level 2" and "Private secret input", read live from the contract. The list at http://localhost:8000/#/bounties shows
-   every bounty; test bounties 14 and 15 carry a "Test bounty" tag.
-7. Rebuild the checker and compare its image id (the longest step; needs Docker with buildx and RISC Zero's toolchain,
-   docs/VERSIONS.md; the first run also downloads RISC Zero's guest builder image
-   `risczero/risc0-guest-builder:r0.1.97.0`, 7.46 GB):
+Warning: this downloads RISC Zero's guest builder image `risczero/risc0-guest-builder:r0.1.97.0`, 7.46 GB, and needs
+Docker with buildx, RISC Zero's toolchain (docs/VERSIONS.md) and about 10 GB of free disk. After the download the
+rebuild took 5 min 12 s on the development laptop. It rebuilds the checker reproducibly and compares its image id with
+the published one and with bounty 12's:
 
-       ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 12
+    ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 12
 
-   See, after the build:
+See, after the build:
 
-       rebuilt checker image id:   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
-       published checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
-       image id of bounty 12 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
-       MATCH
+    rebuilt checker image id:   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+    published checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+    image id of bounty 12 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+    MATCH
 
-   (5 min 12 s in a fresh clone with an empty cargo cache and the builder image already present;
-   docs/evidence/judge/clean_clone.txt).
+(docs/evidence/judge/clean_clone.txt, docs/evidence/judge/check_image_id.txt)
 
 ## What is built
 
@@ -89,8 +100,8 @@ Each claim names the file and the command that show it. Full results, failures i
 | A live Level 2 bounty whose secret input is not in the repository, with a private salt | works on testnet: bounty 12 | `scripts/s18_live_bounty.sh` (EVIDENCE, S18) |
 | Attempt fees are taken from credit deposited in the contract first; unspent credit can be withdrawn with a wallet approval (1 yoctoNEAR) | works on testnet | `scripts/web_testnet.sh` (EVIDENCE, "Site: wallet, credit and attempts") |
 | An agent's limited key (commit and reveal only) cannot withdraw or change limits; with `set_agent_limits` it cannot spend more than the chosen fee per attempt or send winnings elsewhere; it can still spend the whole credit over many attempts | works on testnet on this contract | `./scripts/web_testnet.sh agentkey`, unit tests `audit_s6_*` (EVIDENCE, "Site: wallet, credit and attempts") |
-| A site: live bounties, bounty pages, the recorded probe arena, how to verify, an Account page per account, a page for agents, `feed.json` and `agent-quickstart.txt` | works locally, not hosted | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py` (quick check, step 6) |
-| Wallet connect on the site through NEAR Connect: Intear Wallet and NEAR CLI; MyNearWallet only until it is retired on 31 October 2026. Credit (deposit and withdraw) and attempts (commit, reveal) from the page | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Intear and MyNearWallet only loaded | `scripts/web_testnet.sh` and EVIDENCE, "Site: wallet, credit and attempts" |
+| A site: live bounties, bounty pages, the recorded probe arena, how to verify, an Account page per account, a page for agents, `feed.json` and `agent-quickstart.txt` | works locally, not hosted | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py` (quick check, step 4) |
+| Wallet connect on the site through NEAR Connect: Intear Wallet and NEAR CLI (MyNearWallet, retired on 31 October 2026, is not offered). Credit (deposit and withdraw) and attempts (commit, reveal) from the page | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Intear only loaded | `scripts/web_testnet.sh` and EVIDENCE, "Site: wallet, credit and attempts" |
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts, no proofs for the arena) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
 | Fees of commits never revealed go to a protocol fee pool, never back to the vendor; the pool stays locked as a storage reserve with no withdraw method | works on testnet | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |
 | Proving cost on a laptop CPU, measured | 345 s to 4,984 s per proof, depending on the patch and the run | docs/numbers.md |
@@ -134,5 +145,6 @@ Each claim names the file and the command that show it. Full results, failures i
 
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Exact tool versions: [docs/VERSIONS.md](docs/VERSIONS.md).
 - Work log: [docs/DEVLOG.md](docs/DEVLOG.md). Decisions: [docs/DECISIONS.md](docs/DECISIONS.md).
+- Third party files and their licences: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 - NEAR parts: a Rust contract (near-sdk 5.29.1, `contract/src/lib.rs`, `contract/src/groth16.rs`); function call keys for
   agents; credit held in the contract.

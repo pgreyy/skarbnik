@@ -1,7 +1,7 @@
 // Wallet connection for the site, NEAR testnet only, through NEAR Connect (vendor/near-connect.js, the connector the NEAR
 // docs recommend). The wallets offered are listed in vendor/wallets/manifest.json and their scripts are local copies in
-// vendor/wallets/ (exact sources and sha256 in scripts/wallet-vendor/fetch_wallets.sh): Intear Wallet, NEAR CLI (signs
-// in your own terminal), and MyNearWallet until it is retired on 31 October 2026. Each wallet's script runs in a sandboxed
+// vendor/wallets/ (exact sources and sha256 in scripts/wallet-vendor/fetch_wallets.sh): Intear Wallet and NEAR CLI (signs
+// in your own terminal). MyNearWallet is not offered: it is retired on 31 October 2026. Each wallet's script runs in a sandboxed
 // frame. This page's own code never creates, stores or prints a key; a wallet's script may keep its own session key in
 // the browser (Intear does; it cannot spend on chain). Every transaction is approved in the wallet.
 import { NearConnector } from '../vendor/near-connect.js';

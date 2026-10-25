@@ -72,7 +72,8 @@ bounty 15 was accepted (`HiPPkXptEo1WwGZgh6VJEvyjHt3ZjUo6BiyqJDPfvA5X`, fee 0.01
 
 Clicked through: NEAR CLI (all four steps above). Only loaded: Intear Wallet (its "Connect Intear Wallet" window from
 wallet.intear.tech opens; signing in needs an Intear account, not made here) and MyNearWallet (opens
-testnet.mynearwallet.com). Sources for the wallet choice: NEAR's announcement that MyNearWallet is sunset on 31 October
+testnet.mynearwallet.com; removed from the site afterwards, owner's decision, because it is retired before judging).
+Sources for the wallet choice: NEAR's announcement that MyNearWallet is sunset on 31 October
 (https://x.com/NEARProtocol/status/2107247398216958014), the notice on https://testnet.mynearwallet.com, the NEAR docs
 web login guide (https://docs.near.org/web3-apps/tutorials/wallet-login) and NEAR Connect's wallet manifest (testnet
 flags), hot-dao/near-selector at commit `6766ea5e`.
@@ -84,11 +85,11 @@ Question: can the vendor side run with a secret crashing input that exists only 
 salt, and a Proof 0 that opens a live Level 2 bounty? Raw output: `docs/evidence/S18/`. Script: `scripts/s18_live_bounty.sh`.
 
 - The secret: 18 random bytes of the same crash class as the demo (a list record whose length is exactly twice its item
-  count), made with Python's `secrets` module into `~/.kintsugi-vendor/s18/exploit.hex` (folder mode 700, file mode 600),
+  count), made with Python's `secrets` module into a private folder outside the repo (folder mode 700, file mode 600),
   never printed and not in the repository. Checked natively before proving (`kintsugi-check run`): the original traps,
   the reference fix `data/demo/fixed.wasm` returns -4; `kintsugi-check proof0 --exploit ... --reference-fix
   data/demo/fixed.wasm --fuzz-count 16 --variants 32`: PASS.
-- The salt: `kintsugi-host ... --bounty s18` made a new private salt in `~/.kintsugi-salts/` (never printed). The host's new
+- The salt: `kintsugi-host ... --bounty s18` made a new private salt in a private folder outside the repo (never printed). The host's new
   `--exploit <file>` option reads the secret; it prints only the commitment.
 - Proof 0, alone on the laptop CPU (`./scripts/s18_live_bounty.sh prove`): prove 3,404.47 s, prover peak 4,721 MiB, lowest
   available memory 2,042 MiB (`prove_proof0.log`); succinct 1,020.89 s, peak 1,486 MiB (`compress_proof0.log`).
@@ -139,9 +140,9 @@ Unit tests after the review: 119 passed (`docs/evidence/hardening/contract_unit_
 | S16 preflight | `./scripts/hardening_testnet.sh preflight` (`preflight.txt`) | bounty 7 with an existing payout: PREFLIGHT OK; payout `ghost-kintsugi-audit-zqx.testnet` (does not exist): REFUSED; `MAX_FEE=1`: REFUSED |
 | S1 and S2 | `cargo test -p kintsugi-contract --offline` (`contract/src/tests_level2_attempts.rs`) | the two real attempt proofs of bounty 1 (S6c) run natively: FAIL then PASS paid; a proof refused for another attempt and another bounty; malformed journals and seals, Proof 0 versus attempt mix-ups and a changed control root refused |
 
-## Contract audit (round 1) and the fixes
+## Contract review (AI review passes, round 1) and the fixes
 
-Question: does the bounty contract at commit `bab84c5` hold up against three independent reviewers briefed to break it
+Question: does the bounty contract at commit `bab84c5` hold up against three AI review passes briefed to break it
 (money flow; proof checking; griefing, economics and NEAR traps), and do the fixes hold on testnet? The full report, with
 every finding, its status, the fix commits and the suggested hardening, is docs/AUDIT.md. Raw output: `docs/evidence/audit1/`.
 
@@ -179,7 +180,7 @@ MATCH
 ```
 
 Private salt by default (since this demo): `kintsugi-host execute` and `prove` now need `--bounty <name>` (a private
-random 32 byte salt per bounty, made on first use in ~/.kintsugi-salts/<name>.salt with mode 600 and reused for
+random 32 byte salt per bounty, made on first use in a private folder outside the repo, with mode 600 and reused for
 every proof of that bounty) or `--demo-salt` (the public demo salt; every demo script passes it). Tested with
 `execute` (`docs/evidence/salt/salt_selftest.txt`): no flag and both flags are refused; `--demo-salt` gives the demo
 commitment `9a1be994...`; a new bounty name gives a new commitment (`fe5e6cc9...`), the same name gives it again, a
@@ -710,7 +711,8 @@ pattern, so its verdict says whether the secret matches: at most one bit per att
 | 2 | (v & 0xc00) == 0x400 | FAIL | 1024 | 2.0 | 3 |
 | 3 | (v & 0xe00) == 0x200 | PASS | 512 | 3.0 | 3 |
 
-- A fourth attempt is refused (budget spent). After the game the vendor revealed exploit `a5333f` (value 831) and the salt:
+- A fourth attempt is refused (budget spent). After the game the vendor revealed exploit `a5333f` (value 831) and the salt
+  (public on purpose: revealed after the game so anyone can check the commitment and the bits the log claims):
   the commitment matches, and the secret lies in the set the log describes. 3 bits learned, budget 3.
 - Control with the crash-variant check on (32 variants): all three probes FAIL whatever the secret, because a probe that
   fixes only part of the crash family still crashes on nearby variants of the secret. With that check on, this probe agent

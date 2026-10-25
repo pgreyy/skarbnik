@@ -36,6 +36,7 @@ const DEMO_SEED: &str = "6b696e74737567692053312064656d6f207365656420412e2e2e2e2
 /// The fixed, PUBLIC demo salt for the exploit commitment, used only with `--demo-salt` (the demo bounties were made
 /// with it). With a public salt the commitment is a plain fingerprint of the secret, which can be guessed when the
 /// secret is short or predictable; a real vendor uses `--bounty <name>`, a private random salt per bounty.
+/// Public on purpose: anyone can recompute the demo bounties' exploit commitment from it and data/demo/exploit.hex.
 const DEMO_SALT: [u8; 32] = *b"kintsugi demo salt, not a secret";
 
 fn main() -> ExitCode {

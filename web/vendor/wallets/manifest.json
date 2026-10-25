@@ -64,34 +64,6 @@
     "storage": true,
     "clipboardWrite": true
    }
-  },
-  {
-   "id": "mynearwallet",
-   "name": "MyNearWallet (retired 31 October 2026)",
-   "icon": "https://storage.herewallet.app/upload/d0544304123d10518af961a15d5722ff1cef7abf62155f830e6d733e41f7da4b.png",
-   "description": "Web wallet for NEAR.",
-   "website": "https://mynearwallet.com",
-   "version": "1.0.0",
-   "executor": "vendor/wallets/mynearwallet.js",
-   "type": "sandbox",
-   "platform": {
-    "web": "https://app.mynearwallet.com"
-   },
-   "features": {
-    "signMessage": true,
-    "signInWithoutAddKey": true,
-    "signInAndSignMessage": true,
-    "signInWithFunctionCallKey": true,
-    "signAndSendTransaction": true,
-    "signAndSendTransactions": true,
-    "testnet": true
-   },
-   "permissions": {
-    "storage": true,
-    "allowsOpen": [
-     "https://testnet.mynearwallet.com"
-    ]
-   }
   }
  ]
 }

@@ -16,6 +16,7 @@ control with the crash-variant check on (32 variants), same probes:
 honest fix, variants 0: PASS; variants 32: PASS
 unpatched original: FAIL
 
+# public on purpose: the arena secret and salt are revealed after the game so anyone can check the commitment and the log
 reveal (after the game): exploit a5333f, value 831, salt 61ddd70489cb14ab75bd2d9cf48dc9e2096e2289e491151fed691cb7622266e8
 commitment matches the revealed salt and exploit: True
 the secret value lies in the candidate set the log describes ((v & 0xe00) == 0x200): True

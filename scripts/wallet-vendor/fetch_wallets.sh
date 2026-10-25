@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Copies the wallet scripts the site offers through NEAR Connect into web/vendor/wallets/, from pinned sources, and
 # writes the site's own wallet list (manifest.json) pointing at those local copies. Wallets: Intear (testnet, web
-# wallet), NEAR CLI (signs in your own terminal; the page holds no key), MyNearWallet (an extra until it is retired on
-# 31 October 2026). Entries come from NEAR Connect's public manifest at a fixed commit; the GitHub hosted scripts at
-# fixed commits; Intear's script from the wallet's own site (no versioned address exists), recorded by sha256.
+# wallet) and NEAR CLI (signs in your own terminal; the page holds no key). MyNearWallet was removed: it is retired on
+# 31 October 2026. Entries come from NEAR Connect's public manifest at a fixed commit; the NEAR CLI script at a fixed
+# commit; Intear's script from the wallet's own site (no versioned address exists), recorded by sha256.
 # Usage, from the repo root: ./scripts/wallet-vendor/fetch_wallets.sh
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -12,23 +12,18 @@ NEARCLI=dc5cb123e3a8e42ed095739f4ea058b767a80ad2      # near/near-cli-connect, 2
 D=web/vendor/wallets; T=target/wallet-fetch; mkdir -p "$D" "$T"
 curl -sfL -o "$T/manifest.json" "https://raw.githubusercontent.com/hot-dao/near-selector/$SELECTOR/repository/manifest.json"
 curl -sfL -o "$D/near-cli.js" "https://raw.githubusercontent.com/near/near-cli-connect/$NEARCLI/dist/near-cli.js"
-curl -sfL -o "$D/mynearwallet.js" "https://raw.githubusercontent.com/hot-dao/near-selector/$SELECTOR/repository/mnw.js"
 curl -sfL -o "$D/intear-wallet.js" "https://wallet.intear.tech/near-selector.js"
 python3 -I - "$T/manifest.json" "$D/manifest.json" <<'PY'
 import json, sys
 src = json.load(open(sys.argv[1]))
-keep = {"intear-wallet": "intear-wallet.js", "near-cli": "near-cli.js", "mynearwallet": "mynearwallet.js"}
+keep = {"intear-wallet": "intear-wallet.js", "near-cli": "near-cli.js"}
 out = []
 for w in src["wallets"]:
     if w["id"] in keep:
         w = dict(w); w["executor"] = "vendor/wallets/" + keep[w["id"]]
-        if w["id"] == "mynearwallet":
-            w["permissions"] = dict(w["permissions"]); w["permissions"]["allowsOpen"] = ["https://testnet.mynearwallet.com"]
-            w["name"] = "MyNearWallet (retired 31 October 2026)"
-            w.setdefault("features", {})["testnet"] = True
         out.append(w)
-order = ["intear-wallet", "near-cli", "mynearwallet"]
+order = ["intear-wallet", "near-cli"]
 out.sort(key=lambda w: order.index(w["id"]))
 json.dump({"version": src["version"], "wallets": out}, open(sys.argv[2], "w"), indent=1)
 PY
-( cd "$D" && sha256sum manifest.json intear-wallet.js near-cli.js mynearwallet.js > SHA256SUMS && cat SHA256SUMS )
+( cd "$D" && sha256sum manifest.json intear-wallet.js near-cli.js > SHA256SUMS && cat SHA256SUMS )

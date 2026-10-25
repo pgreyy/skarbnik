@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Hygiene fixes (owner's decisions, branch ui-preview)
+
+- MyNearWallet removed from the site's wallets and from web/vendor/ (retired on 31 October 2026); Intear Wallet and NEAR
+  CLI remain. THIRD_PARTY_NOTICES.md lists every vendored file with source, version and licence.
+- "Three independent reviewers" and similar wording replaced with "AI review passes" (docs and four test comments).
+- Public-on-purpose notes next to the demo secret and salt and the arena secret; the private folders are described as
+  "a private folder outside the repo" in the docs and two logs (the code still names them, because it uses them).
+- The seeds in docs/evidence/*/run.env checked against the chain: all are the fairness seeds the contract recorded at
+  reveal (public; not keys).
+- An IP address removed from this log. The README quick check is split into a fast check and an optional full rebuild.
+
 ## 2026-10-25: Judge package (branch ui-preview)
 
 - README rewritten for judges: pitch, a key: value block, a seven step quick check with exact commands and expected
@@ -132,9 +143,9 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - The S18 memory monitor I set up also stopped too early once: its end check matched the measuring script's own `exit=`
   line. The job itself was not affected.
 
-## 2026-10-25: Contract audit, six fixes, second review
+## 2026-10-25: Contract review (AI review passes), six fixes, second review
 
-- Froze `bab84c5`; three independent reviewers (money flow; proof checking; griefing and economics) got the code and the
+- Froze `bab84c5`; three AI review passes (money flow; proof checking; griefing and economics) got the code and the
   design docs only. Every finding reproduced on a scratch copy of the contract or on testnet (docs/AUDIT.md).
 - Fixes, one commit each with regression tests: reveals leave a full verdict window and windows are capped (`dfd04c3`);
   payout cannot be a verifier, the vendor or the contract (`c8c7566`); the earliest reveal has priority (`3377348`,
@@ -144,19 +155,19 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - Mistakes: one commit (`3377348`) went in with a test that did not compile, because my command chain took a pipeline's
   exit code; fixed forward in `a968fa5` and the chain corrected. During the testnet rerun I misread a step's `exit=0` line
   as the end of the run and started a second script against the same bounty; its extra commit is explained in the evidence.
-- Docs: docs/AUDIT.md (new), README and SECURITY corrections of the overclaims the reviewers found, EVIDENCE section.
+- Docs: docs/AUDIT.md (new), README and SECURITY corrections of the overclaims the review passes found, EVIDENCE section.
 
 ## 2026-10-25: Official Level 2 demo bounty, private salt by default
 
 - Bounty 7 on `kintsugi-l2-cihdp.testnet`: Level 2, open for 30 days (until 2026-11-24 00:19 UTC), opened with the
   reused Groth16 Proof 0; `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 7` prints MATCH. README "Try it" and
   EVIDENCE point at it; it is labelled a demo (public demo salt).
-- `kintsugi-host`: `--bounty <name>` makes and reuses a private random salt per bounty in ~/.kintsugi-salts/
+- `kintsugi-host`: `--bounty <name>` makes and reuses a private random salt per bounty in a private folder outside the repo
   (folder mode 700, file mode 600, never printed); `--demo-salt` keeps the public demo salt; neither flag is refused.
   Every demo script passes `--demo-salt`. Tested with `execute` (7 cases).
 - The first version kept the salts inside the private secrets folder; the commit gate stopped on that folder's name in
-  the code, so the salts now have their own folder, ~/.kintsugi-salts/. The tests left four salt files outside the
-  project (two from the first version, two in ~/.kintsugi-salts/); not deleted.
+  the code, so the salts now have their own private folder outside the repo. The tests left four test salt files in a
+  private folder outside the repo; not deleted.
 - SECURITY known limits: the demo salt, and the reference fix requirement (a vendor with no fix is not supported yet).
 - Not changed: the README Roadmap still lists "the contract checking the proof itself" as planned; that is now built
   (S6c); left for the owner, who decides roadmap changes.
@@ -448,7 +459,7 @@ One dated entry per work block: what was done, the exact commands, the results, 
   - IPv6 to the crate download server does not connect at all:
     `curl -6 https://static.crates.io/...` failed in 0.58 s ("Could not connect to server").
   - IPv4 works but is very slow: `curl -4` received 746,671 bytes of a 2,508,613 byte crate in 40 s, about 18 KB/s.
-  - While `cargo fetch` ran, `ss -tinp` showed its two connections to 140.248.134.137:443 receiving about 18 KB/s each
+  - While `cargo fetch` ran, `ss -tinp` showed its two connections to a download server receiving about 18 KB/s each
     (bytes_received rose from 268,600 to 1,704,969 in 75 s on one connection). So cargo was downloading, slowly, not hung.
     A large crate takes many minutes at this speed and cargo prints nothing until each file is complete.
 - Fixes tried:
