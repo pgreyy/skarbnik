@@ -1,0 +1,70 @@
+<!doctype html>
+<!-- Kintsugi site, first version (read only). The page shell: strip, header, main view, footer with the theme switcher,
+     toast, live region and the intro layer. js/app.js renders each screen into <main> from live testnet data and from
+     the recorded files in data/. Nothing on this site can sign or send a transaction. -->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kintsugi: fix what you can't see (testnet)</title>
+<meta name="description" content="Bounties for bugs that only crash on a secret input. Live read only view of the Kintsugi contract on NEAR testnet.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Archivo:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/app.css">
+<script>
+  // Set the theme before the first paint (System by default), so the page never flashes the wrong palette.
+  document.documentElement.setAttribute('data-theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+</script>
+</head>
+<body>
+<div class="m-app" id="app">
+  <a class="k-skip" href="#main">Skip to content</a>
+  <div class="m-strip"><span>Live data from kintsugi-l2-cihdp.testnet, read only. Testnet only, no token.</span></div>
+  <header class="m-hd">
+    <a class="m-brand" href="#/" id="brand"></a>
+    <span class="m-pills"><span class="m-tag">Testnet</span><span class="m-tag">Read only</span></span>
+    <button class="m-menu" type="button" aria-expanded="false" aria-controls="sheet" id="menuBtn">Menu</button>
+    <div class="m-sheet" id="sheet">
+      <nav class="m-nav" aria-label="Main">
+        <a href="#/bounties" data-nav="bounties">Bounties</a>
+        <a href="#/arena" data-nav="arena">Arena</a>
+        <a href="#/verify" data-nav="verify">How to verify</a>
+        <a href="agent-quickstart.txt">For agents</a>
+      </nav>
+    </div>
+  </header>
+  <main class="m-view" id="main" tabindex="-1"><p class="k-state">Loading…</p></main>
+  <footer class="m-view" style="min-height:0;padding-top:0">
+    <div class="m-foot">
+      <p>Testnet only: no real money and no token. Level 1 is not built. Researchers and the public never see the secret input.
+        Demo bounties are marked: their input is the public demo input in the repository. The name Kintsugi is a working name.</p>
+      <p>For agents and scripts: <a class="m-a" href="feed.json">feed.json</a> <a class="m-a" href="agent-quickstart.txt">agent-quickstart.txt</a></p>
+      <div class="m-footrow">
+        <button class="m-link" type="button" id="replayIntro">Replay the intro</button>
+        <div class="m-themebar" role="group" aria-label="Colour theme">
+          <span>Theme</span>
+          <button type="button" data-pref="light" aria-pressed="false">Light</button>
+          <button type="button" data-pref="dark" aria-pressed="false">Night</button>
+          <button type="button" data-pref="system" aria-pressed="true">System</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <div class="m-toast" role="status" id="toast" hidden></div>
+  <div class="sr-only" role="status" aria-live="polite" id="live"></div>
+</div>
+<div class="k-int" id="intro" hidden>
+  <canvas id="introCanvas" aria-hidden="true"></canvas>
+  <div class="k-cap" id="cap0" aria-hidden="true">Three attempt slots.</div>
+  <div class="k-cap" id="cap1" aria-hidden="true">A failed fix leaves a crack.</div>
+  <div class="k-cap" id="cap2" aria-hidden="true">One fix holds.</div>
+  <div class="k-cap" id="cap3" aria-hidden="true">The proof confirms it.</div>
+  <div class="k-word" id="introWord" aria-hidden="true"></div>
+  <div class="m-ib"><button class="m-skip" type="button" id="skipIntro">Skip intro</button></div>
+</div>
+<noscript><p style="padding:24px;font-family:sans-serif">This site reads live data from NEAR testnet and needs JavaScript. The agent files work without it: feed.json and agent-quickstart.txt.</p></noscript>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

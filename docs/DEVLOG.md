@@ -2,6 +2,25 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Site, first version (read only), branch ui-preview
+
+- Built `web/` from the Gilt Arena design handoff: Light, Night and System themes, desktop and phone layouts, Young
+  Serif, Archivo and Space Mono, the gold seam strips, the PASS stamp, the canvas intro. Plain HTML, CSS and JavaScript,
+  no build step. Logo: the owner's "Cracked ring", one component (`web/js/logo.js`), also the favicon.
+- Screens: Home, Bounties (all 13 bounties, read live), Bounty detail (slots up to each bounty's own cap, live facts,
+  recorded transactions), Arena (only the recorded S8 run), How to verify. `feed.json` (open bounties) and
+  `agent-quickstart.txt`. Wallet, deposits, sending attempts, creating bounties and a proof ledger are not built and
+  appear only as "Planned" on the Roadmap.
+- Data: live chain values come from view calls only; every transaction id comes from an evidence file in the repository
+  (`scripts/gen_site_recorded.py` names the file); the intro uses the real counts of bounty 12's Proof 0.
+- Differences from the handoff: no sample data, no "Sample data" tags, no named agents, slots per bounty cap (not 8),
+  no Send a fix or Create a bounty screens, only Levels 0 and 2 listed, no intro sound.
+- Checked locally with a headless browser: screenshots of every screen in Light and Night, desktop and 390 px wide; a
+  keyboard run (Tab order, focus ring, arrow keys on tabs); the intro (app inert while it plays, Escape skips, focus on
+  the heading, once per session); reduced motion (no intro). Contrast of every colour pair used: all pass in both themes.
+- Mistakes found and fixed on the way: a variable that hid a helper function (the bounty page failed), a number compared
+  with a text id, word breaking that split "NEAR", a free slot counted on a closed bounty, link colours on the menu.
+
 ## 2026-10-25: Owner's decisions on the hardening round
 
 - S7 split kept; its worst case (an honest fix may get 1/K, copiers share equally, still better than the old rule) stated

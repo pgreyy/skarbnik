@@ -1,0 +1,803 @@
+{
+ "contract": "kintsugi-l2-cihdp.testnet",
+ "network": "testnet",
+ "bounties": {
+  "0": [
+   {
+    "step": "l0_create",
+    "method": "create_bounty",
+    "tx": "4w4TzsJuzdiGfbYkgAktZhDzBoRCNUQvpR486uQThnXb",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "l0_attest_proof0_kintsugi-ver1-prnvm",
+    "method": "attest_proof0",
+    "tx": "4hh4VdCJ1NLnQTcMmgqacPPufAQfypv2jG8mMPrJJS7V",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "l0_attest_proof0_kintsugi-ver2-prnvm",
+    "method": "attest_proof0",
+    "tx": "93GAVpjnvoocwQzN8HRncSMKGz8mYd5bqjLFj9SqETqm",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   }
+  ],
+  "1": [
+   {
+    "step": "a_create",
+    "method": "create_bounty",
+    "tx": "h2LfFz5N24AezQymZ5d6mshgS7VYN1XaND6sPQFEKMg",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "E3RTxNVVVGvV2NNTFcMgwNgKagpHPmMnsNBNbu1ZoCx8",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a_attest_proof0_refused",
+    "method": "attest_proof0",
+    "tx": "Bv4py6KX8Cf5YaEdDBT6nELKrteuxEdB4CywRpxdAo9y",
+    "result": "refused by the contract",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a0_commit",
+    "method": "commit",
+    "tx": "2UBpn8FvhAZJ3Z8d1NQWRzzMrm2xFNnozk4Tt5FVFNYK",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a0_reveal",
+    "method": "reveal",
+    "tx": "9j1Hbs52Q49rijKHQvvm415jhrpFVJYPyFtDzohwubsA",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a1_commit",
+    "method": "commit",
+    "tx": "FX677eNJN368qmy7HE5ngrESeZKrqiNcYURF5Uho32ey",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a1_reveal",
+    "method": "reveal",
+    "tx": "No4vSFxHk1DiN4VWpjrKGAeRoMotnmL3gX2EoeRRNLk",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a_post_verdict_refused",
+    "method": "post_verdict",
+    "tx": "631e2mRUDmLigsGB8G5DbZySZeXzWYkbKrvQhHfvkww7",
+    "result": "refused by the contract",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a1_fail",
+    "method": "submit_groth16",
+    "tx": "6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "a0_pass",
+    "method": "submit_groth16",
+    "tx": "CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   }
+  ],
+  "2": [
+   {
+    "step": "d_create",
+    "method": "create_bounty",
+    "tx": "B1MvhSYGPLHmLKjY3FvrKQcwk2msgBse8W9LYPxLp45T",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   }
+  ],
+  "3": [
+   {
+    "step": "b_create",
+    "method": "create_bounty",
+    "tx": "6V9zJEXHucFijSxp4yZsmyaSKXjRtdffy2XB5ZP5sYS8",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "b_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "QDgLcGz4ax9EBvu4VJHDKo642STgbnvvCyQMzY5PDyB",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "b0_commit",
+    "method": "commit",
+    "tx": "8L74wV4nin2aVrrb1wVSevnpfRucaT76zsSAonYu5S4h",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "b0_reveal",
+    "method": "reveal",
+    "tx": "HCh9BDszYBmJ7axyF4dZqGu2GePZJjPiZ79GX8Vmzdvt",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   }
+  ],
+  "4": [
+   {
+    "step": "c_create",
+    "method": "create_bounty",
+    "tx": "5uETnw7Bd28GVJuXyczWa263h9nDoLrg566kXR7qeYzL",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "c_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "J6WPRaRceZzMVkLygVLQ2sJuhkAdup9azGaPEKc5rJm6",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "c0_commit",
+    "method": "commit",
+    "tx": "FYDcSCun67inudFMGFQdhhEFKU4PtaBfYrakUwrwgya3",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "c0_reveal",
+    "method": "reveal",
+    "tx": "GcQ2EfWHH2X3oSw39Mw34XdiN3vz5sjhR3gj4hob6qLZ",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "c_claim_timeout",
+    "method": "claim_timeout",
+    "tx": "2Ga3oSGcrgfMdbKoLCEUK8FwGrpnqMk9ex2Kp2oj6Tiq",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   }
+  ],
+  "5": [
+   {
+    "step": "s_create",
+    "method": "create_bounty",
+    "tx": "Hx4PkTcAfArnFWTiQhVuYd9Bp1SR6ipHC9rad1bkoCwW",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "JAgnGrZKA5YjkQhF5KBo7KYavLtpfoZmiYq1oGSJQgcj",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s_create_sybil",
+    "method": "create-account",
+    "tx": "2FgNc4w2ov78sfnNKHsMpBjpindceKvbhVKTME4syMAs",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s_vendor_funds_sybil_credit",
+    "method": "deposit_credit",
+    "tx": "7ExJNdAi23TCE7DnANwkQ3WCiL3sZivFcLxyKDtUXAuS",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s_honest_commit_ignored",
+    "method": "commit",
+    "tx": "7wv55VszucJV6xGSSGJrgwvycVfwh7bHZkbV67gfPbHq",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s_release_unrevealed_0",
+    "method": "release_unrevealed",
+    "tx": "BSuwfFeEuFYpMNxHPAgzA4N8SK1Vo6hgnsZvDKdcewrV",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s_expire",
+    "method": "expire",
+    "tx": "8iC5Q9UMVAGD3WHfrHE2cVBGv1gHzhNdbc4RFgsQeLRU",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   }
+  ],
+  "6": [
+   {
+    "step": "s2_create",
+    "method": "create_bounty",
+    "tx": "F6mNreAXxDMNp9y6cHNtaHPhdFC3VkEWoc7aZnXUw9no",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s2_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "6jMcTDJw1Nr3x7FXWNqFME573gXBvhUn9J3bZwu6xhD7",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s2_vendor_tops_up_sybil",
+    "method": "send-near",
+    "tx": "76We5GhHE5s2Zwdqgp7netymmVXW3urzKNdXxGeHJ8AR",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s2_sybil_junk_commit_0",
+    "method": "commit",
+    "tx": "64epreebuQam5azfeBPJorLM3rQEZmFSzxzpRmsnqcjE",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s2_sybil_junk_commit_1",
+    "method": "commit",
+    "tx": "BV8aHFzCuKWLm5Z1X1b4Qk2AnsyWCnMJnFtMcvCmzVL8",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s2_sybil_junk_commit_2",
+    "method": "commit",
+    "tx": "3hiPvqjJ18spcVwaP5qFwKmsB3tG8mcFtqhoYD3keKQ5",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s2_honest_commit_ignored",
+    "method": "commit",
+    "tx": "PjQBWCTmt4nAbwAQyT3Kn8UKt18nzpCzfKtbtn9HYpn",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s2_release_unrevealed_0",
+    "method": "release_unrevealed",
+    "tx": "mpBhiyx6w9RxjpMSbcuKVty67hFZCTX7x6K3qQd57zg",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "s2_expire",
+    "method": "expire",
+    "tx": "8LxACsYPrMQ71kHCjDhcdt9uH9ATJNn9qrjbLMRjfVW8",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   }
+  ],
+  "7": [
+   {
+    "step": "demo_create",
+    "method": "create_bounty",
+    "tx": "CRoeYBpDgULtH32NeZNAtb3xWvswnoSRZFmYDUDFrtd3",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "demo_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "DxutukERDxo3DwhgSXueD5NWpJKySbnpuhVPdHadcS8R",
+    "result": "succeeded",
+    "source": "docs/evidence/S6c/transactions.tsv",
+    "script": "scripts/s6c_testnet.sh"
+   }
+  ],
+  "9": [
+   {
+    "step": "x_create",
+    "method": "create_bounty",
+    "tx": "CZoxvPY79dihH8PR5X2neP8TfGWgUPuPW7GDPfzYjtC",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "x_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "BYxHMjZG4A19AB9tKQjMifVdWNimHf6AhHt48cHn6stj",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "fix2_payout_is_a_verifier",
+    "method": "commit",
+    "tx": "E7hEJfRcvS5Kzyoatkb43KcLqk33vTsRzeXaXQyPxTyg",
+    "result": "refused by the contract",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "x_r_commit",
+    "method": "commit",
+    "tx": "2NqpjD6Y27dg3KC4QmhwTprjFrwoyLtsxWRTdRG3Fjgm",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "x_r_reveal",
+    "method": "reveal",
+    "tx": "HGNkEKSyQ24TerT5KUMwgJYjiKDjzNLZjiCQDRA9vXp2",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "x_j_commit",
+    "method": "commit",
+    "tx": "2P96uiKRzoarJU4syDXAA5z3Sg9HVUPzyGydMFa2EpSM",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "x_j_reveal",
+    "method": "reveal",
+    "tx": "6k58gVqXBPnX4K5G9M9LfjHGPZfsCxCxERzKsCAs8aRC",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "fix1_commit_too_close_to_expiry",
+    "method": "commit",
+    "tx": "2PQDNpAY45XgYuxVUCXBFmjg5hofrr47CFe8bAKWcGs6",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "fix3_timeout_of_later_reveal_refused",
+    "method": "claim_timeout",
+    "tx": "9K9xCr4SaYs1ZigJVXGZuyVuhDj3Uv4Er6eAf4QJinSx",
+    "result": "refused by the contract",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "x_k_commit",
+    "method": "commit",
+    "tx": "FJvoaAkjrYLAePqJtRVhQFcsVpRaFCsPkG9X2jcEMc1k",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "x_k_reveal",
+    "method": "reveal",
+    "tx": "Gc8tyFedm4L9jv1h5U4R4XGz3vYuVPJKL3LoQACVeKcy",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "x_submit_fail_j",
+    "method": "submit_groth16",
+    "tx": "7AbUjtucJ7e5Mex3pQtwyCXEV6VG1oxD6Q3HRfKSrmXs",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "fix1_commit_too_close_to_expiry",
+    "method": "commit",
+    "tx": "5bBwtSrE1gfULKLKcBgvLZA2rEjSz9Mv8d5NtzTkwPU3",
+    "result": "refused by the contract",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "fix3_timeout_of_later_reveal_refused",
+    "method": "claim_timeout",
+    "tx": "CbKbvza1haqTm1uBtCfuA8RevdGMHzgrBE9Jtz9cxsxM",
+    "result": "refused by the contract",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "fix3_timeout_of_first_reveal",
+    "method": "claim_timeout",
+    "tx": "82M2gLJ5qzs6MB7ArPwPNrcTwDVzUNvCE9wSWA7NJQD3",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   },
+   {
+    "step": "fix4_expire_fees_to_pool",
+    "method": "expire",
+    "tx": "E2vgNWQJccjApwuLxys5XZSKxiQHAymyZ7V3mRMKNCvD",
+    "result": "succeeded",
+    "source": "docs/evidence/audit1/transactions.tsv",
+    "script": "scripts/audit1_testnet.sh"
+   }
+  ],
+  "10": [
+   {
+    "step": "lim_create",
+    "method": "create_bounty",
+    "tx": "8brBv43w18nHv5uNhJWGGKTuWCmNixfKemuFP6vcGjhw",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "lim_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "H7g4L1rzzEgoaZDdyGSUZEuoGzGLWZFB2HpXMn5xNi36",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s6_set_limits_without_one_yocto",
+    "method": "set_agent_limits",
+    "tx": "G1eDFEEUs5VSN4PiU3UFnYYipe1tpbvoCFkcQGz3arRE",
+    "result": "refused by the contract",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s6_set_limits",
+    "method": "set_agent_limits",
+    "tx": "AtpD1aUaxuWaoU1CFvQpyJDNMewfsSoUpFuvn8uX7LM1",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s6_fee_above_limit",
+    "method": "commit",
+    "tx": "G119Q3L9jpsB6qn24A96Ygt6V4BHG1rzGGYjMGmjp6At",
+    "result": "refused by the contract",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s6_raise_limit",
+    "method": "set_agent_limits",
+    "tx": "BWAS5Q2rmm1D6jz5PoBpZqphqBWA9JH7ZBYGShXpb9iQ",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s6_other_payout",
+    "method": "commit",
+    "tx": "5LaTEQ8kzndLHjTEtbRewE8xtXVWe1tVsx22EkT9isRn",
+    "result": "refused by the contract",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s6_commit_within_limits",
+    "method": "commit",
+    "tx": "B3HTj1PiZ8vbMRJzFtRdyNzKn7bPCsA6UJoSgGSwb2ZW",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s6_clear_limits",
+    "method": "set_agent_limits",
+    "tx": "AJ3BHMD2Eqqw3r8wEK1tyST1LXDK4MytfeunRKracAos",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   }
+  ],
+  "11": [
+   {
+    "step": "split_create",
+    "method": "create_bounty",
+    "tx": "DcwxnyAMNKyEf7RECpvoXGXKq884E2p6Wmsd7XG3C8fM",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "split_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "4LhXkBqDDCt41ch54KDSSA1avZYvFbbPd62mtLLZNmYy",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s7_r_commit",
+    "method": "commit",
+    "tx": "D8o2aPLjCUy57o7QwaieyvGi1y2ZFCVRZ3QxzNAc8hAm",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s7_r_reveal",
+    "method": "reveal",
+    "tx": "BaKK2pS8rCn31QRzWZKttcw1LVoVQ38SQUvsKcKJDF9G",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s7_j_commit",
+    "method": "commit",
+    "tx": "6s7EFMriY7N27nujZQLtAUY5czWjyfcfycRjhu9dxTSa",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s7_j_reveal",
+    "method": "reveal",
+    "tx": "EfZnodB7bAP8hkxUyvuDNdYwScsDD5ik4qmyYQuhb8N2",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s3_proof_of_another_bounty",
+    "method": "submit_groth16",
+    "tx": "8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM",
+    "result": "refused by the contract",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "s7_claim_timeout",
+    "method": "claim_timeout",
+    "tx": "6uem1gWAymCr2VzL3FofpQfVoqZGrzvXA2wERXnvaYpP",
+    "result": "succeeded",
+    "source": "docs/evidence/hardening/transactions.tsv",
+    "script": "scripts/hardening_testnet.sh"
+   }
+  ],
+  "12": [
+   {
+    "step": "s18_create",
+    "method": "create_bounty",
+    "tx": "ByJpYtUh5QJcgeVnYuroFFvMWnCGncRc7bMM5T1dTFQw",
+    "result": "succeeded",
+    "source": "docs/evidence/S18/transactions.tsv",
+    "script": "scripts/s18_live_bounty.sh"
+   },
+   {
+    "step": "s18_open_groth16",
+    "method": "open_with_groth16",
+    "tx": "AwktYGNHGijdv2LWwQYeuc7yFyLoDs41AuJckxUQuPSJ",
+    "result": "succeeded",
+    "source": "docs/evidence/S18/transactions.tsv",
+    "script": "scripts/s18_live_bounty.sh"
+   }
+  ]
+ },
+ "notes": {
+  "demo_public_tests": {
+   "count": 17,
+   "source": "data/demo/public_tests.txt"
+  },
+  "bounty12_proof0": {
+   "fuzz_count": 16,
+   "variant_count": 32,
+   "verdict": "PASS",
+   "source": "docs/evidence/S18/verify_proof0.txt"
+  },
+  "published_image_id": {
+   "id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "source": "docs/EVIDENCE.md (reproducible checker build), scripts/check_image_id.sh"
+  },
+  "demo_exploit_commitment": {
+   "commitment": "9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387",
+   "source": "host/src/main.rs (DEMO_SALT) and data/demo/exploit.hex"
+  }
+ },
+ "bounty_notes": {
+  "8": {
+   "text": "The contract shows this bounty as Paid, but the payout went to an account that does not exist: the transfer failed and the NEAR stayed in the contract (review finding 8, a known limit).",
+   "tx": "AKU4pVTmS3uwmLcGyHAXTekiBELoV5GRMqJeSPMq1BVk",
+   "source": "docs/AUDIT.md, finding 8"
+  }
+ },
+ "attacks_s6c": [
+  {
+   "step": "atk_other_attempt",
+   "tx": "3ULvszXnfJAF8sbFejCKvbxftPK2b13rT2fP8y4JEANT",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  },
+  {
+   "step": "atk_fail_as_pass",
+   "tx": "JDZNSTe72dqrppmqye5gnTxfQ52GNaDEBJ9Z4hZa5HT",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  },
+  {
+   "step": "atk_flipped_seal_bit",
+   "tx": "GibfrVyGKT2ymUs6W87aF5jwyRByAZ6StDxBFscy3ET7",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  },
+  {
+   "step": "atk_changed_journal",
+   "tx": "4Sde4NuTQobypV3x7uC8AgcnSNrZpuqG3NeuTVHkMYZG",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  },
+  {
+   "step": "atk_wrong_image_id",
+   "tx": "4N6oi9MpDii4Vdf4uDLPSVegBsqPYYs4BQP1WzprAy2C",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  },
+  {
+   "step": "atk_fail_second_submission",
+   "tx": "EmKG8Sm96NZ7NzrD9DDQ5fm8ouAzn6Eg8vTPV4KRHhym",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  },
+  {
+   "step": "atk_other_bounty",
+   "tx": "GfZXvdiG1mcRUK1NNTQxdCfBqHMMExLiFWYgoznaKFvS",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  },
+  {
+   "step": "atk_second_submission",
+   "tx": "GiHbmMMR7gsZNzKNbzU1eB9SSTreN4Up3JX4DSHotRGs",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  },
+  {
+   "step": "atk_after_expiry",
+   "tx": "E5DFg1TVhtDoFQjL5GdpfsSeJRBrBobX6GprTirYnrwp",
+   "result": "refused by the contract",
+   "source": "docs/evidence/S6c/transactions.tsv"
+  }
+ ],
+ "wrong_bounty_refused": {
+  "tx": "8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM",
+  "source": "docs/evidence/hardening/transactions.tsv",
+  "what": "the real PASS proof of bounty 1 attempt 0 sent for bounty 11 attempt 0"
+ },
+ "valid_proof_accepted": {
+  "tx": "CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY",
+  "source": "docs/evidence/S6c/transactions.tsv",
+  "what": "a real Groth16 proof of a PASS for bounty 1 attempt 0, accepted and paid"
+ },
+ "arena": {
+  "source": "docs/evidence/S8/arena_log.json, docs/evidence/S8/arena_run.txt",
+  "script": "scripts/s8_arena.sh",
+  "verdicts_from": "the native checker (the same checker code the zkVM guest runs); no proofs were made for the probes",
+  "attempts": [
+   {
+    "attempt": 1,
+    "verdict": "FAIL",
+    "bits_learned": 1.0,
+    "candidates_left": 2048,
+    "budget": 3
+   },
+   {
+    "attempt": 2,
+    "verdict": "FAIL",
+    "bits_learned": 2.0,
+    "candidates_left": 1024,
+    "budget": 3
+   },
+   {
+    "attempt": 3,
+    "verdict": "PASS",
+    "bits_learned": 3.0,
+    "candidates_left": 512,
+    "budget": 3
+   }
+  ],
+  "secret_space": 4096,
+  "control_variant_check_on": [
+   {
+    "probe": "probe_1",
+    "verdict": "FAIL"
+   },
+   {
+    "probe": "probe_2",
+    "verdict": "FAIL"
+   },
+   {
+    "probe": "probe_3",
+    "verdict": "FAIL"
+   }
+  ],
+  "control_variants": 32,
+  "chain": {
+   "contract": "bounty.kintsugi-djloo.testnet",
+   "source": "docs/evidence/S8/transactions.tsv",
+   "script": "scripts/s8_chain.sh",
+   "steps": [
+    {
+     "step": "s8_create_arena_bounty",
+     "tx": "ANCqPZzLAwdybq2qriGQhnquenC9kqqF36oyAMg13q3U"
+    },
+    {
+     "step": "s8_commit_probe_1",
+     "tx": "FpUpVqQyfYRGPtcv9ZTgaWHQMHefpXDUtsy7bAf9FEDi"
+    },
+    {
+     "step": "s8_commit_probe_2",
+     "tx": "8jMLwGnYP4w9CjYPgExt1oLXu1e3SRwWsnAvQWk6S3yU"
+    },
+    {
+     "step": "s8_commit_probe_3",
+     "tx": "AGSSeET6zNB1UomHumPhHD1tHroxCqfcHi8Kk6EdEDm1"
+    },
+    {
+     "step": "s8_commit_probe_4",
+     "tx": "2NuDyLV6pX83LFZcV67fR3AMzaC2BZEwY7dRQvDvpohX"
+    }
+   ],
+   "note": "the fourth probe commit was ignored: still 3 commits, credit unchanged (docs/evidence/S8/chain_summary.txt)"
+  }
+ }
+}

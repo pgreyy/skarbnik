@@ -28,8 +28,9 @@ Full results, including failures, are in [docs/EVIDENCE.md](docs/EVIDENCE.md); t
 | A receipt shrinks to a 2,057 byte Groth16 proof (the kind a contract could check itself) on the laptop CPU, and it verifies against the checker's image id | works on the laptop (187.91 s, about 7 GiB of memory); the contract does not check it yet (design note in docs/ARCHITECTURE.md) | `kintsugi-host compress <succinct receipt> <out> groth16`, then `kintsugi-host verify <out>` (EVIDENCE, S6) |
 | A NEAR contract checks a RISC Zero Groth16 proof itself with NEAR's alt_bn128 host functions: it accepts the real proof and rejects a flipped bit, a changed journal and a wrong image id | works on testnet as a separate spike contract (34.569 Tgas per call); not connected to the bounty contract or its payouts yet | `scripts/s6b_testnet.sh` and `cargo test -p kintsugi-groth16-spike` (EVIDENCE, S6b) |
 | Level 2 bounties: the bounty contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt, and replayed, changed, late or repeated proofs are refused | works on testnet (`kintsugi-l2-cihdp.testnet`: one PASS paid, one FAIL spent, nine attacks refused; 35 to 36 Tgas per proof); Level 0 bounties work as before; each bounty shows its level | `scripts/s6c_testnet.sh` and `cargo test -p kintsugi-contract --offline` (EVIDENCE, S6c) |
-| Fees of commits that are never revealed go to a protocol fee pool, never back to the vendor, so a vendor cannot block its own bounty for free | works on testnet: in the self-block test the vendor side lost 0.045 NEAR in fees and the pool gained exactly 0.045 NEAR; the pool cannot be paid out yet (destination open, docs/SECURITY.md) | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |
+| Fees of commits that are never revealed go to a protocol fee pool, never back to the vendor, so a vendor cannot block its own bounty for free | works on testnet: in the self-block test the vendor side lost 0.045 NEAR in fees and the pool gained exactly 0.045 NEAR; the pool stays locked in the contract as a storage reserve, with no withdraw method (owner's decision, docs/SECURITY.md) | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |
 | A live Level 2 bounty whose secret crashing input is not in the repository and whose commitment uses a private salt. It proves the secret stays private; it uses the public demo bug, so anyone can submit the public `fixed.wasm`, and if the vendor stays silent the timeout rule can pay out without any proof | works on testnet: bounty 12 on `kintsugi-l2-cihdp.testnet`, opened by its own Proof 0; `check_image_id.sh` prints MATCH | `scripts/s18_live_bounty.sh` (EVIDENCE, S18) |
+| A read only site that shows every bounty of the testnet contract live (state, level, attempts used of the cap, next fee, deadlines, image id, slots), the recorded probe agent runs, and the steps to verify a result; a machine readable feed and a plain text quickstart for agents. No wallet: it cannot sign or send anything | works locally (not hosted yet) | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py`; Try it, step 7 |
 | OutLayer (TEE) as one of the two verifiers | not confirmed on testnet yet: OutLayer accepts our jobs but none has been answered (8 of 8 timed out, by link and as an OutLayer project), while OutLayer's own cached test program answers; the contract recorded nothing, as designed | EVIDENCE, S4/S5 and "OutLayer (Level 1) on testnet" |
 
 ## Try it
@@ -48,7 +49,7 @@ guessable when the secret is short or predictable. A real vendor uses the defaul
 3. Print the verdict table for the cheating patches:
    `target/debug/kintsugi-check table --manifest data/attacks/manifest.txt --seed 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21`.
    See the honest fix PASS and the cheats FAIL (`data/attacks/` holds inert test patches).
-4. Run the contract tests: `cargo test -p kintsugi-contract --offline`. See 91 tests pass (docs/evidence/audit1/contract_unit_tests.txt).
+4. Run the contract tests: `cargo test -p kintsugi-contract --offline`. See 119 tests pass (docs/evidence/hardening/contract_unit_tests.txt).
 5. Count the zkVM cycles of one check without proving it:
    `./target/release/kintsugi-host execute data/demo/fixed.wasm --fuzz-count 16 --variants 32 --profile --demo-salt`. See the verdict
    PASS and the cycles per phase.
@@ -57,6 +58,11 @@ guessable when the secret is short or predictable. A real vendor uses the defaul
    current checker is `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`. Try it on the demo bounty:
    `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 7`. See MATCH (open until 2026-11-24). Bounties made before the
    reproducible build (S4, S7, S13) show DIFFERENT (docs/SECURITY.md, known limits).
+
+7. Open the site: `python3 -m http.server 8000 --directory web`, then open http://localhost:8000 in a browser. See the
+   intro, then the live bounties read from `kintsugi-l2-cihdp.testnet` (internet needed). To refresh the agent feed:
+   `python3 -I scripts/gen_feed.py`; to rebuild the recorded data from the evidence files:
+   `python3 -I scripts/gen_site_recorded.py`.
 
 ## How NEAR fits in
 
@@ -83,14 +89,18 @@ Built today (each part has its proof in the table above):
   attestations, and pays by rule, including by default when the vendor stays silent.
 - Guards against the attacks listed in [docs/SECURITY.md](docs/SECURITY.md).
 - A reproducible build of the checker, so anyone can rebuild it and compare its image id with the one a bounty names.
-- The contract checking the proof itself (Level 2), so no verifier has to be trusted for the verdict.
+- The contract checking the proof itself (Level 2), so no verifier has to be trusted for the verdict when the bounty's
+  image id is the published checker (on the owner's allowlist).
+- A read only site (`web/`): live bounties, the recorded probe arena, how to verify, a feed and a quickstart for agents.
 
 Planned next:
 
 - OutLayer as one of the verifiers, once its testnet answers our jobs.
 - An agent driven by a language model in place of the scripted one.
 - Faster proving on a GPU.
-- A small web page to follow a bounty.
+- On the site (planned, not built): connect a wallet; deposit credit and send attempts from the page; create a bounty
+  from the page; a proof ledger.
+- A live bounty on a new original module with its own bug (bounty 12 reuses the public demo bug).
 - After the audit: a "crash proven only" mode, for a vendor who can prove the crash but has no fix yet.
 
 ## Limits
@@ -103,8 +113,8 @@ Planned next:
   the old rule, under which the honest researcher could get nothing (docs/AUDIT.md, finding 3 and hardening S7).
 - Live bounty 12 keeps its secret private but uses the public demo bug: anyone can submit the public `fixed.wasm`, and a
   silent vendor's timeout can pay without any proof. A new original module with its own bug is a possible later
-  improvement. A review of the
-  contract found and fixed six problems; its report, with the unfixed ones stated as known limits, is
-  [docs/AUDIT.md](docs/AUDIT.md).
+  improvement.
+- The contract went through AI review passes; their findings led to seven fixes (six in the first round, one after the
+  final review). The report, with the unfixed findings stated as known limits, is [docs/AUDIT.md](docs/AUDIT.md).
 - Narrow scope: crash bugs in a small module that compiles to WebAssembly.
 - Proving is slow on a laptop CPU (see above). Testnet only. No external security audit.

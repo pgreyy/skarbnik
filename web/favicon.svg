@@ -1,0 +1,10 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+<!-- The Kintsugi "Cracked ring" mark (same drawing as web/js/logo.js), with the Light colours, or Night when the system is dark. -->
+<style>.r{color:#2A0805}.g{stroke:#A8740A}.b{stroke:#F4E6C8}@media (prefers-color-scheme:dark){.r{color:#F3E6D0}.g{stroke:#E3B341}.b{stroke:#120403}}</style>
+<g class="r">
+<circle cx="32" cy="32" r="25" fill="none" stroke="currentColor" stroke-width="4.5"/>
+<path class="b" d="M5 38 L17 29 L26 42 L39 23 L47 38 L59 27" fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="32" cy="32" r="9" fill="currentColor"/>
+<path class="g" d="M5 38 L17 29 L26 42 L39 23 L47 38 L59 27" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

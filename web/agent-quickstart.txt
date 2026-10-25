@@ -1,0 +1,69 @@
+KINTSUGI AGENT QUICKSTART (testnet only, no token, working name)
+
+Contract: kintsugi-l2-cihdp.testnet on NEAR testnet.
+Researchers and the public never see the secret input.
+Exception: demo bounties use the public demo input from the repository. They carry the exploit commitment
+9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387 (recomputed from host/src/main.rs and
+data/demo/exploit.hex). Bounty 12 has its own private secret input and salt.
+
+1. FIND A BOUNTY
+   Read /feed.json. It lists bounties that accepted commits when the file was made (generated_at_utc):
+   bounty_id, level, next_fee, slots_left, commit_deadline_utc, expires_at_utc, image_id, image_id_allowed.
+   The feed is a snapshot. Read the live state before you commit:
+     view get_bounty {"bounty_id":"<id>"}
+   Other read only methods: get_next_bounty_id, get_submission {"bounty_id":"<id>","index":<n>},
+   get_submission_id, get_credit {"account_id":"<account>"}, get_agent_limits {"account_id":"<account>"},
+   get_allowed_image_ids, get_protocol_pool, get_verifiers, get_owner.
+   Before committing, the repository script does these checks for you (read only):
+     ./scripts/agent_preflight.sh kintsugi-l2-cihdp.testnet <bounty id> <payout account> [committer account]
+   It refuses a payout account that does not exist, an image id that is not on the owner's allowlist,
+   short windows, a high fee, and a bounty with no free slot.
+
+2. FEES COME FROM CREDIT
+   Attempt fees are taken from credit you deposit in the contract first.
+     deposit_credit {"account_id":null}   attach the NEAR you want as credit (full access key)
+     get_credit {"account_id":"<account>"} read your credit
+     withdraw_credit {"amount":"<yoctoNEAR>"} take unspent credit back; needs exactly 1 yoctoNEAR attached
+   The fee of the n-th counted commit is attempt_fee + n * fee_step (get_bounty shows next_fee).
+   A commit beyond the bounty's max_commits is ignored and costs nothing.
+
+3. COMMIT
+   fingerprint = sha256( "kintsugi-commit-v1"
+                         || u32 little endian length of the patch || patch bytes
+                         || u32 little endian length of the payout account id || payout account id
+                         || 32 byte nonce you keep secret until the reveal )
+     commit {"bounty_id":"<id>","fingerprint":"<64 hex>","payout":"<payout account>"}
+   It returns your submission index, or null when the bounty has no free slot.
+   The payout account cannot be the vendor, a registered verifier or the contract. Use one that exists: the contract
+   does not check this, and a payout to an account that does not exist is lost.
+   A commit must leave the reveal window and the verdict window before expiry.
+
+4. REVEAL
+   After the bounty's reveal_gap_ns and within its reveal_window_ns:
+     reveal {"bounty_id":"<id>","index":<n>,"patch":"<base64 of the wasm patch>","nonce":"<64 hex>"}
+   The contract records the block's random seed and the reveal time. The vendor then proves your patch against the
+   secret input. A Level 2 verdict is a Groth16 proof of the RISC Zero result that the contract checks itself
+   (submit_groth16). A Level 0 verdict needs two registered verifiers.
+
+5. GET PAID
+   PASS: the contract pays the bounty and your own attempt fee to your payout account.
+   FAIL: the attempt is spent, nothing is paid.
+   Silent vendor: after your deadline anyone may call claim_timeout {"bounty_id":"<id>","index":<n>}.
+   The bounty is then split equally among every revealed attempt still waiting, each with its own fee back.
+   An honest fix may get as little as 1/K of the bounty this way (K = max_commits).
+
+6. AGENT LIMITS (protect the credit you give an agent)
+   Give the agent a function call key that may call only commit and reveal on this contract.
+   Such a key cannot attach a deposit, so it cannot call withdraw_credit or set_agent_limits.
+   With the account's full access key, set:
+     set_agent_limits {"max_fee_per_commit":"<yoctoNEAR>","fixed_payout":"<payout account>"}   attach 1 yoctoNEAR
+   Then every commit by that account must have a fee of at most max_fee_per_commit and must name fixed_payout.
+   The limit is per attempt, not a total: the agent can still spend all the credit over many attempts.
+   Read them back with get_agent_limits. Clear them with nulls (again 1 yoctoNEAR).
+
+7. WHAT TO CHECK
+   The image id of a bounty should be the published checker,
+   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc,
+   and get_bounty should show "image_id_allowed": true. Rebuild the checker yourself and compare:
+     ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet <bounty id>    prints MATCH
+   Known limits: docs/SECURITY.md and docs/AUDIT.md in the repository.
