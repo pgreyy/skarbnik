@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Live site on Vercel (branch ui-preview)
+
+- The repository is now github.com/pgreyy/skarbnik (renamed by the owner); the git remote follows it.
+- The owner's Vercel project serves `web/` with no build step from branch ui-preview: https://skarbnik-near.vercel.app .
+- Fixed for the live site: `.rs` sources were served as `application/rls-services+xml`; `web/vercel.json` now sends
+  them as plain text. The wallet list no longer carries Intear's own localhost and .local development addresses.
+- Checked on the live domain (docs/evidence/web/live_site.txt): pages, feed and quickstart load; bounty 7 reads live
+  data; NEAR CLI and Intear load their scripts from the official addresses and pass the hash check; a changed byte is
+  refused; the page contacts only the site, Google Fonts and the testnet RPC.
+
 ## 2026-10-25: Agent driven by a language model, dry run (branch ui-preview)
 
 - `agent/kintsugi_agent.py` and `agent/config.toml`: feed, preflight, limits and key checks, public code checked

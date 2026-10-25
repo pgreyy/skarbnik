@@ -1,0 +1,44 @@
+# Checks of the live site https://skarbnik-near.vercel.app/ on 2026-10-25T22:50:21Z, deploy of commit b84e3ef
+## Files (HTTP status, content type)
+200 text/html; charset=utf-8  /
+200 application/json; charset=utf-8  /feed.json
+200 text/plain; charset=utf-8  /agent-quickstart.txt
+200 application/json; charset=utf-8  /vendor/wallets/manifest.json
+200 text/plain; charset=utf-8  /code/demo/original.rs
+200 application/wasm  /code/demo/original.wasm
+## Pages in a browser (scripts: target/site-check/livecheck.mjs)
+== ?intro=0#/
+brand: Skarbnik | title: Fix what you can’t see. · Skarbnik (testnet)
+h1: Fix what you can’t see.
+text: BOUNTIES FOR BUGS THAT ONLY CRASH ON A SECRET INPUT Fix what you can’t see. Researchers and AI agents fix a crash from the public code; the contract checks a Groth16 proof of the RISC Zero result itself and pays by rule. BROWSE BOUNTIES HOW TO VERIFY Bounty 12 OPEN A live Level 2 bounty with a private secret input 0.5 NEAR bounty 0 of 3 used · next fee 0.01 NEAR · expires 2026-11-24 03:49 UTC It uses the public demo 
+== ?intro=0#/bounties/7
+brand: Skarbnik | title: Bounty 7 · Skarbnik (testnet)
+h1: Bounty 7
+text: ← All bounties Bounty 7 OPEN Checked by Level 2 Demo input Contract Raw data On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them. SEND AN ATTEMPT 1 Commit 2 Reveal 3 Wait for the vendor’s proof Commit locks a sealed fingerprint of your fix. Reveal sends the fix itself so it can be tested. Reveal within 1 hour of your commit. After you r
+hosts contacted: fonts.googleapis.com, fonts.gstatic.com, skarbnik-near.vercel.app, test.rpc.fastnear.com
+errors: none
+## Wallets (same steps as scripts/wallet-vendor/pin_check.sh, against the live domain)
+== case: lcli
+wallets listed: Intear Wallet, NEAR CLI
+script requests: 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js
+NEAR CLI account form shown: true
+Intear windows opened: none
+header: CONNECTING…
+page message: 
+errors: none
+== case: lintear
+wallets listed: Intear Wallet, NEAR CLI
+script requests: 200 https://wallet.intear.tech/near-selector.js
+NEAR CLI account form shown: false
+Intear windows opened: https://wallet.intear.tech/connect, https://wallet.intear.tech/service_worker.js
+header: CONNECTING…
+page message: 
+errors: none
+== case: ltamper
+wallets listed: Intear Wallet, NEAR CLI
+script requests: tampered one byte of https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js | 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js
+NEAR CLI account form shown: false
+Intear windows opened: none
+header: NEAR CLI changed its wallet script since this site checked it, so the site will not run it. Use another wallet for now. TRY AGAIN
+page message: 
+errors: none
