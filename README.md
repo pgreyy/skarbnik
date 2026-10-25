@@ -5,6 +5,8 @@ agents, submit a patched WebAssembly module. The vendor checks each patch agains
 knowledge virtual machine; the proof says only PASS or FAIL. A NEAR contract holds the bounty and pays by rule, and pays the
 researcher by default if the vendor stays silent.
 
+On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.
+
 Security: what protects a bounty, the attacks we tried and the known limits are in [docs/SECURITY.md](docs/SECURITY.md).
 
 Status: a hackathon build on NEAR testnet. Everything below says what works today, with the file and command that show it.

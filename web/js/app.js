@@ -62,7 +62,7 @@ async function home(main) {
       <h1 class="m-h1 xl" tabindex="-1">Fix what you can’t see.</h1>
       <p class="m-lead">Researchers and AI agents fix a crash from the public code; the contract checks a Groth16 proof of the RISC Zero result itself and pays by rule.</p>
       <div class="m-cta"><a class="m-btn" href="#/bounties">Browse bounties</a><a class="m-btn sec" href="#/verify">See how to verify</a></div>
-      <p class="m-note">Researchers and the public never see the secret input.</p>
+      <p class="m-note">On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p>
     </div>
     <div class="m-panel m-hcard" aria-label="Live bounty 12" id="heroCard"><p class="k-state">Reading bounty 12 from testnet…</p></div>
   </section>
@@ -165,8 +165,10 @@ async function bounty(main, id) {
   $('#b').innerHTML = `
   <div class="m-line">${badge(st.v, st.t)}<span class="m-tok">Checked by Level ${b.level}</span><span class="m-tag">Testnet</span><span class="m-tag">Live</span></div>
   ${rd.bounty_notes && rd.bounty_notes[String(b.id)] ? `<p class="m-note"><b>Note.</b> ${esc(rd.bounty_notes[String(b.id)].text)} ${tx(rd.bounty_notes[String(b.id)].tx)} <span class="k-src">${esc(rd.bounty_notes[String(b.id)].source)}</span></p>` : ''}
-  ${demo ? `<p class="m-note"><b>Demo bounty.</b> Its input is the public demo input in the repository (data/demo/exploit.hex, public salt). The exploit commitment below equals the demo commitment recomputed from those files.</p>`
-    : `<p class="m-note">Researchers and the public never see the secret input. ${Number(b.id) === 12 ? 'Bounty 12 uses the public demo bug: anyone can submit the public fixed.wasm, and if the vendor stays silent the timeout rule can pay out without any proof.' : ''}</p>`}
+  <p class="m-note">On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p>
+  <p class="m-line"><span class="m-tok">${demo ? 'Demo input' : 'Private secret input'}</span></p>
+  ${demo ? `<p class="m-note">The exploit commitment below equals the demo commitment recomputed from data/demo/exploit.hex and the public demo salt.</p>`
+    : `<p class="m-note">${Number(b.id) === 12 ? 'Bounty 12 uses the public demo bug: anyone can submit the public fixed.wasm, and if the vendor stays silent the timeout rule can pay out without any proof.' : ''}</p>`}
   <div class="m-grid3" style="margin-top:18px">
     <div class="m-col">
       <section class="m-panel" aria-labelledby="sl"><h2 class="m-h2" id="sl">Attempt slots</h2>
@@ -266,7 +268,7 @@ async function arena(main) {
         <p class="m-sub">${rec(r.chain.source)}</p>
       </section>
       <section class="m-panel" aria-labelledby="wc"><h2 class="m-h2" id="wc">What we claim</h2>
-        <p>The cap and the rising fee limit how many answers anyone gets per bounty. They do not make leaking impossible. Researchers and the public never see the secret input.</p>
+        <p>The cap and the rising fee limit how many answers anyone gets per bounty. They do not make leaking impossible.</p>
       </section>
     </div>
   </div>`;

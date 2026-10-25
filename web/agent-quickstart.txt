@@ -1,10 +1,9 @@
 KINTSUGI AGENT QUICKSTART (testnet only, no token, working name)
 
 Contract: kintsugi-l2-cihdp.testnet on NEAR testnet.
-Researchers and the public never see the secret input.
-Exception: demo bounties use the public demo input from the repository. They carry the exploit commitment
-9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387 (recomputed from host/src/main.rs and
-data/demo/exploit.hex). Bounty 12 has its own private secret input and salt.
+On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.
+Demo bounties carry the exploit commitment 9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387
+(recomputed from host/src/main.rs and data/demo/exploit.hex). Bounty 12 is a private bounty.
 
 1. FIND A BOUNTY
    Read /feed.json. It lists bounties that accepted commits when the file was made (generated_at_utc):
