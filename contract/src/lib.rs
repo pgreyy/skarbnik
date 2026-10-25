@@ -151,6 +151,16 @@ fn release_to_pool(bounty_id: U64, index: u32, bounty: &mut Bounty, sub: &mut Su
     emit("fee_to_pool", json!({ "bounty_id": bounty_id, "index": index, "fee": U128(sub.fee.as_yoctonear()), "pool": U128(pool) }));
 }
 
+/// Audit round 1, fix 3: the earliest reveal has priority. True if some other submission of the bounty was revealed
+/// before `revealed_at` and is still undecided (outcome Open). A PASS or a timeout for a later reveal must wait until
+/// every earlier reveal is decided or timed out, so copying a revealed patch into a second account cannot jump the queue.
+fn earlier_reveal_undecided(subs: &LookupMap<(u64, u32), Submission>, bounty_id: u64, commits: u32, index: u32, revealed_at: u64) -> bool {
+    (0..commits).filter(|k| *k != index).any(|k| {
+        subs.get(&(bounty_id, k))
+            .is_some_and(|o| o.outcome == Outcome::Open && o.revealed_at_ns.is_some_and(|t| t < revealed_at))
+    })
+}
+
 /// The journal fields that are the same for every proof of one bounty.
 fn check_bounty_fields(bounty: &Bounty, j: &groth16::Journal) {
     require!(j.original_hash == bounty.original_hash, "the journal's original is not this bounty's");
@@ -607,6 +617,11 @@ impl Contract {
         require!(now <= revealed.saturating_add(verdict_window), "verdict window has closed");
         let journal = parse_hash("journal_hash", &journal_hash);
         let receipt = parse_hash("receipt_hash", &receipt_hash);
+        let (commits, id) = (bounty.commits, bounty_id.0);
+        if verdict == Verdict::Pass {
+            require!(!earlier_reveal_undecided(&self.submissions, id, commits, index, revealed), "an attempt revealed earlier is still undecided: decide it or time it out first");
+        }
+        let sub = self.submissions.get_mut(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
         sub.verdict = Some(PostedVerdict { verdict, journal_hash: journal, receipt_hash: receipt, posted_at_ns: now });
         emit(
             "verdict_posted",
@@ -1038,7 +1053,12 @@ impl Contract {
         let revealed = sub.revealed_at_ns.unwrap_or_else(|| env::panic_str("submission not revealed"));
         require!(now <= revealed.saturating_add(bounty.verdict_window_ns), "verdict window has closed");
         let j = groth16::parse_journal(&journal.0);
-        require!(groth16::verify(&seal.0, &bounty.image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
+        let (commits, image_id) = (bounty.commits, bounty.image_id);
+        if j.verdict == 1 {
+            require!(!earlier_reveal_undecided(&self.submissions, bounty_id.0, commits, index, revealed), "an attempt revealed earlier is still undecided: decide it or time it out first");
+        }
+        let sub = self.submissions.get_mut(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
+        require!(groth16::verify(&seal.0, &image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
         let patch_hash = sub.patch_hash.unwrap_or_else(|| env::panic_str("submission not revealed"));
         require!(j.submission_id == submission_id(&contract, bounty_id.0, index, &patch_hash), "the journal belongs to another bounty or attempt (submission id)");
         require!(Some(j.fuzz_seed) == sub.seed, "the journal's seed is not the seed recorded at reveal");
@@ -1089,6 +1109,10 @@ impl Contract {
         require!(sub.outcome == Outcome::Open, "verdict already final");
         let deadline = sub.deadline_ns(bounty).unwrap_or_else(|| env::panic_str("submission not revealed"));
         require!(now > deadline, "deadline has not passed");
+        let (commits, revealed) = (bounty.commits, sub.revealed_at_ns.unwrap_or(u64::MAX));
+        require!(!earlier_reveal_undecided(&self.submissions, bounty_id.0, commits, index, revealed), "an attempt revealed earlier is still undecided: decide it or time it out first");
+        let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        let sub = self.submissions.get_mut(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
         sub.outcome = Outcome::TimedOut;
         bounty.pending -= 1;
         bounty.state = BountyState::Paid;

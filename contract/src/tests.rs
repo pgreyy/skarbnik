@@ -1006,3 +1006,77 @@ fn audit_h2_vendor_as_payout_is_refused() {
     call(researcher(), T0 + SEC);
     c.commit(U64(0), fingerprint_hex(PATCH, &vendor()), vendor());
 }
+
+// Audit round 1, fix 3 (auditor finding C2, critical): the earliest reveal has priority for a PASS and for a timeout.
+fn second_account_copies(c: &mut Contract, who: &str, t: u64) -> u32 {
+    at(acc(who), t, start_credit());
+    c.deposit_credit(None);
+    call(acc(who), t + 1);
+    let s = c.commit(U64(0), fingerprint_hex(PATCH, &acc(who)), acc(who)).unwrap();
+    call(acc(who), t + 1 + GAP);
+    c.reveal(U64(0), s, Base64VecU8(PATCH.to_vec()), NONCE.into()); // the same patch bytes, copied from the chain
+    s
+}
+
+#[test]
+#[should_panic(expected = "an attempt revealed earlier is still undecided")]
+fn audit_c2_pass_for_a_copied_later_reveal_is_refused_while_the_first_reveal_is_undecided() {
+    let mut c = setup();
+    commit_and_reveal(&mut c, T0 + SEC); // the honest researcher reveals first
+    let s = second_account_copies(&mut c, "s.testnet", T0 + 4 * SEC);
+    call(vendor(), T0 + 10 * SEC);
+    c.post_verdict(U64(0), s, Verdict::Pass, H1.into(), H2.into());
+}
+
+#[test]
+#[should_panic(expected = "an attempt revealed earlier is still undecided")]
+fn audit_c2_copier_cannot_claim_its_timeout_before_the_first_reveal_is_decided() {
+    let mut c = setup();
+    commit_and_reveal(&mut c, T0 + SEC);
+    let s = second_account_copies(&mut c, "s.testnet", T0 + 4 * SEC);
+    call(acc("s.testnet"), T0 + 5 * SEC + GAP + W + 1); // the copier's own deadline has passed, the researcher's too
+    c.claim_timeout(U64(0), s);
+}
+
+#[test]
+fn audit_c2_first_reveal_is_paid_by_timeout_then_the_copier_gets_nothing() {
+    let mut c = setup();
+    let r = commit_and_reveal(&mut c, T0 + SEC);
+    let s = second_account_copies(&mut c, "s.testnet", T0 + 4 * SEC);
+    call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(0), r); // anyone may time out the first reveal; it is paid
+    assert_eq!(transfers(), vec![(payout(), bounty_amount().as_yoctonear() + FEE)]);
+    assert_eq!(c.get_submission(U64(0), s).unwrap().outcome, Outcome::Open);
+    assert_eq!(c.get_bounty(U64(0)).unwrap().state, BountyState::Paid);
+}
+
+#[test]
+fn audit_c2_later_pass_goes_through_once_the_earlier_reveal_is_decided() {
+    let mut c = setup();
+    let r = commit_and_reveal(&mut c, T0 + SEC);
+    let s = second_account_copies(&mut c, "s.testnet", T0 + 4 * SEC);
+    call(vendor(), T0 + 10 * SEC);
+    c.post_verdict(U64(0), r, Verdict::Fail, H1.into(), H2.into()); // the earlier reveal is decided first (FAIL)
+    call(v1(), T0 + 11 * SEC);
+    c.attest(U64(0), r, Verdict::Fail, H1.into(), H2.into());
+    call(v2(), T0 + 12 * SEC);
+    assert_eq!(c.attest(U64(0), r, Verdict::Fail, H1.into(), H2.into()), "final_fail");
+    call(vendor(), T0 + 13 * SEC);
+    c.post_verdict(U64(0), s, Verdict::Pass, H1.into(), H2.into()); // now allowed
+    assert_eq!(c.get_submission(U64(0), s).unwrap().verdict.map(|v| v.verdict), Some(Verdict::Pass));
+}
+
+#[test]
+fn audit_c2_a_lower_index_revealed_later_does_not_block_an_earlier_reveal() {
+    let mut c = setup();
+    call(acc("slow.testnet"), T0 + SEC); // index 0 commits first but reveals later
+    at(acc("slow.testnet"), T0 + SEC, start_credit());
+    c.deposit_credit(None);
+    call(acc("slow.testnet"), T0 + 2 * SEC);
+    let slow = c.commit(U64(0), fingerprint_hex(b"junk", &acc("slow.testnet")), acc("slow.testnet")).unwrap();
+    let r = commit_and_reveal(&mut c, T0 + 3 * SEC); // index 1 reveals at T0 + 3 s + gap
+    call(acc("slow.testnet"), T0 + 20 * SEC);
+    c.reveal(U64(0), slow, Base64VecU8(b"junk".to_vec()), NONCE.into()); // index 0 reveals after index 1
+    call(vendor(), T0 + 21 * SEC);
+    c.post_verdict(U64(0), r, Verdict::Pass, H1.into(), H2.into()); // allowed: nothing was revealed before index 1
+}
