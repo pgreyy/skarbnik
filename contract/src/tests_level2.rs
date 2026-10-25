@@ -155,3 +155,51 @@ fn audit_f1_level2_last_minute_commit_is_refused() {
     at("thief.testnet", T0 + 3590 * SEC, NearToken::from_yoctonear(0));
     c.commit(U64(0), "aa".repeat(32), acc("thief.testnet"));
 }
+
+// Audit round 1, fix 5 (auditor finding: the vendor chose the checker program): the owner's allowlist of image ids.
+#[test]
+fn audit_f5_allowlist_pins_the_checker() {
+    let mut c = with_bounty(LEVEL_2, v::IMAGE_ID, 16, 32); // created while the list is empty: any id is accepted
+    assert!(c.get_bounty(U64(0)).unwrap().image_id_allowed);
+    at("kintsugi.testnet", T0 + SEC, NearToken::from_yoctonear(0));
+    assert_eq!(c.allow_image_id(v::IMAGE_ID.into()), vec![v::IMAGE_ID.to_string()]);
+    assert_eq!(c.get_allowed_image_ids(), vec![v::IMAGE_ID.to_string()]);
+    // The allowed id still creates bounties.
+    at("vendor.testnet", T0 + 2 * SEC, NearToken::from_near(1));
+    c.create_bounty(
+        v::ORIGINAL.into(), v::CORPUS.into(), v::IMAGE_ID.into(), v::EXPLOIT.into(), "00".repeat(32), 3, 1024, U64(2 * SEC),
+        U64(600 * SEC), U64(300 * SEC), U64(3600 * SEC), U128(10_000_000_000_000_000_000_000), U128(0),
+        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2),
+    );
+    assert!(c.get_bounty(U64(1)).unwrap().image_id_allowed);
+}
+
+#[test]
+#[should_panic(expected = "image_id is not an allowed checker")]
+fn audit_f5_unlisted_image_id_is_refused_once_the_list_is_set() {
+    let mut c = with_bounty(LEVEL_2, v::IMAGE_ID, 16, 32);
+    at("kintsugi.testnet", T0 + SEC, NearToken::from_yoctonear(0));
+    c.allow_image_id(v::IMAGE_ID.into());
+    at("vendor.testnet", T0 + 2 * SEC, NearToken::from_near(1));
+    c.create_bounty(
+        v::ORIGINAL.into(), v::CORPUS.into(), "ab".repeat(32), v::EXPLOIT.into(), "00".repeat(32), 3, 1024, U64(2 * SEC),
+        U64(600 * SEC), U64(300 * SEC), U64(3600 * SEC), U128(10_000_000_000_000_000_000_000), U128(0),
+        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2),
+    );
+}
+
+#[test]
+#[should_panic(expected = "only the owner can allow an image id")]
+fn audit_f5_only_the_owner_allows_image_ids() {
+    let mut c = with_bounty(LEVEL_2, v::IMAGE_ID, 16, 32);
+    at("vendor.testnet", T0 + SEC, NearToken::from_yoctonear(0));
+    c.allow_image_id(v::OTHER_IMAGE_ID.into());
+}
+
+#[test]
+fn audit_f5_an_existing_bounty_with_an_unlisted_id_is_shown_as_not_allowed() {
+    let mut c = with_bounty(LEVEL_2, v::OTHER_IMAGE_ID, 16, 32); // created before the list existed
+    at("kintsugi.testnet", T0 + SEC, NearToken::from_yoctonear(0));
+    c.allow_image_id(v::IMAGE_ID.into());
+    assert!(!c.get_bounty(U64(0)).unwrap().image_id_allowed);
+}

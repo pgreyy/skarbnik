@@ -88,6 +88,10 @@ const OUTLAYER_KEY: &[u8] = b"OUTLAYER";
 /// never revealed. Kept outside the contract's state struct so the stored layout does not change. There is no way to
 /// take NEAR out of the pool yet; its destination is deliberately left open (docs/SECURITY.md).
 const POOL_KEY: &[u8] = b"PROTOCOL_POOL";
+/// Raw storage key of the owner's allowlist of checker image ids (borsh `Vec<[u8; 32]>`). While it is empty any image id is
+/// accepted (the state before audit round 1); once it holds an id, `create_bounty` refuses every other id, so a Level 2
+/// verdict can only come from a published checker (audit finding: the vendor chose the program).
+const ALLOWED_IMAGE_IDS_KEY: &[u8] = b"ALLOWED_IMAGE_IDS";
 /// Domain tag of the submission id a Proof 0 journal carries: sha256(PROOF0_DOMAIN || reference fix hash), as in
 /// harness/checker/src/zk.rs.
 pub const PROOF0_DOMAIN: &[u8] = b"kintsugi-proof0-v1";
@@ -134,6 +138,17 @@ pub fn proof0_id(reference_fix_hash: &[u8; 32]) -> [u8; 32] {
     let mut b = PROOF0_DOMAIN.to_vec();
     b.extend_from_slice(reference_fix_hash);
     env::sha256_array(&b)
+}
+
+fn allowed_image_ids() -> Vec<[u8; 32]> {
+    env::storage_read(ALLOWED_IMAGE_IDS_KEY)
+        .and_then(|b| near_sdk::borsh::from_slice::<Vec<[u8; 32]>>(&b).ok())
+        .unwrap_or_default()
+}
+
+fn image_id_allowed(image_id: &[u8; 32]) -> bool {
+    let list = allowed_image_ids();
+    list.is_empty() || list.contains(image_id)
 }
 
 fn pool_balance() -> u128 {
@@ -361,6 +376,8 @@ pub struct BountyView {
     pub level: u8,
     pub fuzz_count: u32,
     pub variant_count: u32,
+    /// True if the bounty's image id is on the owner's allowlist of published checkers (or the list is empty).
+    pub image_id_allowed: bool,
 }
 
 /// JSON view of a submission.
@@ -578,6 +595,8 @@ impl Contract {
         let level = level.unwrap_or(LEVEL_0);
         require!(level == LEVEL_0 || level == LEVEL_2, "level must be 0 or 2");
         require!(fuzz_count > 0 && variant_count > 0, "fuzz_count and variant_count must be above zero");
+        let image = parse_hash("image_id", &image_id);
+        require!(image_id_allowed(&image), "image_id is not an allowed checker: ask the owner to allow it (allow_image_id)");
         let now = env::block_timestamp();
         let bounty = Bounty {
             vendor: vendor.clone(),
@@ -1236,6 +1255,24 @@ impl Contract {
         U64(self.next_bounty_id)
     }
 
+    /// Owner only. Adds a checker image id to the allowlist; from the first id on, `create_bounty` accepts only listed ids.
+    pub fn allow_image_id(&mut self, image_id: String) -> Vec<String> {
+        require!(env::predecessor_account_id() == self.owner, "only the owner can allow an image id");
+        let id = parse_hash("image_id", &image_id);
+        let mut list = allowed_image_ids();
+        if !list.contains(&id) {
+            list.push(id);
+            env::storage_write(ALLOWED_IMAGE_IDS_KEY, &near_sdk::borsh::to_vec(&list).expect("borsh"));
+            emit("image_id_allowed", json!({ "image_id": to_hex(&id), "count": list.len() }));
+        }
+        list.iter().map(|h| to_hex(h)).collect()
+    }
+
+    /// The owner's allowlist of checker image ids (empty: any id is accepted).
+    pub fn get_allowed_image_ids(&self) -> Vec<String> {
+        allowed_image_ids().iter().map(|h| to_hex(h)).collect()
+    }
+
     /// The protocol fee pool: attempt fees of commits that were never revealed, in yoctoNEAR. Nothing can take NEAR
     /// out of it yet.
     pub fn get_protocol_pool(&self) -> U128 {
@@ -1277,6 +1314,7 @@ impl Contract {
             level: b.level,
             fuzz_count: b.fuzz_count,
             variant_count: b.variant_count,
+            image_id_allowed: image_id_allowed(&b.image_id),
         })
     }
 

@@ -60,6 +60,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | The payout account cannot be a registered verifier, the vendor or the contract; a registered verifier cannot commit (audit round 1, fix 2) | Blocking a verifier by naming it as payout (the "cannot attest its own submission" rule turned into a weapon), so no verdict could become final and the timeout paid the researcher | `commit` | unit tests `audit_h2_*` |
 | The earliest reveal has priority: a PASS (posted verdict or Groth16 proof) or a timeout for an attempt is refused while an attempt revealed earlier is still undecided (audit round 1, fix 3) | The vendor, or anyone, copying a revealed passing patch into a second account and getting paid for it first; a copier timing out first against a slow researcher | `earlier_reveal_undecided`, `post_verdict`, `submit_groth16`, `claim_timeout` | unit tests `audit_c2_*` |
 | Level 2 fees of decided attempts go to the protocol fee pool at expiry, never to the vendor; when a bounty closes, the fees of other revealed attempts still undecided are refunded as credit (audit round 1, fix 4) | A vendor earning the fees of attempts it failed (fee farming with an unfixable or fake bounty); honest losers' fees swept to the vendor or the verifiers although they were never judged | `expire`, `refund_undecided_revealed` | unit tests `audit_f4_*`; S6c rerun on testnet |
+| The owner keeps an allowlist of checker image ids; once it holds an id, `create_bounty` refuses every other id, and `get_bounty` shows `image_id_allowed` (audit round 1, fix 5) | A vendor naming its own program as the checker: a Level 2 verdict was only as good as the vendor's program, and a fake checker could farm attempt fees | `allow_image_id`, `get_allowed_image_ids`, `create_bounty` | unit tests `audit_f5_*`; set on `kintsugi-l2-cihdp.testnet` to the reproducible id |
 
 ### Keys
 
@@ -192,6 +193,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
+- 2026-10-25 (audit fix 5): owner allowlist of checker image ids; `image_id_allowed` in the bounty view.
 - 2026-10-25 (audit fix 4): Level 2 decided fees to the pool, never the vendor; undecided revealed attempts refunded at closure.
 - 2026-10-25 (audit fix 3): the earliest reveal has priority for a PASS and for a timeout.
 - 2026-10-25 (audit fix 2): payout cannot be a verifier, the vendor or the contract; verifiers cannot commit.
