@@ -13,3 +13,4 @@ background) was still waiting for the deadline. The background copy sent claim_t
 (succeeded); the second copy's call was not sent (near-cli exit 1, no transaction id; its output file was overwritten by the
 first copy, so its cause is not recorded). Both lines measured the same single payout of 0.11 NEAR (0.1 bounty + 0.01 fee).
 test bounty 14 for trying the wallet flow by hand: level 2 opened True K 3 expires 2026-10-28 17:10 UTC
+test bounty 15 for the NEAR CLI wallet run of the page: opened True K 2

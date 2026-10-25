@@ -43,7 +43,29 @@ prove an attempt).
 
 For trying the wallet flow by hand, `./scripts/web_testnet.sh userbounty` made test bounty 14 (K = 3, 0.1 NEAR, Level 2,
 expires 2026-10-28 17:10 UTC): created `GFDKa5dSbChMciB7CZ2dQw1VxZE4ojt3RGtXE2LkqwMU`, opened with the demo Proof 0
-`DhvXT4FjT1ox1nM91CvvYaqiMNdaSVgLTFyPwbjGaC62`. The site and the feed mark bounties 13 and 14 as test bounties.
+`DhvXT4FjT1ox1nM91CvvYaqiMNdaSVgLTFyPwbjGaC62`. The site and the feed mark bounties 13, 14 and 15 as test bounties.
+
+Wallet change (2026-10-25, MyNearWallet is retired on 31 October 2026): the site now connects through NEAR Connect
+(`@hot-labs/near-connect` 0.11.4, the connector the NEAR docs recommend) with Intear Wallet, NEAR CLI and MyNearWallet.
+Run through the page with the NEAR CLI wallet and the throwaway account, on test bounty 15 (K = 2, created
+`AsHkMtkVziHX2e6dJThxWwQzepwgc6PjFzdmx4y18DM9`, opened `HfMrCdtM62vxQBnc42RfbXGyN8GjEPYMiqAMBzBNtGZD`): a script drove the
+page in a headless browser; for each transaction it ran the command the wallet showed with near-cli (adding `send` and
+using near-cli's legacy keychain, where the throwaway key is), and pasted the transaction id back into the wallet.
+
+| Step through the page | Transaction | Result on the page |
+| --- | --- | --- |
+| deposit 0.03 NEAR (credit panel) | `8msX8Rj7WiErUZ3AZuD4JqDCx3ymxax2JgPVHMHd9xK5` | "Deposited 0.03 NEAR. Credit is now 0.03 NEAR." |
+| commit on bounty 15 (attempt panel, confirm sheet) | `2SvC7HPsbBfZEMmvSoksYLLzDp4EFrX1zbsuz8jjPXf7` | "Attempt recorded as #0. The fee was taken from your credit." |
+| reveal | `E5ZwA8ciZVaWotfc4GM2yZyBx5ZbqbgN1826GWJBSED6` | "Revealed. … Waiting for the vendor's proof." |
+| withdraw the rest, 0.02 NEAR | `8u7iHfRZ5Jk4HKQgVD822apvk9eZ8hw5vv5fVHySKfrF` | "Withdrawn 0.02 NEAR. Credit is now 0 NEAR." |
+
+Clicked through: NEAR CLI (all four steps above). Only loaded: Intear Wallet (its "Connect Intear Wallet" window from
+wallet.intear.tech opens; signing in needs an Intear account, not made here) and MyNearWallet (opens
+testnet.mynearwallet.com). Sources for the wallet choice: NEAR's announcement that MyNearWallet is sunset on 31 October
+(https://x.com/NEARProtocol/status/2107247398216958014), the notice on https://testnet.mynearwallet.com, the NEAR docs
+web login guide (https://docs.near.org/web3-apps/tutorials/wallet-login) and NEAR Connect's wallet manifest (testnet
+flags), hot-dao/near-selector at commit `6766ea5e`.
+
 
 ## S18: a live Level 2 bounty whose secret is not in the repository
 

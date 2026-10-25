@@ -1,13 +1,15 @@
-// Wallet connection for the site, NEAR testnet only. Uses the wallet selector with the MyNearWallet module, bundled in
-// vendor/near-wallet.js (exact versions in scripts/wallet-vendor/). Sign in asks for no contract key, so this page never
-// holds or stores a key: every transaction opens the wallet, where the person approves or rejects it. The page only
-// keeps the signed in account name, as the wallet module does.
-import { setupWalletSelector, setupMyNearWallet, actionCreators } from '../vendor/near-wallet.js';
+// Wallet connection for the site, NEAR testnet only, through NEAR Connect (vendor/near-connect.js, the connector the NEAR
+// docs recommend). The wallets offered are listed in vendor/wallets/manifest.json and their scripts are local copies in
+// vendor/wallets/ (exact sources and sha256 in scripts/wallet-vendor/fetch_wallets.sh): Intear Wallet, NEAR CLI (signs
+// in your own terminal), and MyNearWallet until it is retired on 31 October 2026. Each wallet's script runs in a sandboxed
+// frame. This page's own code never creates, stores or prints a key; a wallet's script may keep its own session key in
+// the browser (Intear does; it cannot spend on chain). Every transaction is approved in the wallet.
+import { NearConnector } from '../vendor/near-connect.js';
 import { CONTRACT, RPCS } from './chain.js';
 
-let selector = null;
+let connector = null;
 const listeners = new Set();
-export const state = { status: 'off', account: null, error: '' }; // off | connecting | on | wrongnet | failed
+export const state = { status: 'off', account: null, wallet: null, error: '' }; // off | connecting | on | wrongnet | failed
 
 function set(patch) { Object.assign(state, patch); listeners.forEach((f) => f(state)); }
 export function onChange(f) { listeners.add(f); return () => listeners.delete(f); }
@@ -15,49 +17,57 @@ export function onChange(f) { listeners.add(f); return () => listeners.delete(f)
 // A testnet account is a named account under .testnet or a 64 character implicit account.
 export const isTestnetAccount = (a) => /\.testnet$/.test(a) || /^[0-9a-f]{64}$/.test(a);
 
-function fromSelector(s) {
-  const a = s.accounts && s.accounts[0] ? s.accounts[0].accountId : null;
-  if (!a) set({ status: state.status === 'connecting' ? 'connecting' : 'off', account: null });
-  else if (!isTestnetAccount(a)) set({ status: 'wrongnet', account: a });
-  else set({ status: 'on', account: a, error: '' });
+function fromAccounts(accounts, walletName) {
+  const a = accounts && accounts[0] ? accounts[0].accountId : null;
+  if (!a) set({ status: 'off', account: null, wallet: null });
+  else if (!isTestnetAccount(a)) set({ status: 'wrongnet', account: a, wallet: walletName });
+  else set({ status: 'on', account: a, wallet: walletName, error: '' });
+}
+
+async function manifest() {
+  const m = await (await fetch('vendor/wallets/manifest.json')).json();
+  m.wallets = m.wallets.map((w) => ({ ...w, executor: new URL(w.executor, location.href).href }));
+  return m;
 }
 
 export async function init() {
   try {
-    selector = await setupWalletSelector({ network: 'testnet', modules: [setupMyNearWallet()] });
-    fromSelector(selector.store.getState());
-    selector.store.observable.subscribe(fromSelector);
+    connector = new NearConnector({ network: 'testnet', manifest: await manifest(), footerBranding: null, providers: { testnet: RPCS } });
+    connector.on('wallet:signIn', async (e) => { const w = await connector.wallet().catch(() => null); fromAccounts(e.accounts, w && w.manifest ? w.manifest.name : null); });
+    connector.on('wallet:signOut', () => set({ status: 'off', account: null, wallet: null }));
+    const c = await connector.getConnectedWallet().catch(() => null);
+    if (c) fromAccounts(c.accounts, c.wallet && c.wallet.manifest ? c.wallet.manifest.name : null);
   } catch (e) {
-    set({ status: 'failed', error: `The wallet module did not load: ${e.message}` });
+    set({ status: 'failed', error: `The wallet connector did not load: ${e.message}` });
   }
 }
 
 export async function connect() {
-  if (!selector) await init();
-  if (!selector) return;
+  if (!connector) await init();
+  if (!connector) return;
   set({ status: 'connecting', error: '' });
   try {
-    const w = await selector.wallet('my-near-wallet');
-    await w.signIn({}); // no contractId: the wallet adds no key for this site
-    fromSelector(selector.store.getState());
-    if (state.status === 'connecting') set({ status: 'failed', error: 'The wallet returned no account.' });
+    await connector.connect(); // opens NEAR Connect's wallet list; signs in with no contract key
+    const c = await connector.getConnectedWallet().catch(() => null);
+    if (c) fromAccounts(c.accounts, c.wallet && c.wallet.manifest ? c.wallet.manifest.name : null);
+    else set({ status: 'off' });
   } catch (e) {
-    set({ status: 'failed', error: plainError(e) });
+    set({ status: /closed|reject|cancel/i.test(e && e.message) ? 'off' : 'failed', error: plainError(e) });
   }
 }
 
 export async function disconnect() {
-  try { const w = await selector.wallet(); await w.signOut(); } catch { /* already signed out */ }
-  set({ status: 'off', account: null, error: '' });
+  try { await connector.disconnect(); } catch { /* already signed out */ }
+  set({ status: 'off', account: null, wallet: null, error: '' });
 }
 
 // One function call to the contract, approved in the wallet. Returns the transaction outcome.
 export async function call(method, args, depositYocto = '0', tgas = 100) {
   if (state.status !== 'on') throw new Error('Connect a testnet wallet first.');
-  const w = await selector.wallet();
+  const w = await connector.wallet();
   return w.signAndSendTransaction({
     receiverId: CONTRACT,
-    actions: [actionCreators.functionCall(method, args, BigInt(tgas) * 10n ** 12n, BigInt(depositYocto))],
+    actions: [{ type: 'FunctionCall', params: { methodName: method, args, gas: (BigInt(tgas) * 10n ** 12n).toString(), deposit: String(depositYocto) } }],
   });
 }
 
@@ -84,8 +94,8 @@ function failureText(f) {
 
 export function plainError(e) {
   const m = (e && e.message) || String(e);
-  if (/closed the window|rejected|denied|cancel/i.test(m)) return 'The wallet request was closed or rejected. Nothing was sent.';
-  if (/popup window blocked/i.test(m)) return 'The browser blocked the wallet window. Allow pop ups for this site and try again.';
+  if (/closed the window|closed|rejected|denied|cancel/i.test(m)) return 'The wallet request was closed or rejected. Nothing was sent.';
+  if (/popup window blocked|blocked/i.test(m)) return 'The browser blocked the wallet window. Allow pop ups for this site and try again.';
   const p = m.match(/Smart contract panicked: ([^"\\]+)/);
   return p ? p[1] : m.slice(0, 300);
 }

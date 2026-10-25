@@ -429,3 +429,29 @@ a.m-bid,a.m-link,a.m-back{text-decoration:underline}
 .k-more[open]>summary::before{content:"\25BE"}
 .k-ol h3{margin-bottom:10px}
 .k-ol .m-cmd{margin:0 0 8px}
+/* Tabs and compact sections */
+.k-tabs{margin:0 0 16px}
+.k-tabpanel:focus{outline:none}
+.k-tabpanel:focus-visible{outline:3px solid var(--focus);outline-offset:4px}
+.k-send{margin-top:16px}
+.k-ovgrid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:20px;align-items:start}
+.k-narrow{max-width:720px}
+.k-steplist{gap:0;padding-top:6px;padding-bottom:6px}
+.k-steplist>li{padding:14px 0;border-bottom:1px solid var(--line)}
+.k-steplist>li:last-child{border-bottom:0}
+.k-steplist h3{font-size:18px;margin-bottom:8px}
+.k-steplist .m-sub{margin:0}
+.k-recent{margin-top:18px}
+.k-recent .m-h2{margin-bottom:8px}
+@media (max-width:760px){.k-ovgrid{grid-template-columns:minmax(0,1fr);gap:16px}.k-tabs{flex-wrap:nowrap;overflow-x:auto}}
+.k-tabpanel>.k-tablepanel{padding-top:0}
+.k-tabpanel>.k-tablepanel>.k-tw:first-child{border-top:0}
+/* A table that always stacks (used in the narrow credit sheet) */
+.k-table.k-stack thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.k-table.k-stack,.k-table.k-stack tbody,.k-table.k-stack tr,.k-table.k-stack td{display:block;width:100%}
+.k-table.k-stack tr{padding:8px 0;border-bottom:1px solid var(--line)}
+.k-table.k-stack tr:last-child{border-bottom:0}
+.k-table.k-stack td,.k-table.k-stack td:first-child,.k-table.k-stack td:last-child{display:grid;grid-template-columns:34% minmax(0,1fr);gap:8px;padding:2px 0;border:0;justify-items:start}
+.k-table.k-stack td::before{content:attr(data-label);font-family:'Space Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--smut);padding-top:3px}
+.k-recent .k-tw{overflow:visible}
+.k-cv{min-width:0}

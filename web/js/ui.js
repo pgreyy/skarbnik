@@ -22,7 +22,7 @@ export const hashCell = (h) => `<span class="k-h"><code class="k-hs" data-full="
 // labelled with its column heading.
 export function table(cols, rows, cls = '') {
   return `<div class="k-tw"><table class="k-table ${cls}"><thead><tr>${cols.map((c) => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map((r) => `<tr>${r.map((cell, i) => `<td data-label="${esc(cols[i])}">${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    <tbody>${rows.map((r) => `<tr>${r.map((cell, i) => `<td data-label="${esc(cols[i])}"><div class="k-cv">${cell}</div></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 // A two column table of facts: rows of [label, value HTML].
 export const facts = (rows) => `<table class="k-kv"><tbody>${rows.filter(Boolean).map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
@@ -56,4 +56,30 @@ export function initUi() {
       t.setAttribute('aria-expanded', open); t.textContent = open ? 'Show short' : 'Show full';
     }
   });
+}
+
+// Tabs, one panel visible at a time. items: [{ id, label, html }]. The chosen tab is kept in the address as
+// <base>/<id> (replaced in place, so it does not reload the page), and links to that address open the same tab.
+// Left and Right arrows move between tabs. onShow(id) runs when a tab is shown.
+export function tabbed(el, items, current, base, label, onShow = () => {}) {
+  const cur = items.some((t) => t.id === current) ? current : items[0].id;
+  el.innerHTML = `<div class="m-tabs k-tabs" role="tablist" aria-label="${esc(label)}">${items.map((t) =>
+    `<button role="tab" type="button" id="tab-${t.id}" aria-controls="panel-${t.id}" aria-selected="${t.id === cur}" tabindex="${t.id === cur ? 0 : -1}" data-tab="${t.id}">${esc(t.label)}</button>`).join('')}</div>` +
+    items.map((t) => `<div role="tabpanel" class="k-tabpanel" id="panel-${t.id}" aria-labelledby="tab-${t.id}" tabindex="0"${t.id === cur ? '' : ' hidden'}>${t.html}</div>`).join('');
+  const btns = [...el.querySelectorAll('[data-tab]')];
+  const show = (id, focus) => {
+    btns.forEach((b) => { const on = b.dataset.tab === id; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); });
+    items.forEach((t) => { el.querySelector(`#panel-${t.id}`).hidden = t.id !== id; });
+    history.replaceState(null, '', `${base}/${id}`);
+    onShow(id);
+  };
+  btns.forEach((b, i) => {
+    b.addEventListener('click', () => show(b.dataset.tab, false));
+    b.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(btns[(i + 1) % btns.length].dataset.tab, true); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(btns[(i - 1 + btns.length) % btns.length].dataset.tab, true); }
+    });
+  });
+  onShow(cur);
+  return show;
 }

@@ -2,6 +2,21 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Wallets after MyNearWallet's retirement; pages split into tabs (branch ui-preview)
+
+- kintt.testnet (the owner's MyNearWallet testnet account): 5.999 NEAR and 3.99 NEAR of contract credit, so no funding
+  was needed.
+- MyNearWallet is retired on 31 October 2026 (NEAR's announcement; the notice on testnet.mynearwallet.com). The NEAR docs
+  now recommend NEAR Connect. Owner's decision: Intear Wallet and NEAR CLI, MyNearWallet only as an extra until then.
+  Meteor was left out: its SDK prints its session key to the browser console. The site now uses NEAR Connect 0.11.4
+  (bundled, pinned) with a local wallet list and local copies of the three wallets' scripts (pinned by commit or sha256).
+- Testnet run through the page with the NEAR CLI wallet and the throwaway account on new test bounty 15: deposit,
+  commit, reveal, withdraw (EVIDENCE, "Site: wallet, credit and attempts"). Intear and MyNearWallet only loaded.
+- Tabs: bounty page (Overview, Attempts, Transactions, Proof facts, kept in the address), Arena (Recorded run, Control,
+  On testnet), Account page (Attempts, Credit activity, Bounties created). How to verify is one compact panel. The credit
+  panel shows the last 10 items of Recent activity with View all. Checked at 1280 and 390 px, Light and Night: no script
+  errors, nothing wider than the window (tab rows scroll sideways on a phone, as intended). Not pushed.
+
 ## 2026-10-25: Site polish round (branch ui-preview)
 
 - Account page `#/account/<name>` replaces the agent check page: credit, agent limits, a table of the account's attempts

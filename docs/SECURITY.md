@@ -71,7 +71,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 | Guard | What it stops | Shown by |
 | --- | --- | --- |
-| Wallet sign in asks for no contract key; every transaction is approved in the visitor's wallet (MyNearWallet) | The page, or anyone who reads its storage, signing for the visitor | `docs/evidence/web/`: the sign in address carries no `contract_id` or `public_key`; browser storage holds only the selector's preferences |
+| Wallets through NEAR Connect (Intear Wallet, NEAR CLI, MyNearWallet until 31 October 2026), each wallet's script a pinned local copy run in a sandboxed frame; sign in asks for no contract key; every transaction is approved in the wallet | The page signing for the visitor; wallet code changing under the site | `web/vendor/wallets/SHA256SUMS`; `docs/evidence/web/` (NEAR CLI run through the page) |
 | A confirm step before every payment (deposit, withdraw, commit), showing the amount with its unit; a commit's confirm shows the fee, slots left of the cap and "Each attempt returns one yes or no." | Paying by accident | `web/js/account-ui.js` |
 | Before a commit the page reads the chain again and stops, without sending, what the contract would refuse: bounty closed, cap full, not enough credit, a fee above the account's own limit, a payout the limits do not allow, a payout that is the vendor, a verifier or the contract, or one that does not exist | Lost fees and lost payouts (review finding 8) | `web/js/account-ui.js` (`review`) |
 | The page shows a result only from the chain: after a reveal it says "Waiting for the vendor's proof"; the PASS stamp only for an attempt whose outcome on chain is Passed | A faked result | `web/js/account-ui.js` (`attemptPanel`) |
@@ -243,9 +243,11 @@ Each guard: what it stops, where it lives, and what shows it works.
 - The site keeps an attempt's record (bounty, index, payout, nonce, patch) in the browser's local storage for this site and
   offers it as a file. It holds no key and cannot move money, but without it the attempt cannot be revealed, and an
   attempt not revealed in time loses its fee. Clearing the browser's site data before revealing loses it.
-- The site's wallet code is a third party bundle (`web/vendor/near-wallet.js`, exact versions and sha256 in
-  docs/VERSIONS.md); sign in and approvals happen on testnet.mynearwallet.com. The wallet's approval window was not run
-  by a script, only by hand.
+- The site's wallet code is third party: NEAR Connect and the wallets' own scripts (exact versions and sha256 in
+  docs/VERSIONS.md). The page's own code holds no key, but Intear Wallet's script keeps a wallet session key in the
+  browser's storage for this site (it cannot spend on chain; owner's decision, 2026-10-25). Intear's script has no
+  versioned address, so the copy is pinned by sha256 and must be refreshed by hand if Intear changes it. MyNearWallet is
+  retired on 31 October 2026. Intear's sign in was only loaded, not clicked through by a script.
 - Agent limits are stored per account under a raw storage key with no storage deposit, like the rest of the contract
   (audit finding 12).
 - The contract audit (docs/AUDIT.md) lists every finding, its status and the suggested hardening.

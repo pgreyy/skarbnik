@@ -12,3 +12,9 @@ web_claim_timeout	claim_timeout	kintsugi-ver3-prnvm.testnet	-	-	-	1	2.72
 web_claim_timeout	claim_timeout	kintsugi-ver3-prnvm.testnet	BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC	0.311 Tgas	0.0000310014532315	0	6.97
 user_bounty_create	create_bounty	kintsugi-vendor-prnvm.testnet	GFDKa5dSbChMciB7CZ2dQw1VxZE4ojt3RGtXE2LkqwMU	0.353 Tgas	0.000035269145724	0	5.77
 user_bounty_open	open_with_groth16	kintsugi-res2-prnvm.testnet	DhvXT4FjT1ox1nM91CvvYaqiMNdaSVgLTFyPwbjGaC62	0.377 Tgas	0.000037681941703	0	5.83
+cli_bounty_create	create_bounty	kintsugi-vendor-prnvm.testnet	AsHkMtkVziHX2e6dJThxWwQzepwgc6PjFzdmx4y18DM9	0.353 Tgas	0.0000352643773525	0	6.92
+cli_bounty_open	open_with_groth16	kintsugi-res2-prnvm.testnet	HfMrCdtM62vxQBnc42RfbXGyN8GjEPYMiqAMBzBNtGZD	0.377 Tgas	0.000037681941703	0	6.05
+cli_deposit_credit	deposit_credit	kintsugi-web-1e80c1.testnet	8msX8Rj7WiErUZ3AZuD4JqDCx3ymxax2JgPVHMHd9xK5	-	-	0	-
+cli_commit	commit	kintsugi-web-1e80c1.testnet	2SvC7HPsbBfZEMmvSoksYLLzDp4EFrX1zbsuz8jjPXf7	-	-	0	-
+cli_reveal	reveal	kintsugi-web-1e80c1.testnet	E5ZwA8ciZVaWotfc4GM2yZyBx5ZbqbgN1826GWJBSED6	-	-	0	-
+cli_withdraw_credit	withdraw_credit	kintsugi-web-1e80c1.testnet	8u7iHfRZ5Jk4HKQgVD822apvk9eZ8hw5vv5fVHySKfrF	-	-	0	-

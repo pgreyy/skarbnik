@@ -5,7 +5,7 @@
 import { CONTRACT, EXPLORER_ACCOUNT, view, near, utc, span, commitBy, nsToDate, allBounties, submissions } from './chain.js';
 import * as W from './wallet.js';
 import { fingerprint, newNonce, hex, b64, sha256, putAttempt, attemptsFor, dropAttempt, downloadRecord, toYocto } from './attempt.js';
-import { $, esc, badge, tx, acct, toast, passStamp, table, facts, bothTimes } from './ui.js';
+import { $, esc, badge, tx, acct, toast, passStamp, table, facts, bothTimes, tabbed } from './ui.js';
 
 let credit = null; // the connected account's contract credit, yoctoNEAR string
 const short = (a) => (a.length > 22 ? `${a.slice(0, 12)}…${a.slice(-8)}` : a);
@@ -112,8 +112,11 @@ async function drawCredit() {
   d.innerHTML = `${head}
     <dl class="m-facts"><div><dt>Contract credit</dt><dd class="k-mono">${c === null ? 'could not read' : esc(near(credit))}</dd></div>
     <div><dt>Wallet balance</dt><dd class="k-mono">${bal === null || bal === undefined ? 'could not read' : esc(near(bal))}</dd></div></dl>
-    <p class="m-sub">Account ${esc(s.account)}. Attempt fees are taken from this credit.</p>${body}`;
+    <p class="m-sub">Account ${esc(s.account)}. Attempt fees are taken from this credit.</p>${body}
+    <section class="k-recent" aria-labelledby="recentT"><div class="m-crow"><h2 class="m-h2" id="recentT">Recent activity</h2><a href="#/account/${encodeURIComponent(s.account)}/credit" data-close>View all</a></div>
+      <div id="recent"><p class="m-sub">Reading recent activity…</p></div></section>`;
   bindCommon(d);
+  drawRecent(s.account);
   d.querySelectorAll('[data-mode]').forEach((b) => (b.onclick = () => { creditView = { mode: b.dataset.mode || null, phase: 'form', amount: '', msg: '' }; drawCredit().then(() => { const i = $('#amt', d); if (i) i.focus(); }); }));
   const f = $('#credForm', d);
   if (f) f.onsubmit = (e) => {
@@ -283,32 +286,63 @@ function confirmSheet(info, onYes) {
   $('#confYes', d).onclick = () => { d.close(); onYes(); };
 }
 
-// ---------- Account page ----------
+// ---------- activity and the Account page ----------
 const OUT_LABEL = { Passed: ['ok', '✓ PASS'], Failed: ['bad', '✕ FAIL'], TimedOut: ['info', 'TIMEOUT'], Released: ['info', 'RELEASED'] };
 const FASTNEAR_TX = 'https://tx.test.fastnear.com/v0';
+const fastPost = async (path, body) => (await fetch(`${FASTNEAR_TX}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json();
+const localTime = (ms) => new Date(ms).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-// Commit transactions of an account on this contract, keyed by bounty id and fingerprint, from the FastNEAR transaction
-// index (the contract's views do not keep transaction ids). Empty if the index does not answer.
-async function commitTxs(account) {
-  const out = new Map();
+// The account's own transactions to this contract, newest first: deposits, withdrawals and commits (with the attempt's
+// fee and number, read from the contract). Transaction ids and times come from the FastNEAR transaction index, because
+// the contract's views keep neither. Empty if the index does not answer.
+async function activity(account, max = 150) {
+  const items = [];
   try {
-    const post = async (path, body) => (await fetch(`${FASTNEAR_TX}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json();
-    const list = ((await post('account', { account_id: account })).account_txs || []).filter((t) => t.is_signer).map((t) => t.transaction_hash).slice(0, 200);
+    const list = ((await fastPost('account', { account_id: account })).account_txs || []).filter((t) => t.is_signer)
+      .sort((a, b) => (BigInt(b.tx_block_timestamp) > BigInt(a.tx_block_timestamp) ? 1 : -1)).slice(0, max);
+    const meta = new Map(list.map((t) => [t.transaction_hash, t]));
     for (let i = 0; i < list.length; i += 20) {
-      const res = await post('transactions', { tx_hashes: list.slice(i, i + 20) });
+      const res = await fastPost('transactions', { tx_hashes: list.slice(i, i + 20).map((t) => t.transaction_hash) });
       for (const t of res.transactions || []) {
         const x = t.transaction; if (!x || x.receiver_id !== CONTRACT) continue;
-        for (const a of x.actions || []) {
-          const fc = a.FunctionCall; if (!fc || fc.method_name !== 'commit') continue;
-          try { const args = JSON.parse(atob(fc.args)); out.set(`${args.bounty_id}:${args.fingerprint}`, x.hash); } catch { /* not JSON */ }
-        }
+        const fc = (x.actions || []).map((a) => a.FunctionCall).find(Boolean); if (!fc) continue;
+        let args = {}; try { args = JSON.parse(atob(fc.args)); } catch { /* not JSON */ }
+        const m = meta.get(x.hash), base = { tx: x.hash, ms: Number(BigInt(m.tx_block_timestamp) / 1000000n), ok: m.is_success !== false };
+        if (fc.method_name === 'deposit_credit') items.push({ ...base, kind: 'deposit', amount: String(fc.deposit) });
+        else if (fc.method_name === 'withdraw_credit') items.push({ ...base, kind: 'withdraw', amount: String(args.amount || '0') });
+        else if (fc.method_name === 'commit') items.push({ ...base, kind: 'attempt', bounty: String(args.bounty_id), fingerprint: args.fingerprint });
       }
     }
-  } catch { /* index unavailable: no links */ }
-  return out;
+  } catch { return []; }
+  items.sort((a, b) => b.ms - a.ms);
+  // the fee and number of each attempt, from the contract
+  const bountyIds = [...new Set(items.filter((x) => x.kind === 'attempt').map((x) => x.bounty))];
+  for (const id of bountyIds) {
+    try {
+      const subs = await submissions(await view('get_bounty', { bounty_id: id }));
+      items.filter((x) => x.kind === 'attempt' && x.bounty === id).forEach((x) => { const k = subs.findIndex((s) => s && s.fingerprint === x.fingerprint); if (k >= 0) { x.index = k; x.amount = subs[k].fee; } });
+    } catch { /* fee unknown */ }
+  }
+  return items;
 }
 
-export async function accountPage(main, name) {
+function activityRows(items) {
+  return items.map((x) => [
+    x.kind === 'deposit' ? 'Deposit' : x.kind === 'withdraw' ? 'Withdrawal'
+      : `Attempt on <a href="#/bounties/${esc(x.bounty)}">bounty ${esc(x.bounty)}</a>${x.index !== undefined ? ` #${x.index}` : ''}`,
+    x.ok ? (x.amount !== undefined ? `<span class="k-mono k-nw">${x.kind === 'attempt' ? 'fee ' : ''}${esc(near(x.amount))}</span>` : '<span class="k-dim">fee unknown</span>') : badge('bad', '✕ Failed'),
+    esc(localTime(x.ms)), tx(x.tx)]);
+}
+
+async function drawRecent(account) {
+  const el = document.getElementById('recent'); if (!el) return;
+  const items = (await activity(account, 60)).slice(0, 10);
+  if (!document.getElementById('recent')) return;
+  el.innerHTML = items.length ? table(['What', 'Amount', 'Time', 'Transaction'], activityRows(items), 'k-small k-stack')
+    : '<p class="m-sub">No activity yet.</p>';
+}
+
+export async function accountPage(main, name, tab) {
   if (!name) {
     main.innerHTML = `<h1 class="m-h1" tabindex="-1">Account</h1>
       <form class="m-panel m-form k-acform" id="agForm" novalidate><div class="m-field"><label for="agAcc">Account name</label>
@@ -325,7 +359,8 @@ export async function accountPage(main, name) {
     <p class="m-lead">Activity on ${esc(CONTRACT)}, read from testnet. <a href="${EXPLORER_ACCOUNT}${encodeURIComponent(name)}" rel="noopener" target="_blank">All transactions on the explorer</a></p>
     <div id="acOut"><p class="k-state">Reading from testnet…</p></div>`;
   try {
-    const [c, lim, bs, txs] = await Promise.all([view('get_credit', { account_id: name }), view('get_agent_limits', { account_id: name }), allBounties(), commitTxs(name)]);
+    const [c, lim, bs, act] = await Promise.all([view('get_credit', { account_id: name }), view('get_agent_limits', { account_id: name }), allBounties(), activity(name)]);
+    const txOf = new Map(act.filter((x) => x.kind === 'attempt').map((x) => [`${x.bounty}:${x.fingerprint}`, x.tx]));
     const mine = [], created = [];
     for (const b of bs.filter(Boolean)) {
       if (b.vendor === name) created.push(b);
@@ -333,20 +368,22 @@ export async function accountPage(main, name) {
     }
     mine.sort((x, y) => Number(BigInt(y.s.committed_at_ns) - BigInt(x.s.committed_at_ns)));
     const state = (b, s) => OUT_LABEL[s.outcome] || (s.revealed_at_ns ? (b.state === 'Open' ? ['wait', '… WAITING'] : ['info', 'UNDECIDED']) : ['info', 'COMMITTED']);
-    $('#acOut').innerHTML = `
-      <section class="m-panel"><h2 class="m-h2">Credit and limits</h2>${facts([
+    const credits = act.filter((x) => x.kind !== 'attempt');
+    $('#acOut').innerHTML = `<section class="m-panel k-narrow">${facts([
         ['Contract credit', `<span class="k-mono">${esc(near(String(c)))}</span>`],
         lim.max_fee_per_commit ? ['Max fee per attempt', `<span class="k-mono">${esc(near(lim.max_fee_per_commit))}</span>`] : null,
         lim.fixed_payout ? ['Fixed payout account', acct(lim.fixed_payout)] : null,
         (!lim.max_fee_per_commit && !lim.fixed_payout) ? ['Agent limits', 'none set'] : null])}</section>
-      <section class="m-sec m-panel k-tablepanel"><h2 class="m-h2 k-pad">Attempts (${mine.length})</h2>
-        ${mine.length ? table(['Bounty', 'Attempt', 'State', 'Fee', 'Time', 'Transaction'], mine.map(({ b, s, i }) => [
+      <div class="m-sec" id="actabs"></div>`;
+    tabbed($('#actabs'), [
+      { id: 'attempts', label: `Attempts (${mine.length})`, html: `<section class="m-panel k-tablepanel">${mine.length ? table(['Bounty', 'Attempt', 'State', 'Fee', 'Time', 'Transaction'], mine.map(({ b, s, i }) => [
           `<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, `#${i}`, badge(...state(b, s)),
           s.fee === '0' ? 'refunded' : `<span class="k-mono k-nw">${esc(near(s.fee))}</span>`, esc(utc(s.committed_at_ns)),
-          txs.get(`${b.id}:${s.fingerprint}`) ? tx(txs.get(`${b.id}:${s.fingerprint}`)) : '<span class="k-dim">not found</span>'])) +
-          '<p class="m-sub k-pad">Transaction ids from the FastNEAR transaction index; the attempts themselves from the contract.</p>' : '<p class="m-sub k-pad">No attempts yet.</p>'}
-      </section>
-      ${created.length ? `<section class="m-sec m-panel k-tablepanel"><h2 class="m-h2 k-pad">Bounties created (${created.length})</h2>
-        ${table(['Bounty', 'State', 'Amount', 'Created'], created.slice().reverse().map((b) => [`<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(b.state), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`, esc(utc(b.created_at_ns))]))}</section>` : ''}`;
+          txOf.get(`${b.id}:${s.fingerprint}`) ? tx(txOf.get(`${b.id}:${s.fingerprint}`)) : '<span class="k-dim">not found</span>'])) +
+          '<p class="m-sub k-pad">Attempts from the contract; transaction ids from the FastNEAR transaction index.</p>' : '<p class="m-sub k-pad">No attempts yet.</p>'}</section>` },
+      { id: 'credit', label: `Credit activity (${credits.length})`, html: `<section class="m-panel k-tablepanel">${credits.length ? table(['What', 'Amount', 'Time', 'Transaction'], activityRows(credits)) +
+          '<p class="m-sub k-pad">From the FastNEAR transaction index.</p>' : '<p class="m-sub k-pad">No deposits or withdrawals yet.</p>'}</section>` },
+      { id: 'created', label: `Bounties created (${created.length})`, html: `<section class="m-panel k-tablepanel">${created.length ? table(['Bounty', 'State', 'Reward', 'Created'], created.slice().reverse().map((b) => [`<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(b.state), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`, esc(utc(b.created_at_ns))])) : '<p class="m-sub k-pad">No bounties created.</p>'}</section>` },
+    ], tab, `#/account/${encodeURIComponent(name)}`, 'Account sections');
   } catch (e) { $('#acOut').innerHTML = `<p class="k-err" role="alert">Could not read: ${esc(e.message)}</p>`; }
 }

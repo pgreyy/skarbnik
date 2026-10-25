@@ -1,13 +1,9 @@
 {
   "name": "kintsugi-wallet-vendor",
   "private": true,
-  "description": "Builds web/vendor/near-wallet.js: NEAR wallet selector core and the MyNearWallet module, bundled once from these exact versions (see build.sh). The site itself has no build step.",
+  "description": "Builds web/vendor/near-connect.js: the NEAR Connect wallet connector, bundled once from this exact version (see build.sh). The site itself has no build step.",
   "dependencies": {
-    "@near-wallet-selector/core": "10.1.4",
-    "@near-wallet-selector/my-near-wallet": "10.1.4",
-    "buffer": "6.0.3",
-    "util": "0.12.5",
-    "events": "3.3.0"
+    "@hot-labs/near-connect": "0.11.4"
   },
   "devDependencies": {
     "esbuild": "0.25.10"

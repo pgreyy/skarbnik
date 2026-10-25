@@ -79,16 +79,16 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | RISC Zero Groth16 prover image (Docker, CPU path) | `risczero/risc0-groth16-prover:v2025-04-03.1`, digest `sha256:a4f80ce2e0b8e2bb7637a93c37136a6776ac00ec843a3fdf1c67b1d5ffea64ee` (the tag `risc0-groth16` 3.0.5 runs) | `docker image inspect risczero/risc0-groth16-prover:v2025-04-03.1` |
 | risc0-binfmt (build dependency of `harness`, prebuilt guest mode) | 3.0.5 (pinned `=3.0.5`, the version risc0-build 3.0.6 uses) | `harness/Cargo.toml` |
 
-## Site wallet (bundled once into web/vendor/near-wallet.js by scripts/wallet-vendor/build.sh)
+## Site wallet (NEAR Connect, bundled into web/vendor/near-connect.js by scripts/wallet-vendor/build.sh)
 
-| Package | Version | Where |
+| Item | Version or source | sha256 |
 | --- | --- | --- |
-| @near-wallet-selector/core | 10.1.4 | `scripts/wallet-vendor/package.json`, `package-lock.json` |
-| @near-wallet-selector/my-near-wallet | 10.1.4 | same; sign in and approvals at https://testnet.mynearwallet.com |
-| @near-js/* (accounts, crypto, providers, signers, transactions, types, utils) | 2.5.1 | `package-lock.json` |
-| buffer, events, util (browser versions of Node modules) | 6.0.3, 3.3.0, 0.12.5 | `package-lock.json` |
-| esbuild (bundler, build time only) | 0.25.10 | `package-lock.json` |
-| Bundle | sha256 `eb8559631cb93c556d5e1a55f28cae05ef0de1e3b7352696b7607b495e5707aa` | `sha256sum web/vendor/near-wallet.js` |
+| @hot-labs/near-connect | 0.11.4 (`scripts/wallet-vendor/package.json`, `package-lock.json`) | `c9a291ddf0e8e4fdc2732fb6a54584bd76ee7ebe2bbbe373b25ca2a140f2b36e` (bundle) |
+| esbuild (bundler, build time only) | 0.25.10 | |
+| Wallet list `web/vendor/wallets/manifest.json` | entries from hot-dao/near-selector at commit `6766ea5e71864e5cbcbf5b70d2aeae23b20b60e9` | `10b3596b57d86b329df3512566b1351ccf90f11f0c4da281ca9138b47223ba0d` |
+| Intear Wallet script `intear-wallet.js` | https://wallet.intear.tech/near-selector.js (no versioned address), fetched 2026-10-25 | `6decc283352af197feff4988628899d19e05f4168a4277fe699bd8a0d6178e34` |
+| NEAR CLI script `near-cli.js` | near/near-cli-connect at commit `dc5cb123e3a8e42ed095739f4ea058b767a80ad2` | `522f2a52403f6da84384a409718c54b49ed4432cdfd583363d35109be8c8e318` |
+| MyNearWallet script `mynearwallet.js` (until 31 October 2026) | hot-dao/near-selector at commit `6766ea5e71864e5cbcbf5b70d2aeae23b20b60e9` | `428055aeb7ea018f2e041babf0bfeb33fcf1f0a69b7865e9887a17b9e6f559ca` |
 
 ## Other
 

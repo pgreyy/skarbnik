@@ -1,0 +1,55 @@
+# command shown by the NEAR CLI wallet on the site:
+near contract \
+    call-function \
+    as-transaction 'kintsugi-l2-cihdp.testnet' 'deposit_credit' \
+    json-args '{"account_id":null}' \
+    prepaid-gas '30 Tgas' \
+    attached-deposit '0.03 NEAR' \
+    sign-as 'kintsugi-web-1e80c1.testnet' \
+    network-config testnet \
+    sign-with-keychain
+# run as:
+$ near contract  call-function  as-transaction 'kintsugi-l2-cihdp.testnet' 'deposit_credit'  json-args '{"account_id":null}'  prepaid-gas '30 Tgas'  attached-deposit '0.03 NEAR'  sign-as 'kintsugi-web-1e80c1.testnet'  network-config testnet  sign-with-legacy-keychain send
+utc_start=2026-10-25T19:10:16.661Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-web-1e80c1.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  deposit_credit
+│                       args:         {
+│                                       "account_id": null
+│                                     }
+│                       gas:          30.0 Tgas
+│                       deposit:      0.03 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:G88SCpfSkrSLARdaGnaYYyuUdVgVbDt1AGjShuJdGGBa
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.310 Tgas
+│    Transaction fee: 0.0000309633062595 NEAR
+│    Transaction ID: 8msX8Rj7WiErUZ3AZuD4JqDCx3ymxax2JgPVHMHd9xK5
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/8msX8Rj7WiErUZ3AZuD4JqDCx3ymxax2JgPVHMHd9xK5
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"credit_deposited","data":[{"account_id":"kintsugi-web-1e80c1.testnet","amount":"30000000000000000000000","total":"30000000000000000000000"}]}
+│    Logs [kintsugi-web-1e80c1.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"30000000000000000000000"
+
+
+The "deposit_credit" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-web-1e80c1.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args '{"account_id":null}' prepaid-gas '30.0 Tgas' attached-deposit '0.03 NEAR' sign-as kintsugi-web-1e80c1.testnet network-config testnet sign-with-legacy-keychain send
+
+
+exit=0
