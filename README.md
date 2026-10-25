@@ -66,7 +66,9 @@ guessable when the secret is short or predictable. A real vendor uses the defaul
    intro, then the live bounties read from `kintsugi-l2-cihdp.testnet` (internet needed). "Connect wallet" signs in
    with a testnet wallet: Intear Wallet or NEAR CLI (signs in your own terminal); MyNearWallet is offered only until it is
    retired on 31 October 2026. Test bounty 14 on `kintsugi-l2-cihdp.testnet` (cap 3, 0.1 NEAR, expires
-   2026-10-28 17:10 UTC) is for trying the wallet flow; it is marked "Test bounty" on the site and is not a demo. To refresh the agent feed:
+   2026-10-28 17:10 UTC) is for trying the wallet flow, and test bounty 15 (cap 2, now full) was used for the scripted runs
+   with the NEAR CLI wallet and the limited agent key; both are marked "Test bounty" on the site and in feed.json and are
+   not demos. To refresh the agent feed:
    `python3 -I scripts/gen_feed.py`; to rebuild the recorded data from the evidence files:
    `python3 -I scripts/gen_site_recorded.py`.
 

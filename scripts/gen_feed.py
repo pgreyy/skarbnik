@@ -76,6 +76,8 @@ feed = {
     "generated_at_utc": utc(now_ns),
     "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
     "allowed_image_ids": allowed,
+    "test_bounty_ids": sorted(int(x) for x in test_ids),
+    "test_bounty_note": "Test bounties are for trying the site and the wallet flow, not demos.",
     "open_bounties": open_bounties,
     "quickstart": "/agent-quickstart.txt",
 }

@@ -1,11 +1,17 @@
 {
  "contract": "kintsugi-l2-cihdp.testnet",
  "network": "testnet",
- "generated_at_utc": "2026-10-25T19:31:46Z",
+ "generated_at_utc": "2026-10-25T19:46:01Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
  ],
+ "test_bounty_ids": [
+  13,
+  14,
+  15
+ ],
+ "test_bounty_note": "Test bounties are for trying the site and the wallet flow, not demos.",
  "open_bounties": [
   {
    "bounty_id": 3,
@@ -58,20 +64,6 @@
    "max_commits": 3,
    "commit_deadline_utc": "2026-10-28T12:10:18Z",
    "expires_at_utc": "2026-10-28T17:10:18Z",
-   "bounty_amount": "0.1 NEAR",
-   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
-   "image_id_allowed": true,
-   "test_bounty": true
-  },
-  {
-   "bounty_id": 15,
-   "level": 2,
-   "next_fee_yocto": "15000000000000000000000",
-   "next_fee": "0.015 NEAR",
-   "slots_left": 1,
-   "max_commits": 2,
-   "commit_deadline_utc": "2026-10-26T14:08:49Z",
-   "expires_at_utc": "2026-10-26T19:08:49Z",
    "bounty_amount": "0.1 NEAR",
    "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
    "image_id_allowed": true,

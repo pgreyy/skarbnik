@@ -460,3 +460,5 @@ a.m-bid,a.m-link,a.m-back{text-decoration:underline}
 .k-agents-steps .m-cmd{margin:0 0 4px}
 .k-agents-steps .m-cmd code{padding:8px 10px;font-size:13px}
 .k-qs{margin-top:12px;max-height:60vh}
+.k-tablepanel:has(>.k-tw:first-child){padding-top:0}
+.k-tablepanel>.k-tw:first-child{border-top:0}
