@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet submit_groth16 json-args 'file-args docs/evidence/receipts/valid_pass_bounty1_attempt0.json' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-web-1e80c1.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T19:55:33.643408118Z
+{
+ "tx_hash": "B5P2njJbm56sYPzHRJgACQWdUKWd7dPLGgMsgfdbCkDo",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: bounty is closed'}}}}",
+ "total_gas_burnt": 2123046383981,
+ "logs": [],
+ "wall_seconds": 4.167,
+ "rpc_error": null
+}

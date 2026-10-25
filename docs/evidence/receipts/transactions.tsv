@@ -1,0 +1,3 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+resubmit_valid_pass_bounty1_attempt0	submit_groth16	kintsugi-web-1e80c1.testnet	B5P2njJbm56sYPzHRJgACQWdUKWd7dPLGgMsgfdbCkDo	-	-	rpc:failed	-
+resubmit_wrong_bounty_11_attempt0	submit_groth16	kintsugi-web-1e80c1.testnet	5tQCugrfkRPHSeo3NdVY2DRYrdA7GQZpyQdF3WSCu1z9	-	-	rpc:failed	-
