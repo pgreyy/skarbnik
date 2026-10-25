@@ -100,8 +100,13 @@ Planned next:
 - OutLayer as one of the verifiers, once its testnet answers our jobs.
 - An agent driven by a language model in place of the scripted one.
 - Faster proving on a GPU.
-- On the site (planned, not built): connect a wallet; deposit credit and send attempts from the page; create a bounty
-  from the page; a proof ledger.
+- On the site (planned, not built):
+  - connect a wallet;
+  - deposit credit, and take unspent credit back with `withdraw_credit` (it needs 1 yoctoNEAR attached, so it is a
+    wallet action only, never an agent key);
+  - send attempts from the page;
+  - create a bounty;
+  - a proof ledger.
 - A live bounty on a new original module with its own bug (bounty 12 reuses the public demo bug).
 - After the audit: a "crash proven only" mode, for a vendor who can prove the crash but has no fix yet.
 
