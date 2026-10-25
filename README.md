@@ -82,14 +82,15 @@ Built today (each part has its proof in the table above):
   attestations, and pays by rule, including by default when the vendor stays silent.
 - Guards against the attacks listed in [docs/SECURITY.md](docs/SECURITY.md).
 - A reproducible build of the checker, so anyone can rebuild it and compare its image id with the one a bounty names.
+- The contract checking the proof itself (Level 2), so no verifier has to be trusted for the verdict.
 
 Planned next:
 
 - OutLayer as one of the verifiers, once its testnet answers our jobs.
-- The contract checking the proof itself, so no verifier has to be trusted for the verdict.
 - An agent driven by a language model in place of the scripted one.
 - Faster proving on a GPU.
 - A small web page to follow a bounty.
+- After the audit: a "crash proven only" mode, for a vendor who can prove the crash but has no fix yet.
 
 ## Limits
 
