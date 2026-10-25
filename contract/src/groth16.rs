@@ -8,7 +8,7 @@
 use near_sdk::env;
 
 #[path = "groth16_vk.rs"]
-mod vk;
+pub(crate) mod vk;
 
 /// RISC Zero's tagged struct hash (risc0-binfmt 3.0.5 `src/hash.rs`, `tagged_struct`).
 fn tagged(tag: &str, down: &[&[u8]], data: &[u32]) -> Vec<u8> {
@@ -45,11 +45,16 @@ fn rev(b: &[u8]) -> Vec<u8> {
 /// True if the 256 byte seal proves that the program with `image_id` ran to a normal end and wrote `journal`.
 /// A seal whose numbers are not valid curve points stops the whole call with a host error.
 pub fn verify(seal: &[u8], image_id: &[u8; 32], journal: &[u8]) -> bool {
+    verify_with_root(seal, image_id, journal, &vk::CONTROL_ROOT)
+}
+
+/// `verify` with the control root as a parameter, so a test can show that one changed byte of it fails the check.
+pub(crate) fn verify_with_root(seal: &[u8], image_id: &[u8; 32], journal: &[u8], control_root: &[u8; 32]) -> bool {
     if seal.len() != 256 {
         env::panic_str("the Groth16 seal must be 256 bytes");
     }
     let claim = claim_digest(image_id, journal);
-    let inputs = [half(&vk::CONTROL_ROOT, 0), half(&vk::CONTROL_ROOT, 1), half(&claim, 0), half(&claim, 1), vk::BN254_CONTROL_ID];
+    let inputs = [half(control_root, 0), half(control_root, 1), half(&claim, 0), half(&claim, 1), vk::BN254_CONTROL_ID];
     let mut msm = Vec::with_capacity(5 * 96);
     for (i, s) in inputs.iter().enumerate() {
         msm.extend_from_slice(&vk::IC[64 * (i + 1)..64 * (i + 2)]);

@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"10","fingerprint":"1bcdf6da01d96b445e4fabd017179090cfa77418c855b5dbcb5d72adcc26b48d","payout":"kintsugi-res2-prnvm.testnet"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T02:21:00.530845850Z
+{
+ "tx_hash": "5LaTEQ8kzndLHjTEtbRewE8xtXVWe1tVsx22EkT9isRn",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: this account's commits must use its fixed payout account'}}}}",
+ "total_gas_burnt": 2241046178551,
+ "logs": [],
+ "wall_seconds": 3.97,
+ "rpc_error": null
+}

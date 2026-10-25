@@ -1,6 +1,6 @@
 //! Unit tests for the Level 2 path (Groth16 proofs checked by the contract), run natively with near-sdk's mocked
 //! blockchain and its real alt_bn128 host functions, using the real Groth16 receipt of the demo Proof 0. The
-//! attempt proofs are bound to the deployed contract's account, so they are tested on testnet (scripts/s6c_testnet.sh).
+//! attempt proofs are bound to the deployed contract's account; they are tested in tests_level2_attempts.rs.
 use super::*;
 use near_sdk::test_utils::VMContextBuilder;
 use near_sdk::testing_env;
@@ -73,7 +73,7 @@ fn level2_proof0_refused_with_other_counts() {
 }
 
 #[test]
-#[should_panic(expected = "the Groth16 proof does not verify")]
+#[should_panic(expected = "the journal's check size is not this bounty's")] // S3: the cheap field check comes first
 fn level2_changed_journal_refused() {
     let mut c = with_bounty(LEVEL_2, v::IMAGE_ID, 16, 32);
     let mut j = bytes(v::JOURNAL);

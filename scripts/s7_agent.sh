@@ -4,7 +4,7 @@
 # bounty contract, and spends credit the owner deposited inside the contract. Phases, in order:
 #   setup    owner adds the agent key (allowance 0.25 NEAR, methods commit and reveal) and deposits credit
 #   bounty   the vendor creates a bounty; the agent reads it, checks its canned patch on the public tests with the
-#            native checker (no secret input), commits and reveals with the agent key
+#            native checker (no secret input), runs scripts/agent_preflight.sh, commits and reveals with the agent key
 #   limits   the agent key tries what it must not do: send NEAR, withdraw credit, attach a deposit, call another
 #            method; every attempt must be refused
 #   prove    the vendor proves the agent's submission (laptop CPU, capped) and compresses it
@@ -88,6 +88,14 @@ print(base64.b64encode(patch).decode(), nonce.hex(), hashlib.sha256(buf).hexdige
 PY
 )
   IDX=$(json_field "$B" commits)
+  # Audit hardening S16: the agent checks the payout account, the allowlist, the windows, the fees and K before it
+  # commits. The recorded S7 run used an older contract without these views; a rerun of it sets SKIP_PREFLIGHT=1.
+  if [ "${SKIP_PREFLIGHT:-0}" = 1 ]; then
+    echo "preflight skipped (SKIP_PREFLIGHT=1: the older S7 contract has no allowlist or agent limits)"
+  else
+    ./scripts/agent_preflight.sh "$CONTRACT" "$ID" "$OWNER" "$OWNER" | tee -a "$OUT/summary.txt" \
+      || { echo "the agent refuses to commit: preflight failed"; exit 1; }
+  fi
   agent_call s7_agent_commit commit "{\"bounty_id\":\"$ID\",\"fingerprint\":\"$FP\",\"payout\":\"$OWNER\"}"
   sleep 4
   agent_call s7_agent_reveal reveal "{\"bounty_id\":\"$ID\",\"index\":$IDX,\"patch\":\"$PATCH\",\"nonce\":\"$NONCE\"}"

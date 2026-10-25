@@ -1,0 +1,3 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+s18_create	create_bounty	kintsugi-vendor-prnvm.testnet	ByJpYtUh5QJcgeVnYuroFFvMWnCGncRc7bMM5T1dTFQw	0.353 Tgas	0.0000352739140955	0	4.6
+s18_open_groth16	open_with_groth16	kintsugi-res2-prnvm.testnet	AwktYGNHGijdv2LWwQYeuc7yFyLoDs41AuJckxUQuPSJ	0.377 Tgas	0.000037681941703	0	4.21

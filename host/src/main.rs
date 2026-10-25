@@ -17,9 +17,10 @@
 //! power of two, smaller uses less memory per segment; default: RISC Zero's default of 20), --profile (execute
 //! only: the guest prints its cycles per phase), --submission-id <64 hex> (the id the contract gives the submission,
 //! see `get_submission_id`; default all zeros), --proof0 (Proof 0 mode: the candidate is the vendor's reference fix),
-//! and one of --bounty <name> (a private random salt for the secret's commitment, made once per bounty in
-//! ~/.kintsugi-salts/, the normal choice) or --demo-salt (the public demo salt of the demo bounties).
-//! The bounty files are the demo files in data/demo/. Proving runs on this machine through the installed
+//! --exploit <file> (the secret crashing input as a hex text file; default data/demo/exploit.hex, the public demo
+//! secret; a real bounty keeps its secret outside the repository), and one of --bounty <name> (a private random salt for
+//! the secret's commitment, made once per bounty in ~/.kintsugi-salts/, the normal choice) or --demo-salt (the public
+//! demo salt of the demo bounties). The other bounty files are the demo files in data/demo/. Proving runs on this machine through the installed
 //! r0vm; nothing is sent to a remote prover.
 
 use std::process::ExitCode;
@@ -92,6 +93,8 @@ struct Opts {
     proof0: bool,
     demo_salt: bool,
     bounty: Option<String>,
+    /// The secret crashing input (hex text file). Never printed.
+    exploit: String,
 }
 
 fn parse_opts(args: &[String]) -> Result<Opts, String> {
@@ -109,6 +112,7 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
         proof0: false,
         demo_salt: false,
         bounty: None,
+        exploit: "data/demo/exploit.hex".to_string(),
     };
     let mut i = 1;
     while i < args.len() {
@@ -141,6 +145,7 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
                 continue;
             }
             "--bounty" => opts.bounty = Some(value()?.clone()),
+            "--exploit" => opts.exploit = value()?.clone(),
             other => return Err(format!("unknown option {other}")),
         }
         i += 2;
@@ -195,7 +200,7 @@ fn salt_for(opts: &Opts) -> Result<[u8; 32], String> {
 }
 
 fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
-    let exploit_text = String::from_utf8(read("data/demo/exploit.hex")?).map_err(|e| e.to_string())?;
+    let exploit_text = String::from_utf8(read(&opts.exploit)?).map_err(|e| e.to_string())?;
     let tests_text = String::from_utf8(read("data/demo/public_tests.txt")?).map_err(|e| e.to_string())?;
     let tests = parse_tests(&tests_text)?;
     Ok(GuestInput {

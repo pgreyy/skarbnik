@@ -1,0 +1,13 @@
+$ ./scripts/agent_preflight.sh kintsugi-l2-cihdp.testnet 12 kintsugi-res1-prnvm.testnet
+PASS payout account kintsugi-res1-prnvm.testnet exists
+PASS bounty state is Open (is Open)
+PASS the bounty is opened (Proof 0 accepted)
+PASS a commit now leaves the reveal and verdict windows before expiry (2591845 s left)
+PASS image id dd6c5f42c117ce3a... is on a non-empty allowlist (1 ids)
+PASS next attempt fee 0.0100 NEAR is at most MAX_FEE 0.0500 NEAR
+PASS reveal window 3600 s >= 60 s
+PASS verdict window 14400 s >= 7200 s
+PASS K = 3 is at most MAX_K 16
+PASS a slot is free (0 of 3 in use)
+level 2, bounty 0.5000 NEAR, fee step 0.0050 NEAR
+PREFLIGHT OK

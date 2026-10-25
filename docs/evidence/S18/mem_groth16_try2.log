@@ -1,0 +1,8 @@
+03:45:06 avail_mib=7313 container_mib=1403
+03:45:09 avail_mib=4661 container_mib=3016
+03:45:12 avail_mib=3921 container_mib=4013
+03:45:16 avail_mib=3027 container_mib=6038
+03:45:20 avail_mib=1505 container_mib=6150
+03:45:27 avail_mib=566 container_mib=6851
+03:45:27 KILL: available memory below 700 MiB
+904684f28842

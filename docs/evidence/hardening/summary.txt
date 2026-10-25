@@ -1,0 +1,21 @@
+bounty 7 unchanged by the redeploy
+pool unchanged: 90000000000000000000000 yoctoNEAR
+allowlist unchanged: ["dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"]
+agent limits view answers on the new code: {"max_fee_per_commit":null,"fixed_payout":null}
+== S6 on bounty 10
+set_agent_limits with 0 deposit (what a function call key can send): "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: Requires attached deposit of exactly 1 yoctoNEAR'}}}}"
+limits of kintsugi-res1-prnvm.testnet: {"max_fee_per_commit":"5000000000000000000000","fixed_payout":"kintsugi-res1-prnvm.testnet"}
+commit with fee 0.01 NEAR above the 0.005 NEAR limit: "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the attempt fee is above this account's max_fee_per_commit'}}}}"
+commit naming kintsugi-res2-prnvm.testnet as payout: "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: this account's commits must use its fixed payout account'}}}}"
+commit within the limits accepted: credit 130000000000000000000000 -> 120000000000000000000000 yoctoNEAR, commits 1
+limits cleared: {"max_fee_per_commit":null,"fixed_payout":null}
+== S7 and S3 on bounty 11
+S3: proof of bounty 1 attempt 0 sent for bounty 11 attempt 0: "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the journal belongs to another bounty or attempt (submission id)'}}}}"
+S7: after claim_timeout of index 0: kintsugi-res1-prnvm.testnet +60000000000000000000000 yoctoNEAR (expected 0.05 + 0.01 fee), kintsugi-res2-prnvm.testnet +65000000000000000000000 yoctoNEAR (expected 0.05 + 0.015 fee)
+submission 0: TimedOut kintsugi-res1-prnvm.testnet
+submission 1: TimedOut kintsugi-res2-prnvm.testnet
+bounty 11: {'state': 'Paid', 'winner': 0, 'pending': 0, 'fees_collected': '0'}
+bounty 7 unchanged by the redeploy
+pool unchanged: 90000000000000000000000 yoctoNEAR
+allowlist unchanged: ["dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"]
+agent limits view answers on the new code: {"max_fee_per_commit":null,"fixed_payout":null}

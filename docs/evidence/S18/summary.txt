@@ -1,0 +1,4 @@
+S18 Proof 0: wall_seconds=3404.47 r0vm_peak_rss_mib=4721 (VmHWM, sampled every 5 s) 
+S18 succinct: wall_seconds=1020.89 r0vm_peak_rss_mib=1486 (VmHWM, sampled every 5 s) 
+S18 Groth16: wall_seconds=107.47  container peak peak_container_mib=6963 min_available_mib=1028
+S18 bounty 12: level 2 opened True image_id_allowed True exploit_commitment b0ae74b27fc9321f... expires 2026-11-24 03:49 UTC

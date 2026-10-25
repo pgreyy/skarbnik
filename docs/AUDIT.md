@@ -27,7 +27,7 @@ service, RISC Zero's prover and its trusted setup, NEAR itself, and the operatio
 | 3 | `3377348`, `a968fa5` | The earliest reveal has priority: a PASS or a timeout for an attempt is refused while an attempt revealed earlier is still undecided (`a968fa5` corrects a test that did not compile in `3377348`) |
 | 4 | `5cb277c` | Level 2 fees of decided attempts go to the protocol fee pool at expiry, never to the vendor; when a bounty closes, the fees of other revealed, undecided attempts are refunded as credit |
 | 5 | `affaa5a` | Owner allowlist of checker image ids (`allow_image_id`, `get_allowed_image_ids`); `get_bounty` shows `image_id_allowed` |
-| 6 | `8762144` | From the second review: same-block reveals tie-break by index; a reveal gap of zero is refused; the allowlist fails closed; stale comments corrected |
+| 6 | `8762144` | From the second review: same-block reveals tie-break by index; a reveal gap of zero is refused; a stored allowlist that does not decode fails closed (an empty list still allows any id); stale comments corrected |
 
 None of the fixes changes the contract's stored layout or the checker's image id; the fixed contract was redeployed in place
 on `kintsugi-l2-cihdp.testnet` (first `Gr63BrfkdxGDcnvQGBrtrpu4rtRsF1ZYVorsCqFk4Qjq`, wasm `2e798b70...f9d7`, and the
@@ -65,20 +65,31 @@ Level 0 versus Level 2 call confusion, rounding, double payouts, and the credit 
 
 ## Unfixed findings, stated as known limits
 
-- Finding 3 (residual): a vendor's second account that reveals junk FIRST and never gets a proof is paid by timeout, so a
-  vendor can take its own bounty back and leave a later honest fix unpaid (the honest fee is refunded since fix 4). What
-  stops it: nothing in the contract yet; S7 (split the timeout among all revealed undecided attempts) would make it cost
-  the vendor half the bounty. Decision open.
+- Finding 3 (residual): since S7 (hardening round, below) a silent vendor's timeout is split equally among every revealed
+  attempt still undecided, so a vendor's junk revealed first no longer takes the whole bounty: with one honest fix
+  pending it keeps half. What remains, stated plainly: a vendor that reveals m junk attempts from its own accounts keeps
+  m/(m+1) (m is at most K - 1, K at most 16), and its fees come back with the shares, so the cost to it is only gas.
+  S7 also gives a copy of a revealed fix an equal share when the vendor is silent (before S7 a later copy got nothing,
+  fix 3). Both apply only to a silent vendor; a PASS still pays only the earliest passing reveal.
 - Finding 8: payouts are detached transfers; a payout account that does not exist loses the payout into the contract.
-  Researchers must give an existing account. S4 (pull payments) is the fix.
-- Finding 9: an agent's commit-only key can spend the whole credit it was given on one attacker-set fee and set any
-  payout. The key protects the wallet, not the credit. S6 is the fix; until then keep agent credit small.
+  S4 (pull payments) is the fix and is deliberately not built in this round (owner's decision, 2026-10-25).
+  `scripts/agent_preflight.sh` (S16) refuses a payout account that does not exist; a researcher who skips it can still
+  lose a payout this way.
+- Finding 9: since S6 an account can set `set_agent_limits` (1 yoctoNEAR, which a function call key cannot attach): a
+  largest fee per commit and a fixed payout. With limits set, the agent key cannot spend more than the limit on one
+  attempt nor send winnings elsewhere; it can still spend the whole credit over many attempts. Without limits set, the
+  finding applies unchanged.
 - Findings 10 and 11: the Proof 0 seed is the vendor's choice; the RISC Zero constants are unversioned.
 - Finding 12: no storage accounting; the contract's faucet balance covers storage today.
 - Finding 13: the OutLayer deposit refund (Level 1 is not in use).
 - Finding 14: verifier set management, the owner key, cheap slot griefing with `fee_step = 0`.
 
-## Where the protocol fee pool's fees should go (reviewers' views, decision open)
+## Where the protocol fee pool's fees should go (decided 2026-10-25: option A, locked)
+
+Owner's decision: the pool stays locked in the contract as a declared reserve for storage. There is no method that
+withdraws it and none is planned; it pays no one, so no one (the project included) profits from junk commits or missed
+reveals. `get_protocol_pool` shows its size (0.09 NEAR on `kintsugi-l2-cihdp.testnet` before and after the hardening
+redeploy, `docs/evidence/hardening/summary.txt`). The reviewers' views that led to the decision:
 
 All three reviewers reject paying the pool to the project or owner (conflict of interest: the project would earn from
 griefing and from agents that miss a reveal window), to the vendor (free self-blocking) and to the verifiers (no work,
@@ -90,13 +101,22 @@ and none at Level 2). They differ on the positive answer:
 - C: pay them to that bounty's winner (per-bounty accounting, one u128 per bounty), else leave locked; only after findings
   1 and 5 are fixed, which they now are.
 
+## Owner powers
+
+The owner account (`get_owner`) can register verifiers (`register_verifier`), set the Level 1 OutLayer settings
+(`set_outlayer`) and add checker image ids to the allowlist (`allow_image_id`). The allowlist stays on (owner's decision,
+2026-10-25): once it holds an id, `create_bounty` refuses every other id, so the owner decides which checker programs
+bounties may use; an id cannot be removed, and bounties created before an id was listed show `image_id_allowed: false`.
+The contract account's full access key can replace the code; removing or escrowing it (S14) is planned as the last step
+before submission and is not done. Nothing else is owner-only; in particular the owner cannot move bounties, credit or
+the pool.
+
 ## The skeptical judge (reviewers' views)
 
 The first attacks all three expect: "the vendor picks the program, so your zero knowledge verdict is 'trust the vendor's
 wasm'" (now answered by the allowlist and `check_image_id.sh ... MATCH`); "your timeout pays junk" (fix 1, with tests
 named after the attack); "show the vendor cannot walk away with the fix" (fix 3; the residual of finding 3 must be stated);
-"your demo secret is public" (true: the demo uses the public demo salt; S18, one live bounty with a private secret, is
-the answer); "who proves, and how fast" (66 minutes per proof on a laptop against the window and K; S19); "Groth16 trusted
+"your demo secret is public" (true for the demo bounty 7; S18 answers it: bounty 12's secret and salt are not public); "who proves, and how fast" (66 minutes per proof on a laptop against the window and K; S19); "Groth16 trusted
 setup, BN254 under 100 bits, unversioned constants" (documented with primary sources; S9). What already holds: the
 contract's 35 Tgas on-chain verification with NEAR's alt_bn128 host functions, the function call key for the agent, the
 commit and reveal with the payout bound before reveal, and the reproducible checker build.
@@ -180,3 +200,40 @@ its two timeout calls were correctly refused with "deadline has not passed". The
 the extra commit's 0.02 NEAR fee went to the pool at expiry by the never-revealed rule, which is why the pool gained 0.035
 and not 0.015. Fix 6 was deployed after this rerun (`7EL7CrM2iGs6cbBXa9QXCDLcSDFPNeRxz9Rb9U75nSLK`), so the rerun tested fixes 1 to 5; fix 6 rests on its unit
 tests.
+
+## Hardening round (owner's choices, 2026-10-25)
+
+Applied on top of fix 6, stored layout and checker image id unchanged (new state only under raw storage keys), redeployed
+in place on `kintsugi-l2-cihdp.testnet` (tx `9vrrJwCswthVioqgPtrSnc6phWh2KDyzHKuBSuTEPqFz`, wasm `7d936eee...c836`; after
+the final review's fix, tx `EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W`, wasm `938d5456...d1b7`). Unit tests: 119 passed.
+Evidence: EVIDENCE, "Audit hardening round"; raw output `docs/evidence/hardening/`.
+
+| Item | Status | What changed | Shown by |
+| --- | --- | --- | --- |
+| S7 | applied | a silent vendor's timeout is split equally among every revealed undecided attempt, each paid its share and its own fee; remainder to the claimed index | unit tests `audit_s7_*`, `review_s7_*`; testnet bounty 11, tx `6uem1gWAymCr2VzL3FofpQfVoqZGrzvXA2wERXnvaYpP` |
+| S6 | applied | `set_agent_limits` (exactly 1 yoctoNEAR): `max_fee_per_commit` and `fixed_payout` per account, enforced in `commit`; `get_agent_limits` | unit tests `audit_s6_*`; testnet steps `s6_*` |
+| S3 | applied | cheap binding checks before the pairing check in `submit_groth16` and `open_with_groth16` | testnet: a proof of another bounty refused for 2.35 Tgas (34.90 Tgas before) |
+| S2 | applied | negative tests: journals of 779, 781 and 0 bytes, a byte word of 256, verdict 2, a 255 byte seal, Proof 0 and attempt journals swapped, one changed byte of the control root | unit tests `s2_*` |
+| S1 | applied | the two real attempt proofs of the S6c run as unit test vectors (`contract/src/groth16_attempt_vectors.rs`), with the mock set to the deployed account and the recorded seeds | unit tests `s1_*` |
+| S16 | applied | `scripts/agent_preflight.sh` (payout account exists, image id on a non-empty allowlist, windows, fees, K), wired into `scripts/s7_agent.sh` | `docs/evidence/hardening/preflight.txt` |
+| S18 | done | bounty 12, Level 2, private salt, secret kept outside the repository, opened by its own Proof 0; `check_image_id.sh` MATCH. The original and the fix are the public demo files | EVIDENCE, S18; txs `ByJpYtUh5QJcgeVnYuroFFvMWnCGncRc7bMM5T1dTFQw`, `AwktYGNHGijdv2LWwQYeuc7yFyLoDs41AuJckxUQuPSJ` |
+| S4 | not built (owner's decision) | known limit, finding 8; S16 refuses a missing payout account | |
+| S14 | not done yet | planned as the last step before submission | |
+| Pool | decided: locked (option A) | no withdraw method | section "Where the protocol fee pool's fees should go" |
+| Allowlist | kept, documented as an owner power | | section "Owner powers" |
+
+## Final review of the code changed since `bab84c5`
+
+One reviewer read only the diff since the audited commit (fixes 1 to 6 and the hardening round) and the files around it,
+without the project's own conclusions. It found no path that pays twice, strands funds, or lets a cheap check replace the
+pairing check. Its findings and what was done:
+
+| # | Severity | Finding | Reproduced | Done |
+| --- | --- | --- | --- | --- |
+| 1 | high | With the S7 split, a silent vendor's puppet accounts that reveal junk (before or after the honest fix) share the timeout: with K slots the honest fix can get as little as 1/K, and the puppets' fees come back, so it costs the vendor only gas | yes: `review_s7_puppets_revealed_after_the_honest_fix_share_a_silent_vendors_timeout` (K = 3, honest payout gets a third) | not changed: it is the consequence of the chosen rule. Before S7 the worst case was worse (a puppet revealed first took the whole bounty). Stated as a known limit; a different split is the owner's decision |
+| 2 | medium | A sharer is paid although its own verdict window is still open, or although a FAIL is posted for it (Level 0, one attestation) | yes: `review_s7_a_sharer_with_a_posted_fail_and_an_open_window_is_still_paid` | not changed: excluding those attempts would let a Level 0 vendor post false FAILs to cut honest attempts out, and excluding open windows brings back "junk revealed first takes all". Stated as a known limit |
+| 3 | low | After a PASS, other revealed undecided attempts were refunded but stayed counted in `pending` (the second review's open point) | yes: the extra assertion in `audit_f4_pass_refunds_the_fee_of_an_undecided_revealed_attempt` | fixed: `refund_undecided_revealed` no longer counts them as pending; they still show `Open` (there is no final outcome for them, and adding one would change the stored type) |
+| 4 | low | `max_fee_per_commit` bounds one commit, not the total | by reading | docs already say the credit can still be spent over many attempts; a test now also checks the credit taken |
+| 5 | info | The allowlist allows any id while empty and cannot remove an id | by reading | docs made precise (fixes table, owner powers); the preflight requires a non-empty list |
+| 6 | info | A Level 0 sweep leaves `fees_collected` in the view (Level 2 zeroes it); `fees_swept` prevents a second payout | by reading | not changed (older behaviour, no money effect) |
+

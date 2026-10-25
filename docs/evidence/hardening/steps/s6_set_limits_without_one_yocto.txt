@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_agent_limits json-args '{"max_fee_per_commit":"5000000000000000000000","fixed_payout":"kintsugi-res1-prnvm.testnet"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-25T02:20:35.081394829Z
+{
+ "tx_hash": "G1eDFEEUs5VSN4PiU3UFnYYipe1tpbvoCFkcQGz3arRE",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: Requires attached deposit of exactly 1 yoctoNEAR'}}}}",
+ "total_gas_burnt": 1889032488254,
+ "logs": [],
+ "wall_seconds": 4.072,
+ "rpc_error": null
+}

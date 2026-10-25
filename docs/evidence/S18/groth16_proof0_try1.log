@@ -1,0 +1,8 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/s18/proof0_succinct.bin target/s18/proof0_groth16.bin groth16
+utc_start=2026-10-25T03:41:31Z
+limits: max_rss_mib=6144 min_avail_mib=700 max_seconds=1800
+exit=143
+wall_seconds=97.8
+r0vm_peak_rss_mib=1411 (VmHWM, sampled every 5 s)
+min_available_mib=576
+result: stopped: r0vm peak 1411 MiB, available 576 MiB

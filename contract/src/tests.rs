@@ -1018,6 +1018,17 @@ fn second_account_copies(c: &mut Contract, who: &str, t: u64) -> u32 {
     s
 }
 
+/// A second account commits and reveals its own patch bytes (S7 tests).
+fn second_account_reveals(c: &mut Contract, who: &str, patch: &[u8], t: u64) -> u32 {
+    at(acc(who), t, start_credit());
+    c.deposit_credit(None);
+    call(acc(who), t + 1);
+    let s = c.commit(U64(0), fingerprint_hex(patch, &acc(who)), acc(who)).unwrap();
+    call(acc(who), t + 1 + GAP);
+    c.reveal(U64(0), s, Base64VecU8(patch.to_vec()), NONCE.into());
+    s
+}
+
 #[test]
 #[should_panic(expected = "an attempt revealed earlier is still undecided")]
 fn audit_c2_pass_for_a_copied_later_reveal_is_refused_while_the_first_reveal_is_undecided() {
@@ -1039,14 +1050,16 @@ fn audit_c2_copier_cannot_claim_its_timeout_before_the_first_reveal_is_decided()
 }
 
 #[test]
-fn audit_c2_first_reveal_is_paid_by_timeout_then_the_copier_gets_nothing() {
+fn audit_c2_first_reveal_is_paid_by_timeout_and_shares_with_the_later_copy() {
+    // Since S7 a silent vendor's timeout is split among every revealed undecided attempt, the later copy included.
     let mut c = setup();
     let r = commit_and_reveal(&mut c, T0 + SEC);
     let s = second_account_copies(&mut c, "s.testnet", T0 + 4 * SEC);
     call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
-    c.claim_timeout(U64(0), r); // anyone may time out the first reveal; it is paid
-    assert_eq!(transfers(), vec![(payout(), bounty_amount().as_yoctonear() + FEE)]);
-    assert_eq!(c.get_submission(U64(0), s).unwrap().outcome, Outcome::Open);
+    c.claim_timeout(U64(0), r); // anyone may time out the first reveal
+    let a = bounty_amount().as_yoctonear();
+    assert_eq!(transfers(), vec![(payout(), a - a / 2 + FEE), (acc("s.testnet"), a / 2 + FEE + STEP)]);
+    assert_eq!(c.get_submission(U64(0), s).unwrap().outcome, Outcome::TimedOut);
     assert_eq!(c.get_bounty(U64(0)).unwrap().state, BountyState::Paid);
 }
 
@@ -1101,10 +1114,11 @@ fn audit_f4_pass_refunds_the_fee_of_an_undecided_revealed_attempt() {
     assert_eq!(c.attest(U64(0), r, Verdict::Pass, H1.into(), H2.into()), "final_pass");
     assert_eq!(c.get_credit(acc("other.testnet")).0, before + FEE + STEP); // the undecided attempt's fee is back
     assert_eq!(c.get_bounty(U64(0)).unwrap().fees_collected.0, 0); // nothing left to sweep
+    assert_eq!(c.get_bounty(U64(0)).unwrap().pending, 0); // final review, finding 3: no longer counted as waiting
 }
 
 #[test]
-fn audit_f4_timeout_refunds_the_fee_of_an_undecided_revealed_attempt() {
+fn audit_s7_timeout_pays_the_undecided_revealed_attempt_its_share_and_fee() {
     let mut c = setup();
     let r = commit_and_reveal(&mut c, T0 + SEC);
     at(acc("other.testnet"), T0 + 4 * SEC, start_credit());
@@ -1116,8 +1130,56 @@ fn audit_f4_timeout_refunds_the_fee_of_an_undecided_revealed_attempt() {
     let before = c.get_credit(acc("other.testnet")).0;
     call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
     c.claim_timeout(U64(0), r);
-    assert_eq!(c.get_credit(acc("other.testnet")).0, before + FEE + STEP);
+    let a = bounty_amount().as_yoctonear();
+    assert_eq!(transfers(), vec![(payout(), a - a / 2 + FEE), (acc("other.testnet"), a / 2 + FEE + STEP)]);
+    assert_eq!(c.get_credit(acc("other.testnet")).0, before); // the fee came back with the share, not as credit
     assert_eq!(c.get_bounty(U64(0)).unwrap().fees_collected.0, 0); // nothing is left for the verifiers to be paid from
+    assert_eq!(c.get_bounty(U64(0)).unwrap().pending, 0);
+}
+
+// Audit hardening S7: a vendor's own junk revealed FIRST no longer takes the whole bounty when the vendor stays silent.
+#[test]
+fn audit_s7_junk_revealed_first_shares_with_the_honest_fix() {
+    let mut c = setup();
+    let j = second_account_reveals(&mut c, "puppet.testnet", b"junk", T0 + SEC);
+    let r = commit_and_reveal(&mut c, T0 + 4 * SEC);
+    call(acc("puppet.testnet"), T0 + 2 * SEC + GAP + W);
+    c.claim_timeout(U64(0), j);
+    let a = bounty_amount().as_yoctonear();
+    assert_eq!(transfers(), vec![(acc("puppet.testnet"), a - a / 2 + FEE), (payout(), a / 2 + FEE + STEP)]);
+    assert_eq!(c.get_submission(U64(0), r).unwrap().outcome, Outcome::TimedOut);
+}
+
+#[test]
+fn audit_s7_three_way_split_gives_the_remainder_to_the_claimed_index() {
+    let mut c = setup();
+    let r = commit_and_reveal(&mut c, T0 + SEC);
+    second_account_reveals(&mut c, "b.testnet", b"bbbb", T0 + 4 * SEC);
+    second_account_reveals(&mut c, "d.testnet", b"dddd", T0 + 7 * SEC);
+    call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(0), r);
+    let a = bounty_amount().as_yoctonear();
+    let t = transfers();
+    assert_eq!(t.len(), 3);
+    assert_eq!(t[0], (payout(), a - 2 * (a / 3) + FEE));
+    assert_eq!(t[1].1, a / 3 + FEE + STEP);
+    assert_eq!(t[2].1, a / 3 + FEE + 2 * STEP);
+    assert_eq!(t.iter().map(|x| x.1).sum::<u128>(), a + 3 * FEE + 3 * STEP);
+    assert_eq!(c.get_bounty(U64(0)).unwrap().pending, 0);
+}
+
+#[test]
+fn audit_s7_an_unrevealed_commit_gets_no_share() {
+    let mut c = setup();
+    let r = commit_and_reveal(&mut c, T0 + SEC);
+    at(acc("late.testnet"), T0 + 4 * SEC, start_credit());
+    c.deposit_credit(None);
+    call(acc("late.testnet"), T0 + 5 * SEC);
+    let l = c.commit(U64(0), fingerprint_hex(b"late", &acc("late.testnet")), acc("late.testnet")).unwrap();
+    call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(0), r);
+    assert_eq!(transfers(), vec![(payout(), bounty_amount().as_yoctonear() + FEE)]);
+    assert_eq!(c.get_submission(U64(0), l).unwrap().outcome, Outcome::Open);
 }
 
 // Audit round 2 (fix 6): reveals in the same block tie on time; the lower index then counts as earlier, and a commit can
@@ -1165,4 +1227,106 @@ fn audit_r2_zero_reveal_gap_is_refused() {
     let mut c = Contract::new(owner());
     at(vendor(), T0, bounty_amount());
     c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(0), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+}
+
+// Audit hardening S6: limits an account sets on its own commits, so an agent's commit-only key is bounded.
+fn set_limits(c: &mut Contract, who: AccountId, max: Option<u128>, fixed: Option<AccountId>, t: u64) {
+    at(who, t, NearToken::from_yoctonear(1));
+    c.set_agent_limits(max.map(U128), fixed);
+}
+
+#[test]
+fn audit_s6_fee_above_the_limit_is_refused_and_a_fee_within_it_is_taken() {
+    let mut c = setup();
+    set_limits(&mut c, researcher(), Some(FEE), None, T0 + SEC);
+    call(researcher(), T0 + 2 * SEC);
+    c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap(); // first fee is FEE: allowed
+    call(researcher(), T0 + 3 * SEC);
+    let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        c.commit(U64(0), fingerprint_hex(b"second", &payout()), payout()) // next fee is FEE + STEP
+    }));
+    assert!(r.is_err());
+    assert_eq!(c.get_bounty(U64(0)).unwrap().commits, 1);
+    assert_eq!(c.get_credit(researcher()).0, start_credit().as_yoctonear() - FEE); // only the first fee was taken
+}
+
+#[test]
+#[should_panic(expected = "the attempt fee is above this account's max_fee_per_commit")]
+fn audit_s6_limit_message() {
+    let mut c = setup();
+    set_limits(&mut c, researcher(), Some(FEE - 1), None, T0 + SEC);
+    call(researcher(), T0 + 2 * SEC);
+    c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout());
+}
+
+#[test]
+#[should_panic(expected = "this account's commits must use its fixed payout account")]
+fn audit_s6_fixed_payout_refuses_another_payout() {
+    let mut c = setup();
+    set_limits(&mut c, researcher(), None, Some(payout()), T0 + SEC);
+    call(researcher(), T0 + 2 * SEC);
+    c.commit(U64(0), fingerprint_hex(PATCH, &acc("attacker.testnet")), acc("attacker.testnet"));
+}
+
+#[test]
+fn audit_s6_fixed_payout_allows_its_own_account() {
+    let mut c = setup();
+    set_limits(&mut c, researcher(), Some(FEE), Some(payout()), T0 + SEC);
+    assert_eq!(c.get_agent_limits(researcher()), AgentLimits { max_fee_per_commit: Some(U128(FEE)), fixed_payout: Some(payout()) });
+    assert_eq!(commit_and_reveal(&mut c, T0 + 2 * SEC), 0);
+}
+
+#[test]
+#[should_panic(expected = "Requires attached deposit of exactly 1 yoctoNEAR")]
+fn audit_s6_limits_cannot_be_changed_without_one_yocto() {
+    // A function call key (an agent's commit-only key) cannot attach a deposit, so this is the call it would make.
+    let mut c = setup();
+    call(researcher(), T0 + SEC);
+    c.set_agent_limits(None, None);
+}
+
+#[test]
+fn audit_s6_limits_are_per_account_and_can_be_cleared() {
+    let mut c = setup();
+    set_limits(&mut c, researcher(), Some(1), Some(payout()), T0 + SEC);
+    assert_eq!(c.get_agent_limits(acc("other.testnet")), AgentLimits::default());
+    set_limits(&mut c, researcher(), None, None, T0 + 2 * SEC);
+    assert_eq!(c.get_agent_limits(researcher()), AgentLimits::default());
+    assert_eq!(commit_and_reveal(&mut c, T0 + 3 * SEC), 0);
+}
+
+// Final review of the hardening round, findings 1 and 2: what the S7 split pays, pinned as tests (owner's decision).
+#[test]
+fn review_s7_puppets_revealed_after_the_honest_fix_share_a_silent_vendors_timeout() {
+    // K = 3: the honest fix and two junk reveals from one other account; the honest payout gets a third.
+    let mut c = setup();
+    let r = commit_and_reveal(&mut c, T0 + SEC);
+    second_account_reveals(&mut c, "puppet.testnet", b"junk1", T0 + 4 * SEC);
+    call(acc("puppet.testnet"), T0 + 7 * SEC);
+    let p2 = c.commit(U64(0), fingerprint_hex(b"junk2", &acc("puppet.testnet")), acc("puppet.testnet")).unwrap();
+    call(acc("puppet.testnet"), T0 + 7 * SEC + GAP);
+    c.reveal(U64(0), p2, Base64VecU8(b"junk2".to_vec()), NONCE.into());
+    call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(0), r);
+    let a = bounty_amount().as_yoctonear();
+    let t = transfers();
+    assert_eq!(t[0], (payout(), a - 2 * (a / 3) + FEE));
+    let to_puppet: u128 = t.iter().filter(|x| x.0 == acc("puppet.testnet")).map(|x| x.1).sum();
+    assert_eq!(to_puppet, 2 * (a / 3) + 2 * FEE + 3 * STEP); // two shares and both fees back
+}
+
+#[test]
+fn review_s7_a_sharer_with_a_posted_fail_and_an_open_window_is_still_paid() {
+    // Level 0: the vendor posted FAIL for the junk with one attestation; the honest fix's deadline passes first.
+    let mut c = setup();
+    let r = commit_and_reveal(&mut c, T0 + SEC);
+    let b = second_account_reveals(&mut c, "b.testnet", b"junk", T0 + 4 * SEC);
+    call(vendor(), T0 + SEC + GAP + W - SEC);
+    c.post_verdict(U64(0), b, Verdict::Fail, H1.into(), H2.into());
+    call(v1(), T0 + SEC + GAP + W);
+    c.attest(U64(0), b, Verdict::Fail, H1.into(), H2.into());
+    call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(0), r);
+    let a = bounty_amount().as_yoctonear();
+    assert_eq!(transfers()[1], (acc("b.testnet"), a / 2 + FEE + STEP));
 }

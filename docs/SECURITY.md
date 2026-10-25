@@ -44,7 +44,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Deadlines by block time: a late verdict is refused; with no final verdict the researcher can claim the timeout | A vendor that stays silent, or answers too late | `post_verdict`, `claim_timeout` | S3 testnet: early timeout refused, late verdict refused, timeout paid |
 | Expiry refunds an unpaid bounty only when no revealed submission is still waiting | A vendor taking back money owed to a researcher | `expire` | unit test `expire_waits_for_revealed_submission` |
 | At most K counted commits per bounty; later ones are ignored and cost nothing | Unlimited attempts, and so unlimited leakage | `commit` | S8 testnet: fourth commit ignored ("max_commits reached") |
-| Attempt fees, rising per attempt, paid from prepaid credit; fees of revealed attempts go to the verifiers (Level 0) or the vendor (Level 2), fees of commits never revealed to the protocol fee pool | Free flooding of attempts | `commit`, `deposit_credit`, `expire` | S3b testnet |
+| Attempt fees, rising per attempt, paid from prepaid credit; fees of decided attempts go to the verifiers (Level 0) or the protocol fee pool (Level 2, since audit fix 4), fees of commits never revealed to the protocol fee pool | Free flooding of attempts | `commit`, `deposit_credit`, `expire` | S3b testnet |
 | Withdrawing credit needs 1 yoctoNEAR attached | An agent's function call key draining the credit | `withdraw_credit` | S7: refused for the agent key |
 | OutLayer's answer is accepted only as the callback of the contract's own request, and only if every echoed value matches | A forged OutLayer answer | `request_outlayer_check`, `on_outlayer_result` | 9 unit tests; S5 on chain ("Method on_outlayer_result is private") |
 | A bounty opens only after two different verifiers attest its Proof 0 (added in S13) | Attempts on a bounty that may be unfixable | `attest_proof0`, `commit` | unit tests `s13_commit_before_proof0_rejected` and others; S13 attacks 1, 6 and 7 on testnet |
@@ -62,12 +62,18 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Level 2 fees of decided attempts go to the protocol fee pool at expiry, never to the vendor; when a bounty closes, the fees of other revealed attempts still undecided are refunded as credit (audit round 1, fix 4) | A vendor earning the fees of attempts it failed (fee farming with an unfixable or fake bounty); honest losers' fees swept to the vendor or the verifiers although they were never judged | `expire`, `refund_undecided_revealed` | unit tests `audit_f4_*`; S6c rerun on testnet |
 | The owner keeps an allowlist of checker image ids; once it holds an id, `create_bounty` refuses every other id, and `get_bounty` shows `image_id_allowed` (audit round 1, fix 5) | A vendor naming its own program as the checker: a Level 2 verdict was only as good as the vendor's program, and a fake checker could farm attempt fees | `allow_image_id`, `get_allowed_image_ids`, `create_bounty` | unit tests `audit_f5_*`; set on `kintsugi-l2-cihdp.testnet` to the reproducible id |
 | Reveals in the same block tie on time and the lower index counts as earlier; a reveal gap of zero is refused, so a commit never shares a block with its reveal; a stored allowlist that does not decode fails closed (audit round 2, fix 6) | A copy of a revealed patch landing in the same block as the original and jumping the queue (the round 1 critical through a tie) | `earlier_reveal_undecided`, `create_bounty`, `allowed_image_ids` | unit tests `audit_r2_*` |
+| A silent vendor's timeout is split equally among every revealed attempt still undecided, each paid its share and its own attempt fee; the remainder of the division goes to the attempt that was claimed (audit hardening S7) | A vendor's own junk revealed first taking the whole bounty back by timeout while an honest fix waits (audit finding 3, residual) | `claim_timeout` | unit tests `audit_s7_*`; testnet `scripts/hardening_testnet.sh split` |
+| Each account may set limits on its own commits with `set_agent_limits` (needs exactly 1 yoctoNEAR): a largest attempt fee per commit and a fixed payout account; `commit` refuses a fee above the limit or another payout (audit hardening S6) | An agent's commit-only key (or whoever steals it) spending the credit on one attacker-set fee, or sending winnings elsewhere (audit finding 9) | `set_agent_limits`, `get_agent_limits`, `commit` | unit tests `audit_s6_*`; testnet `scripts/hardening_testnet.sh limits` |
+| A Level 2 proof's cheap binding checks (submission id, seed, candidate, bounty fields; for Proof 0 the journal hash, reference fix and verdict) run before the pairing check (audit hardening S3) | An honest mistake or a replayed proof burning the whole proof check; unclear errors | `submit_groth16`, `open_with_groth16` | unit tests `s1_*`, `s2_*`, `level2_changed_journal_refused`; testnet `s3_proof_of_another_bounty` |
+| The journal parser refuses every malformed journal (wrong length, a byte word above 255, a verdict other than 0 or 1) and a seal that is not 256 bytes; a Proof 0 journal is refused as an attempt and an attempt journal as Proof 0; one changed byte of the control root fails the check (audit hardening S2) | Malformed or mixed-up proofs | `groth16::parse_journal`, `groth16::verify` | unit tests `s2_*` in `contract/src/tests_level2_attempts.rs` |
 
 ### Keys
 
 | Guard | What it stops | Shown by |
 | --- | --- | --- |
-| An AI agent works through a function call key limited to `commit` and `reveal` on the bounty contract | The agent (or whoever steals its key) reaching its owner's wallet; the credit the owner deposited is not protected per commit (audit finding 9) | S7: transfer refused (`RequiresFullAccess`), other method refused (`MethodNameMismatch`), deposits refused |
+| An AI agent works through a function call key limited to `commit` and `reveal` on the bounty contract | The agent (or whoever steals its key) reaching its owner's wallet | S7: transfer refused (`RequiresFullAccess`), other method refused (`MethodNameMismatch`), deposits refused |
+| The owner sets `set_agent_limits` with the account's full access key (1 yoctoNEAR, which a function call key cannot attach) | The agent key spending more than the chosen fee per attempt, or naming another payout account | unit tests `audit_s6_*`; testnet `scripts/hardening_testnet.sh limits` (a call with no deposit refused: "Requires attached deposit of exactly 1 yoctoNEAR") |
+| The agent checks a bounty before committing (`scripts/agent_preflight.sh`, wired into `scripts/s7_agent.sh`): payout account exists, image id on a non-empty allowlist, windows, fees and K within its limits (audit hardening S16) | Committing to a bounty with a fake checker, a missing payout account, too short windows or a large fee | `docs/evidence/hardening/preflight.txt` |
 
 ## 2. Attacks we tried
 
@@ -186,27 +192,50 @@ Each guard: what it stops, where it lives, and what shows it works.
   proves that fix in Proof 0. A vendor who has found a crash but has no fix at all is not supported yet. The reference
   fix stays private (only its sha256 is public) and may be crude; it cannot simply recognise the exact secret bytes,
   because the variants step (copies of the secret with one or two bytes changed) would then fail.
-- The vendor sees each patch before paying. The timeout path protects the researcher except against the vendor's own
-  second account revealing junk before any honest fix: that account is paid by timeout and the bounty closes (audit
-  finding 3, residual; the later honest fee is refunded since fix 4). Splitting the timeout payout among all revealed
-  undecided attempts would make this cost the vendor half the bounty; decision open.
+- The vendor sees each patch before paying. If the vendor stays silent, the timeout is split equally among every revealed
+  attempt still undecided (audit hardening S7). This has two costs, both stated plainly: a vendor that reveals m junk
+  attempts from its own accounts before or after an honest fix keeps m/(m+1) of the bounty (m is at most K - 1, and K
+  is at most 16), and someone who copies a revealed fix into a second account now gets an equal share when the vendor
+  is silent (before S7 the copy got nothing, audit fix 3). The split also pays an attempt whose own verdict window is
+  still open, or for which a FAIL is posted but not yet confirmed: once the earliest reveal times out, the vendor has lost
+  the chance to decide the others (unit tests `review_s7_*`). A vendor that answers is not affected: a PASS pays only the
+  earliest passing reveal.
 - Payouts are detached transfers. A payout account that does not exist makes the transfer fail after the state says
-  Paid; the NEAR stays in the contract with no record and no way out (audit finding 8, shown on testnet). Researchers
-  must give an existing account. Pull payments are the fix; not built.
-- An agent's commit-only key cannot reach the wallet, but it can spend the whole credit it was given on one commit to
-  a bounty with a large attempt fee, and set any payout account (audit finding 9). Keep agent credit small; a per-commit
-  spending limit is the fix; not built.
+  Paid; the NEAR stays in the contract with no record and no way out (audit finding 8, shown on testnet). Pull payments
+  (S4) are the fix and are deliberately not built in this round (owner's decision, 2026-10-25). The mitigation is
+  `scripts/agent_preflight.sh`, which refuses a payout account that does not exist; a researcher who does not run it
+  can still lose a payout this way.
+- An agent's commit-only key cannot reach the wallet. With `set_agent_limits` set, it cannot spend more than
+  `max_fee_per_commit` on one attempt and its winnings go only to the fixed payout account (audit hardening S6). It can
+  still spend the whole credit over many attempts, one limited fee at a time, and without limits set the old finding 9
+  applies unchanged. Keep agent credit small.
 - Storage is not charged to anyone: the contract's own balance covers the storage stake, and it can be ground down by
   tiny deposits or short-lived bounties (audit finding 12). On testnet the faucet balance covers it.
 - Verifiers cannot be removed and are paid the fee sweep for no work; the contract account's full access key is the
   real owner of all funds; slot griefing is cheaper than the arithmetic above when `fee_step` is 0 (audit finding 14).
+- Owner powers, stated in full: the owner (`get_owner`) registers verifiers, sets the Level 1 OutLayer settings, and adds
+  checker image ids to the allowlist (`allow_image_id`). Once the list holds an id, `create_bounty` refuses every other
+  id, so the owner decides which checker programs bounties may use; there is no call to remove an id. Bounties created
+  before an id was listed keep their id and show `image_id_allowed: false`. The contract account's full access key can
+  also replace the code; removing or escrowing that key is planned as the last step before submission (S14), not done.
+- The protocol fee pool (fees of commits never revealed, and Level 2 fees of decided attempts) stays locked in the
+  contract as a reserve for storage. No method withdraws it, by design (owner's decision, 2026-10-25): it pays no one,
+  so no one profits from junk or missed reveals. `get_protocol_pool` shows its size.
+- Agent limits are stored per account under a raw storage key with no storage deposit, like the rest of the contract
+  (audit finding 12).
 - The contract audit (docs/AUDIT.md) lists every finding, its status and the suggested hardening.
 - Arena verdicts (S8) come from the native checker, not proofs. Timing and other side channels are not measured.
 - Proving is slow on a laptop CPU (16 fairness inputs: 47 to 48 minutes, plus 15 to 16 minutes to compress).
 - Narrow scope: crash bugs in a small module that compiles to WebAssembly; the fairness generator knows only the demo format.
-- Testnet only. No security audit.
+- Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-25 (audit hardening): S7 timeout split among revealed undecided attempts; S6 agent limits
+  (`set_agent_limits`); S3 cheap binding checks before the pairing check; S2 parser and mode-confusion tests; S1 real
+  attempt proofs as unit test vectors; S16 `scripts/agent_preflight.sh`; owner powers, the locked pool and S4 stated as
+  known limits; S18 live bounty 12 with a secret outside the repository; `refund_undecided_revealed` no longer counts
+  refunded attempts as pending (final review).
 
 - 2026-10-25 (audit fix 6, from the second review): tie-break by index for reveals in one block; reveal gap above zero;
   allowlist fails closed; stale doc comments corrected.

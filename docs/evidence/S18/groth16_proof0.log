@@ -1,0 +1,13 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/s18/proof0_succinct.bin target/s18/proof0_groth16.bin groth16
+utc_start=2026-10-25T03:47:14Z
+limits: max_rss_mib=6144 min_avail_mib=300 max_seconds=1800
+input receipt: target/s18/proof0_succinct.bin (224786 bytes)
+compressed to: groth16
+compress seconds: 106.81
+verify seconds: 0.009
+output receipt: target/s18/proof0_groth16.bin (2057 bytes)
+exit=0
+wall_seconds=107.47
+r0vm_peak_rss_mib=1410 (VmHWM, sampled every 5 s)
+min_available_mib=1027
+result: finished

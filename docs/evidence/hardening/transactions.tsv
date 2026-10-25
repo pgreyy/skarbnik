@@ -1,0 +1,20 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+redeploy	deploy	kintsugi-l2-cihdp.testnet	9vrrJwCswthVioqgPtrSnc6phWh2KDyzHKuBSuTEPqFz	2.5 Tgas	0.0002434954769582	0	5.43
+lim_create	create_bounty	kintsugi-vendor-prnvm.testnet	8brBv43w18nHv5uNhJWGGKTuWCmNixfKemuFP6vcGjhw	0.353 Tgas	0.0000352357671235	0	4.22
+lim_open_groth16	open_with_groth16	kintsugi-res2-prnvm.testnet	H7g4L1rzzEgoaZDdyGSUZEuoGzGLWZFB2HpXMn5xNi36	0.377 Tgas	0.000037681941703	0	4.44
+s6_set_limits_without_one_yocto	set_agent_limits	kintsugi-res1-prnvm.testnet	G1eDFEEUs5VSN4PiU3UFnYYipe1tpbvoCFkcQGz3arRE	-	-	rpc:failed	-
+s6_set_limits	set_agent_limits	kintsugi-res1-prnvm.testnet	AtpD1aUaxuWaoU1CFvQpyJDNMewfsSoUpFuvn8uX7LM1	0.314 Tgas	0.000031320934122	0	4.58
+s6_fee_above_limit	commit	kintsugi-res1-prnvm.testnet	G119Q3L9jpsB6qn24A96Ygt6V4BHG1rzGGYjMGmjp6At	-	-	rpc:failed	-
+s6_raise_limit	set_agent_limits	kintsugi-res1-prnvm.testnet	BWAS5Q2rmm1D6jz5PoBpZqphqBWA9JH7ZBYGShXpb9iQ	0.314 Tgas	0.0000313257024935	0	4.63
+s6_other_payout	commit	kintsugi-res1-prnvm.testnet	5LaTEQ8kzndLHjTEtbRewE8xtXVWe1tVsx22EkT9isRn	-	-	rpc:failed	-
+s6_commit_within_limits	commit	kintsugi-res1-prnvm.testnet	B3HTj1PiZ8vbMRJzFtRdyNzKn7bPCsA6UJoSgGSwb2ZW	0.315 Tgas	0.000031492595496	0	4.76
+s6_clear_limits	set_agent_limits	kintsugi-res1-prnvm.testnet	AJ3BHMD2Eqqw3r8wEK1tyST1LXDK4MytfeunRKracAos	0.312 Tgas	0.0000311063574045	0	4.37
+split_create	create_bounty	kintsugi-vendor-prnvm.testnet	DcwxnyAMNKyEf7RECpvoXGXKq884E2p6Wmsd7XG3C8fM	0.353 Tgas	0.0000352262303805	0	4.55
+split_open_groth16	open_with_groth16	kintsugi-res2-prnvm.testnet	4LhXkBqDDCt41ch54KDSSA1avZYvFbbPd62mtLLZNmYy	0.377 Tgas	0.000037681941703	0	4.58
+s7_r_commit	commit	kintsugi-res1-prnvm.testnet	D8o2aPLjCUy57o7QwaieyvGi1y2ZFCVRZ3QxzNAc8hAm	0.315 Tgas	0.000031492595496	0	4.34
+s7_r_reveal	reveal	kintsugi-res1-prnvm.testnet	BaKK2pS8rCn31QRzWZKttcw1LVoVQ38SQUvsKcKJDF9G	0.350 Tgas	0.000034925822976	0	4.71
+s7_j_commit	commit	kintsugi-res2-prnvm.testnet	6s7EFMriY7N27nujZQLtAUY5czWjyfcfycRjhu9dxTSa	0.315 Tgas	0.000031492595496	0	4.64
+s7_j_reveal	reveal	kintsugi-res2-prnvm.testnet	EfZnodB7bAP8hkxUyvuDNdYwScsDD5ik4qmyYQuhb8N2	0.319 Tgas	0.000031893138702	0	4.78
+s3_proof_of_another_bounty	submit_groth16	kintsugi-res2-prnvm.testnet	8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM	-	-	rpc:failed	-
+s7_claim_timeout	claim_timeout	kintsugi-ver3-prnvm.testnet	6uem1gWAymCr2VzL3FofpQfVoqZGrzvXA2wERXnvaYpP	0.311 Tgas	0.0000310014532315	0	4.81
+redeploy	deploy	kintsugi-l2-cihdp.testnet	EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W	2.5 Tgas	0.0002435118281558	0	5.97

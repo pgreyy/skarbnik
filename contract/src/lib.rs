@@ -93,6 +93,9 @@ const POOL_KEY: &[u8] = b"PROTOCOL_POOL";
 /// accepted (the state before audit round 1); once it holds an id, `create_bounty` refuses every other id, so a Level 2
 /// verdict can only come from a published checker (audit finding: the vendor chose the program).
 const ALLOWED_IMAGE_IDS_KEY: &[u8] = b"ALLOWED_IMAGE_IDS";
+/// Raw storage key prefix of an account's agent limits (audit hardening S6): the prefix, then the account id; the value is
+/// borsh `AgentLimits`. Raw keys keep the stored contract layout unchanged.
+const AGENT_LIMITS_PREFIX: &[u8] = b"AGENT_LIMITS:";
 /// Domain tag of the submission id a Proof 0 journal carries: sha256(PROOF0_DOMAIN || reference fix hash), as in
 /// harness/checker/src/zk.rs.
 pub const PROOF0_DOMAIN: &[u8] = b"kintsugi-proof0-v1";
@@ -153,6 +156,27 @@ fn image_id_allowed(image_id: &[u8; 32]) -> bool {
     list.is_empty() || list.contains(image_id)
 }
 
+/// Limits an account sets on its own commits, so that a key that may only call `commit` and `reveal` (a function call
+/// key given to an agent) cannot spend more per attempt than the owner chose, nor send winnings anywhere else.
+#[near(serializers = [borsh, json])]
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct AgentLimits {
+    /// The largest attempt fee one commit may take from this account's credit (yoctoNEAR); none means no limit.
+    pub max_fee_per_commit: Option<U128>,
+    /// When set, every commit by this account must name this payout account.
+    pub fixed_payout: Option<AccountId>,
+}
+
+fn agent_limits_key(account: &AccountId) -> Vec<u8> {
+    [AGENT_LIMITS_PREFIX, account.as_str().as_bytes()].concat()
+}
+
+fn agent_limits(account: &AccountId) -> AgentLimits {
+    env::storage_read(&agent_limits_key(account))
+        .map(|b| near_sdk::borsh::from_slice::<AgentLimits>(&b).unwrap_or_else(|_| env::panic_str("the agent limits do not decode")))
+        .unwrap_or_default()
+}
+
 fn pool_balance() -> u128 {
     env::storage_read(POOL_KEY).map(|b| u128::from_le_bytes(b.try_into().unwrap_or([0; 16]))).unwrap_or(0)
 }
@@ -187,8 +211,9 @@ fn add_to_pool(amount: NearToken) -> u128 {
     pool
 }
 
-/// Audit round 1, fix 4: when a bounty closes (a PASS or a timeout paid `winner`), every other revealed attempt that is
+/// Audit round 1, fix 4: when a bounty closes on a PASS for `winner`, every other revealed attempt that is
 /// still undecided gets its attempt fee back as credit: it was never judged, so its fee is neither kept nor swept.
+/// It stays `Open` in the view (no final outcome exists for it) but no longer counts in `pending`.
 fn refund_undecided_revealed(
     subs: &mut LookupMap<(u64, u32), Submission>,
     credits: &mut LookupMap<AccountId, NearToken>,
@@ -201,6 +226,10 @@ fn refund_undecided_revealed(
             continue;
         }
         if let Some(o) = subs.get_mut(&(bounty_id, k)) {
+            if o.outcome == Outcome::Open && o.revealed_at_ns.is_some() {
+                // No longer waiting for a verdict: the bounty is closed (final review of the hardening round).
+                bounty.pending = bounty.pending.saturating_sub(1);
+            }
             if o.outcome == Outcome::Open && o.revealed_at_ns.is_some() && o.fee.as_yoctonear() > 0 {
                 let fee = o.fee;
                 o.fee = NearToken::from_yoctonear(0);
@@ -718,6 +747,13 @@ impl Contract {
             return None;
         }
         let fee = bounty.next_fee();
+        let limits = agent_limits(&committer);
+        if let Some(max) = limits.max_fee_per_commit {
+            require!(fee.as_yoctonear() <= max.0, "the attempt fee is above this account's max_fee_per_commit");
+        }
+        if let Some(fixed) = &limits.fixed_payout {
+            require!(&payout == fixed, "this account's commits must use its fixed payout account");
+        }
         let credit = self.credits.get(&committer).copied().unwrap_or(NearToken::from_yoctonear(0));
         require!(credit >= fee, "not enough credit for the attempt fee: call deposit_credit first");
         self.credits.insert(committer.clone(), credit.saturating_sub(fee));
@@ -801,6 +837,22 @@ impl Contract {
         self.credits.insert(account.clone(), total);
         emit("credit_deposited", json!({ "account_id": account, "amount": U128(amount.as_yoctonear()), "total": U128(total.as_yoctonear()) }));
         U128(total.as_yoctonear())
+    }
+
+    /// Set (or clear, with nulls) the limits on this account's own commits (audit hardening S6). Needs exactly 1 yoctoNEAR,
+    /// which a function call key cannot attach, so an agent's commit-only key cannot change them.
+    #[payable]
+    pub fn set_agent_limits(&mut self, max_fee_per_commit: Option<U128>, fixed_payout: Option<AccountId>) -> AgentLimits {
+        near_sdk::assert_one_yocto();
+        let account = env::predecessor_account_id();
+        let limits = AgentLimits { max_fee_per_commit, fixed_payout };
+        if limits == AgentLimits::default() {
+            env::storage_remove(&agent_limits_key(&account));
+        } else {
+            env::storage_write(&agent_limits_key(&account), &near_sdk::borsh::to_vec(&limits).unwrap());
+        }
+        emit("agent_limits_set", json!({ "account_id": account, "max_fee_per_commit": limits.max_fee_per_commit, "fixed_payout": limits.fixed_payout }));
+        limits
     }
 
     /// Sends `amount` of the caller's unspent credit back to the caller. Needs exactly 1 yoctoNEAR
@@ -1078,12 +1130,14 @@ impl Contract {
         require!(now < bounty.expires_at_ns, "bounty has expired");
         require!(!bounty.opened, "bounty is already open");
         let j = groth16::parse_journal(&journal.0);
-        require!(groth16::verify(&seal.0, &bounty.image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
+        // Cheap binding checks first, the pairing check last (audit hardening S3): a wrong journal fails for a few Tgas
+        // with a message that names the field, instead of for the whole proof check.
         check_bounty_fields(bounty, &j);
         require!(env::sha256_array(&journal.0) == bounty.proof0_journal_hash, "the journal is not this bounty's Proof 0 journal");
         require!(j.candidate_hash == bounty.reference_fix_hash, "the journal's candidate is not this bounty's reference fix");
         require!(j.submission_id == proof0_id(&bounty.reference_fix_hash), "the journal is not a Proof 0 journal");
         require!(j.verdict == 1, "the Proof 0 verdict is not PASS");
+        require!(groth16::verify(&seal.0, &bounty.image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
         bounty.opened = true;
         emit("bounty_opened", json!({ "bounty_id": bounty_id, "by": "groth16", "caller": env::predecessor_account_id() }));
         "opened".to_string()
@@ -1117,12 +1171,13 @@ impl Contract {
             require!(!earlier_reveal_undecided(&self.submissions, bounty_id.0, commits, index, revealed), "an attempt revealed earlier is still undecided: decide it or time it out first");
         }
         let sub = self.submissions.get_mut(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
-        require!(groth16::verify(&seal.0, &image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
+        // Cheap binding checks first, the pairing check last (audit hardening S3).
         let patch_hash = sub.patch_hash.unwrap_or_else(|| env::panic_str("submission not revealed"));
         require!(j.submission_id == submission_id(&contract, bounty_id.0, index, &patch_hash), "the journal belongs to another bounty or attempt (submission id)");
         require!(Some(j.fuzz_seed) == sub.seed, "the journal's seed is not the seed recorded at reveal");
         require!(j.candidate_hash == patch_hash, "the journal's candidate is not the revealed patch");
         check_bounty_fields(bounty, &j);
+        require!(groth16::verify(&seal.0, &image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
         let verdict = if j.verdict == 1 { Verdict::Pass } else { Verdict::Fail };
         sub.verdict = Some(PostedVerdict {
             verdict,
@@ -1156,8 +1211,9 @@ impl Contract {
 
     // ---------- anyone ----------
 
-    /// Anyone. After the deadline of a revealed submission with no final verdict, pays the bounty to that
-    /// submission's payout account and closes the bounty.
+    /// Anyone. After the deadline of a revealed submission with no final verdict (and no earlier reveal still undecided),
+    /// closes the bounty and splits it equally among every revealed submission that is still undecided (audit hardening
+    /// S7): each payout account gets its share and its attempt fee back, the remainder of the division goes to `index`.
     pub fn claim_timeout(&mut self, bounty_id: U64, index: u32) {
         let now = env::block_timestamp();
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
@@ -1171,19 +1227,31 @@ impl Contract {
         require!(now > deadline, "deadline has not passed");
         let (commits, revealed) = (bounty.commits, sub.revealed_at_ns.unwrap_or(u64::MAX));
         require!(!earlier_reveal_undecided(&self.submissions, bounty_id.0, commits, index, revealed), "an attempt revealed earlier is still undecided: decide it or time it out first");
+        let sharers: Vec<u32> = (0..commits)
+            .filter(|k| {
+                self.submissions
+                    .get(&(bounty_id.0, *k))
+                    .is_some_and(|o| o.outcome == Outcome::Open && o.revealed_at_ns.is_some())
+            })
+            .collect();
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
-        let sub = self.submissions.get_mut(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
-        sub.outcome = Outcome::TimedOut;
-        bounty.pending -= 1;
+        let amount = bounty.amount.as_yoctonear();
+        let n = sharers.len() as u128;
+        let share = amount / n;
         bounty.state = BountyState::Paid;
         bounty.winner = Some(index);
-        emit(
-            "paid",
-            json!({ "bounty_id": bounty_id, "index": index, "reason": "timeout", "to": sub.payout, "amount": U128(bounty.amount.as_yoctonear()), "caller": env::predecessor_account_id() }),
-        );
-        bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
-        Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
-        refund_undecided_revealed(&mut self.submissions, &mut self.credits, bounty_id.0, bounty, index);
+        for k in sharers {
+            let sub = self.submissions.get_mut(&(bounty_id.0, k)).unwrap_or_else(|| env::panic_str("no such submission"));
+            let paid = if k == index { amount - share * (n - 1) } else { share };
+            sub.outcome = Outcome::TimedOut;
+            bounty.pending -= 1;
+            bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
+            emit(
+                "paid",
+                json!({ "bounty_id": bounty_id, "index": k, "reason": "timeout", "to": sub.payout, "amount": U128(paid), "caller": env::predecessor_account_id() }),
+            );
+            Promise::new(sub.payout.clone()).transfer(NearToken::from_yoctonear(paid).saturating_add(sub.fee)).detach();
+        }
     }
 
     /// Anyone. After the bounty's expiry: if nothing was paid and no revealed submission is still waiting
@@ -1250,6 +1318,11 @@ impl Contract {
     // ---------- views (free, change nothing) ----------
 
     /// Unspent credit of an account, in yoctoNEAR.
+    /// The limits an account set on its own commits (all null when none are set).
+    pub fn get_agent_limits(&self, account_id: AccountId) -> AgentLimits {
+        agent_limits(&account_id)
+    }
+
     pub fn get_credit(&self, account_id: AccountId) -> U128 {
         U128(self.credits.get(&account_id).map(|c| c.as_yoctonear()).unwrap_or(0))
     }
@@ -1362,3 +1435,5 @@ impl Contract {
 mod tests;
 #[cfg(test)]
 mod tests_level2;
+#[cfg(test)]
+mod tests_level2_attempts;

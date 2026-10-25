@@ -2,6 +2,35 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Audit hardening round (S1, S2, S3, S6, S7, S16, S18)
+
+- Owner's decisions: S7 split the silent-vendor timeout; the protocol pool stays locked as a storage reserve (no
+  withdraw); S4 pull payments not built (known limit), S16 preflight instead; S6 agent limits; the image allowlist stays
+  on as an owner power; S14 (the contract account's full access key) waits for the last step before submission.
+- Contract (`contract/src/lib.rs`): `claim_timeout` splits the bounty among every revealed undecided attempt (S7);
+  `set_agent_limits` / `get_agent_limits` under raw storage keys, enforced in `commit` (S6); cheap binding checks before
+  the pairing check in `submit_groth16` and `open_with_groth16` (S3). `groth16::verify` delegates to `verify_with_root`
+  (for a test). Stored layout unchanged.
+- Tests: `contract/src/tests_level2_attempts.rs` with the two real attempt proofs of the S6c run as vectors
+  (`groth16_attempt_vectors.rs`, S1) and the parser and mix-up tests (S2); S6 and S7 tests in `tests.rs`. Two existing
+  tests changed meaning and were rewritten: the copy of a revealed fix now shares a silent vendor's timeout, and the
+  undecided attempt's fee now comes back with its share instead of as credit.
+- Mistakes in my own tests on the first run: wrong return strings ("fail" instead of "final_fail"); a damaged seal made
+  by flipping one byte, which is no longer a curve point and aborts the native test run (on chain the host function
+  refuses it, without our message); a PASS proof sent out of order hit the ordering rule first. All three fixed in the
+  tests; no contract change.
+- Scripts: `scripts/agent_preflight.sh` (S16, wired into `scripts/s7_agent.sh`), `scripts/hardening_testnet.sh`,
+  `scripts/s18_live_bounty.sh`; host option `--exploit <file>`.
+- Testnet: redeployed in place, then S6, S7, S3 and S16 checked (EVIDENCE, "Audit hardening round").
+- Final review of the code changed since `bab84c5`: no double payment or stranded funds; findings 1 and 2 are consequences of
+  the chosen S7 rule, pinned as tests and stated as known limits; finding 3 (`pending` after a PASS refund) reproduced with
+  the fix taken out, fixed, redeployed (`EEckT3Y7...`). 119 unit tests pass.
+- S18: a new secret outside the repository and a private salt; Proof 0 alone on the CPU (prove 3,404 s, succinct 1,021 s).
+  Groth16 was stopped twice by my own memory guard (the editor holds about 3 GiB); the third try with the guard at 300 MiB
+  finished in 107 s. Bounty 12 created and opened on testnet; `check_image_id.sh` MATCH.
+- The S18 memory monitor I set up also stopped too early once: its end check matched the measuring script's own `exit=`
+  line. The job itself was not affected.
+
 ## 2026-10-25: Contract audit, six fixes, second review
 
 - Froze `bab84c5`; three independent reviewers (money flow; proof checking; griefing and economics) got the code and the

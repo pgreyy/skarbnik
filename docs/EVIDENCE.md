@@ -5,6 +5,62 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## S18: a live Level 2 bounty whose secret is not in the repository
+
+Question: can the vendor side run with a secret crashing input that exists only on the vendor's machine, a private random
+salt, and a Proof 0 that opens a live Level 2 bounty? Raw output: `docs/evidence/S18/`. Script: `scripts/s18_live_bounty.sh`.
+
+- The secret: 18 random bytes of the same crash class as the demo (a list record whose length is exactly twice its item
+  count), made with Python's `secrets` module into `~/.kintsugi-vendor/s18/exploit.hex` (folder mode 700, file mode 600),
+  never printed and not in the repository. Checked natively before proving (`kintsugi-check run`): the original traps,
+  the reference fix `data/demo/fixed.wasm` returns -4; `kintsugi-check proof0 --exploit ... --reference-fix
+  data/demo/fixed.wasm --fuzz-count 16 --variants 32`: PASS.
+- The salt: `kintsugi-host ... --bounty s18` made a new private salt in `~/.kintsugi-salts/` (never printed). The host's new
+  `--exploit <file>` option reads the secret; it prints only the commitment.
+- Proof 0, alone on the laptop CPU (`./scripts/s18_live_bounty.sh prove`): prove 3,404.47 s, prover peak 4,721 MiB, lowest
+  available memory 2,042 MiB (`prove_proof0.log`); succinct 1,020.89 s, peak 1,486 MiB (`compress_proof0.log`).
+- Groth16: the first two tries were stopped by the project's own memory guard (available memory below 700 MiB: 576 MiB with
+  the container at 5,858 MiB, then 566 MiB with the container at 6,851 MiB; `groth16_proof0_try1.log`,
+  `mem_groth16_try1.peaks`, `mem_groth16_try2.log`). The editor's processes held about 3 GiB of the 10 GiB. The third try,
+  `GUARD_MIB=300 ./scripts/s18_live_bounty.sh groth16`, finished in 107.47 s with the container at 6,963 MiB and available
+  memory never below 1,028 MiB (idle memory went to swap) (`groth16_proof0.log`, `mem_groth16.log.peaks`).
+- `kintsugi-host verify`: VALID, image id `dd6c5f42...a2fc`, verdict PASS, journal sha256 `2e031235...9058`, exploit
+  commitment `b0ae74b2...86af` (the demo's is `9a1be994...6387`), seed `b0f66526...7927` (`verify_proof0.txt`).
+- Bounty 12 on `kintsugi-l2-cihdp.testnet`: created (tx `ByJpYtUh5QJcgeVnYuroFFvMWnCGncRc7bMM5T1dTFQw`, 0.5 NEAR, K = 3,
+  reveal window 1 h, verdict window 4 h, expiry 30 days), opened with the Groth16 Proof 0 (tx
+  `AwktYGNHGijdv2LWwQYeuc7yFyLoDs41AuJckxUQuPSJ`): Level 2, opened, `image_id_allowed` true, expires 2026-11-24 03:49 UTC
+  (`bounty.json`). `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 12`: MATCH (`check_image_id.txt`).
+  `./scripts/agent_preflight.sh kintsugi-l2-cihdp.testnet 12 <researcher>`: PREFLIGHT OK (`preflight.txt`).
+
+Verdict: PASS. Limit: the original module and its reference fix are the public demo files, so this bounty shows that the
+secret input stays with the vendor, not that the bug is unknown; anyone can submit `data/demo/fixed.wasm`.
+
+## Audit hardening round: S1, S2, S3, S6, S7, S16 (S18 above)
+
+Question: do the hardening items chosen by the owner (docs/AUDIT.md, "Hardening round") work in unit tests and on the
+live testnet contract, with the stored layout and the checker's image id unchanged? Raw output: `docs/evidence/hardening/`
+(`summary.txt`, `transactions.tsv`, `steps/`, `preflight.txt`).
+
+Build and redeploy: `cargo near build non-reproducible-wasm` in `contract/` (wasm 314,418 bytes, sha256
+`7d936eee...c836`, `docs/evidence/hardening/contract_wasm.txt`), then `./scripts/hardening_testnet.sh deploy`: redeployed in
+place without an init call, tx `9vrrJwCswthVioqgPtrSnc6phWh2KDyzHKuBSuTEPqFz`. Bounty 7's view is byte-identical before and
+after (`bounty7_before.json`, `bounty7_after.json`), the pool stays 0.09 NEAR, the allowlist stays the one id
+`dd6c5f42...a2fc`. The rebuilt host still reports the checker image id `dd6c5f42...a2fc`. After the final review's fix
+(finding 3) the contract was rebuilt (wasm sha256 `938d5456...d1b7`) and redeployed the same way, tx
+`EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W`, with the same three checks (first deploy's files: `*_deploy1.*`).
+Unit tests after the review: 119 passed (`docs/evidence/hardening/contract_unit_tests.txt`).
+
+| Item | Command | Result |
+| --- | --- | --- |
+| S6 limits need 1 yoctoNEAR | `./scripts/hardening_testnet.sh limits`, step `s6_set_limits_without_one_yocto` (tx `G1eDFEEUs5VSN4PiU3UFnYYipe1tpbvoCFkcQGz3arRE`) | refused: "Requires attached deposit of exactly 1 yoctoNEAR" (a function call key can only send this call with no deposit) |
+| S6 fee above the limit | step `s6_fee_above_limit` (tx `G119Q3L9jpsB6qn24A96Ygt6V4BHG1rzGGYjMGmjp6At`), limit 0.005 NEAR, fee 0.01 NEAR | refused: "the attempt fee is above this account's max_fee_per_commit" |
+| S6 other payout | step `s6_other_payout` (tx `5LaTEQ8kzndLHjTEtbRewE8xtXVWe1tVsx22EkT9isRn`) | refused: "this account's commits must use its fixed payout account" |
+| S6 commit within the limits | step `s6_commit_within_limits` (tx `B3HTj1PiZ8vbMRJzFtRdyNzKn7bPCsA6UJoSgGSwb2ZW`) | accepted; credit 0.13 to 0.12 NEAR; limits cleared afterwards (tx `AJ3BHMD2Eqqw3r8wEK1tyST1LXDK4MytfeunRKracAos`) |
+| S7 timeout split | `./scripts/hardening_testnet.sh split`: bounty 11, the honest fix (index 0) and junk (index 1) revealed, vendor silent; `claim_timeout` index 0 (tx `6uem1gWAymCr2VzL3FofpQfVoqZGrzvXA2wERXnvaYpP`) | researcher 1 +0.06 NEAR (half of 0.1 + own 0.01 fee), researcher 2 +0.065 NEAR (half + own 0.015 fee), both TimedOut, bounty Paid, pending 0, fees_collected 0 |
+| S3 cheap refusal | step `s3_proof_of_another_bounty`: the real PASS proof of bounty 1 attempt 0 sent for bounty 11 attempt 0 (tx `8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM`) | refused at the submission id check; 2.35 Tgas burned in total (`total_gas_burnt` 2,353,615,818,397). The same refusal before S3 burned 34.90 Tgas (S6c attack `atk_other_bounty`, `docs/evidence/S6c/steps/atk_other_bounty.txt`) |
+| S16 preflight | `./scripts/hardening_testnet.sh preflight` (`preflight.txt`) | bounty 7 with an existing payout: PREFLIGHT OK; payout `ghost-kintsugi-audit-zqx.testnet` (does not exist): REFUSED; `MAX_FEE=1`: REFUSED |
+| S1 and S2 | `cargo test -p kintsugi-contract --offline` (`contract/src/tests_level2_attempts.rs`) | the two real attempt proofs of bounty 1 (S6c) run natively: FAIL then PASS paid; a proof refused for another attempt and another bounty; malformed journals and seals, Proof 0 versus attempt mix-ups and a changed control root refused |
+
 ## Contract audit (round 1) and the fixes
 
 Question: does the bounty contract at commit `bab84c5` hold up against three independent reviewers briefed to break it

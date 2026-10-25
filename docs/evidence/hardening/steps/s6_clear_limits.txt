@@ -1,0 +1,48 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_agent_limits json-args {"max_fee_per_commit":null,"fixed_payout":null} prepaid-gas 100 Tgas attached-deposit 1 yoctoNEAR sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-25T02:21:13.571025754Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res1-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  set_agent_limits
+│                       args:         {
+│                                       "fixed_payout": null,
+│                                       "max_fee_per_commit": null
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      1 yoctoNEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:4nab7LQVFF5XAGQdk3SACm2PQCmbBJXGcWqL37PiyNxy
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.312 Tgas
+│    Transaction fee: 0.0000311063574045 NEAR
+│    Transaction ID: AJ3BHMD2Eqqw3r8wEK1tyST1LXDK4MytfeunRKracAos
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/AJ3BHMD2Eqqw3r8wEK1tyST1LXDK4MytfeunRKracAos
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"agent_limits_set","data":[{"account_id":"kintsugi-res1-prnvm.testnet","max_fee_per_commit":null,"fixed_payout":null}]}
+│    Logs [kintsugi-res1-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+{
+  "fixed_payout": null,
+  "max_fee_per_commit": null
+}
+
+
+The "set_agent_limits" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-res1-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_agent_limits json-args '{"max_fee_per_commit":null,"fixed_payout":null}' prepaid-gas '100.0 Tgas' attached-deposit '1 yoctoNEAR' sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=4.37
