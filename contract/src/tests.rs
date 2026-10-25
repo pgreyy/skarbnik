@@ -1119,3 +1119,50 @@ fn audit_f4_timeout_refunds_the_fee_of_an_undecided_revealed_attempt() {
     assert_eq!(c.get_credit(acc("other.testnet")).0, before + FEE + STEP);
     assert_eq!(c.get_bounty(U64(0)).unwrap().fees_collected.0, 0); // nothing is left for the verifiers to be paid from
 }
+
+// Audit round 2 (fix 6): reveals in the same block tie on time; the lower index then counts as earlier, and a commit can
+// never share a block with its reveal.
+#[test]
+#[should_panic(expected = "an attempt revealed earlier is still undecided")]
+fn audit_r2_copy_revealed_in_the_same_block_cannot_be_paid_first() {
+    let mut c = setup();
+    call(researcher(), T0 + SEC);
+    let r = c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
+    at(acc("s.testnet"), T0 + SEC, start_credit());
+    c.deposit_credit(None);
+    call(acc("s.testnet"), T0 + SEC);
+    let s = c.commit(U64(0), fingerprint_hex(PATCH, &acc("s.testnet")), acc("s.testnet")).unwrap();
+    call(researcher(), T0 + SEC + GAP);
+    c.reveal(U64(0), r, Base64VecU8(PATCH.to_vec()), NONCE.into());
+    call(acc("s.testnet"), T0 + SEC + GAP); // the same block as the honest reveal
+    c.reveal(U64(0), s, Base64VecU8(PATCH.to_vec()), NONCE.into());
+    call(vendor(), T0 + 10 * SEC);
+    c.post_verdict(U64(0), s, Verdict::Pass, H1.into(), H2.into()); // refused: r has the lower index
+}
+
+#[test]
+fn audit_r2_tie_does_not_block_the_lower_index() {
+    let mut c = setup();
+    call(researcher(), T0 + SEC);
+    let r = c.commit(U64(0), fingerprint_hex(PATCH, &payout()), payout()).unwrap();
+    at(acc("s.testnet"), T0 + SEC, start_credit());
+    c.deposit_credit(None);
+    call(acc("s.testnet"), T0 + SEC);
+    let s = c.commit(U64(0), fingerprint_hex(PATCH, &acc("s.testnet")), acc("s.testnet")).unwrap();
+    call(researcher(), T0 + SEC + GAP);
+    c.reveal(U64(0), r, Base64VecU8(PATCH.to_vec()), NONCE.into());
+    call(acc("s.testnet"), T0 + SEC + GAP);
+    c.reveal(U64(0), s, Base64VecU8(PATCH.to_vec()), NONCE.into());
+    call(vendor(), T0 + 10 * SEC);
+    c.post_verdict(U64(0), r, Verdict::Pass, H1.into(), H2.into()); // allowed: nothing counts as earlier than r
+    assert_eq!(c.get_submission(U64(0), r).unwrap().verdict, Some(Verdict::Pass));
+}
+
+#[test]
+#[should_panic(expected = "reveal_gap_ns must be above zero")]
+fn audit_r2_zero_reveal_gap_is_refused() {
+    call(owner(), T0 - 10);
+    let mut c = Contract::new(owner());
+    at(vendor(), T0, bounty_amount());
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(0), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+}

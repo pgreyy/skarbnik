@@ -51,7 +51,8 @@
 //! alt_bn128 host functions (module `groth16`), then checks that every field of the proof's journal belongs to THIS
 //! bounty and THIS attempt (original, exploit commitment, tests, counts, the seed recorded at reveal, the revealed
 //! patch hash and the submission id), and reads the verdict from the journal: PASS pays, FAIL spends the attempt.
-//! A proof must arrive before the bounty expires and within the verdict window after the reveal; without one, the
+//! A proof must arrive within the verdict window after the reveal (every reveal leaves a full window before expiry);
+//! without one, the
 //! researcher is paid by `claim_timeout` as for Level 0. Attempt fees of a Level 2 bounty's decided attempts go to
 //! the protocol fee pool at expiry (never to the vendor); fees of attempts still undecided when a bounty closes are
 //! refunded as credit. Every bounty records `fuzz_count` and `variant_count`, the check's size, which a proof must match.
@@ -141,8 +142,9 @@ pub fn proof0_id(reference_fix_hash: &[u8; 32]) -> [u8; 32] {
 }
 
 fn allowed_image_ids() -> Vec<[u8; 32]> {
+    // A stored list that does not decode is a fault, not permission: fail closed (audit round 2).
     env::storage_read(ALLOWED_IMAGE_IDS_KEY)
-        .and_then(|b| near_sdk::borsh::from_slice::<Vec<[u8; 32]>>(&b).ok())
+        .map(|b| near_sdk::borsh::from_slice::<Vec<[u8; 32]>>(&b).unwrap_or_else(|_| env::panic_str("the image id allowlist does not decode")))
         .unwrap_or_default()
 }
 
@@ -172,7 +174,9 @@ fn release_to_pool(bounty_id: U64, index: u32, bounty: &mut Bounty, sub: &mut Su
 fn earlier_reveal_undecided(subs: &LookupMap<(u64, u32), Submission>, bounty_id: u64, commits: u32, index: u32, revealed_at: u64) -> bool {
     (0..commits).filter(|k| *k != index).any(|k| {
         subs.get(&(bounty_id, k))
-            .is_some_and(|o| o.outcome == Outcome::Open && o.revealed_at_ns.is_some_and(|t| t < revealed_at))
+            // Reveals in the same block tie on time; the lower index (the earlier commit) then counts as earlier, so
+            // the order is total and a copy revealed in the same block as the original never jumps ahead (audit round 2).
+            .is_some_and(|o| o.outcome == Outcome::Open && o.revealed_at_ns.is_some_and(|t| t < revealed_at || (t == revealed_at && k < index)))
     })
 }
 
@@ -286,7 +290,8 @@ pub struct Bounty {
     attempt_fee: NearToken,
     /// Added to the fee for each later commit.
     fee_step: NearToken,
-    /// Attempt fees taken so far, held by the contract until `expire` sends them to the verifiers.
+    /// Attempt fees of decided attempts, held by the contract until `expire` sends them to the verifiers (Level 0) or the
+    /// protocol fee pool (Level 2); fees of undecided attempts are refunded when the bounty closes.
     fees_collected: NearToken,
     fees_swept: bool,
     /// sha256 of the vendor's reference fix, fixed at creation; Proof 0 must show it passes.
@@ -591,6 +596,7 @@ impl Contract {
             "expiry_ns must cover the reveal gap, the reveal window, the verdict window and the attestation window"
         );
         require!(attempt_fee.0 > 0, "attempt_fee must be above zero");
+        require!(reveal_gap_ns.0 > 0, "reveal_gap_ns must be above zero: a commit and its reveal cannot share a block");
         require!(reveal_window_ns.0 > reveal_gap_ns.0, "reveal_window_ns must be longer than reveal_gap_ns");
         let level = level.unwrap_or(LEVEL_0);
         require!(level == LEVEL_0 || level == LEVEL_2, "level must be 0 or 2");
@@ -1083,8 +1089,8 @@ impl Contract {
         "opened".to_string()
     }
 
-    /// Level 2 bounties only. Anyone: decides a revealed attempt with a Groth16 proof of it, before the bounty expires
-    /// and within the verdict window after the reveal. The proof must verify for the bounty's image id, and its
+    /// Level 2 bounties only. Anyone: decides a revealed attempt with a Groth16 proof of it, within the verdict window
+    /// after the reveal (which always ends before the bounty expires). The proof must verify for the bounty's image id, and its
     /// journal must belong to THIS bounty and THIS attempt: the submission id (contract, bounty, index, patch hash),
     /// the seed recorded at reveal, the revealed patch hash, and the bounty's original, exploit commitment, tests and
     /// counts. The verdict is read from the journal: PASS pays the researcher (with the own fee refunded) and closes
@@ -1182,8 +1188,9 @@ impl Contract {
 
     /// Anyone. After the bounty's expiry: if nothing was paid and no revealed submission is still waiting
     /// for its verdict or timeout, refunds the bounty to the vendor. In the same call (also for a bounty
-    /// that was already paid), sends the collected attempt fees to the registered verifiers in equal
-    /// shares, the remainder of the division to the first one. Fails if there is nothing left to do.
+    /// that was already paid), sends the fees of decided attempts to the registered verifiers in equal shares (Level 0,
+    /// the remainder of the division to the first one) or to the protocol fee pool (Level 2); commits never revealed go to
+    /// the pool first. Fails if there is nothing left to do.
     pub fn expire(&mut self, bounty_id: U64) {
         let now = env::block_timestamp();
         let caller = env::predecessor_account_id();

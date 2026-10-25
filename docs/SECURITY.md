@@ -61,12 +61,13 @@ Each guard: what it stops, where it lives, and what shows it works.
 | The earliest reveal has priority: a PASS (posted verdict or Groth16 proof) or a timeout for an attempt is refused while an attempt revealed earlier is still undecided (audit round 1, fix 3) | The vendor, or anyone, copying a revealed passing patch into a second account and getting paid for it first; a copier timing out first against a slow researcher | `earlier_reveal_undecided`, `post_verdict`, `submit_groth16`, `claim_timeout` | unit tests `audit_c2_*` |
 | Level 2 fees of decided attempts go to the protocol fee pool at expiry, never to the vendor; when a bounty closes, the fees of other revealed attempts still undecided are refunded as credit (audit round 1, fix 4) | A vendor earning the fees of attempts it failed (fee farming with an unfixable or fake bounty); honest losers' fees swept to the vendor or the verifiers although they were never judged | `expire`, `refund_undecided_revealed` | unit tests `audit_f4_*`; S6c rerun on testnet |
 | The owner keeps an allowlist of checker image ids; once it holds an id, `create_bounty` refuses every other id, and `get_bounty` shows `image_id_allowed` (audit round 1, fix 5) | A vendor naming its own program as the checker: a Level 2 verdict was only as good as the vendor's program, and a fake checker could farm attempt fees | `allow_image_id`, `get_allowed_image_ids`, `create_bounty` | unit tests `audit_f5_*`; set on `kintsugi-l2-cihdp.testnet` to the reproducible id |
+| Reveals in the same block tie on time and the lower index counts as earlier; a reveal gap of zero is refused, so a commit never shares a block with its reveal; a stored allowlist that does not decode fails closed (audit round 2, fix 6) | A copy of a revealed patch landing in the same block as the original and jumping the queue (the round 1 critical through a tie) | `earlier_reveal_undecided`, `create_bounty`, `allowed_image_ids` | unit tests `audit_r2_*` |
 
 ### Keys
 
 | Guard | What it stops | Shown by |
 | --- | --- | --- |
-| An AI agent works through a function call key limited to `commit` and `reveal` on the bounty contract | The agent (or whoever steals its key) moving its owner's money | S7: transfer refused (`RequiresFullAccess`), other method refused (`MethodNameMismatch`), deposits refused |
+| An AI agent works through a function call key limited to `commit` and `reveal` on the bounty contract | The agent (or whoever steals its key) reaching its owner's wallet; the credit the owner deposited is not protected per commit (audit finding 9) | S7: transfer refused (`RequiresFullAccess`), other method refused (`MethodNameMismatch`), deposits refused |
 
 ## 2. Attacks we tried
 
@@ -185,7 +186,21 @@ Each guard: what it stops, where it lives, and what shows it works.
   proves that fix in Proof 0. A vendor who has found a crash but has no fix at all is not supported yet. The reference
   fix stays private (only its sha256 is public) and may be crude; it cannot simply recognise the exact secret bytes,
   because the variants step (copies of the secret with one or two bytes changed) would then fail.
-- The vendor sees each patch before paying; the timeout path protects the researcher.
+- The vendor sees each patch before paying. The timeout path protects the researcher except against the vendor's own
+  second account revealing junk before any honest fix: that account is paid by timeout and the bounty closes (audit
+  finding 3, residual; the later honest fee is refunded since fix 4). Splitting the timeout payout among all revealed
+  undecided attempts would make this cost the vendor half the bounty; decision open.
+- Payouts are detached transfers. A payout account that does not exist makes the transfer fail after the state says
+  Paid; the NEAR stays in the contract with no record and no way out (audit finding 8, shown on testnet). Researchers
+  must give an existing account. Pull payments are the fix; not built.
+- An agent's commit-only key cannot reach the wallet, but it can spend the whole credit it was given on one commit to
+  a bounty with a large attempt fee, and set any payout account (audit finding 9). Keep agent credit small; a per-commit
+  spending limit is the fix; not built.
+- Storage is not charged to anyone: the contract's own balance covers the storage stake, and it can be ground down by
+  tiny deposits or short-lived bounties (audit finding 12). On testnet the faucet balance covers it.
+- Verifiers cannot be removed and are paid the fee sweep for no work; the contract account's full access key is the
+  real owner of all funds; slot griefing is cheaper than the arithmetic above when `fee_step` is 0 (audit finding 14).
+- The contract audit (docs/AUDIT.md) lists every finding, its status and the suggested hardening.
 - Arena verdicts (S8) come from the native checker, not proofs. Timing and other side channels are not measured.
 - Proving is slow on a laptop CPU (16 fairness inputs: 47 to 48 minutes, plus 15 to 16 minutes to compress).
 - Narrow scope: crash bugs in a small module that compiles to WebAssembly; the fairness generator knows only the demo format.
@@ -193,6 +208,8 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
+- 2026-10-25 (audit fix 6, from the second review): tie-break by index for reveals in one block; reveal gap above zero;
+  allowlist fails closed; stale doc comments corrected.
 - 2026-10-25 (audit fix 5): owner allowlist of checker image ids; `image_id_allowed` in the bounty view.
 - 2026-10-25 (audit fix 4): Level 2 decided fees to the pool, never the vendor; undecided revealed attempts refunded at closure.
 - 2026-10-25 (audit fix 3): the earliest reveal has priority for a PASS and for a timeout.
