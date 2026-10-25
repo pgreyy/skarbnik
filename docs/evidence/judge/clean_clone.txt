@@ -1,0 +1,19 @@
+Clean clone test of the README "Judge quick check", 2026-10-25.
+A fresh folder, `git clone -b ui-preview <this repository>` (cloned from the local repository so it held the commit that
+adds the quick check, bfd4e57; the same files as the branch), cargo with an empty home folder (CARGO_HOME set to a new
+folder, so every crate was downloaded again). The Rust toolchain, RISC Zero's toolchain and the Docker builder image
+risczero/risc0-guest-builder:r0.1.97.0 (7.46 GB) were already on the machine; a judge's first run downloads that image.
+
+step 1  read bounty 12 over RPC: printed "12 2 True dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc True"   PASS
+step 2  explorer page of CczggiUN... answered HTTP 200; the RPC status of that transaction is SuccessValue                 PASS
+step 3  explorer page of 8fYiFjir... answered HTTP 200; the RPC status is Failure "the journal belongs to another bounty or attempt (submission id)"   PASS
+step 4  cargo test -p kintsugi-contract s1_ : "test result: ok. 5 passed" (2 min 56 s, crates downloaded and compiled)       PASS
+step 5  cargo test -p kintsugi-contract : "test result: ok. 119 passed; 0 failed" (5 s after step 4)                         PASS
+step 6  python3 -m http.server 8000 --directory web, then #/bounties/12: "Bounty 12", OPEN, "Checked by Level 2",
+        "Private secret input", read live (checked in a headless browser on port 8766)                                     PASS
+step 7  ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 12 (5 min 12 s):
+        rebuilt checker image id:   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+        published checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+        image id of bounty 12 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+        MATCH                                                                                                             PASS
+Fixed after the test: step 7 now says that the first run downloads the 7.46 GB builder image.

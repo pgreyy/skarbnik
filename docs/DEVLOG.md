@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Judge package (branch ui-preview)
+
+- README rewritten for judges: pitch, a key: value block, a seven step quick check with exact commands and expected
+  output, what is built (with evidence), what is not built (Level 1), known limits, Roadmap.
+- Stored receipts: docs/evidence/receipts/ holds the exact arguments of the accepted PASS proof (bounty 1) and of the
+  same proof sent for bounty 11 (refused), read back from the chain; both replay in unit tests; sending them again today
+  is refused with "bounty is closed" (transactions recorded there).
+- `scripts/check_image_id.sh` compares the rebuilt image id with the published one by itself; MATCH
+  (docs/evidence/judge/check_image_id.txt). docs/numbers.md lists measured numbers only.
+- Clean clone test of the quick check: all seven steps passed (docs/evidence/judge/clean_clone.txt); step 7 now names
+  the 7.46 GB builder image download.
+
 ## 2026-10-25: For agents page and a limited key on this contract (branch ui-preview)
 
 - `#/agents` is back in the navigation: six steps with exact commands (feed, faucet account, deposit, limited key,

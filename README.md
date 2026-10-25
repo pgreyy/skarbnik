@@ -60,7 +60,8 @@ toolchain; step 7 also needs Docker). Steps 1 to 6 take a few minutes.
    Level 2" and "Private secret input", read live from the contract. The list at http://localhost:8000/#/bounties shows
    every bounty; test bounties 14 and 15 carry a "Test bounty" tag.
 7. Rebuild the checker and compare its image id (the longest step; needs Docker with buildx and RISC Zero's toolchain,
-   docs/VERSIONS.md):
+   docs/VERSIONS.md; the first run also downloads RISC Zero's guest builder image
+   `risczero/risc0-guest-builder:r0.1.97.0`, 7.46 GB):
 
        ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 12
 
@@ -71,7 +72,8 @@ toolchain; step 7 also needs Docker). Steps 1 to 6 take a few minutes.
        image id of bounty 12 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
        MATCH
 
-   (5 min 44 s on the development laptop with the toolchain installed; docs/evidence/judge/check_image_id.txt).
+   (5 min 12 s in a fresh clone with an empty cargo cache and the builder image already present;
+   docs/evidence/judge/clean_clone.txt).
 
 ## What is built
 
