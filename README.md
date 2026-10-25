@@ -174,6 +174,7 @@ Each claim names the file and the command that show it. Full results, failures i
 - On the site: create a bounty, a proof ledger, set agent limits from the page.
 - A live bounty on a new original module with its own bug.
 - A "crash proven only" mode, for a vendor who can prove the crash but has no fix yet.
+- Mainnet: a network switch in the header (Testnet / Mainnet) when the mainnet contract exists.
 
 ## More
 
