@@ -1,4 +1,4 @@
-/* Kintsugi site styles. Ported value for value from the Gilt Arena design handoff (reference/styles-app.css): theme
+/* Skarbnik site styles. Ported value for value from the Gilt Arena design handoff (reference/styles-app.css): theme
    variables for Light and Night, then components. The handoff draws mobile with a ".mob" class on a fixed stage; here the
    same rules apply below 760px wide. Site specific additions (logo, live data states, slots, intro) are at the end. */
 :root{--r:0 14px 0 0}

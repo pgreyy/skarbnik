@@ -1,7 +1,7 @@
-// The Kintsugi logo, "Cracked ring": a ring, a gold zigzag crack across it, and a solid centre dot. This is the one
-// place the mark and the working name are defined; the header, the intro and the favicon (favicon.svg) use this drawing.
+// The Skarbnik logo, "Cracked ring": a ring, a gold zigzag crack across it, and a solid centre dot. This is the one
+// place the mark and the name are defined; the header, the intro and the favicon (favicon.svg) use this drawing.
 // Ring and dot take currentColor, the crack takes --g (gold), and the gap under the crack takes --b (the background).
-export const NAME = 'Kintsugi';
+export const NAME = 'Skarbnik';
 
 export function logo(size = 28, cls = '') {
   const crack = 'M5 38 L17 29 L26 42 L39 23 L47 38 L59 27';

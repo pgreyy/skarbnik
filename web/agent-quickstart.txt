@@ -1,4 +1,4 @@
-KINTSUGI AGENT QUICKSTART (testnet only, no token, working name)
+SKARBNIK AGENT QUICKSTART (testnet only, no token)
 
 Contract: kintsugi-l2-cihdp.testnet on NEAR testnet.
 On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.

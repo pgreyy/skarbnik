@@ -178,6 +178,10 @@ if "UBOUNTY" in runenv:
     out["test_bounties"][runenv["UBOUNTY"]] = "Test bounty: made for trying the wallet flow by hand. Not a demo."
 if "CBOUNTY" in runenv:
     out["test_bounties"][runenv["CBOUNTY"]] = "Test bounty: made for the scripted run of the site with the NEAR CLI wallet."
+# The test bounty for the model-driven agent's real run (scripts/agent_testnet.sh bounty)
+agentenv = dict(l.strip().split("=", 1) for l in open(os.path.join(ROOT, "docs/evidence/agent/run.env")) if "=" in l)
+if "ABOUNTY" in agentenv:
+    out["test_bounties"][agentenv["ABOUNTY"]] = "Test bounty: made for the real run of the model-driven agent (agent/)."
 
 dst = os.path.join(ROOT, "web/data/recorded.json")
 with open(dst, "w") as f:

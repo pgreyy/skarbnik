@@ -116,6 +116,7 @@ for i in range(n):
     })
 
 feed = {
+    "name": "Skarbnik",
     "contract": CONTRACT,
     "network": "testnet",
     "generated_at_utc": utc(now_ns),

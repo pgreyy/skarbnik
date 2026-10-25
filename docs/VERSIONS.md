@@ -1,6 +1,6 @@
 # Versions
 
-Exact versions of every tool used to build and run Kintsugi, checked on 2026-10-23 on the development machine
+Exact versions of every tool used to build and run Skarbnik, checked on 2026-10-23 on the development machine
 (Ubuntu 26.04.1 LTS under WSL2, x86_64). Each line names the command that printed it.
 
 ## Operating system

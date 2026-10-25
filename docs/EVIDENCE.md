@@ -845,7 +845,7 @@ free 32 KB, which costs 0.00001 NEAR per extra byte, held while pending and retu
 
 Published (owner's go, 2026-10-24): public repository https://github.com/pgreyy/farbox-verifier with three files only
 (`README.md`, `farbox-verifier.wasm`, `farbox-verifier.wasm.sha256`) and release v0.1.0. Before upload the file was scanned
-for /home, /Users, /root, the user name, pgreyy, email addresses, the project's working name and other listed names, long
+for /home, /Users, /root, the user name, pgreyy, email addresses, the project's name and other listed names, long
 hex or base58 strings, tokens and key text: no names, paths, emails, tokens or keys; the only long hex is the public Rust
 1.99.1 commit id in standard library paths, and the rest are digit tables and decimal constants
 (`docs/evidence/S4/verifier_publish_scan.txt`). After upload, both

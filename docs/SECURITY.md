@@ -190,7 +190,7 @@ Each guard: what it stops, where it lives, and what shows it works.
   journal's, and the journal must match this bounty and this attempt.
 - Protocol fee pool: since S6c, the attempt fees of commits that are never revealed (released, or still unrevealed at
   expiry) are kept in the contract as a pool, shown by `get_protocol_pool`. There is no function to take NEAR out of
-  it: its destination is deliberately left open, to be decided after the audit. If the pool ever pays Kintsugi (the
+  it: its destination is deliberately left open, to be decided after the audit. If the pool ever pays Skarbnik (the
   project), the project would gain from junk commits that block bounties, a conflict of interest that the decision
   must address. Fees of decided attempts go to the verifiers (Level 0) or the pool (Level 2) at expiry; fees of attempts
   still undecided when a bounty closes are refunded as credit (audit round 1).

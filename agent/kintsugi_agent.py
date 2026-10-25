@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# The Kintsugi agent driven by a language model. It reads feed.json, picks an open bounty, downloads the bounty's public
+# The Skarbnik agent driven by a language model. It reads feed.json, picks an open bounty, downloads the bounty's public
 # code and checks it against the hashes on chain, asks the model for a fix, builds the fix and runs the public tests
 # locally, then commits and reveals it with a limited key (commit and reveal only), and records each attempt so it can
 # watch for the verdict later. Dry run is the default: everything happens except sending transactions; --live sends.
@@ -177,7 +177,10 @@ def ask_model(pcfg, messages, key):
             d = json.load(r)
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"the model API answered HTTP {e.code}: {e.read()[:300].decode(errors='replace')}")
-    return d["choices"][0]["message"]["content"], {"model": d.get("model", pcfg["model"]), "usage": d.get("usage")}
+    ch = d["choices"][0]
+    # A reasoning model may spend its whole budget thinking and return no answer; finish_reason then says "length".
+    return ch["message"].get("content") or "", {"model": d.get("model", pcfg["model"]), "usage": d.get("usage"),
+                                                "finish": ch.get("finish_reason"), "raw": d}
 
 
 def prompt(source, tests, build, b):
@@ -312,14 +315,22 @@ def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key):
     patch = None
     for t in range(1, int(cfg["max_model_tries"]) + 1):
         t0 = time.time()
-        reply, meta = ask_model(pcfg, messages, key)
+        try:
+            reply, meta = ask_model(pcfg, messages, key)
+        except (RuntimeError, OSError, KeyError, ValueError) as e:
+            reply, meta = "", {"model": pcfg.get("model"), "finish": f"call failed: {type(e).__name__}: {e}"[:200]}
         open(os.path.join(run_dir, f"reply_{bid}_{t}.txt"), "w").write(reply)
+        if "raw" in meta:
+            json.dump(meta.pop("raw"), open(os.path.join(run_dir, f"response_{bid}_{t}.json"), "w"), indent=1)
         src = extract_rust(reply)
         src_path = os.path.join(run_dir, f"fix_{bid}_{t}.rs")
         open(src_path, "w").write(src)
-        log(f"  model try {t}: {round(time.time() - t0, 1)} s, model {meta.get('model')}, usage {meta.get('usage') or '-'}")
+        log(f"  model try {t}: {round(time.time() - t0, 1)} s, model {meta.get('model')}, finish {meta.get('finish') or '-'}, "
+            f"usage {meta.get('usage') or '-'}")
         problem = None
-        if FORBIDDEN.search(src):
+        if not reply.strip():
+            problem = f"the model returned no answer (finish reason {meta.get('finish')})"
+        elif FORBIDDEN.search(src):
             problem = "the source uses include!, env!, extern crate, mod or #[path]; these are not allowed"
         else:
             ok, err = build(src_path, src_path[:-3] + ".wasm")
@@ -417,7 +428,7 @@ def cmd_run(cfg, args):
     os.makedirs(run_dir, exist_ok=True)
     log = Log(os.path.join(run_dir, "run.log"), [key])
     chain = Chain(cfg["rpc"], cfg["contract"])
-    log(f"kintsugi agent: {'LIVE' if live else 'DRY RUN (nothing is sent)'}, contract {cfg['contract']} ({cfg['network']}), "
+    log(f"Skarbnik agent: {'LIVE' if live else 'DRY RUN (nothing is sent)'}, contract {cfg['contract']} ({cfg['network']}), "
         f"account {cfg['account']}, payout {cfg['payout']}, max fee {near(cfg['max_fee_yocto'])}, "
         f"max attempts {cfg['max_attempts']}, run folder {os.path.relpath(run_dir, ROOT)}")
     if cfg["network"] != "testnet" and not cfg.get("allow_mainnet"):
@@ -473,7 +484,7 @@ def cmd_status(cfg, args):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Kintsugi agent driven by a language model (testnet).")
+    ap = argparse.ArgumentParser(description="Skarbnik agent driven by a language model (testnet).")
     ap.add_argument("command", choices=["run", "status"])
     ap.add_argument("--config", default=os.path.join(ROOT, "agent/config.toml"))
     ap.add_argument("--live", action="store_true", help="send transactions (default: dry run, nothing is sent)")

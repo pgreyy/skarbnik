@@ -1,4 +1,4 @@
-# Settings for agent/kintsugi_agent.py: the chain, the agent's account and limits, and the model providers.
+# Settings for the Skarbnik agent (agent/kintsugi_agent.py): the chain, the agent's account and limits, and the model providers.
 # No key goes in this file. The model's API key is read from the environment variable or the file named below,
 # outside the repository. The limited key file is near-cli's own key file for a key limited to commit and reveal.
 
@@ -28,7 +28,8 @@ model = "z-ai/glm-5.3-flash"                 # on GET /v1/models, checked 2026-1
 api_key_env = "NEARAI_API_KEY"
 api_key_file = "~/.kintsugi-secrets/nearai_api_key"
 temperature = 0.2
-max_tokens = 4000
+max_tokens = 12000                           # a reasoning model needs room to think before it answers
+timeout_s = 1200                             # thinking runs at about 17 tokens a second (measured 2026-10-25)
 
 # A stand-in for tests: answers with the bounty's known reference fix, no network and no key.
 [provider.standin]

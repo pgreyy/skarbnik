@@ -1,4 +1,4 @@
-# Kintsugi agent
+# Skarbnik agent
 
 `kintsugi_agent.py` is an agent driven by a language model, for NEAR testnet. One run:
 

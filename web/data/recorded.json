@@ -1174,6 +1174,7 @@
  "test_bounties": {
   "13": "Test bounty: made for the scripted testnet run of the site's wallet features.",
   "14": "Test bounty: made for trying the wallet flow by hand. Not a demo.",
-  "15": "Test bounty: made for the scripted run of the site with the NEAR CLI wallet."
+  "15": "Test bounty: made for the scripted run of the site with the NEAR CLI wallet.",
+  "16": "Test bounty: made for the real run of the model-driven agent (agent/)."
  }
 }

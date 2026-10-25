@@ -1,7 +1,7 @@
 # data/attacks: cheating patches (inert test data)
 
 This folder holds inert test data only. Each file is a small WebAssembly module (and the Rust
-source it is built from) that tries to get a PASS from the Kintsugi checker without really fixing
+source it is built from) that tries to get a PASS from the Skarbnik checker without really fixing
 the bug in the demo parser (`data/demo/original.rs`). Nothing here runs on its own; the checker
 loads these modules inside the wasmi interpreter with no access to the host.
 

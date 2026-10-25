@@ -36,10 +36,10 @@ export function putAttempt(rec) {
 export function dropAttempt(rec) { save(all().filter((a) => a.fingerprint !== rec.fingerprint)); }
 
 export function downloadRecord(rec) {
-  const blob = new Blob([JSON.stringify({ note: 'Kintsugi attempt record (testnet). Keep it until you have revealed. It holds no key.', ...rec }, null, 1)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify({ note: 'Skarbnik attempt record (testnet). Keep it until you have revealed. It holds no key.', ...rec }, null, 1)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `kintsugi-bounty-${rec.bounty}-attempt-${rec.index ?? 'pending'}.json`;
+  a.download = `skarbnik-bounty-${rec.bounty}-attempt-${rec.index ?? 'pending'}.json`;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }

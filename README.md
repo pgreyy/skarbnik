@@ -1,4 +1,7 @@
-# Kintsugi (working name)
+# Skarbnik
+
+Skarbnik (Polish and Ukrainian for treasurer; in folklore, the mine spirit who rewards honest miners).
+The testnet contract keeps its original account name.
 
 Fix what you can't see. Get paid when the proof says so.
 

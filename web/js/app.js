@@ -1,4 +1,4 @@
-// The Kintsugi site app: routes (#/, #/bounties, #/bounties/<id>, #/raw/<id>, #/account/<name>, #/arena, #/verify), the
+// The Skarbnik site app: routes (#/, #/bounties, #/bounties/<id>, #/raw/<id>, #/account/<name>, #/arena, #/verify), the
 // theme switcher, the mobile menu, and the screens. Live screens read the testnet contract with view calls
 // (js/chain.js); recorded parts read data/recorded.json, which scripts/gen_site_recorded.py builds from files in the
 // repository. No sample data.
@@ -286,7 +286,7 @@ async function verify(main) {
   const r = await getRecorded();
   const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class="k-mini" type="button" data-copy-text="${esc(text)}">Copy</button></div>`;
   main.innerHTML = `<h1 class="m-h1" tabindex="-1">How to verify</h1>
-  <p class="m-lead">Six checks. Commands run from the root of the Kintsugi repository.</p>
+  <p class="m-lead">Six checks. Commands run from the root of the Skarbnik repository.</p>
   <ol class="k-ol k-steplist m-panel">
     <li><span class="m-n">1</span><div><h3>Read a bounty from the chain</h3>${cmd(`near contract call-function as-read-only ${CONTRACT} get_bounty json-args '{"bounty_id":"12"}' network-config testnet now`)}<p class="m-sub">Or open its <a href="#/raw/12">raw data</a>.</p></div></li>
     <li><span class="m-n">2</span><div><h3>Rebuild the checker and compare its image id</h3>${cmd(`./scripts/check_image_id.sh ${CONTRACT} 12`)}<p class="m-sub">Prints <b class="m-okline">MATCH</b> (needs Docker).</p></div></li>

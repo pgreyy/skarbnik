@@ -1,6 +1,6 @@
 # data
 
-Test data for the Kintsugi checker.
+Test data for the Skarbnik checker.
 
 - `demo/`: the demo program for spike S1. `original.rs` is a tiny record parser with one hidden
   crash, `fixed.rs` is the honest patch, and the `.wasm` files are built from them by

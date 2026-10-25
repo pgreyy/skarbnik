@@ -1,4 +1,4 @@
-// Read only access to the Kintsugi contract on NEAR testnet: JSON-RPC "call_function" view calls, no keys, no wallet,
+// Read only access to the Skarbnik contract on NEAR testnet: JSON-RPC "call_function" view calls, no keys, no wallet,
 // nothing is ever signed or sent. Also the small helpers that turn chain values into text (NEAR amounts, UTC times).
 export const CONTRACT = 'kintsugi-l2-cihdp.testnet';
 export const RPCS = ['https://test.rpc.fastnear.com', 'https://rpc.testnet.near.org'];
