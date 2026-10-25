@@ -1,11 +1,12 @@
 // Wallet connection for the site, NEAR testnet only, through NEAR Connect (vendor/near-connect.js, the connector the NEAR
-// docs recommend). The wallets offered are listed in vendor/wallets/manifest.json and their scripts are local copies in
-// vendor/wallets/ (exact sources and sha256 in scripts/wallet-vendor/fetch_wallets.sh): Intear Wallet and NEAR CLI (signs
-// in your own terminal). MyNearWallet is not offered: it is retired on 31 October 2026. Each wallet's script runs in a sandboxed
-// frame. This page's own code never creates, stores or prints a key; a wallet's script may keep its own session key in
+// docs recommend). The wallets offered are listed in vendor/wallets/manifest.json: Intear Wallet and NEAR CLI (signs in
+// your own terminal). MyNearWallet is not offered: it is retired on 31 October 2026. Each wallet's script is loaded from its
+// official address and must match the sha256 in that list before NEAR Connect may keep or run it (pinScripts below);
+// a script whose bytes differ is refused. Each wallet's script runs in a sandboxed frame. This page's own code never creates, stores or prints a key; a wallet's script may keep its own session key in
 // the browser (Intear does; it cannot spend on chain). Every transaction is approved in the wallet.
 import { NearConnector } from '../vendor/near-connect.js';
 import { CONTRACT, RPCS } from './chain.js';
+import { hex, sha256 } from './attempt.js';
 
 let connector = null;
 const listeners = new Set();
@@ -24,9 +25,27 @@ function fromAccounts(accounts, walletName) {
   else set({ status: 'on', account: a, wallet: walletName, error: '' });
 }
 
+// NEAR Connect fetches each wallet's script with the page's fetch and has no pinning option of its own, so the page
+// checks the bytes itself, as a subresource integrity hash would for a script tag. The wallet's version in the list
+// carries the hash, so NEAR Connect's cache only ever holds bytes that passed this check.
+function pinScripts(wallets) {
+  const pins = new Map(wallets.map((w) => { const u = new URL(w.executor); return [u.origin + u.pathname, w]; }));
+  const plain = window.fetch.bind(window);
+  window.fetch = async (input, init) => {
+    const u = new URL(typeof input === 'string' ? input : input.url, location.href);
+    const w = pins.get(u.origin + u.pathname);
+    if (!w) return plain(input, init);
+    const r = await plain(input, init);
+    if (!r.ok) throw new Error(`${w.name}: its wallet script did not load (HTTP ${r.status}).`);
+    const bytes = new Uint8Array(await r.arrayBuffer());
+    if (hex(await sha256(bytes)) !== w.sha256) throw new Error(`${w.name} changed its wallet script since this site checked it, so the site will not run it. Use another wallet for now.`);
+    return new Response(bytes, { status: 200, headers: { 'Content-Type': 'text/javascript' } });
+  };
+}
+
 async function manifest() {
   const m = await (await fetch('vendor/wallets/manifest.json')).json();
-  m.wallets = m.wallets.map((w) => ({ ...w, executor: new URL(w.executor, location.href).href }));
+  pinScripts(m.wallets);
   return m;
 }
 

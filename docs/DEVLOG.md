@@ -2,6 +2,23 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-25: Wallet scripts loaded from their official addresses, pinned by sha256 (branch ui-preview)
+
+- The copies of the Intear Wallet script (AGPL-3.0) and the NEAR CLI wallet script (no licence declared) are removed from
+  `web/vendor/wallets/`. The wallet list now points at each official address (wallet.intear.tech; the NEAR CLI script
+  at a fixed commit on raw.githubusercontent.com) and carries each script's sha256.
+- NEAR Connect 0.11.4 has no pinning option, and a subresource integrity hash only works on a script tag, so
+  `web/js/wallet.js` (`pinScripts`) checks the sha256 of the bytes before NEAR Connect may keep or run them. The
+  wallet's version carries the hash, so NEAR Connect's browser cache only holds checked bytes.
+- Check: `CHROME=<headless shell> ./scripts/wallet-vendor/pin_check.sh`, output `docs/evidence/web/pinned_wallets.txt`:
+  NEAR CLI loaded (HTTP 200) and showed its account form; Intear loaded and, after "Web" in its chooser, opened
+  https://wallet.intear.tech/connect; with one byte changed in transit the site refused to run the NEAR CLI script.
+- Not rerun: the full NEAR CLI deposit, commit, reveal and withdraw run; the bytes are the same as in that run.
+- Known risk: Intear has no versioned address, so a new Intear release stops Intear on this site (it is refused, not
+  run) until `./scripts/wallet-vendor/fetch_wallets.sh` is run again and the new pin is committed.
+- THIRD_PARTY_NOTICES.md: MIT licence text for NEAR Connect and esbuild's helpers; the two scripts listed as loaded at
+  run time. README known limits: one person can use many accounts; the rising fee and the cap K bound the answers.
+
 ## 2026-10-25: Hygiene fixes (owner's decisions, branch ui-preview)
 
 - MyNearWallet removed from the site's wallets and from web/vendor/ (retired on 31 October 2026); Intear Wallet and NEAR

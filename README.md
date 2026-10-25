@@ -125,6 +125,8 @@ Each claim names the file and the command that show it. Full results, failures i
   silent vendor's timeout can pay without any proof. Bounty 7 and the other demo bounties use the public demo input.
 - A payout to an account that does not exist is lost (docs/AUDIT.md, finding 8); the site and
   `scripts/agent_preflight.sh` refuse such an account before sending.
+- One account cannot take more than K attempts in total, but nothing stops one person using many accounts; the rising
+  fee per attempt and the cap K bound how many yes/no answers anyone can extract per bounty.
 - Intear Wallet's script keeps a wallet session key in the browser (it cannot spend on chain); the page's own code holds
   no key (docs/SECURITY.md).
 - The contract went through AI review passes; their findings led to seven fixes. The report, with the unfixed findings

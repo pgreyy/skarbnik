@@ -1,0 +1,26 @@
+$ CHROME=<headless shell> ./scripts/wallet-vendor/pin_check.sh
+utc=2026-10-25T20:51:24Z
+== case: nearcli
+wallets listed: Intear Wallet, NEAR CLI
+script requests: 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js
+NEAR CLI account form shown: true
+Intear windows opened: none
+header: CONNECTING…
+page message: 
+errors: none
+== case: intear
+wallets listed: Intear Wallet, NEAR CLI
+script requests: 200 https://wallet.intear.tech/near-selector.js
+NEAR CLI account form shown: false
+Intear windows opened: https://wallet.intear.tech/connect, https://wallet.intear.tech/service_worker.js
+header: CONNECTING…
+page message: 
+errors: none
+== case: tampered
+wallets listed: Intear Wallet, NEAR CLI
+script requests: tampered one byte of https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js | 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js
+NEAR CLI account form shown: false
+Intear windows opened: none
+header: NEAR CLI changed its wallet script since this site checked it, so the site will not run it. Use another wallet for now. TRY AGAIN
+page message: 
+errors: none

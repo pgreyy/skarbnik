@@ -85,9 +85,9 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | --- | --- | --- |
 | @hot-labs/near-connect | 0.11.4 (`scripts/wallet-vendor/package.json`, `package-lock.json`) | `c9a291ddf0e8e4fdc2732fb6a54584bd76ee7ebe2bbbe373b25ca2a140f2b36e` (bundle) |
 | esbuild (bundler, build time only) | 0.25.10 | |
-| Wallet list `web/vendor/wallets/manifest.json` | entries from hot-dao/near-selector at commit `6766ea5e71864e5cbcbf5b70d2aeae23b20b60e9` | `0d9f326bd386f2fae5543467558b148b502669f9e53931b9f34c3bca56d05333` |
-| Intear Wallet script `intear-wallet.js` | https://wallet.intear.tech/near-selector.js (no versioned address), fetched 2026-10-25 | `6decc283352af197feff4988628899d19e05f4168a4277fe699bd8a0d6178e34` |
-| NEAR CLI script `near-cli.js` | near/near-cli-connect at commit `dc5cb123e3a8e42ed095739f4ea058b767a80ad2` | `522f2a52403f6da84384a409718c54b49ed4432cdfd583363d35109be8c8e318` |
+| Wallet list `web/vendor/wallets/manifest.json` | entries from hot-dao/near-selector at commit `6766ea5e71864e5cbcbf5b70d2aeae23b20b60e9`, script addresses and pins added | `563c5c3d3b564a2018ec1e0682b56c9d9371f61b0ce5c054f702cf7a7df60e04` |
+| Intear Wallet script (not stored; loaded from https://wallet.intear.tech/near-selector.js, no versioned address; checked 2026-10-25) | pinned by sha256 in the wallet list | `6decc283352af197feff4988628899d19e05f4168a4277fe699bd8a0d6178e34` |
+| NEAR CLI script (not stored; loaded from raw.githubusercontent.com, near/near-cli-connect at commit `dc5cb123e3a8e42ed095739f4ea058b767a80ad2`, `dist/near-cli.js`) | pinned by sha256 in the wallet list | `522f2a52403f6da84384a409718c54b49ed4432cdfd583363d35109be8c8e318` |
 
 ## Other
 

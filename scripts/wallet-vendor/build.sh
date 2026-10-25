@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Rebuilds web/vendor/near-connect.js from the exact version in package.json and package-lock.json: NEAR Connect, the
 # wallet connector the NEAR docs recommend, bundled into one file so the site loads it from its own folder with no build
-# step and no CDN. The wallets' own scripts are kept separately in web/vendor/wallets/ (see fetch_wallets.sh). Installs into target/wallet-build (ignored
+# step and no CDN. The wallets' own scripts are not stored: each is loaded from its official address and checked by sha256 (see fetch_wallets.sh). Installs into target/wallet-build (ignored
 # by git) with install scripts switched off, then prints the bundle's sha256 for docs/VERSIONS.md.
 # Usage, from the repo root: ./scripts/wallet-vendor/build.sh
 set -euo pipefail

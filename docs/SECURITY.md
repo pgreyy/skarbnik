@@ -71,7 +71,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 | Guard | What it stops | Shown by |
 | --- | --- | --- |
-| Wallets through NEAR Connect (Intear Wallet and NEAR CLI), each wallet's script a pinned local copy run in a sandboxed frame; sign in asks for no contract key; every transaction is approved in the wallet | The page signing for the visitor; wallet code changing under the site | `web/vendor/wallets/SHA256SUMS`; `docs/evidence/web/` (NEAR CLI run through the page) |
+| Wallets through NEAR Connect (Intear Wallet and NEAR CLI), each wallet's script loaded from its official address, refused unless its sha256 matches the pin in the wallet list, and run in a sandboxed frame; sign in asks for no contract key; every transaction is approved in the wallet | The page signing for the visitor; wallet code changing under the site | `web/vendor/wallets/manifest.json` (pins), `web/js/wallet.js` (`pinScripts`); `docs/evidence/web/pinned_wallets.txt` (a changed byte is refused); `docs/evidence/web/` (NEAR CLI run through the page) |
 | A confirm step before every payment (deposit, withdraw, commit), showing the amount with its unit; a commit's confirm shows the fee, slots left of the cap and "Each attempt returns one yes or no." | Paying by accident | `web/js/account-ui.js` |
 | Before a commit the page reads the chain again and stops, without sending, what the contract would refuse: bounty closed, cap full, not enough credit, a fee above the account's own limit, a payout the limits do not allow, a payout that is the vendor, a verifier or the contract, or one that does not exist | Lost fees and lost payouts (review finding 8) | `web/js/account-ui.js` (`review`) |
 | The page shows a result only from the chain: after a reveal it says "Waiting for the vendor's proof"; the PASS stamp only for an attempt whose outcome on chain is Passed | A faked result | `web/js/account-ui.js` (`attemptPanel`) |
@@ -258,6 +258,10 @@ Each guard: what it stops, where it lives, and what shows it works.
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-25: the wallet scripts of Intear and NEAR CLI are no longer stored in the repository. The site loads each from
+  its official address and refuses it unless its sha256 matches the pin in `web/vendor/wallets/manifest.json`; a test
+  that changes one byte in transit is refused (`docs/evidence/web/pinned_wallets.txt`).
 
 - 2026-10-25: MyNearWallet removed from the site's wallets (retired on 31 October 2026); THIRD_PARTY_NOTICES added.
 
