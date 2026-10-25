@@ -186,7 +186,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 ## 4. Changelog (newest first)
 
-- 2026-10-25 (this commit): private random salt per bounty by default (`--bounty`), the public demo salt only with
+- 2026-10-25 `3043452`: private random salt per bounty by default (`--bounty`), the public demo salt only with
   `--demo-salt`; known limits for the demo salt and for the reference fix requirement.
 - 2026-10-25 `95915f2`: S6c Level 2 path in the bounty contract (Groth16 proofs, journal binding, level marking,
   check size), protocol fee pool for never-revealed fees, nine Level 2 attacks and the self-block test; trusted setup
