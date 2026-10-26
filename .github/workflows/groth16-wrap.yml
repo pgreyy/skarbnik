@@ -1,18 +1,16 @@
 # Wraps a succinct RISC Zero receipt into a Groth16 receipt (the small proof the bounty contract checks), on a GitHub
-# runner with Docker, so the vendor's own machine does no heavy work. Run it by hand (Actions, "groth16-wrap", Run
-# workflow) or with: gh workflow run groth16-wrap.yml --ref ui-preview -f receipt=<path in the repository>
+# runner with Docker, so the vendor's own machine does no heavy work. It runs when a push to ui-preview changes
+# ci/groth16-request.txt (one line: the receipt's path in the repository); a manual start from the Actions tab needs the
+# workflow on the default branch, which this repository's work does not push to.
 # Input: a succinct receipt committed to the repository. A receipt holds only hashes, the seed, counts, the submission id
 # and the verdict: never the secret input, the salt or a key. Steps: rebuild the checker reproducibly and refuse to go
 # on unless its image id is the published one (scripts/check_image_id.sh), wrap to Groth16 in RISC Zero's Docker
 # prover, verify the result, write the contract arguments, upload them as an artifact.
 name: groth16-wrap
 on:
-  workflow_dispatch:
-    inputs:
-      receipt:
-        description: "path of the succinct receipt in the repository"
-        required: true
-        default: "docs/evidence/smooth/u0_succinct_gpu.bin"
+  push:
+    branches: [ui-preview]
+    paths: [ci/groth16-request.txt]
 permissions:
   contents: read
 jobs:
@@ -40,9 +38,10 @@ jobs:
         run: cargo build --release -p skarbnik-host
       - name: Wrap to Groth16
         run: |
+          RECEIPT=$(head -1 ci/groth16-request.txt | tr -d '[:space:]'); test -f "$RECEIPT"
           mkdir -p out
-          sha256sum "${{ inputs.receipt }}" | tee out/input_sha256.txt
-          RISC0_DEV_MODE=0 /usr/bin/time -v ./target/release/skarbnik-host compress "${{ inputs.receipt }}" out/groth16.bin groth16 2>&1 | tee out/groth16.log
+          sha256sum "$RECEIPT" | tee out/input_sha256.txt
+          RISC0_DEV_MODE=0 /usr/bin/time -v ./target/release/skarbnik-host compress "$RECEIPT" out/groth16.bin groth16 2>&1 | tee out/groth16.log
           ./target/release/skarbnik-host verify out/groth16.bin | tee out/verify.txt
           grep -q '^VALID' out/verify.txt
           ./target/release/skarbnik-host groth16-args out/groth16.bin out/args.json

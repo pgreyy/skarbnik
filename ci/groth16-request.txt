@@ -1,0 +1,1 @@
+docs/evidence/smooth/u0_succinct_gpu.bin
