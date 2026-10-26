@@ -1,17 +1,118 @@
 # Skarbnik
 
-Skarbnik lets outside researchers, including AI agents, fix a crash in a program without ever seeing the secret input
-that causes it. The vendor proves each fix against the secret inside a RISC Zero zero knowledge machine, and a NEAR
-contract checks that proof itself and pays the bounty by rule.
+**Fix what you can't see.** Private evaluation. Verifiable results. Rule-based payment.
 
-**The problem.** A vendor who knows a crashing input cannot publish it (attackers would learn it) and cannot ask outsiders to
-fix a bug they cannot test, and a researcher has no way to make the vendor pay once the fix is handed over.
+Skarbnik is a private repair challenge market. AI agents submit patches against a secret security input, and a NEAR
+contract checks a zero knowledge proof of the result before it pays.
 
-**How NEAR fits.** The bounty money, the deadlines and the payout rules live in a NEAR contract. On a Level 2 bounty the
-contract checks the Groth16 proof of the RISC Zero result itself with NEAR's alt_bn128 host functions (about 35 Tgas). An
-AI agent takes part through a NEAR function call key that may only call `commit` and `reveal`, paying fees from credit held
-in the contract, so it can never reach its owner's wallet. If the vendor stays silent past the deadline, the contract pays
-the researcher anyway.
+Live site: https://skarbnik.xyz (NEAR testnet)
+
+> **Current scope.** The checker handles small WebAssembly modules (patches up to 2,048 bytes) and crash bugs, against
+> defined public tests and a secret input. A bounty needs a reference fix and a passing Proof 0 before it opens. Testnet
+> only. No external security audit; the contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)).
+
+## The problem
+
+Whoever can test a fix holds the secret needed to test it, and often decides whether the person who made the fix gets
+paid. Skarbnik separates knowing the secret from proving the result:
+
+- The **vendor** keeps the secret crashing input and runs the private check.
+- The **agent** fixes the public code. It never gets the secret, and its key can only commit and reveal.
+- The **NEAR contract** holds the reward, checks the proof itself and applies the rules. It never sees the secret and
+  does not run the private check.
+
+The secret input never goes to agents or the public. The vendor chooses where proving runs: its own machine, or a GPU it
+rents for the job.
+
+## How it works
+
+1. The vendor locks a reward, commits to a fingerprint of the secret input, and proves its own reference fix passes
+   (Proof 0). The bounty opens only after that.
+2. An agent fixes the public code and submits the fix sealed (commit), then reveals it. Revealed patches are public.
+3. The vendor runs the fix against the secret inside a zero knowledge checker (RISC Zero). The proof says PASS or FAIL
+   and nothing about the secret.
+4. The NEAR contract checks the proof (about 35 Tgas) and pays a PASS. If no proof arrives in time, a timeout rule pays
+   the waiting attempts.
+
+The timeout is a liveness rule, not a verdict. It stops a vendor holding payment hostage by going silent. It does not
+prove a fix is correct, and timeout payouts are always labelled "paid by timeout", apart from proof-checked payouts.
+
+## Why a vendor uses it
+
+An independent fix, checked against a hidden test the vendor never had to share. Also:
+
+- Proof 0 protects agents: it proves the bounty can be fixed under this checker, so nobody pays fees chasing an
+  impossible bounty.
+- A vendor's own fix is often a quick hot fix. A second, independent fix that passes the same hidden test is real
+  assurance before shipping.
+- Private benchmarks: a hidden test that agents can be graded against without it ever leaking.
+
+What vendors get: confidentiality, independent work, verifiable evaluation, predictable settlement.
+
+## Why an agent takes part
+
+Expected value = chance of a PASS x reward - model cost - compute cost - attempt fees - operator time.
+
+The agent can check the task, the fee and the deadline before spending anything (`web/feed.json`, version 2, lists every
+bounty's terms and the exact next fee), its key can't move funds, and every result links to a transaction (the
+[Ledger](https://skarbnik.xyz/#/ledger)). Growth loop: credible bounties, then more agents, then more proven fixes, then
+more vendor trust, then more bounties.
+
+Honest status: every bounty so far was posted by the team, and every account that took part is run or seeded by the
+team (the Ledger labels each one).
+
+## How NEAR fits
+
+- **Programmable settlement:** the contract holds the reward and applies fixed payout rules (`contract/src/lib.rs`).
+- **Proof checked on chain:** NEAR's BN254 host functions let the contract check a RISC Zero Groth16 proof itself, about
+  35 Tgas (`contract/src/groth16.rs`; docs/numbers.md). That's the cost of checking one proof, not of running a whole
+  bounty, and it excludes proving time.
+- **Agent-safe permissions:** function call keys limited to commit and reveal, plus prepaid credit in the contract, so an
+  agent never holds the owner's wallet.
+
+The platform promise is proof-checked payouts. "Paid by proof" is used only for a specific bounty where a PASS proof was
+accepted (bounties 1 and 16).
+
+## What is shown, and what is not
+
+**Demonstrated on testnet** (each with its evidence):
+
+- The contract opens and decides bounties from Groth16 proofs it checks itself: one PASS paid and one FAIL spent on
+  bounty 1 (txs `CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY`, `6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca`), nine
+  attacks refused (docs/EVIDENCE.md, S6c).
+- An AI agent's fix was committed and revealed with a limited key, proven PASS and paid by proof: bounty 16 (tx
+  `5NH9rhRMdLxRtKBtjxAsqQwFWejtu2tU9oNf69G2yUq9`).
+- An AI agent fixed a new program with no hint in its source (bounty 17): its fix equalled the vendor's private
+  reference fix, but the laptop proof was too slow for the window, so it was paid by timeout, not by proof (claim
+  `BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh`).
+- A judge can open a judge bounty with a real proof from any account, and a proof with the wrong seal is refused at the
+  pairing check itself (steps 5 and 6 below; bounty 18, tx `GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`; bounty 22, tx
+  `5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`).
+- The attempt cap held against a probe agent: 3 of 12 probe commits counted on bounty 23 (step 7).
+- Anyone can rebuild the checker and match the image id on chain (step 9: MATCH from a fresh clone).
+
+**Operational risks:**
+
+- The vendor must prove each revealed attempt inside the verdict window. On the laptop CPU one proof with compression
+  takes 1 to 4 hours (docs/numbers.md); bounty 17 missed its window. A rented GPU is faster, but the secret then sits
+  briefly on that machine.
+- The vendor must stay online; if it goes silent, the timeout rule pays whatever was revealed.
+- The contract account still has a full access key, so its code can still be replaced (planned to be removed last).
+
+**Still needs hardening** (docs/AUDIT.md, findings and suggested hardening):
+
+- A payout to an account that does not exist is lost (finding 8; bounty 8 shows it, the Ledger marks it).
+- No storage accounting (finding 12); the vendor chooses the Proof 0 seed (finding 10); the verifier constants are
+  unversioned (finding 11).
+- One person can use many accounts; a per-account cap is written and tested but not deployed (docs/evidence/account_cap/PLAN.md).
+
+**Narrow claims:**
+
+- PASS means the patch passed this checker against the secret and the public tests; it does not prove the patch is
+  secure against everything.
+- One verdict tells a researcher at most one bit about the secret; the vendor chooses the budget K.
+- Bounty 7 and the other demo bounties use a public demo input; bounty 12 keeps its secret private but uses the public
+  demo bug.
 
 Skarbnik (Polish and Ukrainian for treasurer; in folklore, the mine spirit who rewards honest miners) was built under the
 working name Kintsugi; the testnet contract keeps that name. Mainnet: skarbnik.near.
@@ -27,8 +128,9 @@ official_demo_bounty: 7
 private_demo_bounty: 12
 judge_bounties_closed_at_writing: 19, 20, 21, 22
 paid_by_proof: 1, 16
-paid_by_timeout: 4, 8, 9, 11, 13, 17
+paid_by_timeout: 4, 9, 11, 13, 17 (and 8 on paper only: its transfer failed, finding 8)
 feed_url: https://skarbnik.xyz/feed.json
+ledger_url: https://skarbnik.xyz/#/ledger
 agent_quickstart_url: https://skarbnik.xyz/agent-quickstart.txt
 numbers: docs/numbers.md
 receipts: docs/evidence/receipts/README.md
@@ -158,7 +260,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | Claim | Status | Shown by |
 | --- | --- | --- |
 | Level 2: the contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt; replayed, changed, late or repeated proofs are refused | works on testnet: one PASS paid, one FAIL spent, nine attacks refused; anyone can open a judge bounty (steps 5 and 6) | `scripts/s6c_testnet.sh`, `scripts/judge_bounties.sh`, `cargo test -p kintsugi-contract` (EVIDENCE, S6c and "Judge bounties") |
-| Paid by proof versus paid by timeout | bounties 1 and 16 were paid by a proof (`submit_groth16` PASS); bounties 4, 8, 9, 11, 13 and 17 were paid by the timeout rule, with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `docs/handoff/04-testnet-state.md`; the bounty pages |
+| Proof-checked payouts versus timeout payouts | bounties 1 and 16 were paid by a proof (`submit_groth16` PASS); bounties 4, 9, 11, 13 and 17 were paid by the timeout rule (a liveness rule, not a verdict), and bounty 8 on paper only (its transfer failed, finding 8), with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `docs/handoff/04-testnet-state.md`; the bounty pages |
 | An agent driven by a language model (NEAR AI Cloud by default): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, commits and reveals with a limited key | works on testnet: on test bounty 16 the model's fix was proven PASS and paid; on private bounty 17 (a new program, secret and reference fix outside the repository) the model's fix was the reference fix byte for byte, but the vendor's proof did not finish inside the verdict window, so it was **paid by timeout, not by a proof** | `agent/skarbnik_agent.py`; EVIDENCE "The model-driven agent", "Private bounty 17" |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | 19 of 20 as expected; the one difference (`memory_grow`) is explained | `cargo test -p kintsugi-check`; EVIDENCE, S1 |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |
@@ -229,6 +331,15 @@ it is built. Tests without a key: `./scripts/agent_dry_run_test.sh`.
 ## Roadmap
 
 - Faster vendor proving on a rented GPU, so a proof fits the verdict window (the setup is written, not yet run on a pod).
+- **Planned: unresolved bug bounties.** A mode where Proof 0 proves only that the original crashes on the secret, so no
+  reference fix is needed. It needs a new checker guest and a new image id.
+- **Planned: proving inside sealed hardware.** Proving in a confidential computing environment (a TEE with
+  attestation), so even a rented machine can't read the secret. NEAR AI Cloud already runs inference in TEEs (Intel TDX
+  and NVIDIA confidential computing); running a custom prover there is not confirmed.
+- **Planned: vendor liveness bond and fallback evaluator.** Ideas to make vendor silence costlier and timeouts rarer.
+  Not designed yet.
+- **Planned: agent earnings after costs.** Model and compute costs supplied by the agent's operator, shown next to its
+  rewards and fees (the Ledger already has the column, empty until an operator supplies costs).
 - OutLayer as a Level 1 verifier, once its testnet answers.
 - On the site: create a bounty, set agent limits from the page.
 - A "crash proven only" mode, for a vendor who can prove the crash but has no fix yet.
