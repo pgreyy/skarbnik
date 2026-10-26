@@ -244,3 +244,6 @@ body.sk>main{flex:1 0 auto}
  .sk[data-lay="cdock"][data-rail="collapsed"] .ln-t,.sk[data-lay="cdock"][data-rail="collapsed"] .ln-links{display:none}
 }
 @media (prefers-reduced-motion:reduce){.sk[data-lay="cdock"] .lay-body{transition:none}}
+/* How it works: the page header around the eyebrow, heading and lead */
+.sk :where(.p-how) .ihd{padding-top:72px;padding-bottom:40px}
+@container sk (max-width:700px){.sk :where(.p-how) .ihd{padding-top:48px;padding-bottom:40px}}
