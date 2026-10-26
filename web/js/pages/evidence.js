@@ -8,7 +8,7 @@
 import { CONTRACT, RPCS, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, near, submissions, accessKeys } from '../chain.js';
 import { $, esc, icon, chip, tx, acct, hashCell, table, note, cmd, tabbed, seg, bindSeg } from '../ui.js';
 import { STATUS } from '../status.js';
-import { loadAll, getRecorded, getMeta, getNumbers, firstTx, lastTx, txsOf } from '../data.js';
+import { loadAll, fromFeed, getRecorded, getMeta, getNumbers, txsOf } from '../data.js';
 import { buildLedger } from '../ledger-core.js';
 import { hex } from '../attempt.js';
 
@@ -69,15 +69,22 @@ export async function evidence(viewEl, tab) {
 </div></div>
 </div></section></main>`;
   $('#vocabLink').addEventListener('click', (e) => { e.preventDefault(); $('#vocab').scrollIntoView(); });
-  let all, rec, meta, nums;
-  try { [all, rec, meta, nums] = await Promise.all([loadAll(), getRecorded(), getMeta(), getNumbers()]); } catch (e) {
-    if ($('#etabs')) $('#etabs').innerHTML = note(`Could not read the contract on testnet: ${esc(e.message)}. Reload to try again.`, 'alert'); return;
+  let all, rec, meta, nums, snapshot = null;
+  try { [rec, meta, nums] = await Promise.all([getRecorded(), getMeta(), getNumbers()]); } catch (e) {
+    if ($('#etabs')) $('#etabs').innerHTML = note(`Could not load the site's data: ${esc(e.message)}. Reload to try again.`, 'alert'); return;
+  }
+  // Live from the chain; if it cannot be read within 6 seconds, the feed and ledger.json snapshots, labelled with their time.
+  try { all = await Promise.race([loadAll(true), new Promise((_, no) => setTimeout(() => no(new Error('the testnet RPC is slow or busy')), 6000))]); } catch (e) {
+    try { const f = await fromFeed(); all = f.list; snapshot = { at: f.at, err: e.message }; } catch {
+      if ($('#etabs')) $('#etabs').innerHTML = note(`Could not read the contract on testnet: ${esc(e.message)}. Reload to try again.`, 'alert'); return;
+    }
   }
   if (!$('#etabs')) return;
   const nProof = all.filter((x) => x.status === 'Proof verified').length, nTime = all.filter((x) => x.status === 'Timeout settlement').length;
   const attacks = (rec.attacks_s6c || []).filter((a) => /refused/.test(a.result)).length;
   $('#nums').innerHTML = [[`${nProof}`, 'Bounties paid by a verified proof'], [`${nTime}`, 'Settled by timeout, never called proven'], [`${nums.contract_unit_tests.value}`, 'Contract unit tests pass in the repository'], [`${attacks}`, 'Proof attacks refused on chain'], [`${nums.accepted_proof_tgas.value}<small>Tgas</small>`, `About, per accepted proof (${nums.accepted_proof_tgas.range})`]]
     .map(([v, t]) => `<div role="listitem"><b>${v}</b><span>${esc(t)}</span></div>`).join('');
+  if (snapshot) $('#etabs').insertAdjacentHTML('beforebegin', `<div style="margin-top:24px">${note(`The contract could not be read just now (${esc(snapshot.err)}). The numbers and the ledger below are the snapshots made at ${esc(snapshot.at)} (feed.json, ledger.json): reload to read them live.`, 'alert')}</div>`);
   $('#ctSum').textContent = `One approved checker id, ${all.length} bounties, and no mainnet contract. Read it on the explorer, not on this page.`;
 
   // ---- Ledger: the settled bounties, then the Proof Ledger
@@ -253,13 +260,18 @@ export async function evidence(viewEl, tab) {
   // the Proof Ledger, from every bounty and attempt on chain (js/ledger-core.js)
   try {
     const [accounts, provers, costs] = await Promise.all([fetch('data/accounts.json').then((x) => x.json()), fetch('data/provers.json').then((x) => x.json()), fetch('data/operator_costs.json').then((x) => x.json())]);
-    const bs = all.map((x) => x.b), subs = Object.fromEntries(all.map((x) => [String(x.b.id), x.subs]));
-    const names = new Set([...bs.map((b) => b.vendor), ...Object.values(subs).flat().flatMap((s) => [s.committer, s.payout])]);
-    const hashes = new Map(await Promise.all([...names].map(async (a) => [a, hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(a))))])));
-    const L = buildLedger(bs, subs, rec, accounts, Date.now(), hashes, provers.attempts, costs.costs), c = L.counts;
+    let L, names;
+    if (snapshot) { L = await (await fetch('ledger.json')).json(); names = new Set([...L.paid_accounts.map((a) => a.account), ...L.vendors.map((v) => v.vendor), ...L.earnings.map((x) => x.account)].filter((a) => /\.testnet$/.test(a))); }
+    else {
+      const bs = all.map((x) => x.b), subs = Object.fromEntries(all.map((x) => [String(x.b.id), x.subs]));
+      names = new Set([...bs.map((b) => b.vendor), ...Object.values(subs).flat().flatMap((s) => [s.committer, s.payout])]);
+      const hashes = new Map(await Promise.all([...names].map(async (a) => [a, hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(a))))])));
+      L = buildLedger(bs, subs, rec, accounts, Date.now(), hashes, provers.attempts, costs.costs);
+    }
+    const c = L.counts;
     const pl = $('#proofLedger'); if (!pl) return;
     const howChip = (f) => (f.transfer_failed ? chip('k-fail', 'Paid on paper, transfer failed (audit finding 8)', 'x') : f.how === 'proof' ? chip('k-proof', 'Paid by proof', 'check') : chip('k-timeout', 'Paid by timeout', 'hourglass'));
-    pl.innerHTML = `<div style="max-width:700px"><h2 class="h2s">The Proof Ledger</h2><p class="body" style="margin-top:12px">Every account the contract has paid, how each fix was paid, and each vendor’s on-time record, computed live from every bounty and attempt on chain. No scores, no ranks, no credit for unpaid attempts.</p></div>
+    pl.innerHTML = `<div style="max-width:700px"><h2 class="h2s">The Proof Ledger</h2><p class="body" style="margin-top:12px">Every account the contract has paid, how each fix was paid, and each vendor’s on-time record, ${snapshot ? `from the snapshot made at ${esc(L.made_at)} (ledger.json)` : 'computed live from every bounty and attempt on chain'}. No scores, no ranks, no credit for unpaid attempts.</p></div>
       ${note(`<b>${c.outside_the_team === 0 ? 'Every account below is run by the Skarbnik team or was seeded by its scripts.' : `${c.outside_the_team} account(s) below are not on the team’s list.`}</b> An account missing from the team’s list (data/accounts.json) would show as “not known”.`)}
       <div class="stat4"><div><b class="num">${c.paid_fixes}</b><span>Paid fixes: ${c.paid_by_proof} by proof, ${c.paid_by_timeout} by timeout${c.paid_on_paper_transfer_failed ? `; ${c.paid_on_paper_transfer_failed} more paid on paper only (transfer failed)` : ''}</span></div><div><b class="num">${c.paid_accounts}</b><span>Paid accounts</span></div><div><b class="num">${c.vendors}</b><span>Vendors</span></div><div><b class="num">${c.distinct_counterparties}</b><span>Distinct counterparties: paid accounts and vendors</span></div></div>
       <h3 class="h3 mt24">Paid fixes</h3>${table(['Bounty', 'Attempt', 'Paid to', 'How', 'Paid', 'Checker', 'Transaction'], L.paid_fixes.map((f) => [

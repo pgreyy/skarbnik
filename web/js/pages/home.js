@@ -6,7 +6,7 @@
 import { view, near, span, PUBLISHED_IMAGE_ID, EXPLORER_ACCOUNT, CONTRACT } from '../chain.js';
 import { $, esc, icon, chip, tx, note } from '../ui.js';
 import { STATUS } from '../status.js';
-import { loadAll, getRecorded, getMeta, getConfig, getNumbers, firstTx, lastTx } from '../data.js';
+import { loadSome, paidByProof, getRecorded, getMeta, getConfig, getNumbers, firstTx, lastTx } from '../data.js';
 import { matrix } from './matrix.js';
 
 export const HOME_IDS = ['top', 'mechanism', 'example', 'why', 'paths', 'verify', 'next'];
@@ -236,7 +236,7 @@ async function checkerCard(rec) {
 async function example(id) {
   const el = $('#exCase');
   try {
-    const [all, rec, meta] = await Promise.all([loadAll(), getRecorded(), getMeta()]);
+    const [all, rec, meta, everyone] = await Promise.all([loadSome([...new Set([id, '17'])]), getRecorded(), getMeta(), paidByProof()]);
     const x = all.find((e) => String(e.b.id) === id);
     if (!$('#exCase')) return;
     if (!x) { el.innerHTML = `<p class="state">There is no bounty ${esc(id)} on ${esc(CONTRACT)}.</p>`; return; }
@@ -245,7 +245,7 @@ async function example(id) {
     const proofTx = lastTx(rec, id, 'submit_groth16'), claim = lastTx(rec, id, 'claim_timeout');
     const lead = status === 'Proof verified' ? `This is bounty ${id}, paid by a proof the contract checked itself.` : status === 'Timeout settlement' ? `This is bounty ${id}, paid by the timeout rule: not a proof.` : `This is bounty ${id}, not settled yet.`;
     $('#exLead').textContent = `One example, with its transactions. ${lead}`;
-    const others = all.filter((e) => e.status === 'Proof verified').map((e) => e.b.id);
+    const others = everyone;
     const b17 = all.find((e) => String(e.b.id) === '17');
     el.innerHTML = `
 <article class="card" style="padding:36px;display:flex;flex-direction:column;gap:30px">

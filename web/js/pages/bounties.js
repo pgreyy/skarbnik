@@ -5,13 +5,14 @@
 import { near, utcShort, commitBy, CONTRACT } from '../chain.js';
 import { $, esc, icon, chip, tx, note } from '../ui.js';
 import { STATUS, kindChips } from '../status.js';
-import { loadAll, getRecorded, getMeta, firstTx, lastTx } from '../data.js';
+import { loadAll, fromFeed, getRecorded, getMeta, firstTx, lastTx } from '../data.js';
 
 let filter = 'all';
 
 // A plain line under the status, from the chain (and the bounty's own note when one is recorded).
 function subLine(x, meta, rec) {
   const { b, subs, status } = x, id = String(b.id);
+  if (x.snap) return x.snap.accepts_commits ? `Accepting commits until ${x.snap.windows.commit_deadline_utc.replace('T', ' ').replace(':00Z', '').replace('Z', '')} UTC (snapshot).` : (meta.notes || {})[id] || '';
   const recNote = rec.bounty_notes && rec.bounty_notes[id];
   if (recNote) return recNote.text;
   if (meta.notes && meta.notes[id] && (status === 'Proof verified' || status === 'Timeout settlement' || status === 'Refunded')) return meta.notes[id];
@@ -54,16 +55,17 @@ ${['Proof verified', 'Timeout settlement', 'Refunded'].map((s) => `<div class="k
 <div class="wrap" id="blist"><p class="state">Reading every bounty from testnet…</p></div>
 </section>
 </main>`;
-  let all, rec, meta;
-  try { [all, rec, meta] = await Promise.all([loadAll(), getRecorded(), getMeta()]); } catch (e) {
-    if ($('#blist')) $('#blist').innerHTML = note(`Could not read the contract on testnet: ${esc(e.message)}. Check your connection and reload.`, 'alert'); return;
+  let all, rec, meta, snapshot = null;
+  try { [rec, meta] = await Promise.all([getRecorded(), getMeta()]); } catch (e) {
+    if ($('#blist')) $('#blist').innerHTML = note(`Could not load the site's data: ${esc(e.message)}. Reload to try again.`, 'alert'); return;
   }
+  // First the last feed snapshot (scripts/gen_feed.py), labelled with its time, so the list shows at once and survives
+  // a busy RPC; then the live read from the contract replaces it.
+  const live = loadAll();
+  try { const f = await fromFeed(); all = f.list; snapshot = { at: f.at, err: null }; } catch { all = null; }
+  const goLive = live.then((l) => { all = l; snapshot = null; }).catch((e) => { if (snapshot) snapshot.err = e.message; else throw e; });
+  if (!all) { try { await goLive; } catch (e) { if ($('#blist')) $('#blist').innerHTML = note(`Could not read the contract on testnet: ${esc(e.message)}. Check your connection and reload.`, 'alert'); return; } }
   if (!$('#blist')) return;
-  all = all.slice().reverse();
-  const n = (st) => all.filter((x) => x.status === st).length;
-  const failed8 = all.filter((x) => rec.bounty_notes && rec.bounty_notes[String(x.b.id)] && rec.bounty_notes[String(x.b.id)].transfer_failed).length;
-  const present = Object.keys(STATUS).filter((s) => n(s));
-  if (filter !== 'all' && !present.includes(filter)) filter = 'all';
   const row = (x) => {
     const { b } = x, id = String(b.id), st = STATUS[x.status], [txl, txid] = evidenceOf(x, rec);
     return `<div class="brow" role="listitem">
@@ -78,25 +80,32 @@ ${['Proof verified', 'Timeout settlement', 'Refunded'].map((s) => `<div class="k
 </div>`;
   };
   const draw = () => {
-    const rows = all.filter((x) => filter === 'all' || x.status === filter);
+    const list = all.slice().sort((x, y) => Number(y.b.id) - Number(x.b.id));
+    const n = (st) => list.filter((x) => x.status === st).length;
+    const failed8 = list.filter((x) => rec.bounty_notes && rec.bounty_notes[String(x.b.id)] && rec.bounty_notes[String(x.b.id)].transfer_failed).length;
+    const present = Object.keys(STATUS).filter((st) => n(st));
+    if (filter !== 'all' && !present.includes(filter)) filter = 'all';
+    const rows = list.filter((x) => filter === 'all' || x.status === filter);
     $('#blist').innerHTML = `
-<div class="strip" aria-label="Summary of the ${all.length} bounties on the contract">
-<div><b>${all.filter((x) => x.accepting).length}</b><span>Accepting commits now</span></div>
+<div class="strip" aria-label="Summary of the ${list.length} bounties on the contract">
+<div><b>${list.filter((x) => x.accepting).length}</b><span>Accepting commits now</span></div>
 <div><b>${n('Proof verified')}</b><span>Paid by proof</span></div>
 <div><b>${n('Timeout settlement')}</b><span>Settled by timeout${failed8 ? `, ${failed8} of them paid on paper only (transfer failed)` : ''}</span></div>
 <div><b>${n('Refunded')}</b><span>Refunded</span></div>
 </div>
 <div class="bar">
-<div class="seg" role="group" aria-label="Filter bounties">${[['all', 'All', all.length], ...present.map((s) => [s, s, n(s)])].map(([k, t, c]) => `<button type="button" data-f="${esc(k)}" aria-pressed="${filter === k}">${esc(t)} <span style="color:var(--tx3)">${c}</span></button>`).join('')}</div>
-<p class="small faint" aria-live="polite">Showing ${rows.length} of ${all.length} on ${esc(CONTRACT)}</p>
+<div class="seg" role="group" aria-label="Filter bounties">${[['all', 'All', list.length], ...present.map((s) => [s, s, n(s)])].map(([k, t, c]) => `<button type="button" data-f="${esc(k)}" aria-pressed="${filter === k}">${esc(t)} <span style="color:var(--tx3)">${c}</span></button>`).join('')}</div>
+<p class="small faint" aria-live="polite">Showing ${rows.length} of ${list.length} on ${esc(CONTRACT)}</p>
 </div>
 <div class="blist" role="list" aria-label="Bounties">
 <div class="bhead" aria-hidden="true"><span>Id</span><span>Bounty</span><span>Reward</span><span>Attempts</span><span>Status</span><span>Evidence</span></div>
 ${rows.length ? rows.map(row).join('') : '<p class="empty">No bounties match this filter.</p>'}
 </div>
+${snapshot ? `<div style="margin-top:24px">${note(snapshot.err ? `The contract could not be read just now (${esc(snapshot.err)}). This list is the feed snapshot made at ${esc(snapshot.at)}: reload to read it live.` : `This list is the feed snapshot made at ${esc(snapshot.at)}. Reading the contract live…`, snapshot.err ? 'alert' : 'clock')}</div>` : ''}
 <div style="margin-top:24px">${note(`Every bounty on this contract is listed, read live from testnet. Test, demo and judge bounties are labelled. Titles are short descriptions; every status, amount and count comes from the chain.`)}</div>
 <div style="margin-top:12px">${note('On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.', 'eyeoff')}</div>`;
     $('#blist').querySelectorAll('[data-f]').forEach((btn) => btn.addEventListener('click', () => { filter = btn.dataset.f; draw(); const b = $(`[data-f="${CSS.escape(filter)}"]`); if (b) b.focus(); }));
   };
   draw();
+  goLive.then(() => { if ($('#blist')) draw(); }, () => { if ($('#blist')) draw(); });
 }

@@ -5,6 +5,78 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Site in the final design (Panyl), and agent setup from the site (2026-10-26)
+
+Question: does the rebuilt site match the final design (the design package's SPEC.md, reference CSS and screenshots),
+keep every working feature with live data, and can an agent be set up from the site alone (PASTE-11 part D)?
+
+Measured on the built site in a headless Chromium (Playwright core 1.56.1, Chromium headless shell build 1243), local
+server, against the design's SPEC section 16:
+
+| Check | Expected | Measured |
+| --- | --- | --- |
+| Root attributes | data-th=panyl data-md=dark data-lay=cdock data-lgk=vinyl data-hv=logo | the same |
+| Page background, dark and light | rgb(18,18,12), rgb(238,233,223) | the same |
+| Header | 77 px, wordmark 22 px Unbounded 600, mark 38 px | 77 px; 22 px Unbounded 600, letter spacing -0.132 px; 38 x 38 |
+| Hero heading | 47.06 px Unbounded 600, rgb(232,233,220) | 47.0592 px, line 46.118 px, letter spacing -0.494 px, rgb(232,233,220) |
+| Eyebrow | DM Mono 13 px, .2em, rgb(238,148,56) | DM Mono 13 px, 2.6 px (.2em), rgb(238,148,56); light: DM Sans 13 px, rgb(150,74,50) |
+| Primary button | 232 x 48, rgb(238,148,56), text rgb(20,19,12), radius 1.44 px | 233 x 48, the same colours, 1.44 px (light: rgb(255,177,98), 3.6 px) |
+| Rail | 268 px, items 44 px, current rgb(38,37,26) | 268 px, items 44 px high, rgb(38,37,26) |
+| Console frame | 1380 px, radius 2.64 px (light 6.6 px) | 1380 px, 2.64 px (light 6.6 px) |
+| Control bar | 77 px, buttons 48 px | 77 px, 48 x 48 |
+| Hero logo | mark 272 px, ring 367 px | 271.5 px, 367.34 px |
+| Card radius | 2.4 px dark, 6 px light | 2.4 px, 6 px |
+| Phone 390 | header 69 px, hero heading 33.44 px, mark 181 px, Dock 346 x 58, current Dock item 44 x 44 rgb(238,148,56) | 69 px, 33.44 px, 180.88 px, 346 x 58, 44 x 44 rgb(238,148,56) |
+| Lead, section heading | 20 px DM Sans, line 31 px; 38 px, line 40.3 px (phone 17 px; 24.32 px) | 20 px, 31 px; 38 px, 40.28 px (phone 17 px; 24.32 px) |
+
+- Contrast: `node scripts/contrast_check.mjs` reads the Panyl tokens from `web/css/panyl.css`: every text pair at least
+  4.5:1 and every control border and focus ring at least 3:1, in dark and in light, including the tinted chips. Lowest:
+  light muted text on a selected item 4.89:1, light mint on the footer 4.61:1, light amber on the footer 4.67:1.
+- Keyboard and motion (a scripted run, 27 checks, all PASS): tabs move with the arrow keys, Home and End and keep the
+  tab in the address; the Console rail, Previous and Next and the Dock change the section; #paths and #verify open
+  their section; the How it works player moves with the arrow keys, plays and pauses, and its timeout path says "This
+  is not a proof"; the focus ring is 2 px solid amber with a 3 px offset; with reduced motion the transitions are 0 s;
+  the dark and light toggle is remembered after a reload.
+- Old routes: #/verify, #/ledger, #/arena/run, #/agent and #/bounties/16/attempts redirect to #/evidence/checker,
+  #/evidence/ledger, #/evidence/lab, #/account and #/bounties/16/overview.
+- Links: every link on 23 pages and sections: 16 internal routes render a page, feed.json and agent-quickstart.txt
+  answer 200, the explorer and skarbnik.xyz links answer; no broken link.
+- Widths: no sideways scroll on 11 routes at 1440, 1280, 1000, 768 and 390 px (55 page loads), and no console error.
+- Found and fixed during the checks: the credit dialog was modal, so the wallet's own window under it could not be
+  clicked (true of the old site too); the page fired about 65 chain reads at once and an RPC refused some (the reads
+  now go 5 at a time with up to five tries); after a commit the attempt panel kept the old slot count. After several hundred
+  test page loads from one machine, FastNEAR's testnet RPC answered HTTP 429 to most reads from it (seen with curl: 8 of 40
+  parallel reads answered); the Bounties list now shows the last feed.json snapshot at once, labelled with its time, and
+  replaces it with the live read; the Evidence page uses the feed.json and ledger.json snapshots, labelled, when the live
+  read takes over 6 seconds; Home and How it works read only the bounties they show.
+
+Wallet run through the pages, NEAR CLI wallet, a throwaway account made for it from the faucet
+(`skarbnik-partd-461f99.testnet`, its key in near-cli's keychain outside the repository): a script drove the page
+in the headless browser; for each request it ran the command the wallet showed with near-cli and pasted the
+transaction id back into the wallet. Transactions: `docs/evidence/web/partd_transactions.tsv`.
+
+| Step through the page | Transaction | Result on the page or the chain |
+| --- | --- | --- |
+| deposit 0.02 NEAR (credit dialog) | `Eq7RSBLjXrNAPcgLr3gfJ928YWhF5Sp7kbGucyizRUE6` | "Deposited 0.02 NEAR. Credit is now 0.12 NEAR." |
+| set_agent_limits 0.02 NEAR, fixed payout (Account, Limits) | `7mdPgmt7WMay7YUwyKjmvuiaAkHCNtyvjYCDBurK3PpS` | get_agent_limits: max fee 0.02 NEAR, payout the account |
+| Create an agent key, then AddKey through the wallet (Account, Agent key) | `SKg8rB4RE7QWW2cjZ1jsQ3TKbVtBWmNkbBJwrKuPPCU` | "The key was added: it may call only commit and reveal"; the wallet's command was `near account add-key ... grant-function-call-access --allowance '0.25 NEAR' --contract-account-id kintsugi-l2-cihdp.testnet --function-names 'commit, reveal' use-manually-provided-public-key ed25519:J6Xn4rN7...` |
+| agent dry run with that key (`--provider standin`, no model, nothing sent) | none | PREFLIGHT OK; "key ... limited to commit, reveal on kintsugi-l2-cihdp.testnet, allowance 0.25 NEAR"; 17 of 17 public tests |
+| agent live run with that key on test bounty 14 | commit `9bZygCGt2syghtoa6vvE8bAh7i5GThGqHSYnG9mMCJbD`, reveal `D3brEnjyXFWqUgHnawhPjEAg4m79iLQAtyW2G3B2wVft` | attempt #1, fee 0.015 NEAR from credit |
+| commit on bounty 14 (attempt panel, confirm sheet) | `EJ5ZnZ7N5xRERvM4KSvK1Uo7eR4TNePVouTA8xrNEcm` | "Attempt recorded as #2. The fee was taken from your credit." |
+| reveal | `FsCsxB3i91nZQpvVheXnN8BjFFStSKK1MKtcyptBEmkg` | "Revealed. Waiting for the vendor's proof." deadline 2026-10-26 22:35 UTC |
+| withdraw 0.085 NEAR | `EMbijXQLsX1fdz2cWfTUaYJzHnVubH7tqsUCXzPjXgyM` | "Withdrawn 0.085 NEAR. Credit is now 0 NEAR." |
+| Stop (Account) | `6qHvX9iEPzp8Lz7BoHLihi1mZ3drtFfQdoXNVXRnZgx4` | get_agent_limits: max fee 0 |
+
+Also on chain, not through the page's confirm flow: the account's creation (`267zapHvrAAweGAd5DeG9LAtiDu6jgB86t1SpXoWyKKG`),
+a first deposit whose command ran before the test script could read the transaction id (`cF9UWjJPTCjjXhSJa4351tq9ztEHCanof54nRew4boJ`),
+and a second deposit (`4EbktNsqF2gMrHkeyDj5cSFLePmst5sZjwPxbjDUPJqR`) that hit the modal dialog bug above.
+The private agent key was saved to a file outside the repository and was never printed.
+
+Verdict: PASS. The NEAR CLI wallet adds a function call key from the site. Not tried: AddKey with any other wallet
+(the page shows the exact near-cli command if a wallet refuses). Not run: real phones, Safari, Firefox. The two
+attempts on test bounty 14 wait for a proof that will not come (test bounty); the timeout rule decides them after
+22:35 UTC on 2026-10-26.
+
 ## Per-account cap per bounty: written and tested, not deployed (2026-10-26)
 
 - Question: can a bounty limit how many of its K slots one account holds, without touching the stored layout or any

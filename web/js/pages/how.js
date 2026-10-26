@@ -6,7 +6,7 @@
 // sees what" matrix and two real bounties, read live: 16 (paid by proof) and 17 (paid by timeout).
 import { $, esc, icon, chip, note } from '../ui.js';
 import { STATUS } from '../status.js';
-import { loadAll } from '../data.js';
+import { loadSome } from '../data.js';
 import { matrix } from './matrix.js';
 import { PUBLISHED_IMAGE_ID } from '../chain.js';
 
@@ -122,7 +122,7 @@ ${STEPS(true).map((s, i) => `<div><h3 class="h4" style="margin-top:8px">${i + 1}
 
   // the two real bounties, with their status read live
   try {
-    const all = await loadAll();
+    const all = await loadSome(['16', '17']);
     const card = (id, text, link) => {
       const x = all.find((e) => String(e.b.id) === id); if (!x) return '';
       const s = STATUS[x.status];

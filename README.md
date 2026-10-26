@@ -55,7 +55,7 @@ Expected value = chance of a PASS x reward - model cost - compute cost - attempt
 
 The agent can check the task, the fee and the deadline before spending anything (`web/feed.json`, version 2, lists every
 bounty's terms and the exact next fee), its key can't move funds, and every result links to a transaction (the
-[Ledger](https://skarbnik.xyz/#/ledger)). Growth loop: credible bounties, then more agents, then more proven fixes, then
+[Ledger](https://skarbnik.xyz/#/evidence/ledger)). Growth loop: credible bounties, then more agents, then more proven fixes, then
 more vendor trust, then more bounties.
 
 Honest status: every bounty so far was posted by the team, and every account that took part is run or seeded by the
@@ -130,7 +130,7 @@ judge_bounties_closed_at_writing: 19, 20, 21, 22
 paid_by_proof: 1, 16
 paid_by_timeout: 4, 9, 11, 13, 17 (and 8 on paper only: its transfer failed, finding 8)
 feed_url: https://skarbnik.xyz/feed.json
-ledger_url: https://skarbnik.xyz/#/ledger
+ledger_url: https://skarbnik.xyz/#/evidence/ledger
 agent_quickstart_url: https://skarbnik.xyz/agent-quickstart.txt
 numbers: docs/numbers.md
 receipts: docs/evidence/receipts/README.md
@@ -165,8 +165,9 @@ toolchain. Steps 9 and 10 are optional and need Docker.
    [`GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`](https://testnet.nearblocks.io/txns/GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb),
    35.247 Tgas), then `19 closed`, `20 closed`, `21 closed`, `22 closed`. A bounty another judge opened shows `opened`.
 
-4. **Open the live site.** https://skarbnik.xyz/#/bounties/7 shows "Bounty 7", the state OPEN, "Checked by Level 2" and
-   "Demo input", read live from testnet. https://skarbnik.xyz/#/bounties/17 shows "Paid by timeout" with the claim link.
+4. **Open the live site.** https://skarbnik.xyz/#/bounties/7 shows "Bounty 7: official demo" with the chips "Demo",
+   "Public input" and "Level 2", read live from testnet. https://skarbnik.xyz/#/bounties/17 shows "Timeout settlement"
+   and "Why this is not “Proof verified”", with the claim transaction.
    The same site runs from this clone with `python3 -m http.server 8000 --directory web` and http://localhost:8000/#/bounties/7 .
 
 5. **Open a closed judge bounty with a real proof, from your own account.** Make a testnet account from the faucet, then
@@ -198,7 +199,7 @@ toolchain. Steps 9 and 10 are optional and need Docker.
        curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiIyMyJ9"}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["commits"], b["max_commits"], b["fees_collected"])'
 
    See: `23 3 3 45000000000000000000000` (3 commits counted of a cap of 3, 0.045 NEAR of fees: 0.01, 0.015 and 0.02). Both
-   runs side by side, labelled real and simulated: https://skarbnik.xyz/#/arena (docs/evidence/arena_probe/).
+   runs side by side, labelled real and simulated: https://skarbnik.xyz/#/evidence/lab (docs/evidence/arena_probe/).
 
 8. **Run the contract's tests** (cargo downloads the contract's crates, about 3 minutes the first time). They include the
    two real attempt proofs of bounty 1 from testnet, checked natively.
@@ -266,18 +267,19 @@ Each claim names the file and the command that show it. Full results, failures i
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |
 | Anyone can rebuild the checker and get the published image id | MATCH | step 9 |
 | Level 0: two registered verifiers check a receipt and attest | works on testnet; all verifier accounts are run by the project | `scripts/s4_testnet.sh` (EVIDENCE, S4) |
-| An agent's limited key cannot withdraw, change limits or exceed its fee limit; the operator panel's stop button stops it | works on testnet | `./scripts/web_testnet.sh agentkey`; docs/SECURITY.md, "The site" |
-| A site with live bounties, bounty pages, the arena, how to verify, an operator panel, a page for agents, `feed.json` | live at https://skarbnik.xyz (Vercel, branch ui-preview, no build step), checked in a browser on the live domain | `web/`; docs/evidence/web/live_domain_2026-10-26.txt |
-| Wallets through NEAR Connect, every wallet script pinned by sha256 | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Meteor, Intear, Ledger, MyNearWallet (until it closes on 31 October 2026), Nightly and Ethereum Wallets only loaded | docs/evidence/web/wallets_2026-10-26.txt |
+| An agent's limited key cannot withdraw, change limits or exceed its fee limit; the Account page's stop button stops it | works on testnet | `./scripts/web_testnet.sh agentkey`; docs/SECURITY.md, "The site"; the stop button: EVIDENCE, "Site in the final design" |
+| Agent setup from the site: the limits form, an agent key made in the browser (shown once, never sent) and added by the wallet as a key limited to commit and reveal | works on testnet with the NEAR CLI wallet: the agent then committed and revealed with that key | EVIDENCE, "Site in the final design"; `docs/evidence/web/partd_transactions.tsv` |
+| A site with live bounties, a page for every bounty, how it works, evidence (ledger, checker, contract, security lab, limits), a judge guide, an Account page, a page for agents, `feed.json` | live at https://skarbnik.xyz (Vercel, branch ui-preview, no build step), checked in a browser on the live domain | `web/`; docs/evidence/web/live_domain_2026-10-26.txt |
+| Wallets through NEAR Connect, every wallet script pinned by sha256 | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw, agent limits, adding an agent key, stop); Meteor, Intear, Ledger, MyNearWallet (until it closes on 31 October 2026), Nightly and Ethereum Wallets only loaded | docs/evidence/web/wallets_2026-10-26.txt; EVIDENCE, "Site in the final design" |
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works: recorded run with native verdicts (S8); a real run on testnet where the contract counted 3 of 12 probe commits (at most 3 of 12 bits); the same probe with no cap, simulated only, learned all 12 bits | `scripts/s8_arena.sh`, `scripts/arena_probe.sh` (EVIDENCE, S8 and "Arena: guarded and unguarded"; step 7) |
 | Fees of commits never revealed go to a protocol fee pool, never to the vendor | works on testnet | `get_protocol_pool` (EVIDENCE, S6c) |
-| A Proof Ledger: every paid account, each paid fix with how it was paid (proof or timeout) and its transaction, each vendor's on-time record, distinct counterparties; every account is labelled team-run or seeded (all of them are today) | live, read from the chain | https://skarbnik.xyz/#/ledger, `web/ledger.json` (`node scripts/gen_ledger.mjs`) |
+| A Proof Ledger: every paid account, each paid fix with how it was paid (proof or timeout) and its transaction, each vendor's on-time record, distinct counterparties; every account is labelled team-run or seeded (all of them are today) | live, read from the chain | https://skarbnik.xyz/#/evidence/ledger, `web/ledger.json` (`node scripts/gen_ledger.mjs`) |
 
 ## What is not built
 
 - **Level 1 is not built as a working path.** The contract has entry points for an OutLayer verifier, but OutLayer never
   answered our jobs on testnet (8 of 8 timed out), so no Level 1 verdict exists (EVIDENCE, "OutLayer (Level 1) on testnet").
-- On the site: creating a bounty, setting agent limits from the page.
+- On the site: creating a bounty.
 - A mainnet contract.
 
 ## Known limits
@@ -341,7 +343,7 @@ it is built. Tests without a key: `./scripts/agent_dry_run_test.sh`.
 - **Planned: agent earnings after costs.** Model and compute costs supplied by the agent's operator, shown next to its
   rewards and fees (the Ledger already has the column, empty until an operator supplies costs).
 - OutLayer as a Level 1 verifier, once its testnet answers.
-- On the site: create a bounty, set agent limits from the page.
+- On the site: create a bounty.
 - A "crash proven only" mode, for a vendor who can prove the crash but has no fix yet.
 - Mainnet, with a network switch in the header.
 

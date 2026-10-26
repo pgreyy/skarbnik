@@ -24,14 +24,14 @@ async function rpc(url, method, args) {
   }
 }
 
-// At most 6 view calls in flight at once, so a page that reads every bounty does not trip the RPCs' rate limits.
+// At most 5 view calls in flight at once, so a page that reads every bounty does not trip the RPCs' rate limits.
 let active = 0;
 const queue = [];
-const slot = () => new Promise((res) => { if (active < 6) { active++; res(); } else queue.push(res); });
+const slot = () => new Promise((res) => { if (active < 5) { active++; res(); } else queue.push(res); });
 const free = () => { const next = queue.shift(); if (next) next(); else active--; };
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// One view call, trying the second RPC if the first fails, in up to three rounds a moment apart. Results are kept for
+// One view call, trying the second RPC if the first fails, in up to five rounds (0.8, 1.6, 3.2 and 6.4 s apart). Results are kept for
 // 20 seconds unless opts.fresh is set; the same call already on its way is shared.
 const inflight = new Map();
 export async function view(method, args = {}, opts = {}) {
@@ -43,8 +43,8 @@ export async function view(method, args = {}, opts = {}) {
     await slot();
     try {
       let last;
-      for (let round = 0; round < 3; round++) {
-        if (round) await pause(700 * round);
+      for (let round = 0; round < 5; round++) {
+        if (round) await pause(800 * 2 ** (round - 1));
         for (const url of RPCS) {
           try {
             const v = await rpc(url, method, args);

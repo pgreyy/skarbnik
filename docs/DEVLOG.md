@@ -2,6 +2,36 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: The site in the final design (Panyl), and agent setup from the site (PASTE-12, PASTE-11 part D)
+
+- Rebuilt `web/` in the final design: one theme with a dark (default, film grain) and a light appearance, a header
+  toggle remembered per browser; Unbounded, DM Sans and DM Mono self-hosted; the Vinyl mark in the header, footer and
+  Home hero, and as the favicon, app icons and a 1200x630 social card (`scripts/logo/build.sh`).
+- Pages: Home in seven sections (Console above 700 px, Dock at 700 px and below, deep links #mechanism to #next),
+  How it works (the interactive story, the "who sees what" matrix, bounties 16 and 17 read live), Bounties (every
+  bounty, a status per bounty with the feed's rules in `web/js/status.js`), every bounty page on the Bounty 17 template,
+  Evidence (Ledger with the Proof Ledger, Checker, Contract read live, Security Lab with the guarded and unguarded
+  recording, Limits), Judge guide, For agents, Account. Old routes redirect. Home section 03's bounty is one setting
+  (`home_example_bounty` in `web/site.config.json`). Titles and measured numbers come from `web/data/bounty_meta.json`
+  and `web/data/numbers.json`, each with its source; every status, amount, count and transaction from the chain or
+  `web/data/recorded.json`.
+- Removed: the old theme, logo, the first-visit intro, the number key shortcuts and the Private toggle (not in the final
+  design).
+- Account page (part D): the agent limits form and the stop button, "Create an agent key" (Ed25519 in the browser,
+  shown once, offered as a key file, added by the wallet as a key limited to commit and reveal; the near-cli command
+  if a wallet refuses), and the dry run command.
+- Checks (details and transactions in docs/EVIDENCE.md, "Site in the final design"): every SPEC section 16 value
+  measured; `node scripts/contrast_check.mjs` (rewritten for the new tokens) passes in both modes; 27 keyboard, redirect,
+  motion and toggle checks pass; no broken link; no sideways scroll at 1440, 1280, 1000, 768 and 390 px; no console
+  error. `./scripts/agent_dry_run_test.sh`: 11 passed. Wallet run with the NEAR CLI wallet: deposit, limits, AddKey,
+  agent dry run and live commit and reveal with the browser-made key, page commit and reveal, withdraw, stop.
+- Fixed on the way: the credit dialog blocked the wallet's window; chain reads now go 5 at a time with up to five
+  tries; when the RPC rate-limits (HTTP 429, seen after hundreds of test loads), Bounties and Evidence show the last
+  feed.json and ledger.json snapshots, labelled with their time, instead of an error.
+- `python3 -I scripts/gen_site_recorded.py` (now reads `docs/evidence/web/partd_transactions.tsv`), `python3 -I
+  scripts/gen_feed.py` (4 open of 25 bounties), `node scripts/gen_ledger.mjs` (8 paid fixes).
+- Not run: real phones, Safari, Firefox; AddKey with wallets other than NEAR CLI.
+
 ## 2026-10-26: Per-account cap (Task 5), written and tested, not deployed
 
 - Owner's change of plan: only the per-account cap; the rule that would have sent FAIL fees to the vendor was dropped
