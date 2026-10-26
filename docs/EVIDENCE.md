@@ -22,10 +22,10 @@ in time without heavy work on its own laptop, so the contract pays by proof (not
   `3rBVkucSk1jxirbayxz7GYX1cfurgLAYoRXjiB9HmVhc` (15:11:48 UTC) with its key limited to commit and reveal
   (`agent_run/`).
 - How it was checked that the model could not see the reference fix (the same check as for bounty 17): the fix lives
-  only in a private folder outside the repository. `git log --all -S 'w == 0 || w > n'` finds only `945e738` and
-  `c4d11eb`, both made after the reveal (15:11:52 UTC) and both adding the agent's own output and the evidence. The
+  only in a private folder outside the repository. `git log --all -S 'w == 0 || w > n'` finds only `88818f7` and
+  `7d9bae5`, both made after the reveal (15:11:52 UTC) and both adding the agent's own output and the evidence. The
   private `fixed.rs` is in no commit (`git hash-object`, then `git rev-list --all --objects`: 0 matches); the private
-  `fixed.wasm` matches one blob, the agent's own build `agent_run/fix_24_a1_1.wasm`, first added in `945e738` after the
+  `fixed.wasm` matches one blob, the agent's own build `agent_run/fix_24_a1_1.wasm`, first added in `88818f7` after the
   run (the two are byte for byte equal, sha256 `2138185c...09bb`). The agent's code reads only the feed, the public code
   files and its own records; the model received only the prompt saved in `agent_run/prompt_24_a1.txt`, which contains
   the public `original.rs` byte for byte and not the fixed condition. The fix is one condition (`if w > n` to

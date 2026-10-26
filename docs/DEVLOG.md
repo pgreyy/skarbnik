@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: History cleanup (owner's approval)
+
+- Removed `docs/handoff/` (private handoff notes) from every commit and replaced a local path in one test output
+  (first committed in the per-account cap commit, already fixed forward) with `~`, with `git filter-branch
+  --index-filter` on main and ui-preview. Messages and dates are unchanged; 30 of 114 commits got new hashes (from the
+  commit that first added docs/handoff); main's commits are unchanged. Checks: `git log -- docs/handoff` is empty and
+  `git grep` finds the path in no commit. Files that quoted old hashes now quote the new ones; `docs/handoff/` is ignored
+  from now on.
+
 ## 2026-10-26: Bounty 24 paid by proof (PASTE-10 Task 1)
 
 - The attempt's succinct receipt from the GPU was wrapped to Groth16 on the owner's VPS in Docker (337.73 s, container

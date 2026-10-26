@@ -145,7 +145,6 @@ ledger_url: https://skarbnik.xyz/#/evidence/ledger
 agent_quickstart_url: https://skarbnik.xyz/agent-quickstart.txt
 numbers: docs/numbers.md
 receipts: docs/evidence/receipts/README.md
-handoff: docs/handoff/README.md
 ```
 
 ## Try it
@@ -217,7 +216,7 @@ toolchain. Steps 9 and 10 are optional and need Docker.
 
        cargo test -p kintsugi-contract
 
-   See: `test result: ok. 135 passed; 0 failed` (steps 8 to 10 from a fresh clone at 15b8a8b:
+   See: `test result: ok. 135 passed; 0 failed` (steps 8 to 10 from a fresh clone at 469b288:
    docs/evidence/judge/fresh_clone_2026-10-26b.txt).
 
 9. **Optional: rebuild the checker and compare its image id.** Downloads RISC Zero's guest builder image
@@ -283,7 +282,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | Claim | Status | Shown by |
 | --- | --- | --- |
 | Level 2: the contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt; replayed, changed, late or repeated proofs are refused | works on testnet: one PASS paid, one FAIL spent, nine attacks refused; anyone can open a judge bounty (steps 5 and 6) | `scripts/s6c_testnet.sh`, `scripts/judge_bounties.sh`, `cargo test -p kintsugi-contract` (EVIDENCE, S6c and "Judge bounties") |
-| Proof-checked payouts versus timeout payouts | bounties 1, 16 and 24 were paid by a proof (`submit_groth16` PASS; bounty 24: a private bounty on a new module, tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); bounties 4, 9, 11, 13 and 17 were paid by the timeout rule (a liveness rule, not a verdict), and bounty 8 on paper only (its transfer failed, finding 8), with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `docs/handoff/04-testnet-state.md`; the bounty pages |
+| Proof-checked payouts versus timeout payouts | bounties 1, 16 and 24 were paid by a proof (`submit_groth16` PASS; bounty 24: a private bounty on a new module, tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); bounties 4, 9, 11, 13 and 17 were paid by the timeout rule (a liveness rule, not a verdict), and bounty 8 on paper only (its transfer failed, finding 8), with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `web/data/recorded.json` (`scripts/gen_site_recorded.py`); the bounty pages |
 | An agent driven by a language model (NEAR AI Cloud by default): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, commits and reveals with a limited key | works on testnet: on private bounty 24 (a new program) the model's fix was proven PASS on a rented GPU and paid by proof (tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); on test bounty 16 the model's fix was proven PASS and paid; on private bounty 17 (a new program, secret and reference fix outside the repository) the model's fix was the reference fix byte for byte, but the vendor's proof did not finish inside the verdict window, so it was **paid by timeout, not by a proof** | `agent/skarbnik_agent.py`; EVIDENCE "Bounty 24", "The model-driven agent", "Private bounty 17" |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | 19 of 20 as expected; the one difference (`memory_grow`) is explained | `cargo test -p kintsugi-check`; EVIDENCE, S1 |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |
@@ -371,8 +370,7 @@ it is built. Tests without a key: `./scripts/agent_dry_run_test.sh`.
 
 ## More
 
-- Handoff for a new maintainer: [docs/handoff/README.md](docs/handoff/README.md). How it fits together:
-  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Exact tool versions: [docs/VERSIONS.md](docs/VERSIONS.md).
+- How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Exact tool versions: [docs/VERSIONS.md](docs/VERSIONS.md).
 - Work log: [docs/DEVLOG.md](docs/DEVLOG.md). Decisions: [docs/DECISIONS.md](docs/DECISIONS.md).
 - Third party files and their licences: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 - NEAR parts: a Rust contract (near-sdk 5.29.1, `contract/src/lib.rs`, `contract/src/groth16.rs`); function call keys for

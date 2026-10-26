@@ -1,4 +1,4 @@
-# README steps 8 to 10 run in a fresh clone of github.com/pgreyy/skarbnik, branch ui-preview at 04b0933 (gh repo clone), on the development laptop with the RISC Zero Docker images already cached. Steps 1 to 7 were run as written earlier the same day (docs/EVIDENCE.md, "Judge bounties"; step 7 in "Arena: guarded and unguarded").
+# README steps 8 to 10 run in a fresh clone of github.com/pgreyy/skarbnik, branch ui-preview at 883e690 (gh repo clone), on the development laptop with the RISC Zero Docker images already cached. Steps 1 to 7 were run as written earlier the same day (docs/EVIDENCE.md, "Judge bounties"; step 7 in "Arena: guarded and unguarded").
 == step 8 14:42:02
    Compiling thiserror v2.0.21
    Compiling thiserror-impl v2.0.21

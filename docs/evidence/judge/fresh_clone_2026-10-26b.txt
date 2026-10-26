@@ -1,4 +1,4 @@
-# README steps 8 to 10 run in a fresh clone of github.com/pgreyy/skarbnik, branch ui-preview at 15b8a8b (git clone), on the development laptop with the RISC Zero Docker images already cached. Commands exactly as the README writes them.
+# README steps 8 to 10 run in a fresh clone of github.com/pgreyy/skarbnik, branch ui-preview at 469b288 (git clone), on the development laptop with the RISC Zero Docker images already cached. Commands exactly as the README writes them.
 == step 8 21:34:48
    Compiling thiserror v2.0.21
    Compiling thiserror-impl v2.0.21

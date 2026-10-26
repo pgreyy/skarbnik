@@ -13,7 +13,7 @@
    "team-run": "an account the Skarbnik team runs (vendor, test researchers, the AI agent's account)",
    "seeded": "a throwaway account the team's scripts made from the testnet faucet for one test, or one made not to exist on purpose"
   },
-  "source": "docs/handoff/04-testnet-state.md, Accounts"
+  "source": "docs/EVIDENCE.md and the scripts that made each account (docs/evidence/*/run.env, accounts.env)"
  },
  "paid_fixes": [
   {

@@ -46,3 +46,6 @@ nearai_api_key*
 api_key*.txt
 __pycache__/
 *.pyc
+
+# private handoff notes for a new maintainer (kept outside git; removed from history 2026-10-26)
+docs/handoff/
