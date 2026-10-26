@@ -417,6 +417,15 @@ document.addEventListener('keydown', (e) => {
   if (a) { e.preventDefault(); location.hash = a.getAttribute('href'); }
 });
 
+// The browser tab title of each route, set as soon as the route changes.
+const HOME_TITLE = 'Skarbnik · Fix what you can’t see';
+function titleFor(page, rest) {
+  if (!page) return HOME_TITLE;
+  if (page === 'bounties' && /^\d+$/.test(rest[0] || '')) return `Bounty ${rest[0]} · Skarbnik`;
+  if (page === 'raw' && /^\d+$/.test(rest[0] || '')) return `Bounty ${rest[0]} raw data · Skarbnik`;
+  return ({ bounties: 'Bounties', arena: 'Arena', verify: 'How to verify', agents: 'For agents', account: 'Account' }[page] || 'Not found') + ' · Skarbnik';
+}
+
 // Each route gets a number; a screen that finishes after the visitor has moved on must not touch the new page.
 let routeGen = 0;
 async function route() {
@@ -424,6 +433,7 @@ async function route() {
   const main = $('#main'), h = location.hash.replace(/^#\/?/, '').split('?')[0];
   if (h === 'agent' || h.startsWith('agent/')) { location.replace('#/account'); return null; }
   const [page, ...rest] = h.split('/'), id = rest.join('/');
+  document.title = titleFor(page, rest);
   document.querySelectorAll('[data-nav]').forEach((a) => a.toggleAttribute('aria-current', false));
   const navEl = document.querySelector(`[data-nav="${page === 'raw' ? 'bounties' : page}"]`); if (navEl) navEl.setAttribute('aria-current', 'page');
   try {
@@ -435,13 +445,13 @@ async function route() {
     else if (page === 'arena') await arena(main, rest[0]);
     else if (page === 'verify') await verify(main);
     else if (page === 'agents') await agents(main);
-    else main.innerHTML = '<h1 class="m-h1" tabindex="-1">Page not found</h1><p class="m-lead"><a href="#/">Go to the home page</a></p>';
+    else main.innerHTML = '<h1 class="m-h1" tabindex="-1">Not found</h1><p class="m-lead"><a href="#/">Go to the home page</a></p>';
   } catch (e) {
     if (my !== routeGen) return null;
+    document.title = 'Something went wrong · Skarbnik';
     main.innerHTML = `<h1 class="m-h1" tabindex="-1">Something went wrong</h1><div class="k-state" role="alert"><p class="k-err">This page could not be shown.</p><p class="m-note">${esc(e.message)}</p></div>`; }
   if (my !== routeGen) return null;
   const h1 = main.querySelector('h1');
-  document.title = `${h1 ? h1.textContent : NAME} · ${NAME} (testnet)`;
   $('#live').textContent = `${h1 ? h1.textContent : ''} screen`;
   window.scrollTo(0, 0);
   return h1;
