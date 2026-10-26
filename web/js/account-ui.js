@@ -142,6 +142,9 @@ async function drawCredit() {
   if (go) go.onclick = async () => {
     const dep = v.mode === 'deposit';
     creditView = { ...v, phase: 'wait' }; await drawCredit();
+    // The wallet opens its own window over the page; a modal dialog would make it unclickable, so the dialog steps
+    // aside while the wallet is open and comes back with the result.
+    d.close();
     try {
       const out = W.readOutcome(dep ? await W.call('deposit_credit', { account_id: null }, v.yocto, 30) : await W.call('withdraw_credit', { amount: v.yocto }, '1', 30));
       await refreshCredit();
@@ -149,6 +152,7 @@ async function drawCredit() {
         : { ...v, phase: 'failed', tx: out.tx, msg: out.error };
     } catch (e) { creditView = { ...v, phase: 'failed', msg: W.plainError(e) }; }
     await drawCredit();
+    if (!d.open) d.showModal();
   };
 }
 
@@ -192,6 +196,8 @@ export function attemptPanel(el, b, subs, verifiers) {
     let body;
     if (closed) {
       body = `<p class="small">${chip('k-refund', 'No new attempts')} This bounty does not take new attempts now.</p>`;
+    } else if (slotsLeft === 0) {
+      body = `<p class="small">${chip('k-refund', 'All slots in use')} Every attempt slot of this bounty is taken. A slot comes back when an unrevealed commit is released.</p>`;
     } else if (s.status !== 'on') {
       body = s.status === 'wrongnet' ? '<p class="msg bad" role="alert">This wallet account is not on testnet. Attempts are testnet only.</p>'
         : `<div><button class="btn btn-p" type="button" id="connSubmit">${icon('wallet')} Connect to submit</button></div>`;
@@ -259,6 +265,7 @@ export function attemptPanel(el, b, subs, verifiers) {
           if (!stored) downloadRecord(recd);
         }
       } catch (e) { dropAttempt(recd); say(`Wallet rejected or failed: ${esc(W.plainError(e))} Nothing was taken.`, 'bad'); }
+      try { Object.assign(b, await view('get_bounty', { bounty_id: String(b.id) }, { fresh: true })); } catch { /* the counts refresh on reload */ }
       busy = false; await refreshCredit(); await draw();
     });
   }

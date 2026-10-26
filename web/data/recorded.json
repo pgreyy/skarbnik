@@ -878,6 +878,46 @@
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "partd_commit_agent_key",
+    "method": "commit",
+    "tx": "9bZygCGt2syghtoa6vvE8bAh7i5GThGqHSYnG9mMCJbD",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/web/partd_transactions.tsv",
+    "script": "the site's Account and bounty pages, NEAR CLI wallet; agent/skarbnik_agent.py"
+   },
+   {
+    "step": "partd_reveal_agent_key",
+    "method": "reveal",
+    "tx": "D3brEnjyXFWqUgHnawhPjEAg4m79iLQAtyW2G3B2wVft",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/web/partd_transactions.tsv",
+    "script": "the site's Account and bounty pages, NEAR CLI wallet; agent/skarbnik_agent.py"
+   },
+   {
+    "step": "partd_commit_page",
+    "method": "commit",
+    "tx": "EJ5ZnZ7N5xRERvM4KSvK1Uo7eR4TNePVouTA8xrNEcm",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/web/partd_transactions.tsv",
+    "script": "the site's Account and bounty pages, NEAR CLI wallet; agent/skarbnik_agent.py"
+   },
+   {
+    "step": "partd_reveal_page",
+    "method": "reveal",
+    "tx": "FsCsxB3i91nZQpvVheXnN8BjFFStSKK1MKtcyptBEmkg",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/web/partd_transactions.tsv",
+    "script": "the site's Account and bounty pages, NEAR CLI wallet; agent/skarbnik_agent.py"
    }
   ],
   "15": [
@@ -1308,6 +1348,48 @@
     "script": "scripts/arena_probe.sh"
    }
   ],
+  "24": [
+   {
+    "step": "smooth_bounty_create",
+    "method": "create_bounty",
+    "tx": "9A1KAHxA8ExaDKzxp2UnQS16gQQM4Zx4NcFTwn9WXFZU",
+    "what": "Bounty created",
+    "time": "2026-10-26 14:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/smooth/transactions.tsv",
+    "script": "scripts/private_bounty.sh, agent/skarbnik_agent.py"
+   },
+   {
+    "step": "smooth_bounty_open",
+    "method": "open_with_groth16",
+    "tx": "AE3GWBF45ghMqwGKnaCr3AbAMJ6aYgXu1a1Tf86CJV1g",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 14:40 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/smooth/transactions.tsv",
+    "script": "scripts/private_bounty.sh, agent/skarbnik_agent.py"
+   },
+   {
+    "step": "smooth_live_commit",
+    "method": "commit",
+    "tx": "4G48c6waZdz7Qc3maVdXsXx9u3kwzfDWbXhW2toszvkG",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/smooth/transactions.tsv",
+    "script": "scripts/private_bounty.sh, agent/skarbnik_agent.py"
+   },
+   {
+    "step": "smooth_live_reveal",
+    "method": "reveal",
+    "tx": "3rBVkucSk1jxirbayxz7GYX1cfurgLAYoRXjiB9HmVhc",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/smooth/transactions.tsv",
+    "script": "scripts/private_bounty.sh, agent/skarbnik_agent.py"
+   }
+  ],
   "8": [
    {
     "step": "audit8_claim_timeout",
@@ -1533,10 +1615,12 @@
   "source": "docs/evidence/judge/check_image_id_home.txt"
  },
  "new_module_bounties": {
-  "17": "Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/unpack/) is new, with no hint at its bug."
+  "17": "Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/unpack/) is new, with no hint at its bug.",
+  "24": "Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/smooth/) is new, with no hint at its bug."
  },
  "new_module_programs": {
-  "17": "data/unpack/"
+  "17": "data/unpack/",
+  "24": "data/smooth/"
  },
  "judge_bounties": {
   "18": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",

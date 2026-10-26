@@ -1,0 +1,13 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+partd_create_account	create-account	faucet	267zapHvrAAweGAd5DeG9LAtiDu6jgB86t1SpXoWyKKG	-	-	0	-
+partd_deposit_cli_only	deposit_credit	skarbnik-partd-461f99.testnet	cF9UWjJPTCjjXhSJa4351tq9ztEHCanof54nRew4boJ	-	-	0	-
+partd_deposit_page_1	deposit_credit	skarbnik-partd-461f99.testnet	4EbktNsqF2gMrHkeyDj5cSFLePmst5sZjwPxbjDUPJqR	-	-	0	-
+partd_deposit_page_2	deposit_credit	skarbnik-partd-461f99.testnet	Eq7RSBLjXrNAPcgLr3gfJ928YWhF5Sp7kbGucyizRUE6	-	-	0	-
+partd_set_limits_page	set_agent_limits	skarbnik-partd-461f99.testnet	7mdPgmt7WMay7YUwyKjmvuiaAkHCNtyvjYCDBurK3PpS	-	-	0	-
+partd_add_key_page	add-key	skarbnik-partd-461f99.testnet	SKg8rB4RE7QWW2cjZ1jsQ3TKbVtBWmNkbBJwrKuPPCU	-	-	0	-
+partd_commit_agent_key	commit	limited key of skarbnik-partd-461f99.testnet (made in the browser)	9bZygCGt2syghtoa6vvE8bAh7i5GThGqHSYnG9mMCJbD	-	-	agent:ok	-
+partd_reveal_agent_key	reveal	limited key of skarbnik-partd-461f99.testnet (made in the browser)	D3brEnjyXFWqUgHnawhPjEAg4m79iLQAtyW2G3B2wVft	-	-	agent:ok	-
+partd_commit_page	commit	skarbnik-partd-461f99.testnet	EJ5ZnZ7N5xRERvM4KSvK1Uo7eR4TNePVouTA8xrNEcm	-	-	0	-
+partd_reveal_page	reveal	skarbnik-partd-461f99.testnet	FsCsxB3i91nZQpvVheXnN8BjFFStSKK1MKtcyptBEmkg	-	-	0	-
+partd_withdraw_page	withdraw_credit	skarbnik-partd-461f99.testnet	EMbijXQLsX1fdz2cWfTUaYJzHnVubH7tqsUCXzPjXgyM	-	-	0	-
+partd_stop_page	set_agent_limits	skarbnik-partd-461f99.testnet	6qHvX9iEPzp8Lz7BoHLihi1mZ3drtFfQdoXNVXRnZgx4	-	-	0	-

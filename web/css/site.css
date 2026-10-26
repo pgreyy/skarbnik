@@ -189,3 +189,6 @@ body.sk>main{flex:1 0 auto}
 .sk .g48{gap:48px}
 .sk .tx{white-space:nowrap}
 .sk .tbl.xl{min-width:1100px}
+.sk .nl{white-space:nowrap}
+@container sk (max-width:1320px){.sk .nav-cta .credit-chip{display:none}.sk .nav-links{gap:22px}}
+.sk .g32{gap:32px}

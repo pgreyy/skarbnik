@@ -78,6 +78,9 @@ BOUNTY_STEPS = [
                                                                       7: ["web_commit_no_credit"], 14: ["user_bounty_"], 15: ["cli_", "agentkey_commit", "agentkey_reveal"]}),
     ("docs/evidence/agent/transactions.tsv", "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py",
      {16: ["agent_bounty_", "agent_live_", "agent_submit_groth16_"], 17: ["unpack_bounty_", "unpack_live_", "unpack_submit_groth16_", "unpack_claim_timeout_"]}),
+    # Agent setup from the site (PASTE-11 part D, run through the page with the NEAR CLI wallet): its attempts on test bounty 14
+    ("docs/evidence/web/partd_transactions.tsv", "the site's Account and bounty pages, NEAR CLI wallet; agent/skarbnik_agent.py",
+     {14: ["partd_commit_", "partd_reveal_"]}),
 ]
 # Judge bounties (scripts/judge_bounties.sh): same hashes as bounty 17, created closed, opened by anyone with its Proof 0.
 _jenv = os.path.join(ROOT, "docs/evidence/judge/run.env")

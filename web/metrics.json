@@ -1,5 +1,5 @@
 {
- "made_at": "2026-10-26T14:15:23Z",
+ "made_at": "2026-10-26T18:44:52Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Computed from the chain only (every bounty and attempt), with the proving machine from web/data/provers.json. Same rules as the Ledger page.",
@@ -21,6 +21,6 @@
   }
  },
  "timing_note": "by proof: from the reveal to the proof accepted on chain; by timeout: from the reveal to the verdict deadline (the claim came later).",
- "distinct_outside_accounts": 0,
+ "distinct_outside_accounts": 1,
  "outside_note": "accounts not on the team list (web/data/accounts.json) among vendors, committers and payout accounts"
 }
