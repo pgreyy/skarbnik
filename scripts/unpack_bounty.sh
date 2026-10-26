@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # A private bounty on a new original module (data/unpack/, a packed byte decoder): its secret crashing input and the
 # vendor's reference fix are NOT in the repository; they live in ~/.kintsugi-salts/unpack/ (folder mode 700, files
-# mode 600) and are never printed. The commitment uses a private random salt (`kintsugi-host --bounty unpack`).
+# mode 600) and are never printed. The commitment uses a private random salt (`skarbnik-host --bounty unpack`).
 # Phases, in order (one proving job at a time; Groth16 memory watched):
 #   check     native checks: the secret crashes the original, the original passes its public tests, the reference
 #             fix passes the full check (secret, public tests, fairness inputs, variants) for several seeds
@@ -16,7 +16,7 @@ cd "$(dirname "$0")/.."
 OUTDIR=docs/evidence/agent; mkdir -p "$OUTDIR/steps" target/unpack
 export OUT="$OUTDIR" CONTRACT=kintsugi-l2-cihdp.testnet
 source scripts/s3_lib.sh; source docs/evidence/S3b/accounts.env
-SEC=1000000000; HOST=./target/release/kintsugi-host; W=target/unpack
+SEC=1000000000; HOST=./target/release/skarbnik-host; W=target/unpack
 VDIR="$HOME/.kintsugi-salts/unpack"; SECRET="$VDIR/exploit.hex"; FIX="$VDIR/fixed.wasm"
 ORIG=data/unpack/original.wasm; TESTS=data/unpack/public_tests.txt
 [ -f "$SECRET" ] && [ "$(stat -c %a "$SECRET")" = 600 ] && [ "$(stat -c %a "$VDIR")" = 700 ] \

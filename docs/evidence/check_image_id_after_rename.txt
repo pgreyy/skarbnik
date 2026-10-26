@@ -1,0 +1,8 @@
+$ ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 17   (after the Skarbnik rename: host package, checker tool name, scripts)
+2026-10-26T07:54:09Z
+rebuilt checker image id:   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+published checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+image id of bounty 17 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+MATCH
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:19.64
+exit=0

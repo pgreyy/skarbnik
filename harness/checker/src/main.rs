@@ -31,7 +31,7 @@ use std::process::ExitCode;
 use std::time::Instant;
 
 fn usage() -> ExitCode {
-    eprintln!("usage: kintsugi-check <check|proof0|run|table> [options]; see src/main.rs for the list");
+    eprintln!("usage: skarbnik-check <check|proof0|run|table> [options]; see src/main.rs for the list");
     ExitCode::from(2)
 }
 

@@ -1,0 +1,146 @@
+# Live checks on https://skarbnik.xyz, 2026-10-26 (headless Chromium, fresh profile per check; target/site-check/live_domain_run.sh)
+== livecheck
+== ?intro=0#/
+brand: Skarbnik | title: Skarbnik · Fix what you can’t see
+h1: Fix what you can’t see.
+text: Fix what you can’t see. Researchers and AI agents fix a crash from the public code. The contract checks the proof itself and pays when it holds. agents fix the public code → the crashing input stays sealed → proof ✓ the contract pays [ LIST BOUNTIES ] [ OPERATOR PANEL ] 01 Funded Vendor locks the reward and proves the crash. 02 Attempt Commit a fix, then reveal it. 03 Proof Tested on the secret, checked on chain. 04 
+== ?intro=0#/bounties/7
+brand: Skarbnik | title: Bounty 7 · Skarbnik
+h1: Bounty 7
+text: ← All bounties Bounty 7 OPEN DEMO INPUT LEVEL 2 Contract Raw data Send an attempt 1 Commit 2 Reveal 3 Vendor’s proof Commit locks a sealed fingerprint of your fix. Reveal sends the fix itself so it can be tested. Reveal within 1 hour of your commit. After you reveal, the vendor has 4 hours to prove the result. CONNECT TO SUBMIT Secret input This demo bounty uses the public demo input (data/demo/exploit.hex), so anyon
+hosts contacted: fonts.googleapis.com, fonts.gstatic.com, skarbnik.xyz, test.rpc.fastnear.com
+errors: none
+exit=0
+
+== titles
+og:title: Skarbnik · Fix what you can’t see
+#/                                         "Skarbnik · Fix what you can’t see"  note: false
+#/bounties                                 "Bounties · Skarbnik"  note: false
+#/bounties/17                              "Bounty 17 · Skarbnik"  note: false
+#/bounties/14/proof                        "Bounty 14 · Skarbnik"  note: false
+#/raw/7                                    "Bounty 7 raw data · Skarbnik"  note: true
+#/arena                                    "Arena · Skarbnik"  note: false
+#/verify                                   "How to verify · Skarbnik"  note: true
+#/agents                                   "For agents · Skarbnik"  note: true
+#/account                                  "Account · Skarbnik"  note: false
+#/account/kintsugi-agent-d9410f.testnet    "Account · Skarbnik"  note: true
+#/nowhere                                  "Not found · Skarbnik"  note: false
+exit=0
+
+== walkall
+1280 dark #/                                       fits  theme=dark  h1="Fix what you can’t see."  errors=none
+1280 dark #/bounties                               fits  theme=dark  h1="Bounties"  errors=none
+1280 dark #/bounties/17                            fits  theme=dark  h1="Bounty 17"  errors=none
+1280 dark #/bounties/16/attempts                   fits  theme=dark  h1="Bounty 16"  errors=none
+1280 dark #/bounties/12/proof                      fits  theme=dark  h1="Bounty 12"  errors=none
+1280 dark #/raw/7                                  fits  theme=dark  h1="Bounty 7: raw data"  errors=none
+1280 dark #/arena                                  fits  theme=dark  h1="Arena: how much can repeated attempts le"  errors=none
+1280 dark #/verify                                 fits  theme=dark  h1="How to verify"  errors=none
+1280 dark #/agents                                 fits  theme=dark  h1="For agents"  errors=none
+1280 dark #/account                                fits  theme=dark  h1="Operator panel"  errors=none
+1280 dark #/account/kintsugi-agent-d9410f.testnet  fits  theme=dark  h1="kintsugi-agent-d9410f.testnet"  errors=none
+1280 light #/                                       fits  theme=light  h1="Fix what you can’t see."  errors=none
+1280 light #/bounties                               fits  theme=light  h1="Bounties"  errors=none
+1280 light #/bounties/17                            fits  theme=light  h1="Bounty 17"  errors=none
+1280 light #/bounties/16/attempts                   fits  theme=light  h1="Bounty 16"  errors=none
+1280 light #/bounties/12/proof                      fits  theme=light  h1="Bounty 12"  errors=none
+1280 light #/raw/7                                  fits  theme=light  h1="Bounty 7: raw data"  errors=none
+1280 light #/arena                                  fits  theme=light  h1="Arena: how much can repeated attempts le"  errors=none
+1280 light #/verify                                 fits  theme=light  h1="How to verify"  errors=none
+1280 light #/agents                                 fits  theme=light  h1="For agents"  errors=none
+1280 light #/account                                fits  theme=light  h1="Operator panel"  errors=none
+1280 light #/account/kintsugi-agent-d9410f.testnet  fits  theme=light  h1="kintsugi-agent-d9410f.testnet"  errors=none
+390 dark #/                                       fits  theme=dark  h1="Fix what you can’t see."  errors=none
+390 dark #/bounties                               fits  theme=dark  h1="Bounties"  errors=none
+390 dark #/bounties/17                            fits  theme=dark  h1="Bounty 17"  errors=none
+390 dark #/bounties/16/attempts                   fits  theme=dark  h1="Bounty 16"  errors=none
+390 dark #/bounties/12/proof                      fits  theme=dark  h1="Bounty 12"  errors=none
+390 dark #/raw/7                                  fits  theme=dark  h1="Bounty 7: raw data"  errors=none
+390 dark #/arena                                  fits  theme=dark  h1="Arena: how much can repeated attempts le"  errors=none
+390 dark #/verify                                 fits  theme=dark  h1="How to verify"  errors=none
+390 dark #/agents                                 fits  theme=dark  h1="For agents"  errors=none
+390 dark #/account                                fits  theme=dark  h1="Operator panel"  errors=none
+390 dark #/account/kintsugi-agent-d9410f.testnet  fits  theme=dark  h1="kintsugi-agent-d9410f.testnet"  errors=none
+390 light #/                                       fits  theme=light  h1="Fix what you can’t see."  errors=none
+390 light #/bounties                               fits  theme=light  h1="Bounties"  errors=none
+390 light #/bounties/17                            fits  theme=light  h1="Bounty 17"  errors=none
+390 light #/bounties/16/attempts                   fits  theme=light  h1="Bounty 16"  errors=none
+390 light #/bounties/12/proof                      fits  theme=light  h1="Bounty 12"  errors=none
+390 light #/raw/7                                  fits  theme=light  h1="Bounty 7: raw data"  errors=none
+390 light #/arena                                  fits  theme=light  h1="Arena: how much can repeated attempts le"  errors=none
+390 light #/verify                                 fits  theme=light  h1="How to verify"  errors=none
+390 light #/agents                                 fits  theme=light  h1="For agents"  errors=none
+390 light #/account                                fits  theme=light  h1="Operator panel"  errors=none
+390 light #/account/kintsugi-agent-d9410f.testnet  fits  theme=light  h1="kintsugi-agent-d9410f.testnet"  errors=none
+exit=0
+
+== icons
+links:
+  icon /favicon.svg?v=s12
+  icon /favicon-48.png?v=s12
+  icon /favicon-32.png?v=s12
+  icon /favicon-16.png?v=s12
+  shortcut icon /favicon.ico?v=s12
+  apple-touch-icon /apple-touch-icon.png?v=s12
+  manifest /site.webmanifest?v=s12
+manifest icons: icon-192.png?v=s12 192x192, icon-512.png?v=s12 512x512, favicon.svg?v=s12 any | manifest errors: 0
+loaded in the page:
+  loaded 64px /favicon.svg?v=s12
+  loaded 48px /favicon-48.png?v=s12
+  loaded 32px /favicon-32.png?v=s12
+  loaded 16px /favicon-16.png?v=s12
+  loaded 48px /favicon.ico?v=s12
+  loaded 180px /apple-touch-icon.png?v=s12
+  loaded 192px /icon-192.png?v=s12
+  loaded 512px /icon-512.png?v=s12
+  loaded 64px /favicon.svg?v=s12
+exit=0
+
+== intro
+playing: {"introHidden":false,"appInert":true,"focus":"Skip intro →"}
+after Escape: {"introHidden":true,"appInert":false,"focus":"H1 Fix what you can’t see."}
+reload, same session: {"introHidden":true}
+exit=0
+
+== wallets
+listed on testnet: Closes (UTC) | Select wallet | Meteor Wallet | meteorwallet.app | Intear Wallet | Ledger | ledger.com | MyNearWallet · closes 31 Oct | mynearwallet.com | Nightly Wallet | nightly.app | Ethereum Wallets | NEAR CLI
+== NEAR CLI
+   script: 304 https://skarbnik.xyz/js/app.js, 304 https://skarbnik.xyz/js/chain.js, 304 https://skarbnik.xyz/js/intro.js, 304 https://skarbnik.xyz/js/logo.js, 304 https://skarbnik.xyz/js/account-ui.js, 304 https://skarbnik.xyz/js/ui.js, 304 https://skarbnik.xyz/js/config.js, 304 https://skarbnik.xyz/js/wallet.js, 304 https://skarbnik.xyz/js/attempt.js, 304 https://skarbnik.xyz/vendor/near-connect.js, 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767
+   wallet frame: STEP 1 OF 2 Connect with NEAR CLI Enter your NEAR account ID Next
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+exit=0
+
+== connect
+header now: CONNECTING…
+localStorage keys: []
+exit=0
+
+== social preview and redirects
+<link rel="canonical" href="https://skarbnik.xyz/">
+<meta property="og:url" content="https://skarbnik.xyz/">
+<meta property="og:title" content="Skarbnik · Fix what you can’t see">
+<meta property="og:description" content="Fix what you can’t see. Bounties for bugs that only crash on a secret input, on NEAR testnet.">
+<meta property="og:image" content="https://skarbnik.xyz/social.png?v=s12">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta name="twitter:card" content="summary">
+social.png 200 image/png 21326 bytes
+https://www.skarbnik.xyz/ -> 308 https://skarbnik.xyz/
+https://skarbnik-near.vercel.app/ -> 307 https://skarbnik.xyz/
+http://skarbnik.xyz/ -> 308 https://skarbnik.xyz/
+favicon.ico 200 image/vnd.microsoft.icon
+favicon.svg 200 image/svg+xml
+favicon-16.png 200 image/png
+favicon-32.png 200 image/png
+favicon-48.png 200 image/png
+apple-touch-icon.png 200 image/png
+site.webmanifest 200 application/manifest+json; charset=utf-8
+icon-192.png 200 image/png
+icon-512.png 200 image/png
+feed.json 200 application/json; charset=utf-8
+agent-quickstart.txt 200 text/plain; charset=utf-8
+sitemap.xml 200 application/xml
+robots.txt 200 text/plain; charset=utf-8
+

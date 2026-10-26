@@ -2,6 +2,22 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Rename finished; checker image id unchanged; skarbnik.xyz live
+
+- The scripts that waited for the bounty 17 proof now call `skarbnik-host` (`scripts/unpack_bounty.sh`,
+  `scripts/s2_measure.sh`); the checker tool's usage line says `skarbnik-check`. Old logs and the contract's test files
+  keep the old name (records).
+- `cargo build --release -p skarbnik-host`: 3 min 12 s, exit 0; `./target/release/skarbnik-host verify
+  target/unpack/u0.bin`: VALID, PASS. `cargo build -p kintsugi-check` (the For agents command) builds
+  `target/debug/skarbnik-check`; the temporary link with that name was removed first.
+- `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 17`: rebuilt, published and on-chain image id all
+  `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`, MATCH (`docs/evidence/check_image_id_after_rename.txt`).
+  The home page shows "Check the checker yourself" again.
+- skarbnik.xyz answers from Vercel; www.skarbnik.xyz and http redirect to it (308), skarbnik-near.vercel.app redirects
+  to it (307). Checks on the live domain (headless browser scripts in the ignored target/ folder; output in the evidence file): 44 page views fit with no script
+  errors, tab titles, every icon loads, the intro plays once and Escape skips it, the wallet list and the NEAR CLI
+  wallet's form, the social preview tags and image (`docs/evidence/web/live_domain_2026-10-26.txt`).
+
 ## 2026-10-26: More wallets; JS near CLI commands; bounty 17 evidence proof
 
 - Wallets: `./scripts/wallet-vendor/fetch_wallets.sh` now takes all 14 wallets of NEAR Connect's list (hot-dao/near-selector

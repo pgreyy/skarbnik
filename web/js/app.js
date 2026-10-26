@@ -40,7 +40,7 @@ const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class
 // The same step with the older JavaScript near CLI (npm package near-cli 4.0.13), which NEAR Connect does not support.
 const jsCmd = (...lines) => `<p class="m-sub">With the older JS near CLI:</p>${lines.map(cmd).join('')}`;
 // The home page shows the check command only after ./scripts/check_image_id.sh (no arguments) was run and printed MATCH.
-const SHOW_CHECK_CMD = false;
+const SHOW_CHECK_CMD = true;
 // A real commit fingerprint (bounty 16, attempt 0, read from the chain), shown blurred on the home page.
 const LOCK = '<svg class="k-lock" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 const SAMPLE_FINGERPRINT = 'd8c2c76d001ff41c192daddf542d39dd2fe3dbe045d987145340f4aa1ae842dd';

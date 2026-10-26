@@ -2774,20 +2774,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "skarbnik-host"
-version = "0.1.0"
-dependencies = [
- "bincode",
- "kintsugi-check",
- "kintsugi-harness",
- "risc0-circuit-keccak",
- "risc0-circuit-recursion",
- "risc0-circuit-rv32im",
- "risc0-zkp",
- "risc0-zkvm",
-]
-
-[[package]]
 name = "konst"
 version = "0.2.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5244,6 +5230,20 @@ name = "simdutf8"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
+
+[[package]]
+name = "skarbnik-host"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "kintsugi-check",
+ "kintsugi-harness",
+ "risc0-circuit-keccak",
+ "risc0-circuit-recursion",
+ "risc0-circuit-rv32im",
+ "risc0-zkp",
+ "risc0-zkvm",
+]
 
 [[package]]
 name = "slab"
