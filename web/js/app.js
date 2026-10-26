@@ -1,11 +1,11 @@
-// The Skarbnik site app: routes (#/, #/bounties, #/bounties/<id>, #/raw/<id>, #/account/<name>, #/arena, #/verify), the
-// theme switcher, the mobile menu, and the screens. Live screens read the testnet contract with view calls
-// (js/chain.js); recorded parts read data/recorded.json, which scripts/gen_site_recorded.py builds from files in the
-// repository. No sample data.
-import { CONTRACT, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, allBounties, submissions, near, utc, span, left, commitBy, nsToDate } from './chain.js';
+// The Skarbnik site app: routes (#/, #/bounties, #/bounties/<id>, #/raw/<id>, #/account/<name>, #/arena, #/verify,
+// #/agents), the verify strip, keyboard shortcuts (1 to 4, ?, Esc), the theme switch (Dark by default), the Private
+// toggle, and the screens. Live screens read the testnet contract with view calls (js/chain.js); recorded parts read
+// data/recorded.json, which scripts/gen_site_recorded.py builds from files in the repository. No sample data.
+import { CONTRACT, EXPLORER_ACCOUNT, EXPLORER_TX, PUBLISHED_IMAGE_ID, view, allBounties, submissions, near, utc, span, left, commitBy, nsToDate } from './chain.js';
 import { logo, NAME } from './logo.js';
 import { startIntro, introWanted } from './intro.js';
-import { $, esc, badge, tx, acct, hashCell, table, facts, initUi, tabbed } from './ui.js';
+import { $, esc, badge, tx, acct, hashCell, table, facts, sealed, viewLink, shortId, initUi, tabbed } from './ui.js';
 import { initAccountUi, attemptPanel, accountPage } from './account-ui.js';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -20,11 +20,21 @@ const newModule = (b) => recorded && recorded.new_module_bounties && recorded.ne
 const inputLabel = (b) => (newModule(b) ? 'Private bounty, new module' : isDemo(b) ? 'Demo input' : 'Private secret input');
 const testNote = (b) => recorded && recorded.test_bounties && recorded.test_bounties[String(b.id)];
 const bountyLinks = (b) => `<span class="k-links"><a href="${EXPLORER_ACCOUNT}${CONTRACT}" rel="noopener" target="_blank">Contract</a><a href="#/raw/${esc(b.id)}">Raw data</a></span>`;
+const typeText = (b) => inputLabel(b) + (testNote(b) ? ' · Test bounty' : '');
+// The explorer target of a bounty: its creation transaction when the repository records it, otherwise the contract.
+function explorerOf(b) {
+  const c = recorded && (recorded.bounties[String(b.id)] || []).find((t) => /create/.test(t.step) && t.method === 'create_bounty');
+  return c ? [EXPLORER_TX + c.tx, `Bounty ${b.id} creation transaction`] : [EXPLORER_ACCOUNT + CONTRACT, `The contract ${CONTRACT}`];
+}
+const closesText = (b) => { const cl = left(commitBy(b)); return b.state !== 'Open' ? 'Closed' : cl ? `in ${cl.replace(' left', '')}` : `expires ${utc(b.expires_at_ns)}`; };
+const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class="k-mini" type="button" data-copy-text="${esc(text)}">Copy</button></div>`;
+// A real commit fingerprint (bounty 16, attempt 0, read from the chain), shown blurred on the home page.
+const SAMPLE_FINGERPRINT = 'd8c2c76d001ff41c192daddf542d39dd2fe3dbe045d987145340f4aa1ae842dd';
 const failBox = (e) => `<div class="k-state" role="alert"><p class="k-err">Could not read the contract on testnet.</p><p class="m-note">${esc(e.message)}. Check your connection and reload.</p></div>`;
 
 function bountyState(b, now = Date.now()) {
   if (b.state === 'Paid') return { key: 'closed', v: 'ok', t: '✓ PAID' };
-  if (b.state === 'Refunded') return { key: 'closed', v: 'bad', t: '✕ REFUNDED' };
+  if (b.state === 'Refunded') return { key: 'closed', v: 'info', t: 'REFUNDED' };
   if (!b.opened) return { key: 'other', v: 'wait', t: '… WAITING FOR PROOF 0' };
   if (nsToDate(b.expires_at_ns).getTime() <= now) return { key: 'other', v: 'wait', t: 'PAST EXPIRY, NOT CLOSED' };
   if (nsToDate(commitBy(b)).getTime() <= now) return { key: 'other', v: 'info', t: 'NO NEW ATTEMPTS' };
@@ -35,8 +45,8 @@ function bountyState(b, now = Date.now()) {
 const HOURGLASS = '<svg width="16" height="18" viewBox="0 0 16 18" aria-hidden="true"><path d="M2 1h12M2 17h12M3 1c0 5 10 5 10 8s-10 3-10 8M13 1c0 5-10 5-10 8s10 3 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 // The state of one attempt, as the chain gives it.
 function subState(b, s) {
-  if (s.outcome === 'Passed') return { c: 'pass', g: '✓', t: 'PASS', v: 'ok' };
-  if (s.outcome === 'Failed') return { c: 'fail', g: '✕', t: 'FAIL', v: 'bad' };
+  if (s.outcome === 'Passed') return { c: 'pass', g: '✓', t: '✓ PASSED', v: 'ok' };
+  if (s.outcome === 'Failed') return { c: 'fail', g: '✕', t: '✕ FAILED', v: 'bad' };
   if (s.outcome === 'TimedOut') return { c: 'time', g: HOURGLASS, t: 'TIMEOUT', v: 'info' };
   if (s.outcome === 'Released') return { c: '', g: '·', t: 'RELEASED', v: 'info' };
   if (s.revealed_at_ns) return b.state !== 'Open' ? { c: 'com', g: '?', t: 'UNDECIDED', v: 'info' } : { c: 'wait', g: '…', t: 'WAITING', v: 'wait' };
@@ -65,53 +75,52 @@ const txTable = (list) => table(['What happened', 'Result', 'Transaction', 'Time
 async function home(main) {
   main.innerHTML = `
   <section class="m-hero">
-    <div>
-      <p class="m-eye">Bounties for bugs that only crash on a secret input</p>
-      <h1 class="m-h1 xl" tabindex="-1">Fix what you can’t see.</h1>
-      <p class="m-lead">Researchers and AI agents fix a crash from the public code; the contract checks a Groth16 proof of the RISC Zero result itself and pays by rule.</p>
-      <div class="m-cta"><a class="m-btn" href="#/bounties">Browse bounties</a><a class="m-btn sec" href="#/verify">How to verify</a></div>
-    </div>
-    <div class="m-panel m-hcard" aria-label="Bounty 12" id="heroCard"><p class="k-state">Reading bounty 12 from testnet…</p></div>
+    <h1 class="m-h1 xl" tabindex="-1">Fix what you can’t see.</h1>
+    <p class="m-lead">Researchers and AI agents fix a crash from the public code. The contract checks the proof itself and pays when it holds.</p>
+    <div class="m-cta"><a class="m-btn" href="#/bounties">[ list bounties ]</a><a class="m-btn sec" href="#/account">[ operator panel ]</a></div>
+    <div class="k-cmdblock"><h2 class="m-h2">Check the checker yourself</h2>${cmd('./scripts/check_image_id.sh')}
+      <p class="m-sub">Rebuilds the checker and compares its image id with the one the contract trusts.</p></div>
   </section>
-  <section class="m-sec" aria-labelledby="hw">
-    <h2 class="m-h2" id="hw">How a bounty works</h2>
+  <section class="m-sec" aria-labelledby="hw"><h2 class="m-h2" id="hw">How a bounty works</h2>
     <ol class="m-steps">
-      <li><span class="m-n">1</span><div><h3>Funded</h3><p>A vendor locks NEAR in the contract. Proof 0 shows the program crashes on the secret input and that a fix exists.</p></div></li>
-      <li><span class="m-n">2</span><div><h3>Attempts</h3><p>Researchers and AI agents commit a fix, then reveal it. Attempt fees are taken from credit deposited in the contract first.</p></div></li>
-      <li><span class="m-n">3</span><div><h3>Proof</h3><p>The vendor proves each revealed fix against the secret input. On Level 2 the contract checks the Groth16 proof itself.</p></div></li>
-      <li><span class="m-n">4</span><div><h3>Paid</h3><p>A passing proof pays the fix. If the vendor stays silent past the deadline, the bounty is split among the revealed attempts still waiting. With nothing pending at expiry, the vendor is refunded.</p></div></li>
+      <li><span class="m-n">01</span><h3>Funded</h3><p>Vendor locks the reward and proves the crash.</p></li>
+      <li><span class="m-n">02</span><h3>Attempt</h3><p>Commit a fix, then reveal it.</p></li>
+      <li><span class="m-n">03</span><h3>Proof</h3><p>Tested on the secret, checked on chain.</p></li>
+      <li><span class="m-n">04</span><h3>Paid</h3><p>The fix holds. You get paid.</p></li>
     </ol>
   </section>
-  <section class="m-sec m-two">
-    <div class="m-panel" aria-labelledby="lv">
-      <h2 class="m-h2" id="lv">Who checks the proof</h2>
-      <ul class="m-levels">
-        <li><span class="k-mono">L0</span><span>Two registered verifiers sign the same verdict</span>${badge('ok', '✓ Built')}</li>
-        <li><span class="k-mono">L2</span><span>The contract checks a Groth16 proof of the RISC Zero result itself</span>${badge('ok', '✓ Built')}</li>
-      </ul>
+  <section class="m-sec" aria-labelledby="wp"><h2 class="m-h2" id="wp">What stays private</h2>
+    <div class="k-private">
+      <div><h3>Secret input</h3><div class="k-bars" aria-hidden="true"><i></i><i style="width:78%"></i><i style="width:56%"></i></div>
+        <span class="sr-only">Shown as sealed black bars.</span><p>Never leaves the vendor.</p></div>
+      <div><h3>Your fix</h3><div class="k-blur" aria-hidden="true">${SAMPLE_FINGERPRINT}</div>
+        <span class="sr-only">Shown as a blurred fingerprint.</span><p>Sealed until you reveal it.</p></div>
+      <div><h3>The check</h3><div class="k-g16">Groth16 ✓ on chain</div><p>Proves the result, not the secret.</p></div>
     </div>
-    <div class="m-panel" aria-labelledby="rm">
-      <h2 class="m-h2" id="rm">Roadmap</h2>
-      <ul class="k-road">
-        <li>${badge('wait', 'Planned')}<span>Create a bounty from this site</span></li>
-        <li>${badge('wait', 'Planned')}<span>A proof ledger</span></li>
-        <li>${badge('wait', 'Planned')}<span>Set agent limits from this site</span></li>
-        <li>${badge('wait', 'Planned')}<span>A live bounty on a new original module with its own bug</span></li>
-      </ul>
-    </div>
+  </section>
+  <section class="m-sec" aria-labelledby="on">
+    <div class="k-sechead"><h2 class="m-h2" id="on">Open now</h2><a href="#/bounties">All bounties →</a></div>
+    <div class="m-panel k-tablepanel" id="openNow" style="margin-top:12px"><p class="k-state">Reading bounties from testnet…</p></div>
   </section>`;
   try {
     await getRecorded();
-    const b = await view('get_bounty', { bounty_id: '12' });
-    const st = bountyState(b);
-    $('#heroCard').innerHTML = `
-      <div class="m-crow"><span class="k-mono k-bold">Bounty 12</span>${badge(st.v, st.t)}</div>
-      <p class="m-ct">A live Level 2 bounty with a private secret input</p>
-      <p class="m-amt">${esc(near(b.amount))}<span> bounty</span></p>
-      <p class="m-sub">${esc(attemptsText(b))} · next fee ${esc(near(b.next_fee))} · expires ${esc(utc(b.expires_at_ns))}</p>
-      <p class="m-sub">It uses the public demo bug, so anyone can submit the public fixed.wasm.</p>
-      <div class="m-crow k-cardfoot"><a class="m-btn sec sm" href="#/bounties/12">Open bounty 12</a>${bountyLinks(b)}</div>`;
-  } catch (e) { $('#heroCard').innerHTML = failBox(e); }
+    const open = (await allBounties()).filter(Boolean).filter((b) => bountyState(b).key === 'open').reverse();
+    $('#openNow').innerHTML = open.length ? table(['Bounty', 'Type', 'Reward', 'Attempts', 'Closes'], open.map((b) => [
+      `<a class="m-bid" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(typeText(b)),
+      `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`,
+      `${pips(b)}<span class="k-mono k-nw">${esc(attemptsText(b))}</span>`, `<span class="k-mono">${esc(closesText(b))}</span>`]), 'k-open')
+      : '<p class="m-sub k-pad" style="padding-top:16px;padding-bottom:16px">No bounty accepts attempts right now.</p>';
+    rowLinks($('#openNow'));
+  } catch (e) { $('#openNow').innerHTML = failBox(e); }
+}
+
+// Every row of a bounty table opens its bounty page; the first cell holds the real link for the keyboard.
+function rowLinks(el) {
+  el.querySelectorAll('tbody tr').forEach((tr) => {
+    const a = tr.querySelector('a.m-bid'); if (!a) return;
+    tr.classList.add('k-rowlink');
+    tr.addEventListener('click', (e) => { if (!e.target.closest('a,button')) a.click(); });
+  });
 }
 
 let filter = 'all';
@@ -127,16 +136,18 @@ async function bounties(main) {
   const draw = () => {
     const rows = all.filter((b) => filter === 'all' || bountyState(b).key === filter);
     if (!rows.length) { $('#list').innerHTML = '<div class="m-panel"><p>No bounties in this view.</p></div>'; return; }
-    $('#list').innerHTML = `<div class="m-panel k-tablepanel">${table(['Bounty', 'State', 'Amount', 'Attempts', 'Next fee', 'Deadline', 'Level'], rows.map((b) => {
+    $('#list').innerHTML = `<div class="m-panel k-tablepanel k-sticky">${table(['Bounty', 'State', 'Amount', 'Attempts', 'Next fee', 'Deadline', 'Explorer'], rows.map((b) => {
       const st = bountyState(b), cl = left(commitBy(b));
       const time = b.state !== 'Open' ? 'Closed' : cl ? `Attempts close in ${cl.replace(' left', '')}` : `Expires ${utc(b.expires_at_ns)}`;
+      const [href, label] = explorerOf(b);
       return [
-        `<a class="m-bid" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>${testNote(b) ? ' <span class="m-tag">Test bounty</span>' : ''}<span class="m-sub">${inputLabel(b)}</span>${bountyLinks(b)}`,
+        `<a class="m-bid" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a><span class="m-sub">${esc(typeText(b))}</span>`,
         badge(st.v, st.t), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`,
         `<span class="k-mono k-nw">${esc(attemptsText(b))}</span>${pips(b)}`,
         b.state === 'Open' ? `<span class="k-mono k-nw">${esc(near(b.next_fee))}</span>` : '<span class="k-dim">closed</span>',
-        esc(time), `Level ${b.level}`];
+        `<span class="k-mono">${esc(time)}</span>`, viewLink(href, label)];
     }), 'k-blist')}</div>`;
+    rowLinks($('#list'));
   };
   draw();
   tabs(main, '[data-f]', (btn) => { filter = btn.dataset.f; draw(); });
@@ -165,17 +176,18 @@ async function bounty(main, id, tab) {
   <div class="m-sec" id="btabs"></div>`;
   const overview = `<div class="k-ovgrid">
     <section class="m-panel" aria-label="Overview">${facts([
-      ['Reward', `<span class="k-mono">${esc(near(b.amount))}</span>`],
-      ['State on chain', esc(b.state) + (b.opened ? ', opened' : ', not opened')],
-      b.state === 'Open' ? ['Next attempt fee', `<span class="k-mono">${esc(near(b.next_fee))}</span>, from credit`] : null,
-      ['Fee rule', `${esc(near(b.attempt_fee))} + ${esc(near(b.fee_step))} per earlier attempt`],
-      ['Attempts', esc(attemptsText(b))],
-      ['Commits accepted until', esc(utc(commitBy(b))) + (cl && b.state === 'Open' ? ` (${esc(cl)})` : '')],
-      ['Expires', esc(utc(b.expires_at_ns))],
-      ['Windows', `reveal ${esc(span(b.reveal_window_ns))}, verdict ${esc(span(b.verdict_window_ns))}${b.level === 0 ? ', attest ' + esc(span(b.attest_window_ns)) : ''}`],
-      ['Vendor', acct(b.vendor)],
-      b.winner !== null && b.winner !== undefined ? ['Winner', `#${esc(b.winner)} ${subs[b.winner] ? acct(subs[b.winner].payout) : ''}`] : null,
-      ['Created', esc(utc(b.created_at_ns))],
+      ['Reward', `<span class="k-mono">${esc(near(b.amount))}</span>`, 'public'],
+      ['State on chain', esc(b.state) + (b.opened ? ', opened' : ', not opened'), 'public'],
+      b.state === 'Open' ? ['Next attempt fee', `<span class="k-mono">${esc(near(b.next_fee))}</span>, from credit`, 'public'] : null,
+      ['Fee rule', `<span class="k-mono">${esc(near(b.attempt_fee))} + ${esc(near(b.fee_step))}</span> per earlier attempt`, 'public'],
+      ['Attempts', `<span class="k-mono">${esc(attemptsText(b))}</span>`, 'public'],
+      ['Commits accepted until', `<span class="k-mono">${esc(utc(commitBy(b)))}</span>` + (cl && b.state === 'Open' ? ` (${esc(cl)})` : ''), 'public'],
+      ['Expires', `<span class="k-mono">${esc(utc(b.expires_at_ns))}</span>`, 'public'],
+      ['Windows', `reveal ${esc(span(b.reveal_window_ns))}, verdict ${esc(span(b.verdict_window_ns))}${b.level === 0 ? ', attest ' + esc(span(b.attest_window_ns)) : ''}`, 'public'],
+      ['Vendor', acct(b.vendor), 'public'],
+      b.winner !== null && b.winner !== undefined ? ['Winner', `#${esc(b.winner)} ${subs[b.winner] ? acct(subs[b.winner].payout) : ''}`, 'public'] : null,
+      ['Created', `<span class="k-mono">${esc(utc(b.created_at_ns))}</span>`, 'public'],
+      ['Secret input', demo ? 'public on purpose for this demo bounty (data/demo/exploit.hex)' : sealed('never on chain'), demo ? 'public' : 'vendor only'],
     ])}</section>
     <div class="m-col">
       <section class="m-panel m-lv" aria-labelledby="lvl"><h2 class="m-h2" id="lvl">Checked by Level ${b.level}</h2>
@@ -200,12 +212,13 @@ async function bounty(main, id, tab) {
       ${txs.length ? `${txTable(txs)}<p class="m-sub k-pad">${rec([...new Set(txs.map((t) => t.source))].join(', '))}</p>` : '<p class="m-sub k-pad">No transactions for this bounty are recorded in the repository.</p>'}
     </section>`;
   const proof = `<section class="m-panel" aria-label="Proof facts">${facts([
-      ['Checker image id', `${hashCell(b.image_id)}<span class="k-badges">${imgOk ? badge('ok', '✓ published checker') : badge('bad', '✕ not the published checker')}${b.image_id_allowed ? badge('ok', '✓ on the allowlist') : badge('bad', '✕ not on the allowlist')}</span>`],
-      ['Check size', `${b.fuzz_count} fresh inputs, ${b.variant_count} variants of the secret input`],
-      ['Exploit commitment', hashCell(b.exploit_commitment) + (demo ? '<span class="k-dim k-block">equals the demo commitment (data/demo/exploit.hex, public salt)</span>' : '')],
-      ['Proof 0 journal hash', hashCell(b.proof0_journal_hash)],
-      ['Proof 0 receipt hash', hashCell(b.proof0_receipt_hash)],
-      ['Reference fix hash', hashCell(b.reference_fix_hash)],
+      ['Checker image id', `${hashCell(b.image_id)}<span class="k-badges">${imgOk ? badge('ok', '✓ published checker') : badge('bad', '✕ not the published checker')}${b.image_id_allowed ? badge('ok', '✓ on the allowlist') : badge('bad', '✕ not on the allowlist')}</span>`, 'public'],
+      ['Check size', `${b.fuzz_count} fresh inputs, ${b.variant_count} variants of the secret input`, 'public'],
+      ['Exploit commitment', hashCell(b.exploit_commitment) + (demo ? '<span class="k-dim k-block">equals the demo commitment (data/demo/exploit.hex, public salt)</span>' : ''), 'public'],
+      ['Proof 0 journal hash', hashCell(b.proof0_journal_hash), 'public'],
+      ['Proof 0 receipt hash', hashCell(b.proof0_receipt_hash), 'public'],
+      ['Reference fix hash', hashCell(b.reference_fix_hash), 'public'],
+      ['Reference fix module', demo ? 'public on purpose for demo bounties (data/demo/fixed.wasm)' : sealed('kept by the vendor'), demo ? 'public' : 'vendor only'],
     ])}</section>`;
   tabbed($('#btabs'), [
     { id: 'overview', label: 'Overview', html: overview },
@@ -243,7 +256,7 @@ async function arena(main, tab) {
         <circle cx="160" cy="160" r="140" fill="none" stroke="var(--sink)" stroke-width="3"/>
         <circle cx="160" cy="160" r="96" fill="none" stroke="var(--sink)" stroke-width="2" stroke-dasharray="3 6"/>
         <circle cx="160" cy="160" r="58" fill="var(--surface)" stroke="var(--sink)" stroke-width="3"/>${hatch}
-        <text x="160" y="164" text-anchor="middle" font-size="10" font-weight="700" font-family="Space Mono, monospace" fill="var(--sink)" stroke="var(--surface)" stroke-width="5" paint-order="stroke">secret input: sealed</text>
+        <text x="160" y="164" text-anchor="middle" font-size="10" font-weight="700" font-family="JetBrains Mono, monospace" fill="var(--sink)" stroke="var(--surface)" stroke-width="5" paint-order="stroke">secret input: sealed</text>
         ${A.map((_, j) => seam(j)).join('')}${A.map((_, i) => sock(i)).join('')}
       </svg>
       <p class="m-sub m-leg">The gold seam joins the bits in the order they were taken. The cap of ${K} closes it.</p>
@@ -252,7 +265,7 @@ async function arena(main, tab) {
     </section>
     <div class="m-col">
       <section class="m-panel k-tablepanel" aria-labelledby="at2"><h2 class="m-h2 k-pad" id="at2">The attempts</h2>
-        ${table(['Attempt', 'Verdict', 'Bits learned', 'Candidates left'], A.map((a) => [`<span class="k-mono">${a.attempt} of ${a.budget}</span>`, a.verdict === 'PASS' ? badge('ok', '✓ PASS') : badge('bad', '✕ FAIL'), `<span class="k-mono">${a.bits_learned}</span>`, `<span class="k-mono">${a.candidates_left}</span>`]))}
+        ${table(['Attempt', 'Verdict', 'Bits learned', 'Candidates left'], A.map((a) => [`<span class="k-mono">${a.attempt} of ${a.budget}</span>`, a.verdict === 'PASS' ? badge('ok', '✓ PASSED') : badge('bad', '✕ FAILED'), `<span class="k-mono">${a.bits_learned}</span>`, `<span class="k-mono">${a.candidates_left}</span>`]))}
         <p class="m-note k-pad">Verdicts come from ${esc(r.verdicts_from)}.</p>
       </section>
       <section class="m-panel" aria-labelledby="wc"><h2 class="m-h2" id="wc">What we claim</h2>
@@ -262,7 +275,7 @@ async function arena(main, tab) {
   </div>`;
   const control = `<section class="m-panel k-narrow" aria-label="Control"><h2 class="m-h2">Crash variant check on</h2>
       <p>With the check of ${esc(r.control_variants)} variants of the secret input switched on, the same probes all FAIL whatever the secret, so the probe agent learns 0 bits.</p>
-      ${table(['Probe', 'Verdict'], r.control_variant_check_on.map((c) => [`<span class="k-mono">${esc(c.probe)}</span>`, c.verdict === 'PASS' ? badge('ok', '✓ PASS') : badge('bad', '✕ FAIL')]))}
+      ${table(['Probe', 'Verdict'], r.control_variant_check_on.map((c) => [`<span class="k-mono">${esc(c.probe)}</span>`, c.verdict === 'PASS' ? badge('ok', '✓ PASSED') : badge('bad', '✕ FAILED')]))}
       <p class="m-sub">${rec('docs/evidence/S8/arena_run.txt')}</p></section>`;
   const chain = `<section class="m-panel k-tablepanel" aria-label="On testnet"><p class="m-sub k-pad">The same cap on chain, on the older contract ${esc(r.chain.contract)}: the fourth probe commit was ignored.</p>
       ${txTable(r.chain.steps)}<p class="m-sub k-pad">${rec(r.chain.source)}</p></section>`;
@@ -287,7 +300,6 @@ async function arena(main, tab) {
 
 async function verify(main) {
   const r = await getRecorded();
-  const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class="k-mini" type="button" data-copy-text="${esc(text)}">Copy</button></div>`;
   main.innerHTML = `<h1 class="m-h1" tabindex="-1">How to verify</h1>
   <p class="m-lead">Six checks. Commands run from the root of the Skarbnik repository.</p>
   <ol class="k-ol k-steplist m-panel">
@@ -312,7 +324,6 @@ async function verify(main) {
 }
 
 async function agents(main) {
-  const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class="k-mini" type="button" data-copy-text="${esc(text)}">Copy</button></div>`;
   const feed = new URL('feed.json', location.href).href;
   main.innerHTML = `<h1 class="m-h1" tabindex="-1">For agents</h1>
   <p class="m-lead">Run an agent against a bounty on ${esc(CONTRACT)}. Testnet only. Replace &lt;agent&gt; with the agent's account.</p>
@@ -353,27 +364,64 @@ function tabs(root, sel, onSelect) {
   });
 }
 
-let pref = 'system';
-const dark = matchMedia('(prefers-color-scheme: dark)');
+// Theme: Dark by default; the choice is remembered in this browser (localStorage, if allowed).
+const store = { get: (k, d) => { try { return localStorage.getItem(k) || d; } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* blocked */ } } };
+let pref = store.get('skarbnik-theme', 'dark');
+const light = matchMedia('(prefers-color-scheme: light)');
 function applyTheme() {
-  const theme = pref === 'system' ? (dark.matches ? 'dark' : 'light') : pref;
-  document.documentElement.setAttribute('data-theme', theme);
+  const theme = pref === 'system' ? (light.matches ? 'light' : 'dark') : pref;
+  document.documentElement.setAttribute('data-theme', theme === 'light' ? 'light' : 'dark');
   document.querySelectorAll('[data-pref]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.pref === pref));
 }
-dark.addEventListener('change', () => pref === 'system' && applyTheme());
-document.querySelectorAll('[data-pref]').forEach((b) => b.addEventListener('click', () => { pref = b.dataset.pref; applyTheme(); }));
+light.addEventListener('change', () => pref === 'system' && applyTheme());
+document.querySelectorAll('[data-pref]').forEach((b) => b.addEventListener('click', () => { pref = b.dataset.pref; store.set('skarbnik-theme', pref); applyTheme(); }));
 
-const menuBtn = $('#menuBtn'), sheet = $('#sheet');
-const setMenu = (open) => { sheet.classList.toggle('open', open); menuBtn.setAttribute('aria-expanded', open); menuBtn.textContent = open ? 'Close' : 'Menu'; };
-menuBtn.addEventListener('click', () => setMenu(!sheet.classList.contains('open')));
+// Private: blur balances and account names (anything marked .k-priv).
+const privBtn = $('#privBtn');
+const applyPrivate = (on) => { document.documentElement.setAttribute('data-private', on ? 'on' : 'off'); privBtn.setAttribute('aria-pressed', on); };
+applyPrivate(store.get('skarbnik-private', 'off') === 'on');
+privBtn.addEventListener('click', () => { const on = privBtn.getAttribute('aria-pressed') !== 'true'; store.set('skarbnik-private', on ? 'on' : 'off'); applyPrivate(on); });
 
-$('#brand').innerHTML = `${logo(28)}<span>${NAME}</span>`;
+$('#brand').innerHTML = `${logo(28)}<span class="k-word">${NAME.toUpperCase()}</span>`;
+$('#brand').insertAdjacentHTML('afterend', '<span class="m-tag">Testnet</span>');
 
+// The verify strip: the checker image id the contract trusts (read live from its allowlist), the contract, and the
+// last saved run of scripts/check_image_id.sh. Every item is a live read or a real file; nothing here is mock.
+async function drawStrip() {
+  const el = $('#strip');
+  let ids = null; try { ids = await view('get_allowed_image_ids'); } catch { ids = null; }
+  const r = await getRecorded().catch(() => null), lc = r && r.last_image_check, id = ids && ids[0];
+  el.innerHTML = `${id ? `<span class="k-si"><span class="k-sl">checker</span><code title="${esc(id)}">${esc(shortId(id))}</code><button class="k-mini" type="button" data-copy-text="${esc(id)}" aria-label="Copy the full checker image id">Copy</button></span>`
+      : '<span class="k-si"><span class="k-sl">checker</span><span>could not read the allowlist</span></span>'}
+    <span class="k-si"><span class="k-sl">contract</span><a href="${EXPLORER_ACCOUNT}${CONTRACT}" rel="noopener" target="_blank">${esc(CONTRACT)}</a></span>
+    ${lc ? `<span class="k-si"><span class="k-sl">last check</span><span title="${esc(lc.source)}">${esc(lc.utc)}, ${esc(lc.result)}</span></span>` : ''}
+    <span class="k-si k-right">press <kbd>?</kbd> for shortcuts</span>`;
+}
+
+// Keyboard shortcuts: 1 to 4 open the menu items, ? opens the list, Esc closes it. Ignored while typing, while a
+// dialog or the intro is open, and with Ctrl, Alt or Meta held.
+const keys = $('#keys');
+const showKeys = (open) => { keys.hidden = !open; if (open) $('#keysClose').focus(); };
+$('#keysClose').addEventListener('click', () => showKeys(false));
+keys.addEventListener('click', (e) => { if (e.target === keys) showKeys(false); });
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  if (!keys.hidden) { if (e.key === 'Escape') { e.preventDefault(); showKeys(false); } return; }
+  const t = e.target;
+  if (t && (t.closest('input,textarea,select,[contenteditable="true"]') || t.closest('dialog[open]'))) return;
+  if (!$('#intro').hidden || document.querySelector('dialog[open]')) return;
+  if (e.key === '?') { e.preventDefault(); showKeys(true); return; }
+  const a = document.querySelector(`.m-nav a[data-key="${e.key}"]`);
+  if (a) { e.preventDefault(); location.hash = a.getAttribute('href'); }
+});
+
+// Each route gets a number; a screen that finishes after the visitor has moved on must not touch the new page.
+let routeGen = 0;
 async function route() {
+  const my = ++routeGen;
   const main = $('#main'), h = location.hash.replace(/^#\/?/, '').split('?')[0];
   if (h === 'agent' || h.startsWith('agent/')) { location.replace('#/account'); return null; }
   const [page, ...rest] = h.split('/'), id = rest.join('/');
-  setMenu(false);
   document.querySelectorAll('[data-nav]').forEach((a) => a.toggleAttribute('aria-current', false));
   const navEl = document.querySelector(`[data-nav="${page === 'raw' ? 'bounties' : page}"]`); if (navEl) navEl.setAttribute('aria-current', 'page');
   try {
@@ -386,7 +434,10 @@ async function route() {
     else if (page === 'verify') await verify(main);
     else if (page === 'agents') await agents(main);
     else main.innerHTML = '<h1 class="m-h1" tabindex="-1">Page not found</h1><p class="m-lead"><a href="#/">Go to the home page</a></p>';
-  } catch (e) { main.innerHTML = `<h1 class="m-h1" tabindex="-1">Something went wrong</h1><div class="k-state" role="alert"><p class="k-err">This page could not be shown.</p><p class="m-note">${esc(e.message)}</p></div>`; }
+  } catch (e) {
+    if (my !== routeGen) return null;
+    main.innerHTML = `<h1 class="m-h1" tabindex="-1">Something went wrong</h1><div class="k-state" role="alert"><p class="k-err">This page could not be shown.</p><p class="m-note">${esc(e.message)}</p></div>`; }
+  if (my !== routeGen) return null;
   const h1 = main.querySelector('h1');
   document.title = `${h1 ? h1.textContent : NAME} · ${NAME} (testnet)`;
   $('#live').textContent = `${h1 ? h1.textContent : ''} screen`;
@@ -395,8 +446,9 @@ async function route() {
 }
 
 window.addEventListener('hashchange', async () => { const h1 = await route(); if (h1) h1.focus({ preventScroll: true }); });
-$('#replayIntro').addEventListener('click', () => { if (location.hash && location.hash !== '#/') location.hash = '#/'; startIntro(true); });
+$('#replayIntro').addEventListener('click', () => startIntro());
 applyTheme();
 initUi();
 initAccountUi();
-route().then(() => { if (introWanted()) startIntro(false); });
+drawStrip();
+route().then(() => { if (introWanted()) startIntro(); });

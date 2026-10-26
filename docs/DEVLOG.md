@@ -2,6 +2,31 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Site restyle, "Blueprint Terminal" (branch ui-preview)
+
+- New look on every page, same routes and features: Dark by default (Light and System kept, the choice remembered),
+  IBM Plex Sans for text, JetBrains Mono for facts, Archivo ExtraBold only for the name. Gold only for actions (primary
+  button, active tab, the mark), blue for data, failure as an X chip in the text colour, dashed borders only around
+  sealed things.
+- The mark: the S of Archivo ExtraBold as an SVG path (`scripts/logo/extract_s.mjs`), gold outline and crack; favicon SVG,
+  32 and 16 px PNG and a 512 px social image from `scripts/logo/build.sh`. The old ring logo is gone.
+- Header with bracket number keys, a verify strip (the checker image id read live from the contract's allowlist, the
+  contract, the last saved run of `scripts/check_image_id.sh`), shortcuts (1 to 4, ?, Esc), a fixed footer with the
+  intro replay, the theme switch and a Private toggle that blurs balances and account names.
+- Home: hero, the check command, four steps, "What stays private", the open bounties read live. Bounties: an explorer
+  link per row (the creation transaction when the repository records it). Bounty page: a visibility tag per fact and
+  sealed rows for what only the vendor holds.
+- Operator panel (the Account page): balances, the account's agent keys with scope and gas allowance, spend cap, fees
+  spent (fees paid back to passed attempts not counted), an audit log, and a stop button (max fee 0 through the wallet),
+  tested on testnet with the NEAR CLI wallet (docs/SECURITY.md, "The site").
+- Intro "Handshake": bounty 12 read live with public and sealed fields, the mark drawing itself; first visit on the
+  home page only, never on a direct link, skippable, reduced motion shows the end state. One deviation from the brief:
+  `vendor_notes` does not exist anywhere, so the intro shows `reference_fix` (real, vendor only) in its place.
+- Found and fixed while testing: leaving a slow page before it finished could replace the next page with an error.
+- Checks: `node scripts/contrast_check.mjs` (every pair passes in both themes; the light gold button edge got a darker
+  border to reach 3:1); every route at 1280 and 390 px in both themes and once in mobile emulation: no sideways scroll,
+  no script errors; 13 behaviour checks (intro rules, reduced motion, shortcuts, typing guard, Private, focus).
+
 ## 2026-10-25: The agent's live run on test bounty 16 (PASS, paid)
 
 - `./scripts/agent_testnet.sh bounty` made test bounty 16; the agent ran live with NEAR AI Cloud

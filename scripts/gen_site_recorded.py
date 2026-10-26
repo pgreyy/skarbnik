@@ -57,8 +57,8 @@ def when(path, step, rows):
 
 
 def ok(row):
-    # exit 0 (sent by near-cli) or rpc:ok means the transaction succeeded; rpc:failed means the contract refused it.
-    return row["exit"] in ("0", "rpc:ok")
+    # exit 0 (sent by near-cli), rpc:ok, or agent:ok (sent by agent/kintsugi_agent.py, outcome ok) means it succeeded; rpc:failed means the contract refused it.
+    return row["exit"] in ("0", "rpc:ok", "agent:ok")
 
 
 def refused(row):
@@ -75,6 +75,8 @@ BOUNTY_STEPS = [
     ("docs/evidence/S18/transactions.tsv", "scripts/s18_live_bounty.sh", {12: ["s18_"]}),
     ("docs/evidence/web/transactions.tsv", "scripts/web_testnet.sh", {13: ["web_bounty_", "web_commit", "web_reveal", "web_claim_"],
                                                                       7: ["web_commit_no_credit"], 14: ["user_bounty_"], 15: ["cli_", "agentkey_commit", "agentkey_reveal"]}),
+    ("docs/evidence/agent/transactions.tsv", "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py",
+     {16: ["agent_bounty_", "agent_live_", "agent_submit_groth16_"], 17: ["unpack_bounty_", "unpack_live_", "unpack_submit_groth16_"]}),
 ]
 # Steps whose name starts like another bounty's prefix but belong elsewhere
 EXCLUDE = {13: {"web_commit_no_credit"}}
@@ -172,6 +174,19 @@ out["notes"]["demo_exploit_commitment"] = {"commitment": hashlib.sha256(salt + e
 # Test bounties made by scripts/web_testnet.sh (TBOUNTY: the scripted run; UBOUNTY: for trying the wallet flow by hand)
 runenv = dict(l.strip().split("=", 1) for l in open(os.path.join(ROOT, "docs/evidence/web/run.env")) if "=" in l)
 out["test_bounties"] = {}
+
+# The last run of scripts/check_image_id.sh saved in the repository: its time and result, for the site's verify strip.
+_checks = []
+for _f in ("docs/evidence/judge/check_image_id.txt", "docs/evidence/judge/check_image_id_home.txt"):
+    _p = os.path.join(ROOT, _f)
+    if os.path.exists(_p):
+        _t = open(_p).read()
+        _m = _re.search(r"^run (\d{4}-\d\d-\d\dT\d\d:\d\dZ)", _t, re.M)
+        _r = _re.search(r"^(MATCH|DIFFERENT)$", _t, re.M)
+        if _m and _r:
+            _checks.append({"utc": _m.group(1).replace("T", " ").replace("Z", " UTC"), "result": _r.group(1), "source": _f})
+if _checks:
+    out["last_image_check"] = max(_checks, key=lambda c: c["utc"])
 if "TBOUNTY" in runenv:
     out["test_bounties"][runenv["TBOUNTY"]] = "Test bounty: made for the scripted testnet run of the site's wallet features."
 if "UBOUNTY" in runenv:

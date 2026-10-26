@@ -2,10 +2,10 @@
 // panel (deposit_credit, withdraw_credit), the attempt panel on a bounty page (commit, reveal, then waiting for the
 // vendor's proof), and the read only agent page. Every payment goes through a confirm step and then the wallet; the
 // page shows only what the chain says. Attempt fees are taken from credit deposited in the contract first.
-import { CONTRACT, EXPLORER_ACCOUNT, view, near, utc, span, commitBy, nsToDate, allBounties, submissions } from './chain.js';
+import { CONTRACT, EXPLORER_ACCOUNT, view, near, utc, span, commitBy, nsToDate, allBounties, submissions, accessKeys } from './chain.js';
 import * as W from './wallet.js';
 import { fingerprint, newNonce, hex, b64, sha256, putAttempt, attemptsFor, dropAttempt, downloadRecord, toYocto } from './attempt.js';
-import { $, esc, badge, tx, acct, toast, passStamp, table, facts, bothTimes, tabbed } from './ui.js';
+import { $, esc, badge, tx, acct, toast, passStamp, table, facts, bothTimes, tabbed, hashCell } from './ui.js';
 
 let credit = null; // the connected account's contract credit, yoctoNEAR string
 const short = (a) => (a.length > 22 ? `${a.slice(0, 12)}…${a.slice(-8)}` : a);
@@ -24,8 +24,8 @@ function renderWallet() {
   const el = $('#walletArea'); if (!el) return;
   const s = W.state;
   if (s.status === 'on') {
-    el.innerHTML = `<button class="k-chip" type="button" id="creditChip" aria-haspopup="dialog">Credit <b>${credit === null ? '…' : esc(near(credit))}</b></button>
-      <div class="k-acct"><button class="m-btn sec sm" type="button" id="acctBtn" aria-haspopup="true" aria-expanded="false" aria-controls="acctMenu" title="${esc(s.account)}">${esc(short(s.account))}</button>
+    el.innerHTML = `<button class="k-chip" type="button" id="creditChip" aria-haspopup="dialog">Credit <b class="k-priv">${credit === null ? '…' : esc(near(credit))}</b></button>
+      <div class="k-acct"><button class="m-btn sec sm" type="button" id="acctBtn" aria-haspopup="true" aria-expanded="false" aria-controls="acctMenu" title="${esc(s.account)}"><span class="k-priv">${esc(short(s.account))}</span></button>
       <ul class="k-menu" id="acctMenu" hidden>
         <li><button type="button" data-act="activity">My activity</button></li>
         <li><button type="button" data-act="copy">Copy account name</button></li>
@@ -49,10 +49,10 @@ function renderWallet() {
     el.innerHTML = `<span class="m-badge b-bad" role="alert">✕ Not a testnet account</span><button class="m-btn sec sm" type="button" id="outBtn">Disconnect</button>`;
     $('#outBtn').onclick = () => W.disconnect();
   } else if (s.status === 'failed') {
-    el.innerHTML = `<span class="k-werr" role="alert">${esc(s.error || 'The wallet did not connect.')}</span><button class="m-btn sm" type="button" id="connBtn">Try again</button>`;
+    el.innerHTML = `<span class="k-werr" role="alert">${esc(s.error || 'The wallet did not connect.')}</span><button class="m-btn sm k-connect" type="button" id="connBtn">Try again</button>`;
     $('#connBtn').onclick = () => W.connect();
   } else {
-    el.innerHTML = '<button class="m-btn sm" type="button" id="connBtn">Connect wallet</button>';
+    el.innerHTML = '<button class="m-btn sm k-connect" type="button" id="connBtn">Connect wallet</button>';
     $('#connBtn').onclick = () => W.connect();
   }
 }
@@ -110,9 +110,9 @@ async function drawCredit() {
     body = `<p role="alert">${badge('bad', '✕ Not done')} ${esc(v.msg)}</p>${v.tx ? `<p class="m-sub">Transaction ${tx(v.tx)}</p>` : ''}<div class="m-cta"><button class="m-btn" type="button" data-mode="${v.mode}">Try again</button><button class="m-btn sec" type="button" data-mode="">Back</button></div>`;
   }
   d.innerHTML = `${head}
-    <dl class="m-facts"><div><dt>Contract credit</dt><dd class="k-mono">${c === null ? 'could not read' : esc(near(credit))}</dd></div>
-    <div><dt>Wallet balance</dt><dd class="k-mono">${bal === null || bal === undefined ? 'could not read' : esc(near(bal))}</dd></div></dl>
-    <p class="m-sub">Account ${esc(s.account)}. Attempt fees are taken from this credit.</p>${body}
+    <dl class="m-facts"><div><dt>Contract credit</dt><dd class="k-mono k-priv">${c === null ? 'could not read' : esc(near(credit))}</dd></div>
+    <div><dt>Wallet balance</dt><dd class="k-mono k-priv">${bal === null || bal === undefined ? 'could not read' : esc(near(bal))}</dd></div></dl>
+    <p class="m-sub">Account <span class="k-priv">${esc(s.account)}</span>. Attempt fees are taken from this credit.</p>${body}
     <section class="k-recent" aria-labelledby="recentT"><div class="m-crow"><h2 class="m-h2" id="recentT">Recent activity</h2><a href="#/account/${encodeURIComponent(s.account)}/credit" data-close>View all</a></div>
       <div id="recent"><p class="m-sub">Reading recent activity…</p></div></section>`;
   bindCommon(d);
@@ -146,7 +146,7 @@ async function drawCredit() {
 function bindCommon(d) { d.querySelectorAll('[data-close]').forEach((b) => (b.onclick = () => d.close())); }
 
 // ---------- attempt panel (bounty page) ----------
-const OUTCOME = { Passed: ['ok', '✓ PASS'], Failed: ['bad', '✕ FAIL'], TimedOut: ['info', 'Paid by timeout'], Released: ['info', 'Not revealed in time, slot released'] };
+const OUTCOME = { Passed: ['ok', '✓ PASSED'], Failed: ['bad', '✕ FAILED'], TimedOut: ['info', 'Paid by timeout'], Released: ['info', 'Not revealed in time, slot released'] };
 
 export function attemptPanel(el, b, subs, verifiers) {
   let busy = false, msg = '', msgKind = 'info';
@@ -287,7 +287,7 @@ function confirmSheet(info, onYes) {
 }
 
 // ---------- activity and the Account page ----------
-const OUT_LABEL = { Passed: ['ok', '✓ PASS'], Failed: ['bad', '✕ FAIL'], TimedOut: ['info', 'TIMEOUT'], Released: ['info', 'RELEASED'] };
+const OUT_LABEL = { Passed: ['ok', '✓ PASSED'], Failed: ['bad', '✕ FAILED'], TimedOut: ['info', 'TIMEOUT'], Released: ['info', 'RELEASED'] };
 const FASTNEAR_TX = 'https://tx.test.fastnear.com/v0';
 const fastPost = async (path, body) => (await fetch(`${FASTNEAR_TX}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json();
 const localTime = (ms) => new Date(ms).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -311,6 +311,8 @@ async function activity(account, max = 150) {
         if (fc.method_name === 'deposit_credit') items.push({ ...base, kind: 'deposit', amount: String(fc.deposit) });
         else if (fc.method_name === 'withdraw_credit') items.push({ ...base, kind: 'withdraw', amount: String(args.amount || '0') });
         else if (fc.method_name === 'commit') items.push({ ...base, kind: 'attempt', bounty: String(args.bounty_id), fingerprint: args.fingerprint });
+        else if (fc.method_name === 'reveal') items.push({ ...base, kind: 'reveal', bounty: String(args.bounty_id), index: args.index });
+        else if (fc.method_name === 'set_agent_limits') items.push({ ...base, kind: 'limits', maxFee: args.max_fee_per_commit, payout: args.fixed_payout });
       }
     }
   } catch { return []; }
@@ -329,22 +331,30 @@ async function activity(account, max = 150) {
 function activityRows(items) {
   return items.map((x) => [
     x.kind === 'deposit' ? 'Deposit' : x.kind === 'withdraw' ? 'Withdrawal'
-      : `Attempt on <a href="#/bounties/${esc(x.bounty)}">bounty ${esc(x.bounty)}</a>${x.index !== undefined ? ` #${x.index}` : ''}`,
-    x.ok ? (x.amount !== undefined ? `<span class="k-mono k-nw">${x.kind === 'attempt' ? 'fee ' : ''}${esc(near(x.amount))}</span>` : '<span class="k-dim">fee unknown</span>') : badge('bad', '✕ Failed'),
+      : x.kind === 'limits' ? `Agent limits set: max fee ${x.maxFee ? esc(near(x.maxFee)) : 'none'}, payout ${x.payout ? esc(x.payout) : 'any'}`
+      : `${x.kind === 'reveal' ? 'Reveal' : 'Attempt'} on <a href="#/bounties/${esc(x.bounty)}">bounty ${esc(x.bounty)}</a>${x.index !== undefined ? ` #${x.index}` : ''}`,
+    !x.ok ? badge('bad', '✕ FAILED') : x.kind === 'reveal' || x.kind === 'limits' ? '<span class="k-dim">no amount</span>'
+      : x.amount !== undefined ? `<span class="k-mono k-nw k-priv">${x.kind === 'attempt' ? 'fee ' : ''}${esc(near(x.amount))}</span>` : '<span class="k-dim">fee unknown</span>',
     esc(localTime(x.ms)), tx(x.tx)]);
 }
 
 async function drawRecent(account) {
   const el = document.getElementById('recent'); if (!el) return;
-  const items = (await activity(account, 60)).slice(0, 10);
+  const items = (await activity(account, 60)).filter((x) => x.kind === 'deposit' || x.kind === 'withdraw' || x.kind === 'attempt').slice(0, 10);
   if (!document.getElementById('recent')) return;
   el.innerHTML = items.length ? table(['What', 'Amount', 'Time', 'Transaction'], activityRows(items), 'k-small k-stack')
     : '<p class="m-sub">No activity yet.</p>';
 }
 
+// The operator panel of one account: balances, the agent keys it gave this contract (scope, allowance, spend cap, amount
+// spent), an audit log of its calls with transaction links, and, for the connected owner only, a stop button that sets
+// the account's max fee per attempt to 0 in the contract (set_agent_limits, approved in the wallet): every later commit
+// by the account is then refused, whichever key signs it. Everything shown is read from testnet.
 export async function accountPage(main, name, tab) {
   if (!name) {
-    main.innerHTML = `<h1 class="m-h1" tabindex="-1">Account</h1>
+    if (W.state.status === 'on') { location.replace(`#/account/${encodeURIComponent(W.state.account)}`); return; }
+    main.innerHTML = `<h1 class="m-h1" tabindex="-1">Operator panel</h1>
+      <p class="m-lead">Balances, agent keys, spend limits and an audit log of one account, read from testnet. Connect a wallet to open your own, or enter any account.</p>
       <form class="m-panel m-form k-acform" id="agForm" novalidate><div class="m-field"><label for="agAcc">Account name</label>
       <input id="agAcc" autocomplete="off" aria-describedby="agErr"><p id="agErr" class="m-err" role="alert" hidden></p></div>
       <button class="m-btn" type="submit">Show account</button></form>`;
@@ -355,11 +365,12 @@ export async function accountPage(main, name, tab) {
     };
     return;
   }
-  main.innerHTML = `<a class="m-back" href="#/bounties">← All bounties</a><h1 class="m-h1 k-acname" tabindex="-1">${esc(name)}</h1>
-    <p class="m-lead">Activity on ${esc(CONTRACT)}, read from testnet. <a href="${EXPLORER_ACCOUNT}${encodeURIComponent(name)}" rel="noopener" target="_blank">All transactions on the explorer</a></p>
+  main.innerHTML = `<a class="m-back" href="#/bounties">← All bounties</a><p class="m-eye">Operator panel</p><h1 class="m-h1 k-acname k-priv" tabindex="-1">${esc(name)}</h1>
+    <p class="m-lead">Balances, agent keys and activity on ${esc(CONTRACT)}, read from testnet. <a href="${EXPLORER_ACCOUNT}${encodeURIComponent(name)}" rel="noopener" target="_blank">All transactions on the explorer ↗</a></p>
     <div id="acOut"><p class="k-state">Reading from testnet…</p></div>`;
   try {
-    const [c, lim, bs, act] = await Promise.all([view('get_credit', { account_id: name }), view('get_agent_limits', { account_id: name }), allBounties(), activity(name)]);
+    const [c, lim, bs, act, keys, bal] = await Promise.all([view('get_credit', { account_id: name }, { fresh: true }), view('get_agent_limits', { account_id: name }, { fresh: true }),
+      allBounties(), activity(name), accessKeys(name).catch(() => null), W.balance(name)]);
     const txOf = new Map(act.filter((x) => x.kind === 'attempt').map((x) => [`${x.bounty}:${x.fingerprint}`, x.tx]));
     const mine = [], created = [];
     for (const b of bs.filter(Boolean)) {
@@ -367,23 +378,61 @@ export async function accountPage(main, name, tab) {
       (await submissions(b)).forEach((s, i) => { if (s && s.committer === name) mine.push({ b, s, i }); });
     }
     mine.sort((x, y) => Number(BigInt(y.s.committed_at_ns) - BigInt(x.s.committed_at_ns)));
+    // Fees not paid back: a passed attempt and an attempt paid by timeout get their own fee back.
+    const spent = mine.filter(({ s }) => s.outcome !== 'Passed' && s.outcome !== 'TimedOut').reduce((t, { s }) => t + BigInt(s.fee || '0'), 0n);
     const state = (b, s) => OUT_LABEL[s.outcome] || (s.revealed_at_ns ? (b.state === 'Open' ? ['wait', '… WAITING'] : ['info', 'UNDECIDED']) : ['info', 'COMMITTED']);
-    const credits = act.filter((x) => x.kind !== 'attempt');
-    $('#acOut').innerHTML = `<section class="m-panel k-narrow">${facts([
-        ['Contract credit', `<span class="k-mono">${esc(near(String(c)))}</span>`],
-        lim.max_fee_per_commit ? ['Max fee per attempt', `<span class="k-mono">${esc(near(lim.max_fee_per_commit))}</span>`] : null,
-        lim.fixed_payout ? ['Fixed payout account', acct(lim.fixed_payout)] : null,
-        (!lim.max_fee_per_commit && !lim.fixed_payout) ? ['Agent limits', 'none set'] : null])}</section>
+    const credits = act.filter((x) => x.kind === 'deposit' || x.kind === 'withdraw');
+    const stopped = lim.max_fee_per_commit === '0';
+    const agentKeys = (keys || []).filter((k) => k.access_key.permission.FunctionCall && k.access_key.permission.FunctionCall.receiver_id === CONTRACT);
+    const fullKeys = (keys || []).filter((k) => k.access_key.permission === 'FullAccess').length;
+    const scope = (m) => { const set = new Set(m || []); return m && m.length && [...set].every((x) => x === 'commit' || x === 'reveal')
+      ? 'commit and reveal only; cannot withdraw or change limits' : m && m.length ? esc([...set].join(', ')) : 'every method of the contract that takes no deposit'; };
+    const keyCards = keys === null ? '<p class="k-state">Could not read the account\'s access keys.</p>' : agentKeys.length ? agentKeys.map((k) => {
+      const fc = k.access_key.permission.FunctionCall;
+      return `<div class="k-agentkey">${facts([
+        ['Agent key', hashCell(k.public_key), 'public'],
+        ['Scope', scope(fc.method_names), 'public'],
+        ['Gas allowance left', fc.allowance ? `<span class="k-mono">${esc(near(fc.allowance))}</span>` : 'no limit', 'public'],
+        ['Spend cap', lim.max_fee_per_commit ? `<span class="k-mono">${esc(near(lim.max_fee_per_commit))}</span> per attempt, from credit` : 'no max fee set: any fee up to the credit', 'public'],
+        ['Fixed payout', lim.fixed_payout ? acct(lim.fixed_payout) : 'none set: the key may name any payout', 'public']])}</div>`; }).join('')
+      : '<p class="m-sub">No key of this account is limited to this contract.</p>';
+    const me = W.state.status === 'on' && W.state.account === name;
+    $('#acOut').innerHTML = `<div class="m-two">
+      <section class="m-panel" aria-labelledby="balT"><h2 class="m-h2" id="balT">Balances</h2>${facts([
+        ['Contract credit', `<span class="k-mono k-priv">${esc(near(String(c)))}</span>`, 'public'],
+        ['Wallet balance', bal === null || bal === undefined ? 'could not read' : `<span class="k-mono k-priv">${esc(near(bal))}</span>`, 'public'],
+        ['Spent on attempt fees', `<span class="k-mono k-priv">${esc(near(spent.toString()))}</span> over ${mine.length} ${mine.length === 1 ? 'attempt' : 'attempts'}<span class="k-dim k-block">Not counted: fees paid back to passed attempts and to attempts paid by timeout.</span>`, 'public'],
+        ['Max fee per attempt', lim.max_fee_per_commit ? `<span class="k-mono">${esc(near(lim.max_fee_per_commit))}</span>${stopped ? ' ' + badge('bad', '✕ STOPPED') : ''}` : 'none set', 'public'],
+        ['Fixed payout account', lim.fixed_payout ? acct(lim.fixed_payout) : 'none set', 'public']])}</section>
+      <section class="m-panel" aria-labelledby="keyT"><h2 class="m-h2" id="keyT">Agent keys</h2>
+        <div class="k-keys-list">${keyCards}</div>
+        <p class="m-sub" style="margin-top:12px">${keys === null ? '' : `${fullKeys} full access ${fullKeys === 1 ? 'key' : 'keys'} (the owner's wallet keys) not shown.`}</p>
+        ${me ? `<div id="stopBox" style="margin-top:16px">${stopped
+          ? '<p class="m-sub">Stopped: the max fee per attempt is 0, so every commit by this account is refused. To start again, set a new max fee (For agents, step 5).</p>'
+          : '<button class="m-btn sec" type="button" id="stopBtn">Stop agents: set the max fee to 0</button><p class="m-sub" style="margin-top:8px">Your wallet approves one call (set_agent_limits, 1 yoctoNEAR attached). Every later commit by this account is then refused, whichever key signs it. Reveals of attempts already made still work, and the key itself stays.</p>'}</div>` : ''}
+      </section></div>
       <div class="m-sec" id="actabs"></div>`;
     tabbed($('#actabs'), [
       { id: 'attempts', label: `Attempts (${mine.length})`, html: `<section class="m-panel k-tablepanel">${mine.length ? table(['Bounty', 'Attempt', 'State', 'Fee', 'Time', 'Transaction'], mine.map(({ b, s, i }) => [
           `<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, `#${i}`, badge(...state(b, s)),
-          s.fee === '0' ? 'refunded' : `<span class="k-mono k-nw">${esc(near(s.fee))}</span>`, esc(utc(s.committed_at_ns)),
+          s.fee === '0' ? 'refunded' : `<span class="k-mono k-nw k-priv">${esc(near(s.fee))}</span>`, `<span class="k-mono">${esc(utc(s.committed_at_ns))}</span>`,
           txOf.get(`${b.id}:${s.fingerprint}`) ? tx(txOf.get(`${b.id}:${s.fingerprint}`)) : '<span class="k-dim">not found</span>'])) +
           '<p class="m-sub k-pad">Attempts from the contract; transaction ids from the FastNEAR transaction index.</p>' : '<p class="m-sub k-pad">No attempts yet.</p>'}</section>` },
+      { id: 'audit', label: `Audit log (${act.length})`, html: `<section class="m-panel k-tablepanel">${act.length ? table(['What', 'Amount', 'Time', 'Transaction'], activityRows(act)) +
+          '<p class="m-sub k-pad">Every call this account signed to the contract: deposits, withdrawals, commits, reveals and limit changes. From the FastNEAR transaction index.</p>' : '<p class="m-sub k-pad">No calls to the contract yet.</p>'}</section>` },
       { id: 'credit', label: `Credit activity (${credits.length})`, html: `<section class="m-panel k-tablepanel">${credits.length ? table(['What', 'Amount', 'Time', 'Transaction'], activityRows(credits)) +
           '<p class="m-sub k-pad">From the FastNEAR transaction index.</p>' : '<p class="m-sub k-pad">No deposits or withdrawals yet.</p>'}</section>` },
-      { id: 'created', label: `Bounties created (${created.length})`, html: `<section class="m-panel k-tablepanel">${created.length ? table(['Bounty', 'State', 'Reward', 'Created'], created.slice().reverse().map((b) => [`<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(b.state), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`, esc(utc(b.created_at_ns))])) : '<p class="m-sub k-pad">No bounties created.</p>'}</section>` },
+      { id: 'created', label: `Bounties created (${created.length})`, html: `<section class="m-panel k-tablepanel">${created.length ? table(['Bounty', 'State', 'Reward', 'Created'], created.slice().reverse().map((b) => [`<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(b.state), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`, `<span class="k-mono">${esc(utc(b.created_at_ns))}</span>`])) : '<p class="m-sub k-pad">No bounties created.</p>'}</section>` },
     ], tab, `#/account/${encodeURIComponent(name)}`, 'Account sections');
+    const stop = $('#stopBtn');
+    if (stop) stop.onclick = async () => {
+      const box = $('#stopBox');
+      box.innerHTML = '<p class="k-state" role="status" aria-busy="true">Waiting for the wallet. Approve or reject the request in the wallet window.</p>';
+      try {
+        const out = W.readOutcome(await W.call('set_agent_limits', { max_fee_per_commit: '0', fixed_payout: lim.fixed_payout || null }, '1', 30));
+        box.innerHTML = out.ok ? `<p class="k-msg ok" role="status">Stopped. The max fee per attempt is now 0. Transaction ${tx(out.tx)}</p>`
+          : `<p class="k-msg bad" role="alert">Not stopped: ${esc(out.error)}${out.tx ? ` Transaction ${tx(out.tx)}` : ''}</p>`;
+      } catch (e) { box.innerHTML = `<p class="k-msg bad" role="alert">Not stopped: ${esc(W.plainError(e))}</p>`; }
+    };
   } catch (e) { $('#acOut').innerHTML = `<p class="k-err" role="alert">Could not read: ${esc(e.message)}</p>`; }
 }

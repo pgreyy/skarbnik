@@ -29,3 +29,6 @@ agentkey_commit	commit	limited key of kintsugi-web-1e80c1.testnet	HiPPkXptEo1WwG
 agentkey_reveal	reveal	limited key of kintsugi-web-1e80c1.testnet	AGLDxjCxsD1uMvJCVAwJNYZYRH4Y1mBgQvFTLW8my9BD	-	-	rpc:ok	-
 agentkey_owner_clear_limits	set_agent_limits	kintsugi-web-1e80c1.testnet	4N6K4G52jdnYGymfqkk4EVrr4e3rUgasNPUeVBLYkSTb	0.312 Tgas	0.0000311063574045	0	5.38
 agentkey_owner_withdraw	withdraw_credit	kintsugi-web-1e80c1.testnet	8P4s9FvPVXWpgtjzuhm9XiPQ1rKFzMxWhocP4N7aGnUj	0.311 Tgas	0.0000310491369465	0	6.47
+operator_stop_set_limits	set_agent_limits	kintsugi-web-1e80c1.testnet	7xhHyQEn76dztS4MHLQRPW3zod6wfMxLmFAGt6bop1NG	-	-	0	-
+operator_stop_commit_refused	commit	limited key of kintsugi-web-1e80c1.testnet	CKSC5CiimdJqdLHTvzxYfYhFbhdmq7WY5B8YiaSxrVrm	-	-	rpc:failed	-
+operator_stop_restore_limits	set_agent_limits	kintsugi-web-1e80c1.testnet	B5E9qKGaFdK8HLmFcUkELkz4Wr4ojeJvpQPe2m3k6UZR	0.312 Tgas	0.0000311063574045	0	5.45

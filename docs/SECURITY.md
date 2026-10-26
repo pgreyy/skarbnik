@@ -74,6 +74,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Wallets through NEAR Connect (Intear Wallet and NEAR CLI), each wallet's script loaded from its official address, refused unless its sha256 matches the pin in the wallet list, and run in a sandboxed frame; sign in asks for no contract key; every transaction is approved in the wallet | The page signing for the visitor; wallet code changing under the site | `web/vendor/wallets/manifest.json` (pins), `web/js/wallet.js` (`pinScripts`); `docs/evidence/web/pinned_wallets.txt` (a changed byte is refused); `docs/evidence/web/` (NEAR CLI run through the page) |
 | A confirm step before every payment (deposit, withdraw, commit), showing the amount with its unit; a commit's confirm shows the fee, slots left of the cap and "Each attempt returns one yes or no." | Paying by accident | `web/js/account-ui.js` |
 | Before a commit the page reads the chain again and stops, without sending, what the contract would refuse: bounty closed, cap full, not enough credit, a fee above the account's own limit, a payout the limits do not allow, a payout that is the vendor, a verifier or the contract, or one that does not exist | Lost fees and lost payouts (review finding 8) | `web/js/account-ui.js` (`review`) |
+| Operator panel stop button, shown only to the connected owner of the account: one wallet approved call, `set_agent_limits` with a max fee of 0 (1 yoctoNEAR attached, so a limited agent key cannot undo it); every later commit by that account is refused, since every attempt fee is above 0 (`create_bounty` requires it) | A runaway or stolen agent key spending the account's credit | `docs/evidence/web/steps/operator_stop_set_limits.txt` (tx `7xhHyQEn76dztS4MHLQRPW3zod6wfMxLmFAGt6bop1NG`), `operator_stop_commit_refused.txt` (tx `CKSC5CiimdJqdLHTvzxYfYhFbhdmq7WY5B8YiaSxrVrm`, refused: "the attempt fee is above this account's max_fee_per_commit") |
 | The page shows a result only from the chain: after a reveal it says "Waiting for the vendor's proof"; the PASS stamp only for an attempt whose outcome on chain is Passed | A faked result | `web/js/account-ui.js` (`attemptPanel`) |
 
 ### The model-driven agent (agent/)
@@ -268,6 +269,10 @@ Each guard: what it stops, where it lives, and what shows it works.
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-26: site restyle; the operator panel gains a stop button (max fee 0 through the wallet), tested on testnet with
+  the NEAR CLI wallet: stop `7xhHyQEn76dztS4MHLQRPW3zod6wfMxLmFAGt6bop1NG`, then a commit by the account's limited key refused
+  `CKSC5CiimdJqdLHTvzxYfYhFbhdmq7WY5B8YiaSxrVrm`, limits restored `B5E9qKGaFdK8HLmFcUkELkz4Wr4ojeJvpQPe2m3k6UZR`.
 
 - 2026-10-25: the model-driven agent (agent/) with its guards: limited key check, fee and attempt limits, public code
   checked against the bounty's hashes, no file or environment reading in a model's answer, the API key kept out of logs.

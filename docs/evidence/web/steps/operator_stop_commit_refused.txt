@@ -1,0 +1,12 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"14","fingerprint":"f2d57d3e0b8e62179f161638a8bbe75bdbc5e1d346987824039c676a7085d14d","payout":"kintsugi-web-1e80c1.testnet"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as limited key of kintsugi-web-1e80c1.testnet network-config testnet sign-with-legacy-keychain save-to-file <file>
+$ python3 -I scripts/s3_measure.py sendtx <file> FINAL
+utc_start=2026-10-26T03:37:33.401408379Z
+{
+ "tx_hash": "CKSC5CiimdJqdLHTvzxYfYhFbhdmq7WY5B8YiaSxrVrm",
+ "outcome": "failed",
+ "failure": "{'ActionError': {'index': 0, 'kind': {'FunctionCallError': {'ExecutionError': 'Smart contract panicked: the attempt fee is above this account's max_fee_per_commit'}}}}",
+ "total_gas_burnt": 2160246863711,
+ "logs": [],
+ "wall_seconds": 4.028,
+ "rpc_error": null
+}

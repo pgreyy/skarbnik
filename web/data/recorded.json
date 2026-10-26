@@ -971,6 +971,80 @@
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
    }
+  ],
+  "16": [
+   {
+    "step": "agent_bounty_create",
+    "method": "create_bounty",
+    "tx": "54yXGiNTkLZYhZCYLG9ZyZDR4Ed1ZBZfpoqW2QwnVMbe",
+    "what": "Bounty created",
+    "time": "2026-10-25 21:38 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+   },
+   {
+    "step": "agent_bounty_open",
+    "method": "open_with_groth16",
+    "tx": "CGvpXLc1Dtg7nP5LaoxNUQyutr7NEs57jzdETQCvkcfA",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-25 21:38 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+   },
+   {
+    "step": "agent_submit_groth16_0",
+    "method": "submit_groth16",
+    "tx": "5NH9rhRMdLxRtKBtjxAsqQwFWejtu2tU9oNf69G2yUq9",
+    "what": "Proof of an attempt sent",
+    "time": "2026-10-25 23:24 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+   },
+   {
+    "step": "agent_live_commit",
+    "method": "commit",
+    "tx": "CDJsxmiuTAYbYF25DhRC5Ws7hcSXeBX5WsGrUBPh2tSG",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+   },
+   {
+    "step": "agent_live_reveal",
+    "method": "reveal",
+    "tx": "A8zW8CDS7RcGKUBdNMt6c6jXDzVZKYweA4MMExbNBXug",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+   }
+  ],
+  "17": [
+   {
+    "step": "unpack_bounty_create",
+    "method": "create_bounty",
+    "tx": "XTGrM4irHF4T2HKyLevDmTN9hVXFHKMR4hnQpeQyGNx",
+    "what": "Bounty created",
+    "time": "2026-10-26 01:26 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+   },
+   {
+    "step": "unpack_bounty_open",
+    "method": "open_with_groth16",
+    "tx": "57cTTbF7rh7eWVamQ1Av5fP4BySCAcfqwsXdM68jDJM8",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 01:26 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+   }
   ]
  },
  "notes": {
@@ -1176,6 +1250,11 @@
   "14": "Test bounty: made for trying the wallet flow by hand. Not a demo.",
   "15": "Test bounty: made for the scripted run of the site with the NEAR CLI wallet.",
   "16": "Test bounty: made for the real run of the model-driven agent (agent/)."
+ },
+ "last_image_check": {
+  "utc": "2026-10-25 19:53 UTC",
+  "result": "MATCH",
+  "source": "docs/evidence/judge/check_image_id.txt"
  },
  "new_module_bounties": {
   "17": "Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/unpack/) is new, with no hint at its bug."

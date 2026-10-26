@@ -1,6 +1,6 @@
 // Small pieces shared by the screens: HTML escaping, status badges, links to transactions and to the Account page,
-// shortened hashes with Copy and "Show full", tables that turn into stacked rows on a phone, times in UTC and local
-// time, the toast, and the PASS stamp.
+// shortened hashes with Copy and "Show full", tables that turn into stacked rows on a phone, facts with a visibility tag,
+// sealed values, explorer link boxes, times in UTC and local time, the toast, and the PASS stamp.
 import { EXPLORER_TX } from './chain.js';
 
 export const $ = (s, el = document) => el.querySelector(s);
@@ -11,7 +11,7 @@ export const shortId = (h) => (h.length > 18 ? `${h.slice(0, 8)}…${h.slice(-6)
 // A transaction id, shortened, linking to the testnet explorer.
 export const tx = (hash) => `<a class="k-mono" href="${EXPLORER_TX}${encodeURIComponent(hash)}" rel="noopener" target="_blank" title="${esc(hash)}">${esc(shortId(hash))}</a>`;
 // An account name, linking to this site's Account page.
-export const acct = (a) => `<a class="k-mono k-hash" href="#/account/${encodeURIComponent(a)}">${esc(a)}</a>`;
+export const acct = (a) => `<a class="k-mono k-hash k-priv" href="#/account/${encodeURIComponent(a)}">${esc(a)}</a>`;
 
 // A long hash: first 8 and last 6 characters, with Copy and Show full (handled once, in initUi).
 export const hashCell = (h) => `<span class="k-h"><code class="k-hs" data-full="${esc(h)}" data-short="${esc(shortId(h))}">${esc(shortId(h))}</code>` +
@@ -24,8 +24,14 @@ export function table(cols, rows, cls = '') {
   return `<div class="k-tw"><table class="k-table ${cls}"><thead><tr>${cols.map((c) => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead>
     <tbody>${rows.map((r) => `<tr>${r.map((cell, i) => `<td data-label="${esc(cols[i])}"><div class="k-cv">${cell}</div></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
-// A two column table of facts: rows of [label, value HTML].
-export const facts = (rows) => `<table class="k-kv"><tbody>${rows.filter(Boolean).map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
+// A two column table of facts: rows of [label, value HTML, who can see it (optional: public, agent, operator, vendor only)].
+export const vis = (who) => `<span class="k-vis">${esc(who)}</span>`;
+export const facts = (rows) => `<table class="k-kv"><tbody>${rows.filter(Boolean).map(([k, v, who]) =>
+  `<tr><th scope="row">${who ? `<span class="k-kvh">${esc(k)}${vis(who)}</span>` : esc(k)}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
+// Something sealed (the vendor keeps it): dashed box with a black bar, never a value.
+export const sealed = (label = 'sealed') => `<span class="k-sealed"><i aria-hidden="true"></i><span class="k-dim">${esc(label)}</span></span>`;
+// A small bordered link box to the testnet explorer, opening in a new tab.
+export const viewLink = (href, label) => `<a class="k-view" href="${esc(href)}" rel="noopener" target="_blank" aria-label="${esc(label)} (opens the explorer in a new tab)">View ↗</a>`;
 
 // A moment (milliseconds) as UTC and as the visitor's own local time.
 export function bothTimes(ms) {

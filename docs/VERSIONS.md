@@ -89,6 +89,14 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | Intear Wallet script (not stored; loaded from https://wallet.intear.tech/near-selector.js, no versioned address; checked 2026-10-25) | pinned by sha256 in the wallet list | `6decc283352af197feff4988628899d19e05f4168a4277fe699bd8a0d6178e34` |
 | NEAR CLI script (not stored; loaded from raw.githubusercontent.com, near/near-cli-connect at commit `dc5cb123e3a8e42ed095739f4ea058b767a80ad2`, `dist/near-cli.js`) | pinned by sha256 in the wallet list | `522f2a52403f6da84384a409718c54b49ed4432cdfd583363d35109be8c8e318` |
 
+## Site look
+
+| Item | Version or source | Checked |
+| --- | --- | --- |
+| Fonts | IBM Plex Sans 400, 500, 600; JetBrains Mono 400, 700; Archivo 800 (letters of the name only), served by Google Fonts (css2 API, no version in the address) | 2026-10-26 |
+| Mark outline | Archivo ExtraBold, Google Fonts static weight 800 file, Version 2.001, sha256 `f734704aebd9faeca392e0d7e48007e8776d5727ffccf1648611f6cd768eb296` | 2026-10-26 |
+| opentype.js (reads the glyph, build time only, in `target/logo-build`) | 1.3.4 | 2026-10-26 |
+
 ## Agent model provider (agent/config.toml)
 
 | Item | Value | Checked |

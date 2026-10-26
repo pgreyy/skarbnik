@@ -83,3 +83,19 @@ export function left(ns, now = Date.now()) {
 }
 // The last moment a commit is accepted: the contract wants the reveal window and the verdict window before expiry.
 export const commitBy = (b) => (BigInt(b.expires_at_ns) - BigInt(b.reveal_window_ns) - BigInt(b.verdict_window_ns)).toString();
+
+// The access keys of an account (view_access_key_list): each key's public key and permission (FullAccess, or a
+// FunctionCall key with its receiver, methods and gas allowance). Read only; tries the second RPC if the first fails.
+export async function accessKeys(account) {
+  let last;
+  for (const url of RPCS) {
+    try {
+      const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+        jsonrpc: '2.0', id: 'k', method: 'query', params: { request_type: 'view_access_key_list', finality: 'final', account_id: account } }) });
+      const j = await r.json();
+      if (j.result && j.result.keys) return j.result.keys;
+      last = new Error((j.error && JSON.stringify(j.error)) || 'no result');
+    } catch (e) { last = e; }
+  }
+  throw new Error(`could not read the access keys of ${account} (${last && last.message})`);
+}
