@@ -42,6 +42,12 @@ local stand-in of an OpenAI compatible API exercises the NEAR AI Cloud code path
   PASS (`native_check_bounty17_attempt0.txt`). This is a local check, not a proof on chain.
 - After the deadline the agent's account claimed the timeout: `BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh`, outcome
   TimedOut, bounty Paid, the agent's balance up about 0.11 NEAR (`steps/unpack_claim_timeout_0.txt`).
+- How it was checked that the model could not see the reference fix: the fix lives only in a private folder outside the
+  repository and was never committed (`git log --all -S 'd == 0 || d > n'` finds nothing; only its sha256, public on chain
+  as reference_fix_hash, is in the evidence files); the agent's code reads only the feed, the four public code files and
+  its own records (it never opens the private folder, though it runs as the same user on the vendor's laptop); the model
+  received only the prompt saved in the run log, whose source is the public original.rs byte for byte. The fix is a
+  one condition change (`if d > n` to `if d == 0 || d > n`), so the same text as the reference fix is the natural answer.
 - Verdict: the model found and fixed the bug in code with no hints. The payment came from the timeout rule, not from a
   proof.
 
