@@ -32,6 +32,8 @@ print(d)' "$1" "$2"; }
 keep() { sed -E 's#/home/[^/ "]+#~#g' "$1" | grep -v -i -F "$(tr -d ' \n' < "$SECRET")" > "$OUTDIR/$(basename "$1")" || true; }
 proof_args() { python3 -I -c 'import base64,json,sys; d=json.load(open(sys.argv[1])); print(json.dumps({"seal":base64.b64encode(bytes.fromhex(d["seal"])).decode(),"journal":base64.b64encode(bytes.fromhex(d["journal"])).decode()})[1:-1])' "$1"; }
 # PO2: segment size as a power of two (default 19, as measured before; 18 needs less memory per segment)
+# The succinct steps may run 6 hours (21600 s): a 102 segment receipt needed more than the old 3600 s limit
+# (docs/evidence/agent/compress_u0.log). The limit only guards against a hang.
 P=(--bounty unpack --exploit "$SECRET" --original "$ORIG" --tests "$TESTS" --fuzz-count 16 --variants 32 --po2 "${PO2:-19}")
 # Stop when a measured step did not finish (scripts/s2_measure.sh writes "result: stopped ..." when a guard stops it).
 finished() { grep -q '^result: finished' "$1" && ! grep -q '^exit=[1-9]' "$1" || { echo "stopped: $(grep '^result' "$1")"; exit 1; }; }
@@ -49,11 +51,11 @@ groth16() { # groth16 <name>: succinct receipt -> Groth16 receipt -> contract ar
 case "${1:-}" in
 check)
   { for i in 1 2 3 4 5 6; do S=$(python3 -c 'import secrets;print(secrets.token_hex(32))')
-      echo "seed $S"; ./target/debug/kintsugi-check proof0 --original "$ORIG" --tests "$TESTS" --exploit "$SECRET" \
+      echo "seed $S"; ./target/debug/skarbnik-check proof0 --original "$ORIG" --tests "$TESTS" --exploit "$SECRET" \
         --reference-fix "$FIX" --seed "$S" --fuzz-count 64 --variants 64
-      ./target/debug/kintsugi-check check --candidate "$FIX" --original "$ORIG" --tests "$TESTS" --exploit "$SECRET" \
+      ./target/debug/skarbnik-check check --candidate "$FIX" --original "$ORIG" --tests "$TESTS" --exploit "$SECRET" \
         --seed "$S" --fuzz-count 64 --variants 64 --explain
-      ./target/debug/kintsugi-check check --candidate "$ORIG" --original "$ORIG" --tests "$TESTS" --exploit "$SECRET" \
+      ./target/debug/skarbnik-check check --candidate "$ORIG" --original "$ORIG" --tests "$TESTS" --exploit "$SECRET" \
         --seed "$S" --fuzz-count 64 --variants 64 --explain || true
     done; } > "$W/native_check.txt" 2>&1
   keep "$W/native_check.txt"; cat "$OUTDIR/native_check.txt"
@@ -65,7 +67,7 @@ proof0)
   MAX_SECONDS=10800 scripts/s2_measure.sh "$W/prove_proof0_unpack.log" -- $HOST prove "$FIX" --proof0 "${P[@]}" --seed "$SEED" \
     --out "$W/p0.bin"
   keep "$W/prove_proof0_unpack.log"; finished "$W/prove_proof0_unpack.log"
-  MAX_SECONDS=3600 scripts/s2_measure.sh "$W/compress_proof0_unpack.log" -- $HOST compress "$W/p0.bin" "$W/p0_succinct.bin" succinct
+  MAX_SECONDS=21600 scripts/s2_measure.sh "$W/compress_proof0_unpack.log" -- $HOST compress "$W/p0.bin" "$W/p0_succinct.bin" succinct
   keep "$W/compress_proof0_unpack.log"; finished "$W/compress_proof0_unpack.log"
   groth16 p0
   grep -q '^journal.verdict: PASS' "$W/verify_p0.txt" || { echo "Proof 0 verdict is not PASS"; exit 1; }
@@ -91,7 +93,7 @@ prove)
   MAX_SECONDS=10800 scripts/s2_measure.sh "$W/prove_u$IDX.log" -- $HOST prove "$W/patch_$IDX.wasm" "${P[@]}" --seed "$SEED" \
     --submission-id "$SID" --out "$W/u$IDX.bin"
   keep "$W/prove_u$IDX.log"; finished "$W/prove_u$IDX.log"
-  MAX_SECONDS=3600 scripts/s2_measure.sh "$W/compress_u$IDX.log" -- $HOST compress "$W/u$IDX.bin" "$W/u${IDX}_succinct.bin" succinct
+  MAX_SECONDS=21600 scripts/s2_measure.sh "$W/compress_u$IDX.log" -- $HOST compress "$W/u$IDX.bin" "$W/u${IDX}_succinct.bin" succinct
   keep "$W/compress_u$IDX.log"; finished "$W/compress_u$IDX.log"
   groth16 "u$IDX"
   note "proof for bounty $NBOUNTY attempt $IDX: $(grep -E '^journal.verdict' "$W/verify_u$IDX.txt")"
