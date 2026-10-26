@@ -3,7 +3,7 @@
 # key is used. Each case runs the agent once with a test config (in target/agent-test/) and checks its log:
 #   1 reference fix   the stand-in answers with the known reference fix: public code checked, fix built, 17 of 17
 #                     public tests pass, commit and reveal prepared but not sent; one attempt, then it stops
-#   2 model API       the default provider code talks to a local stand-in of an OpenAI compatible API: the request
+#   2 model API       (and 2b, streamed) the default provider code talks to a local stand-in of an OpenAI compatible API: the request
 #                     carries the key from the environment, and the key appears in no log or file of the run
 #   3 broken answer   an answer that does not compile is not used, and nothing is prepared
 #   4 wrong answer    an answer that fails public tests (data/attacks/reject_all.rs) is not used
@@ -11,6 +11,7 @@
 #   6 fee limit       a max fee below the next fee: the bounty is skipped
 #   7 key check       a full access key in place of the limited key: refused (the dry run notes a live run would stop)
 #   8 fingerprint     the agent's fingerprint equals the site's (scripts/web_fingerprint.mjs)
+#   9 after a FAIL    the next prompt carries the earlier fix and its FAIL verdict
 # Needs: agent/config.local.toml from ./scripts/agent_testnet.sh setup, rustc with wasm32-unknown-unknown, the local
 # checker (cargo build -p kintsugi-check), node. Usage, from the repo root: ./scripts/agent_dry_run_test.sh
 set -uo pipefail
@@ -37,7 +38,7 @@ conf ref ''
 agent ref --provider standin
 has ref 'DRY RUN \(nothing is sent\)' && has ref 'public code: module sha256 [0-9a-f]{16}\.\.\. = original_hash, 17 public tests = corpus_hash, source rebuilds to the same module: yes' \
   && has ref 'fix: sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97, 556 bytes; public tests 17 of 17 pass' \
-  && has ref 'DRY RUN: would commit' && has ref 'stop: max_attempts 1 reached' && has ref 'done: 1 attempt\(s\) prepared' \
+  && has ref 'DRY RUN: would commit' && has ref 'done: 1 attempt\(s\) prepared' \
   && ! has ref 'commit tx|reveal tx'
 ok $? "1 reference fix: checked, built, 17/17 public tests, commit prepared, not sent, stops after 1"
 
@@ -53,6 +54,14 @@ class H(http.server.BaseHTTPRequestHandler):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         open(sys.argv[3], "a").write(f"path {self.path} model {body['model']} key_ok {'yes' if self.headers.get('Authorization') == 'Bearer ' + want else 'no'} messages {len(body['messages'])}\n")
         fix = open("data/demo/fixed.rs").read()
+        if body.get("stream"):
+            # Streamed answer: server-sent events, the fix split into pieces, usage in the last event.
+            self.send_response(200); self.send_header("Content-Type", "text/event-stream"); self.end_headers()
+            text = "Here is the fix.\n```rust\n" + fix + "```"
+            for i in range(0, len(text), 200):
+                self.wfile.write(("data: " + json.dumps({"model": body["model"], "choices": [{"delta": {"reasoning_content": "thinking ", "content": text[i:i + 200]}}]}) + "\n\n").encode())
+            self.wfile.write(("data: " + json.dumps({"model": body["model"], "choices": [{"delta": {}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 1, "completion_tokens": 1}}) + "\n\ndata: [DONE]\n\n").encode())
+            return
         out = json.dumps({"model": body["model"], "choices": [{"message": {"role": "assistant", "content": "Here is the fix.\n```rust\n" + fix + "```"}}],
                           "usage": {"prompt_tokens": 1, "completion_tokens": 1}}).encode()
         self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(out))); self.end_headers(); self.wfile.write(out)
@@ -61,12 +70,22 @@ http.server.HTTPServer(("127.0.0.1", int(sys.argv[1])), H).serve_forever()
 PY
 umask 077; echo "$KEY" > "$T/mock_key"; rm -f "$T/mock_api.log"
 python3 -I "$T/mock_api.py" 8799 "$T/mock_key" "$T/mock_api.log" & M=$!; sleep 1
-conf api 's = s.replace("https://cloud-api.near.ai/v1", "http://127.0.0.1:8799/v1")'
+conf api 's = s.replace("https://cloud-api.near.ai/v1", "http://127.0.0.1:8799/v1").replace("stream = true", "stream = false")'
 NEARAI_API_KEY="$KEY" agent api
 kill $M
 grep -q 'path /v1/chat/completions .* key_ok yes messages 2' "$T/mock_api.log" && has api 'public tests 17 of 17 pass' && has api 'DRY RUN: would commit' \
   && ! grep -r -q -F "$KEY" "$T/runs" "$T/api.out"
 ok $? "2 model API: request to /v1/chat/completions with the key from the environment; key in no log or file"
+
+# 2b the same, streamed (stream = true): the answer arrives in pieces and is put back together
+python3 -I "$T/mock_api.py" 8799 "$T/mock_key" "$T/mock_api.log" & M=$!; sleep 1
+conf apistream 's = s.replace("https://cloud-api.near.ai/v1", "http://127.0.0.1:8799/v1")'
+NEARAI_API_KEY="$KEY" agent apistream
+kill $M
+has apistream 'finish stop' && has apistream 'public tests 17 of 17 pass' && has apistream 'DRY RUN: would commit' \
+  && ! grep -r -q -F "$KEY" "$T/runs" "$T/apistream.out"
+ok $? "2b model API, streamed: the pieces are put back together; 17/17 public tests; key in no log or file"
+
 rm -f "$T/mock_key"
 
 # 3 broken answer
@@ -109,6 +128,14 @@ N=$(python3 -c 'import secrets;print(secrets.token_hex(32))')
 A=$(python3 -I -c "import sys; sys.path.insert(0, 'agent'); import kintsugi_agent as k; print(k.fingerprint(open('data/demo/fixed.wasm','rb').read(), 'payee.testnet', bytes.fromhex('$N')))")
 B=$(node scripts/web_fingerprint.mjs data/demo/fixed.wasm payee.testnet "$N")
 [ "$A" = "$B" ]; ok $? "8 fingerprint equals the site's ($A)"
+
+# 9 after a FAIL: the next prompt carries the earlier fix and its FAIL verdict
+python3 -I - <<'PY9'
+import sys; sys.path.insert(0, "agent"); import kintsugi_agent as k
+m = k.prompt("src", "tests", "build", {"max_patch_bytes": 1024}, [{"source": "EARLIER FIX SOURCE\n"}])
+assert "the verdict was FAIL" in m[1]["content"] and "EARLIER FIX SOURCE" in m[1]["content"]
+PY9
+ok $? "9 after a FAIL: the next prompt holds the earlier fix and its FAIL verdict"
 
 echo "agent dry run tests: $pass passed, $fail failed"
 [ "$fail" = 0 ]

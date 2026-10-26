@@ -20,7 +20,8 @@
 //! --exploit <file> (the secret crashing input as a hex text file; default data/demo/exploit.hex, the public demo
 //! secret; a real bounty keeps its secret outside the repository), and one of --bounty <name> (a private random salt for
 //! the secret's commitment, made once per bounty in ~/.kintsugi-salts/, the normal choice) or --demo-salt (the public
-//! demo salt of the demo bounties). The other bounty files are the demo files in data/demo/. Proving runs on this machine through the installed
+//! demo salt of the demo bounties), --original <file> and --tests <file> (the bounty's original module and public
+//! tests; default the demo files data/demo/original.wasm and data/demo/public_tests.txt). Proving runs on this machine through the installed
 //! r0vm; nothing is sent to a remote prover.
 
 use std::process::ExitCode;
@@ -96,6 +97,9 @@ struct Opts {
     bounty: Option<String>,
     /// The secret crashing input (hex text file). Never printed.
     exploit: String,
+    /// The bounty's original module and public tests.
+    original: String,
+    tests: String,
 }
 
 fn parse_opts(args: &[String]) -> Result<Opts, String> {
@@ -114,6 +118,8 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
         demo_salt: false,
         bounty: None,
         exploit: "data/demo/exploit.hex".to_string(),
+        original: "data/demo/original.wasm".to_string(),
+        tests: "data/demo/public_tests.txt".to_string(),
     };
     let mut i = 1;
     while i < args.len() {
@@ -147,6 +153,8 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
             }
             "--bounty" => opts.bounty = Some(value()?.clone()),
             "--exploit" => opts.exploit = value()?.clone(),
+            "--original" => opts.original = value()?.clone(),
+            "--tests" => opts.tests = value()?.clone(),
             other => return Err(format!("unknown option {other}")),
         }
         i += 2;
@@ -202,10 +210,10 @@ fn salt_for(opts: &Opts) -> Result<[u8; 32], String> {
 
 fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
     let exploit_text = String::from_utf8(read(&opts.exploit)?).map_err(|e| e.to_string())?;
-    let tests_text = String::from_utf8(read("data/demo/public_tests.txt")?).map_err(|e| e.to_string())?;
+    let tests_text = String::from_utf8(read(&opts.tests)?).map_err(|e| e.to_string())?;
     let tests = parse_tests(&tests_text)?;
     Ok(GuestInput {
-        original: read("data/demo/original.wasm")?,
+        original: read(&opts.original)?,
         exploit: parse_hex(exploit_text.trim())?,
         salt: salt_for(opts)?,
         public_tests: tests.into_iter().map(|t| (t.input, t.expected)).collect(),

@@ -1,0 +1,23 @@
+# Public tests for the packed byte decoder (data/unpack/original.rs).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+# The expected values were produced by running the original module:
+#   target/debug/kintsugi-check run --module data/unpack/original.wasm --input <hex>
+# Proof 0 (`kintsugi-check proof0`) re-checks that the original returns every one of them.
+
+-                                  84696351     # no commands
+0041                               1809155255   # literal, 1 byte
+0368656c6c6f                       -1           # literal, 4 bytes "hell", then an unfinished command
+0468656c6c6f                       93541866     # literal "hello"
+0161628002                         523182055    # literal "ab", copy 3 from 2 back
+00788003                           -3           # literal "x", copy from 3 back
+02414243810100                     -1           # literal "ABC", copy 4 from 1 back, then a literal with no byte
+0441424344458203                   248847721    # literal 5 bytes, copy 5 from 3 back
+034b4c4d4e83048101                 150899556    # literal 4 bytes, two copies
+00418001800180018001               722089815    # literal "A", four copies from 1 back
+7f                                 -1           # literal that needs 128 bytes, input ends
+80                                 -1           # copy with no distance byte
+8001                               -3           # copy from 1 back of an empty output
+016162800a                         -3           # copy from 10 back of a 2 byte output
+00009f01                           1960963196   # literal 1 byte, copy 34 from 1 back
+00ff8001ff01                       1636340299   # literal 1 byte, copy 3, copy 130 from 1 back
+00ff8001ff01ff01                   -2           # output would hold more than 200 bytes

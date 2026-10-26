@@ -16,6 +16,8 @@ const getRecorded = async () => recorded || (recorded = await (await fetch('data
 const rec = (src) => `<span class="k-rec">Recorded</span> <span class="k-src">${esc(src)}</span>`;
 const levelText = (l) => (l === 2 ? 'The contract checks a Groth16 proof of the RISC Zero result itself.' : 'Two registered verifiers sign the same verdict.');
 const isDemo = (b) => recorded && b.exploit_commitment === recorded.notes.demo_exploit_commitment.commitment;
+const newModule = (b) => recorded && recorded.new_module_bounties && recorded.new_module_bounties[String(b.id)];
+const inputLabel = (b) => (newModule(b) ? 'Private bounty, new module' : isDemo(b) ? 'Demo input' : 'Private secret input');
 const testNote = (b) => recorded && recorded.test_bounties && recorded.test_bounties[String(b.id)];
 const bountyLinks = (b) => `<span class="k-links"><a href="${EXPLORER_ACCOUNT}${CONTRACT}" rel="noopener" target="_blank">Contract</a><a href="#/raw/${esc(b.id)}">Raw data</a></span>`;
 const failBox = (e) => `<div class="k-state" role="alert"><p class="k-err">Could not read the contract on testnet.</p><p class="m-note">${esc(e.message)}. Check your connection and reload.</p></div>`;
@@ -129,7 +131,7 @@ async function bounties(main) {
       const st = bountyState(b), cl = left(commitBy(b));
       const time = b.state !== 'Open' ? 'Closed' : cl ? `Attempts close in ${cl.replace(' left', '')}` : `Expires ${utc(b.expires_at_ns)}`;
       return [
-        `<a class="m-bid" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>${testNote(b) ? ' <span class="m-tag">Test bounty</span>' : ''}<span class="m-sub">${isDemo(b) ? 'Demo input' : 'Private secret input'}</span>${bountyLinks(b)}`,
+        `<a class="m-bid" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>${testNote(b) ? ' <span class="m-tag">Test bounty</span>' : ''}<span class="m-sub">${inputLabel(b)}</span>${bountyLinks(b)}`,
         badge(st.v, st.t), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`,
         `<span class="k-mono k-nw">${esc(attemptsText(b))}</span>${pips(b)}`,
         b.state === 'Open' ? `<span class="k-mono k-nw">${esc(near(b.next_fee))}</span>` : '<span class="k-dim">closed</span>',
@@ -153,9 +155,10 @@ async function bounty(main, id, tab) {
   const st = bountyState(b), slots = slotList(b, subs), txs = rd.bounties[String(b.id)] || [], note = rd.bounty_notes && rd.bounty_notes[String(b.id)];
   const demo = isDemo(b), imgOk = b.image_id === PUBLISHED_IMAGE_ID, cl = left(commitBy(b));
   $('#b').innerHTML = `
-  <div class="m-line">${badge(st.v, st.t)}${testNote(b) ? '<span class="m-tag">Test bounty</span>' : ''}<span class="m-tok">Checked by Level ${b.level}</span><span class="m-tok">${demo ? 'Demo input' : 'Private secret input'}</span>${bountyLinks(b)}</div>
+  <div class="m-line">${badge(st.v, st.t)}${testNote(b) ? '<span class="m-tag">Test bounty</span>' : ''}<span class="m-tok">Checked by Level ${b.level}</span><span class="m-tok">${inputLabel(b)}</span>${bountyLinks(b)}</div>
   <p class="m-note">On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p>
   ${testNote(b) ? `<p class="m-note"><b>${esc(testNote(b))}</b></p>` : ''}
+  ${newModule(b) ? `<p class="m-note"><b>${esc(newModule(b))}</b></p>` : ''}
   ${Number(b.id) === 12 ? '<p class="m-note">Bounty 12 uses the public demo bug: anyone can submit the public fixed.wasm, and if the vendor stays silent the timeout rule can pay out without any proof.</p>' : ''}
   ${note ? `<p class="m-note"><b>Note.</b> ${esc(note.text)} ${tx(note.tx)} <span class="k-src">${esc(note.source)}</span></p>` : ''}
   <section class="m-panel k-send" id="sendPanel" aria-labelledby="sendT"></section>

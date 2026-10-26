@@ -1,0 +1,9 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/unpack/u0_succinct.bin target/unpack/u0_groth16.bin groth16
+utc_start=2026-10-26T02:30:07Z
+limits: max_rss_mib=6144 min_avail_mib=500 max_seconds=1800
+error: target/unpack/u0_succinct.bin: No such file or directory (os error 2)
+exit=2
+wall_seconds=5.11
+r0vm_peak_rss_mib=0 (VmHWM, sampled every 5 s)
+min_available_mib=5722
+result: finished

@@ -1,0 +1,7 @@
+How to build a patch for this program (the same flags the vendor used for the original):
+rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \
+  -C codegen-units=1 -C target-cpu=mvp -C link-arg=-zstack-size=8192 -C link-arg=--initial-memory=131072 \
+  -C link-arg=--max-memory=131072 -o patch.wasm patch.rs
+Keep the interface: input_buf() -> i32 and parse(len: i32) -> i32. The patch must be at most the bounty's max_patch_bytes.
+Public tests: one per line, <input as hex, or - for empty> <value the original returns>. corpus_hash is sha256 over, for
+each test in order: input length (u32 little endian), input bytes, expected value (i32 little endian).

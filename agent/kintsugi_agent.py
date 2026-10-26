@@ -8,7 +8,8 @@
 # max_attempts commits. The model's API key is read from an environment variable or a file outside the repository and
 # is never printed or logged. Standard library only (Python 3.11+); signing uses near-cli-rs with the key file.
 # Usage, from the repo root:
-#   python3 -I agent/kintsugi_agent.py run [--live] [--bounty ID] [--provider NAME] [--config FILE]
+#   python3 -I agent/kintsugi_agent.py run [--live] [--bounty ID] [--provider NAME] [--config FILE] [--max-attempts N]
+#       [--watch-minutes M]   (after a reveal, wait up to M minutes for the verdict; after a FAIL, try the bounty again)
 #   python3 -I agent/kintsugi_agent.py status [--config FILE]
 import argparse
 import base64
@@ -168,13 +169,18 @@ def ask_model(pcfg, messages, key):
         return "```rust\n" + open(os.path.join(ROOT, pcfg["response_file"])).read() + "```\n", {"model": "standin"}
     if pcfg["type"] != "openai-compatible":
         raise RuntimeError(f"unknown provider type {pcfg['type']}")
-    body = json.dumps({"model": pcfg["model"], "messages": messages, "temperature": pcfg.get("temperature", 0.2),
-                       "max_tokens": pcfg.get("max_tokens", 4000)}).encode()
+    stream = bool(pcfg.get("stream", False))
+    req_body = {"model": pcfg["model"], "messages": messages, "temperature": pcfg.get("temperature", 0.2),
+                "max_tokens": pcfg.get("max_tokens", 4000)}
+    if stream:
+        # Streamed: the answer arrives piece by piece, so a long think does not hit a gateway's idle time limit.
+        req_body.update(stream=True, stream_options={"include_usage": True})
     url = pcfg["base_url"].rstrip("/") + "/chat/completions"
-    req = urllib.request.Request(url, body, {"Content-Type": "application/json", "Authorization": "Bearer " + key})
+    req = urllib.request.Request(url, json.dumps(req_body).encode(),
+                                 {"Content-Type": "application/json", "Authorization": "Bearer " + key})
     try:
         with urllib.request.urlopen(req, timeout=pcfg.get("timeout_s", 300)) as r:
-            d = json.load(r)
+            d = read_stream(r, t_end=time.time() + pcfg.get("timeout_s", 300)) if stream else json.load(r)
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"the model API answered HTTP {e.code}: {e.read()[:300].decode(errors='replace')}")
     ch = d["choices"][0]
@@ -183,7 +189,31 @@ def ask_model(pcfg, messages, key):
                                                 "finish": ch.get("finish_reason"), "raw": d}
 
 
-def prompt(source, tests, build, b):
+def read_stream(r, t_end):
+    """Reads a streamed chat completion (server-sent events) into the same shape as a plain answer."""
+    content, reasoning, finish, usage, model = [], [], None, None, None
+    for raw in r:
+        if time.time() > t_end:
+            raise TimeoutError("the streamed answer took longer than timeout_s")
+        line = raw.decode(errors="replace").strip()
+        if not line.startswith("data:"):
+            continue
+        data = line[5:].strip()
+        if data == "[DONE]":
+            break
+        ev = json.loads(data)
+        model = ev.get("model") or model
+        usage = ev.get("usage") or usage
+        for ch in ev.get("choices") or []:
+            delta = ch.get("delta") or {}
+            content.append(delta.get("content") or "")
+            reasoning.append(delta.get("reasoning_content") or "")
+            finish = ch.get("finish_reason") or finish
+    return {"model": model, "usage": usage, "choices": [{"finish_reason": finish, "message": {
+        "role": "assistant", "content": "".join(content), "reasoning_content": "".join(reasoning)}}]}
+
+
+def prompt(source, tests, build, b, history=()):
     system = ("You fix one crash bug in a small Rust program that is compiled to WebAssembly. The input that makes it "
               "crash is secret. Return the complete fixed source file in one ```rust code block and nothing else.")
     user = f"""This program crashes (traps) on a secret input. Find the bug and fix it.
@@ -201,6 +231,14 @@ Public tests:
 Source (original.rs):
 ```rust
 {source}```
+"""
+    for h in history:
+        # Only what the chain says: the fix was revealed and the checker's verdict on the secret input was FAIL.
+        user += f"""
+An earlier fix for this program was checked against the secret input and the verdict was FAIL (it still crashes on
+the secret input, or it changed a result it must keep). Do not send the same fix again. That fix was:
+```rust
+{h['source']}```
 """
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
@@ -266,7 +304,7 @@ def load_config(path):
 
 # ---- one attempt ----
 
-def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key):
+def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key, k=1, history=()):
     bid = str(b_feed["bounty_id"])
     log(f"== bounty {bid}: level {b_feed['level']}, {b_feed['bounty_amount']}, next fee {b_feed['next_fee']}, "
         f"{b_feed['slots_left']} of {b_feed['max_commits']} slots free")
@@ -308,9 +346,10 @@ def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key):
         f"source rebuilds to the same module: {'yes' if same else 'no'}")
     # 3. ask the model, build, test; retry with the errors, at most max_model_tries times
     pcfg = cfg["providers"][pname]
-    messages = prompt(source, tests_text, build_text, b)
-    open(os.path.join(run_dir, f"prompt_{bid}.txt"), "w").write("\n\n".join(f"[{m['role']}]\n{m['content']}" for m in messages))
-    log(f"  prompt: {len(messages[1]['content'])} characters, saved as prompt_{bid}.txt; provider {pname} ({pcfg['type']}, "
+    tag = f"{bid}_a{k}"
+    messages = prompt(source, tests_text, build_text, b, history)
+    open(os.path.join(run_dir, f"prompt_{tag}.txt"), "w").write("\n\n".join(f"[{m['role']}]\n{m['content']}" for m in messages))
+    log(f"  prompt: {len(messages[1]['content'])} characters, saved as prompt_{tag}.txt ({len(history)} earlier FAIL fix(es) included); provider {pname} ({pcfg['type']}, "
         f"model {pcfg.get('model', '-')})")
     patch = None
     for t in range(1, int(cfg["max_model_tries"]) + 1):
@@ -319,11 +358,11 @@ def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key):
             reply, meta = ask_model(pcfg, messages, key)
         except (RuntimeError, OSError, KeyError, ValueError) as e:
             reply, meta = "", {"model": pcfg.get("model"), "finish": f"call failed: {type(e).__name__}: {e}"[:200]}
-        open(os.path.join(run_dir, f"reply_{bid}_{t}.txt"), "w").write(reply)
+        open(os.path.join(run_dir, f"reply_{tag}_{t}.txt"), "w").write(reply)
         if "raw" in meta:
-            json.dump(meta.pop("raw"), open(os.path.join(run_dir, f"response_{bid}_{t}.json"), "w"), indent=1)
+            json.dump(meta.pop("raw"), open(os.path.join(run_dir, f"response_{tag}_{t}.json"), "w"), indent=1)
         src = extract_rust(reply)
-        src_path = os.path.join(run_dir, f"fix_{bid}_{t}.rs")
+        src_path = os.path.join(run_dir, f"fix_{tag}_{t}.rs")
         open(src_path, "w").write(src)
         log(f"  model try {t}: {round(time.time() - t0, 1)} s, model {meta.get('model')}, finish {meta.get('finish') or '-'}, "
             f"usage {meta.get('usage') or '-'}")
@@ -344,6 +383,8 @@ def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key):
                 problem = f"the module is {len(wasm)} bytes, above the limit of {b['max_patch_bytes']}"
             elif sha(wasm) == b["original_hash"]:
                 problem = "the module is identical to the original"
+            elif sha(wasm) in {h["patch_sha256"] for h in history}:
+                problem = "the module is the same as an earlier fix that got FAIL on the secret input"
             elif fails:
                 problem = "public tests fail:\n" + "\n".join(fails[:8])
             else:
@@ -360,7 +401,8 @@ def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key):
     commit_args = {"bounty_id": bid, "fingerprint": fp, "payout": cfg["payout"]}
     rec = {"bounty_id": bid, "account": cfg["account"], "payout": cfg["payout"], "fingerprint": fp,
            "patch_sha256": sha(patch), "patch_bytes": len(patch), "fee": str(fee), "nonce": nonce.hex(),
-           "patch_file": os.path.relpath(src_path[:-3] + ".wasm", ROOT), "live": live, "run_dir": os.path.relpath(run_dir, ROOT)}
+           "patch_file": os.path.relpath(src_path[:-3] + ".wasm", ROOT),
+           "source_file": os.path.relpath(src_path, ROOT), "live": live, "run_dir": os.path.relpath(run_dir, ROOT)}
     if not live:
         log(f"  DRY RUN: would commit {json.dumps(commit_args)} as {cfg['account']} with the limited key (fee {near(fee)})")
         log(f"  DRY RUN: would then reveal the {len(patch)} byte patch with its nonce; nothing sent")
@@ -378,7 +420,7 @@ def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key):
     log(f"  reveal tx {r['tx']}: {'ok' if r['ok'] else 'refused: ' + r.get('error', '')}")
     rec.update(reveal_tx=r["tx"], revealed=r["ok"])
     save_attempt(cfg, rec)
-    return "sent"
+    return "sent" if r["ok"] else "committed"
 
 
 def state_path(cfg):
@@ -418,6 +460,35 @@ def check_key(cfg, chain, log):
         f"allowance {near(fc['allowance']) if fc.get('allowance') else 'none set'}")
 
 
+def earlier(cfg, chain, bid):
+    """This account's sent attempts on a bounty, each with its state on chain (FAIL, PASS or waiting) and its source."""
+    out = []
+    for a in load_attempts(cfg):
+        if a.get("live") and a["bounty_id"] == bid and a["account"] == cfg["account"] and a.get("index") is not None:
+            s = chain.view("get_submission", {"bounty_id": bid, "index": a["index"]})
+            state = s["verdict"] or ("waiting" if s["outcome"] == "Open" else s["outcome"])
+            src = os.path.join(ROOT, a.get("source_file", ""))
+            out.append({"index": a["index"], "state": state, "patch_sha256": a["patch_sha256"],
+                        "source": open(src).read() if a.get("source_file") and os.path.isfile(src) else "(source not kept)\n"})
+    return out
+
+
+def wait_verdict(cfg, chain, bid, log, minutes):
+    """After a reveal: waits up to `minutes` for the verdict of this account's newest attempt; returns PASS, FAIL or None."""
+    recs = [a for a in load_attempts(cfg) if a["bounty_id"] == bid and a["account"] == cfg["account"] and a.get("index") is not None]
+    idx = max(a["index"] for a in recs)
+    log(f"  waiting up to {minutes} min for the verdict of bounty {bid} attempt {idx} (the vendor proves it against the secret input)")
+    t_end = time.time() + minutes * 60
+    while time.time() < t_end:
+        s = chain.view("get_submission", {"bounty_id": bid, "index": idx})
+        if s["verdict"] or s["outcome"] != "Open":
+            log(f"  verdict of bounty {bid} attempt {idx}: {s['verdict'] or '-'}, outcome {s['outcome']}")
+            return s["verdict"]
+        time.sleep(60)
+    log(f"  no verdict for bounty {bid} attempt {idx} after {minutes} min; stopping")
+    return None
+
+
 def cmd_run(cfg, args):
     live = args.live
     pname = args.provider or cfg["provider"]
@@ -428,9 +499,10 @@ def cmd_run(cfg, args):
     os.makedirs(run_dir, exist_ok=True)
     log = Log(os.path.join(run_dir, "run.log"), [key])
     chain = Chain(cfg["rpc"], cfg["contract"])
+    cap = int(args.max_attempts or cfg["max_attempts"])
     log(f"Skarbnik agent: {'LIVE' if live else 'DRY RUN (nothing is sent)'}, contract {cfg['contract']} ({cfg['network']}), "
         f"account {cfg['account']}, payout {cfg['payout']}, max fee {near(cfg['max_fee_yocto'])}, "
-        f"max attempts {cfg['max_attempts']}, run folder {os.path.relpath(run_dir, ROOT)}")
+        f"max attempts {cap}, run folder {os.path.relpath(run_dir, ROOT)}")
     if cfg["network"] != "testnet" and not cfg.get("allow_mainnet"):
         return log("stop: this agent is set up for testnet only")
     try:
@@ -444,29 +516,39 @@ def cmd_run(cfg, args):
     if feed["contract"] != cfg["contract"]:
         return log(f"stop: the feed is for {feed['contract']}, not {cfg['contract']}")
     log(f"feed: {len(feed['open_bounties'])} open bounties, made {feed['generated_at_utc']}")
-    done = {(a["bounty_id"], a["account"]) for a in load_attempts(cfg) if a.get("live")}
     picks = [b for b in feed["open_bounties"] if args.bounty is None or str(b["bounty_id"]) == str(args.bounty)]
     if args.bounty is None:
         picks = [b for b in picks if not b.get("test_bounty") or cfg.get("include_test_bounties")]
         picks.sort(key=lambda b: (-float(b["bounty_amount"].split()[0]), int(b["next_fee_yocto"])))
+    if not picks:
+        log("no bounty to try" + (f" (bounty {args.bounty} is not open in the feed)" if args.bounty else ""))
     sent = 0
     for b in picks:
-        if sent >= int(cfg["max_attempts"]):
-            log(f"stop: max_attempts {cfg['max_attempts']} reached")
+        bid = str(b["bounty_id"])
+        while True:
+            if sent >= cap:
+                log(f"stop: max attempts {cap} reached")
+                break
+            history = earlier(cfg, chain, bid)
+            if any(h["state"] != "FAIL" for h in history):
+                log(f"skip bounty {bid}: this account has an attempt on it that passed or still waits for its verdict")
+                break
+            if len(history) >= cap:
+                log(f"skip bounty {bid}: this account already has {len(history)} attempts on it (the cap is {cap})")
+                break
+            try:
+                r = attempt(cfg, chain, b, log, run_dir, live, pname, key, len(history) + 1, history)
+            except RuntimeError as e:
+                log(f"error on bounty {bid}: {e}")
+                r = None
+            if r in ("dry", "sent", "committed"):
+                sent += 1
+            if r != "sent" or not args.watch_minutes:
+                break
+            if wait_verdict(cfg, chain, bid, log, int(args.watch_minutes)) != "FAIL":
+                break
+        if sent >= cap:
             break
-        if (str(b["bounty_id"]), cfg["account"]) in done:
-            log(f"skip bounty {b['bounty_id']}: this account already has an attempt on it")
-            continue
-        try:
-            r = attempt(cfg, chain, b, log, run_dir, live, pname, key)
-        except RuntimeError as e:
-            log(f"error on bounty {b['bounty_id']}: {e}")
-            r = None
-        if r in ("dry", "sent"):
-            sent += 1
-    else:
-        if not picks:
-            log("no bounty to try" + (f" (bounty {args.bounty} is not open in the feed)" if args.bounty else ""))
     log(f"done: {sent} attempt(s) {'sent' if live else 'prepared (dry run)'}. Check verdicts later with: "
         f"python3 -I agent/kintsugi_agent.py status")
 
@@ -490,6 +572,9 @@ def main():
     ap.add_argument("--live", action="store_true", help="send transactions (default: dry run, nothing is sent)")
     ap.add_argument("--bounty", help="try only this bounty id")
     ap.add_argument("--provider", help="model provider name from the config")
+    ap.add_argument("--max-attempts", type=int, help="commits in this run, at most (default: max_attempts in the config)")
+    ap.add_argument("--watch-minutes", type=int, default=0,
+                    help="after a reveal, wait this long for the verdict, and after a FAIL try the same bounty again")
     args = ap.parse_args()
     cfg = load_config(args.config)
     for k in ("checker",):

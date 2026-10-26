@@ -5,3 +5,7 @@ test bounty 16 for the agent's real run: opened True K 2 next fee 10000000000000
 proving bounty 16 attempt 0: patch sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97 (read from the chain), seed 167cbd5a3483c03273ac45d62d42010a02e4ca44d1ff6d34e4e2dfaa91876fbc
 proof for attempt 0 ready: receipt file: target/agent-test/a0_groth16.bin (2057 bytes) image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc verify seconds: 0.008 
 bounty 16 attempt 0: verdict PASS, outcome Passed; bounty state Paid; agent balance 9949000091068983399999999 -> 10059000091068983399999999 yoctoNEAR
+unpack Proof 0: wall_seconds=5384.58 r0vm_peak_rss_mib=4725 (VmHWM, sampled every 5 s) 
+private bounty 17 on the new module data/unpack: opened True K 3 image_id_allowed True next fee 10000000000000000000000
+proving bounty 17 attempt 0: patch sha256 da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81 (read from the chain), seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a
+proving bounty 17 attempt 0: patch sha256 da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81 (read from the chain), seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a

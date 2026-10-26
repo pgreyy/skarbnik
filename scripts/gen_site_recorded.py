@@ -180,6 +180,9 @@ if "CBOUNTY" in runenv:
     out["test_bounties"][runenv["CBOUNTY"]] = "Test bounty: made for the scripted run of the site with the NEAR CLI wallet."
 # The test bounty for the model-driven agent's real run (scripts/agent_testnet.sh bounty)
 agentenv = dict(l.strip().split("=", 1) for l in open(os.path.join(ROOT, "docs/evidence/agent/run.env")) if "=" in l)
+out["new_module_bounties"] = {}
+if "NBOUNTY" in agentenv:
+    out["new_module_bounties"][agentenv["NBOUNTY"]] = "Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/unpack/) is new, with no hint at its bug."
 if "ABOUNTY" in agentenv:
     out["test_bounties"][agentenv["ABOUNTY"]] = "Test bounty: made for the real run of the model-driven agent (agent/)."
 

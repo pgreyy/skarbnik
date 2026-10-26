@@ -30,6 +30,7 @@ api_key_file = "~/.kintsugi-secrets/nearai_api_key"
 temperature = 0.2
 max_tokens = 12000                           # a reasoning model needs room to think before it answers
 timeout_s = 1200                             # thinking runs at about 17 tokens a second (measured 2026-10-25)
+stream = true                                # streamed answer: a long think is not cut off at 600 s (seen 2026-10-26)
 
 # A stand-in for tests: answers with the bounty's known reference fix, no network and no key.
 [provider.standin]

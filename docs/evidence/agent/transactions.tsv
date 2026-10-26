@@ -8,3 +8,6 @@ agent_bounty_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	CGvpXLc1Dtg7nP
 agent_submit_groth16_0	submit_groth16	kintsugi-vendor-prnvm.testnet	5NH9rhRMdLxRtKBtjxAsqQwFWejtu2tU9oNf69G2yUq9	0.378 Tgas	0.0000377153203035	0	6.57
 agent_live_commit	commit	limited key of kintsugi-agent-d9410f.testnet	CDJsxmiuTAYbYF25DhRC5Ws7hcSXeBX5WsGrUBPh2tSG	-	-	agent	-
 agent_live_reveal	reveal	limited key of kintsugi-agent-d9410f.testnet	A8zW8CDS7RcGKUBdNMt6c6jXDzVZKYweA4MMExbNBXug	-	-	agent	-
+agent_topup_credit	deposit_credit	kintsugi-agent-d9410f.testnet	oCGP961KkSJb5LyMbf9NCcvZSEBBYPszAHaeQh35wec	0.310 Tgas	0.0000309633062595	0	5.73
+unpack_bounty_create	create_bounty	kintsugi-vendor-prnvm.testnet	XTGrM4irHF4T2HKyLevDmTN9hVXFHKMR4hnQpeQyGNx	0.353 Tgas	0.000035269145724	0	6.79
+unpack_bounty_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	57cTTbF7rh7eWVamQ1Av5fP4BySCAcfqwsXdM68jDJM8	0.377 Tgas	0.000037681941703	0	6.85

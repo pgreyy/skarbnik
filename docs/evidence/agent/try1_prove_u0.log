@@ -1,0 +1,9 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host prove target/unpack/patch_0.wasm --bounty unpack --exploit ~/.kintsugi-salts/unpack/exploit.hex --original data/unpack/original.wasm --tests data/unpack/public_tests.txt --fuzz-count 16 --variants 32 --po2 19 --seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a --submission-id 717b150479368c59aba67d6f372a3255d5c98de1ff666a8535be8493cc8606bb --out target/unpack/u0.bin
+utc_start=2026-10-26T02:04:51Z
+limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=10800
+salt: the private salt of bounty unpack (existing)
+exit=143
+wall_seconds=1511.11
+r0vm_peak_rss_mib=4712 (VmHWM, sampled every 5 s)
+min_available_mib=1513
+result: stopped: r0vm peak 4712 MiB, available 1513 MiB
