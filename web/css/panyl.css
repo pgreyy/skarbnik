@@ -280,7 +280,7 @@
 .sk[data-sec="6"][data-lay="cdock"] main.home>section:not([data-i="6"]){display:none}
 @container sk (min-width:701px){
 
-.sk[data-lay="cdock"] .lay-wrap{display:flex;flex-direction:column;flex:1 0 auto;width:min(1380px,calc(100% - 48px));margin:28px auto 36px;border:1px solid var(--ln);border-radius:calc(22px * var(--rs));background:var(--s1);overflow:hidden}
+.sk[data-lay="cdock"] .lay-wrap{display:flex;flex-direction:column;flex:1 0 auto;width:min(1480px,calc(100% - 48px));margin:28px auto 36px;border:1px solid var(--ln);border-radius:calc(22px * var(--rs));background:var(--s1);overflow:hidden}
 .sk[data-lay="cdock"] .lay-bar{display:flex;border-bottom:1px solid var(--ln);background:var(--bg2)}
 .sk[data-lay="cdock"] .lay-body{display:grid;grid-template-columns:268px minmax(0,1fr);flex:1 0 auto}
 .sk[data-lay="cdock"] .lay-nav{display:flex;flex-direction:column;justify-content:space-between;gap:24px;padding:26px 16px 22px;border-right:1px solid var(--ln);background:var(--bg2)}
@@ -292,7 +292,7 @@
 .sk[data-lay="cdock"] main.home>section{background:transparent!important;border-top:0!important}
 .sk[data-lay="cdock"] main.home>section.sec{padding:64px 0}
 .sk[data-lay="cdock"] main.home>section.hero>.wrap{padding-top:56px!important}
-.sk[data-lay="cdock"] main.home .wrap{max-width:1020px;padding:0 44px}
+.sk[data-lay="cdock"] main.home .wrap{max-width:1100px;padding:0 44px}
 .sk[data-lay="cdock"] .lay-ctl{display:flex;border-top:1px solid var(--ln);background:var(--bg2);padding:14px 0}
 @container sk (max-width:1000px){
  .sk[data-lay="cdock"] .lay-wrap{width:calc(100% - 20px);margin:10px auto 24px}

@@ -174,7 +174,8 @@ function sections(ex) {
 const chrome = (inner) => `<div class="lay-wrap">
 <div class="lay-body">
 <nav class="lay-nav" aria-label="Home sections">
-<ol class="ln-list">${NAMES.map((n, i) => `<li><button class="ln-i" type="button" data-sec="${i}" aria-label="${esc(n)}" aria-current="${i === current}"><span class="ln-n">${two(i)}</span><span class="ln-t">${esc(n)}</span></button></li>`).join('')}</ol>
+<div class="rail-top"><button class="rail-tg" type="button" id="railTg" aria-controls="railList">${icon('sidebar')}</button>
+<ol class="ln-list" id="railList">${NAMES.map((n, i) => `<li><button class="ln-i" type="button" data-sec="${i}" aria-label="${esc(n)}" aria-current="${i === current}"><span class="ln-n">${two(i)}</span><span class="ln-t">${esc(n)}</span></button></li>`).join('')}</ol></div>
 <div class="ln-links"><a href="#/judge">Judge guide</a><a href="#/evidence/ledger">Evidence ledger</a><a href="#/bounties">Browse bounties</a></div>
 </nav>
 <main id="main" class="home p-home" tabindex="-1">${inner}</main>
@@ -203,6 +204,17 @@ export async function home(viewEl, sec = 0) {
   showSection(sec, true);
   viewEl.querySelectorAll('.ln-i').forEach((b) => b.addEventListener('click', () => showSection(Number(b.dataset.sec))));
   $('#secPrev').addEventListener('click', () => showSection(current - 1));
+  // The Console rail collapses to a strip of section numbers (desktop only); the choice is remembered in this browser.
+  const railTg = $('#railTg');
+  const setRail = (collapsed, save) => {
+    document.body.setAttribute('data-rail', collapsed ? 'collapsed' : 'open');
+    railTg.setAttribute('aria-expanded', String(!collapsed));
+    railTg.setAttribute('aria-label', collapsed ? 'Expand sections' : 'Collapse sections'); railTg.title = railTg.getAttribute('aria-label');
+    if (save) { try { localStorage.setItem('skarbnik-rail', collapsed ? 'collapsed' : 'open'); } catch { /* storage blocked */ } }
+  };
+  let railStored = 'open'; try { railStored = localStorage.getItem('skarbnik-rail') || 'open'; } catch { /* storage blocked */ }
+  setRail(railStored === 'collapsed', false);
+  railTg.addEventListener('click', () => setRail(document.body.getAttribute('data-rail') !== 'collapsed', true));
   $('#secNext').addEventListener('click', () => showSection(current + 1));
   matrix($('#homeMatrix'));
   // the six rules: one open at a time, the first open to start

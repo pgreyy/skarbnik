@@ -197,3 +197,50 @@ body.sk>main{flex:1 0 auto}
  .sk[data-lay="cdock"] main.home>section.sec{padding:32px 0 120px}
  .sk[data-lay="cdock"] main.home>section.hero>.wrap{padding-top:32px!important;padding-bottom:120px!important}
 }
+
+/* Big figures never break inside a word; each tile is a size container, so the figure scales down to fit it */
+.sk .metric,.sk .strip>div,.sk .nums>div,.sk .stat4>div{container-type:inline-size}
+.sk .metric .v,.sk .strip b,.sk .nums b,.sk .stat4 .num,.sk .p-evidence .big,.sk .p-judge .sn b{overflow-wrap:normal;word-break:normal;hyphens:none}
+.sk :where(.p-home) .metric .v{font-size:min(calc(40px * var(--hs,1)), 26cqi)}
+.sk :where(.p-bounties) .strip b,.sk :where(.p-evidence) .nums b{font-size:min(calc(34px * var(--hs,1)), 24cqi)}
+.sk .stat4 .num{font-size:min(calc(34px * var(--hs,1)), 22cqi)}
+
+/* "Who sees what": slightly tighter cells, so all four columns fit beside the party list at 1440 px and up */
+@container sk (min-width:701px){
+ .sk .mx{min-width:620px}
+ .sk .mx th{padding:16px 8px 12px}
+ .sk .mx td{padding:6px 6px}
+ .sk .mx td.rowh,.sk .mx th.first{padding-left:16px}
+ .sk .cell{padding:0 8px;gap:6px}
+}
+
+/* Home in the Console between 1001 and about 1360 px wide: the content column is narrower than the design's, so the
+   example's side column goes under the main card, and the two-column sections stack sooner. A collapsed rail gives
+   the content about 200 px back, so its thresholds are lower. */
+@container sk (min-width:1001px) and (max-width:1360px){
+ .sk[data-lay="cdock"]:not([data-rail="collapsed"]) :where(.p-home) .case{grid-template-columns:minmax(0,1fr)}
+}
+@container sk (min-width:1001px) and (max-width:1160px){
+ .sk[data-lay="cdock"] :where(.p-home) .case{grid-template-columns:minmax(0,1fr)}
+}
+@container sk (min-width:1001px) and (max-width:1220px){
+ .sk[data-lay="cdock"]:not([data-rail="collapsed"]) :where(.p-home) .why,.sk[data-lay="cdock"]:not([data-rail="collapsed"]) :where(.p-home) .ver,.sk[data-lay="cdock"]:not([data-rail="collapsed"]) :where(.p-home) .fin-grid{grid-template-columns:minmax(0,1fr);gap:48px}
+ .sk[data-lay="cdock"]:not([data-rail="collapsed"]) .mech{grid-template-columns:minmax(0,1fr);gap:32px}
+ .sk[data-lay="cdock"]:not([data-rail="collapsed"]) .pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* The collapsible Console rail (desktop only): a slim strip of section numbers when collapsed */
+.sk .rail-tg{display:none}
+@container sk (min-width:1001px){
+ .sk[data-lay="cdock"] .lay-body{transition:grid-template-columns .25s ease}
+ .sk[data-lay="cdock"] .rail-tg{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-10px 0 4px;align-self:flex-start;border-radius:calc(8px * var(--rs));border:1px solid transparent;background:transparent;color:var(--tx2);cursor:pointer;transition:color .25s,border-color .25s}
+ .sk[data-lay="cdock"] .rail-tg:hover{color:var(--am);border-color:var(--ln2)}
+ .sk[data-lay="cdock"] .lay-nav>.rail-top{display:flex;flex-direction:column;gap:6px}
+ .sk[data-lay="cdock"][data-rail="collapsed"] .lay-body{grid-template-columns:76px minmax(0,1fr)}
+ .sk[data-lay="cdock"][data-rail="collapsed"] .lay-nav{padding-left:8px;padding-right:8px}
+ .sk[data-lay="cdock"][data-rail="collapsed"] .rail-tg{align-self:center}
+ .sk[data-lay="cdock"][data-rail="collapsed"] .ln-i{justify-content:center;padding:8px 0;gap:6px}
+ .sk[data-lay="cdock"][data-rail="collapsed"] .ln-n{min-width:0}
+ .sk[data-lay="cdock"][data-rail="collapsed"] .ln-t,.sk[data-lay="cdock"][data-rail="collapsed"] .ln-links{display:none}
+}
+@media (prefers-reduced-motion:reduce){.sk[data-lay="cdock"] .lay-body{transition:none}}
