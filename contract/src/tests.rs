@@ -94,7 +94,7 @@ fn setup() -> Contract {
         c.deposit_credit(None);
     }
     at(vendor(), T0, bounty_amount());
-    let id = c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+    let id = c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None, None);
     assert_eq!(id.0, 0);
     // Proof 0: two different verifiers attest it, which opens the bounty.
     call(v1(), T0);
@@ -366,7 +366,7 @@ fn withdraw_returns_unspent_credit() {
 fn zero_fee_bounty_rejected() {
     let mut c = setup();
     at(acc("vendor2.testnet"), T0, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(0), U128(0), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(0), U128(0), H3.into(), P0J.into(), U64(RW), 16, 32, None, None);
 }
 
 #[test]
@@ -399,7 +399,7 @@ fn vendor_cannot_be_verifier() {
 fn verifier_cannot_be_vendor() {
     let mut c = setup();
     at(v1(), T0 + SEC, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None, None);
 }
 
 #[test]
@@ -603,7 +603,7 @@ fn researcher_cannot_attest_own_submission() {
 fn tiny_bounty_rejected() {
     let mut c = setup();
     at(acc("vendor2.testnet"), T0, NearToken::from_millinear(99));
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None, None);
 }
 
 #[test]
@@ -803,7 +803,7 @@ fn only_owner_sets_outlayer() {
 /// A second bounty (id 1) from another vendor, created closed (no Proof 0 attestations yet).
 fn closed_bounty(c: &mut Contract) -> U64 {
     at(acc("vendor2.testnet"), T0, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None)
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None, None)
 }
 
 #[test]
@@ -939,7 +939,7 @@ fn audit_f3_unbounded_attest_window_is_refused() {
     call(owner(), T0 - 10);
     let mut c = Contract::new(owner());
     at(vendor(), T0, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(u64::MAX), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(u64::MAX), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None, None);
 }
 
 #[test]
@@ -948,7 +948,7 @@ fn audit_f3_expiry_shorter_than_the_windows_is_refused() {
     call(owner(), T0 - 10);
     let mut c = Contract::new(owner());
     at(vendor(), T0, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(W), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(W), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None, None);
 }
 
 #[test]
@@ -1226,7 +1226,7 @@ fn audit_r2_zero_reveal_gap_is_refused() {
     call(owner(), T0 - 10);
     let mut c = Contract::new(owner());
     at(vendor(), T0, bounty_amount());
-    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(0), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None);
+    c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(0), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None, None);
 }
 
 // Audit hardening S6: limits an account sets on its own commits, so an agent's commit-only key is bounded.
@@ -1329,4 +1329,204 @@ fn review_s7_a_sharer_with_a_posted_fail_and_an_open_window_is_still_paid() {
     c.claim_timeout(U64(0), r);
     let a = bounty_amount().as_yoctonear();
     assert_eq!(transfers()[1], (acc("b.testnet"), a / 2 + FEE + STEP));
+}
+
+// Task 5: a per-account cap per bounty (`max_commits_per_account`, raw storage keys). Bounty 1 below is created with a cap;
+// bounty 0 of `setup()` has none and must behave exactly as before.
+fn setup_capped(cap: Option<u32>) -> Contract {
+    let mut c = setup();
+    at(vendor(), T0, bounty_amount());
+    let id = c.create_bounty(H1.into(), H2.into(), H3.into(), H1.into(), H2.into(), 3, 1024, U64(GAP), U64(W), U64(A), U64(E), U128(FEE), U128(STEP), H3.into(), P0J.into(), U64(RW), 16, 32, None, cap);
+    assert_eq!(id.0, 1);
+    call(v1(), T0);
+    c.attest_proof0(U64(1), P0J.into(), H2.into());
+    call(v2(), T0);
+    assert_eq!(c.attest_proof0(U64(1), P0J.into(), H2.into()), "opened");
+    c
+}
+
+/// `who` commits `patch` to bounty `bid` at `t`, with itself as payout.
+fn commit_to(c: &mut Contract, bid: u64, who: &AccountId, patch: &[u8], t: u64) -> Option<u32> {
+    call(who.clone(), t);
+    c.commit(U64(bid), fingerprint_hex(patch, who), who.clone())
+}
+
+fn refused<T>(f: impl FnOnce() -> T) -> bool {
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)).is_err()
+}
+
+#[test]
+fn cap_reached_refuses_the_account_and_takes_no_fee() {
+    let mut c = setup_capped(Some(1));
+    let r = researcher();
+    assert_eq!(commit_to(&mut c, 1, &r, b"first", T0 + SEC), Some(0));
+    assert_eq!(c.get_account_slots(U64(1), r.clone()), 1);
+    assert!(refused(|| commit_to(&mut c, 1, &r, b"second", T0 + 2 * SEC)));
+    assert_eq!(c.get_bounty(U64(1)).unwrap().commits, 1);
+    assert_eq!(c.get_credit(r).0, start_credit().as_yoctonear() - FEE); // only the first fee was taken
+}
+
+#[test]
+#[should_panic(expected = "this account already holds max_commits_per_account slots of this bounty")]
+fn cap_refusal_message() {
+    let mut c = setup_capped(Some(1));
+    commit_to(&mut c, 1, &researcher(), b"first", T0 + SEC);
+    commit_to(&mut c, 1, &researcher(), b"second", T0 + 2 * SEC);
+}
+
+#[test]
+fn cap_leaves_other_accounts_free() {
+    let mut c = setup_capped(Some(1));
+    assert_eq!(commit_to(&mut c, 1, &researcher(), b"first", T0 + SEC), Some(0));
+    assert_eq!(commit_to(&mut c, 1, &acc("r1.testnet"), b"other", T0 + 2 * SEC), Some(1));
+    assert_eq!(commit_to(&mut c, 1, &acc("r2.testnet"), b"third", T0 + 3 * SEC), Some(2));
+    // K = 3 is full: a fourth account is ignored as before (null, no fee), not refused by the cap.
+    let before = c.get_credit(acc("r3.testnet")).0;
+    assert_eq!(commit_to(&mut c, 1, &acc("r3.testnet"), b"fourth", T0 + 4 * SEC), None);
+    assert_eq!(c.get_credit(acc("r3.testnet")).0, before);
+}
+
+#[test]
+fn cap_of_two_allows_two_slots_per_account() {
+    let mut c = setup_capped(Some(2));
+    let r = researcher();
+    assert_eq!(commit_to(&mut c, 1, &r, b"a", T0 + SEC), Some(0));
+    assert_eq!(commit_to(&mut c, 1, &r, b"b", T0 + 2 * SEC), Some(1));
+    assert!(refused(|| commit_to(&mut c, 1, &r, b"c", T0 + 3 * SEC)));
+    assert_eq!(commit_to(&mut c, 1, &acc("r1.testnet"), b"d", T0 + 4 * SEC), Some(2));
+}
+
+#[test]
+fn released_commit_frees_the_accounts_share() {
+    let mut c = setup_capped(Some(1));
+    let r = researcher();
+    let idx = commit_to(&mut c, 1, &r, b"never revealed", T0 + SEC).unwrap();
+    call(acc("stranger.testnet"), T0 + SEC + RW + 1);
+    c.release_unrevealed(U64(1), idx);
+    assert_eq!(c.get_account_slots(U64(1), r.clone()), 0);
+    assert_eq!(c.get_protocol_pool().0, FEE); // the fee path is unchanged: the released fee goes to the pool
+    assert_eq!(commit_to(&mut c, 1, &r, b"again", T0 + SEC + RW + 2), Some(1));
+    assert_eq!(c.get_account_slots(U64(1), r), 1);
+}
+
+#[test]
+fn a_revealed_commit_keeps_its_slot_like_k() {
+    // Only release frees a slot, for K as for the cap: a revealed (or decided) attempt keeps it.
+    let mut c = setup_capped(Some(1));
+    let r = researcher();
+    let idx = commit_to(&mut c, 1, &r, PATCH, T0 + SEC).unwrap();
+    call(r.clone(), T0 + SEC + GAP);
+    c.reveal(U64(1), idx, Base64VecU8(PATCH.to_vec()), NONCE.into());
+    assert!(refused(|| commit_to(&mut c, 1, &r, b"again", T0 + SEC + GAP + 1)));
+}
+
+#[test]
+fn no_cap_behaves_as_today() {
+    let mut c = setup_capped(None);
+    let r = researcher();
+    assert_eq!(c.get_bounty(U64(1)).unwrap().max_commits_per_account, None);
+    assert_eq!(commit_to(&mut c, 1, &r, b"a", T0 + SEC), Some(0));
+    assert_eq!(commit_to(&mut c, 1, &r, b"b", T0 + 2 * SEC), Some(1));
+    assert_eq!(commit_to(&mut c, 1, &r, b"c", T0 + 3 * SEC), Some(2));
+    assert_eq!(commit_to(&mut c, 1, &r, b"d", T0 + 4 * SEC), None); // K, as before
+    assert_eq!(c.get_account_slots(U64(1), r.clone()), 0); // no per-account counts are stored without a cap
+    // and the bounty of setup(), made with the unchanged argument list, has no cap either
+    assert_eq!(c.get_bounty(U64(0)).unwrap().max_commits_per_account, None);
+    assert_eq!(c.get_credit(r).0, start_credit().as_yoctonear() - (3 * FEE + 3 * STEP));
+}
+
+#[test]
+fn get_bounty_shows_the_cap() {
+    let c = setup_capped(Some(2));
+    assert_eq!(c.get_bounty(U64(1)).unwrap().max_commits_per_account, Some(2));
+}
+
+#[test]
+#[should_panic(expected = "max_commits_per_account must be 1 to max_commits")]
+fn cap_of_zero_is_refused() {
+    setup_capped(Some(0));
+}
+
+#[test]
+#[should_panic(expected = "max_commits_per_account must be 1 to max_commits")]
+fn cap_above_k_is_refused() {
+    setup_capped(Some(4));
+}
+
+#[test]
+fn cap_equal_to_k_is_allowed() {
+    let c = setup_capped(Some(3));
+    assert_eq!(c.get_bounty(U64(1)).unwrap().max_commits_per_account, Some(3));
+}
+
+#[test]
+fn cap_works_with_agent_limits() {
+    let mut c = setup_capped(Some(1));
+    let r = researcher();
+    // A commit refused by the account's own fee limit takes no slot of the cap.
+    set_limits(&mut c, r.clone(), Some(FEE - 1), None, T0 + SEC);
+    assert!(refused(|| commit_to(&mut c, 1, &r, b"too dear", T0 + 2 * SEC)));
+    assert_eq!(c.get_account_slots(U64(1), r.clone()), 0);
+    set_limits(&mut c, r.clone(), Some(FEE), Some(r.clone()), T0 + 3 * SEC);
+    assert_eq!(commit_to(&mut c, 1, &r, b"within", T0 + 4 * SEC), Some(0));
+    // With the cap reached, the cap refuses before any fee or limit matters.
+    assert!(refused(|| commit_to(&mut c, 1, &r, b"over cap", T0 + 5 * SEC)));
+    assert_eq!(c.get_credit(r).0, start_credit().as_yoctonear() - FEE);
+}
+
+#[test]
+fn cap_leaves_the_timeout_split_unchanged() {
+    // Two accounts, one slot each, both revealed; the vendor stays silent: the S7 split pays as on an uncapped bounty.
+    let mut c = setup_capped(Some(1));
+    let r = researcher();
+    let o = acc("r1.testnet");
+    let a0 = commit_to(&mut c, 1, &r, b"fix", T0 + SEC).unwrap();
+    call(r.clone(), T0 + SEC + GAP);
+    c.reveal(U64(1), a0, Base64VecU8(b"fix".to_vec()), NONCE.into());
+    let a1 = commit_to(&mut c, 1, &o, b"junk", T0 + 4 * SEC).unwrap();
+    call(o.clone(), T0 + 4 * SEC + GAP);
+    c.reveal(U64(1), a1, Base64VecU8(b"junk".to_vec()), NONCE.into());
+    call(acc("anyone.testnet"), T0 + SEC + GAP + W + 1);
+    c.claim_timeout(U64(1), a0);
+    let a = bounty_amount().as_yoctonear();
+    assert_eq!(transfers(), vec![(r, a - a / 2 + FEE), (o, a / 2 + FEE + STEP)]);
+    assert_eq!(c.get_bounty(U64(1)).unwrap().state, BountyState::Paid);
+}
+
+#[test]
+fn cap_leaves_the_pass_payout_unchanged() {
+    let mut c = setup_capped(Some(1));
+    let r = researcher();
+    let idx = commit_to(&mut c, 1, &r, PATCH, T0 + SEC).unwrap();
+    call(r.clone(), T0 + SEC + GAP);
+    c.reveal(U64(1), idx, Base64VecU8(PATCH.to_vec()), NONCE.into());
+    call(vendor(), T0 + 10 * SEC);
+    c.post_verdict(U64(1), idx, Verdict::Pass, H1.into(), H2.into());
+    call(v1(), T0 + 11 * SEC);
+    c.attest(U64(1), idx, Verdict::Pass, H1.into(), H2.into());
+    call(v2(), T0 + 12 * SEC);
+    assert_eq!(c.attest(U64(1), idx, Verdict::Pass, H1.into(), H2.into()), "final_pass");
+    assert_eq!(transfers(), vec![(r, bounty_amount().as_yoctonear() + FEE)]);
+}
+
+#[test]
+fn cap_and_the_fee_pool_at_expiry() {
+    // An unrevealed commit still open at expiry is released by expire: fee to the pool, the account's share freed.
+    let mut c = setup_capped(Some(1));
+    let r = researcher();
+    commit_to(&mut c, 1, &r, b"never revealed", T0 + SEC).unwrap();
+    call(acc("stranger.testnet"), T0 + E);
+    c.expire(U64(1));
+    assert_eq!(c.get_protocol_pool().0, FEE);
+    assert_eq!(c.get_account_slots(U64(1), r), 0);
+    assert_eq!(transfers(), vec![(vendor(), bounty_amount().as_yoctonear())]);
+}
+
+#[test]
+fn caps_are_per_bounty() {
+    // The account at its cap on bounty 1 can still commit to bounty 0, which has no cap.
+    let mut c = setup_capped(Some(1));
+    let r = researcher();
+    commit_to(&mut c, 1, &r, b"one", T0 + SEC).unwrap();
+    assert_eq!(commit_to(&mut c, 0, &r, b"zero", T0 + 2 * SEC), Some(0));
 }

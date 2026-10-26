@@ -224,6 +224,10 @@ export function attemptPanel(el, b, subs, verifiers) {
     await refreshCredit();
     if (fresh.state !== 'Open' || !fresh.opened || nsToDate(commitBy(fresh)).getTime() <= Date.now()) return stop('Bounty closed: it does not take new attempts. Nothing was sent.');
     if (fresh.active >= fresh.max_commits) return stop('Cap full: every attempt slot of this bounty is in use. Nothing was sent.');
+    if (fresh.max_commits_per_account) {
+      const held = Number(await view('get_account_slots', { bounty_id: String(b.id), account_id: s.account }, { fresh: true }));
+      if (held >= fresh.max_commits_per_account) return stop(`Per-account cap: your account already holds ${held} of the ${fresh.max_commits_per_account} slots one account may hold on this bounty. Nothing was sent.`);
+    }
     if (credit === null || BigInt(credit) < BigInt(fresh.next_fee)) return stop(`Not enough credit: the fee is ${esc(near(fresh.next_fee))} and your credit is ${esc(near(credit || '0'))}. <button class="m-link" type="button" data-deposit>Deposit</button>`);
     if (lim.max_fee_per_commit && BigInt(fresh.next_fee) > BigInt(lim.max_fee_per_commit)) return stop(`Refused before sending: the fee ${esc(near(fresh.next_fee))} is above your own max fee per attempt (${esc(near(lim.max_fee_per_commit))}, set with set_agent_limits). Nothing taken.`);
     if (lim.fixed_payout && lim.fixed_payout !== payout) return stop(`Your agent limits fix the payout account to ${esc(lim.fixed_payout)}.`);

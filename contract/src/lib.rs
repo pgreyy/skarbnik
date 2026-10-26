@@ -6,6 +6,8 @@
 //!    vendor's first proof receipt, plus the time windows for this bounty.
 //! 2. `commit`: a researcher posts a fingerprint of their patch (sha256 over the patch bytes, the payout
 //!    account and a random nonce). Only the first K commits of a bounty count; later ones are ignored.
+//!    A bounty created with `max_commits_per_account` also refuses a commit from an account that already holds that
+//!    many of its slots (committed and not released); bounties created without it have no such limit.
 //! 3. `reveal`: after a short gap, the researcher posts the patch and the nonce. The contract checks the
 //!    fingerprint and the size, and records the block's random seed and the reveal time.
 //! 4. `post_verdict`: the vendor posts PASS or FAIL with the journal hash and receipt hash of its proof,
@@ -96,6 +98,12 @@ const ALLOWED_IMAGE_IDS_KEY: &[u8] = b"ALLOWED_IMAGE_IDS";
 /// Raw storage key prefix of an account's agent limits (audit hardening S6): the prefix, then the account id; the value is
 /// borsh `AgentLimits`. Raw keys keep the stored contract layout unchanged.
 const AGENT_LIMITS_PREFIX: &[u8] = b"AGENT_LIMITS:";
+/// Raw storage key prefixes of the per-account cap (Task 5): `ACCOUNT_CAP:` + bounty id (u64 LE) holds a bounty's
+/// `max_commits_per_account` (borsh u32), set only at creation; `ACCOUNT_SLOTS:` + bounty id (u64 LE) + account id holds how
+/// many of that bounty's slots the account holds now (borsh u32; committed and not released). Only bounties created with a
+/// cap have these entries, so every older bounty works exactly as before. Raw keys keep the stored layout unchanged.
+const ACCOUNT_CAP_PREFIX: &[u8] = b"ACCOUNT_CAP:";
+const ACCOUNT_SLOTS_PREFIX: &[u8] = b"ACCOUNT_SLOTS:";
 /// Domain tag of the submission id a Proof 0 journal carries: sha256(PROOF0_DOMAIN || reference fix hash), as in
 /// harness/checker/src/zk.rs.
 pub const PROOF0_DOMAIN: &[u8] = b"kintsugi-proof0-v1";
@@ -177,6 +185,35 @@ fn agent_limits(account: &AccountId) -> AgentLimits {
         .unwrap_or_default()
 }
 
+fn account_cap_key(bounty_id: u64) -> Vec<u8> {
+    [ACCOUNT_CAP_PREFIX, &bounty_id.to_le_bytes()].concat()
+}
+
+/// A bounty's cap on the slots one account may hold (none for bounties created without one, and for every older bounty).
+fn account_cap(bounty_id: u64) -> Option<u32> {
+    env::storage_read(&account_cap_key(bounty_id))
+        .map(|b| near_sdk::borsh::from_slice::<u32>(&b).unwrap_or_else(|_| env::panic_str("the account cap does not decode")))
+}
+
+fn account_slots_key(bounty_id: u64, account: &AccountId) -> Vec<u8> {
+    [ACCOUNT_SLOTS_PREFIX, &bounty_id.to_le_bytes(), account.as_str().as_bytes()].concat()
+}
+
+/// How many slots of a capped bounty `account` holds now (committed and not released).
+fn account_slots(bounty_id: u64, account: &AccountId) -> u32 {
+    env::storage_read(&account_slots_key(bounty_id, account))
+        .map(|b| near_sdk::borsh::from_slice::<u32>(&b).unwrap_or_else(|_| env::panic_str("the account slot count does not decode")))
+        .unwrap_or(0)
+}
+
+fn set_account_slots(bounty_id: u64, account: &AccountId, n: u32) {
+    if n == 0 {
+        env::storage_remove(&account_slots_key(bounty_id, account));
+    } else {
+        env::storage_write(&account_slots_key(bounty_id, account), &near_sdk::borsh::to_vec(&n).unwrap());
+    }
+}
+
 fn pool_balance() -> u128 {
     env::storage_read(POOL_KEY).map(|b| u128::from_le_bytes(b.try_into().unwrap_or([0; 16]))).unwrap_or(0)
 }
@@ -187,6 +224,10 @@ fn pool_balance() -> u128 {
 fn release_to_pool(bounty_id: U64, index: u32, bounty: &mut Bounty, sub: &mut Submission) {
     sub.outcome = Outcome::Released;
     bounty.active = bounty.active.saturating_sub(1);
+    if account_cap(bounty_id.0).is_some() {
+        // A released commit frees its account's share of the cap too (Task 5).
+        set_account_slots(bounty_id.0, &sub.committer, account_slots(bounty_id.0, &sub.committer).saturating_sub(1));
+    }
     bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
     let pool = add_to_pool(sub.fee);
     emit("fee_to_pool", json!({ "bounty_id": bounty_id, "index": index, "fee": U128(sub.fee.as_yoctonear()), "pool": U128(pool) }));
@@ -412,6 +453,8 @@ pub struct BountyView {
     pub variant_count: u32,
     /// True if the bounty's image id is on the owner's allowlist of published checkers (or the list is empty).
     pub image_id_allowed: bool,
+    /// The most slots one account may hold at a time (committed and not released); none for bounties without a cap.
+    pub max_commits_per_account: Option<u32>,
 }
 
 /// JSON view of a submission.
@@ -607,6 +650,7 @@ impl Contract {
         fuzz_count: u32,
         variant_count: u32,
         level: Option<u8>,
+        max_commits_per_account: Option<u32>,
     ) -> U64 {
         let vendor = env::predecessor_account_id();
         let amount = env::attached_deposit();
@@ -632,6 +676,9 @@ impl Contract {
         require!(fuzz_count > 0 && variant_count > 0, "fuzz_count and variant_count must be above zero");
         let image = parse_hash("image_id", &image_id);
         require!(image_id_allowed(&image), "image_id is not an allowed checker: ask the owner to allow it (allow_image_id)");
+        if let Some(cap) = max_commits_per_account {
+            require!((1..=max_commits).contains(&cap), "max_commits_per_account must be 1 to max_commits");
+        }
         let now = env::block_timestamp();
         let bounty = Bounty {
             vendor: vendor.clone(),
@@ -680,8 +727,12 @@ impl Contract {
                 "attempt_fee": attempt_fee,
                 "fee_step": fee_step,
                 "expires_at_ns": U64(bounty.expires_at_ns),
+                "max_commits_per_account": max_commits_per_account,
             }),
         );
+        if let Some(cap) = max_commits_per_account {
+            env::storage_write(&account_cap_key(id), &near_sdk::borsh::to_vec(&cap).unwrap());
+        }
         self.vendors.insert(vendor);
         self.bounties.insert(id, bounty);
         U64(id)
@@ -746,6 +797,10 @@ impl Contract {
             emit("commit_ignored", json!({ "bounty_id": bounty_id, "committer": committer, "reason": "max_commits reached" }));
             return None;
         }
+        let cap = account_cap(bounty_id.0);
+        if let Some(cap) = cap {
+            require!(account_slots(bounty_id.0, &committer) < cap, "this account already holds max_commits_per_account slots of this bounty");
+        }
         let fee = bounty.next_fee();
         let limits = agent_limits(&committer);
         if let Some(max) = limits.max_fee_per_commit {
@@ -761,6 +816,9 @@ impl Contract {
         let index = bounty.commits;
         bounty.commits += 1;
         bounty.active += 1;
+        if cap.is_some() {
+            set_account_slots(bounty_id.0, &committer, account_slots(bounty_id.0, &committer) + 1);
+        }
         emit(
             "committed",
             json!({ "bounty_id": bounty_id, "index": index, "committer": committer, "payout": payout, "fingerprint": to_hex(&fp), "fee": U128(fee.as_yoctonear()) }),
@@ -1395,7 +1453,13 @@ impl Contract {
             fuzz_count: b.fuzz_count,
             variant_count: b.variant_count,
             image_id_allowed: image_id_allowed(&b.image_id),
+            max_commits_per_account: account_cap(bounty_id.0),
         })
+    }
+
+    /// How many slots of a bounty with a per-account cap `account_id` holds now (0 for bounties without a cap).
+    pub fn get_account_slots(&self, bounty_id: U64, account_id: AccountId) -> u32 {
+        account_slots(bounty_id.0, &account_id)
     }
 
     pub fn get_submission(&self, bounty_id: U64, index: u32) -> Option<SubmissionView> {

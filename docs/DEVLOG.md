@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Per-account cap (Task 5), written and tested, not deployed
+
+- Owner's change of plan: only the per-account cap; the rule that would have sent FAIL fees to the vendor was dropped
+  (a vendor could fill its own bounty with junk from other accounts, prove it FAIL and get the fees back).
+- Contract: `max_commits_per_account` at creation (1 to K, refused otherwise), raw keys `ACCOUNT_CAP:` and
+  `ACCOUNT_SLOTS:`, no struct change, no migration, no setter for existing bounties, every fee path unchanged.
+- Tests: 135 passed (16 new). Review and deploy plan: `docs/evidence/account_cap/PLAN.md`. Site and agent check the cap
+  before a commit; agent dry run 11 of 11.
+
 ## 2026-10-26: PASTE-11 part B: data for agents, the ledger and the fees
 
 - `web/feed.json` version 2 (`scripts/gen_feed.py`): every bounty under `bounties` with its status, kind (private, demo

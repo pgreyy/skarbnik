@@ -5,6 +5,19 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Per-account cap per bounty: written and tested, not deployed (2026-10-26)
+
+- Question: can a bounty limit how many of its K slots one account holds, without touching the stored layout or any
+  existing bounty or fee path? Design, review, risks and the deploy plan: `docs/evidence/account_cap/PLAN.md`.
+- Code: `contract/src/lib.rs` (an optional `max_commits_per_account` on `create_bounty`, two raw storage entries, a
+  refusal in `commit`, the count freed in `release_to_pool`, a new field in `get_bounty`, a `get_account_slots` view);
+  the site (`web/js/account-ui.js`, `review`) and the agent (`account_at_cap`) check it before a commit; the bounty page
+  shows it.
+- Tests: `cargo test -p kintsugi-contract --offline`: 135 passed, 0 failed (the 119 existing tests unchanged apart from
+  the extra `None` argument, plus 16 new ones) (`docs/evidence/account_cap/contract_unit_tests.txt`). Agent:
+  `./scripts/agent_dry_run_test.sh` 11 of 11.
+- Not deployed: the live contract still runs wasm `938d5456...d1b7`. Deploying waits for the owner's yes.
+
 ## Arena: guarded and unguarded (2026-10-26)
 
 - Question: how much does a probe agent learn about the secret before the attempt cap stops it, and how much without the

@@ -312,6 +312,17 @@ def load_config(path):
     return a
 
 
+def account_at_cap(chain, b, bid, account, log):
+    """True if the bounty has a per-account cap (max_commits_per_account) and this account already holds that many of
+    its slots. Bounties without a cap (every bounty created before the cap existed) never stop the agent here."""
+    cap = b.get("max_commits_per_account")
+    if cap is None:
+        return False
+    held = int(chain.view("get_account_slots", {"bounty_id": bid, "account_id": account}))
+    log(f"  per-account cap: {held} of {cap} slots held by {account}")
+    return held >= int(cap)
+
+
 # ---- one attempt ----
 
 def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key, k=1, history=()):
@@ -340,6 +351,8 @@ def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key, k=1, history=())
         return log(f"stop: payout {cfg['payout']} is not the fixed payout {lim['fixed_payout']}")
     if fee > int(cfg["max_fee_yocto"]):
         return log(f"skip bounty {bid}: fee {near(fee)} is above max_fee {near(cfg['max_fee_yocto'])}")
+    if account_at_cap(chain, b, bid, cfg["account"], log):
+        return log(f"skip bounty {bid}: this account already holds its max_commits_per_account slots")
     # 2. the public code, checked against the hashes on chain
     source = fetch(cfg["feed"], pc["source"]).decode()
     module = fetch(cfg["feed"], pc["module"])
@@ -417,6 +430,9 @@ def attempt(cfg, chain, b_feed, log, run_dir, live, pname, key, k=1, history=())
         log(f"  DRY RUN: would commit {json.dumps(commit_args)} as {cfg['account']} with the limited key (fee {near(fee)})")
         log(f"  DRY RUN: would then reveal the {len(patch)} byte patch with its nonce; nothing sent")
         return "dry"
+    # The model may have taken many minutes: read the per-account cap again just before sending.
+    if account_at_cap(chain, chain.view("get_bounty", {"bounty_id": bid}), bid, cfg["account"], log):
+        return log(f"  bounty {bid}: this account already holds its max_commits_per_account slots; nothing sent")
     log(f"  commit: fingerprint {fp}, fee {near(fee)}")
     r = chain.send(sign(cfg, "commit", commit_args, run_dir))
     log(f"  commit tx {r['tx']}: {'ok, index ' + str(r.get('value')) if r['ok'] else 'refused: ' + r.get('error', '')}")

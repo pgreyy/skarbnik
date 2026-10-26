@@ -36,7 +36,7 @@ fn with_bounty(level: u8, image_id: &str, fuzz: u32, variants: u32) -> Contract 
     c.create_bounty(
         v::ORIGINAL.into(), v::CORPUS.into(), image_id.into(), v::EXPLOIT.into(), "00".repeat(32), 3, 1024, U64(2 * SEC),
         U64(600 * SEC), U64(300 * SEC), U64(3600 * SEC), U128(10_000_000_000_000_000_000_000), U128(0),
-        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), fuzz, variants, Some(level),
+        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), fuzz, variants, Some(level), None,
     );
     c
 }
@@ -169,7 +169,7 @@ fn audit_f5_allowlist_pins_the_checker() {
     c.create_bounty(
         v::ORIGINAL.into(), v::CORPUS.into(), v::IMAGE_ID.into(), v::EXPLOIT.into(), "00".repeat(32), 3, 1024, U64(2 * SEC),
         U64(600 * SEC), U64(300 * SEC), U64(3600 * SEC), U128(10_000_000_000_000_000_000_000), U128(0),
-        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2),
+        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2), None,
     );
     assert!(c.get_bounty(U64(1)).unwrap().image_id_allowed);
 }
@@ -184,7 +184,7 @@ fn audit_f5_unlisted_image_id_is_refused_once_the_list_is_set() {
     c.create_bounty(
         v::ORIGINAL.into(), v::CORPUS.into(), "ab".repeat(32), v::EXPLOIT.into(), "00".repeat(32), 3, 1024, U64(2 * SEC),
         U64(600 * SEC), U64(300 * SEC), U64(3600 * SEC), U128(10_000_000_000_000_000_000_000), U128(0),
-        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2),
+        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2), None,
     );
 }
 

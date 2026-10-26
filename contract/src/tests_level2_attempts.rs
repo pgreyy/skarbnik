@@ -50,7 +50,7 @@ fn testnet_bounty_1() -> Contract {
         c.create_bounty(
             v::ORIGINAL.into(), v::CORPUS.into(), v::IMAGE_ID.into(), v::EXPLOIT.into(), "00".repeat(32), 3, 1024,
             U64(2 * SEC), U64(600 * SEC), U64(300 * SEC), U64(3600 * SEC), U128(10_000_000_000_000_000_000_000), U128(0),
-            v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2),
+            v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2), None,
         );
     }
     call("anyone.testnet", T0 + SEC);
@@ -161,7 +161,7 @@ fn s2_an_attempt_journal_is_refused_as_proof0() {
     c.create_bounty(
         v::ORIGINAL.into(), v::CORPUS.into(), v::IMAGE_ID.into(), v::EXPLOIT.into(), "00".repeat(32), 3, 1024,
         U64(2 * SEC), U64(600 * SEC), U64(300 * SEC), U64(3600 * SEC), U128(10_000_000_000_000_000_000_000), U128(0),
-        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2),
+        v::REFERENCE_FIX.into(), v::JOURNAL_SHA256.into(), U64(120 * SEC), 16, 32, Some(LEVEL_2), None,
     );
     call("anyone.testnet", T0 + SEC);
     c.open_with_groth16(U64(0), bytes(va::SEAL_A0), bytes(va::JOURNAL_A0));
