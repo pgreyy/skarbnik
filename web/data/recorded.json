@@ -1044,6 +1044,48 @@
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
     "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
+   },
+   {
+    "step": "unpack_claim_timeout_0",
+    "method": "claim_timeout",
+    "tx": "BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh",
+    "what": "Timeout claimed",
+    "time": "2026-10-26 06:06 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
+   },
+   {
+    "step": "unpack_live_commit",
+    "method": "commit",
+    "tx": "CYenharjwHthzxw8aBQVp2xMXGQ2V8JvdztmuGYdvCU6",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
+   },
+   {
+    "step": "unpack_live_reveal",
+    "method": "reveal",
+    "tx": "9hspSj3rK82pSvBQjGt1XDnmJLSALSaj1G9WKaXt1hQb",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/agent/transactions.tsv",
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
+   }
+  ],
+  "8": [
+   {
+    "step": "audit8_claim_timeout",
+    "method": "claim_timeout",
+    "tx": "AKU4pVTmS3uwmLcGyHAXTekiBELoV5GRMqJeSPMq1BVk",
+    "what": "Timeout claimed (the payout transfer then failed, review finding 8)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/AUDIT.md, finding 8",
+    "script": "scripts/hardening_testnet.sh"
    }
   ]
  },

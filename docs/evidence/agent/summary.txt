@@ -10,3 +10,4 @@ private bounty 17 on the new module data/unpack: opened True K 3 image_id_allowe
 proving bounty 17 attempt 0: patch sha256 da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81 (read from the chain), seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a
 proving bounty 17 attempt 0: patch sha256 da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81 (read from the chain), seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a
 proving bounty 17 attempt 0: patch sha256 da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81 (read from the chain), seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a
+bounty 17 attempt 0: claim_timeout; outcome TimedOut; bounty state Paid; agent balance 10008244692462638399999999 -> 10117950862102543599999999 yoctoNEAR

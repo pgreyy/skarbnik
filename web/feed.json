@@ -3,7 +3,7 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-10-26T06:04:24Z",
+ "generated_at_utc": "2026-10-26T06:38:25Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -84,31 +84,47 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt"
    }
+  }
+ ],
+ "paid_by_timeout": [
+  {
+   "bounty_id": 4,
+   "attempt": 0,
+   "outcome": "paid by timeout, not by a proof",
+   "claim_tx": "2Ga3oSGcrgfMdbKoLCEUK8FwGrpnqMk9ex2Kp2oj6Tiq"
+  },
+  {
+   "bounty_id": 8,
+   "attempt": 0,
+   "outcome": "paid by timeout, not by a proof",
+   "claim_tx": "AKU4pVTmS3uwmLcGyHAXTekiBELoV5GRMqJeSPMq1BVk"
+  },
+  {
+   "bounty_id": 9,
+   "attempt": 0,
+   "outcome": "paid by timeout, not by a proof",
+   "claim_tx": "82M2gLJ5qzs6MB7ArPwPNrcTwDVzUNvCE9wSWA7NJQD3"
+  },
+  {
+   "bounty_id": 11,
+   "attempt": 0,
+   "outcome": "paid by timeout, not by a proof",
+   "claim_tx": "6uem1gWAymCr2VzL3FofpQfVoqZGrzvXA2wERXnvaYpP"
+  },
+  {
+   "bounty_id": 13,
+   "attempt": 0,
+   "outcome": "paid by timeout, not by a proof",
+   "claim_tx": "BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC"
   },
   {
    "bounty_id": 17,
-   "level": 2,
-   "next_fee_yocto": "15000000000000000000000",
-   "next_fee": "0.015 NEAR",
-   "slots_left": 2,
-   "max_commits": 3,
-   "commit_deadline_utc": "2026-10-27T20:26:20Z",
-   "expires_at_utc": "2026-10-28T01:26:20Z",
-   "bounty_amount": "0.1 NEAR",
-   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
-   "image_id_allowed": true,
-   "test_bounty": false,
-   "max_patch_bytes": 1024,
-   "original_hash": "7911181d1c1981a0f4b76a5a8345bf0ea21d5c82514ba24847f926a5304e8bc5",
-   "corpus_hash": "2c13167325b3eff2cc1c25352d31d9fa21eefd3c06099fc50b99efb87475c1bb",
-   "public_code": {
-    "source": "code/unpack/original.rs",
-    "module": "code/unpack/original.wasm",
-    "tests": "code/unpack/public_tests.txt",
-    "build": "code/unpack/BUILD.txt"
-   }
+   "attempt": 0,
+   "outcome": "paid by timeout, not by a proof",
+   "claim_tx": "BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh"
   }
  ],
+ "paid_by_timeout_note": "These bounties were paid by the timeout rule (the vendor gave no verdict in time), not by a proof.",
  "public_code_note": "public_code paths are relative to this file. Check sha256(module) == original_hash and the tests' corpus_hash before you use them.",
  "quickstart": "agent-quickstart.txt",
  "quickstart_url": "https://skarbnik.xyz/agent-quickstart.txt"

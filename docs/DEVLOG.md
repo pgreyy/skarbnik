@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Paid by timeout is never shown as proven
+
+- A paid bounty whose winning attempt timed out (outcome TimedOut, no verdict) was paid by the timeout rule, not by a
+  proof. The site now shows it with a neutral "Paid by timeout" chip and a link to the claim transaction (Bounties
+  table, bounty page, Account audit log); the green "✓ Paid" chip stays only for a bounty paid by an accepted proof.
+  feed.json lists these bounties under `paid_by_timeout` with their claim transaction.
+- The rule found six such bounties: 4, 8, 9, 11, 13 and 17 (bounty 17: claim
+  `BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh`). Before this, 4, 8, 9, 11 and 13 were shown with the green chip.
+  Bounty 8's claim (`AKU4pVTm...`, named in docs/AUDIT.md, finding 8) is now in its recorded transactions.
+- README and docs/EVIDENCE.md describe bounty 17 as paid by timeout, not by a proof.
+
 ## 2026-10-26: The site works on any domain; one config for the address and the chain
 
 - `web/site.config.json` holds site_url (https://skarbnik.xyz), network, contract, RPC addresses, explorer bases and the

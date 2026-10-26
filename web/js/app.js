@@ -21,6 +21,14 @@ const newModule = (b) => recorded && recorded.new_module_bounties && recorded.ne
 const inputLabel = (b) => (newModule(b) ? 'Private bounty, new module' : isDemo(b) ? (testNote(b) ? 'Test bounty · demo input' : 'Demo input') : 'Private secret input');
 const bountyLinks = (b) => `<span class="k-links"><a href="${EXPLORER_ACCOUNT}${CONTRACT}" rel="noopener" target="_blank">Contract</a><a href="#/raw/${esc(b.id)}">Raw data</a></span>`;
 const typeText = (b) => inputLabel(b);
+// How a paid bounty was paid: the outcome of its winning attempt (TimedOut means paid by the timeout rule).
+async function paidHow(b) {
+  if (b.state !== 'Paid' || b.winner === null || b.winner === undefined) return null;
+  try { return (await view('get_submission', { bounty_id: String(b.id), index: b.winner })).outcome === 'TimedOut' ? 'timeout' : 'proof'; } catch { return null; }
+}
+// The successful claim_timeout transaction of a bounty, when the repository records it.
+const claimTx = (b) => { const c = recorded && (recorded.bounties[String(b.id)] || []).find((t) => t.method === 'claim_timeout' && t.result === 'succeeded'); return c ? c.tx : null; };
+const timeoutNote = (b) => (claimTx(b) ? `<span class="m-sub">claim ${tx(claimTx(b))}</span>` : '');
 // The explorer target of a bounty: its creation transaction when the repository records it, otherwise the contract.
 function explorerOf(b) {
   const c = recorded && (recorded.bounties[String(b.id)] || []).find((t) => /create/.test(t.step) && t.method === 'create_bounty');
@@ -36,8 +44,10 @@ const LOCK = '<svg class="k-lock" width="20" height="20" viewBox="0 0 24 24" ari
 const SAMPLE_FINGERPRINT = 'd8c2c76d001ff41c192daddf542d39dd2fe3dbe045d987145340f4aa1ae842dd';
 const failBox = (e) => `<div class="k-state" role="alert"><p class="k-err">Could not read the contract on testnet.</p><p class="m-note">${esc(e.message)}. Check your connection and reload.</p></div>`;
 
-function bountyState(b, now = Date.now()) {
-  if (b.state === 'Paid') return { key: 'closed', v: 'ok', t: '✓ PAID' };
+// how: 'timeout' when the attempt that was paid timed out (the vendor gave no verdict), so it was paid by the timeout
+// rule, not by a proof: a neutral chip, never the green proof chip.
+function bountyState(b, now = Date.now(), how = null) {
+  if (b.state === 'Paid') return how === 'timeout' ? { key: 'closed', v: 'info', t: 'Paid by timeout' } : { key: 'closed', v: 'ok', t: '✓ PAID' };
   if (b.state === 'Refunded') return { key: 'closed', v: 'info', t: 'REFUNDED' };
   if (!b.opened) return { key: 'other', v: 'wait', t: '… WAITING FOR PROOF 0' };
   if (nsToDate(b.expires_at_ns).getTime() <= now) return { key: 'other', v: 'wait', t: 'PAST EXPIRY, NOT CLOSED' };
@@ -51,7 +61,7 @@ const HOURGLASS = '<svg width="16" height="18" viewBox="0 0 16 18" aria-hidden="
 function subState(b, s) {
   if (s.outcome === 'Passed') return { c: 'pass', g: '✓', t: '✓ PASSED', v: 'ok' };
   if (s.outcome === 'Failed') return { c: 'fail', g: '✕', t: '✕ FAILED', v: 'bad' };
-  if (s.outcome === 'TimedOut') return { c: 'time', g: HOURGLASS, t: 'TIMEOUT', v: 'info' };
+  if (s.outcome === 'TimedOut') return { c: 'time', g: HOURGLASS, t: 'Paid by timeout', v: 'info' };
   if (s.outcome === 'Released') return { c: '', g: '·', t: 'RELEASED', v: 'info' };
   if (s.revealed_at_ns) return b.state !== 'Open' ? { c: 'com', g: '?', t: 'UNDECIDED', v: 'info' } : { c: 'wait', g: '…', t: 'WAITING', v: 'wait' };
   return { c: 'com', g: '○', t: 'COMMITTED', v: 'info' };
@@ -134,16 +144,21 @@ async function bounties(main) {
     </div>
     <div id="list"><p class="k-state">Reading bounties from testnet…</p></div>`;
   let all;
-  try { await getRecorded(); all = (await allBounties()).filter(Boolean).reverse(); } catch (e) { $('#list').innerHTML = failBox(e); return; }
+  let how = {};
+  try {
+    await getRecorded(); all = (await allBounties()).filter(Boolean).reverse();
+    const paid = all.filter((b) => b.state === 'Paid');
+    (await Promise.all(paid.map(paidHow))).forEach((h, i) => (how[paid[i].id] = h));
+  } catch (e) { $('#list').innerHTML = failBox(e); return; }
   const draw = () => {
-    const rows = all.filter((b) => filter === 'all' || bountyState(b).key === filter);
+    const rows = all.filter((b) => filter === 'all' || bountyState(b, Date.now(), how[b.id]).key === filter);
     if (!rows.length) { $('#list').innerHTML = '<div class="m-panel"><p>No bounties in this view.</p></div>'; return; }
     $('#list').innerHTML = `<div class="m-panel k-tablepanel k-sticky">${table(['Bounty', 'State', 'Amount', 'Attempts', 'Next fee', 'Deadline (UTC)', 'Explorer'], rows.map((b) => {
-      const st = bountyState(b);
+      const st = bountyState(b, Date.now(), how[b.id]);
       const [href, label] = explorerOf(b);
       return [
         `<a class="m-bid" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a><span class="m-sub">${esc(typeText(b))}</span>`,
-        badge(st.v, st.t), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`,
+        badge(st.v, st.t) + (how[b.id] === 'timeout' ? timeoutNote(b) : ''), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`,
         `<span class="k-attcol">${esc(attemptsText(b))}${pips(b)}</span>`,
         `<span class="k-mono k-nw">${b.state === 'Open' ? esc(near(b.next_fee)) : 'closed'}</span>`,
         `<span class="k-nw">${esc(closesText(b))}</span>`, viewLink(href, label)];
@@ -164,7 +179,8 @@ async function bounty(main, id, tab) {
     subs = await submissions(b);
     verifiers = (await view('get_verifiers')).map((v) => v.account_id);
   } catch (e) { $('#b').innerHTML = failBox(e); return; }
-  const st = bountyState(b), slots = slotList(b, subs), txs = rd.bounties[String(b.id)] || [], note = rd.bounty_notes && rd.bounty_notes[String(b.id)];
+  const how = b.state === 'Paid' && b.winner !== null && b.winner !== undefined && subs[b.winner] ? (subs[b.winner].outcome === 'TimedOut' ? 'timeout' : 'proof') : null;
+  const st = bountyState(b, Date.now(), how), slots = slotList(b, subs), txs = rd.bounties[String(b.id)] || [], note = rd.bounty_notes && rd.bounty_notes[String(b.id)];
   const demo = isDemo(b), imgOk = b.image_id === PUBLISHED_IMAGE_ID, cl = left(commitBy(b));
   $('#btitle').insertAdjacentHTML('beforeend', `${badge(st.v, st.t)}${testNote(b) ? '<span class="m-tok">Test bounty</span>' : demo ? '<span class="m-tok">Demo input</span>' : `<span class="m-tok">${esc(inputLabel(b))}</span>`}<span class="m-tok">Level ${b.level}</span>${bountyLinks(b)}`);
   // What the secret input is for this bounty, then the site's secrecy sentence.
@@ -189,7 +205,7 @@ async function bounty(main, id, tab) {
       ['Expires', `<span class="k-mono">${esc(utc(b.expires_at_ns))}</span>`, 'public'],
       ['Windows', `reveal ${esc(span(b.reveal_window_ns))}, verdict ${esc(span(b.verdict_window_ns))}${b.level === 0 ? ', attest ' + esc(span(b.attest_window_ns)) : ''}`, 'public'],
       ['Vendor', acct(b.vendor), 'public'],
-      b.winner !== null && b.winner !== undefined ? ['Winner', `#${esc(b.winner)} ${subs[b.winner] ? acct(subs[b.winner].payout) : ''}`, 'public'] : null,
+      b.winner !== null && b.winner !== undefined ? ['Winner', `#${esc(b.winner)} ${subs[b.winner] ? acct(subs[b.winner].payout) : ''}${how === 'timeout' ? ` · paid by timeout, not by a proof${claimTx(b) ? ` (claim ${tx(claimTx(b))})` : ''}` : ''}`, 'public'] : null,
       ['Created', `<span class="k-mono">${esc(utc(b.created_at_ns))}</span>`, 'public'],
       ['Secret input', demo ? 'public on purpose for this demo bounty (data/demo/exploit.hex)' : sealed('never on chain'), demo ? 'public' : 'vendor only'],
     ])}</section>
@@ -202,7 +218,7 @@ async function bounty(main, id, tab) {
         <ul class="m-states">
           <li><span>Created</span>${badge('ok', '✓')}</li>
           <li class="${b.opened ? (b.state === 'Open' ? 'now' : '') : 'off'}"><span>Opened (Proof 0 accepted)</span>${b.opened ? badge(b.state === 'Open' ? 'wait' : 'ok', b.state === 'Open' ? 'Now' : '✓') : '<span>not reached</span>'}</li>
-          <li class="${b.state === 'Paid' ? 'now' : 'off'}"><span>Paid</span>${b.state === 'Paid' ? badge('ok', '✓ Now') : '<span>not taken</span>'}</li>
+          <li class="${b.state === 'Paid' ? 'now' : 'off'}"><span>${how === 'timeout' ? `Paid by timeout${claimTx(b) ? ` (claim ${tx(claimTx(b))})` : ''}` : 'Paid'}</span>${b.state === 'Paid' ? (how === 'timeout' ? badge('info', 'Now') : badge('ok', '✓ Now')) : '<span>not taken</span>'}</li>
           <li class="${b.state === 'Refunded' ? 'now' : 'off'}"><span>Refunded to the vendor</span>${b.state === 'Refunded' ? badge('bad', '✕ Now') : '<span>not taken</span>'}</li>
         </ul>
       </section>

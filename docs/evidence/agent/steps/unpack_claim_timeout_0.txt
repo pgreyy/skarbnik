@@ -1,0 +1,47 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet claim_timeout json-args {"bounty_id":"17","index":0} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-agent-d9410f.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-26T06:06:21.524268141Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-agent-d9410f.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  claim_timeout
+│                       args:         {
+│                                       "bounty_id": "17",
+│                                       "index": 0
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:9CVQk7u22hwHnbwubbFK4uEni66RYQaW6bqQ6aSgFPhs
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.311 Tgas
+│    Transaction fee: 0.0000310014532315 NEAR
+│    Transaction ID: BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"paid","data":[{"bounty_id":"17","index":0,"reason":"timeout","to":"kintsugi-agent-d9410f.testnet","amount":"100000000000000000000000","caller":"kintsugi-agent-d9410f.testnet"}]}
+│    Logs [kintsugi-agent-d9410f.testnet]:   No logs
+│    Logs [kintsugi-agent-d9410f.testnet]:   No logs
+│    Logs [kintsugi-agent-d9410f.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "claim_timeout" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-agent-d9410f.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet claim_timeout json-args '{"bounty_id":"17","index":0}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-agent-d9410f.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=15.09

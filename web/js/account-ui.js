@@ -288,7 +288,7 @@ function confirmSheet(info, onYes) {
 }
 
 // ---------- activity and the Account page ----------
-const OUT_LABEL = { Passed: ['ok', '✓ PASSED'], Failed: ['bad', '✕ FAILED'], TimedOut: ['info', 'TIMEOUT'], Released: ['info', 'RELEASED'] };
+const OUT_LABEL = { Passed: ['ok', '✓ PASSED'], Failed: ['bad', '✕ FAILED'], TimedOut: ['info', 'Paid by timeout'], Released: ['info', 'RELEASED'] };
 const FASTNEAR_TX = TX_INDEX; // the transaction index, from the site config
 const fastPost = async (path, body) => (await fetch(`${FASTNEAR_TX}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json();
 const localTime = (ms) => new Date(ms).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -313,6 +313,7 @@ async function activity(account, max = 150) {
         else if (fc.method_name === 'withdraw_credit') items.push({ ...base, kind: 'withdraw', amount: String(args.amount || '0') });
         else if (fc.method_name === 'commit') items.push({ ...base, kind: 'attempt', bounty: String(args.bounty_id), fingerprint: args.fingerprint });
         else if (fc.method_name === 'reveal') items.push({ ...base, kind: 'reveal', bounty: String(args.bounty_id), index: args.index });
+        else if (fc.method_name === 'claim_timeout') items.push({ ...base, kind: 'timeout', bounty: String(args.bounty_id), index: args.index });
         else if (fc.method_name === 'set_agent_limits') items.push({ ...base, kind: 'limits', maxFee: args.max_fee_per_commit, payout: args.fixed_payout });
       }
     }
@@ -332,9 +333,10 @@ async function activity(account, max = 150) {
 function activityRows(items) {
   return items.map((x) => [
     x.kind === 'deposit' ? 'Deposit' : x.kind === 'withdraw' ? 'Withdrawal'
+      : x.kind === 'timeout' ? `Timeout claimed on <a href="#/bounties/${esc(x.bounty)}">bounty ${esc(x.bounty)}</a> (paid by timeout)`
       : x.kind === 'limits' ? `Agent limits set: max fee ${x.maxFee ? esc(near(x.maxFee)) : 'none'}, payout ${x.payout ? esc(x.payout) : 'any'}`
       : `${x.kind === 'reveal' ? 'Reveal' : 'Attempt'} on <a href="#/bounties/${esc(x.bounty)}">bounty ${esc(x.bounty)}</a>${x.index !== undefined ? ` #${x.index}` : ''}`,
-    !x.ok ? badge('bad', '✕ FAILED') : x.kind === 'reveal' || x.kind === 'limits' ? '<span class="k-dim">no amount</span>'
+    !x.ok ? badge('bad', '✕ FAILED') : x.kind === 'reveal' || x.kind === 'limits' || x.kind === 'timeout' ? '<span class="k-dim">no amount</span>'
       : x.amount !== undefined ? `<span class="k-mono k-nw k-priv">${x.kind === 'attempt' ? 'fee ' : ''}${esc(near(x.amount))}</span>` : '<span class="k-dim">fee unknown</span>',
     esc(localTime(x.ms)), tx(x.tx)]);
 }
@@ -423,6 +425,7 @@ export async function accountPage(main, name, tab) {
       <section class="m-panel k-tablepanel" aria-labelledby="auT">${act.length ? plain(act.map((x) => {
           const agent = agentSet.has(x.key), what = x.kind === 'deposit' ? `Deposited <span class="k-priv">${esc(near(x.amount))}</span> credit`
             : x.kind === 'withdraw' ? `Withdrew <span class="k-priv">${esc(near(x.amount || '0'))}</span> of credit`
+              : x.kind === 'timeout' ? `Claimed the timeout on bounty ${esc(x.bounty)}${x.index !== undefined ? `, attempt #${esc(x.index)}` : ''}: paid by timeout, not by a proof`
               : x.kind === 'limits' ? `Set agent limits: max fee ${x.maxFee ? esc(near(x.maxFee)) : 'none'}, payout ${x.payout ? esc(x.payout) : 'any'}`
                 : `${x.kind === 'reveal' ? 'Revealed' : 'Committed'} attempt${x.index !== undefined ? ` #${esc(x.index)}` : ''} on bounty ${esc(x.bounty)}${x.kind === 'attempt' && x.amount !== undefined ? ` · fee ${esc(near(x.amount))}` : ''}`;
           return [`<span class="k-actor">${agent ? 'agent' : 'operator'}</span>`, `${what}${x.ok ? '' : ' ' + badge('bad', '✕ FAILED')}`, tx(x.tx), `<span class="k-vis">${agent ? 'Agent' : 'Operator'}</span>`];

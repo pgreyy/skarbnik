@@ -88,11 +88,23 @@ try:
     test_ids = set(json.load(open(os.path.join(ROOT, "web/data/recorded.json"))).get("test_bounties", {}))
 except (OSError, ValueError):
     test_ids = set()
+# Successful claim_timeout transactions recorded in the repository, per bounty (web/data/recorded.json).
+try:
+    _rec = json.load(open(os.path.join(ROOT, "web/data/recorded.json")))["bounties"]
+except (OSError, ValueError, KeyError):
+    _rec = {}
+claim_tx = {k: next((t["tx"] for t in v if t["method"] == "claim_timeout" and t["result"] == "succeeded"), None) for k, v in _rec.items()}
+paid_by_timeout = []
 n = int(view("get_next_bounty_id", {}))
 allowed = view("get_allowed_image_ids", {})
 open_bounties = []
 for i in range(n):
     b = view("get_bounty", {"bounty_id": str(i)})
+    if b and b["state"] == "Paid" and b.get("winner") is not None:
+        w = view("get_submission", {"bounty_id": str(i), "index": b["winner"]})
+        if w and w["outcome"] == "TimedOut":
+            paid_by_timeout.append({"bounty_id": int(b["id"]), "attempt": b["winner"], "outcome": "paid by timeout, not by a proof",
+                                    "claim_tx": claim_tx.get(str(b["id"]))})
     if not b or b["state"] != "Open" or not b["opened"]:
         continue
     # the contract refuses a commit that leaves less than the reveal window and the verdict window before expiry
@@ -130,6 +142,8 @@ feed = {
     "test_bounty_ids": sorted(int(x) for x in test_ids),
     "test_bounty_note": "Test bounties are for trying the site and the wallet flow, not demos.",
     "open_bounties": open_bounties,
+    "paid_by_timeout": paid_by_timeout,
+    "paid_by_timeout_note": "These bounties were paid by the timeout rule (the vendor gave no verdict in time), not by a proof.",
     "public_code_note": "public_code paths are relative to this file. Check sha256(module) == original_hash and the tests' corpus_hash before you use them.",
     "quickstart": "agent-quickstart.txt",
     "quickstart_url": f"{SITE_URL}/agent-quickstart.txt",

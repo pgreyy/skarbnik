@@ -22,6 +22,29 @@ local stand-in of an OpenAI compatible API exercises the NEAR AI Cloud code path
 - Verdict: PASS for the dry run.
 - Note: the demo's public source names its bug in a comment, so this shows the agent's path, not a model's skill.
 
+### Private bounty 17: a new module with no hints (paid by timeout, not by a proof)
+
+- The program `data/unpack/` (a packed byte decoder) is new; its public code names no bug. The secret input and the
+  vendor's reference fix are kept outside the repository. Native checks before the bounty (`./scripts/unpack_bounty.sh
+  check`, `native_check.txt`): for six seeds, Proof 0 PASS, the reference fix PASS, the unfixed original FAIL.
+- Proof 0 on the laptop (`./scripts/unpack_bounty.sh proof0`): prove 5,384.58 s, succinct 1,496.74 s, Groth16 177.04 s
+  (`prove_proof0_unpack.log`, `compress_proof0_unpack.log`, `groth16_p0.log`, `verify_p0.txt`: VALID, PASS).
+- Bounty 17 (K = 3, 0.1 NEAR) created `XTGrM4irHF4T2HKyLevDmTN9hVXFHKMR4hnQpeQyGNx` and opened with its Proof 0
+  `57cTTbF7rh7eWVamQ1Av5fP4BySCAcfqwsXdM68jDJM8` by the vendor account.
+- The agent (`--max-attempts 3`): two model calls were cut by the provider after about 600 s with no answer and sent
+  nothing; with streamed answers, the model answered in 924 s with a fix whose module is byte for byte the private
+  reference fix (sha256 `da3536562e17...`), 17 of 17 public tests. Commit `CYenharjwHthzxw8aBQVp2xMXGQ2V8JvdztmuGYdvCU6`,
+  reveal `9hspSj3rK82pSvBQjGt1XDnmJLSALSaj1G9WKaXt1hQb` (limited key). One attempt used of three.
+- The vendor's proof of that attempt did not finish in time: try 1 (`--po2 19`) and try 2 (`--po2 18`) were stopped by
+  the memory guard when other work on the laptop took memory (`try1_prove_u0.log`, `try2_prove_u0.log`); a new proof
+  would have ended after the 4 hour verdict window, and the contract refuses a late proof.
+- Native check of the revealed patch (read from the chain) against the secret, with the seed recorded at reveal:
+  PASS (`native_check_bounty17_attempt0.txt`). This is a local check, not a proof on chain.
+- After the deadline the agent's account claimed the timeout: `BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh`, outcome
+  TimedOut, bounty Paid, the agent's balance up about 0.11 NEAR (`steps/unpack_claim_timeout_0.txt`).
+- Verdict: the model found and fixed the bug in code with no hints. The payment came from the timeout rule, not from a
+  proof.
+
 ### Live run on test bounty 16 (NEAR AI Cloud, `z-ai/glm-5.3-flash`)
 
 - Bounty 16 (demo module, K = 2, 0.1 NEAR), made for this run by the vendor account: create
