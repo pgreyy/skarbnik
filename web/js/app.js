@@ -8,6 +8,7 @@ import { startIntro, introWanted } from './intro.js';
 import { $, esc, badge, tx, acct, hashCell, table, facts, sealed, viewLink, shortId, initUi, tabbed } from './ui.js';
 import { initAccountUi, attemptPanel, accountPage } from './account-ui.js';
 import { buildLedger } from './ledger-core.js';
+import { hex } from './attempt.js';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 let recorded = null;
@@ -69,6 +70,14 @@ function subState(b, s) {
   if (s.outcome === 'Released') return { c: '', g: '·', t: 'RELEASED', v: 'info' };
   if (s.revealed_at_ns) return b.state !== 'Open' ? { c: 'com', g: '?', t: 'UNDECIDED', v: 'info' } : { c: 'wait', g: '…', t: 'WAITING', v: 'wait' };
   return { c: 'com', g: '○', t: 'COMMITTED', v: 'info' };
+}
+// The next deadline of one attempt and the time left: reveal it (committed, not revealed) or prove it (revealed, waiting).
+function windowLeft(b, s) {
+  if (s.outcome !== 'Open' || b.state !== 'Open') return '<span class="k-dim">none</span>';
+  const ns = s.revealed_at_ns ? s.deadline_ns : (BigInt(s.committed_at_ns) + BigInt(b.reveal_window_ns)).toString();
+  const what = s.revealed_at_ns ? 'proof due' : 'reveal by';
+  const l = left(ns);
+  return `${what} <span class="k-mono k-nw">${esc(utcShort(ns))}</span> <span class="m-sub">${l ? esc(l) : 'passed'}</span>`;
 }
 // One entry per attempt slot: the commits made so far, then the free slots up to the cap.
 function slotList(b, subs) {
@@ -203,12 +212,12 @@ async function bounty(main, id, tab) {
     <section class="m-panel" aria-label="Overview">${facts([
       ['Reward', `<span class="k-mono">${esc(near(b.amount))}</span>`, 'public'],
       ['State on chain', esc(b.state) + (b.opened ? ', opened' : ', not opened'), 'public'],
-      b.state === 'Open' ? ['Next attempt fee', `<span class="k-mono">${esc(near(b.next_fee))}</span>, from credit`, 'public'] : null,
+      b.state === 'Open' ? ['Next attempt fee', `<span class="k-mono">${esc(near(b.next_fee))}</span> (${esc(b.next_fee)} yoctoNEAR) for attempt #${esc(b.commits)}, from credit`, 'public'] : null,
       ['Fee rule', `<span class="k-mono">${esc(near(b.attempt_fee))} + ${esc(near(b.fee_step))}</span> per earlier attempt`, 'public'],
       ['Attempts', `<span class="k-mono">${esc(attemptsText(b))}</span>`, 'public'],
       ['Per-account cap', `<span class="k-mono">${b.max_commits_per_account ? `${esc(b.max_commits_per_account)} of ${esc(b.max_commits)} slots per account` : 'none'}</span>`, 'public'],
       ['Commits accepted until', `<span class="k-mono">${esc(utc(commitBy(b)))}</span>` + (cl && b.state === 'Open' ? ` (${esc(cl)})` : ''), 'public'],
-      ['Expires', `<span class="k-mono">${esc(utc(b.expires_at_ns))}</span>`, 'public'],
+      ['Expires', `<span class="k-mono">${esc(utc(b.expires_at_ns))}</span>` + (b.state === 'Open' && left(b.expires_at_ns) ? ` (${esc(left(b.expires_at_ns))})` : ''), 'public'],
       ['Windows', `reveal ${esc(span(b.reveal_window_ns))}, verdict ${esc(span(b.verdict_window_ns))}${b.level === 0 ? ', attest ' + esc(span(b.attest_window_ns)) : ''}`, 'public'],
       ['Vendor', acct(b.vendor), 'public'],
       b.winner !== null && b.winner !== undefined ? ['Winner', `#${esc(b.winner)} ${subs[b.winner] ? acct(subs[b.winner].payout) : ''}${how === 'timeout' ? ` · paid by timeout, not by a proof${claimTx(b) ? ` (claim ${tx(claimTx(b))})` : ''}` : ''}`, 'public'] : null,
@@ -232,7 +241,7 @@ async function bounty(main, id, tab) {
   const attempts = `<section class="m-panel k-tablepanel" aria-label="Attempts">
       <div class="m-slots k-pad">${slots.map((s, i) => `<div class="m-slot"><i class="${s.c}" aria-hidden="true">${s.g}</i><span>${i < subs.length ? '#' + i + ' ' : ''}${s.t}</span></div>`).join('')}</div>
       <p class="m-sub k-pad">${esc(attemptsText(b))}.</p>
-      ${subs.length ? table(['Attempt', 'State', 'Fee', 'Payout', 'Revealed'], subs.map((s, i) => [`#${i}`, badge(subState(b, s).v, subState(b, s).t), s.fee === '0' ? 'refunded' : `<span class="k-mono k-nw">${esc(near(s.fee))}</span>`, acct(s.payout), s.revealed_at_ns ? esc(utc(s.revealed_at_ns)) : '<span class="k-dim">not revealed</span>'])) : '<p class="m-sub k-pad">No attempts yet.</p>'}
+      ${subs.length ? table(['Attempt', 'State', 'Fee', 'Payout', 'Revealed', 'Next deadline'], subs.map((s, i) => [`#${i}`, badge(subState(b, s).v, subState(b, s).t), s.fee === '0' ? 'refunded' : `<span class="k-mono k-nw">${esc(near(s.fee))}</span>`, acct(s.payout), s.revealed_at_ns ? esc(utc(s.revealed_at_ns)) : '<span class="k-dim">not revealed</span>', windowLeft(b, s)])) : '<p class="m-sub k-pad">No attempts yet.</p>'}
     </section>`;
   const transactions = `<section class="m-panel k-tablepanel" aria-label="Transactions">
       ${txs.length ? `${txTable(txs)}<p class="m-sub k-pad">${rec([...new Set(txs.map((t) => t.source))].join(', '))}</p>` : '<p class="m-sub k-pad">No transactions for this bounty are recorded in the repository.</p>'}
@@ -355,6 +364,17 @@ async function verify(main) {
     <li><span class="m-n">5</span><div><h3>Run every contract test</h3>${cmd('cargo test -p kintsugi-contract --offline')}</div></li>
     <li><span class="m-n">6</span><div><h3>Read the findings of the AI review passes</h3><p>docs/AUDIT.md (every finding, fix and known limit) and docs/SECURITY.md (guards and known limits).</p></div></li>
   </ol>
+  <section class="m-sec m-panel k-tablepanel" aria-labelledby="feesT"><h2 class="m-h2 k-pad" id="feesT">Where every fee goes</h2>
+    <p class="m-sub k-pad">An attempt fee is taken from your credit in the contract when your commit is counted. It never goes to the vendor.</p>
+    ${table(['How the attempt ends', 'Where its fee goes', 'When'], [
+      ['Never revealed in time', 'Protocol fee pool', 'When anyone calls release_unrevealed after the reveal window, or at expire'],
+      ['Wins with a PASS proof', 'Back to the winner, with the bounty', 'Same transaction'],
+      ['Paid by the timeout rule', 'Back to each account that shares the payout, with its share', 'Same transaction'],
+      ['Revealed and still waiting when another attempt wins', 'Back to the committer as credit', 'Same transaction'],
+      ['Decided FAIL', 'Level 2 bounties: the protocol fee pool. Level 0: equal shares to the registered verifiers', 'When anyone calls expire after the bounty\'s expiry'],
+    ].map((r) => r.map(esc)))}
+    <p class="m-sub k-pad">The protocol fee pool cannot be withdrawn: no method takes NEAR out of it. Unspent credit is always yours: withdraw_credit returns it (it needs 1 yoctoNEAR, so only your full key can call it, never an agent's limited key). docs/SECURITY.md, "Where every fee goes".</p>
+  </section>
   <details class="m-sec m-panel k-more"><summary>More detail</summary>
     <h2 class="m-h2">Levels: what you trust</h2>
     ${table(['Level', 'Who checks the proof', 'You trust', 'Status'], [
@@ -389,6 +409,23 @@ async function agents(main) {
     ${cmd('python3 -I agent/skarbnik_agent.py status --config agent/config.local.toml')}
     <p class="m-sub">The agent stops after max_attempts commits, never commits above max_fee_yocto or your on-chain max fee, refuses a key that is not limited to commit and reveal, and refuses a fix that would read files or the environment when it is built. Each run writes a plain log: the bounty, the prompt, the fix's hash and size, the public test result and the transactions sent.</p>
   </section>
+  <details class="m-sec m-panel k-more" id="feedfields"><summary>feed.json fields (version 2)</summary>
+    <p class="m-sub">A snapshot made by <code>python3 -I scripts/gen_feed.py</code> from read only calls on ${esc(CONTRACT)}; read <code>get_bounty</code> yourself before you commit.</p>
+    ${table(['Field', 'Meaning'], [
+      ['open_bounties', 'the bounties that accept a commit right now (the agent reads this list)'],
+      ['bounties', 'every bounty, with the fields below'],
+      ['status', 'one of: Proof verified (paid by an accepted PASS proof), Proof rejected (an attempt was rejected by a FAIL proof; still open), Awaiting evaluation (a revealed attempt waits for its proof), Timeout settlement (paid by the timeout rule: a liveness rule, not a verdict), Refunded (back to the vendor), Failed (past expiry, not settled), Demo or test only (a demo or test bounty not yet settled), Open for attempts, Waiting for Proof 0 (created, not opened yet)'],
+      ['kind, judge_bounty', 'private, demo or test; judge bounties share bounty 17\'s hashes and open with its stored Proof 0'],
+      ['program, module_description, public_code', 'which public program the bounty is about, and where its source, module, tests and build flags are (paths relative to feed.json; check sha256(module) = original_hash and the tests\' corpus_hash)'],
+      ['target', 'what a fix must do to PASS, and what PASS does not mean'],
+      ['max_patch_bytes', 'the largest patch the contract accepts at reveal'],
+      ['reward, reward_yocto', 'the bounty'],
+      ['max_commits, attempts_used, slots_in_use, max_commits_per_account', 'K, the commits counted so far, the slots held now, and the per-account cap (null: none)'],
+      ['fee_schedule, next_fee, next_fee_yocto', 'base and step of the attempt fee, and the exact fee of the next attempt'],
+      ['windows', 'reveal gap, reveal window and verdict window (nanoseconds), the last time a commit is accepted, and the expiry'],
+      ['image_id, image_id_allowed, level', 'the checker program every proof must come from, whether it is on the owner\'s allowlist, and the verification level (2: the contract checks the proof itself)'],
+    ].map(([k, v]) => [`<code>${esc(k)}</code>`, esc(v)]))}
+  </details>
   <details class="m-sec m-panel k-more"><summary>agent-quickstart.txt</summary><div id="qs"><p class="k-state">Reading…</p></div></details>`;
   try {
     const text = await (await fetch('agent-quickstart.txt')).text();
@@ -459,19 +496,25 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ---------- ledger ----------
+// A duration in seconds as plain words, for example "1 h 23 min" or "3 min".
+const dur = (sec) => { const m = Math.round(sec / 60), h = Math.floor(m / 60); return h ? `${h} h ${m % 60} min` : `${m} min`; };
 // The Proof Ledger: every account the contract has paid and each vendor's on-time record, read live from the chain (rules
 // in js/ledger-core.js, shared with scripts/gen_ledger.mjs, which writes ledger.json). No scores, no ranks.
 async function ledger(main) {
   main.innerHTML = `<h1 class="m-h1" tabindex="-1">Ledger</h1>
   <p class="m-lead">Every account ${esc(CONTRACT)} has paid, how each fix was paid, and each vendor's on-time record, read live from testnet.</p>
   <div id="lg"><p class="k-state">Reading every bounty and attempt from testnet…</p></div>`;
-  let L;
+  let L, names;
   try {
-    const [r, accounts, all] = await Promise.all([getRecorded(), fetch('data/accounts.json').then((x) => x.json()), allBounties()]);
+    const [r, accounts, provers, costs, all] = await Promise.all([getRecorded(), fetch('data/accounts.json').then((x) => x.json()),
+      fetch('data/provers.json').then((x) => x.json()), fetch('data/operator_costs.json').then((x) => x.json()), allBounties()]);
     const bs = all.filter(Boolean);
     const subs = {};
     (await Promise.all(bs.map((b) => (b.commits ? submissions(b) : [])))).forEach((s, i) => (subs[String(bs[i].id)] = s));
-    L = buildLedger(bs, subs, r, accounts);
+    // sha256 of every account name, for accounts listed by hash only (data/accounts.json, hashed_accounts)
+    names = new Set([...bs.map((b) => b.vendor), ...Object.values(subs).flat().flatMap((s) => [s.committer, s.payout])]);
+    const hashes = new Map(await Promise.all([...names].map(async (a) => [a, hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(a))))])));
+    L = buildLedger(bs, subs, r, accounts, Date.now(), hashes, provers.attempts, costs.costs);
   } catch (e) { $('#lg').innerHTML = failBox(e); return; }
   const c = L.counts;
   const kindChip = (k) => `<span class="m-tok">${esc(k)}</span>`;
@@ -486,10 +529,25 @@ async function ledger(main) {
   <div class="m-panel k-tablepanel">${table(['Account', 'Who runs it', 'Fixes paid', 'By proof', 'By timeout', 'Total paid'], L.paid_accounts.map((a) => [
     acct(a.account), kindChip(a.kind), esc(a.fixes_paid), esc(a.paid_by_proof), esc(a.paid_by_timeout), `<span class="k-mono k-nw">${esc(near(a.total_paid_yocto))}</span>`]))}</div>
   <h2 class="m-h2 k-gap">Paid fixes</h2>
-  <div class="m-panel k-tablepanel">${table(['Bounty', 'Attempt', 'Paid to', 'How', 'Paid', 'Transaction'], L.paid_fixes.map((f) => [
+  <div class="m-panel k-tablepanel">${table(['Bounty', 'Attempt', 'Paid to', 'How', 'Paid', 'Checker', 'Transaction'], L.paid_fixes.map((f) => [
     `<a class="m-bid" href="#/bounties/${esc(f.bounty_id)}">Bounty ${esc(f.bounty_id)}</a>`, `#${esc(f.attempt)}`, `${acct(f.payout_account)} ${kindChip(f.kind)}`,
-    howChip(f) + (f.note ? `<span class="m-sub">${esc(f.note)}</span>` : ''), f.transfer_failed ? `<span class="k-mono k-nw">0 NEAR</span><span class="m-sub">${esc(near(f.on_paper_yocto))} on paper; the transfer failed, no NEAR moved</span>` : `<span class="k-mono k-nw">${esc(near(f.paid_yocto))}</span><span class="m-sub">plus its own fee back</span>`,
-    f.tx ? tx(f.tx) : '<span class="k-dim">not recorded</span>']))}</div>
+    howChip(f) + `<span class="m-sub">${esc(f.how === 'proof' ? 'PASS means: ' : '')}${esc(f.means)}</span>` + (f.note ? `<span class="m-sub">${esc(f.note)}</span>` : ''), f.transfer_failed ? `<span class="k-mono k-nw">0 NEAR</span><span class="m-sub">${esc(near(f.on_paper_yocto))} on paper; the transfer failed, no NEAR moved</span>` : `<span class="k-mono k-nw">${esc(near(f.paid_yocto))}</span><span class="m-sub">plus its own fee back</span>`,
+    hashCell(f.image_id), f.tx ? tx(f.tx) : '<span class="k-dim">not recorded</span>']))}</div>
+  <h2 class="m-h2 k-gap">Earnings by account</h2>
+  <p class="m-sub">Every account that committed or was paid. Fees spent are the attempt fees it paid; fees returned came back with a payout or as credit when a bounty closed. Model and compute costs appear only if the agent's operator supplies them (data/operator_costs.json).</p>
+  <div class="m-panel k-tablepanel">${table(['Account', 'Who runs it', 'Attempts', 'Gross rewards', 'Fees spent', 'Fees returned', 'Proof-checked passes', 'Timeout payouts', 'Rejected by a FAIL proof', 'Released unrevealed', 'Model and compute cost'], L.earnings.map((x) => [
+    names.has(x.account) ? acct(x.account) : esc(x.account), kindChip(x.kind), esc(x.attempts), `<span class="k-mono k-nw">${esc(near(x.gross_rewards_yocto))}</span>`,
+    `<span class="k-mono k-nw">${esc(near(x.fees_spent_yocto))}</span>`, `<span class="k-mono k-nw">${esc(near(x.fees_returned_yocto))}</span>`, esc(x.proof_checked_passes),
+    esc(x.timeout_payouts), esc(x.rejected_by_a_fail_proof), esc(x.released_unrevealed), x.model_and_compute_cost ? esc(x.model_and_compute_cost) : '<span class="k-dim">not supplied</span>']))}</div>
+  <h2 class="m-h2 k-gap">Numbers</h2>
+  <p class="m-sub">From the chain only (every decided attempt); the proving machine from data/provers.json.</p>
+  <div class="m-panel k-tablepanel">${table(['Measure', 'Value'], [
+    ['Decided attempts', esc(L.metrics.decided_attempts)],
+    ['Settled by a proof', `${esc(L.metrics.settled_by_proof)} (${esc(Math.round((L.metrics.share_settled_by_proof || 0) * 100))}%)`],
+    ['Settled by the timeout rule (timeout rate)', `${esc(L.metrics.settled_by_timeout)} (${esc(Math.round((L.metrics.timeout_rate || 0) * 100))}%)`],
+    ...Object.entries(L.metrics.reveal_to_settlement_seconds).map(([k, v]) => [`Reveal to settlement, ${esc(k)}`, `median ${esc(dur(v.median))}, slowest ${esc(dur(v.slowest))} (${esc(v.attempts)} attempts)`]),
+    ['Distinct outside accounts', `${esc(L.metrics.distinct_outside_accounts)}${L.metrics.distinct_outside_accounts === 0 ? ': every account so far is run or seeded by the team' : ''}`],
+  ])}<p class="m-sub k-pad">${esc(L.metrics.timing_note)} Machine-readable: <a href="metrics.json">metrics.json</a>.</p></div>
   <h2 class="m-h2 k-gap">Vendors: proved in time or not</h2>
   <p class="m-sub">For each revealed attempt: decided by a proof before its deadline, or not (then the timeout rule paid it, or it is still waiting past its deadline).</p>
   <div class="m-panel k-tablepanel">${table(['Vendor', 'Who runs it', 'Bounties', 'Proved in time', 'Not proved in time', 'Waiting past deadline'], L.vendors.map((v) => [

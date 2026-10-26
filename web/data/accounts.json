@@ -17,7 +17,15 @@
   "skarbnik-js-bb6c19.testnet": "seeded",
   "skarbnik-cmds-ace3fb.testnet": "seeded",
   "sybil.kintsugi-vendor-prnvm.testnet": "seeded",
-  "ghost-kintsugi-audit-zqx.testnet": "seeded"
+  "ghost-kintsugi-audit-zqx.testnet": "seeded",
+  "skarbnik-probe-eb33d2.testnet": "seeded"
  },
- "source": "docs/handoff/04-testnet-state.md, Accounts"
+ "source": "docs/handoff/04-testnet-state.md, Accounts",
+ "hashed_accounts": {
+  "787bc4e7e3d6c9740c164915fd664cc8f810eb526143bc46063d9544682a887f": {
+   "kind": "team-run",
+   "label": "the owner's personal testnet account"
+  }
+ },
+ "hashed_note": "Accounts listed here by the sha256 of their name only: the Ledger shows the label instead of the name, so no personal account name is published by this repository (it is still on chain)."
 }

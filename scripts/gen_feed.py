@@ -45,9 +45,20 @@ def utc(ns):
 
 
 # Public code packages: the program's source, its compiled module, its public tests and how to build a patch.
-PACKAGES = {"demo": {"dir": "data/demo", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt"},
-            "unpack": {"dir": "data/unpack", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt"},
-            "smooth": {"dir": "data/smooth", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt"}}
+PACKAGES = {"demo": {"dir": "data/demo", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
+                     "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"},
+            "unpack": {"dir": "data/unpack", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
+                       "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"},
+            "smooth": {"dir": "data/smooth", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
+                       "description": "a smoothing filter for a stream of sensor samples; no hint at its bug"}}
+# What every fix must do, for every program (the checker's rules: harness/checker/src/lib.rs).
+TARGET = ("Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies "
+          "of it where the original crashes, while giving the original's answers on every public test and on fresh inputs "
+          "drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this "
+          "checker against the secret and the public tests; it does not prove the patch is secure against everything.")
+# The status vocabulary of each bounty in this feed (documented on the site's For agents page).
+STATUSES = ["Proof verified", "Proof rejected", "Awaiting evaluation", "Timeout settlement", "Refunded", "Failed",
+            "Demo or test only", "Open for attempts", "Waiting for Proof 0"]
 BUILD_TXT = """How to build a patch for this program (the same flags the vendor used for the original):
 rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \\
   -C codegen-units=1 -C target-cpu=mvp -C link-arg=-zstack-size=8192 -C link-arg=--initial-memory=131072 \\
@@ -81,14 +92,18 @@ for name, pk in PACKAGES.items():
     tests = open(os.path.join(dst_dir, pk["tests"])).read()
     public_code[(hashlib.sha256(module).hexdigest(), corpus_hash(tests))] = {
         "source": f"code/{name}/{pk['source']}", "module": f"code/{name}/{pk['module']}",
-        "tests": f"code/{name}/{pk['tests']}", "build": f"code/{name}/BUILD.txt"}
+        "tests": f"code/{name}/{pk['tests']}", "build": f"code/{name}/BUILD.txt", "program": name,
+        "description": pk["description"]}
 
 now_ns = int(datetime.datetime.now(datetime.UTC).timestamp() * 1e9)
 # Test bounties (made for trying the site), from web/data/recorded.json (scripts/gen_site_recorded.py)
 try:
-    test_ids = set(json.load(open(os.path.join(ROOT, "web/data/recorded.json"))).get("test_bounties", {}))
+    _recorded = json.load(open(os.path.join(ROOT, "web/data/recorded.json")))
 except (OSError, ValueError):
-    test_ids = set()
+    _recorded = {}
+test_ids = set(_recorded.get("test_bounties", {}))
+judge_ids = set(_recorded.get("judge_bounties", {}))
+demo_commitment = (_recorded.get("notes", {}).get("demo_exploit_commitment") or {}).get("commitment")
 # Successful claim_timeout transactions recorded in the repository, per bounty (web/data/recorded.json).
 try:
     _rec = json.load(open(os.path.join(ROOT, "web/data/recorded.json")))["bounties"]
@@ -99,8 +114,55 @@ paid_by_timeout = []
 n = int(view("get_next_bounty_id", {}))
 allowed = view("get_allowed_image_ids", {})
 open_bounties = []
+all_bounties = []
+
+
+def status_of(b, subs, kind, accepting):
+    """One status per bounty, from the chain (see STATUSES)."""
+    if b["state"] == "Paid":
+        w = subs[b["winner"]] if b.get("winner") is not None and b["winner"] < len(subs) else None
+        return "Timeout settlement" if w and w["outcome"] == "TimedOut" else "Proof verified"
+    if b["state"] == "Refunded":
+        return "Refunded"
+    if kind in ("demo", "test"):
+        return "Demo or test only"
+    if any(s["outcome"] == "Open" and s.get("revealed_at_ns") for s in subs):
+        return "Awaiting evaluation"
+    if now_ns >= int(b["expires_at_ns"]):
+        return "Failed"  # past expiry and not settled: nothing will be decided any more until someone calls expire
+    if not b["opened"]:
+        return "Waiting for Proof 0"
+    if any(s["outcome"] == "Failed" for s in subs):
+        return "Proof rejected"  # an attempt was rejected by a FAIL proof; the bounty is still open
+    return "Open for attempts" if accepting else "Awaiting evaluation"
+
+
 for i in range(n):
     b = view("get_bounty", {"bounty_id": str(i)})
+    if not b:
+        continue
+    subs = [view("get_submission", {"bounty_id": str(i), "index": k}) for k in range(b["commits"])]
+    kind = "test" if str(i) in test_ids else "demo" if b["exploit_commitment"] == demo_commitment else "private"
+    cb = int(b["expires_at_ns"]) - int(b["reveal_window_ns"]) - int(b["verdict_window_ns"])
+    accepting = b["state"] == "Open" and b["opened"] and now_ns < cb and b["max_commits"] - b["active"] > 0
+    pc = public_code.get((b["original_hash"], b["corpus_hash"]))
+    all_bounties.append({
+        "bounty_id": int(b["id"]), "status": status_of(b, subs, kind, accepting), "kind": kind,
+        "judge_bounty": str(i) in judge_ids, "accepts_commits": accepting, "level": b["level"],
+        "program": pc["program"] if pc else None, "module_description": pc["description"] if pc else None,
+        "target": TARGET, "max_patch_bytes": b["max_patch_bytes"],
+        "reward_yocto": b["amount"], "reward": near(b["amount"]),
+        "max_commits": b["max_commits"], "attempts_used": b["commits"], "slots_in_use": b["active"],
+        "max_commits_per_account": b.get("max_commits_per_account"),
+        "fee_schedule": {"base_yocto": b["attempt_fee"], "step_yocto": b["fee_step"],
+                         "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"},
+        "next_fee_yocto": b["next_fee"], "next_fee": near(b["next_fee"]),
+        "windows": {"reveal_gap_ns": b["reveal_gap_ns"], "reveal_window_ns": b["reveal_window_ns"],
+                    "verdict_window_ns": b["verdict_window_ns"], "commit_deadline_utc": utc(cb),
+                    "expires_at_utc": utc(b["expires_at_ns"])},
+        "image_id": b["image_id"], "image_id_allowed": b["image_id_allowed"],
+        "original_hash": b["original_hash"], "corpus_hash": b["corpus_hash"], "public_code": pc,
+    })
     if b and b["state"] == "Paid" and b.get("winner") is not None:
         w = view("get_submission", {"bounty_id": str(i), "index": b["winner"]})
         if w and w["outcome"] == "TimedOut":
@@ -114,12 +176,14 @@ for i in range(n):
     if now_ns >= commit_by or slots_left <= 0:
         continue
     open_bounties.append({
+        **all_bounties[-1],
         "bounty_id": int(b["id"]),
         "level": b["level"],
         "next_fee_yocto": b["next_fee"],
         "next_fee": near(b["next_fee"]),
         "slots_left": slots_left,
         "max_commits": b["max_commits"],
+        "max_commits_per_account": b.get("max_commits_per_account"),
         "commit_deadline_utc": utc(commit_by),
         "expires_at_utc": utc(b["expires_at_ns"]),
         "bounty_amount": near(b["amount"]),
@@ -134,6 +198,9 @@ for i in range(n):
 
 feed = {
     "name": "Skarbnik",
+    "feed_version": 2,
+    "fields_doc": "https://skarbnik.xyz/#/agents (section \"feed.json fields\")",
+    "statuses": STATUSES,
     "contract": CONTRACT,
     "site_url": SITE_URL,
     "network": SITE["network"],
@@ -143,6 +210,7 @@ feed = {
     "test_bounty_ids": sorted(int(x) for x in test_ids),
     "test_bounty_note": "Test bounties are for trying the site and the wallet flow, not demos.",
     "open_bounties": open_bounties,
+    "bounties": all_bounties,
     "paid_by_timeout": paid_by_timeout,
     "paid_by_timeout_note": "These bounties were paid by the timeout rule (the vendor gave no verdict in time), not by a proof.",
     "public_code_note": "public_code paths are relative to this file. Check sha256(module) == original_hash and the tests' corpus_hash before you use them.",

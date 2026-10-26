@@ -95,6 +95,25 @@ Each guard: what it stops, where it lives, and what shows it works.
 | The owner sets `set_agent_limits` with the account's full access key (1 yoctoNEAR, which a function call key cannot attach) | The agent key spending more than the chosen fee per attempt, or naming another payout account | unit tests `audit_s6_*`; testnet `scripts/hardening_testnet.sh limits` (a call with no deposit refused: "Requires attached deposit of exactly 1 yoctoNEAR") |
 | The agent checks a bounty before committing (`scripts/agent_preflight.sh`, wired into `scripts/s7_agent.sh`): payout account exists, image id on a non-empty allowlist, windows, fees and K within its limits (audit hardening S16) | Committing to a bounty with a fake checker, a missing payout account, too short windows or a large fee | `docs/evidence/hardening/preflight.txt` |
 
+## Where every fee goes
+
+An attempt fee is taken from the committer's credit in the contract (prepaid with `deposit_credit`) when the commit is
+counted. It never goes to the vendor. Where it goes next depends on how the attempt ends (`contract/src/lib.rs`:
+`release_to_pool`, `submit_groth16`, `claim_timeout`, `refund_undecided_revealed`, `expire`):
+
+| How the attempt ends | Where its fee goes | When |
+| --- | --- | --- |
+| Never revealed in time | Protocol fee pool | When anyone calls `release_unrevealed` after the reveal window, or at `expire` |
+| Wins with a PASS proof | Back to the winner, with the bounty | Same transaction |
+| Paid by the timeout rule | Back to each account that shares the payout, with its share | Same transaction |
+| Revealed and still waiting when another attempt wins | Back to the committer as credit | Same transaction |
+| Decided FAIL | Level 2 bounties: the protocol fee pool. Level 0: equal shares to the registered verifiers | When anyone calls `expire` after the bounty's expiry |
+
+- The protocol fee pool cannot be withdrawn: no method takes NEAR out of it (owner's decision, docs/AUDIT.md). It held
+  0.09 NEAR on 2026-10-26 (`get_protocol_pool`).
+- Unspent credit is always the depositor's: `withdraw_credit` returns it (it needs 1 yoctoNEAR, so only the account's full
+  key can call it, never an agent's limited key).
+
 ## 2. Attacks we tried
 
 | Date | Commit | Attack | Command | Result |

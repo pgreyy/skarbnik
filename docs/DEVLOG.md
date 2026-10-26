@@ -2,6 +2,29 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: PASTE-11 part B: data for agents, the ledger and the fees
+
+- `web/feed.json` version 2 (`scripts/gen_feed.py`): every bounty under `bounties` with its status, kind (private, demo
+  or test, judge bounty), program and module description, what a fix must do and what PASS means, patch size limit,
+  reward, K and attempts used, per-account cap, fee schedule and the exact next fee, the windows and expiry, image id
+  and level. `open_bounties` keeps the bounties that accept a commit now (the agent reads it). Statuses: the seven asked
+  for plus two the chain needs: "Open for attempts" (an open bounty with nothing to decide) and "Waiting for Proof 0"
+  (closed judge bounties). The fields are documented on the For agents page.
+- Ledger: per paid fix the checker image id and what PASS means (or that a timeout is a liveness rule, not a verdict);
+  an earnings table per account (attempts, gross rewards, fees spent, fees returned, proof-checked passes, timeout
+  payouts, rejected by a FAIL proof, released unrevealed, and a model and compute cost column that stays empty unless
+  an operator supplies it in `web/data/operator_costs.json`); a Numbers block and `web/metrics.json` from the chain:
+  11 decided attempts, 4 settled by a proof (36%), 7 by the timeout rule (64%); reveal to proof on chain on the laptop:
+  median 1 h 23 min, slowest 1 h 25 min (4 attempts, `web/data/provers.json`); 0 outside accounts. Fees are recomputed
+  from each attempt's index (the contract zeroes the stored fee of an attempt it refunds as credit).
+- The owner's personal testnet account appears in the earnings by a label only: `web/data/accounts.json` lists it by
+  the sha256 of its name, so no file names it.
+- "Where every fee goes": a table in docs/SECURITY.md and on the How to verify page.
+- Bounty page: the next attempt's exact fee (also in yoctoNEAR) and its index, time left to expiry, and each open
+  attempt's next deadline (reveal by, or proof due) with the time left.
+- Checked: the Ledger at 1280 and 390 px (a scoping bug in my first version, "names is not defined", was caught by the
+  check and fixed), bounty 14's Attempts tab and the How to verify page: no sideways scroll, no script errors.
+
 ## 2026-10-26: Arena recording, guarded and unguarded (Task 4)
 
 - `scripts/arena_probe.sh`: one probe agent, 12 one-bit probes. Unguarded, simulated on this machine only (no cap, no fee,
