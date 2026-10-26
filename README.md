@@ -71,7 +71,7 @@ team (the Ledger labels each one).
   agent never holds the owner's wallet.
 
 The platform promise is proof-checked payouts. "Paid by proof" is used only for a specific bounty where a PASS proof was
-accepted (bounties 1 and 16).
+accepted (bounties 1, 16 and 24).
 
 ## What is shown, and what is not
 
@@ -127,7 +127,7 @@ checker_image_id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2
 official_demo_bounty: 7
 private_demo_bounty: 12
 judge_bounties_closed_at_writing: 19, 20, 21, 22
-paid_by_proof: 1, 16
+paid_by_proof: 1, 16, 24
 paid_by_timeout: 4, 9, 11, 13, 17 (and 8 on paper only: its transfer failed, finding 8)
 feed_url: https://skarbnik.xyz/feed.json
 ledger_url: https://skarbnik.xyz/#/evidence/ledger
@@ -261,7 +261,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | Claim | Status | Shown by |
 | --- | --- | --- |
 | Level 2: the contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt; replayed, changed, late or repeated proofs are refused | works on testnet: one PASS paid, one FAIL spent, nine attacks refused; anyone can open a judge bounty (steps 5 and 6) | `scripts/s6c_testnet.sh`, `scripts/judge_bounties.sh`, `cargo test -p kintsugi-contract` (EVIDENCE, S6c and "Judge bounties") |
-| Proof-checked payouts versus timeout payouts | bounties 1 and 16 were paid by a proof (`submit_groth16` PASS); bounties 4, 9, 11, 13 and 17 were paid by the timeout rule (a liveness rule, not a verdict), and bounty 8 on paper only (its transfer failed, finding 8), with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `docs/handoff/04-testnet-state.md`; the bounty pages |
+| Proof-checked payouts versus timeout payouts | bounties 1, 16 and 24 were paid by a proof (`submit_groth16` PASS; bounty 24: a private bounty on a new module, tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); bounties 4, 9, 11, 13 and 17 were paid by the timeout rule (a liveness rule, not a verdict), and bounty 8 on paper only (its transfer failed, finding 8), with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `docs/handoff/04-testnet-state.md`; the bounty pages |
 | An agent driven by a language model (NEAR AI Cloud by default): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, commits and reveals with a limited key | works on testnet: on test bounty 16 the model's fix was proven PASS and paid; on private bounty 17 (a new program, secret and reference fix outside the repository) the model's fix was the reference fix byte for byte, but the vendor's proof did not finish inside the verdict window, so it was **paid by timeout, not by a proof** | `agent/skarbnik_agent.py`; EVIDENCE "The model-driven agent", "Private bounty 17" |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | 19 of 20 as expected; the one difference (`memory_grow`) is explained | `cargo test -p kintsugi-check`; EVIDENCE, S1 |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |

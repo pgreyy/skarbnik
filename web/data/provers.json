@@ -4,12 +4,14 @@
   "1:0": "laptop",
   "1:1": "laptop",
   "9:1": "laptop",
-  "16:0": "laptop"
+  "16:0": "laptop",
+  "24:0": "rented GPU (prove and shrink), then a Docker VPS (Groth16)"
  },
  "sources": {
   "1:0": "docs/evidence/S6c/prove_a0.log",
   "1:1": "docs/evidence/S6c/prove_a1.log",
   "9:1": "docs/AUDIT.md (testnet rerun: a real FAIL proof for J, made on the laptop)",
-  "16:0": "docs/evidence/agent/prove_0.log"
+  "16:0": "docs/evidence/agent/prove_0.log",
+  "24:0": "docs/evidence/smooth/gpu/03_prove.log, gpu/compress_succinct.log, vps/groth16.log"
  }
 }

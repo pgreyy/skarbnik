@@ -1388,6 +1388,16 @@
     "result": "succeeded",
     "source": "docs/evidence/smooth/transactions.tsv",
     "script": "scripts/private_bounty.sh, agent/skarbnik_agent.py"
+   },
+   {
+    "step": "smooth_submit_groth16_0",
+    "method": "submit_groth16",
+    "tx": "9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR",
+    "what": "Proof of an attempt sent",
+    "time": "2026-10-26 21:22 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/smooth/transactions.tsv",
+    "script": "scripts/private_bounty.sh, agent/skarbnik_agent.py"
    }
   ],
   "8": [

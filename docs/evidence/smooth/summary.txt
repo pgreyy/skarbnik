@@ -7,3 +7,4 @@
 2026-10-26T16:14:33Z proving bounty 24 attempt 0 on this machine (PO2=18)
 2026-10-26T16:49:10Z attempt 0 of bounty 24 read from the chain: patch sha256 2138185cf0ad4d771fc554aa1d9c68881d92cdda53a17eb2cc17a3c1196609bb, seed da6ef35635d89464b2f158842da2c7bc4ce1c2bca071010c479367a1382480f3, submission id a5245285a6156f502b80fc06057c1ae61a250f1204f9f0a164965463a6626db3
 2026-10-26T16:51:31Z try 2 of the laptop proof stopped on purpose after about 37 min (the GPU proof is verified; Groth16 needs the memory)
+2026-10-26T21:22:28Z bounty 24 attempt 0: verdict PASS, outcome Passed; bounty state Paid; agent balance 10117412406100572899999999 -> 10227412406100572899999999 yoctoNEAR

@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Bounty 24 paid by proof (PASTE-10 Task 1)
+
+- The attempt's succinct receipt from the GPU was wrapped to Groth16 on the owner's VPS in Docker (337.73 s, container
+  peak 6.82 GiB, 371 MiB of swap), verified on the laptop and submitted: `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`,
+  PASS, bounty 24 Paid. Only the succinct receipt went to the VPS; its work folder was deleted afterwards.
+- Commands: `scp` of the receipt, `skarbnik-host` and `r0vm`; on the VPS `skarbnik-host compress u0_succinct.bin
+  u0_groth16.bin groth16` under `/usr/bin/time -v` with a memory log; on the laptop `skarbnik-host verify`,
+  `skarbnik-host groth16-args`, `MODULE=smooth ./scripts/private_bounty.sh submit 0`; then `gen_site_recorded.py`,
+  `gen_feed.py`, `gen_ledger.mjs` (9 paid fixes: 3 by proof, 6 by timeout).
+
 ## 2026-10-26: The site in the final design (Panyl), and agent setup from the site (PASTE-12, PASTE-11 part D)
 
 - Rebuilt `web/` in the final design: one theme with a dark (default, film grain) and a light appearance, a header

@@ -1,5 +1,5 @@
 {
- "made_at": "2026-10-26T18:44:52Z",
+ "made_at": "2026-10-26T21:24:23Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Every account in this ledger is run by the Skarbnik team or was seeded by its scripts (accounts.kinds). No scores, no ranks, no credit for unpaid attempts. Amounts in yoctoNEAR; a paid fix also got its own attempt fee back.",
@@ -159,6 +159,22 @@
    "fee_refunded_yocto": "10000000000000000000000",
    "tx": "BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh",
    "note": null
+  },
+  {
+   "bounty_id": "24",
+   "attempt": 0,
+   "payout_account": "kintsugi-agent-d9410f.testnet",
+   "kind": "team-run",
+   "how": "proof",
+   "status": "paid by proof",
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "means": "passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
+   "transfer_failed": false,
+   "paid_yocto": "100000000000000000000000",
+   "on_paper_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR",
+   "note": null
   }
  ],
  "paid_accounts": [
@@ -189,10 +205,10 @@
   {
    "account": "kintsugi-agent-d9410f.testnet",
    "kind": "team-run",
-   "fixes_paid": 2,
-   "paid_by_proof": 1,
+   "fixes_paid": 3,
+   "paid_by_proof": 2,
    "paid_by_timeout": 1,
-   "total_paid_yocto": "200000000000000000000000"
+   "total_paid_yocto": "300000000000000000000000"
   }
  ],
  "earnings": [
@@ -285,13 +301,13 @@
    "kind": "team-run",
    "attempts": 3,
    "fees_spent_yocto": "30000000000000000000000",
-   "fees_returned_yocto": "20000000000000000000000",
-   "gross_rewards_yocto": "200000000000000000000000",
-   "proof_checked_passes": 1,
+   "fees_returned_yocto": "30000000000000000000000",
+   "gross_rewards_yocto": "300000000000000000000000",
+   "proof_checked_passes": 2,
    "timeout_payouts": 1,
    "rejected_by_a_fail_proof": 0,
    "released_unrevealed": 0,
-   "waiting": 1,
+   "waiting": 0,
    "model_and_compute_cost": null
   },
   {
@@ -314,17 +330,17 @@
    "vendor": "kintsugi-vendor-prnvm.testnet",
    "kind": "team-run",
    "bounties": 25,
-   "proved_on_time": 4,
+   "proved_on_time": 5,
    "not_proved_in_time": 7,
    "waiting_past_deadline": 4
   }
  ],
  "metrics": {
-  "decided_attempts": 11,
-  "settled_by_proof": 4,
+  "decided_attempts": 12,
+  "settled_by_proof": 5,
   "settled_by_timeout": 7,
-  "share_settled_by_proof": 0.36363636363636365,
-  "timeout_rate": 0.6363636363636364,
+  "share_settled_by_proof": 0.4166666666666667,
+  "timeout_rate": 0.5833333333333334,
   "reveal_to_settlement_seconds": {
    "proof, laptop": {
     "attempts": 4,
@@ -335,6 +351,11 @@
     "attempts": 7,
     "median": 180,
     "slowest": 14400
+   },
+   "proof, rented GPU (prove and shrink), then a Docker VPS (Groth16)": {
+    "attempts": 1,
+    "median": 22231.844960858,
+    "slowest": 22231.844960858
    }
   },
   "timing_note": "by proof: from the reveal to the proof accepted on chain; by timeout: from the reveal to the verdict deadline (the claim came later).",
@@ -342,8 +363,8 @@
   "outside_note": "accounts not on the team list (web/data/accounts.json) among vendors, committers and payout accounts"
  },
  "counts": {
-  "paid_fixes": 8,
-  "paid_by_proof": 2,
+  "paid_fixes": 9,
+  "paid_by_proof": 3,
   "paid_by_timeout": 6,
   "paid_on_paper_transfer_failed": 1,
   "paid_accounts": 4,

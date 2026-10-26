@@ -36,11 +36,23 @@
   "11": "The bounty was split equally between two revealed attempts.",
   "13": "One attempt allowed. No proof arrived in the window.",
   "16": "The agent's fix on the public demo module was proven PASS and paid. It shows the path, not a model's skill: the demo bug is named in the module's comments.",
-  "17": "The vendor's proof finished after the 4 hour window, so the contract paid by timeout. Not a proof."
+  "17": "The vendor's proof finished after the 4 hour window, so the contract paid by timeout. Not a proof.",
+  "24": "An AI agent's fix of a private bug it could not see, proven PASS and paid by the contract. Proved and shrunk on a rented GPU, wrapped to Groth16 on a separate Docker machine; the secret never left the vendor's control."
  },
  "agent_runs": {
-  "16": { "account_note": "the agent's own testnet account", "model": "z-ai/glm-5.3-flash", "host": "NEAR AI Cloud", "key": "commit and reveal only", "source": "docs/evidence/agent/live_bounty16/run.log" },
-  "17": { "model": "z-ai/glm-5.3-flash", "host": "NEAR AI Cloud", "key": "commit and reveal only", "source": "docs/evidence/agent/summary.txt" }
+  "16": {
+   "account_note": "the agent's own testnet account",
+   "model": "z-ai/glm-5.3-flash",
+   "host": "NEAR AI Cloud",
+   "key": "commit and reveal only",
+   "source": "docs/evidence/agent/live_bounty16/run.log"
+  },
+  "17": {
+   "model": "z-ai/glm-5.3-flash",
+   "host": "NEAR AI Cloud",
+   "key": "commit and reveal only",
+   "source": "docs/evidence/agent/summary.txt"
+  }
  },
  "home_example": {
   "16": {
@@ -54,35 +66,98 @@
   "17": {
    "lead": "A language model agent fixed a bug it could not see. The vendor's proof did not finish inside the 4 hour window, so the contract paid by timeout.",
    "why": [
-    ["The fix matched", "The agent's module equals the private reference fix byte for byte. That was checked natively and is recorded (docs/evidence/agent/native_check_bounty17_attempt0.txt)."],
-    ["The proof was late", "The vendor's laptop proof finished after the window. The contract refuses a late proof."],
-    ["The evidence proof was not submitted", "A proof run later says PASS. It is evidence on file, not a settlement."]
+    [
+     "The fix matched",
+     "The agent's module equals the private reference fix byte for byte. That was checked natively and is recorded (docs/evidence/agent/native_check_bounty17_attempt0.txt)."
+    ],
+    [
+     "The proof was late",
+     "The vendor's laptop proof finished after the window. The contract refuses a late proof."
+    ],
+    [
+     "The evidence proof was not submitted",
+     "A proof run later says PASS. It is evidence on file, not a settlement."
+    ]
    ],
    "measured_title": "Measured on the vendor's laptop",
    "measured": [
-    ["Model answer", "924 s", "z-ai/glm-5.3-flash on NEAR AI Cloud"],
-    ["Proof 0, prove", "5,384.58 s", "Then succinct 1,496.74 s and Groth16 177.04 s"],
-    ["Attempt, prove", "6,530.99 s", "--po2 18, 102 segments, prover peak 2,406 MiB"],
-    ["Verdict window", "14,400 s", "4 hours from the reveal"]
+    [
+     "Model answer",
+     "924 s",
+     "z-ai/glm-5.3-flash on NEAR AI Cloud"
+    ],
+    [
+     "Proof 0, prove",
+     "5,384.58 s",
+     "Then succinct 1,496.74 s and Groth16 177.04 s"
+    ],
+    [
+     "Attempt, prove",
+     "6,530.99 s",
+     "--po2 18, 102 segments, prover peak 2,406 MiB"
+    ],
+    [
+     "Verdict window",
+     "14,400 s",
+     "4 hours from the reveal"
+    ]
    ],
    "measured_note": "Two earlier proof tries were stopped by the project's memory guard when other work used memory. The third finished after the window. Source: docs/numbers.md.",
    "claims": [
-    ["The agent's fix equals the private reference fix", "Demonstrated", "Native check of attempt 0: PASS"],
-    ["A full proof of the attempt says PASS", "Demonstrated", "Evidence proof, valid, never submitted"],
-    ["The model could not see the reference fix", "Demonstrated", "Search of the repository history and the prompt contents"],
-    ["The contract verified a proof for this attempt", "Not claimed", "It did not. Paid by timeout."]
+    [
+     "The agent's fix equals the private reference fix",
+     "Demonstrated",
+     "Native check of attempt 0: PASS"
+    ],
+    [
+     "A full proof of the attempt says PASS",
+     "Demonstrated",
+     "Evidence proof, valid, never submitted"
+    ],
+    [
+     "The model could not see the reference fix",
+     "Demonstrated",
+     "Search of the repository history and the prompt contents"
+    ],
+    [
+     "The contract verified a proof for this attempt",
+     "Not claimed",
+     "It did not. Paid by timeout."
+    ]
    ],
    "caveat": "A one line fix is often the reference fix byte for byte, so a secret reference fix protects little once someone solves it. The agent also ran on the same laptop as the vendor's files. Its code never read the private folder, but nothing technical stopped a process of that user from doing so."
   },
   "24": {
    "measured_title": "Measured: laptop CPU and a rented GPU",
    "measured": [
-    ["Proof 0, prove (laptop CPU)", "8,679.49 s", "--po2 18, 141 segments, peak 2,418 MiB"],
-    ["Proof 0, shrink and Groth16 (laptop)", "5,591.59 s and 252.93 s", "Groth16 container peak 6,201 MiB"],
-    ["Attempt 0, prove (NVIDIA L40S, rented)", "29.82 s", "--po2 19, 33 segments, after the image id check"],
-    ["Attempt 0, shrink (same GPU)", "21.71 s", "The secret stayed in the pod's memory and was wiped"]
+    [
+     "Proof 0, prove (laptop CPU)",
+     "8,679.49 s",
+     "--po2 18, 141 segments, peak 2,418 MiB"
+    ],
+    [
+     "Proof 0, shrink and Groth16 (laptop)",
+     "5,591.59 s and 252.93 s",
+     "Groth16 container peak 6,201 MiB"
+    ],
+    [
+     "Attempt 0, prove (NVIDIA L40S, rented)",
+     "29.82 s",
+     "--po2 19, 33 segments, after the image id check"
+    ],
+    [
+     "Attempt 0, shrink (same GPU)",
+     "21.71 s",
+     "The secret stayed in the pod's memory and was wiped"
+    ],
+    [
+     "Attempt 0, Groth16 wrap (4 core VPS, Docker)",
+     "337.73 s",
+     "container peak 6.82 GiB on a 7.8 GiB machine, 371 MiB of swap used"
+    ]
    ],
-   "measured_note": "Source: docs/numbers.md. The GPU proof is the vendor's evidence for attempt 0; the result counts only when the contract accepts its Groth16 proof."
+   "measured_note": "Source: docs/numbers.md and docs/evidence/smooth/. Only the succinct receipt went to the GPU's output and the VPS: never the secret, the salt or a key. The contract accepted the proof: submit_groth16 9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR.",
+   "lead": "An AI agent fixed a private bug it could not see, on a new program. The vendor proved the fix PASS (on a rented GPU, wrapped on a Docker machine) and the contract checked the proof itself and paid."
   }
  }
 }

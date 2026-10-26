@@ -1,0 +1,61 @@
+2026-10-26T21:15:51Z avail_mib=7091 swap_used_mib=0  
+2026-10-26T21:15:56Z avail_mib=6730 swap_used_mib=0  
+2026-10-26T21:16:02Z avail_mib=6719 swap_used_mib=0  
+2026-10-26T21:16:07Z avail_mib=6733 swap_used_mib=0  
+2026-10-26T21:16:12Z avail_mib=6740 swap_used_mib=0  
+2026-10-26T21:16:17Z avail_mib=6733 swap_used_mib=0  
+2026-10-26T21:16:22Z avail_mib=6750 swap_used_mib=0  
+2026-10-26T21:16:27Z avail_mib=6739 swap_used_mib=0  
+2026-10-26T21:16:33Z avail_mib=6130 swap_used_mib=0  
+2026-10-26T21:16:38Z avail_mib=6013 swap_used_mib=1  
+2026-10-26T21:16:43Z avail_mib=6013 swap_used_mib=1  
+2026-10-26T21:16:49Z avail_mib=6014 swap_used_mib=1  
+2026-10-26T21:16:54Z avail_mib=6008 swap_used_mib=1  
+2026-10-26T21:16:59Z avail_mib=6021 swap_used_mib=1  
+2026-10-26T21:17:04Z avail_mib=6107 swap_used_mib=1  
+2026-10-26T21:17:13Z avail_mib=6114 swap_used_mib=1  
+2026-10-26T21:17:19Z avail_mib=6107 swap_used_mib=1  
+2026-10-26T21:17:24Z avail_mib=6105 swap_used_mib=1  
+2026-10-26T21:17:29Z avail_mib=6100 swap_used_mib=1  
+2026-10-26T21:17:35Z avail_mib=6114 swap_used_mib=1  
+2026-10-26T21:17:40Z avail_mib=6113 swap_used_mib=1  
+2026-10-26T21:17:45Z avail_mib=6114 swap_used_mib=1  
+2026-10-26T21:17:51Z avail_mib=6120 swap_used_mib=1  
+2026-10-26T21:17:56Z avail_mib=6110 swap_used_mib=1  
+2026-10-26T21:18:01Z avail_mib=6119 swap_used_mib=1  
+2026-10-26T21:18:07Z avail_mib=6110 swap_used_mib=1  
+2026-10-26T21:18:12Z avail_mib=6124 swap_used_mib=1  
+2026-10-26T21:18:17Z avail_mib=6117 swap_used_mib=1  
+2026-10-26T21:18:22Z avail_mib=6120 swap_used_mib=1  
+2026-10-26T21:18:27Z avail_mib=5990 swap_used_mib=1  
+2026-10-26T21:18:33Z avail_mib=5992 swap_used_mib=1  
+2026-10-26T21:18:38Z avail_mib=5979 swap_used_mib=1  
+2026-10-26T21:18:43Z avail_mib=5990 swap_used_mib=1  
+2026-10-26T21:18:48Z avail_mib=5994 swap_used_mib=1  
+2026-10-26T21:18:54Z avail_mib=5991 swap_used_mib=1  
+2026-10-26T21:18:59Z avail_mib=5978 swap_used_mib=1  
+2026-10-26T21:19:04Z avail_mib=5975 swap_used_mib=1  
+2026-10-26T21:19:10Z avail_mib=5974 swap_used_mib=1  
+2026-10-26T21:19:15Z avail_mib=5975 swap_used_mib=1  
+2026-10-26T21:19:20Z avail_mib=5993 swap_used_mib=1  
+2026-10-26T21:19:25Z avail_mib=5979 swap_used_mib=1  
+2026-10-26T21:19:31Z avail_mib=5849 swap_used_mib=1  
+2026-10-26T21:19:36Z avail_mib=5848 swap_used_mib=1  
+2026-10-26T21:19:41Z avail_mib=5847 swap_used_mib=1  
+2026-10-26T21:19:46Z avail_mib=5851 swap_used_mib=1  
+2026-10-26T21:19:52Z avail_mib=5866 swap_used_mib=1  
+2026-10-26T21:19:57Z avail_mib=5815 swap_used_mib=1  
+2026-10-26T21:20:02Z avail_mib=7070 swap_used_mib=1  nice_meninsky 158.2MiB / 7.755GiB 
+2026-10-26T21:20:09Z avail_mib=5630 swap_used_mib=1  nice_meninsky 2.048GiB / 7.755GiB 
+2026-10-26T21:20:15Z avail_mib=3545 swap_used_mib=1  nice_meninsky 3.917GiB / 7.755GiB 
+2026-10-26T21:20:21Z avail_mib=2658 swap_used_mib=1  nice_meninsky 4.622GiB / 7.755GiB 
+2026-10-26T21:20:27Z avail_mib=1375 swap_used_mib=1  nice_meninsky 5.802GiB / 7.755GiB 
+2026-10-26T21:20:33Z avail_mib=1275 swap_used_mib=1  nice_meninsky 5.883GiB / 7.755GiB 
+2026-10-26T21:20:40Z avail_mib=1216 swap_used_mib=1  nice_meninsky 6.53GiB / 7.755GiB 
+2026-10-26T21:20:46Z avail_mib=229 swap_used_mib=44  nice_meninsky 6.781GiB / 7.755GiB 
+2026-10-26T21:20:52Z avail_mib=184 swap_used_mib=150  nice_meninsky 6.804GiB / 7.755GiB 
+2026-10-26T21:20:58Z avail_mib=218 swap_used_mib=315  nice_meninsky 6.811GiB / 7.755GiB 
+2026-10-26T21:21:04Z avail_mib=206 swap_used_mib=315  nice_meninsky 6.815GiB / 7.755GiB 
+2026-10-26T21:21:11Z avail_mib=202 swap_used_mib=315  nice_meninsky 6.817GiB / 7.755GiB 
+2026-10-26T21:21:17Z avail_mib=201 swap_used_mib=315  nice_meninsky 6.821GiB / 7.755GiB 
+2026-10-26T21:21:23Z avail_mib=248 swap_used_mib=371  nice_meninsky 6.771GiB / 7.755GiB 

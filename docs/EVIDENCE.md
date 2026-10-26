@@ -5,6 +5,50 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Bounty 24: an AI agent fixes a private bug it cannot see, paid by proof (2026-10-26)
+
+Question: can a model-driven agent fix a new private bug from public code alone, and can the vendor prove the result
+in time without heavy work on its own laptop, so the contract pays by proof (not by timeout)?
+
+- Program: `data/smooth/` (new; the bug, a division by zero when the window is 0, is not named in its source). The
+  secret input and the salt stay in a private folder outside the repository; the reference fix is not in the repository.
+- Proof 0 on the laptop: prove 8,679.49 s (141 segments, `--po2 18`, peak 2,418 MiB), shrink 5,591.59 s, Groth16
+  252.93 s; VALID PASS (`prove_proof0.log`, `compress_proof0.log`, `groth16_p0.log`, `verify_p0.txt`).
+- Created `9A1KAHxA8ExaDKzxp2UnQS16gQQM4Zx4NcFTwn9WXFZU`, opened with Proof 0 `AE3GWBF45ghMqwGKnaCr3AbAMJ6aYgXu1a1Tf86CJV1g`
+  (verdict window 24 hours).
+- The agent (`agent/skarbnik_agent.py`, model z-ai/glm-5.3-flash on NEAR AI Cloud, answer in 611.6 s) wrote a fix that
+  passes 22 of 22 public tests and equals the private reference fix (sha256 `2138185c...09bb`, also on chain as the
+  reference fix hash); it committed `4G48c6waZdz7Qc3maVdXsXx9u3kwzfDWbXhW2toszvkG` and revealed
+  `3rBVkucSk1jxirbayxz7GYX1cfurgLAYoRXjiB9HmVhc` (15:11:48 UTC) with its key limited to commit and reveal
+  (`agent_run/`). No peek: `git log -S 'w == 0 || w > n'` finds nothing, and the prompt holds the public `original.rs`
+  byte for byte.
+- Attempt proof on a rented GPU (RunPod, 1x NVIDIA L40S; `notes`-side script, logs in `gpu/`): the checker image id
+  was checked before proving; the secret was copied into the pod's memory only (`/dev/shm`) and removed afterwards
+  (`gpu/01_secret_out.log`). Prove 29.82 s (33 segments, `--po2 19`, PASS, peak GPU memory 9,275 MiB), shrink to a
+  succinct receipt 21.71 s; the succinct receipt verified on the laptop and its journal matched the chain. Cost $0.60.
+  A laptop proof of the same attempt failed once with "verify segment" after 3,698.61 s (`try1_prove_u0.log`); a
+  second try was stopped on purpose once the GPU proof was verified.
+- Groth16 wrap on a separate Docker machine (a 4 core x86_64 VPS with 7.8 GiB of memory and 8 GiB of swap, Docker
+  29.9.2): only the succinct receipt (224,786 bytes, sha256 `27d64bc0...285e`), the host binary and r0vm were copied
+  there, never the secret, the salt or a key. `skarbnik-host compress u0_succinct.bin u0_groth16.bin groth16`:
+  337.73 s, exit 0; the prover container peaked at 6.82 GiB, the lowest available memory was 184 MiB and 371 MiB of
+  swap was used (`vps/groth16.log`, `vps/mem.log`). The work folder was deleted from the VPS afterwards; the prover
+  image was kept.
+- On the laptop: `skarbnik-host verify target/smooth/u0_groth16.bin`: VALID, image id `dd6c5f42...a2fc`, verdict PASS,
+  candidate hash `2138185c...09bb` (`verify_u0.txt`). `MODULE=smooth ./scripts/private_bounty.sh submit 0` checked the
+  journal's secret commitment against the chain, then sent submit_groth16
+  `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR` at 21:22 UTC, about 6 hours after the reveal and 18 hours before the
+  verdict deadline (2026-10-27 15:11:48 UTC): verdict PASS, outcome Passed, bounty state Paid; the agent's balance rose
+  by 0.11 NEAR (the 0.1 NEAR reward and its own 0.01 NEAR fee back).
+
+Times of the wrap and submit (UTC, 2026-10-26): copy to the VPS 21:05 to 21:12; prover image pull 21:13 to 21:15
+(146.82 s); wrap 21:15:51 to 21:21:29; copy back and verify 21:21:48 to 21:22:04; submit 21:22:12 to 21:22:28; VPS
+clean up 21:22:36.
+
+Verdict: PASS. An agent fixed a private bug it could not see and was paid by a proof the contract checked itself, with
+nothing heavy on the vendor's laptop for the attempt. Limits: one bounty, one model, one run; the one line fix equals
+the reference fix, which says nothing about harder bugs; the GPU and the VPS were each used once.
+
 ## Site in the final design (Panyl), and agent setup from the site (2026-10-26)
 
 Question: does the rebuilt site match the final design (the design package's SPEC.md, reference CSS and screenshots),

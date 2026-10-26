@@ -1,0 +1,47 @@
+utc_start=2026-10-26T21:22:14.580799062Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  submit_groth16
+│                       args:         {
+│                                       "bounty_id": "24",
+│                                       "index": 0,
+│                                       "seal": "K/EbIRv+2YZ1MnplFjzpyqrPgfqlekrPxnrQDuOw/w0PsD4BUoQAXC/yfVZ4OB8jM7msiCek/YYX7nlxgjAdsCvK+hDiQfPnjqSkQUkj5V5Y5VxOdobza1lnMnp+zGitI8ZTTqT9mjzlKQTuV5+tKiSU/oxiQZRZqRwWpJeyREglurvp4VOHnI7HJ1RCE73/JGYh6p70x1wOGME47Xyzuy9nQbi9/JIfb3ExZ7HFvj3mGy+U1gl5L4Jh060hyxUbDwx6hRkmX3OC/IVQwHLIoC10Tjb+LrVfSbqGnVcqRiUFOS4Tv1YOyZGrbxzEF2IReT1zqrWbOVnEa3trN1PS2A=="
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.378 Tgas
+│    Transaction fee: 0.0000377153203035 NEAR
+│    Transaction ID: 9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"groth16_verified","data":[{"bounty_id":"24","index":0,"verdict":"PASS","caller":"kintsugi-vendor-prnvm.testnet"}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"paid","data":[{"bounty_id":"24","index":0,"reason":"groth16_pass","to":"kintsugi-agent-d9410f.testnet","amount":"100000000000000000000000"}]}
+│    Logs [kintsugi-agent-d9410f.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"final_pass"
+
+
+The "submit_groth16" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=6.3

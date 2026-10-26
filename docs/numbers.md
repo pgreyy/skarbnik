@@ -40,7 +40,7 @@ the seed recorded at reveal and the attempt's submission id; Proof 0 uses Proof 
 | --- | --- | --- | --- |
 | Prove | 8,679.49 s (141 segments), peak 2,418 MiB | **29.82 s** (33 segments), peak GPU memory 9,275 MiB, host 514,528 KB | docs/evidence/smooth/prove_proof0.log; docs/evidence/smooth/gpu/prove_u0.log, 03_prove.log |
 | Compress to succinct ("shrink") | 5,591.59 s, peak 1,564 MiB | **21.71 s**, host 294,940 KB | compress_proof0.log; gpu/compress_succinct.log |
-| Groth16 wrap | 252.93 s, container peak 6,201 MiB | not on the pod (no Docker there): the laptop wraps the fetched succinct receipt (see EVIDENCE) | groth16_p0.log |
+| Groth16 wrap | 252.93 s (Proof 0), container peak 6,201 MiB | not on the pod (no Docker there); the attempt was wrapped on a separate Docker machine: 337.73 s on a 4 core x86_64 VPS with 7.8 GiB RAM, container peak 6.82 GiB, lowest available memory 184 MiB, 371 MiB of swap used | groth16_p0.log; docs/evidence/smooth/vps/groth16.log, mem.log |
 | Whole pod use, first check to fetch | | 706 s: setup 554 s (Rust and RISC Zero install 86 s, code 38 s, build 425 s, image id check), secret in 48 s, prove and wipe, verify, shrink, fetch | docs/evidence/smooth/gpu/*.log |
 | Cost | electricity and time | **$0.60**: RunPod balance $9.46 to $8.86, reported by the owner (it may include a first pod that stayed on "Initializing" and was terminated) | owner |
 

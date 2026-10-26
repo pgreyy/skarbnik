@@ -48,6 +48,7 @@ export async function judge(viewEl, tab) {
     ['An agent key cannot withdraw or change limits', 'demo', '<span class="small">docs/EVIDENCE.md, limited agent key</span>', 'The network rejected both before they reached the chain.'],
     ...(check ? [['The checker rebuilds to the id on chain', 'demo', `<span class="small">Image id MATCH, ${esc(rec.last_image_check.utc)}</span>`, 'Level B, B1. One machine so far.']] : []),
     ['The secret input stays off chain and out of the repository', 'demo', '<a class="tx" href="#/bounties/12">Bounty 12</a><a class="tx" href="#/bounties/17">Bounty 17</a>', 'Bounty 12 uses the public demo bug.'],
+    ['An agent fixed a private bug on a new module and was paid by proof', 'demo', tx(t('24', 'submit_groth16'), 'Proof'), 'Bounty 24: the contract checked the Groth16 proof itself.'],
     ['Vendor proofs on a rented GPU', 'exp', '<span class="small">Bounty 24, attempt 0: 29.82 s prove, 21.71 s shrink</span>', 'One run on one machine, under the published image id. docs/numbers.md.'],
     ['Level 1 verification through OutLayer', 'exp', '<span class="small">Built, never answered on testnet</span>', 'Not used by any current bounty.'],
     ['A per-account cap on attempt slots', 'impl', '<span class="small">docs/evidence/account_cap/</span>', 'Written and tested, not deployed on the testnet contract.'],
