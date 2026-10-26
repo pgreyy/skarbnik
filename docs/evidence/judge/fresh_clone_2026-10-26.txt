@@ -1,0 +1,23 @@
+# README steps 8 to 10 run in a fresh clone of github.com/pgreyy/skarbnik, branch ui-preview at 04b0933 (gh repo clone), on the development laptop with the RISC Zero Docker images already cached. Steps 1 to 7 were run as written earlier the same day (docs/EVIDENCE.md, "Judge bounties"; step 7 in "Arena: guarded and unguarded").
+== step 8 14:42:02
+   Compiling thiserror v2.0.21
+   Compiling thiserror-impl v2.0.21
+test result: ok. 119 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+wall 117.12 s, max rss 1615568 KB
+== step 9 14:43:59
+    Finished `release` profile [optimized] target(s) in 2m 57s
+rebuilt checker image id:   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+published checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+image id of bounty 17 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+MATCH
+wall 181.94 s, max rss 399204 KB
+== step 10 14:47:01
+    Finished `release` profile [optimized] target(s) in 1m 00s
+wall 60.62 s, max rss 619232 KB
+receipt file: docs/evidence/receipts/bounty17_proof0_groth16.bin (2057 bytes)
+image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+verify seconds: 0.008
+VALID
+journal sha256: cc7aeb44e12433964ba9ff1b76a0207a5c78d3e3b5e46d8dc2d3c462554efaef
+== done 14:48:02
