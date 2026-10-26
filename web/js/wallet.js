@@ -44,11 +44,25 @@ function pinScripts(wallets) {
   };
 }
 
+// The wallet list: NEAR Connect's own list, pinned (vendor/wallets/manifest.json, scripts/wallet-vendor/fetch_wallets.sh).
+// A wallet with an end date ("until", MyNearWallet closes on 31 October 2026) carries a short note in its name until
+// then and drops out of the list after it, so nobody is sent to a closed wallet. NEAR Connect itself shows on testnet
+// only the wallets whose features say testnet.
 async function manifest() {
   const m = await (await fetch('vendor/wallets/manifest.json')).json();
+  const now = Date.now();
+  m.wallets = m.wallets.filter((w) => !w.until || Date.parse(w.until) > now)
+    .map((w) => (w.until_note ? { ...w, name: `${w.name} · ${w.until_note}` } : w));
   pinScripts(m.wallets);
   return m;
 }
+
+// A wallet installed as a browser extension announces itself to NEAR Connect ("near-wallet-injected"); NEAR Connect
+// puts it at the top of the list. Its code is the extension the visitor installed, not a script this site loads, so
+// there is nothing to pin. This listener runs first and adds "installed" to its name.
+function markInstalled(manifest) { if (manifest && manifest.name && !/· installed$/.test(manifest.name)) manifest.name = `${manifest.name} · installed`; }
+window.addEventListener('near-wallet-injected', (e) => markInstalled(e.detail && e.detail.manifest));
+window.addEventListener('message', (e) => { if (e.data && e.data.type === 'near-wallet-injected') markInstalled(e.data.manifest || (e.data.detail && e.data.detail.manifest)); });
 
 export async function init() {
   try {

@@ -25,6 +25,7 @@ Exact versions of every tool used to build and run Skarbnik, checked on 2026-10-
 | Tool | Version | Command |
 | --- | --- | --- |
 | near-cli-rs | 0.30.1 | `near --version` |
+| near-cli (older JavaScript CLI; only to test the For agents page's JS commands, installed in target/jscli) | 4.0.13 on Node v22.23.4 | `./node_modules/.bin/near --version` |
 | cargo-near | 0.22.0 | `cargo near --version` |
 | near-sdk (crate) | 5.29.1 | `contract/Cargo.toml`, `Cargo.lock` |
 
@@ -85,9 +86,21 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | --- | --- | --- |
 | @hot-labs/near-connect | 0.11.4 (`scripts/wallet-vendor/package.json`, `package-lock.json`) | `c9a291ddf0e8e4fdc2732fb6a54584bd76ee7ebe2bbbe373b25ca2a140f2b36e` (bundle) |
 | esbuild (bundler, build time only) | 0.25.10 | |
-| Wallet list `web/vendor/wallets/manifest.json` | entries from hot-dao/near-selector at commit `6766ea5e71864e5cbcbf5b70d2aeae23b20b60e9`, script addresses and pins added, the wallets' localhost and .local development addresses removed | `1ca169ef591abe072950e1aca41e0523953218657584975e483ed2832707337c` |
+| Wallet list `web/vendor/wallets/manifest.json` | all 14 entries from hot-dao/near-selector at commit `5385297f1ebd21af648c99fa347eac28ba55d462` (2026-10-26), GitHub scripts pinned to a commit, sha256 pins added, the wallets' localhost and .local development addresses removed; MyNearWallet marked testnet (with https://testnet.mynearwallet.com allowed to open) and dropped after 2026-10-31T23:59:59Z | `f384889842198c677d5fe8f774adbe557dbe42564ca4f6c7cf69ad0fbe9c940b` |
 | Intear Wallet script (not stored; loaded from https://wallet.intear.tech/near-selector.js, no versioned address; checked 2026-10-25) | pinned by sha256 in the wallet list | `6decc283352af197feff4988628899d19e05f4168a4277fe699bd8a0d6178e34` |
 | NEAR CLI script (not stored; loaded from raw.githubusercontent.com, near/near-cli-connect at commit `dc5cb123e3a8e42ed095739f4ea058b767a80ad2`, `dist/near-cli.js`) | pinned by sha256 in the wallet list | `522f2a52403f6da84384a409718c54b49ed4432cdfd583363d35109be8c8e318` |
+| Meteor Wallet script (not stored; loaded from https://raw.githubusercontent.com/Meteor-Wallet/meteor_wallet_sdk/e0a7d48a07d1a02e69921aa6624f0f7a1f3f3ddf/storage/meteor-near-connect-latest.js; checked 2026-10-26) | pinned by sha256 in the wallet list | `3b4befc73afc582657a49a374682ee9c4a4f57c92312d8cd441463679097ce94` |
+| Ledger script (not stored; loaded from https://raw.githubusercontent.com/near/near-connect-ledger/a705e63c3543982f8d3d788a216e5e5cb53c676d/ledger-executor.js; checked 2026-10-26) | pinned by sha256 in the wallet list | `e3b4569f91aa57fe0c4217c4b0cc394a991f582ae7961fb60b0abed5ade51729` |
+| MyNearWallet script (not stored; loaded from https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba55d462/repository/mnw.js; checked 2026-10-26) | pinned by sha256 in the wallet list | `428055aeb7ea018f2e041babf0bfeb33fcf1f0a69b7865e9887a17b9e6f559ca` |
+| Nightly Wallet script (not stored; loaded from https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba55d462/repository/nightly.js; checked 2026-10-26) | pinned by sha256 in the wallet list | `6e769f105fb30d37501439287ec901b4d858a503ab195e2e99c06c172c5b5d48` |
+| Ethereum Wallets script (not stored; loaded from https://evm-on-near.dev/executor.js; checked 2026-10-26) | pinned by sha256 in the wallet list | `0480ca7b4d2204b1702a554e92f6d00d69a780ff1dee9dcf67feb6ae7991556b` |
+| HOT Wallet script (not stored; loaded from https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba55d462/repository/hotwallet.js; checked 2026-10-26; not shown on testnet) | pinned by sha256 in the wallet list | `7597090092612c66856548528043094ff418ab09dea85e886f921c6f6f1277fb` |
+| OKX Wallet script (not stored; loaded from https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba55d462/repository/okx.js; checked 2026-10-26; not shown on testnet) | pinned by sha256 in the wallet list | `e0a6bad07df32596dcdbf6f47396749e03be15f580da0726fa557e0e058891d8` |
+| NEAR Mobile script (not stored; loaded from https://near-mobile-production.aws.peersyst.tech/connector/near-connect.js; checked 2026-10-26; not shown on testnet) | pinned by sha256 in the wallet list | `df84681559dee638491c158377627a78819fe96fe4be7f8cbad2c756e4e913e7` |
+| Trezu Wallet script (not stored; loaded from https://trezu.app/_next/static/near-connect/trezu-wallet.js; checked 2026-10-26; not shown on testnet) | pinned by sha256 in the wallet list | `c6883a75ddb0d196818736881208cf4a47df75c26d3e1cae2abd96d970b2321d` |
+| Hana Wallet script (not stored; loaded from https://raw.githubusercontent.com/Hana-Technology/near-connect/93237ea1b59d439451b7a08a97085f411274c250/repository/hana.js; checked 2026-10-26; not shown on testnet) | pinned by sha256 in the wallet list | `ef6c88f45bb7ea68e0c5878d4b135c2b4d3e0b0544a3c952a5aae72dcb1bdd62` |
+| Wallet Connect script (not stored; loaded from https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba55d462/repository/wallet-connect.js; checked 2026-10-26) | pinned by sha256 in the wallet list | `65a8bc0f9b8f73d49249872d76e2d931dd93e69e2f87498b0d89a76ada21bbc1` |
+| Unity Wallet script (not stored; loaded from https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba55d462/repository/wallet-connect.js; checked 2026-10-26) | pinned by sha256 in the wallet list | `65a8bc0f9b8f73d49249872d76e2d931dd93e69e2f87498b0d89a76ada21bbc1` |
 
 ## Site look
 

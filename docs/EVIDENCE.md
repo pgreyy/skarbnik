@@ -42,6 +42,13 @@ local stand-in of an OpenAI compatible API exercises the NEAR AI Cloud code path
   PASS (`native_check_bounty17_attempt0.txt`). This is a local check, not a proof on chain.
 - After the deadline the agent's account claimed the timeout: `BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh`, outcome
   TimedOut, bounty Paid, the agent's balance up about 0.11 NEAR (`steps/unpack_claim_timeout_0.txt`).
+- Evidence proof (not submitted), try 3 (`PO2=18 ./scripts/unpack_bounty.sh prove 0`, started 04:50:50 UTC; the verdict
+  window closed at 06:04 UTC): prove 6,530.99 s, 102 segments, prover peak 2,406 MiB (`prove_u0.log`). The receipt
+  (composite, 26,085,852 bytes) checks out: `./target/release/kintsugi-host verify target/unpack/u0.bin` printed VALID,
+  verdict PASS, in 3.75 s (`verify_u0_composite.txt`). Its journal matches bounty 17 on chain: image id, original hash,
+  corpus hash, secret input commitment, patch hash, seed and submission id. Compressing it to succinct was stopped at
+  its 1 hour limit (`compress_u0.log`), so there is no Groth16 receipt. It was never sent to the chain (the contract
+  refuses a proof after the window) and changes nothing about the payment.
 - How it was checked that the model could not see the reference fix: the fix lives only in a private folder outside the
   repository and was never committed (`git log --all -S 'd == 0 || d > n'` finds nothing; only its sha256, public on chain
   as reference_fix_hash, is in the evidence files); the agent's code reads only the feed, the four public code files and
@@ -49,7 +56,7 @@ local stand-in of an OpenAI compatible API exercises the NEAR AI Cloud code path
   received only the prompt saved in the run log, whose source is the public original.rs byte for byte. The fix is a
   one condition change (`if d > n` to `if d == 0 || d > n`), so the same text as the reference fix is the natural answer.
 - Verdict: the model found and fixed the bug in code with no hints. The payment came from the timeout rule, not from a
-  proof.
+  proof. The evidence proof made afterwards (not submitted) also says PASS.
 
 ### Live run on test bounty 16 (NEAR AI Cloud, `z-ai/glm-5.3-flash`)
 
@@ -71,6 +78,44 @@ local stand-in of an OpenAI compatible API exercises the NEAR AI Cloud code path
   The agent now treats both as an unused try; the budget is 12,000 tokens and the time limit 1,200 s.
 - Verdict: PASS. The full path works on testnet: feed, model, local tests, commit and reveal with a limited key, the
   vendor's proof checked by the contract, payment. Easy task: the demo source names its bug.
+
+## Site: more wallets, and the older JS near CLI (2026-10-26)
+
+- Question: which wallets can the site offer on testnet, each loaded from its official address and pinned by sha256,
+  and do the For agents setup steps also work with the older JavaScript near CLI?
+- Wallet list: `./scripts/wallet-vendor/fetch_wallets.sh` takes all 14 wallets of NEAR Connect's own list
+  (hot-dao/near-selector at commit `5385297f`), pins GitHub scripts to a commit and every script by sha256
+  (`web/vendor/wallets/manifest.json`). NEAR Connect itself shows on testnet only the wallets whose entry says testnet.
+- Commands: `node wallettest.mjs <port> <site> list|clock|installed` against a local copy of `web/` and
+  `./scripts/wallet-vendor/pin_check.sh` (two runs). Raw output: `docs/evidence/web/wallets_2026-10-26.txt`.
+
+| Wallet | On testnet | What the test saw | Tested for real |
+| --- | --- | --- | --- |
+| NEAR CLI | shown | script 200 at its pinned commit; its account form; earlier clicked through on testnet (deposit, commit, reveal, withdraw, stop button) | yes (earlier runs, this section's earlier entries) |
+| Meteor Wallet (web and extension) | shown | script 200 at its pinned commit; no frame or window in the test browser | loaded only |
+| Intear Wallet | shown | script 200; its own chooser (Web, App); pin check run 1 opened wallet.intear.tech/connect, run 2 did not | loaded only |
+| Ledger | shown | script 200; "Connect Ledger: make sure your Ledger device is connected via USB" | loaded only (no device) |
+| MyNearWallet · closes 31 Oct | shown until 2026-10-31 23:59:59 UTC | script 200; no frame or window in the test browser, also after allowing testnet.mynearwallet.com to open (cause not found) | loaded only |
+| Nightly Wallet | shown | script 200; "Download Nightly" (extension not installed) in one run | loaded only |
+| Ethereum Wallets | shown | script 200 from evm-on-near.dev; opened its own window at evm-on-near.dev | loaded only |
+| WalletConnect, Unity Wallet | hidden | NEAR Connect drops wallets that need WalletConnect when the site sets no WalletConnect project; the site sets none | no |
+| HOT, OKX, NEAR Mobile, Trezu, Hana | hidden | their entries in NEAR Connect's list say no testnet; HOT's and NEAR Mobile's scripts have no testnet address | no |
+
+- MyNearWallet drops out by itself: with the page clock moved to 2026-11-01 it is no longer listed, the rest are.
+- An installed extension: when a wallet extension announces itself (simulated here for Meteor, no real extension in the
+  test browser), it is listed at the top as "Meteor Wallet · installed".
+- A changed byte is still refused: pin check run 1 and 2, tampered case, NEAR CLI refused with "NEAR CLI changed its
+  wallet script since this site checked it". In run 1 that case did not open the wallet list at all (timing); run 2
+  showed the refusal.
+- Older JS near CLI: NEAR Connect's NEAR CLI wallet writes near-cli-rs commands only, so the JS commands are shown on the
+  For agents page next to each near-cli-rs step. Run on testnet with near-cli 4.0.13 and a throwaway account
+  `skarbnik-js-bb6c19.testnet`: create with the faucet; deposit 0.1 NEAR `Gfih6WczKnjSTi1qVUDfKDTZxHy7FDETr7HM3YNB8GST`;
+  limited key (commit and reveal, 0.25 NEAR) `9MSC7YcgFwAtYBaMMmS5Q7FvmT9UEozCFgjGCpHWy9zb` and, saved to its own file
+  with `near generate-key limited.<agent>.testnet`, `DrFJkQR2u7azULHtmCWCtTs5zvioD5nT56ZL5vfe9YRz`; limits
+  `3mCr6UPsoc8sjvB7VZx43kY5WFG2VbqgCa3rSX35xMVd`. Read back: credit 0.1 NEAR, limits as set, the key limited to commit
+  and reveal. The JS CLI's default RPC timed out four times (each retried); a commit with that key was not run.
+- Verdict: 7 wallets shown on testnet, all loaded from their pinned scripts; only NEAR CLI was clicked through to a
+  transaction. The other wallets need an account in that wallet (or a device) to go further.
 
 ## Site: wallet, credit and attempts on testnet
 

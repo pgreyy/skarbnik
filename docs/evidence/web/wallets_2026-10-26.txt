@@ -1,0 +1,145 @@
+# Wallet list checks, 2026-10-26 (local copy of web/ served on 127.0.0.1:8765, headless Chromium, network testnet)
+# Wallet list: web/vendor/wallets/manifest.json sha256 f384889842198c677d5fe8f774adbe557dbe42564ca4f6c7cf69ad0fbe9c940b
+# Test driver: wallettest.mjs (list: open Connect wallet, click each wallet, record its script request, its own frame and any window;
+#   clock: page clock moved to 2026-11-01; installed: a simulated Meteor extension announces itself with near-wallet-injected).
+# The 'script' line can also show the previous wallet's request (same page); frames are the wallet's own sandboxed frame.
+
+## mode: list
+listed on testnet: Select wallet | Meteor Wallet | meteorwallet.app | Intear Wallet | Ledger | ledger.com | MyNearWallet · closes 31 Oct | mynearwallet.com | Nightly Wallet | nightly.app | Ethereum Wallets | NEAR CLI
+== Meteor Wallet
+   script: 200 https://raw.githubusercontent.com/Meteor-Wallet/meteor_wallet_sdk/e0a7d48a07d1a02e69921aa6
+   wallet frame: none
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+== Intear Wallet
+   script: 200 https://raw.githubusercontent.com/Meteor-Wallet/meteor_wallet_sdk/e0a7d48a07d1a02e69921aa6, 200 https://wallet.intear.tech/near-selector.js
+   wallet frame: CONNECT INTEAR WALLET Choose your preferred wallet connection method 🌐 Web 📱💻 App 🧪 We
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+== Ledger
+   script: 200 https://wallet.intear.tech/near-selector.js, 200 https://raw.githubusercontent.com/near/near-connect-ledger/a705e63c3543982f8d3d788a216e5e5
+   wallet frame: Connect Ledger Make sure your Ledger device is connected via USB and the NEAR app is insta
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+== MyNearWallet · closes 31 Oct
+   script: 200 https://raw.githubusercontent.com/near/near-connect-ledger/a705e63c3543982f8d3d788a216e5e5, 200 https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba
+   wallet frame: none
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+== Nightly Wallet
+   script: 200 https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba, 200 https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba
+   wallet frame: none
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+== Ethereum Wallets
+   script: 200 https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba, 200 https://evm-on-near.dev/executor.js
+   wallet frame:  :root { --background-color: rgb(40, 40, 40); --text-color: rgb(255, 255, 255); --border-c
+   windows opened: https://evm-on-near.dev
+   header: CONNECTING…
+   errors: none
+== NEAR CLI
+   script: 200 https://evm-on-near.dev/executor.js, 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767
+   wallet frame: STEP 1 OF 2 Connect with NEAR CLI Enter your NEAR account ID Next
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+## mode: clock
+listed with the clock at 2026-11-01: Select wallet | Meteor Wallet | meteorwallet.app | Intear Wallet | Ledger | ledger.com | Nightly Wallet | nightly.app | Ethereum Wallets | NEAR CLI | header: CONNECTING… | errors: none
+## mode: installed
+listed after a simulated Meteor extension announced itself: Closes (UTC) | Select wallet | Meteor Wallet · installed | meteorwallet.app | Intear Wallet | Ledger | ledger.com | MyNearWallet · closes 31 Oct | mynearwallet.com | Nightly Wallet | nightly.app | Ethereum Wallets | NEAR CLI
+
+## MyNearWallet again, after allowing https://testnet.mynearwallet.com to open (two clicks in one profile)
+## run 1 (same profile)
+== MyNearWallet · closes 31 Oct
+   script: none
+   wallet frame: none
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+## run 2 (same profile)
+== MyNearWallet · closes 31 Oct
+   script: 200 https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28ba, 200 https://raw.githubusercontent.com/hot-dao/near-selector/5385297f1ebd21af648c99fa347eac28b
+   wallet frame: none
+   windows opened: none
+   header: CONNECTING…
+   errors: none
+
+## ./scripts/wallet-vendor/pin_check.sh, run 1
+== case: nearcli
+wallets listed: Intear Wallet, NEAR CLI
+script requests: 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js
+NEAR CLI account form shown: true
+Intear windows opened: none
+header: CONNECTING…
+page message: 
+errors: none
+== case: intear
+wallets listed: Intear Wallet, NEAR CLI
+script requests: 200 https://wallet.intear.tech/near-selector.js
+NEAR CLI account form shown: false
+Intear windows opened: https://wallet.intear.tech/connect
+header: CONNECTING…
+page message: 
+errors: none
+== case: tampered
+wallets listed: 
+script requests: none
+NEAR CLI account form shown: false
+Intear windows opened: none
+header: CONNECT WALLET
+page message: 
+errors: none
+
+## ./scripts/wallet-vendor/pin_check.sh, run 2
+== case: nearcli
+wallets listed: Intear Wallet, NEAR CLI
+script requests: 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js
+NEAR CLI account form shown: true
+Intear windows opened: none
+header: CONNECTING…
+page message: 
+errors: none
+== case: intear
+wallets listed: Intear Wallet, NEAR CLI
+script requests: 200 https://wallet.intear.tech/near-selector.js
+NEAR CLI account form shown: false
+Intear windows opened: none
+header: CONNECTING…
+page message: 
+errors: none
+== case: tampered
+wallets listed: Intear Wallet, NEAR CLI
+script requests: tampered one byte of https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js | 200 https://raw.githubusercontent.com/near/near-cli-connect/dc5cb123e3a8e42ed095739f4ea058b767a80ad2/dist/near-cli.js
+NEAR CLI account form shown: false
+Intear windows opened: none
+header: NEAR CLI changed its wallet script since this site checked it, so the site will not run it. Use another wallet for now. TRY AGAIN
+page message: 
+errors: none
+
+## Older JS near CLI (npm near-cli 4.0.13, Node v22.23.4), HOME set to a throwaway folder, account skarbnik-js-bb6c19.testnet
+account skarbnik-js-bb6c19.testnet
+Storing credentials for account: skarbnik-js-bb6c19.testnet (network: testnet)
+Saving key to '~/.near-credentials/testnet/skarbnik-js-bb6c19.testnet.json'
+Scheduling a call: kintsugi-l2-cihdp.testnet.deposit_credit({"account_id":null}) with attached 0.1 NEAR
+TypeError: fetch failed
+limited public key ed25519:DQDN27MK7rdpE5MWePw1CN9brqVi4tHNTuA8gNWABToU
+Adding function call access key ed25519:DQDN27MK7rdpE5MWePw1CN9brqVi4tHNTuA8gNWABToU to skarbnik-js-bb6c19.testnet.
+Limited to: 0.25 $NEAR and methods: [commit reveal].
+Key added to account, but not stored locally.
+Transaction Id 9MSC7YcgFwAtYBaMMmS5Q7FvmT9UEozCFgjGCpHWy9zb
+Scheduling a call: kintsugi-l2-cihdp.testnet.set_agent_limits({"max_fee_per_commit":"20000000000000000000000","fixed_payout":"skarbnik-js-bb6c19.testnet"}) with attached 0.000000000000000000000001 NEAR
+Transaction Id 3mCr6UPsoc8sjvB7VZx43kY5WFG2VbqgCa3rSX35xMVd
+Scheduling a call: kintsugi-l2-cihdp.testnet.deposit_credit({"account_id":null}) with attached 0.1 NEAR
+Transaction Id Gfih6WczKnjSTi1qVUDfKDTZxHy7FDETr7HM3YNB8GST
+near generate-key limited.skarbnik-js-bb6c19.testnet --networkId testnet  (key saved to the throwaway home; public key ed25519:CHXxmsthB29NcU79PN5GQn3jC6KCUPqqRJTgxiFXmxqv)
+near add-key (that key, --contractId kintsugi-l2-cihdp.testnet --methodNames commit reveal --allowance 0.25): first try 'TypeError: fetch failed', second try Transaction Id DrFJkQR2u7azULHtmCWCtTs5zvioD5nT56ZL5vfe9YRz
+# Read back over https://test.rpc.fastnear.com (the JS CLI's default RPC timed out several times):
+tx Gfih6WczKn (deposit_credit) FunctionCall SuccessValue; tx 9MSC7YcgFw (add-key) AddKey SuccessValue; tx 3mCr6UPsoc (set_agent_limits) FunctionCall SuccessValue
+get_credit: "100000000000000000000000" (0.1 NEAR)
+get_agent_limits: {"max_fee_per_commit":"20000000000000000000000","fixed_payout":"skarbnik-js-bb6c19.testnet"}
+keys: ed25519:DQDN27MK7rdp FunctionCall commit, reveal on kintsugi-l2-cihdp.testnet allowance 0.25 NEAR; ed25519:FXsmb1hKsGaE FullAccess

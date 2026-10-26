@@ -2,6 +2,29 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: More wallets; JS near CLI commands; bounty 17 evidence proof
+
+- Wallets: `./scripts/wallet-vendor/fetch_wallets.sh` now takes all 14 wallets of NEAR Connect's list (hot-dao/near-selector
+  `5385297f`), pins GitHub scripts to a commit and every script by sha256; `web/js/wallet.js` drops a wallet after its end
+  date (MyNearWallet, "closes 31 Oct") and marks an extension that announces itself as "installed". On testnet NEAR
+  Connect shows 7: Meteor, Intear, Ledger, MyNearWallet, Nightly, Ethereum Wallets, NEAR CLI. HOT, OKX, NEAR Mobile, Trezu
+  and Hana say no testnet in NEAR Connect's list; WalletConnect and Unity need a WalletConnect project the site does not set.
+- Checks: `node wallettest.mjs` (list, clock moved to 2026-11-01, simulated extension) and `./scripts/wallet-vendor/pin_check.sh`
+  twice; output in `docs/evidence/web/wallets_2026-10-26.txt`. Every shown wallet's script loaded (HTTP 200, pin
+  matched); only NEAR CLI has been clicked through to a transaction. A changed byte is refused.
+- What failed: the first test runs read the list before it opened (now waits for it); a frozen page clock broke NEAR
+  Connect (now shifted instead); one GitHub lookup in the fetch script failed (now retried 3 times); MyNearWallet opened no
+  window in the test browser even after allowing testnet.mynearwallet.com (cause not found); pin check run 1's tampered
+  case did not open the list, run 2 showed the refusal.
+- For agents page: next to each near-cli-rs step, the same step with the older JS near CLI (near-cli 4.0.13), run on
+  testnet with a throwaway account: deposit `Gfih6WczKnjSTi1qVUDfKDTZxHy7FDETr7HM3YNB8GST`, limited key
+  `DrFJkQR2u7azULHtmCWCtTs5zvioD5nT56ZL5vfe9YRz`, limits `3mCr6UPsoc8sjvB7VZx43kY5WFG2VbqgCa3rSX35xMVd`. NEAR Connect's
+  NEAR CLI wallet writes near-cli-rs commands only.
+- Bounty 17 evidence proof (not submitted): `PO2=18 ./scripts/unpack_bounty.sh prove 0` proved in 6,530.99 s (102
+  segments, peak 2,406 MiB); `./target/release/kintsugi-host verify target/unpack/u0.bin`: VALID, verdict PASS, journal
+  matching bounty 17 on chain. Compressing to succinct stopped at its 1 hour limit, so no Groth16; not sent to the chain.
+- Next: the leftover renames that waited for this proof (scripts calling kintsugi-host), rebuild, image id check.
+
 ## 2026-10-26: Paid by timeout is never shown as proven
 
 - A paid bounty whose winning attempt timed out (outcome TimedOut, no verdict) was paid by the timeout rule, not by a

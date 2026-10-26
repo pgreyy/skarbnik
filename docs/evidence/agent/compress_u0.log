@@ -1,0 +1,8 @@
+$ RISC0_DEV_MODE=0 ./target/release/kintsugi-host compress target/unpack/u0.bin target/unpack/u0_succinct.bin succinct
+utc_start=2026-10-26T06:39:45Z
+limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=3600
+exit=143
+wall_seconds=3605.17
+r0vm_peak_rss_mib=1536 (VmHWM, sampled every 5 s)
+min_available_mib=3845
+result: stopped: time limit of 3600 s reached
