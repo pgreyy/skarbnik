@@ -11,6 +11,9 @@ Live site: https://skarbnik.xyz (NEAR testnet)
 > defined public tests and a secret input. A bounty needs a reference fix and a passing Proof 0 before it opens. Testnet
 > only. No external security audit; the contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)).
 
+**Judges:** [JUDGE_GUIDE.md](JUDGE_GUIDE.md) is a 5 to 10 minute evidence tour with no install, an optional local
+reproduction, and every claim mapped to its evidence. The same guide is on the site: https://skarbnik.xyz/#/judge
+
 ## The problem
 
 Whoever can test a fix holds the secret needed to test it, and often decides whether the person who made the fix gets
@@ -77,14 +80,21 @@ accepted (bounties 1, 16 and 24).
 
 **Demonstrated on testnet** (each with its evidence):
 
+- **An AI agent fixed a private bug it could not see and was paid by proof: bounty 24.** A private bounty on a new
+  program (`data/smooth/`; the bug, a division by zero, is not named in its source; the secret input and the reference
+  fix never left the vendor). An agent on NEAR AI Cloud fixed it from the public code and committed and revealed with a
+  key limited to those two calls. The vendor proved the attempt on a rented GPU (29.82 s to prove, 21.71 s to shrink),
+  wrapped it to Groth16 on a separate Docker machine (337.73 s), and the contract checked the proof itself and paid:
+  tx [`9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR)
+  (docs/EVIDENCE.md, "Bounty 24").
+- The honest comparison: bounty 16 was the first proof-paid agent fix, on the public demo bug (tx
+  `5NH9rhRMdLxRtKBtjxAsqQwFWejtu2tU9oNf69G2yUq9`). Bounty 17 was the same kind of private task as 24 and the agent's fix
+  equalled the vendor's reference fix, but the laptop proof was too slow for the 4 hour window, so it was paid by
+  timeout, not by proof (claim `BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh`). Moving proving to a GPU is what changed
+  between 17 and 24.
 - The contract opens and decides bounties from Groth16 proofs it checks itself: one PASS paid and one FAIL spent on
   bounty 1 (txs `CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY`, `6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca`), nine
   attacks refused (docs/EVIDENCE.md, S6c).
-- An AI agent's fix was committed and revealed with a limited key, proven PASS and paid by proof: bounty 16 (tx
-  `5NH9rhRMdLxRtKBtjxAsqQwFWejtu2tU9oNf69G2yUq9`).
-- An AI agent fixed a new program with no hint in its source (bounty 17): its fix equalled the vendor's private
-  reference fix, but the laptop proof was too slow for the window, so it was paid by timeout, not by proof (claim
-  `BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh`).
 - A judge can open a judge bounty with a real proof from any account, and a proof with the wrong seal is refused at the
   pairing check itself (steps 5 and 6 below; bounty 18, tx `GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`; bounty 22, tx
   `5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`).
@@ -94,8 +104,9 @@ accepted (bounties 1, 16 and 24).
 **Operational risks:**
 
 - The vendor must prove each revealed attempt inside the verdict window. On the laptop CPU one proof with compression
-  takes 1 to 4 hours (docs/numbers.md); bounty 17 missed its window. A rented GPU is faster, but the secret then sits
-  briefly on that machine.
+  takes 1.5 to 4 hours (docs/numbers.md); bounty 17 missed its window. On a rented GPU bounty 24's attempt took under a
+  minute, but the secret then sits in that machine's memory for the run (wiped afterwards), and the Groth16 wrap needs
+  a separate x86 machine with Docker and about 7 GiB of memory.
 - The vendor must stay online; if it goes silent, the timeout rule pays whatever was revealed.
 - The contract account still has a full access key, so its code can still be replaced (planned to be removed last).
 
@@ -254,6 +265,16 @@ Development laptop: 13th Gen Intel Core i7-1360P, 16 logical CPUs, 10 GiB visibl
 | Proof size | composite 7 to 33 MB; succinct 224,786 bytes; Groth16 2,057 bytes (the contract reads a 256 byte seal and a 780 byte journal) | docs/numbers.md |
 | Gas per on-chain verification | 35.2 to 36.4 Tgas per accepted proof; 34.856 Tgas for a proof refused at the pairing check | `docs/evidence/S6c/gas_level2.txt`, step 6 above |
 
+The same kind of proof on the laptop and on a rented GPU (bounty 24, `data/smooth/`; the agent's fix is the reference fix
+byte for byte, so both proofs check the same patch under the same checker image id):
+
+| Step | Laptop CPU (i7-1360P, `--po2 18`) | 1x NVIDIA L40S on RunPod (`--po2 19`) | Source |
+| --- | --- | --- | --- |
+| Prove | 8,679.49 s (141 segments), peak 2,418 MiB | **29.82 s** (33 segments), peak GPU memory 9,275 MiB | `docs/evidence/smooth/prove_proof0.log`; `docs/evidence/smooth/gpu/prove_u0.log` |
+| Compress to succinct | 5,591.59 s | **21.71 s** | `docs/evidence/smooth/compress_proof0.log`; `docs/evidence/smooth/gpu/compress_succinct.log` |
+| Groth16 wrap (Docker, x86) | 252.93 s, container peak 6,201 MiB | not on the pod (no Docker there): 337.73 s on a 4 core VPS with 7.8 GiB, container peak 6.82 GiB | `docs/evidence/smooth/groth16_p0.log`; `docs/evidence/smooth/vps/groth16.log` |
+| Cost | electricity and time | $0.60 of GPU rental for the pod session | docs/numbers.md |
+
 ## What is built
 
 Each claim names the file and the command that show it. Full results, failures included: [docs/EVIDENCE.md](docs/EVIDENCE.md).
@@ -262,7 +283,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | --- | --- | --- |
 | Level 2: the contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt; replayed, changed, late or repeated proofs are refused | works on testnet: one PASS paid, one FAIL spent, nine attacks refused; anyone can open a judge bounty (steps 5 and 6) | `scripts/s6c_testnet.sh`, `scripts/judge_bounties.sh`, `cargo test -p kintsugi-contract` (EVIDENCE, S6c and "Judge bounties") |
 | Proof-checked payouts versus timeout payouts | bounties 1, 16 and 24 were paid by a proof (`submit_groth16` PASS; bounty 24: a private bounty on a new module, tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); bounties 4, 9, 11, 13 and 17 were paid by the timeout rule (a liveness rule, not a verdict), and bounty 8 on paper only (its transfer failed, finding 8), with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `docs/handoff/04-testnet-state.md`; the bounty pages |
-| An agent driven by a language model (NEAR AI Cloud by default): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, commits and reveals with a limited key | works on testnet: on test bounty 16 the model's fix was proven PASS and paid; on private bounty 17 (a new program, secret and reference fix outside the repository) the model's fix was the reference fix byte for byte, but the vendor's proof did not finish inside the verdict window, so it was **paid by timeout, not by a proof** | `agent/skarbnik_agent.py`; EVIDENCE "The model-driven agent", "Private bounty 17" |
+| An agent driven by a language model (NEAR AI Cloud by default): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, commits and reveals with a limited key | works on testnet: on private bounty 24 (a new program) the model's fix was proven PASS on a rented GPU and paid by proof (tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); on test bounty 16 the model's fix was proven PASS and paid; on private bounty 17 (a new program, secret and reference fix outside the repository) the model's fix was the reference fix byte for byte, but the vendor's proof did not finish inside the verdict window, so it was **paid by timeout, not by a proof** | `agent/skarbnik_agent.py`; EVIDENCE "Bounty 24", "The model-driven agent", "Private bounty 17" |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | 19 of 20 as expected; the one difference (`memory_grow`) is explained | `cargo test -p kintsugi-check`; EVIDENCE, S1 |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |
 | Anyone can rebuild the checker and get the published image id | MATCH | step 9 |
@@ -290,8 +311,9 @@ Each claim names the file and the command that show it. Full results, failures i
 - One verdict tells a researcher at most one bit about the secret; the vendor chooses the budget K.
 - If the vendor stays silent, the bounty is split equally among every revealed attempt still waiting, whatever they
   contain. In the worst case an honest fix gets only 1/K of the bounty (docs/AUDIT.md, finding 3 and hardening S7).
-- Proving is slow on a laptop CPU: one passing proof with compression takes 1 to 2 hours, which is why bounty 17 was paid
-  by timeout.
+- Proving is slow on a laptop CPU: one passing proof with compression takes 1.5 to 4 hours, which is why bounty 17 was
+  paid by timeout. A rented GPU did bounty 24's in under a minute (one run, one machine), with the secret in that
+  machine's memory for the run.
 - Bounty 12 keeps its secret private but uses the public demo bug. Bounty 7 and the demo bounties use the public demo input.
 - A payout to an account that does not exist is lost (docs/AUDIT.md, finding 8); the site and
   `scripts/agent_preflight.sh` refuse such an account before sending.
@@ -332,7 +354,6 @@ it is built. Tests without a key: `./scripts/agent_dry_run_test.sh`.
 
 ## Roadmap
 
-- Faster vendor proving on a rented GPU, so a proof fits the verdict window (the setup is written, not yet run on a pod).
 - **Planned: unresolved bug bounties.** A mode where Proof 0 proves only that the original crashes on the secret, so no
   reference fix is needed. It needs a new checker guest and a new image id.
 - **Planned: proving inside sealed hardware.** Proving in a confidential computing environment (a TEE with

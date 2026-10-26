@@ -30,6 +30,10 @@ in time without heavy work on its own laptop, so the contract pays by proof (not
   files and its own records; the model received only the prompt saved in `agent_run/prompt_24_a1.txt`, which contains
   the public `original.rs` byte for byte and not the fixed condition. The fix is one condition (`if w > n` to
   `if w == 0 || w > n`), so the same text as the reference fix is the natural answer.
+  Caveat, the same as for bounty 17: the agent ran on the same laptop and as the same user as the vendor's private
+  folder. Its code never reads that folder, but nothing technical stopped a process of that user from doing so. A
+  stronger setup, the agent on a separate machine or under a separate account with no access to the vendor's files, is
+  future work.
 - Attempt proof on a rented GPU (RunPod, 1x NVIDIA L40S; `notes`-side script, logs in `gpu/`): the checker image id
   was checked before proving; the secret was copied into the pod's memory only (`/dev/shm`) and removed afterwards
   (`gpu/01_secret_out.log`). Prove 29.82 s (33 segments, `--po2 19`, PASS, peak GPU memory 9,275 MiB), shrink to a
