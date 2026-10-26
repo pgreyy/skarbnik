@@ -1,0 +1,5 @@
+{
+ "note": "Measured time to prove one attempt end to end (prove, shrink to succinct, Groth16 wrap), by prover mode and module, used by `skarbnik-vendor check` for the verdict window rule (window >= K x time x 1.5) and by `watch` for its early warning. Each entry names the run that measured it; docs/numbers.md has the details. A module that is not listed must be measured first (prove0 measures it).",
+ "per_attempt_seconds": {},
+ "sources": {}
+}

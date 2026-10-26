@@ -1,0 +1,436 @@
+#!/usr/bin/env python3
+"""skarbnik-vendor: the vendor's command line tool for private Level 2 bounties on the Skarbnik contract (NEAR testnet).
+
+A vendor should not have to be a cryptography operator. Commands:
+  init     ask a few questions (or copy an older config with --from) and write a bounty config (TOML), outside the repo
+  check    the preflight: module, public tests, the secret crashes the original, the reference fix passes on several
+           seeds, memory for the prover mode, the checker id on the allowlist, the vendor's balance, and the verdict
+           window against K times the measured proof time; prints a preview and refuses with a plain reason
+  prove0   Proof 0 of the reference fix: prove, shrink to succinct, Groth16, verify, the contract arguments; one job at a
+           time, memory watched (scripts/s2_measure.sh)
+  publish  shows the preview, asks for confirmation, creates and opens the bounty, prints the transactions
+  watch    the auto prover: polls the chain for revealed attempts on the bounties in the watch config, proves each one
+           (oldest first) with the attempt's seed and submission id, checks the verdict and the secret commitment, and
+           submits the Groth16 proof (submit_groth16, which anyone may send); warns when a window is at risk
+  status   each watched bounty and attempt, its state and the next action needed
+
+Secrets (the secret input, the salt, the reference fix) stay on the machine that proves, in files of mode 600 outside
+the repository, and are never printed. The salt is made and read by `skarbnik-host --bounty <name>` in
+~/.kintsugi-salts/. Transactions are signed by NEAR CLI (near-cli-rs) from its legacy keychain. Python 3.11+, no
+packages. Usage: tools/skarbnik-vendor <command> --config <file.toml> (see tools/vendor.example.toml, docs/VENDOR.md).
+"""
+import argparse, base64, fcntl, hashlib, json, os, re, subprocess, sys, time, tomllib, urllib.request
+from datetime import datetime, timezone
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SEC = 10**9
+YOCTO = 10**24
+MARGIN = 1.5            # the verdict window must cover K x the measured proof time x this margin
+GROTH16_NEED_MIB = 7600  # memory plus free swap the Groth16 wrap needs (container peak 6.8 to 7.3 GiB measured)
+PROVE_NEED_MIB = {18: 2600, 19: 5000, 20: 9000}  # prover peak by segment size (docs/numbers.md), with a little room
+
+def now(): return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+def say(*a): print(*a, flush=True)
+def fail(msg): say(f'REFUSED: {msg}'); sys.exit(2)
+def sha_file(p): return hashlib.sha256(open(p, 'rb').read()).hexdigest()
+def near_amount(y): y = int(y); w, f = divmod(y, YOCTO); f = str(f).rjust(24, '0').rstrip('0')[:6]; return f'{w}{"." + f if f else ""} NEAR'
+def yocto(near_text): w, _, f = str(near_text).partition('.'); return int(w or 0) * YOCTO + int((f + '0' * 24)[:24] or 0)
+def span(s): s = int(s); return f'{s // 86400} days' if s % 86400 == 0 and s >= 86400 else f'{s // 3600} h' if s % 3600 == 0 and s >= 3600 else f'{s // 60} min' if s % 60 == 0 else f'{s} s'
+def hm(s): s = int(s); return f'{s // 3600} h {s % 3600 // 60:02d} min' if s >= 3600 else f'{s // 60} min {s % 60:02d} s'
+
+# ---------------------------------------------------------------- config
+def load(path):
+    cfg = tomllib.load(open(os.path.expanduser(path), 'rb'))
+    cfg['_path'] = os.path.abspath(os.path.expanduser(path))
+    for sec in cfg.values():
+        if isinstance(sec, dict):
+            for k, v in list(sec.items()):
+                if isinstance(v, str) and v.startswith('~'): sec[k] = os.path.expanduser(v)
+    return cfg
+
+def inside_repo(p): return os.path.abspath(p).startswith(ROOT + os.sep)
+def binpath(cfg, name): return os.path.expanduser(cfg.get('paths', {}).get(name, {'host': f'{ROOT}/target/release/skarbnik-host', 'check': f'{ROOT}/target/debug/skarbnik-check', 'near': 'near'}[name]))
+
+# ---------------------------------------------------------------- chain (read only)
+def rpc(cfg, method, params):
+    last = None
+    for url in cfg['chain']['rpc_urls']:
+        for attempt in range(4):
+            try:
+                req = urllib.request.Request(url, json.dumps({'jsonrpc': '2.0', 'id': 'v', 'method': method, 'params': params}).encode(), {'Content-Type': 'application/json'})
+                j = json.load(urllib.request.urlopen(req, timeout=30))
+                if 'result' in j: return j['result']
+                last = j.get('error')
+                break
+            except Exception as e:  # noqa: BLE001 (try again, then the next RPC)
+                last = e; time.sleep(1.5 * (attempt + 1))
+    raise RuntimeError(f'no RPC answered {method}: {last}')
+
+def view(cfg, method, args=None):
+    r = rpc(cfg, 'query', {'request_type': 'call_function', 'finality': 'final', 'account_id': cfg['chain']['contract'], 'method_name': method,
+                           'args_base64': base64.b64encode(json.dumps(args or {}).encode()).decode()})
+    return json.loads(bytes(r['result']))
+
+def balance(cfg, account):
+    try: return int(rpc(cfg, 'query', {'request_type': 'view_account', 'finality': 'final', 'account_id': account})['amount'])
+    except Exception: return None  # noqa: BLE001
+
+# ---------------------------------------------------------------- transactions (NEAR CLI, legacy keychain)
+def send(cfg, signer, method, args_file, deposit='0 NEAR', gas='300 Tgas', log=None):
+    cmd = [binpath(cfg, 'near'), 'contract', 'call-function', 'as-transaction', cfg['chain']['contract'], method, 'file-args', args_file,
+           'prepaid-gas', gas, 'attached-deposit', deposit, 'sign-as', signer, 'network-config', cfg['chain'].get('network', 'testnet'),
+           'sign-with-legacy-keychain', 'send']
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    out = r.stdout + '\n' + r.stderr
+    # keep only lines that are safe to show: no keys, signatures or long base58 strings
+    safe = '\n'.join(l for l in re.sub(r'\x1b\[[0-9;]*m', '', out).splitlines()
+                     if not re.search(r'private|secret|seed.?phrase|signature', l, re.I) and not re.search(r'[1-9A-HJ-NP-Za-km-z]{80,}', l))
+    if log: open(log, 'a').write(f'$ near ... {method} sign-as {signer}\n{safe}\n')
+    tx = re.search(r'(?:transactions/|Transaction ID: )([1-9A-HJ-NP-Za-km-z]{43,44})', out)
+    failed = r.returncode != 0 or 'Smart contract panicked' in out or 'Error' in out and not tx
+    reason = re.search(r'Smart contract panicked: ([^\n"\\]+)', out)
+    return (tx.group(1) if tx else None), (not failed), (reason.group(1) if reason else safe[-400:])
+
+# ---------------------------------------------------------------- measured proof times (tools/proof_times.json)
+def proof_time(mode, module, workdir=None, machine='this machine'):
+    """Seconds to prove one attempt: the measured table, else this bounty's own Proof 0 (same module, same machine)."""
+    t = json.load(open(f'{ROOT}/tools/proof_times.json'))
+    key = f'{mode}@{machine}:{os.path.basename(module.rstrip("/"))}'
+    if key in t['per_attempt_seconds']: return t['per_attempt_seconds'][key], t
+    w = os.path.expanduser(workdir) if workdir else None
+    if w and os.path.exists(f'{w}/proof0_times.json'): return round(sum(json.load(open(f'{w}/proof0_times.json'))['times_s'].values())), t
+    return None, t
+
+def window_rule(cfg, est):
+    b = cfg['bounty']; k = int(b['k']); window = int(b['verdict_window_h']) * 3600
+    if est is None: return 'no measured proof time yet for this mode and module: prove0 measures it'
+    if window < k * est * MARGIN: return f'the verdict window ({b["verdict_window_h"]} h) is shorter than K x the measured proof time x {MARGIN} = {k} x {hm(est)} x {MARGIN} = {hm(k * est * MARGIN)}: lower K or lengthen the window'
+    return None
+
+# ---------------------------------------------------------------- memory
+def mem_mib():
+    m = {l.split(':')[0]: int(l.split()[1]) // 1024 for l in open('/proc/meminfo')}
+    return m['MemAvailable'], m.get('SwapFree', 0)
+
+def wait_memory(need, log, what):
+    while True:
+        avail, swap = mem_mib()
+        if avail + min(swap, 2048) >= need: return
+        msg = f'{now()} waiting for memory for {what}: available {avail} MiB + swap {swap} MiB, needs {need} MiB'
+        say(msg); open(log, 'a').write(msg + '\n'); time.sleep(120)
+
+# ---------------------------------------------------------------- proving steps (one job at a time)
+def measured(cfg, log, argv, max_s, min_avail):
+    env = dict(os.environ, MAX_SECONDS=str(max_s), MIN_AVAIL_MIB=str(min_avail), MAX_RSS_MIB=str(cfg['prover'].get('max_rss_mib', 6144)))
+    p = subprocess.Popen([f'{ROOT}/scripts/s2_measure.sh', log, '--', *argv], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    t0 = time.time()
+    while p.poll() is None:
+        time.sleep(60)
+        avail, _ = mem_mib()
+        say(f'  ... {os.path.basename(log)}: {hm(time.time() - t0)}, available memory {avail} MiB')
+    text = open(log).read()
+    ok = re.search(r'^result: finished', text, re.M) and re.search(r'^exit=0', text, re.M)
+    if not ok:
+        err = (re.findall(r'^error: .*', text, re.M) or [''])[-1]
+        raise RuntimeError(f'{os.path.basename(log)} did not finish: {(re.findall(r"^exit=.*", text, re.M) or ["no exit"])[-1]}, {(re.findall(r"^result: .*", text, re.M) or ["no result"])[-1]} {err}'.strip())
+    return float(re.search(r'^wall_seconds=([\d.]+)', text, re.M).group(1))
+
+class ProverLock:
+    """One proving job at a time on this machine: prove0 and watch share ~/.skarbnik-vendor-prover.lock."""
+    def __enter__(self):
+        self.f = open(os.path.expanduser('~/.skarbnik-vendor-prover.lock'), 'w')
+        try: fcntl.flock(self.f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            say(f'{now()} another proving job runs on this machine; waiting for it to finish'); fcntl.flock(self.f, fcntl.LOCK_EX)
+        return self
+    def __exit__(self, *a): fcntl.flock(self.f, fcntl.LOCK_UN); self.f.close()
+
+def prove_chain(cfg, *a, **k):
+    with ProverLock(): return _prove_chain(cfg, *a, **k)
+
+def _prove_chain(cfg, w, name, candidate, module, secret, seed, fuzz, variants, po2, proof0=False, sid=None):
+    """prove -> succinct -> Groth16 -> verify -> contract arguments, in workdir w. Returns the verify text and times."""
+    host = binpath(cfg, 'host'); log = f'{w}/run.log'; times = {}
+    argv = [host, 'prove', candidate, '--bounty', name, '--exploit', secret, '--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt',
+            '--fuzz-count', str(fuzz), '--variants', str(variants), '--po2', str(po2), '--seed', seed, '--out', f'{w}/{"p0" if proof0 else "u"}.bin']
+    if proof0: argv.insert(3, '--proof0')
+    if sid: argv += ['--submission-id', sid]
+    tag = 'p0' if proof0 else 'u'
+    wait_memory(PROVE_NEED_MIB.get(po2, 5000), log, 'proving')
+    times['prove'] = measured(cfg, f'{w}/prove_{tag}.log', argv, cfg['prover'].get('prove_max_s', 43200), cfg['prover'].get('min_avail_mib', 300))
+    times['succinct'] = measured(cfg, f'{w}/succinct_{tag}.log', [host, 'compress', f'{w}/{tag}.bin', f'{w}/{tag}_succinct.bin', 'succinct'], cfg['prover'].get('succinct_max_s', 43200), cfg['prover'].get('min_avail_mib', 300))
+    os.remove(f'{w}/{tag}.bin')  # the composite receipt is large and no longer needed
+    wait_memory(GROTH16_NEED_MIB, log, 'the Groth16 wrap')
+    t0 = time.time()
+    g = subprocess.run(['/usr/bin/time', '-v', host, 'compress', f'{w}/{tag}_succinct.bin', f'{w}/{tag}_groth16.bin', 'groth16'], capture_output=True, text=True, env=dict(os.environ, RISC0_DEV_MODE='0'))
+    open(f'{w}/groth16_{tag}.log', 'w').write(g.stdout + g.stderr)
+    times['groth16'] = round(time.time() - t0, 2)
+    if g.returncode != 0: raise RuntimeError(f'the Groth16 wrap failed (groth16_{tag}.log)')
+    v = subprocess.run([host, 'verify', f'{w}/{tag}_groth16.bin'], capture_output=True, text=True).stdout
+    open(f'{w}/verify_{tag}.txt', 'w').write(v)
+    if not re.search(r'^VALID', v, re.M): raise RuntimeError('the Groth16 receipt does not verify')
+    subprocess.run([host, 'groth16-args', f'{w}/{tag}_groth16.bin', f'{w}/{tag}_args.json'], check=True, capture_output=True)
+    return v, times
+
+def journal(v, field):
+    m = re.search(rf'^journal\.{field}: (\S+)', v, re.M); return m.group(1) if m else None
+
+def proof_args(w, tag, extra):
+    d = json.load(open(f'{w}/{tag}_args.json'))
+    args = dict(extra, seal=base64.b64encode(bytes.fromhex(d['seal'])).decode(), journal=base64.b64encode(bytes.fromhex(d['journal'])).decode())
+    p = f'{w}/{tag}_call.json'; json.dump(args, open(p, 'w')); return p
+
+# ---------------------------------------------------------------- init
+QUESTIONS = [
+    ('bounty', 'name', 'a short name for this bounty (also names its salt in ~/.kintsugi-salts/)', 'mybounty'),
+    ('bounty', 'module', 'the folder with original.wasm and public_tests.txt', 'data/demo'),
+    ('bounty', 'reward_near', 'reward in NEAR', '0.1'),
+    ('bounty', 'k', 'attempts allowed, K (1 to 16)', '1'),
+    ('bounty', 'attempt_fee_near', 'fee of the first attempt, in NEAR', '0.01'),
+    ('bounty', 'fee_step_near', 'added to the fee for each earlier attempt, in NEAR', '0.005'),
+    ('bounty', 'reveal_gap_s', 'seconds between a commit and its earliest reveal', '60'),
+    ('bounty', 'reveal_window_s', 'seconds after a commit to reveal it', '3600'),
+    ('bounty', 'verdict_window_h', 'hours after a reveal to prove it', '24'),
+    ('bounty', 'expiry_h', 'hours until the bounty expires', '96'),
+    ('bounty', 'po2', 'proof segment size (18 needs about 2.5 GiB, 19 about 5 GiB)', '18'),
+    ('secrets', 'secret', 'path of the secret crashing input (hex), outside the repository', '~/.skarbnik-vendor/mybounty/exploit.hex'),
+    ('secrets', 'reference_fix', 'path of your reference fix (.wasm), outside the repository', '~/.skarbnik-vendor/mybounty/fixed.wasm'),
+    ('prover', 'mode', 'where proving runs: cpu (this machine); gpu is not built yet', 'cpu'),
+    ('prover', 'workdir', 'folder for receipts and logs, outside the repository', '~/skarbnik-vendor/mybounty'),
+    ('chain', 'vendor_account', 'your vendor account (signs create and open)', 'you.testnet'),
+]
+
+def cmd_init(a):
+    base = load(a.from_) if a.from_ else tomllib.load(open(f'{ROOT}/tools/vendor.example.toml', 'rb'))
+    out = os.path.abspath(os.path.expanduser(a.out))
+    if inside_repo(out): fail('write the config outside the repository; it names your secret files')
+    for sec, key, q, default in QUESTIONS:
+        cur = str(base.get(sec, {}).get(key, default))
+        if a.yes: continue
+        ans = input(f'{q} [{cur}]: ').strip()
+        if ans: base.setdefault(sec, {})[key] = ans
+    for sec, key in (('secrets', 'secret'), ('secrets', 'reference_fix'), ('prover', 'workdir')):
+        if inside_repo(os.path.expanduser(str(base[sec][key]))): fail(f'{sec}.{key} must point outside the repository')
+    lines = []
+    for sec, vals in base.items():
+        if sec.startswith('_') or not isinstance(vals, dict): continue
+        lines.append(f'[{sec}]')
+        for k, v in vals.items():
+            num = isinstance(v, (int, float)) or (isinstance(v, str) and re.fullmatch(r'\d+', v) and k in ('k', 'reveal_gap_s', 'reveal_window_s', 'verdict_window_h', 'expiry_h', 'po2', 'max_patch_bytes', 'fuzz_count', 'variants'))
+            lines.append(f'{k} = {json.dumps(v) if not num else int(v) if isinstance(v, str) else v}')
+        lines.append('')
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    open(out, 'w').write('# skarbnik-vendor bounty config (tools/vendor.example.toml). Keep it outside the repository.\n' + '\n'.join(lines))
+    os.chmod(out, 0o600)
+    say(f'wrote {out}. Next: tools/skarbnik-vendor check --config {out}')
+
+# ---------------------------------------------------------------- check and preview
+def preview(cfg, est):
+    b = cfg['bounty']; k = int(b['k']); fee = yocto(b['attempt_fee_near']); step = yocto(b['fee_step_near'])
+    say('\nPreview')
+    say(f'  reward: {b["reward_near"]} NEAR, locked in the contract when the bounty is created')
+    say(f'  attempts: up to {k}; fees, taken from each researcher\'s credit: ' + ', '.join(f'#{i + 1} {near_amount(fee + i * step)}' for i in range(k)))
+    say(f'  windows: reveal {span(b["reveal_gap_s"])} to {span(b["reveal_window_s"])} after a commit; your proof within {b["verdict_window_h"]} h of each reveal; the bounty expires after {b["expiry_h"]} h')
+    say('  on timeout: if you do not prove a revealed attempt within its verdict window, anyone can call claim_timeout and the')
+    say('    reward is split equally among the revealed attempts still waiting. The contract does not look at the fix: it pays')
+    say('    whatever was revealed. That protects researchers from a silent vendor; it is not a verdict.')
+    if est:
+        mode = cfg['prover']['mode']
+        say(f'  proving one attempt ({mode}): about {hm(est)} (measured, tools/proof_times.json); cost: {"electricity and machine time" if mode == "cpu" else "GPU rental time"}')
+        say(f'  time to open: Proof 0 (about {hm(est)}) plus two transactions')
+
+def cmd_check(a):
+    cfg = load(a.config); b, s, pr = cfg['bounty'], cfg['secrets'], cfg['prover']
+    problems = []; ok = lambda m: say(f'  ok   {m}')
+    say(f'Preflight for {b["name"]} ({cfg["_path"]})')
+    module = os.path.join(ROOT, b['module']) if not os.path.isabs(b['module']) else b['module']
+    for f in ('original.wasm', 'public_tests.txt'):
+        if not os.path.isfile(f'{module}/{f}'): problems.append(f'{b["module"]}/{f} is missing')
+    for key in ('secret', 'reference_fix'):
+        p = s[key]
+        if inside_repo(p): problems.append(f'{key} is inside the repository; keep it outside')
+        elif not os.path.isfile(p): problems.append(f'{key} file not found: {p}')
+        elif oct(os.stat(p).st_mode)[-3:] != '600': problems.append(f'{key} is readable by others (mode {oct(os.stat(p).st_mode)[-3:]}); make it 600')
+    if problems: fail('; '.join(problems))
+    size = os.path.getsize(f'{module}/original.wasm'); tests = sum(1 for l in open(f'{module}/public_tests.txt') if l.strip() and not l.startswith('#'))
+    if size > 2048: problems.append(f'the module is {size} bytes; the checker takes at most 2,048')
+    else: ok(f'module {b["module"]}/original.wasm, {size} bytes; {tests} public tests')
+    fixsize = os.path.getsize(s['reference_fix'])
+    if fixsize > int(b.get('max_patch_bytes', 1024)): problems.append(f'the reference fix is {fixsize} bytes, above max_patch_bytes')
+    chk = binpath(cfg, 'check'); common = ['--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt', '--exploit', s['secret']]
+    crash = subprocess.run([chk, 'check', '--candidate', f'{module}/original.wasm', *common, '--seed', '00' * 32, '--fuzz-count', '16', '--variants', '32', '--explain'], capture_output=True, text=True)
+    if not re.search(r'exploit: (trapped|out of fuel)', crash.stdout): problems.append('the original does not crash on the secret input')
+    else: ok('the original crashes on the secret input')
+    passes = 0
+    for i in range(4):
+        seed = hashlib.sha256(f'{b["name"]}:{i}:{time.time()}'.encode()).hexdigest()
+        r = subprocess.run([chk, 'proof0', *common, '--reference-fix', s['reference_fix'], '--seed', seed, '--fuzz-count', '64', '--variants', '64'], capture_output=True, text=True)
+        passes += r.returncode == 0 and 'proof0: PASS' in r.stdout
+    if passes != 4: problems.append(f'the reference fix passed the full check on {passes} of 4 seeds')
+    else: ok('the reference fix passes the full check on 4 random seeds')
+    po2 = int(b.get('po2', 18)); avail, swap = mem_mib()
+    need = max(PROVE_NEED_MIB.get(po2, 5000), GROTH16_NEED_MIB)
+    if avail + min(swap, 2048) < need: problems.append(f'not enough memory here for {pr["mode"]} proving: {avail} MiB available + {swap} MiB swap, needs about {need} MiB (the Groth16 wrap)')
+    else: ok(f'memory: {avail} MiB available, {swap} MiB swap; proving needs about {PROVE_NEED_MIB.get(po2)} MiB at --po2 {po2}, the Groth16 wrap about {GROTH16_NEED_MIB} MiB')
+    if pr['mode'] != 'cpu': problems.append(f'prover mode {pr["mode"]} is not built yet; use cpu')
+    try:
+        allowed = view(cfg, 'get_allowed_image_ids')
+        if cfg['chain']['image_id'] in allowed: ok(f'checker image id {cfg["chain"]["image_id"][:16]}... is on the contract\'s allowlist')
+        else: problems.append('the checker image id is not on the contract\'s allowlist')
+    except Exception as e: problems.append(f'could not read the allowlist: {e}')  # noqa: BLE001
+    bal = balance(cfg, cfg['chain']['vendor_account']); need_near = yocto(b['reward_near']) + yocto('0.2')
+    if bal is None: problems.append(f'vendor account {cfg["chain"]["vendor_account"]} not found')
+    elif bal < need_near: problems.append(f'vendor balance {near_amount(bal)} is below the reward plus 0.2 NEAR for gas and storage')
+    else: ok(f'vendor balance {near_amount(bal)}')
+    est, _ = proof_time(pr['mode'], b['module'], pr.get('workdir'), pr.get('machine', 'this machine'))
+    why = window_rule(cfg, est)
+    if est is None: say(f'  note {why}; publish refuses until it is measured')
+    elif why: problems.append(why)
+    else: ok(f'verdict window {b["verdict_window_h"]} h covers K x proof time x {MARGIN} = {hm(int(b["k"]) * est * MARGIN)}')
+    preview(cfg, est)
+    if problems: say(''); fail('\n  - ' + '\n  - '.join(problems))
+    say('\nPreflight passed.')
+
+# ---------------------------------------------------------------- prove0 and publish
+def cmd_prove0(a):
+    cfg = load(a.config); b, s = cfg['bounty'], cfg['secrets']; w = os.path.expanduser(cfg['prover']['workdir']); os.makedirs(w, mode=0o700, exist_ok=True)
+    seedf = f'{w}/proof0_seed.txt'
+    if not os.path.exists(seedf):
+        fd = os.open(seedf, os.O_WRONLY | os.O_CREAT, 0o600); os.write(fd, os.urandom(32).hex().encode()); os.close(fd)
+    seed = open(seedf).read().strip()
+    module = os.path.join(ROOT, b['module']) if not os.path.isabs(b['module']) else b['module']
+    say(f'{now()} Proof 0 of {b["name"]}: prove, succinct, Groth16, one step at a time (logs in {w})')
+    v, t = prove_chain(cfg, w, b['name'], s['reference_fix'], module, s['secret'], seed, int(b.get('fuzz_count', 16)), int(b.get('variants', 32)), int(b.get('po2', 18)), proof0=True)
+    if journal(v, 'verdict') != 'PASS': fail('Proof 0 did not say PASS')
+    json.dump({'times_s': t, 'at': now()}, open(f'{w}/proof0_times.json', 'w'))
+    say(f'{now()} Proof 0 ready: VALID, PASS; prove {t["prove"]} s, succinct {t["succinct"]} s, Groth16 {t["groth16"]} s. Next: publish')
+
+def cmd_publish(a):
+    cfg = load(a.config); b = cfg['bounty']; w = os.path.expanduser(cfg['prover']['workdir'])
+    v = open(f'{w}/verify_p0.txt').read()
+    module = os.path.join(ROOT, b['module']) if not os.path.isabs(b['module']) else b['module']
+    if journal(v, 'original_hash') != sha_file(f'{module}/original.wasm'): fail('Proof 0 is not for this module')
+    if journal(v, 'verdict') != 'PASS': fail('Proof 0 does not say PASS')
+    est, _ = proof_time(cfg['prover']['mode'], b['module'], cfg['prover'].get('workdir'), cfg['prover'].get('machine', 'this machine')); preview(cfg, est)
+    why = window_rule(cfg, est)
+    if why: fail(why)
+    if not a.yes and input('\nType "publish" to create and open this bounty on testnet: ').strip() != 'publish': fail('not confirmed; nothing was sent')
+    ref = sha_file(cfg['secrets']['reference_fix']) if os.path.exists(cfg['secrets']['reference_fix']) else journal(v, 'candidate_hash')
+    create = {'original_hash': journal(v, 'original_hash'), 'corpus_hash': journal(v, 'corpus_hash'), 'image_id': re.search(r'^image id: (\S+)', v, re.M).group(1),
+              'exploit_commitment': journal(v, 'exploit_commitment'), 'proof0_receipt_hash': sha_file(f'{w}/p0_succinct.bin'), 'max_commits': int(b['k']),
+              'max_patch_bytes': int(b.get('max_patch_bytes', 1024)), 'reveal_gap_ns': str(int(b['reveal_gap_s']) * SEC), 'verdict_window_ns': str(int(b['verdict_window_h']) * 3600 * SEC),
+              'attest_window_ns': str(3600 * SEC), 'expiry_ns': str(int(b['expiry_h']) * 3600 * SEC), 'attempt_fee': str(yocto(b['attempt_fee_near'])), 'fee_step': str(yocto(b['fee_step_near'])),
+              'reference_fix_hash': ref, 'proof0_journal_hash': re.search(r'^journal sha256: (\S+)', v, re.M).group(1), 'reveal_window_ns': str(int(b['reveal_window_s']) * SEC),
+              'fuzz_count': int(b.get('fuzz_count', 16)), 'variant_count': int(b.get('variants', 32)), 'level': 2}
+    json.dump(create, open(f'{w}/create_call.json', 'w'))
+    bid = str(view(cfg, 'get_next_bounty_id'))
+    tx1, ok1, why = send(cfg, cfg['chain']['vendor_account'], 'create_bounty', f'{w}/create_call.json', f'{b["reward_near"]} NEAR', log=f'{w}/run.log')
+    say(f'create_bounty: {tx1} {"ok" if ok1 else "FAILED: " + why}')
+    if not ok1: sys.exit(1)
+    tx2, ok2, why = send(cfg, cfg['chain']['vendor_account'], 'open_with_groth16', proof_args(w, 'p0', {'bounty_id': bid}), log=f'{w}/run.log')
+    say(f'open_with_groth16: {tx2} {"ok" if ok2 else "FAILED: " + why}')
+    json.dump({'bounty_id': bid, 'create_tx': tx1, 'open_tx': tx2, 'at': now()}, open(f'{w}/published.json', 'w'))
+    bb = view(cfg, 'get_bounty', {'bounty_id': bid})
+    say(f'bounty {bid}: state {bb["state"]}, opened {bb["opened"]}, image id allowed {bb["image_id_allowed"]}. Add it to the watch config.')
+
+# ---------------------------------------------------------------- watch and status
+def watched(wcfg):
+    for e in wcfg['bounties']:
+        for bid in e['ids']: yield str(bid), e
+
+def attempts(cfg, bid):
+    b = view(cfg, 'get_bounty', {'bounty_id': bid})
+    return b, [view(cfg, 'get_submission', {'bounty_id': bid, 'index': i}) for i in range(b['commits'])]
+
+def state_load(wcfg):
+    p = os.path.expanduser(wcfg['watch']['state']); return json.load(open(p)) if os.path.exists(p) else {}
+def state_save(wcfg, st):
+    p = os.path.expanduser(wcfg['watch']['state']); json.dump(st, open(p + '.tmp', 'w'), indent=1); os.replace(p + '.tmp', p)
+
+def log_line(wcfg, msg):
+    line = f'{now()} {msg}'; say(line); open(os.path.expanduser(wcfg['watch']['log']), 'a').write(line + '\n')
+
+def prove_attempt(wcfg, bid, e, b, i, s, st):
+    key = f'{bid}:{i}'; w = os.path.expanduser(f'{wcfg["watch"]["workdir"]}/b{bid}_a{i}'); os.makedirs(w, mode=0o700, exist_ok=True)
+    patch = f'{w}/patch.wasm'; open(patch, 'wb').write(base64.b64decode(s['patch']))
+    sid = view(wcfg, 'get_submission_id', {'bounty_id': bid, 'index': i})
+    module = os.path.join(ROOT, e['module']) if not os.path.isabs(e['module']) else e['module']
+    log_line(wcfg, f'bounty {bid} attempt {i}: proving (patch sha256 {sha_file(patch)[:16]}..., seed {s["seed"][:16]}..., deadline {datetime.fromtimestamp(int(s["deadline_ns"]) / 1e9, timezone.utc):%Y-%m-%d %H:%M} UTC)')
+    st[key] = {'state': 'proving', 'started': now()}; state_save(wcfg, st)
+    v, t = prove_chain(wcfg, w, e['name'], patch, module, os.path.expanduser(e['secret']), s['seed'], b['fuzz_count'], b['variant_count'], int(e.get('po2', 18)), sid=sid)
+    if journal(v, 'exploit_commitment') != b['exploit_commitment']: raise RuntimeError('the proof\'s secret commitment is not the bounty\'s (wrong secret or salt); not submitting')
+    if journal(v, 'submission_id') != sid: raise RuntimeError('the proof is for another submission id; not submitting')
+    verdict = journal(v, 'verdict')
+    log_line(wcfg, f'bounty {bid} attempt {i}: proof ready, verdict {verdict}; prove {t["prove"]} s, succinct {t["succinct"]} s, Groth16 {t["groth16"]} s')
+    fresh = view(wcfg, 'get_submission', {'bounty_id': bid, 'index': i})
+    if fresh['outcome'] != 'Open': log_line(wcfg, f'bounty {bid} attempt {i}: already decided on chain ({fresh["outcome"]}); not submitting'); st[key] = {'state': 'decided elsewhere', 'outcome': fresh['outcome']}; return
+    tx, ok, why = send(wcfg, wcfg['chain']['submit_account'], 'submit_groth16', proof_args(w, 'u', {'bounty_id': bid, 'index': i}), log=f'{w}/run.log')
+    after = view(wcfg, 'get_submission', {'bounty_id': bid, 'index': i})
+    log_line(wcfg, f'bounty {bid} attempt {i}: submit_groth16 {tx} {"ok" if ok else "FAILED: " + why}; outcome on chain {after["outcome"]}')
+    st[key] = {'state': 'submitted' if ok else 'submit failed', 'tx': tx, 'verdict': verdict, 'outcome': after['outcome'], 'times_s': t, 'done': now()}
+    for f in ('u_succinct.bin',):
+        if os.path.exists(f'{w}/{f}'): os.remove(f'{w}/{f}')
+
+def scan(wcfg, st):
+    jobs = []
+    for bid, e in watched(wcfg):
+        try: b, subs = attempts(wcfg, bid)
+        except Exception as ex: log_line(wcfg, f'bounty {bid}: could not read ({ex})'); continue  # noqa: BLE001
+        if b['state'] != 'Open': continue
+        for i, s in enumerate(subs):
+            if s['outcome'] != 'Open' or not s.get('revealed_at_ns'): continue
+            done = st.get(f'{bid}:{i}', {})
+            if done.get('state') in ('submitted', 'decided elsewhere', 'deadline passed') or done.get('failures', 0) >= 2: continue
+            jobs.append((int(s['revealed_at_ns']), bid, e, b, i, s))
+    return sorted(jobs, key=lambda j: j[0])
+
+def cmd_watch(a):
+    wcfg = load(a.config); st = state_load(wcfg)
+    log_line(wcfg, f'watch started (mode {wcfg["prover"]["mode"]}, bounties {", ".join(b for b, _ in watched(wcfg))}, one job at a time)')
+    if wcfg['prover']['mode'] != 'cpu': log_line(wcfg, 'GPU mode is not built yet; proving on this machine (cpu)')
+    while True:
+        jobs = scan(wcfg, st)
+        nowns = time.time() * SEC
+        for _, bid, e, b, i, s in jobs:
+            est, _ = proof_time('cpu', e['module'], None, wcfg['prover'].get('machine', 'this machine')); left = (int(s['deadline_ns']) - nowns) / SEC
+            if left <= 0: log_line(wcfg, f'bounty {bid} attempt {i}: its verdict deadline has passed; the timeout rule decides it'); st[f'{bid}:{i}'] = {'state': 'deadline passed'}; state_save(wcfg, st); continue
+            if est and left < est * 1.2: log_line(wcfg, f'WINDOW AT RISK: bounty {bid} attempt {i} has {hm(left)} left; one proof here takes about {hm(est)}')
+        jobs = [j for j in jobs if st.get(f'{j[1]}:{j[4]}', {}).get('state') != 'deadline passed']
+        if jobs:
+            _, bid, e, b, i, s = jobs[0]
+            try: prove_attempt(wcfg, bid, e, b, i, s, st)
+            except Exception as ex:  # noqa: BLE001
+                rec = st.get(f'{bid}:{i}', {}); rec.update(state='failed', failures=rec.get('failures', 0) + 1, error=str(ex)[:300]); st[f'{bid}:{i}'] = rec
+                log_line(wcfg, f'bounty {bid} attempt {i}: FAILED ({ex}); try {rec["failures"]} of 2')
+            state_save(wcfg, st)
+            continue
+        if a.once: log_line(wcfg, 'nothing to prove'); return
+        time.sleep(int(wcfg['watch'].get('poll_s', 60)))
+
+def cmd_status(a):
+    wcfg = load(a.config); st = state_load(wcfg); nowns = time.time() * SEC
+    for bid, e in watched(wcfg):
+        try: b, subs = attempts(wcfg, bid)
+        except Exception as ex: say(f'bounty {bid}: could not read ({ex})'); continue  # noqa: BLE001
+        say(f'bounty {bid} ({e["name"]}): {b["state"]}, opened {b["opened"]}, {b["commits"]} of {b["max_commits"]} attempts, verdict window {span(int(b["verdict_window_ns"]) // SEC)}')
+        for i, s in enumerate(subs):
+            mine = st.get(f'{bid}:{i}', {})
+            if s['outcome'] != 'Open': nxt = 'nothing: decided'
+            elif not s.get('revealed_at_ns'): nxt = 'wait for the researcher to reveal'
+            elif int(s['deadline_ns']) < nowns: nxt = 'deadline passed: anyone can claim the timeout'
+            else: nxt = f'prove by {datetime.fromtimestamp(int(s["deadline_ns"]) / 1e9, timezone.utc):%Y-%m-%d %H:%M} UTC ({hm((int(s["deadline_ns"]) - nowns) / SEC)} left)' + (f'; watch: {mine.get("state")}' if mine else '')
+            say(f'  attempt {i}: {s["outcome"]}{", revealed" if s.get("revealed_at_ns") else ""}; next: {nxt}' + (f'; tx {mine["tx"]}' if mine.get('tx') else ''))
+
+def main():
+    p = argparse.ArgumentParser(prog='skarbnik-vendor', description=__doc__.split('\n')[0])
+    sub = p.add_subparsers(dest='cmd', required=True)
+    i = sub.add_parser('init'); i.add_argument('--out', required=True); i.add_argument('--from', dest='from_'); i.add_argument('--yes', action='store_true', help='take the defaults or the --from values without asking')
+    for name in ('check', 'prove0', 'publish', 'watch', 'status'):
+        c = sub.add_parser(name); c.add_argument('--config', required=True)
+        if name == 'publish': c.add_argument('--yes', action='store_true', help='skip the typed confirmation')
+        if name == 'watch': c.add_argument('--once', action='store_true', help='prove what is waiting, then stop')
+    a = p.parse_args()
+    {'init': cmd_init, 'check': cmd_check, 'prove0': cmd_prove0, 'publish': cmd_publish, 'watch': cmd_watch, 'status': cmd_status}[a.cmd](a)
+
+if __name__ == '__main__':
+    main()

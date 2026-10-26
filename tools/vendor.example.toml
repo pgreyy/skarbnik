@@ -1,0 +1,41 @@
+# skarbnik-vendor bounty config: a template with placeholder paths. Copy it with `tools/skarbnik-vendor init --out <path>`
+# (or `--from <an older config>` to reuse the settings: only the secret and the fix change). Real configs name your
+# secret files: keep them outside the repository. See docs/VENDOR.md.
+
+[bounty]
+name = "mybounty"            # also names the bounty's private salt, ~/.kintsugi-salts/<name>.salt (made at the first proof)
+module = "data/demo"         # folder with original.wasm and public_tests.txt
+reward_near = "0.1"
+k = 1                        # attempts allowed (1 to 16): each verdict tells at most one bit about the secret
+attempt_fee_near = "0.01"
+fee_step_near = "0.005"      # each later attempt costs this much more
+reveal_gap_s = 60
+reveal_window_s = 3600
+verdict_window_h = 24        # must cover K x the measured proof time x 1.5 (tools/proof_times.json)
+expiry_h = 96
+max_patch_bytes = 1024
+fuzz_count = 16
+variants = 32
+po2 = 18                     # proof segment size: 18 needs about 2.5 GiB of memory, 19 about 5 GiB
+
+[secrets]                    # files of mode 600, outside the repository, never printed or committed
+secret = "~/.skarbnik-vendor/mybounty/exploit.hex"
+reference_fix = "~/.skarbnik-vendor/mybounty/fixed.wasm"
+
+[prover]
+mode = "cpu"                 # cpu: this machine. gpu: not built yet
+machine = "my-laptop"        # names this machine in tools/proof_times.json (proof times differ by machine)
+workdir = "~/skarbnik-vendor/mybounty"
+min_avail_mib = 300          # stop a proving step if available memory falls below this
+
+[chain]
+network = "testnet"
+contract = "kintsugi-l2-cihdp.testnet"
+rpc_urls = ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"]
+image_id = "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
+vendor_account = "you.testnet"
+
+[paths]                      # optional: where the binaries are (defaults: this repository's target/ and `near` on PATH)
+# host = "~/skarbnik/bin/skarbnik-host"
+# check = "~/skarbnik/bin/skarbnik-check"
+# near = "~/skarbnik/bin/near"
