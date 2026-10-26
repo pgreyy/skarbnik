@@ -1,0 +1,88 @@
+{
+ "note": "Short titles and plain notes for the bounty list and the bounty pages. Descriptive text only: every status, amount, count, time and transaction on the site is read from the chain or from recorded.json. A bounty missing here is shown by its kind.",
+ "titles": {
+  "0": "First Level 0 bounty",
+  "1": "First Level 2 check",
+  "2": "Early test, never opened",
+  "3": "Early Level 2 test",
+  "4": "Timeout test",
+  "5": "Self block test 1",
+  "6": "Self block test 2",
+  "7": "Official demo",
+  "8": "Missing payout account",
+  "9": "Audit rerun",
+  "10": "Agent limits test",
+  "11": "Timeout split test",
+  "12": "Private secret, public demo bug",
+  "13": "Site wallet run",
+  "14": "Wallet by hand",
+  "15": "NEAR CLI wallet run",
+  "16": "Agent live run",
+  "17": "New module, private secret",
+  "18": "Judge bounty",
+  "19": "Judge bounty",
+  "20": "Judge bounty",
+  "21": "Judge bounty",
+  "22": "Judge bounty",
+  "23": "Arena guarded probe",
+  "24": "Second new module, private secret"
+ },
+ "notes": {
+  "1": "Attempt 0 passed and was paid. Attempt 1 was a valid proof of FAIL, which spent that attempt.",
+  "4": "A silent vendor test. No proof arrived in the window.",
+  "5": "Refunded to the vendor after a self block test.",
+  "6": "Refunded to the vendor. Junk commit fees went to the protocol pool.",
+  "9": "One attempt was rejected by a valid FAIL proof. Another was paid by timeout.",
+  "11": "The bounty was split equally between two revealed attempts.",
+  "13": "One attempt allowed. No proof arrived in the window.",
+  "16": "The agent's fix on the public demo module was proven PASS and paid. It shows the path, not a model's skill: the demo bug is named in the module's comments.",
+  "17": "The vendor's proof finished after the 4 hour window, so the contract paid by timeout. Not a proof."
+ },
+ "agent_runs": {
+  "16": { "account_note": "the agent's own testnet account", "model": "z-ai/glm-5.3-flash", "host": "NEAR AI Cloud", "key": "commit and reveal only", "source": "docs/evidence/agent/live_bounty16/run.log" },
+  "17": { "model": "z-ai/glm-5.3-flash", "host": "NEAR AI Cloud", "key": "commit and reveal only", "source": "docs/evidence/agent/summary.txt" }
+ },
+ "home_example": {
+  "16": {
+   "title": "A patch evaluated against a private input",
+   "body": "A language model agent fixed the demo bug, committed and revealed with a key limited to those two calls, and was paid when the contract accepted the proof.",
+   "note": "Bounty 16 used the public demo module, so anyone can check its input. It shows the path, not a model's skill.",
+   "input": "Defined checker, public demo input"
+  }
+ },
+ "story": {
+  "17": {
+   "lead": "A language model agent fixed a bug it could not see. The vendor's proof did not finish inside the 4 hour window, so the contract paid by timeout.",
+   "why": [
+    ["The fix matched", "The agent's module equals the private reference fix byte for byte. That was checked natively and is recorded (docs/evidence/agent/native_check_bounty17_attempt0.txt)."],
+    ["The proof was late", "The vendor's laptop proof finished after the window. The contract refuses a late proof."],
+    ["The evidence proof was not submitted", "A proof run later says PASS. It is evidence on file, not a settlement."]
+   ],
+   "measured_title": "Measured on the vendor's laptop",
+   "measured": [
+    ["Model answer", "924 s", "z-ai/glm-5.3-flash on NEAR AI Cloud"],
+    ["Proof 0, prove", "5,384.58 s", "Then succinct 1,496.74 s and Groth16 177.04 s"],
+    ["Attempt, prove", "6,530.99 s", "--po2 18, 102 segments, prover peak 2,406 MiB"],
+    ["Verdict window", "14,400 s", "4 hours from the reveal"]
+   ],
+   "measured_note": "Two earlier proof tries were stopped by the project's memory guard when other work used memory. The third finished after the window. Source: docs/numbers.md.",
+   "claims": [
+    ["The agent's fix equals the private reference fix", "Demonstrated", "Native check of attempt 0: PASS"],
+    ["A full proof of the attempt says PASS", "Demonstrated", "Evidence proof, valid, never submitted"],
+    ["The model could not see the reference fix", "Demonstrated", "Search of the repository history and the prompt contents"],
+    ["The contract verified a proof for this attempt", "Not claimed", "It did not. Paid by timeout."]
+   ],
+   "caveat": "A one line fix is often the reference fix byte for byte, so a secret reference fix protects little once someone solves it. The agent also ran on the same laptop as the vendor's files. Its code never read the private folder, but nothing technical stopped a process of that user from doing so."
+  },
+  "24": {
+   "measured_title": "Measured: laptop CPU and a rented GPU",
+   "measured": [
+    ["Proof 0, prove (laptop CPU)", "8,679.49 s", "--po2 18, 141 segments, peak 2,418 MiB"],
+    ["Proof 0, shrink and Groth16 (laptop)", "5,591.59 s and 252.93 s", "Groth16 container peak 6,201 MiB"],
+    ["Attempt 0, prove (NVIDIA L40S, rented)", "29.82 s", "--po2 19, 33 segments, after the image id check"],
+    ["Attempt 0, shrink (same GPU)", "21.71 s", "The secret stayed in the pod's memory and was wiped"]
+   ],
+   "measured_note": "Source: docs/numbers.md. The GPU proof is the vendor's evidence for attempt 0; the result counts only when the contract accepts its Groth16 proof."
+  }
+ }
+}

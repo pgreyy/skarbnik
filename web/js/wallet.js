@@ -105,6 +105,18 @@ export async function call(method, args, depositYocto = '0', tgas = 100) {
   });
 }
 
+// Adds a function call key to the connected account, approved in the wallet: the key may call only commit and reveal
+// on the contract, and may spend at most allowanceYocto on gas. The public key is made in this browser (the private
+// key never leaves it). Some wallets refuse an AddKey from a site; the caller then shows the CLI command instead.
+export async function addKey(publicKey, allowanceYocto) {
+  if (state.status !== 'on') throw new Error('Connect a testnet wallet first.');
+  const w = await connector.wallet();
+  return w.signAndSendTransaction({
+    receiverId: state.account,
+    actions: [{ type: 'AddKey', params: { publicKey, accessKey: { permission: { receiverId: CONTRACT, allowance: String(allowanceYocto), methodNames: ['commit', 'reveal'] } } } }],
+  });
+}
+
 // What a transaction outcome says: its id, whether it succeeded, the decoded return value, or the contract's message.
 export function readOutcome(o) {
   if (!o) return { ok: false, tx: null, error: 'The wallet did not return a result. Check the account on the explorer.' };

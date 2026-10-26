@@ -24,20 +24,40 @@ async function rpc(url, method, args) {
   }
 }
 
-// One view call, trying the second RPC if the first fails. Results are kept for 20 seconds unless opts.fresh is set.
+// At most 6 view calls in flight at once, so a page that reads every bounty does not trip the RPCs' rate limits.
+let active = 0;
+const queue = [];
+const slot = () => new Promise((res) => { if (active < 6) { active++; res(); } else queue.push(res); });
+const free = () => { const next = queue.shift(); if (next) next(); else active--; };
+const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// One view call, trying the second RPC if the first fails, in up to three rounds a moment apart. Results are kept for
+// 20 seconds unless opts.fresh is set; the same call already on its way is shared.
+const inflight = new Map();
 export async function view(method, args = {}, opts = {}) {
   const key = method + JSON.stringify(args);
   const hit = cache.get(key);
   if (!opts.fresh && hit && Date.now() - hit.t < 20000) return hit.v;
-  let last;
-  for (const url of RPCS) {
+  if (!opts.fresh && inflight.has(key)) return inflight.get(key);
+  const p = (async () => {
+    await slot();
     try {
-      const v = await rpc(url, method, args);
-      cache.set(key, { t: Date.now(), v });
-      return v;
-    } catch (e) { last = e; }
-  }
-  throw new Error(`could not read ${method} from testnet (${last && last.message})`);
+      let last;
+      for (let round = 0; round < 3; round++) {
+        if (round) await pause(700 * round);
+        for (const url of RPCS) {
+          try {
+            const v = await rpc(url, method, args);
+            cache.set(key, { t: Date.now(), v });
+            return v;
+          } catch (e) { last = e; }
+        }
+      }
+      throw new Error(`could not read ${method} from testnet (${last && last.message})`);
+    } finally { free(); inflight.delete(key); }
+  })();
+  inflight.set(key, p);
+  return p;
 }
 
 export async function allBounties() {

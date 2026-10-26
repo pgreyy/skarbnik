@@ -1,0 +1,53 @@
+{
+ "note": "Measured numbers the site shows that the chain cannot give. Each names the file that measured it.",
+ "contract_unit_tests": {
+  "value": 135,
+  "text": "contract unit tests pass in the repository",
+  "source": "docs/evidence/account_cap/contract_unit_tests.txt",
+  "detail": "135 with the per-account cap, which is written and tested but not deployed; the deployed contract's code passed 119 (docs/evidence/judge/clean_clone.txt)."
+ },
+ "accepted_proof_tgas": {
+  "value": "35",
+  "range": "35.2 to 36.4",
+  "source": "docs/numbers.md (docs/evidence/S6c/gas_level2.txt)"
+ },
+ "wrong_bounty_tgas": {
+  "value": "2.35",
+  "source": "docs/evidence/hardening/steps/s3_proof_of_another_bounty.txt"
+ },
+ "groth16_bytes": {
+  "value": "2,057",
+  "source": "docs/evidence/agent/summary.txt"
+ },
+ "image_rebuild": {
+  "cached": "2 min 20 s",
+  "fresh": "5 min 12 s",
+  "download": "7.46 GB",
+  "source": "docs/evidence/judge/"
+ },
+ "agent_dry_run": {
+  "value": "11 of 11",
+  "date": "2026-10-26",
+  "source": "docs/EVIDENCE.md (scripts/agent_dry_run_test.sh)"
+ },
+ "laptop_prove": {
+  "text": "about 1.5 to 2.5 hours to prove one attempt on a laptop CPU (bounty 17: 6,530.99 s; bounty 24's Proof 0: 8,679.49 s), then the shrink step",
+  "source": "docs/numbers.md"
+ },
+ "gpu_prove": {
+  "text": "29.82 s to prove and 21.71 s to shrink bounty 24's attempt on one rented NVIDIA L40S, under the published checker image id",
+  "source": "docs/numbers.md, docs/evidence/smooth/gpu/"
+ },
+ "vendor_time": {
+  "text": "About 1.5 to 2.5 hours per attempt on a laptop CPU; under a minute on one rented GPU (bounty 24: 29.82 s to prove, 21.71 s to shrink). Size your verdict window for it.",
+  "source": "docs/numbers.md"
+ },
+ "last_deploy": {
+  "tx": "EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W",
+  "source": "docs/AUDIT.md (the final review's fix), docs/EVIDENCE.md"
+ },
+ "allowlist_tx": {
+  "tx": "BLQoFNQ7Vz3Le4TruAgU4YkeKDtexYquQSTcZALpRvWM",
+  "source": "docs/AUDIT.md, finding 6"
+ }
+}

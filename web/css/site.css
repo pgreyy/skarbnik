@@ -1,0 +1,191 @@
+/* Skarbnik site components on the Panyl tokens (css/panyl.css): the header extras (dark and light toggle, wallet
+   control, phone header), the skip link, forms, dialogs, the toast, hashes with Copy, facts lists, the attempt panel,
+   the account page and the small helpers the live screens use. Every colour is a token variable. */
+
+html{background:var(--bg)}
+html[data-md="light"]{background:#EEE9DF}
+body.sk{margin:0;min-height:100vh;display:flex;flex-direction:column;position:relative}
+body.sk>main{flex:1 0 auto}
+.sk main:focus{outline:none}
+.sk a:focus-visible,.sk button:focus-visible,.sk input:focus-visible,.sk select:focus-visible,.sk summary:focus-visible,.sk [tabindex]:focus-visible{outline:2px solid var(--am);outline-offset:3px}
+.sk [role=tabpanel]:focus-visible{outline-offset:6px}
+.sk .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sk .skip{position:absolute;left:12px;top:-60px;z-index:90;background:var(--btn);color:var(--on-btn);padding:12px 16px;font:600 15px/1 var(--fu);text-decoration:none;border-radius:calc(8px * var(--rs))}
+.sk .skip:focus{top:12px}
+.sk code{font-family:var(--fm)}
+
+/* header */
+.sk .lgo{display:inline-flex;align-items:center;gap:12px}
+.sk .lgt{height:38px;width:38px;display:block;flex:none}
+.sk .brand b{color:var(--tx)}
+.sk .foot .brand b{color:var(--tx2)}
+.sk .md-btn{width:44px;height:44px;border-radius:calc(12px * var(--rs));border:1px solid var(--ln2);background:var(--s1);color:var(--tx);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:border-color .25s,color .25s}
+.sk .md-btn:hover{border-color:var(--am);color:var(--am)}
+.sk .md-btn svg.i{width:19px;height:19px}
+.sk[data-md="dark"] .md-moon,.sk[data-md="light"] .md-sun{display:none}
+.sk .nav{position:relative;z-index:50}
+.sk .nav-cta .wallet{display:flex;align-items:center;gap:8px}
+.sk .menu-btn{color:var(--tx)}
+.sk .menu-sheet a[aria-current=page]{color:var(--am)}
+.sk .menu-sheet .sheet-wallet{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--ln)}
+.sk .menu-sheet .sheet-wallet:empty{display:none}
+.sk .acct{position:relative}
+.sk .acct-menu{position:absolute;right:0;top:calc(100% + 8px);min-width:220px;margin:0;padding:6px;background:var(--s1);border:1px solid var(--ln2);border-radius:calc(12px * var(--rs));box-shadow:0 18px 50px rgba(0,0,0,.35);z-index:60}
+.sk .acct-menu button{display:flex;width:100%;min-height:44px;align-items:center;padding:0 12px;background:transparent;border:0;border-radius:calc(8px * var(--rs));font:500 15px/1 var(--fu);color:var(--tx2);cursor:pointer;text-align:left}
+.sk .acct-menu button:hover{background:var(--s2);color:var(--tx)}
+.sk .credit-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:calc(12px * var(--rs));border:1px solid var(--ln);background:transparent;color:var(--tx2);font:500 14px/1 var(--fu);cursor:pointer}
+.sk .credit-chip b{font:500 13px/1 var(--fm);color:var(--tx)}
+.sk .credit-chip:hover{border-color:var(--ln2)}
+.sk .werr{font-size:13px;color:var(--co);max-width:220px;line-height:1.3}
+@container sk (max-width:900px){
+ .sk .nav-cta .wallet{display:none}
+}
+@container sk (max-width:700px){
+ .sk .menu-btn{width:44px;height:44px}
+ .sk .nav-in{gap:8px}
+ .sk .nav-cta{gap:6px}
+ .sk .brand{gap:6px;min-width:0}
+ .sk .brand b{font-size:calc(19px * (.2 + .8 * var(--hs,1)))}
+ .sk .lgo{gap:8px}
+ .sk .brand .tag{font-size:10px;padding:3px 5px;letter-spacing:.06em}
+}
+
+/* page head shared by the live screens that have no page CSS of their own (For agents, Account, raw data) */
+.sk :where(.p-gen) .ph{padding:72px 0 56px;background:radial-gradient(800px 380px at 88% -10%,rgba(var(--am-rgb),.06),transparent 70%),var(--bg)}
+.sk :where(.p-gen) .ph h1{font:var(--wd) clamp(40px,5cqw,68px)/1 var(--fd);letter-spacing:calc(-.03em * var(--trk));text-wrap:balance;overflow-wrap:anywhere}
+.sk :where(.p-gen) .ph-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:64px;align-items:end}
+.sk .pbody{padding:0 0 112px}
+.sk .h2s{font:var(--wd) calc(clamp(28px,3cqw,40px) * var(--hs,1))/1.1 var(--fd);letter-spacing:calc(-.02em * var(--trk));text-wrap:balance}
+.sk .state{padding:48px 0;color:var(--tx2)}
+.sk .err{color:var(--co)}
+.sk .stack{display:flex;flex-direction:column}
+.sk .g8{gap:8px}.sk .g12{gap:12px}.sk .g16{gap:16px}.sk .g20{gap:20px}.sk .g24{gap:24px}.sk .g28{gap:28px}.sk .g36{gap:36px}
+.sk .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sk .mt8{margin-top:8px}.sk .mt12{margin-top:12px}.sk .mt16{margin-top:16px}.sk .mt24{margin-top:24px}.sk .mt32{margin-top:32px}.sk .mt48{margin-top:48px}
+.sk .pad24{padding:24px}.sk .pad28{padding:28px}
+.sk .tx2{color:var(--tx2)}.sk .txt{color:var(--tx)}
+.sk .nw{white-space:nowrap}
+.sk .lnk.sm{min-height:36px;font-size:14px}
+@container sk (max-width:1100px){
+ .sk :where(.p-gen) .ph-grid{grid-template-columns:minmax(0,1fr);gap:32px;align-items:start}
+}
+@container sk (max-width:700px){
+ .sk :where(.p-gen) .ph{padding:48px 0 40px}
+ .sk .pbody{padding-bottom:72px}
+}
+
+/* hash with Copy and Show full */
+.sk .hsh{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;max-width:100%}
+.sk .hsh code{font:400 13px/1.4 var(--fm);color:var(--tx);overflow-wrap:anywhere}
+.sk .mini{min-height:30px;padding:0 10px;border-radius:calc(8px * var(--rs));border:1px solid var(--ln2);background:transparent;color:var(--tx2);font:500 13px/1 var(--fu);cursor:pointer}
+.sk .mini:hover{border-color:var(--am);color:var(--am)}
+.sk .code-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start}
+.sk .code-row .code{margin:0;white-space:pre-wrap}
+.sk pre.code{white-space:pre-wrap;margin:0;max-height:520px;overflow:auto}
+
+/* facts list (two columns) */
+.sk .facts{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:12px 16px;font-size:14px;margin:0}
+.sk .facts dt{color:var(--tx3)}
+.sk .facts dd{margin:0;color:var(--tx);font-weight:500;overflow-wrap:anywhere}
+.sk .facts dd .small{display:block;font-weight:400;margin-top:2px}
+@container sk (max-width:700px){.sk .facts{grid-template-columns:minmax(0,1fr);gap:2px 0}.sk .facts dd{margin-bottom:10px}}
+
+/* tables: scroll inside their card on narrow screens */
+.sk .card.scroll-x{overflow-x:auto}
+.sk .tbl td .small,.sk .tbl td .faint{display:block;margin-top:4px}
+.sk .tbl.wide{min-width:760px}
+.sk .tbl.mid{min-width:600px}
+.sk .tbl code{font-size:13px;color:var(--tx)}
+
+/* chips row and numbers */
+.sk .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sk .num{font:var(--wd) calc(34px * var(--hs,1))/1 var(--fd);letter-spacing:calc(-.02em * var(--trk));overflow-wrap:anywhere;min-width:0}
+.sk .num small{font:500 13px/1 var(--fu);color:var(--tx3);margin-left:4px;letter-spacing:0}
+
+/* forms */
+.sk .form{display:flex;flex-direction:column;gap:16px}
+.sk .field{display:flex;flex-direction:column;gap:6px}
+.sk .field label{font:600 14px/1.3 var(--fu);color:var(--tx)}
+.sk .field input{min-height:48px;padding:0 14px;border-radius:calc(10px * var(--rs));border:1px solid var(--ln2);background:var(--bg2);color:var(--tx);font:400 16px/1.2 var(--fb);width:100%;max-width:520px}
+.sk .field input[type=file]{padding:10px 12px}
+.sk .field input[readonly]{color:var(--tx2);border-style:dashed}
+.sk .field input[aria-invalid=true]{border-color:var(--co)}
+.sk .hint{font-size:13px;line-height:1.45;color:var(--tx3)}
+.sk .ferr{font-size:14px;color:var(--co)}
+.sk .msg{padding:14px 16px;border-radius:calc(12px * var(--rs));border:1px solid var(--ln2);background:var(--bg2);font-size:15px;line-height:1.5;color:var(--tx)}
+.sk .msg.ok{border-color:rgba(var(--mn-rgb),.55)}
+.sk .msg.bad{border-color:rgba(var(--co-rgb),.6)}
+.sk .msg.warn{border-color:rgba(var(--am-rgb),.6)}
+.sk .btn.sm{min-height:44px;padding:0 16px;font-size:15px}
+.sk .linkbtn{background:none;border:0;padding:0;color:var(--am);font:inherit;text-decoration:underline;cursor:pointer;min-height:auto}
+
+/* dialogs */
+.sk dialog.sheet{width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 40px);overflow:auto;padding:28px;border:1px solid var(--ln2);border-radius:calc(20px * var(--rs));background:var(--s1);color:var(--tx);box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.sk dialog.sheet::backdrop{background:rgba(0,0,0,.6)}
+.sk dialog .dhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.sk dialog .h3{font-size:20px}
+@container sk (max-width:700px){.sk dialog.sheet{padding:20px}}
+
+.sk .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:80;padding:12px 16px;border-radius:calc(12px * var(--rs));background:var(--s2);border:1px solid var(--ln2);color:var(--tx);font-size:14px}
+
+/* attempt panel and attempt slots */
+.sk .steps3{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
+.sk .steps3 li{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px 0 6px;border-radius:999px;border:1px solid var(--ln);font:500 14px/1 var(--fu);color:var(--tx3)}
+.sk .steps3 li span{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--ln2);font:500 12px/1 var(--fm)}
+.sk .steps3 li.now{border-color:var(--am);color:var(--tx)}
+.sk .steps3 li.now span{background:var(--btn);border-color:var(--btn);color:var(--on-btn)}
+.sk .steps3 li.past{color:var(--tx2)}
+.sk .steps3 li.past span{border-color:var(--am);color:var(--am)}
+.sk .mine{padding:16px 0;border-top:1px solid var(--ln);display:flex;flex-direction:column;gap:10px}
+.sk .aslots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.sk .aslot{border-radius:calc(12px * var(--rs));padding:12px;min-height:76px;border:1px dashed var(--ln);display:flex;flex-direction:column;gap:6px;color:var(--tx3);font-size:13px}
+.sk .aslot b{font:500 12px/1 var(--fm);color:var(--tx3)}
+.sk .aslot.used{border:1px solid var(--ln2);background:var(--s2);color:var(--tx)}
+.sk .aslot .chip{height:24px;font-size:12px;padding:0 9px;align-self:flex-start}
+
+/* bounty page story (generic timeline of recorded calls) */
+.sk .tli .vico.ok{color:var(--mn);border-color:rgba(var(--mn-rgb),.6)}
+.sk .tli .vico.bad{color:var(--co);border-color:rgba(var(--co-rgb),.6)}
+
+/* ledger and account tables */
+.sk .acc-out .num{font-size:calc(30px * var(--hs,1))}
+.sk .stat4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--ln);border-radius:calc(20px * var(--rs));background:var(--s1)}
+.sk .stat4>div{padding:20px 24px;border-right:1px solid var(--ln);min-width:0}
+.sk .stat4>div:last-child{border-right:0}
+.sk .stat4 span{display:block;margin-top:8px;font-size:14px;line-height:1.4;color:var(--tx2)}
+.sk .stat3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@container sk (max-width:900px){
+ .sk .stat4{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sk .stat4>div:nth-child(2n){border-right:0}
+ .sk .stat4>div:nth-child(-n+2){border-bottom:1px solid var(--ln)}
+ .sk .stat3>div{border-right:0!important;border-bottom:1px solid var(--ln)}
+ .sk .stat3{grid-template-columns:minmax(0,1fr)}
+}
+
+/* guarded vs unguarded share bar */
+.sk .sharebar{display:inline-block;width:120px;height:10px;border-radius:calc(5px * var(--rs));background:var(--bg2);border:1px solid var(--ln);overflow:hidden;vertical-align:middle;margin-right:8px}
+.sk .sharebar i{display:block;height:100%;background:var(--am)}
+
+/* the agent key, shown once */
+.sk .keybox{display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:calc(14px * var(--rs));border:1.5px dashed rgba(var(--am-rgb),.75);background:rgba(var(--am-rgb),.05)}
+.sk .keybox code{font:400 13px/1.5 var(--fm);color:var(--tx);overflow-wrap:anywhere}
+
+/* details used for longer reference blocks */
+.sk details.more{border:1px solid var(--ln);border-radius:calc(20px * var(--rs));background:var(--s1)}
+.sk details.more>summary{min-height:56px;display:flex;align-items:center;padding:0 24px;cursor:pointer;font:600 16px/1.2 var(--fu);color:var(--tx)}
+.sk details.more>div{padding:0 24px 24px}
+
+/* the Home section 03 example falls back gracefully while the chain is read */
+.sk .ph-note{font-size:13px;color:var(--tx3)}
+
+@media (prefers-reduced-motion:reduce){.sk *,.sk *::before,.sk *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+.sk .view{flex:1 0 auto;display:flex;flex-direction:column}
+.sk .view>main{flex:1 0 auto}
+.sk [hidden]{display:none!important}
+.sk .seg{flex-wrap:wrap}
+.sk .seg button{white-space:nowrap}
+.sk [tabindex="-1"]:focus,.sk [tabindex="-1"]:focus-visible{outline:none}
+.sk .aslots{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.sk .g48{gap:48px}
+.sk .tx{white-space:nowrap}
+.sk .tbl.xl{min-width:1100px}
