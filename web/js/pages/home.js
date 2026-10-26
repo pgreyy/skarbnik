@@ -247,7 +247,7 @@ async function checkerCard(rec) {
 async function example(id) {
   const el = $('#exCase');
   try {
-    const [all, rec, meta, everyone] = await Promise.all([loadSome([...new Set([id, '17'])]), getRecorded(), getMeta(), paidByProof()]);
+    const [all, rec, meta, everyone] = await Promise.all([loadSome([...new Set([id, '16', '17', '24'])]), getRecorded(), getMeta(), paidByProof()]);
     const x = all.find((e) => String(e.b.id) === id);
     if (!$('#exCase')) return;
     if (!x) { el.innerHTML = `<p class="state">There is no bounty ${esc(id)} on ${esc(CONTRACT)}.</p>`; return; }
@@ -257,8 +257,7 @@ async function example(id) {
     const lead = status === 'Proof verified' ? `This is bounty ${id}, paid by a proof the contract checked itself.` : status === 'Timeout settlement' ? `This is bounty ${id}, paid by the timeout rule: not a proof.` : `This is bounty ${id}, not settled yet.`;
     $('#exLead').textContent = `One example, with its transactions. ${lead}`;
     const others = everyone;
-    const b17 = all.find((e) => String(e.b.id) === '17');
-    el.innerHTML = `
+        el.innerHTML = `
 <article class="card" style="padding:36px;display:flex;flex-direction:column;gap:30px">
 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span class="eyebrow" style="color:var(--tx3)">Example bounty ${esc(id)}</span>${chip(st.cls, status, st.icon)}${x.kind === 'test' ? chip('k-test', 'Test bounty', 'flask') : x.kind === 'demo' ? chip('k-test', 'Demo bounty', 'flask') : chip('k-priv', 'Private secret')}</div>
 <div style="display:flex;flex-direction:column;gap:10px"><h3 class="h3" style="font-size:calc(30px * var(--hs,1));line-height:1.15">${esc(hx.title || (meta.titles || {})[id] || `Bounty ${id}`)}</h3>${hx.body ? `<p class="body">${esc(hx.body)}</p>` : ''}</div>
@@ -273,7 +272,7 @@ async function example(id) {
 ${status === 'Timeout settlement' ? `<div class="tl-row" role="listitem"><span class="tl-n">${icon('hourglass')}</span><div><b class="h4">The window ends; anyone claims the timeout</b><p class="small">Paid by the timeout rule. No proof was checked.</p></div>${tx(claim)}</div>`
   : `<div class="tl-row" role="listitem"><span class="tl-n${status === 'Proof verified' ? ' ok' : ''}">${status === 'Proof verified' ? icon('check') : '3'}</span><div><b class="h4">Contract checks the proof and pays</b><p class="small">${status === 'Proof verified' ? 'Proof accepted, reward released under the bounty’s rule.' : 'Not yet: no proof accepted so far.'}</p></div>${proofTx ? tx(proofTx) : '<span class="faint small">not yet</span>'}</div>`}
 </div>
-${note(`${esc(hx.note || '')} ${others.length ? `Bounties ${others.join(' and ')} are the ${others.length === 2 ? 'two' : others.length} paid by a proof so far.` : ''}`)}
+${note(`${esc(hx.note || '')} ${others.length ? `Bounties ${others.length > 1 ? `${others.slice(0, -1).join(', ')} and ${others[others.length - 1]}` : others[0]} are the ${['', 'one', 'two', 'three', 'four', 'five'][others.length] || others.length} paid by a proof so far.` : ''}`)}
 <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-g" href="#/bounties/${esc(id)}">View the evidence trail</a><a class="lnk" href="#/judge">Judge verification checklist ${icon('right')}</a></div>
 </article>
 <div style="display:flex;flex-direction:column;gap:24px">
@@ -285,17 +284,17 @@ ${run.model ? `<div><dt class="small faint">Model</dt><dd style="margin:2px 0 0"
 ${run.key ? `<div><dt class="small faint">Key permissions</dt><dd style="margin:2px 0 0" class="body">${esc(run.key)}</dd></div>` : ''}
 </dl>
 </article>
-${b17 && id !== '17' ? `<article class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px">
-<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span class="eyebrow" style="color:var(--tx3)">Compare, bounty 17</span>${chip(STATUS[b17.status].cls, b17.status, STATUS[b17.status].icon)}</div>
-<p class="body" style="color:var(--tx)">The stronger agent result, and a different outcome.</p>
-<p class="body">On a private bounty the agent’s fix equalled the vendor’s reference fix byte for byte. The vendor’s proof finished after its verdict window (${esc(span(b17.b.verdict_window_ns))}), so the contract paid by timeout. That shows the liveness rule works. It is not a proof that the patch passed.</p>
-<a class="lnk" href="#/bounties/17" style="align-self:flex-start">Read the full account ${icon('right')}</a>
-</article>` : ''}
+<article class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px">
+<p class="eyebrow" style="color:var(--tx3)">Compare three agent runs</p>
+<ul style="display:flex;flex-direction:column;gap:16px">${Object.entries(meta.compare || {}).map(([cid, text]) => { const c = all.find((e) => String(e.b.id) === cid); if (!c) return ''; const cs = STATUS[c.status];
+  return `<li style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><a class="h4" style="color:var(--tx);text-decoration:none" href="#/bounties/${esc(cid)}">Bounty ${esc(cid)}</a>${chip(cs.cls, c.status, cs.icon)}${cid === id ? '<span class="small faint">this example</span>' : ''}</div><p class="small">${esc(text)}</p></li>`; }).join('')}</ul>
+<a class="lnk" href="#/bounties/17" style="align-self:flex-start">Read bounty 17's full account ${icon('right')}</a>
+</article>
 <article class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px">
 <p class="eyebrow" style="color:var(--tx3)">What this establishes</p>
 <ul style="display:flex;flex-direction:column;gap:12px">
-<li style="display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px" class="small"><span style="color:var(--mn)">${icon('check')}</span><span><b style="color:var(--tx)">Shows:</b> a limited key can commit and reveal, a proof can be checked on chain, and the reward follows.</span></li>
-<li style="display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px" class="small"><span style="color:var(--tx3)">${icon('x')}</span><span><b style="color:var(--tx)">Does not show:</b> skill on a private bug, production security or an external audit.</span></li>
+<li style="display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px" class="small"><span style="color:var(--mn)">${icon('check')}</span><span><b style="color:var(--tx)">Shows:</b> ${esc(hx.shows || 'a limited key can commit and reveal, a proof can be checked on chain, and the reward follows.')}</span></li>
+<li style="display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px" class="small"><span style="color:var(--tx3)">${icon('x')}</span><span><b style="color:var(--tx)">Does not show:</b> ${esc(hx.not_shown || 'skill on a private bug, production security or an external audit.')}</span></li>
 </ul>
 </article>
 </div>`;

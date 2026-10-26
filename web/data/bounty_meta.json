@@ -52,6 +52,12 @@
    "host": "NEAR AI Cloud",
    "key": "commit and reveal only",
    "source": "docs/evidence/agent/summary.txt"
+  },
+  "24": {
+   "model": "z-ai/glm-5.3-flash",
+   "host": "NEAR AI Cloud",
+   "key": "commit and reveal only",
+   "source": "docs/evidence/smooth/agent_run/run.log"
   }
  },
  "home_example": {
@@ -59,7 +65,17 @@
    "title": "A patch evaluated against a private input",
    "body": "A language model agent fixed the demo bug, committed and revealed with a key limited to those two calls, and was paid when the contract accepted the proof.",
    "note": "Bounty 16 used the public demo module, so anyone can check its input. It shows the path, not a model's skill.",
-   "input": "Defined checker, public demo input"
+   "input": "Defined checker, public demo input",
+   "shows": "a limited key can commit and reveal, a proof can be checked on chain, and the reward follows.",
+   "not_shown": "skill on a private bug, production security or an external audit."
+  },
+  "24": {
+   "title": "A private bug fixed without seeing it",
+   "body": "A language model agent on NEAR AI Cloud read only the public code of a new module, found its division by zero, and committed and revealed a fix with a key limited to those two calls. The vendor's proof was produced on a rented GPU in under a minute, and the contract paid when it accepted the proof.",
+   "note": "Bounty 24 is a private bounty: its secret input and reference fix never left the vendor, and the bug is not named in the public source. The proof took 29.82 s to prove and 21.71 s to shrink on one rented GPU, then was wrapped to Groth16 on a separate machine.",
+   "input": "Defined checker, private secret input",
+   "shows": "an agent fixed a private bug from public code alone, a limited key committed and revealed, and the contract checked the proof itself and paid.",
+   "not_shown": "skill on harder bugs (this is a one line fix), production security or an external audit."
   }
  },
  "story": {
@@ -159,5 +175,10 @@
    "measured_note": "Source: docs/numbers.md and docs/evidence/smooth/. Only the succinct receipt went to the GPU's output and the VPS: never the secret, the salt or a key. The contract accepted the proof: submit_groth16 9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR.",
    "lead": "An AI agent fixed a private bug it could not see, on a new program. The vendor proved the fix PASS (on a rented GPU, wrapped on a Docker machine) and the contract checked the proof itself and paid."
   }
+ },
+ "compare": {
+  "16": "The first proof-paid agent fix, on the public demo bug.",
+  "17": "A private task on a new module. The fix matched, but the laptop proof was too slow for the verdict window, so the timeout rule paid. Not a proof.",
+  "24": "The same kind of private task, paid by proof after proving moved to a rented GPU."
  }
 }

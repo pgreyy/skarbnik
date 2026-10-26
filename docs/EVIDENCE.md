@@ -20,8 +20,16 @@ in time without heavy work on its own laptop, so the contract pays by proof (not
   passes 22 of 22 public tests and equals the private reference fix (sha256 `2138185c...09bb`, also on chain as the
   reference fix hash); it committed `4G48c6waZdz7Qc3maVdXsXx9u3kwzfDWbXhW2toszvkG` and revealed
   `3rBVkucSk1jxirbayxz7GYX1cfurgLAYoRXjiB9HmVhc` (15:11:48 UTC) with its key limited to commit and reveal
-  (`agent_run/`). No peek: `git log -S 'w == 0 || w > n'` finds nothing, and the prompt holds the public `original.rs`
-  byte for byte.
+  (`agent_run/`).
+- How it was checked that the model could not see the reference fix (the same check as for bounty 17): the fix lives
+  only in a private folder outside the repository. `git log --all -S 'w == 0 || w > n'` finds only `945e738` and
+  `c4d11eb`, both made after the reveal (15:11:52 UTC) and both adding the agent's own output and the evidence. The
+  private `fixed.rs` is in no commit (`git hash-object`, then `git rev-list --all --objects`: 0 matches); the private
+  `fixed.wasm` matches one blob, the agent's own build `agent_run/fix_24_a1_1.wasm`, first added in `945e738` after the
+  run (the two are byte for byte equal, sha256 `2138185c...09bb`). The agent's code reads only the feed, the public code
+  files and its own records; the model received only the prompt saved in `agent_run/prompt_24_a1.txt`, which contains
+  the public `original.rs` byte for byte and not the fixed condition. The fix is one condition (`if w > n` to
+  `if w == 0 || w > n`), so the same text as the reference fix is the natural answer.
 - Attempt proof on a rented GPU (RunPod, 1x NVIDIA L40S; `notes`-side script, logs in `gpu/`): the checker image id
   was checked before proving; the secret was copied into the pod's memory only (`/dev/shm`) and removed afterwards
   (`gpu/01_secret_out.log`). Prove 29.82 s (33 segments, `--po2 19`, PASS, peak GPU memory 9,275 MiB), shrink to a
