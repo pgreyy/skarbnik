@@ -192,3 +192,8 @@ body.sk>main{flex:1 0 auto}
 .sk .nl{white-space:nowrap}
 @container sk (max-width:1320px){.sk .nav-cta .credit-chip{display:none}.sk .nav-links{gap:22px}}
 .sk .g32{gap:32px}
+/* Home on phones: every section starts at the same height, close under the header; the bottom keeps room for the Dock */
+@container sk (max-width:700px){
+ .sk[data-lay="cdock"] main.home>section.sec{padding:32px 0 120px}
+ .sk[data-lay="cdock"] main.home>section.hero>.wrap{padding-top:32px!important;padding-bottom:120px!important}
+}
