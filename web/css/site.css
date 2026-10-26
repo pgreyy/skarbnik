@@ -247,3 +247,6 @@ body.sk>main{flex:1 0 auto}
 /* How it works: the page header around the eyebrow, heading and lead */
 .sk :where(.p-how) .ihd{padding-top:72px;padding-bottom:40px}
 @container sk (max-width:700px){.sk :where(.p-how) .ihd{padding-top:48px;padding-bottom:40px}}
+/* The header's content spans the same width as the Home Console frame, on every page (desktop and tablet) */
+@container sk (min-width:701px){.sk .nav .wrap.nav-in{max-width:none;width:min(1480px,calc(100% - 48px));padding:0}}
+@container sk (min-width:701px) and (max-width:1000px){.sk .nav .wrap.nav-in{width:calc(100% - 20px)}}
