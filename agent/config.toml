@@ -1,4 +1,4 @@
-# Settings for the Skarbnik agent (agent/kintsugi_agent.py): the chain, the agent's account and limits, and the model providers.
+# Settings for the Skarbnik agent (agent/skarbnik_agent.py): the chain, the agent's account and limits, and the model providers.
 # No key goes in this file. The model's API key is read from the environment variable or the file named below,
 # outside the repository. The limited key file is near-cli's own key file for a key limited to commit and reveal.
 
@@ -15,7 +15,7 @@ max_attempts = 1                             # commits per run, at most
 max_model_tries = 2                          # model answers per bounty (each later try sees why the last was not used)
 require_onchain_limits = true                # refuse to send unless set_agent_limits was called for the account
 include_test_bounties = false                # test bounties are tried only when named with --bounty
-checker = "target/debug/kintsugi-check"      # the local checker, for the public tests
+checker = "target/debug/skarbnik-check"      # the local checker, for the public tests
 state_dir = "target/agent-runs"              # run logs and attempt records (ignored by git)
 provider = "nearai"                          # the default model provider, one of the [provider.*] entries
 
@@ -26,7 +26,7 @@ type = "openai-compatible"
 base_url = "https://cloud-api.near.ai/v1"
 model = "z-ai/glm-5.3-flash"                 # on GET /v1/models, checked 2026-10-25; runs in a TEE
 api_key_env = "NEARAI_API_KEY"
-api_key_file = "~/.kintsugi-secrets/nearai_api_key"
+api_key_file = "~/.skarbnik-secrets/nearai_api_key"
 temperature = 0.2
 max_tokens = 12000                           # a reasoning model needs room to think before it answers
 timeout_s = 1200                             # thinking runs at about 17 tokens a second (measured 2026-10-25)

@@ -1,0 +1,43 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args '{"account_id":null}' prepaid-gas '30 Tgas' attached-deposit '0.1 NEAR' sign-as skarbnik-cmds-ace3fb.testnet network-config testnet sign-with-legacy-keychain send
+utc=2026-10-26T05:52:48Z
+├  Unsigned transaction:
+│    signer_id:    skarbnik-cmds-ace3fb.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  deposit_credit
+│                       args:         {
+│                                       "account_id": null
+│                                     }
+│                       gas:          30.0 Tgas
+│                       deposit:      0.1 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DkFv5tm5ZjJnrMhVPZpzgLVBRbG5QD8iyRwmAvrBetRB
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.310 Tgas
+│    Transaction fee: 0.0000309633062595 NEAR
+│    Transaction ID: 61N1kT6FncUABBFG22Lm8kUy6bJexhTgC4NhkXqCYwnA
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/61N1kT6FncUABBFG22Lm8kUy6bJexhTgC4NhkXqCYwnA
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"credit_deposited","data":[{"account_id":"skarbnik-cmds-ace3fb.testnet","amount":"100000000000000000000000","total":"100000000000000000000000"}]}
+│    Logs [skarbnik-cmds-ace3fb.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"100000000000000000000000"
+
+
+The "deposit_credit" call to <kintsugi-l2-cihdp.testnet> on behalf of <skarbnik-cmds-ace3fb.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args '{"account_id":null}' prepaid-gas '30.0 Tgas' attached-deposit '0.1 NEAR' sign-as skarbnik-cmds-ace3fb.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0

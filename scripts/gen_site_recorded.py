@@ -57,7 +57,7 @@ def when(path, step, rows):
 
 
 def ok(row):
-    # exit 0 (sent by near-cli), rpc:ok, or agent:ok (sent by agent/kintsugi_agent.py, outcome ok) means it succeeded; rpc:failed means the contract refused it.
+    # exit 0 (sent by near-cli), rpc:ok, or agent:ok (sent by agent/skarbnik_agent.py, outcome ok) means it succeeded; rpc:failed means the contract refused it.
     return row["exit"] in ("0", "rpc:ok", "agent:ok")
 
 
@@ -75,7 +75,7 @@ BOUNTY_STEPS = [
     ("docs/evidence/S18/transactions.tsv", "scripts/s18_live_bounty.sh", {12: ["s18_"]}),
     ("docs/evidence/web/transactions.tsv", "scripts/web_testnet.sh", {13: ["web_bounty_", "web_commit", "web_reveal", "web_claim_"],
                                                                       7: ["web_commit_no_credit"], 14: ["user_bounty_"], 15: ["cli_", "agentkey_commit", "agentkey_reveal"]}),
-    ("docs/evidence/agent/transactions.tsv", "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py",
+    ("docs/evidence/agent/transactions.tsv", "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py",
      {16: ["agent_bounty_", "agent_live_", "agent_submit_groth16_"], 17: ["unpack_bounty_", "unpack_live_", "unpack_submit_groth16_"]}),
 ]
 # Steps whose name starts like another bounty's prefix but belong elsewhere

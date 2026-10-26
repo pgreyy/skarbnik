@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "imports a host function": the honest fix, but it imports `env.peek(i32) -> i32` from the
 // host (the kind of call that could try to read the secret). The checker allows no imports.
 //

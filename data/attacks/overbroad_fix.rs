@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "overbroad fix": stops the crash by rejecting every list record of even length. That also
 // rejects valid lists with one extra trailing byte, which the original accepts.
 //

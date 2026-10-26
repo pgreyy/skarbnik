@@ -2774,7 +2774,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "kintsugi-host"
+name = "skarbnik-host"
 version = "0.1.0"
 dependencies = [
  "bincode",

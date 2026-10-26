@@ -13,7 +13,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 OUT=docs/evidence/S8; PRIV=target/arena; mkdir -p "$OUT" "$PRIV/probes"
-CHECK=./target/debug/kintsugi-check
+CHECK=./target/debug/skarbnik-check
 K=3; FUZZ=16
 FLAGS=(--edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort
   -C strip=symbols -C codegen-units=1 -C target-cpu=mvp -C link-arg=-zstack-size=8192
@@ -24,7 +24,7 @@ log() { echo "$*" | tee -a "$OUT/arena_run.txt"; }
 # 1. modules and public tests
 for m in original fixed; do rustc "${FLAGS[@]}" -o data/arena/$m.wasm data/arena/$m.rs; done
 { echo "# Public tests for the arena module (data/arena/original.rs). One per line: <input hex or -> <value>."
-  echo "# Expected values come from: target/debug/kintsugi-check run --module data/arena/original.wasm --input <hex>"
+  echo "# Expected values come from: target/debug/skarbnik-check run --module data/arena/original.wasm --input <hex>"
   for input in - 00 01 0102 a5 a501 0011223344 a4ffff a6ffff 5aa5ff 6b696e74 ffffffffffff 7f00a5ff 0a0b0c0d0e0f; do
     hex="$input"; [ "$hex" = "-" ] && hex=""
     v=$($CHECK run --module data/arena/original.wasm --input "$hex" | awk '$1=="returned"{print $2}')

@@ -12,5 +12,5 @@ echo "== 2/2 contract wasm (cargo near build non-reproducible-wasm)"
 (cd contract && cargo near build non-reproducible-wasm)
 
 echo "== done"
-stat -c '%s bytes  %n' target/release/kintsugi-host target/near/kintsugi_contract/kintsugi_contract.wasm
+stat -c '%s bytes  %n' target/release/skarbnik-host target/near/kintsugi_contract/kintsugi_contract.wasm
 sha256sum target/near/kintsugi_contract/kintsugi_contract.wasm

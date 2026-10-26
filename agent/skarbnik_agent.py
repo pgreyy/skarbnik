@@ -8,9 +8,9 @@
 # max_attempts commits. The model's API key is read from an environment variable or a file outside the repository and
 # is never printed or logged. Standard library only (Python 3.11+); signing uses near-cli-rs with the key file.
 # Usage, from the repo root:
-#   python3 -I agent/kintsugi_agent.py run [--live] [--bounty ID] [--provider NAME] [--config FILE] [--max-attempts N]
+#   python3 -I agent/skarbnik_agent.py run [--live] [--bounty ID] [--provider NAME] [--config FILE] [--max-attempts N]
 #       [--watch-minutes M]   (after a reveal, wait up to M minutes for the verdict; after a FAIL, try the bounty again)
-#   python3 -I agent/kintsugi_agent.py status [--config FILE]
+#   python3 -I agent/skarbnik_agent.py status [--config FILE]
 import argparse
 import base64
 import datetime
@@ -122,7 +122,7 @@ def sign(cfg, method, args, run_dir):
         os.remove(signed)
     cmd = ["near", "contract", "call-function", "as-transaction", cfg["contract"], method, "json-args", json.dumps(args),
            "prepaid-gas", "100 Tgas", "attached-deposit", "0 NEAR", "sign-as", cfg["account"], "network-config",
-           cfg["network"], "sign-with-access-key-file", os.path.expanduser(cfg["limited_key_file"]), "save-to-file", signed]
+           cfg["network"], "sign-with-access-key-file", secret_file(cfg["limited_key_file"]), "save-to-file", signed]
     p = subprocess.run(cmd, capture_output=True, text=True, timeout=180, env=clean_env())
     if p.returncode != 0 or not os.path.exists(signed):
         tail = [l for l in (p.stdout + p.stderr).splitlines() if not re.search(r"private|secret|signature|[1-9A-HJ-NP-Za-km-z]{80,}", l, re.I)]
@@ -150,12 +150,22 @@ def fingerprint(patch, payout, nonce):
 
 # ---- the model ----
 
+def secret_file(path):
+    """A path for a file in the private secrets folder: ~/.skarbnik-secrets first; if that file does not exist there,
+    the same file in the folder's earlier name ~/.kintsugi-secrets (the project was built as Kintsugi). Never reads it."""
+    p = os.path.expanduser(path or "")
+    old = os.path.expanduser("~/.kintsugi-secrets") + p[len(os.path.expanduser("~/.skarbnik-secrets")):]
+    if p.startswith(os.path.expanduser("~/.skarbnik-secrets")) and not os.path.exists(p) and os.path.exists(old):
+        return old
+    return p
+
+
 def api_key(pcfg):
     """The API key, from the environment variable or the key file named in the config. Never printed."""
     v = os.environ.get(pcfg.get("api_key_env", ""), "").strip()
     if v:
         return v
-    f = os.path.expanduser(pcfg.get("api_key_file", ""))
+    f = secret_file(pcfg.get("api_key_file", ""))
     if f and os.path.isfile(f):
         if os.path.realpath(f).startswith(os.path.realpath(ROOT) + os.sep):
             raise RuntimeError("the API key file is inside the repository; move it outside (see agent/README.md)")
@@ -445,7 +455,7 @@ def save_attempt(cfg, rec):
 
 def check_key(cfg, chain, log):
     """The key must be a function call key for this contract, limited to commit and reveal."""
-    kf = os.path.expanduser(cfg["limited_key_file"])
+    kf = secret_file(cfg["limited_key_file"])
     if not os.path.isfile(kf):
         raise RuntimeError(f"limited key file {cfg['limited_key_file']} not found (see agent/README.md)")
     pub = json.load(open(kf))["public_key"]
@@ -550,7 +560,7 @@ def cmd_run(cfg, args):
         if sent >= cap:
             break
     log(f"done: {sent} attempt(s) {'sent' if live else 'prepared (dry run)'}. Check verdicts later with: "
-        f"python3 -I agent/kintsugi_agent.py status")
+        f"python3 -I agent/skarbnik_agent.py status")
 
 
 def cmd_status(cfg, args):

@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "wrong export": the honest fix, but its entry point is exported as `parse_input`
 // instead of `parse`.
 //

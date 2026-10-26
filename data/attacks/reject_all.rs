@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "reject everything": returns the error -1 for every input, so nothing can crash.
 //
 // Same interface as the original: input_buf() -> i32 and parse(len: i32) -> i32.

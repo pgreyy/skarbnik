@@ -415,6 +415,7 @@ export async function accountPage(main, name, tab) {
         <p class="m-sub k-pad">${keys === null ? '' : `Spend cap: the most one attempt may cost (set_agent_limits). Spent: attempt fees not paid back. ${fullKeys} full access ${fullKeys === 1 ? 'key' : 'keys'} (the owner’s wallet keys) not listed.`}
         ${lim.fixed_payout ? ` Fixed payout: ${acct(lim.fixed_payout)}.` : ''}${me && !stopped && agentKeys.length ? ' Stop: your wallet approves one call (set_agent_limits with a max fee of 0, 1 yoctoNEAR attached); every later commit by this account is then refused, whichever key signs it. Reveals of attempts already made still work, and the key stays.' : ''}
         ${stopped ? ' Stopped: the max fee per attempt is 0, so every commit by this account is refused. To start again, set a new max fee (For agents, step 5).' : ''}</p>
+        <p class="m-note k-pad" style="margin-top:0;padding-bottom:14px">Skarbnik was built under the working name Kintsugi; the testnet contract keeps that name. Mainnet: skarbnik.near.</p>
         <div id="stopBox" class="k-pad" style="padding-bottom:4px"></div>
       </section>
       <h2 class="k-auditt" id="auT">Audit log</h2>

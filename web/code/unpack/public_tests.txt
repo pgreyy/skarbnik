@@ -1,8 +1,8 @@
 # Public tests for the packed byte decoder (data/unpack/original.rs).
 # One test per line: <input as hex, or - for empty> <value the original returns>.
 # The expected values were produced by running the original module:
-#   target/debug/kintsugi-check run --module data/unpack/original.wasm --input <hex>
-# Proof 0 (`kintsugi-check proof0`) re-checks that the original returns every one of them.
+#   target/debug/skarbnik-check run --module data/unpack/original.wasm --input <hex>
+# Proof 0 (`skarbnik-check proof0`) re-checks that the original returns every one of them.
 
 -                                  84696351     # no commands
 0041                               1809155255   # literal, 1 byte

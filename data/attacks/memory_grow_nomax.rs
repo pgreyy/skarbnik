@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "use too much memory, no declared maximum": the same code as memory_grow.rs, but built with
 // no maximum memory size in the module (see harness/checker/build_modules.sh), so a request for
 // 64 more pages is not refused by the module's own limit and reaches the checker's memory cap.

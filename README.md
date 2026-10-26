@@ -1,7 +1,7 @@
 # Skarbnik
 
 Skarbnik (Polish and Ukrainian for treasurer; in folklore, the mine spirit who rewards honest miners).
-The testnet contract keeps its original account name.
+Skarbnik was built under the working name Kintsugi; the testnet contract keeps that name. Mainnet: skarbnik.near.
 
 Fix what you can't see. Get paid when the proof says so.
 
@@ -91,7 +91,7 @@ See, after the build:
 
 ## Run your own agent
 
-The agent in `agent/kintsugi_agent.py` reads `web/feed.json`, picks an open bounty, checks its public code against the
+The agent in `agent/skarbnik_agent.py` reads `web/feed.json`, picks an open bounty, checks its public code against the
 hashes on chain, asks a language model for a fix (NEAR AI Cloud by default; the provider is set in `agent/config.toml`),
 builds the fix and runs the public tests on your machine, then commits and reveals it with a key limited to commit and
 reveal. Dry run is the default and sends nothing. Run these on your own machine, from the repository folder (testnet):
@@ -102,16 +102,16 @@ reveal. Dry run is the default and sends nothing. Run these on your own machine,
        ./scripts/agent_testnet.sh setup
 
 2. Put the model's API key outside the repository, in the `NEARAI_API_KEY` environment variable or in
-   `~/.kintsugi-secrets/nearai_api_key`. The agent never prints it.
+   `~/.skarbnik-secrets/nearai_api_key`. The agent never prints it.
 3. Build the local checker, then do a dry run:
 
        cargo build -p kintsugi-check
-       python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml
+       python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml
 
 4. Send for real, on one bounty, then check the verdict later:
 
-       python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml --live --bounty <id>
-       python3 -I agent/kintsugi_agent.py status --config agent/config.local.toml
+       python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml --live --bounty <id>
+       python3 -I agent/skarbnik_agent.py status --config agent/config.local.toml
 
 The agent stops after `max_attempts` commits, never commits above `max_fee_yocto` or the account's on-chain max fee,
 refuses a key that is not limited to commit and reveal, and refuses a fix that would read files or the environment when
@@ -126,7 +126,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | --- | --- | --- |
 | Level 2: the bounty contract opens and decides a bounty from Groth16 proofs it checks itself with NEAR's alt_bn128 host functions, with no verifier signatures; a proof must belong to that bounty and attempt; replayed, changed, late or repeated proofs are refused | works on testnet: one PASS paid, one FAIL spent, nine attacks refused; 35 to 36.4 Tgas per accepted proof | `scripts/s6c_testnet.sh`, `cargo test -p kintsugi-contract` (EVIDENCE, S6c; docs/numbers.md) |
 | Level 0: two different registered verifiers check a receipt against the chain and attest; commit, reveal, verdict, payout, silent vendor timeout, expiry refund | works on testnet | `scripts/s4_testnet.sh`, `scripts/s3_testnet.sh`, `scripts/s3b_testnet.sh` (EVIDENCE, S3, S3b, S4) |
-| The checker gives PASS to an honest patch and FAIL to cheating patches (reject everything, special-case the crash, loop forever, memorize the tests, and others) | works, 19 of 20 as expected; the one difference (`memory_grow`) is explained | `cargo test -p kintsugi-check`; `target/debug/kintsugi-check table --manifest data/attacks/manifest.txt --seed <hex>` (EVIDENCE, S1) |
+| The checker gives PASS to an honest patch and FAIL to cheating patches (reject everything, special-case the crash, loop forever, memorize the tests, and others) | works, 19 of 20 as expected; the one difference (`memory_grow`) is explained | `cargo test -p kintsugi-check`; `target/debug/skarbnik-check table --manifest data/attacks/manifest.txt --seed <hex>` (EVIDENCE, S1) |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet (Level 0: two verifiers attest; Level 2: the contract checks Proof 0 itself) | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |
 | Anyone can rebuild the checker and get the published image id | works: `MATCH` for bounty 12 | `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 12` (docs/evidence/judge/check_image_id.txt) |
 | A live Level 2 bounty whose secret input is not in the repository, with a private salt | works on testnet: bounty 12 | `scripts/s18_live_bounty.sh` (EVIDENCE, S18) |
@@ -134,7 +134,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | An agent's limited key (commit and reveal only) cannot withdraw or change limits; with `set_agent_limits` it cannot spend more than the chosen fee per attempt or send winnings elsewhere; it can still spend the whole credit over many attempts | works on testnet on this contract | `./scripts/web_testnet.sh agentkey`, unit tests `audit_s6_*` (EVIDENCE, "Site: wallet, credit and attempts") |
 | A site: live bounties, bounty pages, the recorded probe arena, how to verify, an operator panel per account, a page for agents, `feed.json` and `agent-quickstart.txt`; Dark and Light themes whose text pairs all reach 4.5:1 (`node scripts/contrast_check.mjs`) | live at https://skarbnik-near.vercel.app (Vercel, built from branch ui-preview with no build step); checked in a browser on the live domain (docs/evidence/web/live_site.txt) | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py` (quick check, step 4) |
 | Wallet connect on the site through NEAR Connect: Intear Wallet and NEAR CLI (MyNearWallet, retired on 31 October 2026, is not offered). Credit (deposit and withdraw) and attempts (commit, reveal) from the page | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Intear only loaded | `scripts/web_testnet.sh` and EVIDENCE, "Site: wallet, credit and attempts" |
-| An agent driven by a language model (NEAR AI Cloud by default, provider in `agent/config.toml`): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, then commits and reveals with a limited key | works on testnet: on test bounty 16 the model's fix was committed and revealed with the limited key, proven PASS by the vendor and paid (0.1 NEAR plus the fee back); dry run tests 9 of 9 | `./scripts/agent_testnet.sh`, `agent/kintsugi_agent.py` (docs/evidence/agent/live_bounty16/, EVIDENCE "The model-driven agent") |
+| An agent driven by a language model (NEAR AI Cloud by default, provider in `agent/config.toml`): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, then commits and reveals with a limited key | works on testnet: on test bounty 16 the model's fix was committed and revealed with the limited key, proven PASS by the vendor and paid (0.1 NEAR plus the fee back); dry run tests 9 of 9 | `./scripts/agent_testnet.sh`, `agent/skarbnik_agent.py` (docs/evidence/agent/live_bounty16/, EVIDENCE "The model-driven agent") |
 | The operator panel stops an account's agents with one wallet approval (max fee per attempt set to 0); the next commit by its limited key is refused | works on testnet, through the site with the NEAR CLI wallet | docs/evidence/web/steps/operator_stop_set_limits.txt, operator_stop_commit_refused.txt (docs/SECURITY.md, "The site") |
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts, no proofs for the arena) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
 | Fees of commits never revealed go to a protocol fee pool, never back to the vendor; the pool stays locked as a storage reserve with no withdraw method | works on testnet | `scripts/s6c_testnet.sh selfblock2`, `get_protocol_pool` (EVIDENCE, S6c) |

@@ -1,0 +1,21 @@
+$ near account create-account sponsor-by-faucet-service skarbnik-cmds-ace3fb.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
+utc=2026-10-26T05:52:39Z
+├  Your transaction:
+│    signer_id:    testnet
+│    actions:
+│       -- create account:      skarbnik-cmds-ace3fb.testnet
+│       -- add access key:     
+│                       public key:   ed25519:DkFv5tm5ZjJnrMhVPZpzgLVBRbG5QD8iyRwmAvrBetRB
+│                       permission:   FullAccess
+│     
+├  Transaction Execution Info:
+│    Transaction ID: D2iH1L6gHt2bdRZFFRSHqDHLtYJ6D2BiEyniTr6kZqSx
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/D2iH1L6gHt2bdRZFFRSHqDHLtYJ6D2BiEyniTr6kZqSx
+
+New account <skarbnik-cmds-ace3fb.testnet> created successfully.
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0

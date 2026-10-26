@@ -1,0 +1,47 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_agent_limits json-args '{"max_fee_per_commit":"20000000000000000000000","fixed_payout":"skarbnik-cmds-ace3fb.testnet"}' prepaid-gas '30 Tgas' attached-deposit '1 yoctoNEAR' sign-as skarbnik-cmds-ace3fb.testnet network-config testnet sign-with-legacy-keychain send
+utc=2026-10-26T05:53:17Z
+├  Unsigned transaction:
+│    signer_id:    skarbnik-cmds-ace3fb.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  set_agent_limits
+│                       args:         {
+│                                       "fixed_payout": "skarbnik-cmds-ace3fb.testnet",
+│                                       "max_fee_per_commit": "20000000000000000000000"
+│                                     }
+│                       gas:          30.0 Tgas
+│                       deposit:      1 yoctoNEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DkFv5tm5ZjJnrMhVPZpzgLVBRbG5QD8iyRwmAvrBetRB
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.314 Tgas
+│    Transaction fee: 0.000031330470865 NEAR
+│    Transaction ID: 4jLyBZ7RtZn9ZRJamUeUKP7fM4frx2cvKpCauMdNfBUe
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/4jLyBZ7RtZn9ZRJamUeUKP7fM4frx2cvKpCauMdNfBUe
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"agent_limits_set","data":[{"account_id":"skarbnik-cmds-ace3fb.testnet","max_fee_per_commit":"20000000000000000000000","fixed_payout":"skarbnik-cmds-ace3fb.testnet"}]}
+│    Logs [skarbnik-cmds-ace3fb.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+{
+  "fixed_payout": "skarbnik-cmds-ace3fb.testnet",
+  "max_fee_per_commit": "20000000000000000000000"
+}
+
+
+The "set_agent_limits" call to <kintsugi-l2-cihdp.testnet> on behalf of <skarbnik-cmds-ace3fb.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_agent_limits json-args '{"max_fee_per_commit":"20000000000000000000000","fixed_payout":"skarbnik-cmds-ace3fb.testnet"}' prepaid-gas '30.0 Tgas' attached-deposit '1 yoctoNEAR' sign-as skarbnik-cmds-ace3fb.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0

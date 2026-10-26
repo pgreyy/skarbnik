@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "memorise the public tests": contains no parser at all. It looks the input up in a copy
 // of data/demo/public_tests.txt and returns the listed answer; every other input gets -1.
 //

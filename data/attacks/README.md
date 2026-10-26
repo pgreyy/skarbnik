@@ -7,7 +7,7 @@ loads these modules inside the wasmi interpreter with no access to the host.
 
 The expected verdict for each module is in `manifest.txt`. Build them with
 `bash harness/checker/build_modules.sh` and check them with
-`target/debug/kintsugi-check table --manifest data/attacks/manifest.txt --seed <64 hex digits>`.
+`target/debug/skarbnik-check table --manifest data/attacks/manifest.txt --seed <64 hex digits>`.
 Results: `docs/evidence/S1/RESULTS.md`.
 
 | Module | What it tries |

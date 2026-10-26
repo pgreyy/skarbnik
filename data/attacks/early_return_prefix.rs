@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "return early on a common prefix": returns 0 straight away for every input that starts
 // like the crash input (an int record of 2 bytes: 01 02), so it never reaches the buggy code for it.
 // Other inputs still go through the buggy parser.

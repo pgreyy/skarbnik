@@ -1,7 +1,7 @@
 # Writes the Rust constants the Groth16 spike contract needs, in NEAR's alt_bn128 byte layout (each number 32 bytes
 # little-endian; a G2 point as x real, x imaginary, y real, y imaginary). The verifying key numbers are read from RISC
 # Zero's own verifier source (risc0-groth16 3.0.5, src/verifier.rs), and the control root and BN254 control id from the
-# JSON that `kintsugi-host groth16-args` writes (RISC Zero's default verifier parameters).
+# JSON that `skarbnik-host groth16-args` writes (RISC Zero's default verifier parameters).
 # Usage: python3 -I scripts/gen_groth16_vk.py <risc0-groth16-3.0.5/src/verifier.rs> <args.json> > verifier/groth16-near/src/vk.rs
 import json, re, sys
 

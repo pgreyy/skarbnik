@@ -1,5 +1,5 @@
 {
-  "name": "kintsugi-wallet-vendor",
+  "name": "skarbnik-wallet-vendor",
   "private": true,
   "description": "Builds web/vendor/near-connect.js: the NEAR Connect wallet connector, bundled once from this exact version (see build.sh). The site itself has no build step.",
   "dependencies": {

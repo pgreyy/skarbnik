@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "loop forever": where the original would crash (a list of length exactly 2 * n),
 // it loops forever instead, hoping a hang is not counted as a crash.
 //

@@ -19,7 +19,7 @@ mkdir -p "$OUT/steps" target/s4-logs target/s4
 RUN="$OUT/run.env"; touch "$RUN"; source "$RUN"
 OUTLAYER=outlayer.testnet
 SEC=1000000000
-HOST=./target/release/kintsugi-host
+HOST=./target/release/skarbnik-host
 WASM=target/near/kintsugi_contract/kintsugi_contract.wasm
 save() { grep -v "^$1=" "$RUN" > "$RUN.tmp" || true; echo "$1=$2" >> "$RUN.tmp"; mv "$RUN.tmp" "$RUN"; }
 json_field() { python3 -c 'import json,sys; d=json.loads(sys.argv[1])

@@ -17,7 +17,7 @@ source scripts/s3_lib.sh
 # After s3_lib.sh, whose default vendor name (vendor.<contract>) this file replaces with the S3b vendor account.
 source docs/evidence/S3b/accounts.env
 SEC=1000000000
-HOST=./target/release/kintsugi-host
+HOST=./target/release/skarbnik-host
 save() { grep -v "^$1=" "$RUN" > "$RUN.tmp" || true; echo "$1=$2" >> "$RUN.tmp"; mv "$RUN.tmp" "$RUN"; }
 json_field() { python3 -c 'import json,sys; d=json.loads(sys.argv[1])
 for k in filter(None, sys.argv[2].split(".")): d=d[int(k)] if isinstance(d,list) else d[k]

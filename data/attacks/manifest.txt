@@ -1,6 +1,6 @@
 # Spike S1 manifest: every module the checker is run on, and the verdict it must give.
 # Format: <module path relative to this file> <expected verdict>. Used by
-#   kintsugi-check table --manifest data/attacks/manifest.txt --seed <hex>
+#   skarbnik-check table --manifest data/attacks/manifest.txt --seed <hex>
 # and by harness/checker/tests/corpus.rs.
 
 ../demo/fixed.wasm            PASS   # the honest patch

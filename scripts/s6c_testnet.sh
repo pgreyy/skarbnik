@@ -26,9 +26,9 @@ source scripts/s3_lib.sh
 # After s3_lib.sh, whose default vendor name (vendor.<contract>) this file replaces with the S3b vendor account.
 source docs/evidence/S3b/accounts.env
 SEC=1000000000
-HOST=./target/release/kintsugi-host
+HOST=./target/release/skarbnik-host
 W=target/near/kintsugi_contract/kintsugi_contract.wasm
-P0_ARGS=target/s6b/args.json                       # Groth16 Proof 0 of the demo bounty (kintsugi-host groth16-args)
+P0_ARGS=target/s6b/args.json                       # Groth16 Proof 0 of the demo bounty (skarbnik-host groth16-args)
 P0_SUCCINCT=target/demo/proof0_succinct.bin         # the same Proof 0, succinct, for the Level 0 verifiers
 P0_JOURNAL=fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5
 P0_RECEIPT=$(sha256sum "$P0_SUCCINCT" | cut -d' ' -f1)

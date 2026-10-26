@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "return a constant": returns 0 for every input.
 //
 // Same interface as the original: input_buf() -> i32 and parse(len: i32) -> i32.

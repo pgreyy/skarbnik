@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "use too much memory, for real": on the crash shape it asks for 64 more memory pages
 // (4 MiB) and then writes to the end of them before answering -4. The checker caps memory at 2 pages.
 //

@@ -1,0 +1,30 @@
+$ near account add-key skarbnik-cmds-ace3fb.testnet grant-function-call-access --allowance '0.25 NEAR' --contract-account-id kintsugi-l2-cihdp.testnet --function-names 'commit, reveal' autogenerate-new-keypair save-to-legacy-keychain network-config testnet sign-with-legacy-keychain send
+utc=2026-10-26T05:53:04Z
+├  Unsigned transaction:
+│    signer_id:    skarbnik-cmds-ace3fb.testnet
+│    receiver_id:  skarbnik-cmds-ace3fb.testnet
+│    actions:
+│       -- add access key:     
+│                       public key:   ed25519:jPpL8xGUUty9DpUkGi64Z6ebwLXfc6kWa3mJC4o3oex
+│                       nonce:        0
+│                       permission:   FunctionCall(FunctionCallPermission { allowance: Some(NearToken { inner: 250000000000000000000000 }), receiver_id: "kintsugi-l2-cihdp.testnet", method_names: ["commit", "reveal"] })
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DkFv5tm5ZjJnrMhVPZpzgLVBRbG5QD8iyRwmAvrBetRB
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.211 Tgas
+│    Transaction fee: 0.0000210304079634 NEAR
+│    Transaction ID: B5zzZHDWc6ja3Hk2agq6Soy9j4KkynmH2wZk5tK5c67y
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/B5zzZHDWc6ja3Hk2agq6Soy9j4KkynmH2wZk5tK5c67y
+│     
+
+
+Added access key = ed25519:jPpL8xGUUty9DpUkGi64Z6ebwLXfc6kWa3mJC4o3oex to skarbnik-cmds-ace3fb.testnet.
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0

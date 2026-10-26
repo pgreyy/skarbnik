@@ -13,7 +13,7 @@ source scripts/s3_lib.sh
 source docs/evidence/S3b/accounts.env
 save() { grep -v "^$1=" "$RUN" > "$RUN.tmp" || true; echo "$1=$2" >> "$RUN.tmp"; mv "$RUN.tmp" "$RUN"; }
 W=target/near/kintsugi_groth16_spike/kintsugi_groth16_spike.wasm
-ARGS=target/s6b/args.json   # from: ./target/release/kintsugi-host groth16-args target/s6/proof0_groth16.bin target/s6b/args.json
+ARGS=target/s6b/args.json   # from: ./target/release/skarbnik-host groth16-args target/s6/proof0_groth16.bin target/s6b/args.json
 
 # args <variant>: the JSON arguments for one call (real | flipped | journal | image)
 args() { python3 -I - "$ARGS" "$1" <<'PY'

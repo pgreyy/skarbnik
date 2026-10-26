@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Audit hardening S18: one live Level 2 bounty whose secret crashing input is NOT in the repository and whose commitment
 # uses a private random salt. The vendor's secret lives in ~/.kintsugi-vendor/s18/ (folder mode 700, files mode 600) and
-# is never printed; the salt is made by `kintsugi-host --bounty s18` in ~/.kintsugi-salts/. Phases, in order:
+# is never printed; the salt is made by `skarbnik-host --bounty s18` in ~/.kintsugi-salts/. Phases, in order:
 #   prove   Proof 0 of the reference fix (data/demo/fixed.wasm) against the private secret on this laptop's CPU, then
 #           compress it to a succinct receipt, then runs the groth16 phase; one job at a time
 #   groth16 compress the succinct receipt to a Groth16 proof (Docker), memory watched, and write the contract arguments
@@ -14,7 +14,7 @@ OUTDIR=docs/evidence/S18; mkdir -p "$OUTDIR/steps" target/s18
 export OUT="$OUTDIR" CONTRACT=kintsugi-l2-cihdp.testnet
 source scripts/s3_lib.sh; source docs/evidence/S3b/accounts.env
 SEC=1000000000
-HOST=./target/release/kintsugi-host
+HOST=./target/release/skarbnik-host
 VDIR="$HOME/.kintsugi-vendor/s18"
 SECRET="$VDIR/exploit.hex"
 [ -f "$SECRET" ] && [ "$(stat -c %a "$SECRET")" = 600 ] && [ "$(stat -c %a "$VDIR")" = 700 ] \

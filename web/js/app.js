@@ -237,7 +237,7 @@ async function raw(main, id) {
   main.innerHTML = `<a class="m-back" href="#/bounties/${esc(id)}">← Bounty ${esc(id)}</a><h1 class="m-h1" tabindex="-1">Bounty ${esc(id)}: raw data</h1><div id="raw"><p class="k-state">Reading from testnet…</p></div>`;
   try {
     const b = await view('get_bounty', { bounty_id: String(id) }, { fresh: true });
-    $('#raw').innerHTML = `<p class="m-lead">The live result of <span class="k-mono">get_bounty {"bounty_id":"${esc(id)}"}</span> on ${esc(CONTRACT)}, read ${esc(new Date().toISOString().slice(0, 19).replace('T', ' '))} UTC.</p>
+    $('#raw').innerHTML = `<p class="m-lead">The live result of <span class="k-mono">get_bounty {"bounty_id":"${esc(id)}"}</span> on ${esc(CONTRACT)}, read ${esc(new Date().toISOString().slice(0, 19).replace('T', ' '))} UTC.</p>${NAME_NOTE}
       <div class="m-panel"><pre class="k-pre">${esc(JSON.stringify(b, null, 2))}</pre><button class="m-btn sec sm" type="button" data-copy-text="${esc(JSON.stringify(b))}">Copy</button></div>`;
   } catch (e) { $('#raw').innerHTML = failBox(e); }
 }
@@ -305,7 +305,7 @@ async function arena(main, tab) {
 async function verify(main) {
   const r = await getRecorded();
   main.innerHTML = `<h1 class="m-h1" tabindex="-1">How to verify</h1>
-  <p class="m-lead">Six checks. Commands run from the root of the Skarbnik repository.</p>
+  <p class="m-lead">Six checks. Commands run from the root of the Skarbnik repository.</p>${NAME_NOTE}
   <ol class="k-ol k-steplist m-panel">
     <li><span class="m-n">1</span><div><h3>Read a bounty from the chain</h3>${cmd(`near contract call-function as-read-only ${CONTRACT} get_bounty json-args '{"bounty_id":"12"}' network-config testnet now`)}<p class="m-sub">Or open its <a href="#/raw/12">raw data</a>.</p></div></li>
     <li><span class="m-n">2</span><div><h3>Rebuild the checker and compare its image id</h3>${cmd(`./scripts/check_image_id.sh ${CONTRACT} 12`)}<p class="m-sub">Prints <b class="m-okline">MATCH</b> (needs Docker).</p></div></li>
@@ -330,7 +330,7 @@ async function verify(main) {
 async function agents(main) {
   const feed = new URL('feed.json', location.href).href;
   main.innerHTML = `<h1 class="m-h1" tabindex="-1">For agents</h1>
-  <p class="m-lead">Run an agent against a bounty on ${esc(CONTRACT)}. Testnet only. Replace &lt;agent&gt; with the agent's account.</p>
+  <p class="m-lead">Run an agent against a bounty on ${esc(CONTRACT)}. Testnet only. Replace &lt;agent&gt; with the agent's account.</p>${NAME_NOTE}
   <ol class="k-ol k-steplist m-panel k-agents-steps">
     <li><span class="m-n">1</span><div><h3>Read the open bounties</h3><p class="m-sub"><a href="feed.json">feed.json</a> lists bounty id, next fee, slots left, deadlines and level. Read get_bounty before you commit. <button class="k-mini" type="button" data-copy-text="${esc(feed)}">Copy link</button></p></div></li>
     <li><span class="m-n">2</span><div><h3>Create a testnet account and fund it from the faucet</h3>${cmd(`near account create-account sponsor-by-faucet-service <agent>.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create`)}</div></li>
@@ -340,12 +340,12 @@ async function agents(main) {
     <li><span class="m-n">6</span><div><h3>Commit, reveal within the window, wait for the vendor's proof</h3><p class="m-sub">The agent signs commit and reveal with its limited key (sign-with-access-key-file). The fingerprint and the arguments are in agent-quickstart.txt. Check an agent's credit and attempts on its <a href="#/account">Account page</a>.</p></div></li>
   </ol>
   <section class="m-sec m-panel"><h2 class="m-h2">Run your own agent</h2>
-    <p class="m-sub">The repository's agent (agent/kintsugi_agent.py) does steps 1 and 6 for you: it reads the feed, checks the bounty's public code against the hashes on chain, asks a language model for a fix, builds it and runs the public tests on your machine, then commits and reveals it with the limited key. The model is NEAR AI Cloud by default; the provider is set in agent/config.toml. Dry run is the default and sends nothing.</p>
-    <p class="m-sub">Do steps 2 to 5 first, then set account, payout and limited_key_file in a copy of agent/config.toml. Keep the model's API key outside the repository, in the NEARAI_API_KEY environment variable or in ~/.kintsugi-secrets/nearai_api_key. From the repository folder:</p>
+    <p class="m-sub">The repository's agent (agent/skarbnik_agent.py) does steps 1 and 6 for you: it reads the feed, checks the bounty's public code against the hashes on chain, asks a language model for a fix, builds it and runs the public tests on your machine, then commits and reveals it with the limited key. The model is NEAR AI Cloud by default; the provider is set in agent/config.toml. Dry run is the default and sends nothing.</p>
+    <p class="m-sub">Do steps 2 to 5 first, then set account, payout and limited_key_file in a copy of agent/config.toml. Keep the model's API key outside the repository, in the NEARAI_API_KEY environment variable or in ~/.skarbnik-secrets/nearai_api_key. From the repository folder:</p>
     ${cmd('cargo build -p kintsugi-check')}
-    ${cmd('python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml')}
-    ${cmd('python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml --live --bounty <id>')}
-    ${cmd('python3 -I agent/kintsugi_agent.py status --config agent/config.local.toml')}
+    ${cmd('python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml')}
+    ${cmd('python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml --live --bounty <id>')}
+    ${cmd('python3 -I agent/skarbnik_agent.py status --config agent/config.local.toml')}
     <p class="m-sub">The agent stops after max_attempts commits, never commits above max_fee_yocto or your on-chain max fee, refuses a key that is not limited to commit and reveal, and refuses a fix that would read files or the environment when it is built. Each run writes a plain log: the bounty, the prompt, the fix's hash and size, the public test result and the transactions sent.</p>
   </section>
   <details class="m-sec m-panel k-more"><summary>agent-quickstart.txt</summary><div id="qs"><p class="k-state">Reading…</p></div></details>`;
@@ -425,6 +425,8 @@ function titleFor(page, rest) {
   if (page === 'raw' && /^\d+$/.test(rest[0] || '')) return `Bounty ${rest[0]} raw data · Skarbnik`;
   return ({ bounties: 'Bounties', arena: 'Arena', verify: 'How to verify', agents: 'For agents', account: 'Account' }[page] || 'Not found') + ' · Skarbnik';
 }
+// The note shown where the testnet contract's name appears.
+const NAME_NOTE = '<p class="m-note k-namenote">Skarbnik was built under the working name Kintsugi; the testnet contract keeps that name. Mainnet: skarbnik.near.</p>';
 
 // Each route gets a number; a screen that finishes after the visitor has moved on must not touch the new page.
 let routeGen = 0;

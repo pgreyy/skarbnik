@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "fix that subtly changes behaviour": fixes the crash correctly, but also reads only the
 // low 3 bytes of a 4 byte int, so 4 byte ints with a non zero top byte get a different answer.
 //

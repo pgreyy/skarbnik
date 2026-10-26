@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 OUTDIR=docs/evidence/audit1; mkdir -p "$OUTDIR/steps" target/audit1
 export OUT="$OUTDIR" CONTRACT=kintsugi-l2-cihdp.testnet
 source scripts/s3_lib.sh; source docs/evidence/S3b/accounts.env
-SEC=1000000000; HOST=./target/release/kintsugi-host
+SEC=1000000000; HOST=./target/release/skarbnik-host
 P0_ARGS=target/s6b/args.json; P0_SUCCINCT=target/demo/proof0_succinct.bin
 P0_JOURNAL=fb7939dca90136238fdc24bc38f077c11c4adae332cd0392611a12797f423ec5; P0_RECEIPT=$(sha256sum "$P0_SUCCINCT" | cut -d' ' -f1)
 IMAGE=dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc

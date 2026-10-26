@@ -981,7 +981,7 @@
     "time": "2026-10-25 21:38 UTC",
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
-    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
    },
    {
     "step": "agent_bounty_open",
@@ -991,7 +991,7 @@
     "time": "2026-10-25 21:38 UTC",
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
-    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
    },
    {
     "step": "agent_submit_groth16_0",
@@ -1001,7 +1001,7 @@
     "time": "2026-10-25 23:24 UTC",
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
-    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
    },
    {
     "step": "agent_live_commit",
@@ -1011,7 +1011,7 @@
     "time": null,
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
-    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
    },
    {
     "step": "agent_live_reveal",
@@ -1021,7 +1021,7 @@
     "time": null,
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
-    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
    }
   ],
   "17": [
@@ -1033,7 +1033,7 @@
     "time": "2026-10-26 01:26 UTC",
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
-    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
    },
    {
     "step": "unpack_bounty_open",
@@ -1043,7 +1043,7 @@
     "time": "2026-10-26 01:26 UTC",
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
-    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/kintsugi_agent.py"
+    "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
    }
   ]
  },

@@ -24,8 +24,8 @@ OWNER=$RES2                                   # the agent's owner (a faucet test
 # The legacy keychain folder, read from near-cli-rs's own settings (not written into this script).
 CREDS="$(sed -n 's/^credentials_home_dir = "\(.*\)"$/\1/p' "$HOME/.config/near-cli/config.toml")/testnet"
 SEC=1000000000
-HOST=./target/release/kintsugi-host
-CHECK=./target/debug/kintsugi-check
+HOST=./target/release/skarbnik-host
+CHECK=./target/debug/skarbnik-check
 PATCH_FILE=data/demo/fixed.wasm               # the canned patch
 save() { grep -v "^$1=" "$RUN" > "$RUN.tmp" || true; echo "$1=$2" >> "$RUN.tmp"; mv "$RUN.tmp" "$RUN"; }
 json_field() { python3 -c 'import json,sys; d=json.loads(sys.argv[1])

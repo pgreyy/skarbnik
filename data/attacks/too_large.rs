@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "module too large": the honest fix plus a 4 KiB table of filler bytes that it really
 // uses, so the module is far over the checker's size limit.
 //

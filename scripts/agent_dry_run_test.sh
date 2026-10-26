@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tests the model-driven agent (agent/kintsugi_agent.py) in dry run: nothing is sent to the chain and no real model
+# Tests the model-driven agent (agent/skarbnik_agent.py) in dry run: nothing is sent to the chain and no real model
 # key is used. Each case runs the agent once with a test config (in target/agent-test/) and checks its log:
 #   1 reference fix   the stand-in answers with the known reference fix: public code checked, fix built, 17 of 17
 #                     public tests pass, commit and reveal prepared but not sent; one attempt, then it stops
@@ -29,7 +29,7 @@ exec(sys.argv[3])
 open(sys.argv[2], "w").write(s)
 PY
 }
-agent() { python3 -I agent/kintsugi_agent.py run --config "$T/$1.toml" "${@:2}" > "$T/$1.out" 2>&1; }
+agent() { python3 -I agent/skarbnik_agent.py run --config "$T/$1.toml" "${@:2}" > "$T/$1.out" 2>&1; }
 has() { grep -q -E -- "$2" "$T/$1.out"; }
 rm -rf "$T/runs"
 
@@ -125,13 +125,13 @@ ok $? "7b the real limited key: accepted (commit, reveal on the contract)"
 
 # 8 fingerprint against the site's code
 N=$(python3 -c 'import secrets;print(secrets.token_hex(32))')
-A=$(python3 -I -c "import sys; sys.path.insert(0, 'agent'); import kintsugi_agent as k; print(k.fingerprint(open('data/demo/fixed.wasm','rb').read(), 'payee.testnet', bytes.fromhex('$N')))")
+A=$(python3 -I -c "import sys; sys.path.insert(0, 'agent'); import skarbnik_agent as k; print(k.fingerprint(open('data/demo/fixed.wasm','rb').read(), 'payee.testnet', bytes.fromhex('$N')))")
 B=$(node scripts/web_fingerprint.mjs data/demo/fixed.wasm payee.testnet "$N")
 [ "$A" = "$B" ]; ok $? "8 fingerprint equals the site's ($A)"
 
 # 9 after a FAIL: the next prompt carries the earlier fix and its FAIL verdict
 python3 -I - <<'PY9'
-import sys; sys.path.insert(0, "agent"); import kintsugi_agent as k
+import sys; sys.path.insert(0, "agent"); import skarbnik_agent as k
 m = k.prompt("src", "tests", "build", {"max_patch_bytes": 1024}, [{"source": "EARLIER FIX SOURCE\n"}])
 assert "the verdict was FAIL" in m[1]["content"] and "EARLIER FIX SOURCE" in m[1]["content"]
 PY9

@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "wrong fix": a plausible looking patch for a different suspected bug (it caps list
 // counts at 120) that leaves the real off by one in place.
 //

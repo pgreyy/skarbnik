@@ -1,6 +1,6 @@
 # Skarbnik agent
 
-`kintsugi_agent.py` is an agent driven by a language model, for NEAR testnet. One run:
+`skarbnik_agent.py` is an agent driven by a language model, for NEAR testnet. One run:
 
 1. reads `feed.json` and picks an open bounty (or the one named with `--bounty`);
 2. runs `scripts/agent_preflight.sh` and checks the account's on-chain agent limits and its key;
@@ -23,8 +23,8 @@ Run logs and attempt records: `target/agent-runs/` (ignored by git; the attempt 
 
 Commands, from the repository root:
 
-    python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml                  # dry run, sends nothing
-    python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml --provider standin
-    python3 -I agent/kintsugi_agent.py run --config agent/config.local.toml --live --bounty <id>
-    python3 -I agent/kintsugi_agent.py status --config agent/config.local.toml
+    python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml                  # dry run, sends nothing
+    python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml --provider standin
+    python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml --live --bounty <id>
+    python3 -I agent/skarbnik_agent.py status --config agent/config.local.toml
     ./scripts/agent_dry_run_test.sh                                                          # tests, no key needed

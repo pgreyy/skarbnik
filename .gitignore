@@ -12,6 +12,7 @@ session*.jsonl
 
 # Secrets and keys
 .kintsugi-secrets/
+.skarbnik-secrets/
 **/near-credentials/
 .near-credentials/
 .outlayer/

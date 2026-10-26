@@ -1,4 +1,4 @@
-// Inert test data for the Kintsugi checker (spike S1). Not a real fix.
+// Inert test data for the Skarbnik checker (spike S1). Not a real fix.
 // Cheat "declare too much memory": the honest fix, but built with 16 pages (1 MiB) of
 // initial memory (see harness/checker/build_modules.sh). The checker allows at most 2 pages.
 //

@@ -43,14 +43,14 @@ const DEMO_SALT: [u8; 32] = *b"kintsugi demo salt, not a secret";
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let result = match args.first().map(String::as_str) {
-        Some("hello") => hello(args.get(1).cloned().unwrap_or_else(|| "kintsugi".to_string())),
+        Some("hello") => hello(args.get(1).cloned().unwrap_or_else(|| "skarbnik".to_string())),
         Some("execute") => execute(&args[1..]),
         Some("prove") => prove(&args[1..]),
         Some("verify") => return verify(&args[1..]),
         Some("tamper") => tamper(&args[1..]),
         Some("compress") => compress(&args[1..]),
         Some("groth16-args") => groth16_args(&args[1..]),
-        None => hello("kintsugi".to_string()),
+        None => hello("skarbnik".to_string()),
         Some(other) => Err(format!("unknown command {other}; see the comment at the top of host/src/main.rs")),
     };
     match result {

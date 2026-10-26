@@ -1,7 +1,7 @@
 # The host program: runs the zkVM guests, produces proofs (receipts), verifies them, and measures
 # cycles, time and receipt size. Commands: hello, execute, prove, verify, tamper, compress.
 [package]
-name = "kintsugi-host"
+name = "skarbnik-host"
 version = "0.1.0"
 edition = "2021"
 

@@ -12,7 +12,9 @@ name = "kintsugi_check"
 path = "src/lib.rs"
 
 [[bin]]
-name = "kintsugi-check"
+# The command line tool is called skarbnik-check; the package and the library keep the name kintsugi-check, which the
+# zkVM guest depends on (renaming them would change the checker image id).
+name = "skarbnik-check"
 path = "src/main.rs"
 
 [dependencies]

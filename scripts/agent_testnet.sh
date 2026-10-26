@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Testnet steps around the model-driven agent (agent/kintsugi_agent.py). Testnet only. Output: docs/evidence/agent/.
+# Testnet steps around the model-driven agent (agent/skarbnik_agent.py). Testnet only. Output: docs/evidence/agent/.
 # Phases:
 #   setup    make the agent's account (faucet), deposit credit, set agent limits (max fee, fixed payout), and add a
 #            key limited to commit and reveal on the contract; writes agent/config.local.toml (ignored by git)
@@ -14,7 +14,7 @@ cd "$(dirname "$0")/.."
 OUTDIR=docs/evidence/agent; mkdir -p "$OUTDIR/steps" target/agent-test
 export OUT="$OUTDIR" CONTRACT=kintsugi-l2-cihdp.testnet
 source scripts/s3_lib.sh; source docs/evidence/S3b/accounts.env
-SEC=1000000000; HOST=./target/release/kintsugi-host; W=target/agent-test
+SEC=1000000000; HOST=./target/release/skarbnik-host; W=target/agent-test
 RUN="$OUTDIR/run.env"; touch "$RUN"; source "$RUN"
 save() { grep -v "^$1=" "$RUN" > "$RUN.tmp" || true; echo "$1=$2" >> "$RUN.tmp"; mv "$RUN.tmp" "$RUN"; }
 sha() { sha256sum "$1" | cut -d' ' -f1; }

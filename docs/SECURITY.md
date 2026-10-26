@@ -28,7 +28,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | --- | --- | --- | --- |
 | The receipt is checked against the checker program's image id | A receipt from another program | `host/src/main.rs` (`verify`), `scripts/verifier_check.sh` | verifying with another image id fails (EVIDENCE, S4 native verifier tests) |
 | The checker is built reproducibly (inside RISC Zero's guest builder image, fixed folder and toolchain), so anyone can rebuild it and get the same image id (added 2026-10-24) | A vendor naming an image id that does not come from the published checker source | `harness/build.rs`, `scripts/check_image_id.sh` | the same id from two folders and two home folders, and no laptop path inside the guest (EVIDENCE, "Image id"); demo bounty 4 on `kintsugi-s13-tlryo.testnet` holds the reproducible id and `./scripts/check_image_id.sh kintsugi-s13-tlryo.testnet 4` prints MATCH (EVIDENCE, "Demo bounty") |
-| Changing the journal or one bit of the proof breaks verification | Forged or edited receipts | RISC Zero verification | `kintsugi-host tamper ... journal` and `... seal`, then `verify`: both INVALID, exit 1 (S1 zkVM part) |
+| Changing the journal or one bit of the proof breaks verification | Forged or edited receipts | RISC Zero verification | `skarbnik-host tamper ... journal` and `... seal`, then `verify`: both INVALID, exit 1 (S1 zkVM part) |
 | The journal binds the candidate hash, the original hash, sha256(salt || secret), the public tests' hash, the seed, the counts and the submission id | Reusing a receipt for another patch, bounty, secret, test set or seed | `zk.rs`, `harness/check-guest/src/main.rs` | the Level 0 check compares all of them with the chain (S4, 11 of 11 checks) |
 | The submission id is sha256 of the contract account, bounty id, index and patch hash | Replaying a receipt on another bounty or attempt | `contract/src/lib.rs` (`submission_id`) | S4 Level 0 check; S13 attack 4 |
 | A Proof 0 journal carries an id only Proof 0 mode can produce (added in S13) | Passing off a normal check as a Proof 0 | `harness/check-guest/src/main.rs` | S13 Proof 0 receipt (`docs/evidence/S13/verify_proof0.txt`) |
@@ -99,9 +99,9 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 | Date | Commit | Attack | Command | Result |
 | --- | --- | --- | --- | --- |
-| 2026-10-23 | `d150da2` | 18 cheating patches (reject all, constant, special-case the secret, loop forever, memory tricks, early return, disable a feature, memorize tests, wrong fix, subtle change, overbroad fix, wrong export, imports, too large, truncated) | `target/debug/kintsugi-check table --manifest data/attacks/manifest.txt --seed <hex>` | **blocked**: all FAIL except `memory_grow`, **accepted risk**: its oversized memory request is refused by its own limit, it gets no memory and behaves exactly like the honest fix |
+| 2026-10-23 | `d150da2` | 18 cheating patches (reject all, constant, special-case the secret, loop forever, memory tricks, early return, disable a feature, memorize tests, wrong fix, subtle change, overbroad fix, wrong export, imports, too large, truncated) | `target/debug/skarbnik-check table --manifest data/attacks/manifest.txt --seed <hex>` | **blocked**: all FAIL except `memory_grow`, **accepted risk**: its oversized memory request is refused by its own limit, it gets no memory and behaves exactly like the honest fix |
 | 2026-10-23 | `d150da2` | Same cheats over 200 seeds, 128 fairness inputs | seed sweep (`docs/evidence/S1/seed_sweep.txt`) | **blocked** on every seed; the honest fix passed on every seed |
-| 2026-10-24 | `2b41cad` | Change the verdict in a receipt's journal; flip one bit of the proof | `kintsugi-host tamper <in> <out> journal`, `... seal`, then `kintsugi-host verify <out>` | **blocked**: INVALID, exit 1 |
+| 2026-10-24 | `2b41cad` | Change the verdict in a receipt's journal; flip one bit of the proof | `skarbnik-host tamper <in> <out> journal`, `... seal`, then `skarbnik-host verify <out>` | **blocked**: INVALID, exit 1 |
 | 2026-10-23 | `f24e01d` | Claim the timeout early; post a verdict after its window; expire early | `scripts/s3_testnet.sh` | **blocked** on chain ("deadline has not passed", "verdict window has closed", "bounty has not expired") |
 | 2026-10-24 | `2b4c761` | Commit without credit; expire twice | `scripts/s3b_testnet.sh` | **blocked** on chain ("not enough credit", "nothing to do") |
 | 2026-10-24 | `f169bbb` | A stranger calls the private OutLayer callback; the owner registers the vendor as a verifier | `call_expect_fail` in `scripts/s3_lib.sh` | **blocked** on chain ("Method on_outlayer_result is private", "a vendor account cannot be a verifier") |
@@ -205,7 +205,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 - The demo bounties use a public fixed salt (`--demo-salt`; `DEMO_SALT` in `host/src/main.rs`) for the secret's
   commitment, sha256(salt || secret). With a public salt the commitment is a plain fingerprint of the secret, which
   anyone can match by guessing when the secret is short or predictable. The vendor tools' default is a private random
-  salt per bounty (`kintsugi-host ... --bounty <name>`: 32 bytes from /dev/urandom in
+  salt per bounty (`skarbnik-host ... --bounty <name>`: 32 bytes from /dev/urandom in
   a private folder outside the repo, file mode 600, reused for every proof of that bounty, never printed or committed);
   a real vendor must use it.
 - Proof 0 needs a reference fix: the vendor must already hold a fix that passes every check of the bounty, and it

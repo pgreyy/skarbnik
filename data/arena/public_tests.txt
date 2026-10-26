@@ -1,5 +1,5 @@
 # Public tests for the arena module (data/arena/original.rs). One per line: <input hex or -> <value>.
-# Expected values come from: target/debug/kintsugi-check run --module data/arena/original.wasm --input <hex>
+# Expected values come from: target/debug/skarbnik-check run --module data/arena/original.wasm --input <hex>
 -                    18652613
 00                   84696351
 01                   67918732

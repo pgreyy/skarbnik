@@ -2,6 +2,21 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Kintsugi renamed to Skarbnik where safe
+
+- Renamed: the agent (`agent/skarbnik_agent.py`), the host program (`skarbnik-host`, built at
+  `target/release/skarbnik-host`), the checker's command line tool (`skarbnik-check`, built by `cargo build -p
+  kintsugi-check`), the secrets folder in the agent's config (`~/.skarbnik-secrets`; the agent falls back to
+  `~/.kintsugi-secrets`, so the existing files keep working; nothing was moved or opened), the wallet build package,
+  and the name in comments, scripts, docs and on the site.
+- Kept: on-chain names (the testnet contract and accounts, the commit domain), everything that feeds the checker guest
+  (the `kintsugi-check` package and library, `kintsugi-harness`, `KINTSUGI_PREBUILT_GUESTS`, the proof domains), the
+  contract crates, the private salt folders, the browser key of saved attempts, and recorded evidence.
+- A note where the testnet contract's name appears on the site and in the README: "Skarbnik was built under the working
+  name Kintsugi; the testnet contract keeps that name. Mainnet: skarbnik.near." (skarbnik.near exists on mainnet.)
+- Commands on the For agents page run as shown: steps 2 to 5 with a throwaway account on testnet
+  (`docs/evidence/web/agents_page/`), the agent's status and dry run.
+
 ## 2026-10-26: Every icon from the S12 favicon
 
 - There was no favicon.ico (the live site answered 404), so a browser that had cached the old favicon.svg kept showing

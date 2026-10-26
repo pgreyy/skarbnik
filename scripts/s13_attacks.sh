@@ -23,7 +23,7 @@ source scripts/s3_lib.sh
 # After s3_lib.sh, whose default vendor name (vendor.<contract>) this file replaces with the S3b vendor account.
 source docs/evidence/S3b/accounts.env
 SEC=1000000000
-HOST=./target/release/kintsugi-host
+HOST=./target/release/skarbnik-host
 SEED_P0=6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21
 save() { grep -v "^$1=" "$RUN" > "$RUN.tmp" || true; echo "$1=$2" >> "$RUN.tmp"; mv "$RUN.tmp" "$RUN"; }
 json_field() { python3 -c 'import json,sys; d=json.loads(sys.argv[1])
@@ -85,10 +85,10 @@ open)
   # (1) an unfixable bounty: a 300 byte secret (over the 256 byte input limit) makes every patch fail. Proof 0 with
   # the reference fix now refuses it, so no honest verifier could attest it and such a bounty never opens.
   python3 -c 'print("03" * 300)' > target/s13/overlong_exploit.hex
-  { echo '$ target/debug/kintsugi-check proof0 --exploit target/s13/overlong_exploit.hex --reference-fix data/demo/fixed.wasm --seed <S1 seed> --fuzz-count 16 --variants 32'
-    ./target/debug/kintsugi-check proof0 --exploit target/s13/overlong_exploit.hex --reference-fix data/demo/fixed.wasm --seed "$SEED_P0" --fuzz-count 16 --variants 32; echo "exit=$?"
-    echo '$ target/debug/kintsugi-check proof0 --reference-fix data/demo/fixed.wasm --seed <S1 seed> --fuzz-count 16 --variants 32   (the real secret)'
-    ./target/debug/kintsugi-check proof0 --reference-fix data/demo/fixed.wasm --seed "$SEED_P0" --fuzz-count 16 --variants 32; echo "exit=$?"
+  { echo '$ target/debug/skarbnik-check proof0 --exploit target/s13/overlong_exploit.hex --reference-fix data/demo/fixed.wasm --seed <S1 seed> --fuzz-count 16 --variants 32'
+    ./target/debug/skarbnik-check proof0 --exploit target/s13/overlong_exploit.hex --reference-fix data/demo/fixed.wasm --seed "$SEED_P0" --fuzz-count 16 --variants 32; echo "exit=$?"
+    echo '$ target/debug/skarbnik-check proof0 --reference-fix data/demo/fixed.wasm --seed <S1 seed> --fuzz-count 16 --variants 32   (the real secret)'
+    ./target/debug/skarbnik-check proof0 --reference-fix data/demo/fixed.wasm --seed "$SEED_P0" --fuzz-count 16 --variants 32; echo "exit=$?"
   } > "$OUTDIR/atk1_unfixable_native.txt" 2>&1 || true
   note "atk1 native Proof 0: $(grep -E '^proof0:|^reason' "$OUTDIR/atk1_unfixable_native.txt" | tr '\n' ' ')"
   BA=$(create a_create 7200 900 21600 900); save BOUNTY_A "$BA"

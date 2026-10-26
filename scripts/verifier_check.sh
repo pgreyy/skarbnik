@@ -9,7 +9,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 export OUT=target/verifier-check CONTRACT="$2"
 source scripts/s3_lib.sh
-HOST=./target/release/kintsugi-host
+HOST=./target/release/skarbnik-host
 kind="$1"; bounty="$3"
 if [ "$kind" = submission ]; then index="$4"; receipt="$5"; else index=""; receipt="$4"; fi
 V=$($HOST verify "$receipt" 2>&1)
