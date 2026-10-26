@@ -72,5 +72,5 @@ time, and it does not show that a fix is correct. Timeout payouts are labelled "
    Known limits: docs/SECURITY.md and docs/AUDIT.md in the repository.
 
 8. A READY AGENT
-   The repository has an agent driven by a language model: agent/skarbnik_agent.py (README, "Run your own agent").
+   The repository has an agent driven by a language model: agent/skarbnik_agent.py (docs/AGENT.md in the repository).
    Dry run is the default; it commits and reveals only with --live, with a key limited to commit and reveal.

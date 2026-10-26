@@ -2,6 +2,22 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: README restyled; licence files
+
+- README.md rewritten to about 215 lines: badges, the Vinyl lockup (light and dark), the tagline, the opening paragraph,
+  a 2 minute path, a diagram and five steps, the checks, bounty kinds, what it is built on (versions and licences from
+  the Cargo manifests, the cargo registry and the font files), what we changed, evidence, honest limits, links for
+  vendors and agents, run it yourself, licence. The long sections moved, unchanged apart from their links, into
+  docs/TRY_IT.md (the ten steps), docs/CLAIMS.md (what is shown and built, numbers, known limits), docs/OVERVIEW.md,
+  docs/ROADMAP.md and docs/AGENT.md; docs/README.md indexes every document. JUDGE_GUIDE.md and
+  web/agent-quickstart.txt point to the new places.
+- `web/img/vinyl-lockup-{light,dark}.svg` from `scripts/logo/lockup.mjs` (the word as outlines, so GitHub needs no
+  font). Checked with GitHub's Markdown API (`gh api -X POST markdown -f mode=markdown`) in a headless browser at
+  830 px, light and dark: no code block or table wider than the column. Every local link exists; all 27 outside links
+  answered 200; the site routes the README links to show their content.
+- LICENSE-MIT, LICENSE-APACHE (the standard text, the same as apache.org's apart from blank lines) and NOTICE: MIT OR
+  Apache-2.0. THIRD_PARTY_NOTICES.md and docs/VERSIONS.md now name the current fonts and the Vinyl mark.
+
 ## 2026-10-26: Per-account cap deployed (Task 5)
 
 - Bounties 15 and 14 closed by `claim_timeout`; `./scripts/cap_deploy.sh build before deploy after captest`: wasm

@@ -106,8 +106,8 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 
 | Item | Version or source | Checked |
 | --- | --- | --- |
-| Fonts | Space Grotesk 600 (headings); IBM Plex Sans 500, 600 (text); JetBrains Mono 400, 700 (facts); Fraunces 600 (the name only), served by Google Fonts (css2 API, no version in the address) | 2026-10-26 |
-| Mark outline | Fraunces SemiBold S as a vector path, from the approved design's `logo/s12-mark-on-dark.svg` (copied into `web/js/logo.js`) | 2026-10-26 |
+| Fonts | Unbounded 1.701, DM Sans 4.004, DM Mono 1.000, self-hosted in `web/fonts` (versions read from each file's name table) | 2026-10-26 |
+| Mark | the Vinyl mark (`web/img/vinyl-mark-*.svg`); the README lockup `web/img/vinyl-lockup-*.svg` from `scripts/logo/lockup.mjs` (opentype.js 1.3.4, wawoff2 2.0.1) | 2026-10-26 |
 
 ## Agent model provider (agent/config.toml)
 
