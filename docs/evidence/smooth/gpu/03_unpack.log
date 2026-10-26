@@ -1,0 +1,16 @@
+step=unpack utc_start=2026-10-26T16:40:43Z elapsed_since_start_s=98
+Cargo.lock
+Cargo.toml
+README.md
+THIRD_PARTY_NOTICES.md
+agent
+contract
+data
+docs
+harness
+host
+scripts
+verifier
+web
+d327c30af0d18bd97de9c0dc8c3169971be7201918afe5559f8f5f79a8ffdfca  kintsugi-src.tar.gz
+exit=0

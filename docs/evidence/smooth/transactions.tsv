@@ -1,0 +1,5 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+smooth_bounty_create	create_bounty	kintsugi-vendor-prnvm.testnet	9A1KAHxA8ExaDKzxp2UnQS16gQQM4Zx4NcFTwn9WXFZU	0.353 Tgas	0.0000352834508385	0	6.17
+smooth_bounty_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	AE3GWBF45ghMqwGKnaCr3AbAMJ6aYgXu1a1Tf86CJV1g	0.377 Tgas	0.000037681941703	0	6.17
+smooth_live_commit	commit	limited key of kintsugi-agent-d9410f.testnet	4G48c6waZdz7Qc3maVdXsXx9u3kwzfDWbXhW2toszvkG	-	-	agent:ok	-
+smooth_live_reveal	reveal	limited key of kintsugi-agent-d9410f.testnet	3rBVkucSk1jxirbayxz7GYX1cfurgLAYoRXjiB9HmVhc	-	-	agent:ok	-

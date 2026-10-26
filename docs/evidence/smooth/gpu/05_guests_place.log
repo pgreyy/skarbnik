@@ -1,0 +1,4 @@
+step=guests_place utc_start=2026-10-26T16:41:05Z elapsed_since_start_s=120
+4741ef156b297cc8d5a71ee8c181c437ad81845cfbb3459c801e3443f613eb0a  prebuilt-guests/check_guest.bin
+78fdb721fe71f087c366b04be2a74d9ed36a72b3dad97afa5124b60cefcae3ca  prebuilt-guests/hello_guest.bin
+exit=0

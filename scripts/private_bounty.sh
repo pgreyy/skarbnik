@@ -14,7 +14,7 @@
 #   submit N    sends that proof (submit_groth16) and reads the outcome
 #   timeout N   after the attempt's verdict deadline: claim_timeout by the agent's account (silent vendor rule)
 # Settings for create (environment): REWARD (default "0.1 NEAR"), K (3), VERDICT_H (24), REVEAL_GAP_S (1200),
-# REVEAL_WINDOW_S (7200), EXPIRY_H (96). PO2 (19) for proving.
+# REVEAL_WINDOW_S (7200), EXPIRY_H (96). PO2 (19) for proving; NO_GROTH16=1 makes `prove` stop after the succinct receipt.
 # Usage, from the repo root: MODULE=<name> ./scripts/private_bounty.sh <phase>. Testnet only. Output: docs/evidence/<MODULE>/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -111,6 +111,8 @@ prove)
   keep "$W/prove_u$IDX.log"; finished "$W/prove_u$IDX.log"
   MAX_SECONDS=$SUCCINCT_MAX_S scripts/s2_measure.sh "$W/compress_u$IDX.log" -- $HOST compress "$W/u$IDX.bin" "$W/u${IDX}_succinct.bin" succinct
   keep "$W/compress_u$IDX.log"; finished "$W/compress_u$IDX.log"
+  # NO_GROTH16=1 stops here: the Groth16 wrap then runs as `groth16 N` once enough memory is free (it needs about 7 GiB).
+  [ -n "${NO_GROTH16:-}" ] && { note "succinct receipt ready for bounty $NBOUNTY attempt $IDX; Groth16 left for later (NO_GROTH16)"; exit 0; }
   groth16 "u$IDX"; commitment_ok "$W/verify_u$IDX.txt"
   note "proof for bounty $NBOUNTY attempt $IDX: $(grep -E '^journal.verdict' "$W/verify_u$IDX.txt")"
   ;;

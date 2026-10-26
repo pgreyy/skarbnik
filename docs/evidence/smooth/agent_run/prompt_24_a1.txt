@@ -1,0 +1,127 @@
+[system]
+You fix one crash bug in a small Rust program that is compiled to WebAssembly. The input that makes it crash is secret. Return the complete fixed source file in one ```rust code block and nothing else.
+
+[user]
+This program crashes (traps) on a secret input. Find the bug and fix it.
+
+Rules for the fix:
+- Every input on which the original does not crash must give exactly the same result as before.
+- Keep the interface: input_buf() -> i32 and parse(len: i32) -> i32, #![no_std], no imports, no other crates.
+- Change as little as possible. The built module must be at most 1024 bytes.
+- Every public test below must still give its value.
+
+How it is built:
+How to build a patch for this program (the same flags the vendor used for the original):
+rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \
+  -C codegen-units=1 -C target-cpu=mvp -C link-arg=-zstack-size=8192 -C link-arg=--initial-memory=131072 \
+  -C link-arg=--max-memory=131072 -o patch.wasm patch.rs
+Keep the interface: input_buf() -> i32 and parse(len: i32) -> i32. The patch must be at most the bounty's max_patch_bytes.
+Public tests: one per line, <input as hex, or - for empty> <value the original returns>. corpus_hash is sha256 over, for
+each test in order: input length (u32 little endian), input bytes, expected value (i32 little endian).
+
+Public tests:
+# Public tests for the smoothing filter (data/smooth/original.rs).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+# The expected values were produced by running the original module:
+#   target/debug/skarbnik-check run --module data/smooth/original.wasm --input <hex>
+# Proof 0 (`skarbnik-check proof0`) re-checks that the original returns every one of them.
+- -1
+01 -3
+05aabbcc -3
+13101010 1082812802
+21ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00 -2
+013a 755388932
+017444f8cf2d04cdb5 1551214689
+02a9ae 664731569
+03628affaebe1b6fbffe69 1996321201
+14fe42c6d19d6f 1809161596
+25c8dda59123adbf4bd8a49df4bcefad651c4e684f 105265123
+3172f37a1fd9 1718337083
+4fc939ca9e057223e741c8541c8e8c33 544156197
+5fb6308196ec29d32897059aa0298818061d38b45ee5b4c8fc126e2ae392a1fbdf58b99ac3e6dbd9e7 1616456603
+672844a2aa2712f4 1819549431
+72bdb7629c9a869851b5afc8d2eb63bbd8a44a99ea2b6dc4b0d648e981e6ba63d37063508eb64143add0f697d0322e9939f0e6445ad2093a1c4bef72ad006caa93 885744
+8847081d7f6f1621a9e74e2527 2054651838
+a3dad6b2f7c324aafc7f 350316128
+c4f8c5c0e6295d016f340f34a5051f4adf7cc80e4cb088f034e4a77ae08c34 1791748260
+f17ec0ab 1217785948
+9ef450c5f5635c2060e37a63872da5dba0 1217785948
+0b8f6c498d590412b8ec0842 740610519
+
+Source (original.rs):
+```rust
+// A small smoothing filter for a stream of sensor samples. It is compiled to WebAssembly with plain rustc (see
+// web/code/smooth/BUILD.txt, the same flags as the other programs).
+//
+// The input starts with one header byte h, followed by the samples (one byte each):
+//   the low four bits of h are the window size w, the high four bits are a scale s.
+// For every window of w consecutive samples, the filter takes their sum, shifts it right by s bits, and divides it by
+// w; the result, cut to one byte, is one output value. With n samples there are n - w + 1 output values.
+// The result is a fingerprint of the output values (0 or more), or a negative error code:
+//   -1 there is no header byte, -2 more than 64 samples, -3 the window is longer than the samples.
+//
+// How the harness talks to the module:
+//   input_buf() -> i32   address of a 256 byte buffer the harness writes the input into
+//   parse(len: i32) -> i32   filters the first len bytes of that buffer
+#![no_std]
+
+const MAX_INPUT: usize = 256;
+const MAX_SAMPLES: usize = 64;
+static mut INPUT: [u8; MAX_INPUT] = [0; MAX_INPUT];
+
+#[no_mangle]
+pub extern "C" fn input_buf() -> i32 {
+    core::ptr::addr_of_mut!(INPUT) as i32
+}
+
+#[no_mangle]
+pub extern "C" fn parse(len: i32) -> i32 {
+    if len < 0 || len as usize > MAX_INPUT {
+        return -1;
+    }
+    let input = unsafe { core::slice::from_raw_parts(core::ptr::addr_of!(INPUT) as *const u8, len as usize) };
+    smooth(input)
+}
+
+fn at(p: &[u8], i: usize) -> u8 {
+    match p.get(i) {
+        Some(b) => *b,
+        None => core::arch::wasm32::unreachable(),
+    }
+}
+
+fn smooth(input: &[u8]) -> i32 {
+    if input.is_empty() {
+        return -1;
+    }
+    let h = at(input, 0);
+    let w = (h & 0x0f) as usize;
+    let s = (h >> 4) as u32;
+    let n = input.len() - 1;
+    if n > MAX_SAMPLES {
+        return -2;
+    }
+    if w > n {
+        return -3;
+    }
+    let mut f: u32 = 0x811c_9dc5;
+    let mut count: u32 = 0;
+    let mut i = 0usize;
+    while i + w <= n {
+        let mut sum: u32 = 0;
+        for j in 0..w {
+            sum = sum.wrapping_add(at(input, 1 + i + j) as u32);
+        }
+        let v = ((sum >> s) / w as u32) as u8;
+        f = (f ^ v as u32).wrapping_mul(16_777_619);
+        count += 1;
+        i += 1;
+    }
+    ((f ^ count).wrapping_mul(16_777_619) & 0x7fff_ffff) as i32
+}
+
+#[panic_handler]
+fn panic(_: &core::panic::PanicInfo) -> ! {
+    core::arch::wasm32::unreachable()
+}
+```

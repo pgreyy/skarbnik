@@ -1,0 +1,4 @@
+step=idcheck utc_start=2026-10-26T16:48:14Z elapsed_since_start_s=549
+r0vm_id=dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+cargo:warning=prebuilt guest check_guest: image id dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+exit=0

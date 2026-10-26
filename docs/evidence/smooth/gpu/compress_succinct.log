@@ -1,0 +1,6 @@
+input receipt: gpu-results/u0.bin (8789234 bytes)
+compressed to: succinct
+compress seconds: 21.71
+verify seconds: 0.025
+output receipt: gpu-results/u0_succinct.bin (224786 bytes)
+wall_seconds=21.87 max_rss_kb=294940

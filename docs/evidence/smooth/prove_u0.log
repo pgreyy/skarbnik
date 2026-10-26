@@ -1,0 +1,9 @@
+$ RISC0_DEV_MODE=0 ./target/release/skarbnik-host prove target/smooth/patch_0.wasm --bounty smooth --exploit ~/.kintsugi-salts/smooth/exploit.hex --original data/smooth/original.wasm --tests data/smooth/public_tests.txt --fuzz-count 16 --variants 32 --po2 18 --seed da6ef35635d89464b2f158842da2c7bc4ce1c2bca071010c479367a1382480f3 --submission-id a5245285a6156f502b80fc06057c1ae61a250f1204f9f0a164965463a6626db3 --out target/smooth/u0.bin
+utc_start=2026-10-26T16:14:33Z
+limits: max_rss_mib=6144 min_avail_mib=1536 max_seconds=21600
+salt: the private salt of bounty smooth (existing)
+exit=143
+wall_seconds=2215.43
+r0vm_peak_rss_mib=2378 (VmHWM, sampled every 5 s)
+min_available_mib=4085
+result: finished

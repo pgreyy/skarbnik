@@ -1,0 +1,75 @@
+// A small smoothing filter for a stream of sensor samples. It is compiled to WebAssembly with plain rustc (see
+// web/code/smooth/BUILD.txt, the same flags as the other programs).
+//
+// The input starts with one header byte h, followed by the samples (one byte each):
+//   the low four bits of h are the window size w, the high four bits are a scale s.
+// For every window of w consecutive samples, the filter takes their sum, shifts it right by s bits, and divides it by
+// w; the result, cut to one byte, is one output value. With n samples there are n - w + 1 output values.
+// The result is a fingerprint of the output values (0 or more), or a negative error code:
+//   -1 there is no header byte, -2 more than 64 samples, -3 the window is longer than the samples.
+//
+// How the harness talks to the module:
+//   input_buf() -> i32   address of a 256 byte buffer the harness writes the input into
+//   parse(len: i32) -> i32   filters the first len bytes of that buffer
+#![no_std]
+
+const MAX_INPUT: usize = 256;
+const MAX_SAMPLES: usize = 64;
+static mut INPUT: [u8; MAX_INPUT] = [0; MAX_INPUT];
+
+#[no_mangle]
+pub extern "C" fn input_buf() -> i32 {
+    core::ptr::addr_of_mut!(INPUT) as i32
+}
+
+#[no_mangle]
+pub extern "C" fn parse(len: i32) -> i32 {
+    if len < 0 || len as usize > MAX_INPUT {
+        return -1;
+    }
+    let input = unsafe { core::slice::from_raw_parts(core::ptr::addr_of!(INPUT) as *const u8, len as usize) };
+    smooth(input)
+}
+
+fn at(p: &[u8], i: usize) -> u8 {
+    match p.get(i) {
+        Some(b) => *b,
+        None => core::arch::wasm32::unreachable(),
+    }
+}
+
+fn smooth(input: &[u8]) -> i32 {
+    if input.is_empty() {
+        return -1;
+    }
+    let h = at(input, 0);
+    let w = (h & 0x0f) as usize;
+    let s = (h >> 4) as u32;
+    let n = input.len() - 1;
+    if n > MAX_SAMPLES {
+        return -2;
+    }
+    // A window size of 0 would reach the division below and trap; reject it as an unusable window.
+    if w == 0 || w > n {
+        return -3;
+    }
+    let mut f: u32 = 0x811c_9dc5;
+    let mut count: u32 = 0;
+    let mut i = 0usize;
+    while i + w <= n {
+        let mut sum: u32 = 0;
+        for j in 0..w {
+            sum = sum.wrapping_add(at(input, 1 + i + j) as u32);
+        }
+        let v = ((sum >> s) / w as u32) as u8;
+        f = (f ^ v as u32).wrapping_mul(16_777_619);
+        count += 1;
+        i += 1;
+    }
+    ((f ^ count).wrapping_mul(16_777_619) & 0x7fff_ffff) as i32
+}
+
+#[panic_handler]
+fn panic(_: &core::panic::PanicInfo) -> ! {
+    core::arch::wasm32::unreachable()
+}

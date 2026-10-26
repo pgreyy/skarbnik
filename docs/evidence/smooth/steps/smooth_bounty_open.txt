@@ -1,0 +1,43 @@
+utc_start=2026-10-26T14:40:05.730365769Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  open_with_groth16
+│                       args:         {
+│                                       "bounty_id": "24",
+│                                       "seal": "BPdW6/y6+MStkBN28N+A5BqKNfBP8aORESHiSLHlbNgvIHnytdhTcSDt/KoZ/erXfzIa4gLkSqireNSsPFU33xxi1uWC2ZXRUvZwPNtAo58ReHHLF0Fqm1KfbJ2UufS3IJsz/WlfVvWRsaQ5O+TDCQApoD/ANis6/QeoHL5D9rkl0B3VV5Pgov05Sz0MqqNxeOG3w8xtnqQz1vLWNREx9xLYJ0GEEJ4dOpedYKicKFBwFGinEsDftoL1hkF8NjiACnzI1cfimQbLlQ4hU3Xm86gFbdGUtdel43KC+VCmHDME+4JAVVoEtJYMsJHka/Q1JRVzTbejM9LATgIxn2l7uw=="
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.377 Tgas
+│    Transaction fee: 0.000037681941703 NEAR
+│    Transaction ID: AE3GWBF45ghMqwGKnaCr3AbAMJ6aYgXu1a1Tf86CJV1g
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/AE3GWBF45ghMqwGKnaCr3AbAMJ6aYgXu1a1Tf86CJV1g
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_opened","data":[{"bounty_id":"24","by":"groth16","caller":"kintsugi-vendor-prnvm.testnet"}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"opened"
+
+
+The "open_with_groth16" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=6.17
