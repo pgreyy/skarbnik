@@ -133,6 +133,31 @@ Verdict: PASS. The NEAR CLI wallet adds a function call key from the site. Not t
 attempts on test bounty 14 wait for a proof that will not come (test bounty); the timeout rule decides them after
 22:35 UTC on 2026-10-26.
 
+## Per-account cap deployed (2026-10-26)
+
+The owner's yes came with conditions: bounty 24 settled (paid by proof, 21:22 UTC), bounty 15 closed, and no proof in
+flight on bounties 14 and 18 to 24. `./scripts/cap_deploy.sh` follows `docs/evidence/account_cap/PLAN.md`:
+
+- Closed first, by the timeout rule (anyone may send it): bounty 15, `claim_timeout`
+  `Esz2a9FEkD1QkjFLs4PLpUBnvDkEghowKP95UHRzGbmm`; bounty 14 (three revealed test attempts, the last deadline 22:35 UTC),
+  `45tmZsU9Sxe57qCheEraPewWz1q2mHVu2cU3iwYq92EV` (a claim naming attempt 2 first was refused: the earliest reveal goes
+  first).
+- Build: `cargo near build non-reproducible-wasm`, 318,809 bytes, wasm sha256
+  `b863487e3d402251eb385e0b2eae3e85e19843751b4b71800dabcf242da61024`. The code before, kept for a rollback:
+  `938d5456cad92d66ab1d20c77dfc6badcc830e4a69f5cbb48035a8bfd427d1b7`.
+- Deploy in place, no init call: tx `DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7` (new code hash
+  `DQmpjLzrVdipS17krqBymQsLaNadxw3THnaGR5Kpxx8B`).
+- Before and after (`before_*.json`, `after_*.json`, `deploy_comparison.txt`): `get_bounty` of 7, 12, 14, 15 and 18 to 24
+  identical apart from the new `max_commits_per_account` field (null on each); `get_protocol_pool` and
+  `get_allowed_image_ids` identical byte for byte. No rollback needed.
+- Live test, bounty 25 (`max_commits_per_account` 1, K = 3, opened with the demo's Groth16 Proof 0: create
+  `BpQhXCGTk315sViUfqp2Hw3D8SjnkKdVATuGCLU8W9wn`, open `A6dFucNnoJthFtxWuPq4icx8whAdPHAmGZZkAZ4bmL7i`): one account's first
+  commit accepted (`4bauQmuam4A1D5tjBdrMrhoZFgx2HGeoZAQWrUgo3PQV`), its second refused with "this account already holds
+  max_commits_per_account slots of this bounty" (no fee taken), another account's commit accepted
+  (`9nUhzd4zRFi6ckY1Sr8DFRnys63bqFU3MZ4FXPfptcVo`); `get_account_slots` gives 1 and 1.
+
+Verdict: PASS. The cap is live for bounties created from now on; older bounties have none.
+
 ## Per-account cap per bounty: written and tested, not deployed (2026-10-26)
 
 - Question: can a bounty limit how many of its K slots one account holds, without touching the stored layout or any

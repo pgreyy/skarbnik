@@ -1,0 +1,29 @@
+$ near contract deploy kintsugi-l2-cihdp.testnet use-file target/cap-deploy/new.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-26T22:38:02.585592871Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-l2-cihdp.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- deploy code <DQmpjLzrVdipS17krqBymQsLaNadxw3THnaGR5Kpxx8B> to a account <kintsugi-l2-cihdp.testnet>
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:A1kuE8J7zaYKoErnxQpMLauqVmrp3UVvNiYuamXtLDjN
+│     
+├  Transaction Execution Info:
+│    Gas burned: 2.5 Tgas
+│    Transaction fee: 0.0002464870648191 NEAR
+│    Transaction ID: DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7
+│     
+
+Contract code has been successfully deployed.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract deploy kintsugi-l2-cihdp.testnet use-file target/cap-deploy/new.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=9.57

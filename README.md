@@ -115,7 +115,7 @@ accepted (bounties 1, 16 and 24).
 - A payout to an account that does not exist is lost (finding 8; bounty 8 shows it, the Ledger marks it).
 - No storage accounting (finding 12); the vendor chooses the Proof 0 seed (finding 10); the verifier constants are
   unversioned (finding 11).
-- One person can use many accounts; a per-account cap is written and tested but not deployed (docs/evidence/account_cap/PLAN.md).
+- One person can use many accounts; the per-account cap (deployed 2026-10-26) limits one account, not one person.
 
 **Narrow claims:**
 

@@ -94,7 +94,7 @@ evidence is never shown as done.
 | The checker rebuilds to the image id on chain | Demonstrated | MATCH from a fresh clone: [`docs/evidence/judge/fresh_clone_2026-10-26b.txt`](docs/evidence/judge/fresh_clone_2026-10-26b.txt); B5 |
 | 135 contract unit tests pass | Implemented | `cargo test -p kintsugi-contract`; [`docs/evidence/account_cap/contract_unit_tests.txt`](docs/evidence/account_cap/contract_unit_tests.txt) |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | Implemented | `cargo test -p kintsugi-check`; [docs/EVIDENCE.md](docs/EVIDENCE.md), S1 |
-| A per-account cap on attempt slots | Implemented | written and tested, not deployed: [`docs/evidence/account_cap/PLAN.md`](docs/evidence/account_cap/PLAN.md) |
+| A per-account cap on attempt slots | Demonstrated | deployed 2026-10-26 (tx [`DVv7N9o1…`](https://testnet.nearblocks.io/txns/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7)); bounty 25: a second commit by one account refused ([`docs/evidence/account_cap/deploy_summary.txt`](docs/evidence/account_cap/deploy_summary.txt)) |
 | Vendor proving on a rented GPU (29.82 s prove, 21.71 s shrink) with the secret in memory only | Experimental | one run, one machine: [`docs/evidence/smooth/gpu/`](docs/evidence/smooth/gpu/); [docs/numbers.md](docs/numbers.md) |
 | The Groth16 wrap on a separate Docker machine (337.73 s, 6.82 GiB peak) | Experimental | one run: [`docs/evidence/smooth/vps/groth16.log`](docs/evidence/smooth/vps/groth16.log) |
 | Level 1 verification through OutLayer | Experimental | built, never answered on testnet: [docs/EVIDENCE.md](docs/EVIDENCE.md), S4/S5 |

@@ -25,7 +25,8 @@
   "21": "Judge bounty",
   "22": "Judge bounty",
   "23": "Arena guarded probe",
-  "24": "Second new module, private secret"
+  "24": "Second new module, private secret",
+  "25": "Per-account cap test"
  },
  "notes": {
   "1": "Attempt 0 passed and was paid. Attempt 1 was a valid proof of FAIL, which spent that attempt.",
@@ -37,7 +38,8 @@
   "13": "One attempt allowed. No proof arrived in the window.",
   "16": "The agent's fix on the public demo module was proven PASS and paid. It shows the path, not a model's skill: the demo bug is named in the module's comments.",
   "17": "The vendor's proof finished after the 4 hour window, so the contract paid by timeout. Not a proof.",
-  "24": "An AI agent's fix of a private bug it could not see, proven PASS and paid by the contract. Proved and shrunk on a rented GPU, wrapped to Groth16 on a separate Docker machine; the secret never left the vendor's control."
+  "24": "An AI agent's fix of a private bug it could not see, proven PASS and paid by the contract. Proved and shrunk on a rented GPU, wrapped to Groth16 on a separate Docker machine; the secret never left the vendor's control.",
+  "25": "A throwaway bounty for the live test of the per-account cap: one account's second commit was refused."
  },
  "agent_runs": {
   "16": {

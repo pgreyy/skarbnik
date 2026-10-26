@@ -79,6 +79,8 @@ BOUNTY_STEPS = [
     ("docs/evidence/agent/transactions.tsv", "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py",
      {16: ["agent_bounty_", "agent_live_", "agent_submit_groth16_"], 17: ["unpack_bounty_", "unpack_live_", "unpack_submit_groth16_", "unpack_claim_timeout_"]}),
     # Agent setup from the site (PASTE-11 part D, run through the page with the NEAR CLI wallet): its attempts on test bounty 14
+    # The per-account cap deploy's live test (scripts/cap_deploy.sh captest): a throwaway bounty with a cap of 1
+    ("docs/evidence/account_cap/transactions.tsv", "scripts/cap_deploy.sh", {25: ["cap_test_create", "cap_test_open", "cap_test_commit_"], 15: ["cap_claim_timeout_b15_"], 14: ["cap_claim_timeout_b14_"]}),
     ("docs/evidence/web/partd_transactions.tsv", "the site's Account and bounty pages, NEAR CLI wallet; agent/skarbnik_agent.py",
      {14: ["partd_commit_", "partd_reveal_"]}),
 ]
@@ -240,6 +242,7 @@ for _m in NEW_MODULES:
 if "ABOUNTY" in agentenv:
     out["test_bounties"][agentenv["ABOUNTY"]] = "Test bounty: made for the real run of the model-driven agent (agent/)."
 
+out["test_bounties"]["25"] = "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo."
 if ARENA_BOUNTY:
     out["test_bounties"][ARENA_BOUNTY] = "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
 out["judge_bounties"] = {str(j): "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself." for j in JUDGE_IDS}

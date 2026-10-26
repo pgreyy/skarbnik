@@ -35,7 +35,7 @@ const LIMITS = (live) => [
   ['eye', '', 'Revealed fixes are public', 'After the reveal a patch is on chain. A one line fix is often the reference fix byte for byte, so a secret reference fix protects little.'],
   ['cube', '', 'Narrow scope', 'Crash bugs in small WebAssembly modules, patches up to 2,048 bytes. A vendor with a crash but no fix is not supported.'],
   ['coin', '', 'A payout to a missing account is lost', 'Bounty 8 shows it. The site and the agent check the account before a commit, but the contract does not.'],
-  ['hash', '', 'One verdict leaks one bit', 'K is the leak budget. The deployed contract has no cap per account, so one person with many accounts can fill a bounty’s slots. A per-account cap is written and tested, not deployed.'],
+  ['hash', '', 'One verdict leaks one bit', 'K is the leak budget. A per-account cap (deployed 2026-10-26) limits how many slots one account holds, but one person with many accounts can still fill a bounty’s slots.'],
   ['link', '', 'Level 1 is not built', 'The OutLayer path exists but never answered on testnet. Every current bounty is Level 2 or the older Level 0.'],
   ['wallet', '', 'Wallets are mostly untested', 'NEAR CLI was clicked through to real transactions. The other wallets were only loaded, not signed in.'],
 ];

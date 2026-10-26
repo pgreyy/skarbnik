@@ -2,6 +2,13 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Per-account cap deployed (Task 5)
+
+- Bounties 15 and 14 closed by `claim_timeout`; `./scripts/cap_deploy.sh build before deploy after captest`: wasm
+  `b863487e...1024`, deploy tx `DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7`, every saved view unchanged apart from the
+  new field, live cap test on bounty 25 (a second commit by one account refused). SECURITY, the judge guide and the site's
+  limits now say the cap is deployed.
+
 ## 2026-10-26: History cleanup (owner's approval)
 
 - Removed `docs/handoff/` (private handoff notes) from every commit and replaced a local path in one test output

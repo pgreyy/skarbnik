@@ -880,6 +880,16 @@
     "script": "scripts/web_testnet.sh"
    },
    {
+    "step": "cap_claim_timeout_b14_0",
+    "method": "claim_timeout",
+    "tx": "45tmZsU9Sxe57qCheEraPewWz1q2mHVu2cU3iwYq92EV",
+    "what": "Timeout claimed",
+    "time": "2026-10-26 22:37 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/account_cap/transactions.tsv",
+    "script": "scripts/cap_deploy.sh"
+   },
+   {
     "step": "partd_commit_agent_key",
     "method": "commit",
     "tx": "9bZygCGt2syghtoa6vvE8bAh7i5GThGqHSYnG9mMCJbD",
@@ -1010,6 +1020,16 @@
     "result": "succeeded",
     "source": "docs/evidence/web/transactions.tsv",
     "script": "scripts/web_testnet.sh"
+   },
+   {
+    "step": "cap_claim_timeout_b15_0",
+    "method": "claim_timeout",
+    "tx": "Esz2a9FEkD1QkjFLs4PLpUBnvDkEghowKP95UHRzGbmm",
+    "what": "Timeout claimed",
+    "time": "2026-10-26 22:22 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/account_cap/transactions.tsv",
+    "script": "scripts/cap_deploy.sh"
    }
   ],
   "16": [
@@ -1114,6 +1134,48 @@
     "result": "succeeded",
     "source": "docs/evidence/agent/transactions.tsv",
     "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
+   }
+  ],
+  "25": [
+   {
+    "step": "cap_test_create",
+    "method": "create_bounty",
+    "tx": "BpQhXCGTk315sViUfqp2Hw3D8SjnkKdVATuGCLU8W9wn",
+    "what": "Bounty created",
+    "time": "2026-10-26 22:38 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/account_cap/transactions.tsv",
+    "script": "scripts/cap_deploy.sh"
+   },
+   {
+    "step": "cap_test_open",
+    "method": "open_with_groth16",
+    "tx": "A6dFucNnoJthFtxWuPq4icx8whAdPHAmGZZkAZ4bmL7i",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 22:38 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/account_cap/transactions.tsv",
+    "script": "scripts/cap_deploy.sh"
+   },
+   {
+    "step": "cap_test_commit_RES1_1793054362",
+    "method": "commit",
+    "tx": "4bauQmuam4A1D5tjBdrMrhoZFgx2HGeoZAQWrUgo3PQV",
+    "what": "Attempt committed",
+    "time": "2026-10-26 22:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/account_cap/transactions.tsv",
+    "script": "scripts/cap_deploy.sh"
+   },
+   {
+    "step": "cap_test_commit_RES2_1793054382",
+    "method": "commit",
+    "tx": "9nUhzd4zRFi6ckY1Sr8DFRnys63bqFU3MZ4FXPfptcVo",
+    "what": "Attempt committed",
+    "time": "2026-10-26 22:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/account_cap/transactions.tsv",
+    "script": "scripts/cap_deploy.sh"
    }
   ],
   "18": [
@@ -1617,6 +1679,7 @@
   "14": "Test bounty: made for trying the wallet flow by hand. Not a demo.",
   "15": "Test bounty: made for the scripted run of the site with the NEAR CLI wallet.",
   "16": "Test bounty: made for the real run of the model-driven agent (agent/).",
+  "25": "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo.",
   "23": "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
  },
  "last_image_check": {

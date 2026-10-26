@@ -65,6 +65,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | A silent vendor's timeout (a liveness rule, not a verdict) is split equally among every revealed attempt still undecided, each paid its share and its own attempt fee; the remainder of the division goes to the attempt that was claimed (audit hardening S7) | A vendor's own junk revealed first taking the whole bounty back by timeout while an honest fix waits (audit finding 3, residual) | `claim_timeout` | unit tests `audit_s7_*`; testnet `scripts/hardening_testnet.sh split` |
 | Each account may set limits on its own commits with `set_agent_limits` (needs exactly 1 yoctoNEAR): a largest attempt fee per commit and a fixed payout account; `commit` refuses a fee above the limit or another payout (audit hardening S6) | An agent's commit-only key (or whoever steals it) spending the credit on one attacker-set fee, or sending winnings elsewhere (audit finding 9) | `set_agent_limits`, `get_agent_limits`, `commit` | unit tests `audit_s6_*`; testnet `scripts/hardening_testnet.sh limits` |
 | A Level 2 proof's cheap binding checks (submission id, seed, candidate, bounty fields; for Proof 0 the journal hash, reference fix and verdict) run before the pairing check (audit hardening S3) | An honest mistake or a replayed proof burning the whole proof check; unclear errors | `submit_groth16`, `open_with_groth16` | unit tests `s1_*`, `s2_*`, `level2_changed_journal_refused`; testnet `s3_proof_of_another_bounty` |
+| A bounty created with `max_commits_per_account` lets one committer account hold at most that many of its K slots at a time; a commit over the cap is refused before any fee is taken; the slot is freed only as K frees it (a commit never revealed, released). Bounties made without it, and every bounty made before 2026-10-26, have no cap (deployed 2026-10-26) | One account taking every slot of a bounty (it does not stop one person with many accounts) | `create_bounty`, `commit`, `release_to_pool`, `get_account_slots` | 16 unit tests from `setup_capped`; testnet: bounty 25, a second commit by one account refused (docs/evidence/account_cap/deploy_summary.txt) |
 | The journal parser refuses every malformed journal (wrong length, a byte word above 255, a verdict other than 0 or 1) and a seal that is not 256 bytes; a Proof 0 journal is refused as an attempt and an attempt journal as Proof 0; one changed byte of the control root fails the check (audit hardening S2) | Malformed or mixed-up proofs | `groth16::parse_journal`, `groth16::verify` | unit tests `s2_*` in `contract/src/tests_level2_attempts.rs` |
 
 ### The site (web/)
@@ -183,7 +184,8 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
   0.045 NEAR; the fees are kept (since S6c in the protocol fee pool), and because `commits` never goes down, window w (from 0) costs
   0.045 + 0.045 w NEAR, so W windows in a row cost 0.0225 W (W + 1) NEAR (10 windows: 2.475 NEAR). After each window
   anyone can free the slots and commit. **Accepted risk**: the cost of blocking grows with every window, the leak stays
-  at most K bits, and the vendor sets K, both fees and the reveal window.
+  at most K bits, and the vendor sets K, both fees and the reveal window. Since 2026-10-26 a vendor can also cap the slots
+  one committer account holds (`max_commits_per_account`); that slows one fast account, not one person with many accounts.
 - RISC Zero states its zero knowledge property is not formally proven.
 - What Level 2 still trusts:
   - the BN254 curve: NEAR's own NEP-488 says recent research puts BN254 below 100-bit security, and RISC Zero's
@@ -292,6 +294,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-26: per-account cap deployed on `kintsugi-l2-cihdp.testnet` (wasm sha256 `b863487e...1024`, tx
+  `DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7`); every saved view of bounties 7, 12, 14, 15 and 18 to 24, the pool and
+  the allowlist unchanged apart from the new `max_commits_per_account` field (null on old bounties); live test on bounty 25.
 
 - 2026-10-26: more wallets: all of NEAR Connect's list, pinned (GitHub scripts to a commit, every script by sha256);
   on testnet Meteor, Intear, Ledger, MyNearWallet (until 31 October), Nightly, Ethereum Wallets and NEAR CLI are shown.

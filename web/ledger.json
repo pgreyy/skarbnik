@@ -1,5 +1,5 @@
 {
- "made_at": "2026-10-26T21:24:23Z",
+ "made_at": "2026-10-26T22:42:08Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Every account in this ledger is run by the Skarbnik team or was seeded by its scripts (accounts.kinds). No scores, no ranks, no credit for unpaid attempts. Amounts in yoctoNEAR; a paid fix also got its own attempt fee back.",
@@ -129,6 +129,86 @@
    "note": null
   },
   {
+   "bounty_id": "14",
+   "attempt": 0,
+   "payout_account": "the owner's personal testnet account",
+   "kind": "team-run",
+   "how": "timeout",
+   "status": "paid by timeout",
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "means": "paid by the timeout rule: a liveness rule, not a verdict; no proof checked this fix.",
+   "transfer_failed": false,
+   "paid_yocto": "33333333333333333333334",
+   "on_paper_yocto": "33333333333333333333334",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "45tmZsU9Sxe57qCheEraPewWz1q2mHVu2cU3iwYq92EV",
+   "note": null
+  },
+  {
+   "bounty_id": "14",
+   "attempt": 1,
+   "payout_account": "skarbnik-partd-461f99.testnet",
+   "kind": "not known",
+   "how": "timeout",
+   "status": "paid by timeout",
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "means": "paid by the timeout rule: a liveness rule, not a verdict; no proof checked this fix.",
+   "transfer_failed": false,
+   "paid_yocto": "33333333333333333333333",
+   "on_paper_yocto": "33333333333333333333333",
+   "fee_refunded_yocto": "15000000000000000000000",
+   "tx": "45tmZsU9Sxe57qCheEraPewWz1q2mHVu2cU3iwYq92EV",
+   "note": null
+  },
+  {
+   "bounty_id": "14",
+   "attempt": 2,
+   "payout_account": "skarbnik-partd-461f99.testnet",
+   "kind": "not known",
+   "how": "timeout",
+   "status": "paid by timeout",
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "means": "paid by the timeout rule: a liveness rule, not a verdict; no proof checked this fix.",
+   "transfer_failed": false,
+   "paid_yocto": "33333333333333333333333",
+   "on_paper_yocto": "33333333333333333333333",
+   "fee_refunded_yocto": "20000000000000000000000",
+   "tx": "45tmZsU9Sxe57qCheEraPewWz1q2mHVu2cU3iwYq92EV",
+   "note": null
+  },
+  {
+   "bounty_id": "15",
+   "attempt": 0,
+   "payout_account": "kintsugi-web-1e80c1.testnet",
+   "kind": "seeded",
+   "how": "timeout",
+   "status": "paid by timeout",
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "means": "paid by the timeout rule: a liveness rule, not a verdict; no proof checked this fix.",
+   "transfer_failed": false,
+   "paid_yocto": "50000000000000000000000",
+   "on_paper_yocto": "50000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "Esz2a9FEkD1QkjFLs4PLpUBnvDkEghowKP95UHRzGbmm",
+   "note": null
+  },
+  {
+   "bounty_id": "15",
+   "attempt": 1,
+   "payout_account": "kintsugi-web-1e80c1.testnet",
+   "kind": "seeded",
+   "how": "timeout",
+   "status": "paid by timeout",
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "means": "paid by the timeout rule: a liveness rule, not a verdict; no proof checked this fix.",
+   "transfer_failed": false,
+   "paid_yocto": "50000000000000000000000",
+   "on_paper_yocto": "50000000000000000000000",
+   "fee_refunded_yocto": "15000000000000000000000",
+   "tx": "Esz2a9FEkD1QkjFLs4PLpUBnvDkEghowKP95UHRzGbmm",
+   "note": null
+  },
+  {
    "bounty_id": "16",
    "attempt": 0,
    "payout_account": "kintsugi-agent-d9410f.testnet",
@@ -197,10 +277,26 @@
   {
    "account": "kintsugi-web-1e80c1.testnet",
    "kind": "seeded",
+   "fixes_paid": 3,
+   "paid_by_proof": 0,
+   "paid_by_timeout": 3,
+   "total_paid_yocto": "200000000000000000000000"
+  },
+  {
+   "account": "the owner's personal testnet account",
+   "kind": "team-run",
    "fixes_paid": 1,
    "paid_by_proof": 0,
    "paid_by_timeout": 1,
-   "total_paid_yocto": "100000000000000000000000"
+   "total_paid_yocto": "33333333333333333333334"
+  },
+  {
+   "account": "skarbnik-partd-461f99.testnet",
+   "kind": "not known",
+   "fixes_paid": 2,
+   "paid_by_proof": 0,
+   "paid_by_timeout": 2,
+   "total_paid_yocto": "66666666666666666666666"
   },
   {
    "account": "kintsugi-agent-d9410f.testnet",
@@ -215,29 +311,29 @@
   {
    "account": "kintsugi-res1-prnvm.testnet",
    "kind": "team-run",
-   "attempts": 8,
-   "fees_spent_yocto": "90000000000000000000000",
+   "attempts": 9,
+   "fees_spent_yocto": "100000000000000000000000",
    "fees_returned_yocto": "40000000000000000000000",
    "gross_rewards_yocto": "350000000000000000000000",
    "proof_checked_passes": 1,
    "timeout_payouts": 3,
    "rejected_by_a_fail_proof": 0,
    "released_unrevealed": 2,
-   "waiting": 2,
+   "waiting": 3,
    "model_and_compute_cost": null
   },
   {
    "account": "kintsugi-res2-prnvm.testnet",
    "kind": "team-run",
-   "attempts": 5,
-   "fees_spent_yocto": "80000000000000000000000",
+   "attempts": 6,
+   "fees_spent_yocto": "95000000000000000000000",
    "fees_returned_yocto": "40000000000000000000000",
    "gross_rewards_yocto": "50000000000000000000000",
    "proof_checked_passes": 0,
    "timeout_payouts": 2,
    "rejected_by_a_fail_proof": 2,
    "released_unrevealed": 0,
-   "waiting": 0,
+   "waiting": 1,
    "model_and_compute_cost": null
   },
   {
@@ -259,13 +355,13 @@
    "kind": "seeded",
    "attempts": 3,
    "fees_spent_yocto": "35000000000000000000000",
-   "fees_returned_yocto": "10000000000000000000000",
-   "gross_rewards_yocto": "100000000000000000000000",
+   "fees_returned_yocto": "35000000000000000000000",
+   "gross_rewards_yocto": "200000000000000000000000",
    "proof_checked_passes": 0,
-   "timeout_payouts": 1,
+   "timeout_payouts": 3,
    "rejected_by_a_fail_proof": 0,
    "released_unrevealed": 0,
-   "waiting": 2,
+   "waiting": 0,
    "model_and_compute_cost": null
   },
   {
@@ -273,13 +369,13 @@
    "kind": "team-run",
    "attempts": 1,
    "fees_spent_yocto": "10000000000000000000000",
-   "fees_returned_yocto": "0",
-   "gross_rewards_yocto": "0",
+   "fees_returned_yocto": "10000000000000000000000",
+   "gross_rewards_yocto": "33333333333333333333334",
    "proof_checked_passes": 0,
-   "timeout_payouts": 0,
+   "timeout_payouts": 1,
    "rejected_by_a_fail_proof": 0,
    "released_unrevealed": 0,
-   "waiting": 1,
+   "waiting": 0,
    "model_and_compute_cost": null
   },
   {
@@ -287,13 +383,13 @@
    "kind": "not known",
    "attempts": 2,
    "fees_spent_yocto": "35000000000000000000000",
-   "fees_returned_yocto": "0",
-   "gross_rewards_yocto": "0",
+   "fees_returned_yocto": "35000000000000000000000",
+   "gross_rewards_yocto": "66666666666666666666666",
    "proof_checked_passes": 0,
-   "timeout_payouts": 0,
+   "timeout_payouts": 2,
    "rejected_by_a_fail_proof": 0,
    "released_unrevealed": 0,
-   "waiting": 2,
+   "waiting": 0,
    "model_and_compute_cost": null
   },
   {
@@ -329,18 +425,18 @@
   {
    "vendor": "kintsugi-vendor-prnvm.testnet",
    "kind": "team-run",
-   "bounties": 25,
+   "bounties": 26,
    "proved_on_time": 5,
-   "not_proved_in_time": 7,
-   "waiting_past_deadline": 4
+   "not_proved_in_time": 12,
+   "waiting_past_deadline": 1
   }
  ],
  "metrics": {
-  "decided_attempts": 12,
+  "decided_attempts": 17,
   "settled_by_proof": 5,
-  "settled_by_timeout": 7,
-  "share_settled_by_proof": 0.4166666666666667,
-  "timeout_rate": 0.5833333333333334,
+  "settled_by_timeout": 12,
+  "share_settled_by_proof": 0.29411764705882354,
+  "timeout_rate": 0.7058823529411765,
   "reveal_to_settlement_seconds": {
    "proof, laptop": {
     "attempts": 4,
@@ -348,8 +444,8 @@
     "slowest": 5111.346138547
    },
    "timeout, none (no proof)": {
-    "attempts": 7,
-    "median": 180,
+    "attempts": 12,
+    "median": 7800,
     "slowest": 14400
    },
    "proof, rented GPU (prove and shrink), then a Docker VPS (Groth16)": {
@@ -363,13 +459,13 @@
   "outside_note": "accounts not on the team list (web/data/accounts.json) among vendors, committers and payout accounts"
  },
  "counts": {
-  "paid_fixes": 9,
+  "paid_fixes": 14,
   "paid_by_proof": 3,
-  "paid_by_timeout": 6,
+  "paid_by_timeout": 11,
   "paid_on_paper_transfer_failed": 1,
-  "paid_accounts": 4,
+  "paid_accounts": 6,
   "vendors": 1,
-  "distinct_counterparties": 5,
-  "outside_the_team": 0
+  "distinct_counterparties": 7,
+  "outside_the_team": 1
  }
 }

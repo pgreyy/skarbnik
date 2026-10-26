@@ -1,0 +1,13 @@
+bounty 7: the same (apart from max_commits_per_account: None)
+bounty 12: the same (apart from max_commits_per_account: None)
+bounty 14: the same (apart from max_commits_per_account: None)
+bounty 15: the same (apart from max_commits_per_account: None)
+bounty 18: the same (apart from max_commits_per_account: None)
+bounty 19: the same (apart from max_commits_per_account: None)
+bounty 20: the same (apart from max_commits_per_account: None)
+bounty 21: the same (apart from max_commits_per_account: None)
+bounty 22: the same (apart from max_commits_per_account: None)
+bounty 23: the same (apart from max_commits_per_account: None)
+bounty 24: the same (apart from max_commits_per_account: None)
+pool: the same, byte for byte
+allowlist: the same, byte for byte

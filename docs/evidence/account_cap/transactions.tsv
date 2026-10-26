@@ -1,0 +1,12 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+cap_claim_timeout_b15_0	claim_timeout	kintsugi-ver3-prnvm.testnet	Esz2a9FEkD1QkjFLs4PLpUBnvDkEghowKP95UHRzGbmm	0.311 Tgas	0.0000310014532315	0	7.43
+cap_claim_timeout_b14_2	claim_timeout	kintsugi-ver3-prnvm.testnet	-	-	-	1	6.5
+cap_claim_timeout_b14_0	claim_timeout	kintsugi-ver3-prnvm.testnet	45tmZsU9Sxe57qCheEraPewWz1q2mHVu2cU3iwYq92EV	0.311 Tgas	0.0000310014532315	0	5.41
+cap_deploy	deploy	kintsugi-l2-cihdp.testnet	DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7	2.5 Tgas	0.0002464870648191	0	9.57
+cap_test_create	create_bounty	kintsugi-vendor-prnvm.testnet	BpQhXCGTk315sViUfqp2Hw3D8SjnkKdVATuGCLU8W9wn	0.355 Tgas	0.0000354074284975	0	5.71
+cap_test_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	A6dFucNnoJthFtxWuPq4icx8whAdPHAmGZZkAZ4bmL7i	0.377 Tgas	0.000037681941703	0	6.34
+cap_test_credit_RES1	deposit_credit	kintsugi-res1-prnvm.testnet	HGfvfBdyJsiMwk5GynpUPSZxGmRcKQy6dVxYyKthvzgp	0.310 Tgas	0.0000309633062595	0	5.46
+cap_test_credit_RES2	deposit_credit	kintsugi-res2-prnvm.testnet	EhajPiASNW28qAajnEcuRsSxBKtXVSva1JC6cFMabVwC	0.310 Tgas	0.0000309633062595	0	7.31
+cap_test_commit_RES1_1793054362	commit	kintsugi-res1-prnvm.testnet	4bauQmuam4A1D5tjBdrMrhoZFgx2HGeoZAQWrUgo3PQV	0.315 Tgas	0.000031492595496	0	6.53
+cap_test_commit_RES1_1793054372	commit	kintsugi-res1-prnvm.testnet	-	-	-	1	5.7
+cap_test_commit_RES2_1793054382	commit	kintsugi-res2-prnvm.testnet	9nUhzd4zRFi6ckY1Sr8DFRnys63bqFU3MZ4FXPfptcVo	0.315 Tgas	0.000031492595496	0	5.39

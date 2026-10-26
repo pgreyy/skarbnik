@@ -1,0 +1,12 @@
+2026-10-26T22:22:58Z claim_timeout on bounty 15 attempt 0: bounty state Paid
+2026-10-26T22:23:40Z built 318809 bytes, wasm sha256 b863487e3d402251eb385e0b2eae3e85e19843751b4b71800dabcf242da61024
+2026-10-26T22:36:45Z claim_timeout on bounty 14 attempt 2: bounty state Open
+2026-10-26T22:37:11Z claim_timeout on bounty 14 attempt 0: bounty state Paid
+2026-10-26T22:37:43Z deployed code before: wasm sha256 938d5456cad92d66ab1d20c77dfc6badcc830e4a69f5cbb48035a8bfd427d1b7 (kept for a rollback)
+2026-10-26T22:38:02Z views saved before the deploy: bounties 7 12 14 15 18 19 20 21 22 23 24, pool, allowlist
+2026-10-26T22:38:13Z deployed: wasm sha256 b863487e3d402251eb385e0b2eae3e85e19843751b4b71800dabcf242da61024, tx DQmpjLzrVdipS17krqBymQsLaNadxw3THnaGR5Kpxx8B
+2026-10-26T22:38:29Z comparison passed: every saved view unchanged except the new max_commits_per_account field (null on every old bounty)
+2026-10-26T22:38:47Z correction: the deploy transaction is DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7; DQmpjLzrVdipS17krqBymQsLaNadxw3THnaGR5Kpxx8B in the line above is the new code hash
+2026-10-26T22:39:06Z cap test bounty 25: max_commits_per_account 1, opened True
+2026-10-26T22:39:53Z cap test bounty 25 after three commits (RES1, RES1 again, RES2): commits 2; RES1 holds 1 slot(s), RES2 holds 1
+        ExecutionError("Smart contract panicked: this account already holds max_commits_per_account slots of this bounty")

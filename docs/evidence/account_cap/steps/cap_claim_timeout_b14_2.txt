@@ -1,0 +1,32 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet claim_timeout json-args {"bounty_id":"14","index":2} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-ver3-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-26T22:36:33.744083014Z
+Migrating config.toml from V4 to V5...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+├  Unsigned transaction:
+│    signer_id:    kintsugi-ver3-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  claim_timeout
+│                       args:         {
+│                                       "bounty_id": "14",
+│                                       "index": 2
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:5X2ugGp2QnCfi4888bRFGtHPP4QY6NzeTgTE6fUQ1h1Q
+│     
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet claim_timeout json-args '{"bounty_id":"14","index":2}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-ver3-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: An error occurred during a `FunctionCall` action.
+      ExecutionError("Smart contract panicked: an attempt revealed earlier is still undecided: decide it or time it out first")
+
+Location:
+   src/common.rs:1808
+exit=1
+wall_seconds=6.5

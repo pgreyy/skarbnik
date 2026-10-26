@@ -1,0 +1,31 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args {"bounty_id":"25","fingerprint":"909925bf425ba7dae650d6dd6dc57df79c0378fb4a4a9ba1e87e8ba3b2d80261","payout":"kintsugi-res1-prnvm.testnet"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-26T22:39:32.816594243Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res1-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  commit
+│                       args:         {
+│                                       "bounty_id": "25",
+│                                       "fingerprint": "909925bf425ba7dae650d6dd6dc57df79c0378fb4a4a9ba1e87e8ba3b2d80261",
+│                                       "payout": "kintsugi-res1-prnvm.testnet"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:4nab7LQVFF5XAGQdk3SACm2PQCmbBJXGcWqL37PiyNxy
+│     
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"25","fingerprint":"909925bf425ba7dae650d6dd6dc57df79c0378fb4a4a9ba1e87e8ba3b2d80261","payout":"kintsugi-res1-prnvm.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: An error occurred during a `FunctionCall` action.
+      ExecutionError("Smart contract panicked: this account already holds max_commits_per_account slots of this bounty")
+
+Location:
+   src/common.rs:1808
+exit=1
+wall_seconds=5.7

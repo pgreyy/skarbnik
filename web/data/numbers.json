@@ -4,7 +4,7 @@
   "value": 135,
   "text": "contract unit tests pass in the repository",
   "source": "docs/evidence/account_cap/contract_unit_tests.txt",
-  "detail": "135 with the per-account cap, which is written and tested but not deployed; the deployed contract's code passed 119 (docs/evidence/judge/clean_clone.txt)."
+  "detail": "135 with the per-account cap, deployed 2026-10-26 (docs/evidence/account_cap/); the code before it passed 119 (docs/evidence/judge/clean_clone.txt)."
  },
  "accepted_proof_tgas": {
   "value": "35",
