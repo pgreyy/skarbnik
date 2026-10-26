@@ -169,7 +169,7 @@ export function attemptPanel(el, b, subs, verifiers) {
       else if (OUTCOME[sub.outcome]) line = `<p>${sub.outcome === 'Passed' ? passStamp() : ''} ${badge(...OUTCOME[sub.outcome])} The chain says this attempt is final.</p>`;
       else if (sub.revealed_at_ns) {
         const dl = Number(BigInt(sub.deadline_ns) / 1000000n);
-        line = now > dl ? `<p>${badge('info', 'Vendor’s time is up')} The vendor did not prove it by ${esc(bothTimes(dl))}. Anyone can now claim the timeout.</p>`
+        line = now > dl ? `<p>${badge('info', 'Vendor’s time is up')} The vendor did not prove it by ${esc(bothTimes(dl))}. Anyone can now claim the timeout: a liveness rule, not a verdict.</p>`
           : `<p>${badge('wait', '… Waiting for the vendor’s proof')} Only the vendor can prove an attempt. Deadline: ${esc(bothTimes(dl))}.</p>`;
       }
       else {

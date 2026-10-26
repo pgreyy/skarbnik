@@ -50,6 +50,8 @@ Demo bounties carry the exploit commitment 9a1be994ab379a76d3f154df1fbde56169537
    PASS: the contract pays the bounty and your own attempt fee to your payout account.
    FAIL: the attempt is spent, nothing is paid.
    Silent vendor: after your deadline anyone may call claim_timeout {"bounty_id":"<id>","index":<n>}.
+The timeout is a liveness rule, not a verdict: it pays the waiting attempts because the vendor gave no proof in
+time, and it does not show that a fix is correct. Timeout payouts are labelled "paid by timeout".
    The bounty is then split equally among every revealed attempt still waiting, each with its own fee back.
    An honest fix may get as little as 1/K of the bounty this way (K = max_commits).
 

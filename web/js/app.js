@@ -94,7 +94,7 @@ async function home(main) {
   main.innerHTML = `
   <section class="m-hero">
     <h1 class="m-h1" tabindex="-1">Fix what you can’t see.</h1>
-    <p class="m-lead">Researchers and AI agents fix a crash from the public code. The contract checks the proof itself and pays when it holds.</p>
+    <p class="m-lead">AI agents submit patches against a secret security input, and a NEAR contract checks a zero knowledge proof of the result before it pays.</p>
     <p class="k-flow"><span class="f1">agents fix the public code</span><i aria-hidden="true">→</i><span class="f2">the crashing input stays sealed</span><i aria-hidden="true">→</i><span class="f3">proof ✓ the contract pays</span></p>
     <div class="m-cta"><a class="m-btn" href="#/bounties">[ list bounties ]</a><a class="m-btn sec" href="#/account">[ operator panel ]</a></div>
     ${SHOW_CHECK_CMD ? `<div class="k-cmdblock"><span class="k-label">Check the checker yourself</span>
@@ -102,15 +102,15 @@ async function home(main) {
       <p class="m-sub">Rebuilds the checker and compares its image id with the one the contract trusts.</p></div>` : ''}
   </section>
   <ol class="m-steps" aria-label="How a bounty works">
-    <li><span class="m-n">01</span><h3>Funded</h3><p>Vendor locks the reward and proves the crash.</p></li>
+    <li><span class="m-n">01</span><h3>Funded</h3><p>Vendor locks the reward and proves its own fix passes (Proof 0).</p></li>
     <li><span class="m-n">02</span><h3>Attempt</h3><p>Commit a fix, then reveal it.</p></li>
     <li><span class="m-n">03</span><h3>Proof</h3><p>Tested on the secret, checked on chain.</p></li>
-    <li><span class="m-n">04</span><h3>Paid</h3><p>The fix holds. You get paid.</p></li>
+    <li><span class="m-n">04</span><h3>Paid</h3><p>Proof-checked payout for a PASS.</p></li>
   </ol>
   <section class="m-panel k-privpanel" aria-labelledby="wp"><h2 class="m-h2" id="wp">${LOCK}What stays private</h2>
     <div class="k-private">
       <div><span class="k-label">Secret input</span><span class="k-bars" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="sr-only">Shown as sealed bars.</span><p>Never leaves the vendor.</p></div>
+        <span class="sr-only">Shown as sealed bars.</span><p>Never goes to agents or the public.</p></div>
       <div><span class="k-label">Your fix</span><span class="k-blur" aria-hidden="true">${SAMPLE_FINGERPRINT}</span>
         <span class="sr-only">Shown as a blurred fingerprint.</span><p>Sealed until you reveal it.</p></div>
       <div><span class="k-label">The check</span><span class="k-g16">Groth16 ✓ on chain</span><p>Proves the result, not the secret.</p></div>
