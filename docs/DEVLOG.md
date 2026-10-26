@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Every icon from the S12 favicon
+
+- There was no favicon.ico (the live site answered 404), so a browser that had cached the old favicon.svg kept showing
+  the old ring. Added favicon.ico (16, 32 and 48 px PNGs inside), favicon-48.png, a 180 px apple-touch-icon, 192 and 512
+  px icons with site.webmanifest, all rendered from the design's logo/favicon.svg by `scripts/logo/build.sh`. Every icon
+  link and the manifest's icons carry `?v=s12`, so browsers fetch the new files instead of cached ones.
+- Removed `scripts/logo/extract_s.mjs` (it made an earlier mark). The light mode primary button has a 1px #7A5200 border.
+
 ## 2026-10-26: Site rebuilt from the approved design folder (branch ui-preview)
 
 - Built to the approved design (its README, tokens and screenshots; the design folder itself is not in the repository).
