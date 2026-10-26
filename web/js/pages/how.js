@@ -35,6 +35,7 @@ export async function how(viewEl) {
 <section style="background:radial-gradient(900px 400px at 85% 0%,rgba(var(--am-rgb),.06),transparent 70%),var(--bg)">
 <div class="wrap" style="padding-top:40px;padding-bottom:36px">
 <div style="display:flex;flex-direction:column;gap:22px;max-width:860px">
+<p class="eyebrow" style="margin-bottom:2px">Interactive introduction</p>
 <h1 class="h1" style="font-size:clamp(40px,5.4cqw,76px)">Inside a private repair challenge</h1>
 <p class="lead">Four steps and a timeout branch, about a minute. Press play, or click through at your own pace. Skip any time. Everything shown is also written out below it.</p>
 <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><button class="btn btn-p" type="button" data-play></button><a class="lnk" href="#/bounties">Skip the intro, browse bounties ${icon('right')}</a></div>
