@@ -18,7 +18,9 @@
   "skarbnik-cmds-ace3fb.testnet": "seeded",
   "sybil.kintsugi-vendor-prnvm.testnet": "seeded",
   "ghost-kintsugi-audit-zqx.testnet": "seeded",
-  "skarbnik-probe-eb33d2.testnet": "seeded"
+  "skarbnik-probe-eb33d2.testnet": "seeded",
+  "skarbnik-partd-461f99.testnet": "seeded",
+  "skarbnik-prover-bb2d00.testnet": "team-run"
  },
  "source": "docs/EVIDENCE.md and the scripts that made each account (docs/evidence/*/run.env, accounts.env)",
  "hashed_accounts": {

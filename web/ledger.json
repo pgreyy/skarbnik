@@ -1,5 +1,5 @@
 {
- "made_at": "2026-10-26T22:42:08Z",
+ "made_at": "2026-10-26T22:42:41Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Every account in this ledger is run by the Skarbnik team or was seeded by its scripts (accounts.kinds). No scores, no ranks, no credit for unpaid attempts. Amounts in yoctoNEAR; a paid fix also got its own attempt fee back.",
@@ -148,7 +148,7 @@
    "bounty_id": "14",
    "attempt": 1,
    "payout_account": "skarbnik-partd-461f99.testnet",
-   "kind": "not known",
+   "kind": "seeded",
    "how": "timeout",
    "status": "paid by timeout",
    "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
@@ -164,7 +164,7 @@
    "bounty_id": "14",
    "attempt": 2,
    "payout_account": "skarbnik-partd-461f99.testnet",
-   "kind": "not known",
+   "kind": "seeded",
    "how": "timeout",
    "status": "paid by timeout",
    "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
@@ -292,7 +292,7 @@
   },
   {
    "account": "skarbnik-partd-461f99.testnet",
-   "kind": "not known",
+   "kind": "seeded",
    "fixes_paid": 2,
    "paid_by_proof": 0,
    "paid_by_timeout": 2,
@@ -380,7 +380,7 @@
   },
   {
    "account": "skarbnik-partd-461f99.testnet",
-   "kind": "not known",
+   "kind": "seeded",
    "attempts": 2,
    "fees_spent_yocto": "35000000000000000000000",
    "fees_returned_yocto": "35000000000000000000000",
@@ -455,7 +455,7 @@
    }
   },
   "timing_note": "by proof: from the reveal to the proof accepted on chain; by timeout: from the reveal to the verdict deadline (the claim came later).",
-  "distinct_outside_accounts": 1,
+  "distinct_outside_accounts": 0,
   "outside_note": "accounts not on the team list (web/data/accounts.json) among vendors, committers and payout accounts"
  },
  "counts": {
@@ -466,6 +466,6 @@
   "paid_accounts": 6,
   "vendors": 1,
   "distinct_counterparties": 7,
-  "outside_the_team": 1
+  "outside_the_team": 0
  }
 }
