@@ -2,6 +2,20 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Proof Ledger (Task 3)
+
+- New page `#/ledger` (menu key 5) and `web/ledger.json`: every account the contract has paid, each paid fix with how it
+  was paid (proof or timeout) and its transaction, each vendor's on-time record (decided by a proof before the deadline,
+  paid by timeout, or waiting past the deadline), and the number of distinct counterparties. No scores, no ranks, nothing
+  for unpaid attempts. The page reads every bounty and attempt live from the chain; `node scripts/gen_ledger.mjs` writes
+  the JSON with the same rules (`web/js/ledger-core.js`). Transaction links come from the recorded evidence files.
+- Every account is labelled from `web/data/accounts.json`: team-run or seeded. All of them are today; the page says so
+  at the top. Result on 2026-10-26: 9 paid fixes (2 by proof: bounties 1 and 16; 7 by timeout), 5 paid accounts, 1
+  vendor, 6 distinct counterparties, 0 outside the team. Bounty 8's payout went to an account that does not exist; its
+  row carries that note.
+- Checked: the page at 1280 and 390 px in dark and light (no sideways scroll, no script errors), and judge bounties 18
+  and 22's pages.
+
 ## 2026-10-26: Judge bounties, README for judges, vendor script for any module
 
 - Judge bounties 18 to 22 (`scripts/judge_bounties.sh`): Level 2, the same hashes as private bounty 17, created closed;

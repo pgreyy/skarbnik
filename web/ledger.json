@@ -1,0 +1,180 @@
+{
+ "made_at": "2026-10-26T10:51:56Z",
+ "network": "testnet",
+ "contract": "kintsugi-l2-cihdp.testnet",
+ "note": "Every account in this ledger is run by the Skarbnik team or was seeded by its scripts (accounts.kinds). No scores, no ranks, no credit for unpaid attempts. Amounts in yoctoNEAR; a paid fix also got its own attempt fee back.",
+ "rules": {
+  "proof": "a final verdict paid the fix (a Groth16 PASS checked by the contract, or two verifier attestations at Level 0)",
+  "timeout": "no final verdict before the deadline; claim_timeout paid it (shared equally among the attempts waiting)",
+  "vendor_on_time": "proved_on_time counts attempts decided by a proof before their deadline; not_proved_in_time counts attempts the timeout rule paid; waiting_past_deadline counts revealed attempts past their deadline and not yet claimed"
+ },
+ "accounts": {
+  "kinds": {
+   "team-run": "an account the Skarbnik team runs (vendor, test researchers, the AI agent's account)",
+   "seeded": "a throwaway account the team's scripts made from the testnet faucet for one test, or one made not to exist on purpose"
+  },
+  "source": "docs/handoff/04-testnet-state.md, Accounts"
+ },
+ "paid_fixes": [
+  {
+   "bounty_id": "1",
+   "attempt": 0,
+   "payout_account": "kintsugi-res1-prnvm.testnet",
+   "kind": "team-run",
+   "how": "proof",
+   "paid_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY",
+   "note": null
+  },
+  {
+   "bounty_id": "4",
+   "attempt": 0,
+   "payout_account": "kintsugi-res1-prnvm.testnet",
+   "kind": "team-run",
+   "how": "timeout",
+   "paid_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "2Ga3oSGcrgfMdbKoLCEUK8FwGrpnqMk9ex2Kp2oj6Tiq",
+   "note": null
+  },
+  {
+   "bounty_id": "8",
+   "attempt": 0,
+   "payout_account": "ghost-kintsugi-audit-zqx.testnet",
+   "kind": "seeded",
+   "how": "timeout",
+   "paid_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "AKU4pVTmS3uwmLcGyHAXTekiBELoV5GRMqJeSPMq1BVk",
+   "note": "The contract shows this bounty as Paid, but the payout went to an account that does not exist: the transfer failed and the NEAR stayed in the contract (review finding 8, a known limit)."
+  },
+  {
+   "bounty_id": "9",
+   "attempt": 0,
+   "payout_account": "kintsugi-res1-prnvm.testnet",
+   "kind": "team-run",
+   "how": "timeout",
+   "paid_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "82M2gLJ5qzs6MB7ArPwPNrcTwDVzUNvCE9wSWA7NJQD3",
+   "note": null
+  },
+  {
+   "bounty_id": "11",
+   "attempt": 0,
+   "payout_account": "kintsugi-res1-prnvm.testnet",
+   "kind": "team-run",
+   "how": "timeout",
+   "paid_yocto": "50000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "6uem1gWAymCr2VzL3FofpQfVoqZGrzvXA2wERXnvaYpP",
+   "note": null
+  },
+  {
+   "bounty_id": "11",
+   "attempt": 1,
+   "payout_account": "kintsugi-res2-prnvm.testnet",
+   "kind": "team-run",
+   "how": "timeout",
+   "paid_yocto": "50000000000000000000000",
+   "fee_refunded_yocto": "15000000000000000000000",
+   "tx": "6uem1gWAymCr2VzL3FofpQfVoqZGrzvXA2wERXnvaYpP",
+   "note": null
+  },
+  {
+   "bounty_id": "13",
+   "attempt": 0,
+   "payout_account": "kintsugi-web-1e80c1.testnet",
+   "kind": "seeded",
+   "how": "timeout",
+   "paid_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "BcUEswCdJghURYoLj8pMojVXZowEzUx6EMs8JPoLibcC",
+   "note": null
+  },
+  {
+   "bounty_id": "16",
+   "attempt": 0,
+   "payout_account": "kintsugi-agent-d9410f.testnet",
+   "kind": "team-run",
+   "how": "proof",
+   "paid_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "5NH9rhRMdLxRtKBtjxAsqQwFWejtu2tU9oNf69G2yUq9",
+   "note": null
+  },
+  {
+   "bounty_id": "17",
+   "attempt": 0,
+   "payout_account": "kintsugi-agent-d9410f.testnet",
+   "kind": "team-run",
+   "how": "timeout",
+   "paid_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh",
+   "note": null
+  }
+ ],
+ "paid_accounts": [
+  {
+   "account": "kintsugi-res1-prnvm.testnet",
+   "kind": "team-run",
+   "fixes_paid": 4,
+   "paid_by_proof": 1,
+   "paid_by_timeout": 3,
+   "total_paid_yocto": "350000000000000000000000"
+  },
+  {
+   "account": "ghost-kintsugi-audit-zqx.testnet",
+   "kind": "seeded",
+   "fixes_paid": 1,
+   "paid_by_proof": 0,
+   "paid_by_timeout": 1,
+   "total_paid_yocto": "100000000000000000000000"
+  },
+  {
+   "account": "kintsugi-res2-prnvm.testnet",
+   "kind": "team-run",
+   "fixes_paid": 1,
+   "paid_by_proof": 0,
+   "paid_by_timeout": 1,
+   "total_paid_yocto": "50000000000000000000000"
+  },
+  {
+   "account": "kintsugi-web-1e80c1.testnet",
+   "kind": "seeded",
+   "fixes_paid": 1,
+   "paid_by_proof": 0,
+   "paid_by_timeout": 1,
+   "total_paid_yocto": "100000000000000000000000"
+  },
+  {
+   "account": "kintsugi-agent-d9410f.testnet",
+   "kind": "team-run",
+   "fixes_paid": 2,
+   "paid_by_proof": 1,
+   "paid_by_timeout": 1,
+   "total_paid_yocto": "200000000000000000000000"
+  }
+ ],
+ "vendors": [
+  {
+   "vendor": "kintsugi-vendor-prnvm.testnet",
+   "kind": "team-run",
+   "bounties": 23,
+   "proved_on_time": 4,
+   "not_proved_in_time": 7,
+   "waiting_past_deadline": 4
+  }
+ ],
+ "counts": {
+  "paid_fixes": 9,
+  "paid_by_proof": 2,
+  "paid_by_timeout": 7,
+  "paid_accounts": 5,
+  "vendors": 1,
+  "distinct_counterparties": 6,
+  "outside_the_team": 0
+ }
+}

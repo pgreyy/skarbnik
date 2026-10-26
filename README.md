@@ -160,6 +160,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | Wallets through NEAR Connect, every wallet script pinned by sha256 | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Meteor, Intear, Ledger, MyNearWallet (until it closes on 31 October 2026), Nightly and Ethereum Wallets only loaded | docs/evidence/web/wallets_2026-10-26.txt |
 | A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts in the recorded arena run) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
 | Fees of commits never revealed go to a protocol fee pool, never to the vendor | works on testnet | `get_protocol_pool` (EVIDENCE, S6c) |
+| A Proof Ledger: every paid account, each paid fix with how it was paid (proof or timeout) and its transaction, each vendor's on-time record, distinct counterparties; every account is labelled team-run or seeded (all of them are today) | live, read from the chain | https://skarbnik.xyz/#/ledger, `web/ledger.json` (`node scripts/gen_ledger.mjs`) |
 
 ## What is not built
 

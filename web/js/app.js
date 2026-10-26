@@ -7,6 +7,7 @@ import { logo, NAME } from './logo.js';
 import { startIntro, introWanted } from './intro.js';
 import { $, esc, badge, tx, acct, hashCell, table, facts, sealed, viewLink, shortId, initUi, tabbed } from './ui.js';
 import { initAccountUi, attemptPanel, accountPage } from './account-ui.js';
+import { buildLedger } from './ledger-core.js';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 let recorded = null;
@@ -437,13 +438,52 @@ document.addEventListener('keydown', (e) => {
   if (a) { e.preventDefault(); location.hash = a.getAttribute('href'); }
 });
 
+// ---------- ledger ----------
+// The Proof Ledger: every account the contract has paid and each vendor's on-time record, read live from the chain (rules
+// in js/ledger-core.js, shared with scripts/gen_ledger.mjs, which writes ledger.json). No scores, no ranks.
+async function ledger(main) {
+  main.innerHTML = `<h1 class="m-h1" tabindex="-1">Ledger</h1>
+  <p class="m-lead">Every account ${esc(CONTRACT)} has paid, how each fix was paid, and each vendor's on-time record, read live from testnet.</p>
+  <div id="lg"><p class="k-state">Reading every bounty and attempt from testnet…</p></div>`;
+  let L;
+  try {
+    const [r, accounts, all] = await Promise.all([getRecorded(), fetch('data/accounts.json').then((x) => x.json()), allBounties()]);
+    const bs = all.filter(Boolean);
+    const subs = {};
+    (await Promise.all(bs.map((b) => (b.commits ? submissions(b) : [])))).forEach((s, i) => (subs[String(bs[i].id)] = s));
+    L = buildLedger(bs, subs, r, accounts);
+  } catch (e) { $('#lg').innerHTML = failBox(e); return; }
+  const c = L.counts;
+  const kindChip = (k) => `<span class="m-tok">${esc(k)}</span>`;
+  const howChip = (h) => (h === 'proof' ? badge('ok', '✓ Paid by proof') : badge('info', 'Paid by timeout'));
+  $('#lg').innerHTML = `
+  <div class="m-panel k-pad16" role="note"><p><b>${c.outside_the_team === 0 ? 'Every account below is run by the Skarbnik team or was seeded by its scripts.' : `${c.outside_the_team} account(s) below are not on the team's list.`}</b>
+    So far no account outside the team has used the contract. An account missing from the team's list (web/data/accounts.json) would show as "not known".</p></div>
+  <dl class="k-stats k-stats4">${[['Paid fixes', `${c.paid_fixes}`, `${c.paid_by_proof} by proof, ${c.paid_by_timeout} by timeout`], ['Paid accounts', `${c.paid_accounts}`, ''],
+    ['Vendors', `${c.vendors}`, ''], ['Distinct counterparties', `${c.distinct_counterparties}`, 'paid accounts and vendors']].map(([k, v, s]) =>
+    `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd>${s ? `<span class="m-sub">${esc(s)}</span>` : ''}</div>`).join('')}</dl>
+  <h2 class="m-h2 k-gap">Paid accounts</h2>
+  <div class="m-panel k-tablepanel">${table(['Account', 'Who runs it', 'Fixes paid', 'By proof', 'By timeout', 'Total paid'], L.paid_accounts.map((a) => [
+    acct(a.account), kindChip(a.kind), esc(a.fixes_paid), esc(a.paid_by_proof), esc(a.paid_by_timeout), `<span class="k-mono k-nw">${esc(near(a.total_paid_yocto))}</span>`]))}</div>
+  <h2 class="m-h2 k-gap">Paid fixes</h2>
+  <div class="m-panel k-tablepanel">${table(['Bounty', 'Attempt', 'Paid to', 'How', 'Paid', 'Transaction'], L.paid_fixes.map((f) => [
+    `<a class="m-bid" href="#/bounties/${esc(f.bounty_id)}">Bounty ${esc(f.bounty_id)}</a>`, `#${esc(f.attempt)}`, `${acct(f.payout_account)} ${kindChip(f.kind)}`,
+    howChip(f.how) + (f.note ? `<span class="m-sub">${esc(f.note)}</span>` : ''), `<span class="k-mono k-nw">${esc(near(f.paid_yocto))}</span><span class="m-sub">plus its own fee back</span>`,
+    f.tx ? tx(f.tx) : '<span class="k-dim">not recorded</span>']))}</div>
+  <h2 class="m-h2 k-gap">Vendors: proved in time or not</h2>
+  <p class="m-sub">For each revealed attempt: decided by a proof before its deadline, or not (then the timeout rule paid it, or it is still waiting past its deadline).</p>
+  <div class="m-panel k-tablepanel">${table(['Vendor', 'Who runs it', 'Bounties', 'Proved in time', 'Not proved in time', 'Waiting past deadline'], L.vendors.map((v) => [
+    acct(v.vendor), kindChip(v.kind), esc(v.bounties), esc(v.proved_on_time), esc(v.not_proved_in_time), esc(v.waiting_past_deadline)]))}</div>
+  <p class="m-sub k-gap">Machine-readable: <a href="ledger.json">ledger.json</a> (a snapshot made by <code>node scripts/gen_ledger.mjs</code> with the same rules). Transaction links come from the files the repository records; amounts and outcomes come from the chain. Unpaid attempts are not counted.</p>`;
+}
+
 // The browser tab title of each route, set as soon as the route changes.
 const HOME_TITLE = 'Skarbnik · Fix what you can’t see';
 function titleFor(page, rest) {
   if (!page) return HOME_TITLE;
   if (page === 'bounties' && /^\d+$/.test(rest[0] || '')) return `Bounty ${rest[0]} · Skarbnik`;
   if (page === 'raw' && /^\d+$/.test(rest[0] || '')) return `Bounty ${rest[0]} raw data · Skarbnik`;
-  return ({ bounties: 'Bounties', arena: 'Arena', verify: 'How to verify', agents: 'For agents', account: 'Account' }[page] || 'Not found') + ' · Skarbnik';
+  return ({ bounties: 'Bounties', arena: 'Arena', verify: 'How to verify', agents: 'For agents', ledger: 'Ledger', account: 'Account' }[page] || 'Not found') + ' · Skarbnik';
 }
 // The note shown where the testnet contract's name appears.
 const NAME_NOTE = '<p class="m-note k-namenote">Skarbnik was built under the working name Kintsugi; the testnet contract keeps that name. Mainnet: skarbnik.near.</p>';
@@ -467,6 +507,7 @@ async function route() {
     else if (page === 'arena') await arena(main, rest[0]);
     else if (page === 'verify') await verify(main);
     else if (page === 'agents') await agents(main);
+    else if (page === 'ledger') await ledger(main);
     else main.innerHTML = '<h1 class="m-h1" tabindex="-1">Not found</h1><p class="m-lead"><a href="#/">Go to the home page</a></p>';
   } catch (e) {
     if (my !== routeGen) return null;

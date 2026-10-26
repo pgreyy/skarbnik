@@ -1,0 +1,23 @@
+{
+ "note": "Who runs each account that appears in the ledger. Every account the testnet contract has paid so far, and every vendor, is run by the Skarbnik team or was made by the team's scripts (seeded). An account missing from this list is shown as 'not known'.",
+ "kinds": {
+  "team-run": "an account the Skarbnik team runs (vendor, test researchers, the AI agent's account)",
+  "seeded": "a throwaway account the team's scripts made from the testnet faucet for one test, or one made not to exist on purpose"
+ },
+ "accounts": {
+  "kintsugi-vendor-prnvm.testnet": "team-run",
+  "kintsugi-res1-prnvm.testnet": "team-run",
+  "kintsugi-res2-prnvm.testnet": "team-run",
+  "kintsugi-agent-d9410f.testnet": "team-run",
+  "kintsugi-ver1-prnvm.testnet": "team-run",
+  "kintsugi-ver2-prnvm.testnet": "team-run",
+  "kintsugi-ver3-prnvm.testnet": "team-run",
+  "kintsugi-web-1e80c1.testnet": "seeded",
+  "skarbnik-judge-47afb3.testnet": "seeded",
+  "skarbnik-js-bb6c19.testnet": "seeded",
+  "skarbnik-cmds-ace3fb.testnet": "seeded",
+  "sybil.kintsugi-vendor-prnvm.testnet": "seeded",
+  "ghost-kintsugi-audit-zqx.testnet": "seeded"
+ },
+ "source": "docs/handoff/04-testnet-state.md, Accounts"
+}
