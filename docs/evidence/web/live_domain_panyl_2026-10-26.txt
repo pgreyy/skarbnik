@@ -1,0 +1,33 @@
+# Live check of https://skarbnik.xyz after the PASTE-12 deploy (commit 27d9b16), headless Chromium, each route once per width and mode, 5 s apart, 8 s after load. "live": read from the chain; "SNAPSHOT": the RPC refused too many reads (HTTP 429 after several hundred earlier test loads from this machine) and the page showed the labelled feed or ledger snapshot. rpc-refusals: refused RPC requests (the page retries them); other-errors: any other console error.
+dark 1440 home: "Fix what youcan’t see." mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 1440 #/how-it-works: "Inside a private repair challenge" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 1440 #/bounties: "Bounties" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 1440 #/bounties/17: "Bounty 17: new module, private secret" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 1440 #/evidence/ledger: "Built for verification" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 1440 #/judge/a: "Check it in ten minutes" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 1440 #/agents: "Run an agent against a bounty" mode=dark live sideways=0 rpc-refusals=52 other-errors=0
+dark 1440 #/account: "Account and agent setup" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 390 home: "Fix what youcan’t see." mode=dark live sideways=0 rpc-refusals=4 other-errors=0
+dark 390 #/how-it-works: "Inside a private repair challenge" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 390 #/bounties: "Bounties" mode=dark live sideways=0 rpc-refusals=10 other-errors=0
+dark 390 #/bounties/17: "Bounty 17: new module, private secret" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 390 #/evidence/ledger: "Built for verification" mode=dark SNAPSHOT sideways=0 rpc-refusals=20 other-errors=0
+dark 390 #/judge/a: "Check it in ten minutes" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+dark 390 #/agents: "Run an agent against a bounty" mode=dark live sideways=0 rpc-refusals=84 other-errors=0
+dark 390 #/account: "Account and agent setup" mode=dark live sideways=0 rpc-refusals=0 other-errors=0
+light 1440 home: "Fix what youcan’t see." mode=light live sideways=0 rpc-refusals=4 other-errors=0
+light 1440 #/how-it-works: "Inside a private repair challenge" mode=light live sideways=0 rpc-refusals=0 other-errors=0
+light 1440 #/bounties: "Bounties" mode=light live sideways=0 rpc-refusals=56 other-errors=0
+light 1440 #/bounties/17: "Bounty 17: new module, private secret" mode=light live sideways=0 rpc-refusals=0 other-errors=0
+light 1440 #/evidence/ledger: "Built for verification" mode=light SNAPSHOT sideways=0 rpc-refusals=120 other-errors=0
+light 1440 #/judge/a: "Check it in ten minutes" mode=light live sideways=0 rpc-refusals=0 other-errors=0
+light 1440 #/agents: "Run an agent against a bounty" mode=light live sideways=0 rpc-refusals=112 other-errors=0
+light 1440 #/account: "Account and agent setup" mode=light live sideways=0 rpc-refusals=0 other-errors=0
+light 390 home: "Fix what youcan’t see." mode=light live sideways=0 rpc-refusals=8 other-errors=0
+light 390 #/how-it-works: "Inside a private repair challenge" mode=light live sideways=0 rpc-refusals=0 other-errors=0
+light 390 #/bounties: "Bounties" mode=light SNAPSHOT sideways=0 rpc-refusals=80 other-errors=0
+light 390 #/bounties/17: "Bounty 17: new module, private secret" mode=light live sideways=0 rpc-refusals=0 other-errors=0
+light 390 #/evidence/ledger: "Built for verification" mode=light SNAPSHOT sideways=0 rpc-refusals=36 other-errors=0
+light 390 #/judge/a: "Check it in ten minutes" mode=light live sideways=0 rpc-refusals=0 other-errors=0
+light 390 #/agents: "Run an agent against a bounty" mode=light live sideways=0 rpc-refusals=0 other-errors=0
+light 390 #/account: "Account and agent setup" mode=light live sideways=0 rpc-refusals=0 other-errors=0

@@ -3,7 +3,7 @@
 // reference agent (agent/skarbnik_agent.py, dry run by default), the feed.json fields, and agent-quickstart.txt.
 import { CONTRACT } from '../chain.js';
 import { $, esc, icon, tx, table, note, cmd } from '../ui.js';
-import { loadAll } from '../data.js';
+import { fromFeed } from '../data.js';
 
 const js = (...lines) => `<p class="small faint mt8">With the older JS near CLI:</p><div class="stack g8 mt8">${lines.map(cmd).join('')}</div>`;
 
@@ -54,8 +54,9 @@ ${table(['Field', 'Meaning'], [
     const text = await (await fetch('agent-quickstart.txt')).text();
     if ($('#qs')) $('#qs').innerHTML = `<div class="row"><button class="btn btn-g btn-s" type="button" data-copy-text="${esc(text)}">${icon('copy')} Copy</button><a class="lnk sm" href="agent-quickstart.txt">Open as a file</a></div><pre class="code">${esc(text)}</pre>`;
   } catch (e) { if ($('#qs')) $('#qs').innerHTML = `<p class="ferr">Could not read agent-quickstart.txt: ${esc(e.message)}</p>`; }
+  // The open list from feed.json itself (what an agent reads), with the feed's time: no chain reads on this page.
   try {
-    const open = (await loadAll()).filter((x) => x.accepting);
-    if ($('#openNow')) $('#openNow').innerHTML = open.length ? `Accepting commits now: ${open.map((x) => `<a href="#/bounties/${esc(x.b.id)}">bounty ${esc(x.b.id)}</a>`).join(', ')}.` : 'No bounty accepts commits right now.';
+    const f = await fromFeed(), open = f.list.filter((x) => x.accepting);
+    if ($('#openNow')) $('#openNow').innerHTML = `${open.length ? `Open in the feed made at ${esc(f.at)}: ${open.map((x) => `<a href="#/bounties/${esc(x.b.id)}">bounty ${esc(x.b.id)}</a>`).join(', ')}.` : 'No bounty in the feed accepts commits.'} Each bounty page reads the chain live.`;
   } catch { /* the feed link still works */ }
 }
