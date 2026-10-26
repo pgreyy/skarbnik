@@ -7,7 +7,7 @@ The full licence texts are at the end of this file.
 | File | What it is | Source and exact version | Licence |
 | --- | --- | --- | --- |
 | `web/vendor/near-connect.js` | NEAR Connect, the wallet connector, bundled into one file by `scripts/wallet-vendor/build.sh` | npm `@hot-labs/near-connect` 0.11.4 (repository github.com/hot-dao/near-selector, now github.com/azbang/near-connect); exact install in `scripts/wallet-vendor/package-lock.json` | MIT, declared in the package's `package.json` and on npm. The repository has no licence text file. The bundle also holds esbuild's small runtime helpers (esbuild 0.25.10, MIT) |
-| `web/js/logo.js`, `web/favicon.svg`, `web/favicon-*.png`, `web/social.png` | The mark: the outline of the letter S of Archivo ExtraBold, turned into an SVG path (`scripts/logo/extract_s.mjs`), with a crack drawn over it | Archivo by Omnibus-Type, Google Fonts static weight 800 file (Version 2.001), sha256 `f734704aebd9faeca392e0d7e48007e8776d5727ffccf1648611f6cd768eb296` | SIL Open Font License 1.1 (the font); the drawing made from one glyph is not a font |
+| `web/js/logo.js`, `web/favicon.svg`, `web/favicon-*.png`, `web/social.png` | The mark "S12": the letter S of Fraunces SemiBold as a vector path, with a gold vein drawn over it, from the approved design (its `logo/` files; the favicon SVG is its `logo/favicon.svg` unchanged) | Fraunces by Undercase Type (Google Fonts) | SIL Open Font License 1.1 (the font); the drawing made from one glyph is not a font |
 | `web/vendor/wallets/manifest.json` | The site's wallet list: two entries taken from NEAR Connect's public wallet manifest, each pointing at the wallet's official script address, with that script's sha256 added (`scripts/wallet-vendor/fetch_wallets.sh`) | `repository/manifest.json` of github.com/hot-dao/near-selector at commit `6766ea5e71864e5cbcbf5b70d2aeae23b20b60e9` | MIT, as declared in that repository's `package.json` (no licence text file in the repository) |
 
 Not stored in the repository, loaded by the site at run time:
@@ -16,7 +16,7 @@ Not stored in the repository, loaded by the site at run time:
 | --- | --- | --- | --- |
 | The Intear Wallet script for NEAR Connect | https://wallet.intear.tech/near-selector.js (no versioned address); built from `web/src/js/near-selector.js` in github.com/INTEARnear/wallet | sha256 `6decc283352af197feff4988628899d19e05f4168a4277fe699bd8a0d6178e34`, checked by `web/js/wallet.js` before the script may run | AGPL-3.0, the licence of the INTEARnear/wallet repository |
 | The NEAR CLI wallet script for NEAR Connect | `dist/near-cli.js` of github.com/near/near-cli-connect at commit `dc5cb123e3a8e42ed095739f4ea058b767a80ad2`, from raw.githubusercontent.com | sha256 `522f2a52403f6da84384a409718c54b49ed4432cdfd583363d35109be8c8e318`, checked the same way | Not declared: the repository has no licence file and its `package.json` has no licence field |
-| Fonts IBM Plex Sans, JetBrains Mono and Archivo (ExtraBold, only the letters of the name) | Google Fonts | none | SIL Open Font License 1.1 |
+| Fonts Space Grotesk (600), IBM Plex Sans (500, 600), JetBrains Mono (400, 700) and Fraunces (600, only the letters of the name) | Google Fonts | none | SIL Open Font License 1.1 |
 | Each wallet's own site, when a visitor uses it | wallet.intear.tech | none | that wallet's own terms |
 
 ## Licence texts

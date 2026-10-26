@@ -1,8 +1,8 @@
 // The Skarbnik site app: routes (#/, #/bounties, #/bounties/<id>, #/raw/<id>, #/account/<name>, #/arena, #/verify,
-// #/agents), the verify strip, keyboard shortcuts (1 to 4, ?, Esc), the theme switch (Dark by default), the Private
-// toggle, and the screens. Live screens read the testnet contract with view calls (js/chain.js); recorded parts read
+// #/agents), keyboard shortcuts (1 to 4, ?, Esc), the theme switch (the visitor's system setting by default), the
+// Private toggle, the cursor light, and the screens. Live screens read the testnet contract with view calls (js/chain.js); recorded parts read
 // data/recorded.json, which scripts/gen_site_recorded.py builds from files in the repository. No sample data.
-import { CONTRACT, EXPLORER_ACCOUNT, EXPLORER_TX, PUBLISHED_IMAGE_ID, view, allBounties, submissions, near, utc, span, left, commitBy, nsToDate } from './chain.js';
+import { CONTRACT, EXPLORER_ACCOUNT, EXPLORER_TX, PUBLISHED_IMAGE_ID, view, allBounties, submissions, near, utc, utcShort, span, left, commitBy, nsToDate } from './chain.js';
 import { logo, NAME } from './logo.js';
 import { startIntro, introWanted } from './intro.js';
 import { $, esc, badge, tx, acct, hashCell, table, facts, sealed, viewLink, shortId, initUi, tabbed } from './ui.js';
@@ -15,22 +15,24 @@ const getRecorded = async () => recorded || (recorded = await (await fetch('data
 // ---------- shared pieces ----------
 const rec = (src) => `<span class="k-rec">Recorded</span> <span class="k-src">${esc(src)}</span>`;
 const levelText = (l) => (l === 2 ? 'The contract checks a Groth16 proof of the RISC Zero result itself.' : 'Two registered verifiers sign the same verdict.');
+const testNote = (b) => recorded && recorded.test_bounties && recorded.test_bounties[String(b.id)];
 const isDemo = (b) => recorded && b.exploit_commitment === recorded.notes.demo_exploit_commitment.commitment;
 const newModule = (b) => recorded && recorded.new_module_bounties && recorded.new_module_bounties[String(b.id)];
-const inputLabel = (b) => (newModule(b) ? 'Private bounty, new module' : isDemo(b) ? 'Demo input' : 'Private secret input');
-const testNote = (b) => recorded && recorded.test_bounties && recorded.test_bounties[String(b.id)];
+const inputLabel = (b) => (newModule(b) ? 'Private bounty, new module' : isDemo(b) ? (testNote(b) ? 'Test bounty · demo input' : 'Demo input') : 'Private secret input');
 const bountyLinks = (b) => `<span class="k-links"><a href="${EXPLORER_ACCOUNT}${CONTRACT}" rel="noopener" target="_blank">Contract</a><a href="#/raw/${esc(b.id)}">Raw data</a></span>`;
-const typeText = (b) => inputLabel(b) + (testNote(b) ? ' · Test bounty' : '');
+const typeText = (b) => inputLabel(b);
 // The explorer target of a bounty: its creation transaction when the repository records it, otherwise the contract.
 function explorerOf(b) {
   const c = recorded && (recorded.bounties[String(b.id)] || []).find((t) => /create/.test(t.step) && t.method === 'create_bounty');
   return c ? [EXPLORER_TX + c.tx, `Bounty ${b.id} creation transaction`] : [EXPLORER_ACCOUNT + CONTRACT, `The contract ${CONTRACT}`];
 }
-const closesText = (b) => { const cl = left(commitBy(b)); return b.state !== 'Open' ? 'Closed' : cl ? `in ${cl.replace(' left', '')}` : `expires ${utc(b.expires_at_ns)}`; };
-const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class="k-mini" type="button" data-copy-text="${esc(text)}">Copy</button></div>`;
+// The last moment a commit is accepted, as a UTC date and time, or Closed.
+const closesText = (b) => (b.state !== 'Open' ? 'Closed' : utcShort(commitBy(b)));
+const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class="k-mini" type="button" data-copy-text="${esc(text)}">copy</button></div>`;
 // The home page shows the check command only after ./scripts/check_image_id.sh (no arguments) was run and printed MATCH.
-const SHOW_CHECK_CMD = true;
+const SHOW_CHECK_CMD = false;
 // A real commit fingerprint (bounty 16, attempt 0, read from the chain), shown blurred on the home page.
+const LOCK = '<svg class="k-lock" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 const SAMPLE_FINGERPRINT = 'd8c2c76d001ff41c192daddf542d39dd2fe3dbe045d987145340f4aa1ae842dd';
 const failBox = (e) => `<div class="k-state" role="alert"><p class="k-err">Could not read the contract on testnet.</p><p class="m-note">${esc(e.message)}. Check your connection and reload.</p></div>`;
 
@@ -77,40 +79,39 @@ const txTable = (list) => table(['What happened', 'Result', 'Transaction', 'Time
 async function home(main) {
   main.innerHTML = `
   <section class="m-hero">
-    <h1 class="m-h1 xl" tabindex="-1">Fix what you can’t see.</h1>
+    <h1 class="m-h1" tabindex="-1">Fix what you can’t see.</h1>
     <p class="m-lead">Researchers and AI agents fix a crash from the public code. The contract checks the proof itself and pays when it holds.</p>
+    <p class="k-flow"><span class="f1">agents fix the public code</span><i aria-hidden="true">→</i><span class="f2">the crashing input stays sealed</span><i aria-hidden="true">→</i><span class="f3">proof ✓ the contract pays</span></p>
     <div class="m-cta"><a class="m-btn" href="#/bounties">[ list bounties ]</a><a class="m-btn sec" href="#/account">[ operator panel ]</a></div>
-    ${SHOW_CHECK_CMD ? `<div class="k-cmdblock"><h2 class="m-h2">Check the checker yourself</h2>${cmd('./scripts/check_image_id.sh')}
+    ${SHOW_CHECK_CMD ? `<div class="k-cmdblock"><span class="k-label">Check the checker yourself</span>
+      <div class="k-cmd1"><span class="k-dollar" aria-hidden="true">$</span><code>./scripts/check_image_id.sh</code><button class="k-mini" type="button" data-copy-text="./scripts/check_image_id.sh">copy</button></div>
       <p class="m-sub">Rebuilds the checker and compares its image id with the one the contract trusts.</p></div>` : ''}
   </section>
-  <section class="m-sec" aria-labelledby="hw"><h2 class="m-h2" id="hw">How a bounty works</h2>
-    <ol class="m-steps">
-      <li><span class="m-n">01</span><h3>Funded</h3><p>Vendor locks the reward and proves the crash.</p></li>
-      <li><span class="m-n">02</span><h3>Attempt</h3><p>Commit a fix, then reveal it.</p></li>
-      <li><span class="m-n">03</span><h3>Proof</h3><p>Tested on the secret, checked on chain.</p></li>
-      <li><span class="m-n">04</span><h3>Paid</h3><p>The fix holds. You get paid.</p></li>
-    </ol>
-  </section>
-  <section class="m-sec" aria-labelledby="wp"><h2 class="m-h2" id="wp">What stays private</h2>
+  <ol class="m-steps" aria-label="How a bounty works">
+    <li><span class="m-n">01</span><h3>Funded</h3><p>Vendor locks the reward and proves the crash.</p></li>
+    <li><span class="m-n">02</span><h3>Attempt</h3><p>Commit a fix, then reveal it.</p></li>
+    <li><span class="m-n">03</span><h3>Proof</h3><p>Tested on the secret, checked on chain.</p></li>
+    <li><span class="m-n">04</span><h3>Paid</h3><p>The fix holds. You get paid.</p></li>
+  </ol>
+  <section class="m-panel k-privpanel" aria-labelledby="wp"><h2 class="m-h2" id="wp">${LOCK}What stays private</h2>
     <div class="k-private">
-      <div><h3>Secret input</h3><div class="k-bars" aria-hidden="true"><i></i><i style="width:78%"></i><i style="width:56%"></i></div>
-        <span class="sr-only">Shown as sealed black bars.</span><p>Never leaves the vendor.</p></div>
-      <div><h3>Your fix</h3><div class="k-blur" aria-hidden="true">${SAMPLE_FINGERPRINT}</div>
+      <div><span class="k-label">Secret input</span><span class="k-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="sr-only">Shown as sealed bars.</span><p>Never leaves the vendor.</p></div>
+      <div><span class="k-label">Your fix</span><span class="k-blur" aria-hidden="true">${SAMPLE_FINGERPRINT}</span>
         <span class="sr-only">Shown as a blurred fingerprint.</span><p>Sealed until you reveal it.</p></div>
-      <div><h3>The check</h3><div class="k-g16">Groth16 ✓ on chain</div><p>Proves the result, not the secret.</p></div>
+      <div><span class="k-label">The check</span><span class="k-g16">Groth16 ✓ on chain</span><p>Proves the result, not the secret.</p></div>
     </div>
   </section>
-  <section class="m-sec" aria-labelledby="on">
-    <div class="k-sechead"><h2 class="m-h2" id="on">Open now</h2><a href="#/bounties">All bounties →</a></div>
-    <div class="m-panel k-tablepanel" id="openNow" style="margin-top:12px"><p class="k-state">Reading bounties from testnet…</p></div>
-  </section>`;
+  <div class="k-sechead"><h2 class="m-h2" id="on">Open now</h2><a href="#/bounties">All bounties →</a></div>
+  <section class="m-panel k-tablepanel k-open" id="openNow" aria-labelledby="on" style="margin-top:14px"><p class="k-state">Reading bounties from testnet…</p></section>`;
   try {
     await getRecorded();
     const open = (await allBounties()).filter(Boolean).filter((b) => bountyState(b).key === 'open').reverse();
-    $('#openNow').innerHTML = open.length ? table(['Bounty', 'Type', 'Reward', 'Attempts', 'Closes'], open.map((b) => [
-      `<a class="m-bid" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(typeText(b)),
+    $('#openNow').innerHTML = open.length ? table(['Bounty', 'Type', 'Reward', 'Attempts', 'Closes (UTC)', ''], open.map((b) => [
+      `<a class="m-bid k-bn" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, `<span class="m-sub">${esc(typeText(b))}</span>`,
       `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`,
-      `${pips(b)}<span class="k-mono k-nw">${esc(attemptsText(b))}</span>`, `<span class="k-mono">${esc(closesText(b))}</span>`]), 'k-open')
+      `<span class="k-att">${pips(b)}${esc(attemptsText(b))}</span>`, `<span class="m-sub k-nw">${esc(closesText(b))}</span>`,
+      '<span class="k-arrow" aria-hidden="true">→</span>']))
       : '<p class="m-sub k-pad" style="padding-top:16px;padding-bottom:16px">No bounty accepts attempts right now.</p>';
     rowLinks($('#openNow'));
   } catch (e) { $('#openNow').innerHTML = failBox(e); }
@@ -128,8 +129,7 @@ function rowLinks(el) {
 let filter = 'all';
 async function bounties(main) {
   main.innerHTML = `<h1 class="m-h1" tabindex="-1">Bounties</h1>
-    <p class="m-lead">Every bounty on ${esc(CONTRACT)}, read live from testnet.</p>
-    <div class="m-tabs" role="tablist" aria-label="Filter bounties">
+    <div class="m-tabs" role="tablist" aria-label="Filter bounties" style="margin-top:22px">
       ${[['all', 'All'], ['open', 'Open now'], ['closed', 'Closed']].map(([k, t]) => `<button role="tab" type="button" data-f="${k}" aria-selected="${filter === k}" tabindex="${filter === k ? 0 : -1}">${t}</button>`).join('')}
     </div>
     <div id="list"><p class="k-state">Reading bounties from testnet…</p></div>`;
@@ -138,16 +138,15 @@ async function bounties(main) {
   const draw = () => {
     const rows = all.filter((b) => filter === 'all' || bountyState(b).key === filter);
     if (!rows.length) { $('#list').innerHTML = '<div class="m-panel"><p>No bounties in this view.</p></div>'; return; }
-    $('#list').innerHTML = `<div class="m-panel k-tablepanel k-sticky">${table(['Bounty', 'State', 'Amount', 'Attempts', 'Next fee', 'Deadline', 'Explorer'], rows.map((b) => {
-      const st = bountyState(b), cl = left(commitBy(b));
-      const time = b.state !== 'Open' ? 'Closed' : cl ? `Attempts close in ${cl.replace(' left', '')}` : `Expires ${utc(b.expires_at_ns)}`;
+    $('#list').innerHTML = `<div class="m-panel k-tablepanel k-sticky">${table(['Bounty', 'State', 'Amount', 'Attempts', 'Next fee', 'Deadline (UTC)', 'Explorer'], rows.map((b) => {
+      const st = bountyState(b);
       const [href, label] = explorerOf(b);
       return [
         `<a class="m-bid" href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a><span class="m-sub">${esc(typeText(b))}</span>`,
         badge(st.v, st.t), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`,
-        `<span class="k-mono k-nw">${esc(attemptsText(b))}</span>${pips(b)}`,
-        b.state === 'Open' ? `<span class="k-mono k-nw">${esc(near(b.next_fee))}</span>` : '<span class="k-dim">closed</span>',
-        `<span class="k-mono">${esc(time)}</span>`, viewLink(href, label)];
+        `<span class="k-attcol">${esc(attemptsText(b))}${pips(b)}</span>`,
+        `<span class="k-mono k-nw">${b.state === 'Open' ? esc(near(b.next_fee)) : 'closed'}</span>`,
+        `<span class="k-nw">${esc(closesText(b))}</span>`, viewLink(href, label)];
     }), 'k-blist')}</div>`;
     rowLinks($('#list'));
   };
@@ -156,7 +155,7 @@ async function bounties(main) {
 }
 
 async function bounty(main, id, tab) {
-  main.innerHTML = `<a class="m-back" href="#/bounties">← All bounties</a><h1 class="m-h1" tabindex="-1">Bounty ${esc(id)}</h1><div id="b"><p class="k-state">Reading bounty ${esc(id)} from testnet…</p></div>`;
+  main.innerHTML = `<a class="m-back" href="#/bounties">← All bounties</a><div class="k-titlerow" id="btitle"><h1 class="m-h1" tabindex="-1">Bounty ${esc(id)}</h1></div><div id="b"><p class="k-state">Reading bounty ${esc(id)} from testnet…</p></div>`;
   let b, subs, rd, verifiers;
   try {
     rd = await getRecorded();
@@ -167,14 +166,17 @@ async function bounty(main, id, tab) {
   } catch (e) { $('#b').innerHTML = failBox(e); return; }
   const st = bountyState(b), slots = slotList(b, subs), txs = rd.bounties[String(b.id)] || [], note = rd.bounty_notes && rd.bounty_notes[String(b.id)];
   const demo = isDemo(b), imgOk = b.image_id === PUBLISHED_IMAGE_ID, cl = left(commitBy(b));
+  $('#btitle').insertAdjacentHTML('beforeend', `${badge(st.v, st.t)}${testNote(b) ? '<span class="m-tok">Test bounty</span>' : demo ? '<span class="m-tok">Demo input</span>' : `<span class="m-tok">${esc(inputLabel(b))}</span>`}<span class="m-tok">Level ${b.level}</span>${bountyLinks(b)}`);
+  // What the secret input is for this bounty, then the site's secrecy sentence.
+  const secretLine = demo ? (testNote(b) ? 'This test bounty uses the public demo input.' : 'This demo bounty uses the public demo input (data/demo/exploit.hex), so anyone can check it.')
+    : newModule(b) ? 'Sealed: only its commitment is on chain. The program (data/unpack/) is new, and its reference fix is not in the repository.'
+      : Number(b.id) === 12 ? 'Sealed: only its commitment is on chain. This bounty uses the public demo bug, so anyone can submit the public fixed.wasm, and if the vendor stays silent the timeout rule can pay out without any proof.'
+        : 'Sealed: only its commitment is on chain.';
   $('#b').innerHTML = `
-  <div class="m-line">${badge(st.v, st.t)}${testNote(b) ? '<span class="m-tag">Test bounty</span>' : ''}<span class="m-tok">Checked by Level ${b.level}</span><span class="m-tok">${inputLabel(b)}</span>${bountyLinks(b)}</div>
-  <p class="m-note">On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p>
-  ${testNote(b) ? `<p class="m-note"><b>${esc(testNote(b))}</b></p>` : ''}
-  ${newModule(b) ? `<p class="m-note"><b>${esc(newModule(b))}</b></p>` : ''}
-  ${Number(b.id) === 12 ? '<p class="m-note">Bounty 12 uses the public demo bug: anyone can submit the public fixed.wasm, and if the vendor stays silent the timeout rule can pay out without any proof.</p>' : ''}
-  ${note ? `<p class="m-note"><b>Note.</b> ${esc(note.text)} ${tx(note.tx)} <span class="k-src">${esc(note.source)}</span></p>` : ''}
   <section class="m-panel k-send" id="sendPanel" aria-labelledby="sendT"></section>
+  <div class="k-secret">${LOCK}<b>Secret input</b><span class="k-sbars" aria-hidden="true"><i></i><i></i></span><p>${esc(secretLine)} On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p></div>
+  ${testNote(b) ? `<p class="m-note">${esc(testNote(b))}</p>` : ''}
+  ${note ? `<p class="m-note"><b>Note.</b> ${esc(note.text)} ${tx(note.tx)} <span class="k-src">${esc(note.source)}</span></p>` : ''}
   <div class="m-sec" id="btabs"></div>`;
   const overview = `<div class="k-ovgrid">
     <section class="m-panel" aria-label="Overview">${facts([
@@ -366,9 +368,10 @@ function tabs(root, sel, onSelect) {
   });
 }
 
-// Theme: Dark by default; the choice is remembered in this browser (localStorage, if allowed).
+// Theme: the visitor's system setting by default; a manual choice is remembered in this browser (localStorage, if
+// allowed). The intro uses the same tokens, so it always follows the same mode.
 const store = { get: (k, d) => { try { return localStorage.getItem(k) || d; } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* blocked */ } } };
-let pref = store.get('skarbnik-theme', 'dark');
+let pref = store.get('skarbnik-theme', 'system');
 const light = matchMedia('(prefers-color-scheme: light)');
 function applyTheme() {
   const theme = pref === 'system' ? (light.matches ? 'light' : 'dark') : pref;
@@ -384,31 +387,28 @@ const applyPrivate = (on) => { document.documentElement.setAttribute('data-priva
 applyPrivate(store.get('skarbnik-private', 'off') === 'on');
 privBtn.addEventListener('click', () => { const on = privBtn.getAttribute('aria-pressed') !== 'true'; store.set('skarbnik-private', on ? 'on' : 'off'); applyPrivate(on); });
 
-$('#brand').innerHTML = `${logo(28)}<span class="k-word">${NAME.toUpperCase()}</span>`;
+$('#brand').innerHTML = `${logo(32)}<span class="k-word">${NAME}</span>`;
 $('#brand').insertAdjacentHTML('afterend', '<span class="m-tag">Testnet</span>');
 
-// The verify strip: the checker image id the contract trusts (read live from its allowlist), the contract, and the
-// last saved run of scripts/check_image_id.sh. Every item is a live read or a real file; nothing here is mock.
-async function drawStrip() {
-  const el = $('#strip');
-  let ids = null; try { ids = await view('get_allowed_image_ids'); } catch { ids = null; }
-  const r = await getRecorded().catch(() => null), lc = r && r.last_image_check, id = ids && ids[0];
-  el.innerHTML = `${id ? `<span class="k-si"><span class="k-sl">checker</span><code title="${esc(id)}">${esc(shortId(id))}</code><button class="k-mini" type="button" data-copy-text="${esc(id)}" aria-label="Copy the full checker image id">Copy</button></span>`
-      : '<span class="k-si"><span class="k-sl">checker</span><span>could not read the allowlist</span></span>'}
-    <span class="k-si"><span class="k-sl">contract</span><a href="${EXPLORER_ACCOUNT}${CONTRACT}" rel="noopener" target="_blank">${esc(CONTRACT)}</a></span>
-    ${lc ? `<span class="k-si"><span class="k-sl">last check</span><span title="${esc(lc.source)}">${esc(lc.utc)}, ${esc(lc.result)}</span></span>` : ''}
-    <span class="k-si k-right">press <kbd>?</kbd> for shortcuts</span>`;
+// A soft light that follows the cursor (decorative; off for reduced motion and on touch screens).
+const glow = $('#cursorGlow');
+if (glow && !reduce.matches && matchMedia('(pointer: fine)').matches) {
+  window.addEventListener('pointermove', (e) => { glow.style.left = `${e.clientX}px`; glow.style.top = `${e.clientY}px`; }, { passive: true });
 }
 
-// Keyboard shortcuts: 1 to 4 open the menu items, ? opens the list, Esc closes it. Ignored while typing, while a
-// dialog or the intro is open, and with Ctrl, Alt or Meta held.
+// Keyboard shortcuts: 1 to 4 open the menu items, ? shows or hides the list, Esc closes it. Ignored while typing,
+// while a dialog or the intro is open, and with Ctrl, Alt or Meta held.
 const keys = $('#keys');
-const showKeys = (open) => { keys.hidden = !open; if (open) $('#keysClose').focus(); };
-$('#keysClose').addEventListener('click', () => showKeys(false));
+let keysFrom = null;
+const showKeys = (open) => {
+  keys.hidden = !open;
+  if (open) { keysFrom = document.activeElement; keys.querySelector('[role=dialog]').setAttribute('tabindex', '-1'); keys.querySelector('[role=dialog]').focus(); }
+  else if (keysFrom && keysFrom.focus) keysFrom.focus();
+};
 keys.addEventListener('click', (e) => { if (e.target === keys) showKeys(false); });
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey || e.altKey || e.metaKey) return;
-  if (!keys.hidden) { if (e.key === 'Escape') { e.preventDefault(); showKeys(false); } return; }
+  if (!keys.hidden) { if (e.key === 'Escape' || e.key === '?') { e.preventDefault(); showKeys(false); } return; }
   const t = e.target;
   if (t && (t.closest('input,textarea,select,[contenteditable="true"]') || t.closest('dialog[open]'))) return;
   if (!$('#intro').hidden || document.querySelector('dialog[open]')) return;
@@ -452,5 +452,4 @@ $('#replayIntro').addEventListener('click', () => startIntro());
 applyTheme();
 initUi();
 initAccountUi();
-drawStrip();
 route().then(() => { if (introWanted()) startIntro(); });

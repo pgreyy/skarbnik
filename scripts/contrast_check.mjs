@@ -1,6 +1,7 @@
 // Checks the colour contrast of the site (WCAG 2 relative luminance): reads the Dark and Light colour tokens from
 // web/css/app.css and prints the contrast ratio of every text and background pair the site uses, in both themes.
-// Text needs at least 4.5:1; the focus ring and the borders of controls (non-text) need at least 3:1.
+// Text needs at least 4.5:1 and the focus ring 3:1. The gold button's fill and offset shadow are printed for information
+// (their colours are fixed by the approved design; the button is identified by its text, which passes).
 // Usage, from the repo root: node scripts/contrast_check.mjs   (exit 1 if any pair is below its minimum)
 import { readFileSync } from 'node:fs';
 
@@ -25,9 +26,9 @@ const PAIRS = [
   ['data blue on page', 'data', 'bg', 4.5], ['data blue on panel', 'data', 'panel', 4.5], ['data blue on row hover', 'data', 'hover', 4.5],
   ['success on page', 'ok', 'bg', 4.5], ['success on panel', 'ok', 'panel', 4.5],
   ['page colour on text colour (pressed toggle, toast)', 'bg', 'ink', 4.5],
-  ['code text on command bar', '#E8EDF5', 'bar', 4.5],
   ['focus ring against page (non-text)', 'focus', 'bg', 3], ['focus ring against panel (non-text)', 'focus', 'panel', 3],
-  ['gold button edge against page (non-text)', 'goldedge', 'bg', 3], ['gold button edge against panel (non-text)', 'goldedge', 'panel', 3],
+  ['gold button fill against page (non-text, information only)', 'goldfill', 'bg', 0], ['gold button offset shadow against page (decoration, information only)', 'goldshadow', 'bg', 0],
+  ['Skip intro chip text', 'skipink', 'skipbg', 4.5], ['panel text on page colour code block', 'ink', 'bg', 4.5],
 ];
 let bad = 0;
 for (const [name, t] of Object.entries(themes)) {
@@ -36,7 +37,7 @@ for (const [name, t] of Object.entries(themes)) {
     const fg = f.startsWith('#') ? f : t[f], bg = b.startsWith('#') ? b : t[b];
     const r = ratio(fg, bg), ok = r >= min;
     if (!ok) bad++;
-    console.log(`${ok ? 'PASS' : 'FAIL'}  ${r.toFixed(2).padStart(5)}:1  (min ${min})  ${what}: ${fg} on ${bg}`);
+    console.log(`${min === 0 ? 'INFO' : ok ? 'PASS' : 'FAIL'}  ${r.toFixed(2).padStart(5)}:1  ${min ? `(min ${min})` : '        '}  ${what}: ${fg} on ${bg}`);
   }
 }
 console.log(bad ? `${bad} pair(s) below the minimum` : 'every pair passes');

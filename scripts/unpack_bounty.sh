@@ -9,6 +9,7 @@
 #   create    the vendor creates the Level 2 bounty (K = 3) and opens it with the Groth16 Proof 0
 #   prove N   the vendor proves revealed attempt N against the secret (Groth16), memory watched
 #   submit N  sends that proof (submit_groth16) and reads the outcome
+#   timeout N after the attempt's verdict deadline: claim_timeout by the agent's account (silent vendor rule)
 # Usage, from the repo root: ./scripts/unpack_bounty.sh <phase>. Testnet only. Output: docs/evidence/agent/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -102,5 +103,16 @@ submit)
   S=$(view get_submission "{\"bounty_id\":\"$NBOUNTY\",\"index\":$IDX}")
   note "bounty $NBOUNTY attempt $IDX: verdict $(json_field "$S" verdict), outcome $(json_field "$S" outcome); bounty state $(json_field "$(view get_bounty "{\"bounty_id\":\"$NBOUNTY\"}")" state)"
   ;;
-*) echo "usage: $0 check|proof0|create|prove <index>|submit <index>"; exit 2 ;;
+timeout)
+  # The silent vendor rule: after the attempt's verdict deadline anyone may call claim_timeout, which pays the revealed
+  # attempt(s) still waiting. Called here by the agent's account with its full access key (its limited key may only
+  # commit and reveal).
+  IDX="${2:?usage: timeout <attempt index>}"
+  B0=$(balance "$AGENT")
+  call "unpack_claim_timeout_$IDX" "$AGENT" claim_timeout "{\"bounty_id\":\"$NBOUNTY\",\"index\":$IDX}" "0 NEAR" "100 Tgas"
+  sleep 3
+  S=$(view get_submission "{\"bounty_id\":\"$NBOUNTY\",\"index\":$IDX}")
+  note "bounty $NBOUNTY attempt $IDX: claim_timeout; outcome $(json_field "$S" outcome); bounty state $(json_field "$(view get_bounty "{\"bounty_id\":\"$NBOUNTY\"}")" state); agent balance $B0 -> $(balance "$AGENT") yoctoNEAR"
+  ;;
+*) echo "usage: $0 check|proof0|create|prove <index>|submit <index>|timeout <index>"; exit 2 ;;
 esac

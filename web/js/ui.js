@@ -15,8 +15,8 @@ export const acct = (a) => `<a class="k-mono k-hash k-priv" href="#/account/${en
 
 // A long hash: first 8 and last 6 characters, with Copy and Show full (handled once, in initUi).
 export const hashCell = (h) => `<span class="k-h"><code class="k-hs" data-full="${esc(h)}" data-short="${esc(shortId(h))}">${esc(shortId(h))}</code>` +
-  `<span class="k-hb"><button class="k-mini" type="button" data-copy-text="${esc(h)}">Copy</button>` +
-  `<button class="k-mini" type="button" data-toggle-full aria-expanded="false">Show full</button></span></span>`;
+  `<span class="k-hb"><button class="k-mini" type="button" data-copy-text="${esc(h)}">copy</button>` +
+  `<button class="k-mini" type="button" data-toggle-full aria-expanded="false">full</button></span></span>`;
 
 // A table: cols is a list of headings, rows a list of lists of HTML cells. On a phone each row stacks, each cell
 // labelled with its column heading.
@@ -27,7 +27,7 @@ export function table(cols, rows, cls = '') {
 // A two column table of facts: rows of [label, value HTML, who can see it (optional: public, agent, operator, vendor only)].
 export const vis = (who) => `<span class="k-vis">${esc(who)}</span>`;
 export const facts = (rows) => `<table class="k-kv"><tbody>${rows.filter(Boolean).map(([k, v, who]) =>
-  `<tr><th scope="row">${who ? `<span class="k-kvh">${esc(k)}${vis(who)}</span>` : esc(k)}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
+  `<tr><th scope="row">${esc(k)}</th><td>${v}</td>${who ? `<td class="k-tagc">${vis(who)}</td>` : ''}</tr>`).join('')}</tbody></table>`;
 // Something sealed (the vendor keeps it): dashed box with a black bar, never a value.
 export const sealed = (label = 'sealed') => `<span class="k-sealed"><i aria-hidden="true"></i><span class="k-dim">${esc(label)}</span></span>`;
 // A small bordered link box to the testnet explorer, opening in a new tab.
@@ -50,8 +50,9 @@ export function initUi() {
   document.addEventListener('click', async (e) => {
     const c = e.target.closest('[data-copy-text]');
     if (c) {
-      try { await navigator.clipboard.writeText(c.dataset.copyText); c.textContent = 'Copied'; toast('Copied.'); setTimeout(() => (c.textContent = 'Copy'), 1500); }
-      catch { c.textContent = 'Select it'; }
+      const was = c.textContent;
+      try { await navigator.clipboard.writeText(c.dataset.copyText); c.textContent = 'copied'; setTimeout(() => (c.textContent = was), 1200); }
+      catch { c.textContent = 'select it'; setTimeout(() => (c.textContent = was), 1200); }
       return;
     }
     const t = e.target.closest('[data-toggle-full]');
@@ -59,7 +60,7 @@ export function initUi() {
       const code = t.closest('.k-h').querySelector('.k-hs'), open = t.getAttribute('aria-expanded') !== 'true';
       code.textContent = open ? code.dataset.full : code.dataset.short;
       code.classList.toggle('full', open);
-      t.setAttribute('aria-expanded', open); t.textContent = open ? 'Show short' : 'Show full';
+      t.setAttribute('aria-expanded', open); t.textContent = open ? 'short' : 'full';
     }
   });
 }

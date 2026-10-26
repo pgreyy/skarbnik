@@ -93,9 +93,9 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 
 | Item | Version or source | Checked |
 | --- | --- | --- |
-| Fonts | IBM Plex Sans 400, 500, 600; JetBrains Mono 400, 700; Archivo 800 (letters of the name only), served by Google Fonts (css2 API, no version in the address) | 2026-10-26 |
-| Mark outline | Archivo ExtraBold, Google Fonts static weight 800 file, Version 2.001, sha256 `f734704aebd9faeca392e0d7e48007e8776d5727ffccf1648611f6cd768eb296` | 2026-10-26 |
-| opentype.js (reads the glyph, build time only, in `target/logo-build`) | 1.3.4 | 2026-10-26 |
+| Fonts | Space Grotesk 600 (headings); IBM Plex Sans 500, 600 (text); JetBrains Mono 400, 700 (facts); Fraunces 600 (the name only), served by Google Fonts (css2 API, no version in the address) | 2026-10-26 |
+| Mark outline | Fraunces SemiBold S as a vector path, from the approved design's `logo/s12-mark-on-dark.svg` (copied into `web/js/logo.js`) | 2026-10-26 |
+| opentype.js (read the glyph of an earlier mark, build time only, in `target/logo-build`; not used by the current mark) | 1.3.4 | 2026-10-26 |
 
 ## Agent model provider (agent/config.toml)
 

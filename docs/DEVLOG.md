@@ -2,6 +2,26 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Site rebuilt from the approved design folder (branch ui-preview)
+
+- Built to the approved design (its README, tokens and screenshots; the design folder itself is not in the repository).
+  Fonts: Space Grotesk 600 for headings, IBM Plex Sans (500 body, 600 emphasis), JetBrains Mono for facts, Fraunces
+  600 only for the name. Mark "S12": the Fraunces S as a path with a gold vein; favicon from the design's favicon.
+- Light and dark follow the visitor's system setting by default; a manual choice is remembered; the intro follows the
+  same mode. Background: dot grid, hero glow and a light that follows the cursor. The verify strip is removed.
+- Deadlines are a UTC date and time ("Oct 28, 17:10") or "Closed". Bounties keep their filter tabs and the EXPLORER
+  column. The bounty page has chips by the title, square step pills, a dashed secret input strip with the site's
+  secrecy sentence, and a visibility tag on every fact. The Account page is the operator panel of the design (balances,
+  history, agent keys with scope, spend cap, spent, status and the stop button, an audit log by signing key), real data
+  only. Phone tables scroll inside their box.
+- The intro shows near_bounty.json from private bounty 17 (bounty 12's reference fix is the public demo fix, so it
+  could not be shown as sealed). The design's `vendor_notes` field does not exist; `reference_fix` is shown instead.
+- The "Check the checker yourself" block stays hidden until the bounty 17 proof has finished and the script has run.
+- Checks: `node scripts/contrast_check.mjs` (every text pair passes in both modes); every route at 1440, 1280 and 390 px
+  in both modes (no sideways scroll, no script errors); 17 behaviour checks (intro mode, first visit, replay, skip, deep
+  link, reduced motion, shortcuts, typing guard, Private, theme memory, fixed footer, focus);
+  `./scripts/wallet-vendor/pin_check.sh` (3 of 3 cases as expected); `./scripts/agent_dry_run_test.sh` (11 of 11).
+
 ## 2026-10-26: Site restyle, "Blueprint Terminal" (branch ui-preview)
 
 - New look on every page, same routes and features: Dark by default (Light and System kept, the choice remembered),

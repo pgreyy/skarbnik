@@ -25,7 +25,7 @@ function renderWallet() {
   const s = W.state;
   if (s.status === 'on') {
     el.innerHTML = `<button class="k-chip" type="button" id="creditChip" aria-haspopup="dialog">Credit <b class="k-priv">${credit === null ? '…' : esc(near(credit))}</b></button>
-      <div class="k-acct"><button class="m-btn sec sm" type="button" id="acctBtn" aria-haspopup="true" aria-expanded="false" aria-controls="acctMenu" title="${esc(s.account)}"><span class="k-priv">${esc(short(s.account))}</span></button>
+      <div class="k-acct"><button class="m-btn" type="button" id="acctBtn" aria-haspopup="true" aria-expanded="false" aria-controls="acctMenu" title="${esc(s.account)}"><span class="k-priv">${esc(short(s.account))}</span></button>
       <ul class="k-menu" id="acctMenu" hidden>
         <li><button type="button" data-act="activity">My activity</button></li>
         <li><button type="button" data-act="copy">Copy account name</button></li>
@@ -44,15 +44,15 @@ function renderWallet() {
       if (b.dataset.act === 'out') { await W.disconnect(); toast('Disconnected.'); }
     }));
   } else if (s.status === 'connecting') {
-    el.innerHTML = '<button class="m-btn sm" type="button" disabled aria-busy="true">Connecting…</button>';
+    el.innerHTML = '<button class="m-btn" type="button" disabled aria-busy="true">Connecting…</button>';
   } else if (s.status === 'wrongnet') {
     el.innerHTML = `<span class="m-badge b-bad" role="alert">✕ Not a testnet account</span><button class="m-btn sec sm" type="button" id="outBtn">Disconnect</button>`;
     $('#outBtn').onclick = () => W.disconnect();
   } else if (s.status === 'failed') {
-    el.innerHTML = `<span class="k-werr" role="alert">${esc(s.error || 'The wallet did not connect.')}</span><button class="m-btn sm k-connect" type="button" id="connBtn">Try again</button>`;
+    el.innerHTML = `<span class="k-werr" role="alert">${esc(s.error || 'The wallet did not connect.')}</span><button class="m-btn" type="button" id="connBtn">Try again</button>`;
     $('#connBtn').onclick = () => W.connect();
   } else {
-    el.innerHTML = '<button class="m-btn sm k-connect" type="button" id="connBtn">Connect wallet</button>';
+    el.innerHTML = '<button class="m-btn" type="button" id="connBtn">Connect wallet</button>';
     $('#connBtn').onclick = () => W.connect();
   }
 }
@@ -157,7 +157,7 @@ export function attemptPanel(el, b, subs, verifiers) {
     const slotsLeft = Math.max(0, b.max_commits - b.active);
     const mine = s.status === 'on' ? attemptsFor(s.account, b.id) : [];
     const step = mine.some((m) => m.index !== null && m.revealed) ? 3 : mine.some((m) => m.index !== null) ? 2 : 1;
-    const stepper = `<ol class="m-sstep" aria-label="Steps of an attempt">${['Commit', 'Reveal', 'Wait for the vendor’s proof'].map((t, i) =>
+    const stepper = `<ol class="m-sstep" aria-label="Steps of an attempt">${['Commit', 'Reveal', 'Vendor’s proof'].map((t, i) =>
       `<li class="${i + 1 === step ? 'now' : i + 1 < step ? 'past' : ''}"${i + 1 === step ? ' aria-current="step"' : ''}><span class="m-n">${i + 1 < step ? '✓' : i + 1}</span>${t}</li>`).join('')}</ol>`;
     let mineHtml = '';
     for (const m of mine) {
@@ -307,7 +307,7 @@ async function activity(account, max = 150) {
         const x = t.transaction; if (!x || x.receiver_id !== CONTRACT) continue;
         const fc = (x.actions || []).map((a) => a.FunctionCall).find(Boolean); if (!fc) continue;
         let args = {}; try { args = JSON.parse(atob(fc.args)); } catch { /* not JSON */ }
-        const m = meta.get(x.hash), base = { tx: x.hash, ms: Number(BigInt(m.tx_block_timestamp) / 1000000n), ok: m.is_success !== false };
+        const m = meta.get(x.hash), base = { tx: x.hash, ms: Number(BigInt(m.tx_block_timestamp) / 1000000n), ok: m.is_success !== false, key: x.public_key };
         if (fc.method_name === 'deposit_credit') items.push({ ...base, kind: 'deposit', amount: String(fc.deposit) });
         else if (fc.method_name === 'withdraw_credit') items.push({ ...base, kind: 'withdraw', amount: String(args.amount || '0') });
         else if (fc.method_name === 'commit') items.push({ ...base, kind: 'attempt', bounty: String(args.bounty_id), fingerprint: args.fingerprint });
@@ -365,9 +365,8 @@ export async function accountPage(main, name, tab) {
     };
     return;
   }
-  main.innerHTML = `<a class="m-back" href="#/bounties">← All bounties</a><p class="m-eye">Operator panel</p><h1 class="m-h1 k-acname k-priv" tabindex="-1">${esc(name)}</h1>
-    <p class="m-lead">Balances, agent keys and activity on ${esc(CONTRACT)}, read from testnet. <a href="${EXPLORER_ACCOUNT}${encodeURIComponent(name)}" rel="noopener" target="_blank">All transactions on the explorer ↗</a></p>
-    <div id="acOut"><p class="k-state">Reading from testnet…</p></div>`;
+  main.innerHTML = `<p class="m-eye">Account</p><h1 class="m-h1 k-acname k-priv" tabindex="-1">${esc(name)}</h1>
+    <div id="acOut"><p class="k-state" style="margin-top:28px">Reading from testnet…</p></div>`;
   try {
     const [c, lim, bs, act, keys, bal] = await Promise.all([view('get_credit', { account_id: name }, { fresh: true }), view('get_agent_limits', { account_id: name }, { fresh: true }),
       allBounties(), activity(name), accessKeys(name).catch(() => null), W.balance(name)]);
@@ -380,50 +379,55 @@ export async function accountPage(main, name, tab) {
     mine.sort((x, y) => Number(BigInt(y.s.committed_at_ns) - BigInt(x.s.committed_at_ns)));
     // Fees not paid back: a passed attempt and an attempt paid by timeout get their own fee back.
     const spent = mine.filter(({ s }) => s.outcome !== 'Passed' && s.outcome !== 'TimedOut').reduce((t, { s }) => t + BigInt(s.fee || '0'), 0n);
-    const state = (b, s) => OUT_LABEL[s.outcome] || (s.revealed_at_ns ? (b.state === 'Open' ? ['wait', '… WAITING'] : ['info', 'UNDECIDED']) : ['info', 'COMMITTED']);
-    const credits = act.filter((x) => x.kind === 'deposit' || x.kind === 'withdraw');
+    const stateText = (b, s) => ({ Passed: 'Passed, paid', Failed: 'Failed', TimedOut: 'Paid by timeout', Released: 'Slot released' }[s.outcome]
+      || (s.revealed_at_ns ? (b.state === 'Open' ? 'Waiting for the vendor’s proof' : 'Undecided') : 'Committed, not revealed'));
     const stopped = lim.max_fee_per_commit === '0';
     const agentKeys = (keys || []).filter((k) => k.access_key.permission.FunctionCall && k.access_key.permission.FunctionCall.receiver_id === CONTRACT);
+    const agentSet = new Set(agentKeys.map((k) => k.public_key));
     const fullKeys = (keys || []).filter((k) => k.access_key.permission === 'FullAccess').length;
     const scope = (m) => { const set = new Set(m || []); return m && m.length && [...set].every((x) => x === 'commit' || x === 'reveal')
-      ? 'commit and reveal only; cannot withdraw or change limits' : m && m.length ? esc([...set].join(', ')) : 'every method of the contract that takes no deposit'; };
-    const keyCards = keys === null ? '<p class="k-state">Could not read the account\'s access keys.</p>' : agentKeys.length ? agentKeys.map((k) => {
-      const fc = k.access_key.permission.FunctionCall;
-      return `<div class="k-agentkey">${facts([
-        ['Agent key', hashCell(k.public_key), 'public'],
-        ['Scope', scope(fc.method_names), 'public'],
-        ['Gas allowance left', fc.allowance ? `<span class="k-mono">${esc(near(fc.allowance))}</span>` : 'no limit', 'public'],
-        ['Spend cap', lim.max_fee_per_commit ? `<span class="k-mono">${esc(near(lim.max_fee_per_commit))}</span> per attempt, from credit` : 'no max fee set: any fee up to the credit', 'public'],
-        ['Fixed payout', lim.fixed_payout ? acct(lim.fixed_payout) : 'none set: the key may name any payout', 'public']])}</div>`; }).join('')
-      : '<p class="m-sub">No key of this account is limited to this contract.</p>';
+      ? `commit and reveal on ${esc(CONTRACT)}<span class="m-sub">cannot withdraw or change limits</span>` : m && m.length ? esc([...set].join(', ')) : 'every method of the contract that takes no deposit'; };
     const me = W.state.status === 'on' && W.state.account === name;
-    $('#acOut').innerHTML = `<div class="m-two">
-      <section class="m-panel" aria-labelledby="balT"><h2 class="m-h2" id="balT">Balances</h2>${facts([
-        ['Contract credit', `<span class="k-mono k-priv">${esc(near(String(c)))}</span>`, 'public'],
-        ['Wallet balance', bal === null || bal === undefined ? 'could not read' : `<span class="k-mono k-priv">${esc(near(bal))}</span>`, 'public'],
-        ['Spent on attempt fees', `<span class="k-mono k-priv">${esc(near(spent.toString()))}</span> over ${mine.length} ${mine.length === 1 ? 'attempt' : 'attempts'}<span class="k-dim k-block">Not counted: fees paid back to passed attempts and to attempts paid by timeout.</span>`, 'public'],
-        ['Max fee per attempt', lim.max_fee_per_commit ? `<span class="k-mono">${esc(near(lim.max_fee_per_commit))}</span>${stopped ? ' ' + badge('bad', '✕ STOPPED') : ''}` : 'none set', 'public'],
-        ['Fixed payout account', lim.fixed_payout ? acct(lim.fixed_payout) : 'none set', 'public']])}</section>
-      <section class="m-panel" aria-labelledby="keyT"><h2 class="m-h2" id="keyT">Agent keys</h2>
-        <div class="k-keys-list">${keyCards}</div>
-        <p class="m-sub" style="margin-top:12px">${keys === null ? '' : `${fullKeys} full access ${fullKeys === 1 ? 'key' : 'keys'} (the owner's wallet keys) not shown.`}</p>
-        ${me ? `<div id="stopBox" style="margin-top:16px">${stopped
-          ? '<p class="m-sub">Stopped: the max fee per attempt is 0, so every commit by this account is refused. To start again, set a new max fee (For agents, step 5).</p>'
-          : '<button class="m-btn sec" type="button" id="stopBtn">Stop agents: set the max fee to 0</button><p class="m-sub" style="margin-top:8px">Your wallet approves one call (set_agent_limits, 1 yoctoNEAR attached). Every later commit by this account is then refused, whichever key signs it. Reveals of attempts already made still work, and the key itself stays.</p>'}</div>` : ''}
-      </section></div>
-      <div class="m-sec" id="actabs"></div>`;
-    tabbed($('#actabs'), [
-      { id: 'attempts', label: `Attempts (${mine.length})`, html: `<section class="m-panel k-tablepanel">${mine.length ? table(['Bounty', 'Attempt', 'State', 'Fee', 'Time', 'Transaction'], mine.map(({ b, s, i }) => [
-          `<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, `#${i}`, badge(...state(b, s)),
-          s.fee === '0' ? 'refunded' : `<span class="k-mono k-nw k-priv">${esc(near(s.fee))}</span>`, `<span class="k-mono">${esc(utc(s.committed_at_ns))}</span>`,
-          txOf.get(`${b.id}:${s.fingerprint}`) ? tx(txOf.get(`${b.id}:${s.fingerprint}`)) : '<span class="k-dim">not found</span>'])) +
-          '<p class="m-sub k-pad">Attempts from the contract; transaction ids from the FastNEAR transaction index.</p>' : '<p class="m-sub k-pad">No attempts yet.</p>'}</section>` },
-      { id: 'audit', label: `Audit log (${act.length})`, html: `<section class="m-panel k-tablepanel">${act.length ? table(['What', 'Amount', 'Time', 'Transaction'], activityRows(act)) +
-          '<p class="m-sub k-pad">Every call this account signed to the contract: deposits, withdrawals, commits, reveals and limit changes. From the FastNEAR transaction index.</p>' : '<p class="m-sub k-pad">No calls to the contract yet.</p>'}</section>` },
-      { id: 'credit', label: `Credit activity (${credits.length})`, html: `<section class="m-panel k-tablepanel">${credits.length ? table(['What', 'Amount', 'Time', 'Transaction'], activityRows(credits)) +
-          '<p class="m-sub k-pad">From the FastNEAR transaction index.</p>' : '<p class="m-sub k-pad">No deposits or withdrawals yet.</p>'}</section>` },
-      { id: 'created', label: `Bounties created (${created.length})`, html: `<section class="m-panel k-tablepanel">${created.length ? table(['Bounty', 'State', 'Reward', 'Created'], created.slice().reverse().map((b) => [`<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(b.state), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`, `<span class="k-mono">${esc(utc(b.created_at_ns))}</span>`])) : '<p class="m-sub k-pad">No bounties created.</p>'}</section>` },
-    ], tab, `#/account/${encodeURIComponent(name)}`, 'Account sections');
+    const history = [...mine.map(({ b, s, i }) => ({ ms: Number(BigInt(s.committed_at_ns) / 1000000n),
+        row: [`<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a> · #${i}`, `${esc(stateText(b, s))} · <span class="k-mono k-priv">${s.fee === '0' ? 'fee refunded' : esc(near(s.fee))}</span>`,
+          txOf.get(`${b.id}:${s.fingerprint}`) ? tx(txOf.get(`${b.id}:${s.fingerprint}`)) : '<span class="k-dim">not found</span>'] })),
+      ...act.filter((x) => x.kind === 'deposit' || x.kind === 'withdraw').map((x) => ({ ms: x.ms,
+        row: [x.kind === 'deposit' ? 'Deposit' : 'Withdrawal', x.ok ? `Credit <span class="k-mono k-priv">${esc(near(x.amount))}</span>` : badge('bad', '✕ FAILED'), tx(x.tx)] }))]
+      .sort((p, q) => q.ms - p.ms).slice(0, 12);
+    const plain = (rows) => `<div class="k-tw"><table class="k-table"><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td><div class="k-cv">${c}</div></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const stopCell = (i) => (me && !stopped && i === 0 ? `<button class="m-btn sec sm" type="button" id="stopBtn">[ ${agentKeys.length > 1 ? 'stop agents' : 'stop agent'} ]</button>` : '');
+    $('#acOut').innerHTML = `
+      <dl class="k-stats">
+        <div><dt>Contract credit</dt><dd class="k-priv">${esc(near(String(c)))}</dd></div>
+        <div><dt>Wallet balance</dt><dd class="k-priv">${bal === null || bal === undefined ? 'could not read' : esc(near(bal))}</dd></div>
+        <div><dt>Attempts</dt><dd>${mine.length}</dd></div></dl>
+      ${history.length ? `<section class="m-panel k-tablepanel" aria-label="History">${plain(history.map((h) => h.row))}</section>` : '<p class="k-state">No attempts or deposits yet.</p>'}
+      <div class="k-ophead"><h2 class="m-h2" id="opT">Operator panel</h2></div>
+      <section class="m-panel k-tablepanel" aria-labelledby="opT">${keys === null ? '<p class="m-sub k-pad" style="padding:16px 18px">Could not read the account’s access keys.</p>'
+        : agentKeys.length ? table(['Agent', 'Scope', 'Spend cap', 'Spent', 'Status', ''], agentKeys.map((k, i) => {
+          const fc = k.access_key.permission.FunctionCall;
+          return [`<span class="k-agentname"><b>Agent key</b><code title="${esc(k.public_key)}">${esc(k.public_key.slice(0, 16))}…</code> <button class="k-mini" type="button" data-copy-text="${esc(k.public_key)}">copy</button><span class="m-sub">function-call key</span></span>`,
+            `${scope(fc.method_names)}<span class="m-sub">gas allowance left ${fc.allowance ? esc(near(fc.allowance)) : 'not limited'}</span>`,
+            `<span class="k-mono k-nw">${lim.max_fee_per_commit ? `${esc(near(lim.max_fee_per_commit))}` : 'none set'}</span><span class="m-sub">per attempt</span>`,
+            `<span class="k-mono k-nw k-priv">${esc(near(spent.toString()))}</span>`,
+            stopped ? badge('bad', '✕ Stopped') : badge('ok', 'Active'), stopCell(i)];
+        })) : '<p class="m-sub k-pad" style="padding:16px 18px">No key of this account is limited to this contract.</p>'}
+        <p class="m-sub k-pad">${keys === null ? '' : `Spend cap: the most one attempt may cost (set_agent_limits). Spent: attempt fees not paid back. ${fullKeys} full access ${fullKeys === 1 ? 'key' : 'keys'} (the owner’s wallet keys) not listed.`}
+        ${lim.fixed_payout ? ` Fixed payout: ${acct(lim.fixed_payout)}.` : ''}${me && !stopped && agentKeys.length ? ' Stop: your wallet approves one call (set_agent_limits with a max fee of 0, 1 yoctoNEAR attached); every later commit by this account is then refused, whichever key signs it. Reveals of attempts already made still work, and the key stays.' : ''}
+        ${stopped ? ' Stopped: the max fee per attempt is 0, so every commit by this account is refused. To start again, set a new max fee (For agents, step 5).' : ''}</p>
+        <div id="stopBox" class="k-pad" style="padding-bottom:4px"></div>
+      </section>
+      <h2 class="k-auditt" id="auT">Audit log</h2>
+      <section class="m-panel k-tablepanel" aria-labelledby="auT">${act.length ? plain(act.map((x) => {
+          const agent = agentSet.has(x.key), what = x.kind === 'deposit' ? `Deposited <span class="k-priv">${esc(near(x.amount))}</span> credit`
+            : x.kind === 'withdraw' ? `Withdrew <span class="k-priv">${esc(near(x.amount || '0'))}</span> of credit`
+              : x.kind === 'limits' ? `Set agent limits: max fee ${x.maxFee ? esc(near(x.maxFee)) : 'none'}, payout ${x.payout ? esc(x.payout) : 'any'}`
+                : `${x.kind === 'reveal' ? 'Revealed' : 'Committed'} attempt${x.index !== undefined ? ` #${esc(x.index)}` : ''} on bounty ${esc(x.bounty)}${x.kind === 'attempt' && x.amount !== undefined ? ` · fee ${esc(near(x.amount))}` : ''}`;
+          return [`<span class="k-actor">${agent ? 'agent' : 'operator'}</span>`, `${what}${x.ok ? '' : ' ' + badge('bad', '✕ FAILED')}`, tx(x.tx), `<span class="k-vis">${agent ? 'Agent' : 'Operator'}</span>`];
+        })) + '<p class="m-sub k-pad">Every call this account signed to the contract, from the FastNEAR transaction index. Agent: signed by a key limited to this contract; operator: signed by another key of the account.</p>'
+        : '<p class="m-sub k-pad" style="padding:16px 18px">No calls to the contract yet.</p>'}</section>
+      ${created.length ? `<h2 class="k-auditt" id="crT">Bounties created</h2><section class="m-panel k-tablepanel" aria-labelledby="crT">${table(['Bounty', 'State', 'Reward', 'Created'], created.slice().reverse().map((b) => [`<a href="#/bounties/${esc(b.id)}">Bounty ${esc(b.id)}</a>`, esc(b.state), `<span class="k-mono k-nw">${esc(near(b.amount))}</span>`, `<span class="k-mono">${esc(utc(b.created_at_ns))}</span>`]))}</section>` : ''}
+      <p class="m-sub" style="margin-top:18px"><a href="${EXPLORER_ACCOUNT}${encodeURIComponent(name)}" rel="noopener" target="_blank">All transactions of this account on the explorer ↗</a></p>`;
     const stop = $('#stopBtn');
     if (stop) stop.onclick = async () => {
       const box = $('#stopBox');

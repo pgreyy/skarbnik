@@ -66,6 +66,11 @@ export function utc(ns) {
   const d = nsToDate(ns);
   return d.toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
 }
+// A moment as a short UTC date and time, like "Oct 28, 17:10" (the times on bounty lists).
+export function utcShort(ns) {
+  const d = nsToDate(ns);
+  return `${d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })} ${d.getUTCDate()}, ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+}
 export function span(ns) {
   const s = Math.round(Number(BigInt(ns) / 1000000000n));
   if (s % 86400 === 0) return `${s / 86400} ${s === 86400 ? 'day' : 'days'}`;

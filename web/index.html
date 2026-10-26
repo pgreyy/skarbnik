@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- Skarbnik site (testnet). The page shell: header (mark, menu with number keys, wallet control), the verify strip,
-     the main view, the fixed footer (intro replay, theme switch, Private toggle), the shortcuts panel, the credit and
+<!-- Skarbnik site (testnet). The page shell: header (mark, menu with number keys, wallet control), the main view,
+     the fixed footer (intro replay, theme switch, Private toggle), the shortcuts panel, the credit and
      confirm dialogs, toast, live region and the intro layer. js/app.js renders each screen into <main> from live testnet
      data and from the recorded files in data/. Transactions are only ever signed in the visitor's wallet after a
      confirm step (js/wallet.js); this page holds no key. -->
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,20 +16,21 @@
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0A1424">
+<meta name="theme-color" content="#0A1424" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F3F5F9" media="(prefers-color-scheme: light)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="icon" href="favicon-16.png" type="image/png" sizes="16x16">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&text=SKARBNIK&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&family=IBM+Plex+Sans:wght@500;600&family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&text=Skarbnik&display=swap">
 <link rel="stylesheet" href="css/app.css">
 <script>
-  // Set the theme before the first paint (Dark by default, or the visitor's saved choice), so the page never flashes.
+  // Set the theme before the first paint (the visitor's system setting, or their saved choice), so the page never flashes.
   (function () {
-    var p = 'dark', priv = 'off';
-    try { p = localStorage.getItem('skarbnik-theme') || 'dark'; priv = localStorage.getItem('skarbnik-private') || 'off'; } catch (e) { /* storage blocked */ }
+    var p = 'system', priv = 'off';
+    try { p = localStorage.getItem('skarbnik-theme') || 'system'; priv = localStorage.getItem('skarbnik-private') || 'off'; } catch (e) { /* storage blocked */ }
     var t = p === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : p;
     document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
     document.documentElement.setAttribute('data-private', priv === 'on' ? 'on' : 'off');
@@ -37,6 +38,7 @@
 </script>
 </head>
 <body>
+<div class="k-bg" aria-hidden="true"><div class="k-cursor" id="cursorGlow"></div></div>
 <div class="m-app" id="app">
   <a class="k-skip" href="#main">Skip to content</a>
   <header class="m-hd">
@@ -49,19 +51,17 @@
     </nav>
     <div class="k-wallet" id="walletArea" aria-live="polite"></div>
   </header>
-  <div class="k-strip" id="strip" role="region" aria-label="What this site checks"></div>
   <main class="m-view" id="main" tabindex="-1"><p class="k-state">Loading…</p></main>
   <footer class="m-foot">
     <div class="k-footl">
       <button class="m-link" type="button" id="replayIntro">Replay the intro</button>
-      <button class="k-privbtn" type="button" id="privBtn" aria-pressed="false" title="Blur balances and account names">Private</button>
+      <div class="m-themebar" role="group" aria-label="Colour mode">
+        <button type="button" data-pref="light" aria-pressed="false">Light</button>
+        <button type="button" data-pref="dark" aria-pressed="false">Dark</button>
+        <button type="button" data-pref="system" aria-pressed="true">System</button>
+      </div>
     </div>
-    <div class="m-themebar" role="group" aria-label="Colour theme">
-      <span>Theme</span>
-      <button type="button" data-pref="light" aria-pressed="false">Light</button>
-      <button type="button" data-pref="dark" aria-pressed="true">Dark</button>
-      <button type="button" data-pref="system" aria-pressed="false">System</button>
-    </div>
+    <button class="k-privbtn" type="button" id="privBtn" aria-pressed="false" title="Blur balances and account names"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Private</button>
   </footer>
   <dialog class="k-sheet" id="creditDlg" aria-labelledby="creditTitle"></dialog>
   <dialog class="k-sheet k-conf" id="confirmDlg" aria-labelledby="confTitle"></dialog>
@@ -76,10 +76,9 @@
       <dt><kbd>2</kbd></dt><dd>Arena</dd>
       <dt><kbd>3</kbd></dt><dd>How to verify</dd>
       <dt><kbd>4</kbd></dt><dd>For agents</dd>
-      <dt><kbd>?</kbd></dt><dd>This list</dd>
-      <dt><kbd>Esc</kbd></dt><dd>Close this list or the intro</dd>
+      <dt><kbd>?</kbd></dt><dd>Show or hide this</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close</dd>
     </dl>
-    <button class="m-btn sec sm" type="button" id="keysClose">Close</button>
   </div>
 </div>
 <div class="k-int" id="intro" hidden></div>

@@ -1,15 +1,21 @@
-// The Skarbnik mark: a capital S in Archivo ExtraBold (Google Fonts, SIL Open Font License 1.1), turned into an SVG path
-// so it never depends on a font loading (scripts/logo/extract_s.mjs), filled near black with a thin gold outline, and a
-// gold crack over it, drawn first in near black (width 6) and then in gold (width 2.6). This is the one place the mark
-// and the name are defined; the header, the intro, the favicon (favicon.svg, favicon-32.png, favicon-16.png) and the
-// social image (social.png) use this drawing. Colours are fixed, so the mark looks the same in both themes.
+// The Skarbnik mark "S12": a heavy serif S (Fraunces SemiBold, as a vector path, from the approved design's
+// logo/s12-mark-on-dark.svg and s12-mark-on-light.svg) mended with a gold vein: a gap stroke in the page colour under a
+// gold gradient stroke, and a small spark. The S takes the text colour and the gap the page colour, so one drawing
+// serves both modes. This is the one place the mark and the name are defined; the header, the intro, the favicon
+// (favicon.svg and the PNGs, from the design's logo/favicon.svg) and the social image (social.png) use it.
 export const NAME = 'Skarbnik';
-export const S_PATH = 'M32.75 60.00L32.75 60.00Q27.63 60.00 23.14 59.09Q18.65 58.19 15.22 56.14Q11.80 54.09 9.83 50.75Q7.86 47.40 7.86 42.51L7.86 42.51Q7.86 42.20 7.86 41.81Q7.86 41.41 7.94 41.18L7.94 41.18L21.56 41.18Q21.56 41.41 21.52 41.77Q21.49 42.12 21.49 42.36L21.49 42.36Q21.49 44.88 22.78 46.41Q24.08 47.95 26.45 48.62Q28.81 49.29 31.96 49.29L31.96 49.29Q33.69 49.29 35.19 49.13Q36.69 48.97 37.87 48.58Q39.05 48.19 39.95 47.59Q40.86 47.00 41.29 46.18Q41.73 45.35 41.73 44.25L41.73 44.25Q41.73 42.44 40.35 41.25Q38.97 40.07 36.65 39.29Q34.32 38.50 31.41 37.79Q28.50 37.08 25.34 36.29Q22.19 35.50 19.28 34.32Q16.37 33.14 14.04 31.33Q11.72 29.52 10.34 26.80Q8.96 24.08 8.96 20.23L8.96 20.23Q8.96 15.97 10.77 12.86Q12.59 9.75 15.77 7.78Q18.96 5.81 23.14 4.91Q27.31 4 32.04 4L32.04 4Q36.69 4 40.74 4.95Q44.80 5.89 47.95 7.90Q51.10 9.91 52.87 12.94Q54.64 15.97 54.72 20.23L54.72 20.23L54.72 21.17L41.18 21.17L41.18 20.62Q41.18 18.81 40.19 17.43Q39.21 16.05 37.24 15.22Q35.27 14.40 32.35 14.40L32.35 14.40Q29.44 14.40 27.43 14.95Q25.42 15.50 24.36 16.52Q23.30 17.55 23.30 18.96L23.30 18.96Q23.30 20.70 24.68 21.80Q26.05 22.90 28.42 23.69Q30.78 24.48 33.69 25.15Q36.61 25.82 39.72 26.57Q42.83 27.31 45.74 28.46Q48.66 29.60 51.02 31.37Q53.38 33.14 54.76 35.74Q56.14 38.34 56.14 42.04L56.14 42.04Q56.14 48.50 53.11 52.44Q50.08 56.38 44.76 58.19Q39.44 60.00 32.75 60.00Z';
-export const CRACK = 'M18 8 L29 22 L22 33 L37 43 L30 60';
+export const S_TRANSFORM = 'translate(12.528 55) scale(0.03200 -0.03200)';
+export const S_PATH = 'M661 -31Q579 -31 520.0 -11.5Q461 8 423.5 27.0Q386 46 368 46Q348 46 335.0 34.0Q322 22 310.5 6.5Q299 -9 286.0 -21.0Q273 -33 254 -33Q233 -33 219.5 -20.5Q206 -8 201 21L132 347Q128 369 137.5 385.0Q147 401 169 408Q193 416 211.0 407.0Q229 398 242 372Q299 260 363.5 194.0Q428 128 498.0 100.0Q568 72 641 72Q743 72 802.0 125.0Q861 178 861 267Q862 325 835.0 371.5Q808 418 733.0 462.0Q658 506 511 554Q359 603 267.5 667.5Q176 732 135.0 818.0Q94 904 94 1018Q94 1139 151.5 1231.0Q209 1323 313.5 1374.5Q418 1426 558 1426Q648 1426 707.0 1407.5Q766 1389 804.0 1370.0Q842 1351 867 1351Q889 1351 901.0 1370.5Q913 1390 927.0 1409.5Q941 1429 969 1429Q991 1429 1005.5 1415.0Q1020 1401 1031 1363L1125 1035Q1133 1009 1123.5 988.5Q1114 968 1091 961Q1068 953 1049.5 962.5Q1031 972 1019 995Q957 1119 886.5 1190.5Q816 1262 741.0 1293.0Q666 1324 589 1324Q487 1324 426.5 1265.5Q366 1207 366 1113Q366 1056 392.5 1007.0Q419 958 493.0 911.5Q567 865 707 813Q862 758 953.5 694.0Q1045 630 1084.5 549.5Q1124 469 1124 365Q1124 256 1069.0 166.0Q1014 76 911.0 22.5Q808 -31 661 -31Z';
+export const VEIN = 'M21 9 L30 22 L25 32 L38 41 L33 57';
+let n = 0;
 
-export function logo(size = 28, cls = '') {
+// size in px; parts: which layers to draw (the intro draws them one by one)
+export function logo(size = 32, cls = '') {
+  const id = 'vein' + (++n);
   return `<svg class="k-logo ${cls}" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true" focusable="false">` +
-    `<path class="k-s" d="${S_PATH}" fill="#0A0A0A" stroke="#E3B04B" stroke-width="1.6" stroke-linejoin="round"/>` +
-    `<path class="k-c1" d="${CRACK}" fill="none" stroke="#0A0A0A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>` +
-    `<path class="k-c2" d="${CRACK}" fill="none" stroke="#E3B04B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6A3"/><stop offset=".5" stop-color="#E3B04B"/><stop offset="1" stop-color="#A9761C"/></linearGradient></defs>` +
+    `<path class="k-s" fill="currentColor" transform="${S_TRANSFORM}" d="${S_PATH}"/>` +
+    `<path class="k-gap" d="${VEIN}" fill="none" stroke="var(--bg)" stroke-width="4.5" stroke-linejoin="round"/>` +
+    `<path class="k-vein" d="${VEIN}" fill="none" stroke="url(#${id})" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>` +
+    `<circle class="k-spark" cx="25" cy="32" r="1.8" fill="#FFE6A3"/></svg>`;
 }

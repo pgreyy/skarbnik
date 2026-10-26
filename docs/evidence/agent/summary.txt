@@ -9,3 +9,4 @@ unpack Proof 0: wall_seconds=5384.58 r0vm_peak_rss_mib=4725 (VmHWM, sampled ever
 private bounty 17 on the new module data/unpack: opened True K 3 image_id_allowed True next fee 10000000000000000000000
 proving bounty 17 attempt 0: patch sha256 da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81 (read from the chain), seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a
 proving bounty 17 attempt 0: patch sha256 da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81 (read from the chain), seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a
+proving bounty 17 attempt 0: patch sha256 da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81 (read from the chain), seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a

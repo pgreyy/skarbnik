@@ -1,5 +1,5 @@
-// Converts the "S" of Space Grotesk Bold (Google Fonts, OFL) into one SVG path in a 64 by 64 box, about 56 units tall,
-// centred, so the mark never depends on a font loading.
+// Converts the "S" of a font file (Google Fonts, OFL) into one SVG path in a 64 by 64 box, about 56 units tall, centred.
+// Used for an earlier mark; the current mark (web/js/logo.js) comes as a path from the approved design.
 import opentype from 'opentype.js';
 const font = opentype.loadSync(process.argv[2]);
 const g = font.charToGlyph('S');
