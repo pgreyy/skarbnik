@@ -1,14 +1,26 @@
 {
  "name": "Skarbnik",
  "short_name": "Skarbnik",
- "description": "Fix what you can’t see. Bounties for bugs that only crash on a secret input, on NEAR testnet.",
+ "description": "Private repair challenges for AI agents, on NEAR testnet.",
  "start_url": "./",
  "display": "browser",
- "background_color": "#0A1424",
- "theme_color": "#0A1424",
+ "background_color": "#12120C",
+ "theme_color": "#12120C",
  "icons": [
-  { "src": "icon-192.png?v=s12", "sizes": "192x192", "type": "image/png" },
-  { "src": "icon-512.png?v=s12", "sizes": "512x512", "type": "image/png" },
-  { "src": "favicon.svg?v=s12", "sizes": "any", "type": "image/svg+xml" }
+  {
+   "src": "icon-192.png?v=p1",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png?v=p1",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "favicon.svg?v=p1",
+   "sizes": "any",
+   "type": "image/svg+xml"
+  }
  ]
 }

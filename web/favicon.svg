@@ -1,7 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-<defs><linearGradient id="vein" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6A3"/><stop offset=".5" stop-color="#E3B04B"/><stop offset="1" stop-color="#A9761C"/></linearGradient></defs>
-<rect width="64" height="64" rx="12" fill="#0A1424"/><g fill="#E8EDF5"><path transform="translate(12.528 55) scale(0.03200 -0.03200)" d="M661 -31Q579 -31 520.0 -11.5Q461 8 423.5 27.0Q386 46 368 46Q348 46 335.0 34.0Q322 22 310.5 6.5Q299 -9 286.0 -21.0Q273 -33 254 -33Q233 -33 219.5 -20.5Q206 -8 201 21L132 347Q128 369 137.5 385.0Q147 401 169 408Q193 416 211.0 407.0Q229 398 242 372Q299 260 363.5 194.0Q428 128 498.0 100.0Q568 72 641 72Q743 72 802.0 125.0Q861 178 861 267Q862 325 835.0 371.5Q808 418 733.0 462.0Q658 506 511 554Q359 603 267.5 667.5Q176 732 135.0 818.0Q94 904 94 1018Q94 1139 151.5 1231.0Q209 1323 313.5 1374.5Q418 1426 558 1426Q648 1426 707.0 1407.5Q766 1389 804.0 1370.0Q842 1351 867 1351Q889 1351 901.0 1370.5Q913 1390 927.0 1409.5Q941 1429 969 1429Q991 1429 1005.5 1415.0Q1020 1401 1031 1363L1125 1035Q1133 1009 1123.5 988.5Q1114 968 1091 961Q1068 953 1049.5 962.5Q1031 972 1019 995Q957 1119 886.5 1190.5Q816 1262 741.0 1293.0Q666 1324 589 1324Q487 1324 426.5 1265.5Q366 1207 366 1113Q366 1056 392.5 1007.0Q419 958 493.0 911.5Q567 865 707 813Q862 758 953.5 694.0Q1045 630 1084.5 549.5Q1124 469 1124 365Q1124 256 1069.0 166.0Q1014 76 911.0 22.5Q808 -31 661 -31Z"/></g>
-<path d="M21 9 L30 22 L25 32 L38 41 L33 57" fill="none" stroke="#0A1424" stroke-width="4.5" stroke-linejoin="round"/>
-<path d="M21 9 L30 22 L25 32 L38 41 L33 57" fill="none" stroke="url(#vein)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="25" cy="32" r="1.8" fill="#FFE6A3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" role="img" aria-label="Skarbnik">
+<circle cx="20" cy="20" r="18" fill="#1C1B13" stroke="#77745A" stroke-width="1.2"/>
+<circle cx="20" cy="20" r="14.2" fill="none" stroke="#34321F" stroke-width="1"/>
+<circle cx="20" cy="20" r="11.2" fill="none" stroke="#34321F" stroke-width="1"/>
+<path d="M20 2A18 18 0 0 1 38 20" fill="none" stroke="#2B9AB0" stroke-width="2.4" stroke-linecap="round"/>
+<circle cx="20" cy="20" r="6.8" fill="#EE9438"/>
+<circle cx="20" cy="20" r="1.5" fill="#12120C"/>
 </svg>

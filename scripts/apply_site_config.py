@@ -38,7 +38,7 @@ def index_html(s):
     s = swap_old(s)
     s = re.sub(r'<link rel="canonical" href="[^"]*">\n', "", s)
     s = re.sub(r'<meta property="og:url" content="[^"]*">\n', "", s)
-    s = re.sub(r'(<meta property="og:image" content=")[^"]*(/social\.png\?v=s12">)', rf"\g<1>{url}\g<2>", s)
+    s = re.sub(r'(<meta property="og:image" content=")[^"]*(/social\.png\?v=[a-z0-9]+">)', rf"\g<1>{url}\g<2>", s)
     return s.replace('<meta property="og:title"', f'<link rel="canonical" href="{url}/">\n<meta property="og:url" content="{url}/">\n<meta property="og:title"', 1)
 
 
