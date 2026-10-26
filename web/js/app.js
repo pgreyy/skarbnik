@@ -206,6 +206,7 @@ async function bounty(main, id, tab) {
       b.state === 'Open' ? ['Next attempt fee', `<span class="k-mono">${esc(near(b.next_fee))}</span>, from credit`, 'public'] : null,
       ['Fee rule', `<span class="k-mono">${esc(near(b.attempt_fee))} + ${esc(near(b.fee_step))}</span> per earlier attempt`, 'public'],
       ['Attempts', `<span class="k-mono">${esc(attemptsText(b))}</span>`, 'public'],
+      ['Per-account cap', `<span class="k-mono">${b.max_commits_per_account ? `${esc(b.max_commits_per_account)} of ${esc(b.max_commits)} slots per account` : 'none'}</span>`, 'public'],
       ['Commits accepted until', `<span class="k-mono">${esc(utc(commitBy(b)))}</span>` + (cl && b.state === 'Open' ? ` (${esc(cl)})` : ''), 'public'],
       ['Expires', `<span class="k-mono">${esc(utc(b.expires_at_ns))}</span>`, 'public'],
       ['Windows', `reveal ${esc(span(b.reveal_window_ns))}, verdict ${esc(span(b.verdict_window_ns))}${b.level === 0 ? ', attest ' + esc(span(b.attest_window_ns)) : ''}`, 'public'],
@@ -474,11 +475,11 @@ async function ledger(main) {
   } catch (e) { $('#lg').innerHTML = failBox(e); return; }
   const c = L.counts;
   const kindChip = (k) => `<span class="m-tok">${esc(k)}</span>`;
-  const howChip = (h) => (h === 'proof' ? badge('ok', '✓ Paid by proof') : badge('info', 'Paid by timeout'));
+  const howChip = (f) => (f.transfer_failed ? badge('bad', '✕ Paid on paper, transfer failed (audit finding 8)') : f.how === 'proof' ? badge('ok', '✓ Paid by proof') : badge('info', 'Paid by timeout'));
   $('#lg').innerHTML = `
   <div class="m-panel k-pad16" role="note"><p><b>${c.outside_the_team === 0 ? 'Every account below is run by the Skarbnik team or was seeded by its scripts.' : `${c.outside_the_team} account(s) below are not on the team's list.`}</b>
     So far no account outside the team has used the contract. An account missing from the team's list (web/data/accounts.json) would show as "not known".</p></div>
-  <dl class="k-stats k-stats4">${[['Paid fixes', `${c.paid_fixes}`, `${c.paid_by_proof} by proof, ${c.paid_by_timeout} by timeout`], ['Paid accounts', `${c.paid_accounts}`, ''],
+  <dl class="k-stats k-stats4">${[['Paid fixes', `${c.paid_fixes}`, `${c.paid_by_proof} by proof, ${c.paid_by_timeout} by timeout${c.paid_on_paper_transfer_failed ? `; ${c.paid_on_paper_transfer_failed} more paid on paper only (transfer failed)` : ''}`], ['Paid accounts', `${c.paid_accounts}`, ''],
     ['Vendors', `${c.vendors}`, ''], ['Distinct counterparties', `${c.distinct_counterparties}`, 'paid accounts and vendors']].map(([k, v, s]) =>
     `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd>${s ? `<span class="m-sub">${esc(s)}</span>` : ''}</div>`).join('')}</dl>
   <h2 class="m-h2 k-gap">Paid accounts</h2>
@@ -487,7 +488,7 @@ async function ledger(main) {
   <h2 class="m-h2 k-gap">Paid fixes</h2>
   <div class="m-panel k-tablepanel">${table(['Bounty', 'Attempt', 'Paid to', 'How', 'Paid', 'Transaction'], L.paid_fixes.map((f) => [
     `<a class="m-bid" href="#/bounties/${esc(f.bounty_id)}">Bounty ${esc(f.bounty_id)}</a>`, `#${esc(f.attempt)}`, `${acct(f.payout_account)} ${kindChip(f.kind)}`,
-    howChip(f.how) + (f.note ? `<span class="m-sub">${esc(f.note)}</span>` : ''), `<span class="k-mono k-nw">${esc(near(f.paid_yocto))}</span><span class="m-sub">plus its own fee back</span>`,
+    howChip(f) + (f.note ? `<span class="m-sub">${esc(f.note)}</span>` : ''), f.transfer_failed ? `<span class="k-mono k-nw">0 NEAR</span><span class="m-sub">${esc(near(f.on_paper_yocto))} on paper; the transfer failed, no NEAR moved</span>` : `<span class="k-mono k-nw">${esc(near(f.paid_yocto))}</span><span class="m-sub">plus its own fee back</span>`,
     f.tx ? tx(f.tx) : '<span class="k-dim">not recorded</span>']))}</div>
   <h2 class="m-h2 k-gap">Vendors: proved in time or not</h2>
   <p class="m-sub">For each revealed attempt: decided by a proof before its deadline, or not (then the timeout rule paid it, or it is still waiting past its deadline).</p>

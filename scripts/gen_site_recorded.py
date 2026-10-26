@@ -129,7 +129,8 @@ row = next(ln for ln in open(os.path.join(ROOT, "docs/AUDIT.md")) if ln.startswi
 out["bounty_notes"] = {"8": {
     "text": "The contract shows this bounty as Paid, but the payout went to an account that does not exist: the transfer "
             "failed and the NEAR stayed in the contract (review finding 8, a known limit).",
-    "tx": _re.search(r"tx `([1-9A-HJ-NP-Za-km-z]{43,44})`", row).group(1), "source": "docs/AUDIT.md, finding 8"}}
+    "tx": _re.search(r"tx `([1-9A-HJ-NP-Za-km-z]{43,44})`", row).group(1), "source": "docs/AUDIT.md, finding 8",
+    "transfer_failed": True}}
 # That transaction is bounty 8's timeout claim (claim_timeout, checked with the FastNEAR transaction index).
 out["bounties"].setdefault("8", []).append({"step": "audit8_claim_timeout", "method": "claim_timeout", "tx": out["bounty_notes"]["8"]["tx"],
     "what": "Timeout claimed (the payout transfer then failed, review finding 8)", "time": None, "result": "succeeded",

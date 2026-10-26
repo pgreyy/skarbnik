@@ -35,13 +35,19 @@ export function buildLedger(bounties, subsByBounty, recorded, accounts, nowMs = 
       const how = howOf(s);
       if (!how) return;
       const paid = how === 'proof' ? amount : (b.winner === i ? amount - share * (n - 1n) : share);
-      fixes.push({ bounty_id: String(b.id), attempt: i, payout_account: s.payout, kind: kind(s.payout), how, paid_yocto: paid.toString(),
-        fee_refunded_yocto: s.fee, tx: payoutTx(recorded, b.id, how), note: (recorded && recorded.bounty_notes && recorded.bounty_notes[String(b.id)] && recorded.bounty_notes[String(b.id)].text) || null });
+      const note = recorded && recorded.bounty_notes && recorded.bounty_notes[String(b.id)];
+      // A payout the contract marked as paid but whose transfer failed (bounty 8: the account does not exist) moved no
+      // NEAR: it is listed, labelled, and counted nowhere as paid.
+      const failed = !!(note && note.transfer_failed);
+      fixes.push({ bounty_id: String(b.id), attempt: i, payout_account: s.payout, kind: kind(s.payout), how,
+        status: failed ? 'paid on paper, transfer failed (audit finding 8)' : how === 'proof' ? 'paid by proof' : 'paid by timeout',
+        transfer_failed: failed, paid_yocto: failed ? '0' : paid.toString(), on_paper_yocto: paid.toString(),
+        fee_refunded_yocto: failed ? '0' : s.fee, tx: payoutTx(recorded, b.id, how), note: (note && note.text) || null });
     });
     vendors.set(b.vendor, v);
   }
   const acc = new Map();
-  for (const f of fixes) {
+  for (const f of fixes.filter((x) => !x.transfer_failed)) {
     const a = acc.get(f.payout_account) || { account: f.payout_account, kind: f.kind, fixes_paid: 0, paid_by_proof: 0, paid_by_timeout: 0, total_paid_yocto: '0' };
     a.fixes_paid += 1;
     if (f.how === 'proof') a.paid_by_proof += 1; else a.paid_by_timeout += 1;
@@ -54,7 +60,8 @@ export function buildLedger(bounties, subsByBounty, recorded, accounts, nowMs = 
     paid_fixes: fixes,
     paid_accounts: [...acc.values()],
     vendors: vend,
-    counts: { paid_fixes: fixes.length, paid_by_proof: fixes.filter((f) => f.how === 'proof').length, paid_by_timeout: fixes.filter((f) => f.how === 'timeout').length,
+    counts: { paid_fixes: fixes.filter((f) => !f.transfer_failed).length, paid_by_proof: fixes.filter((f) => f.how === 'proof' && !f.transfer_failed).length,
+      paid_by_timeout: fixes.filter((f) => f.how === 'timeout' && !f.transfer_failed).length, paid_on_paper_transfer_failed: fixes.filter((f) => f.transfer_failed).length,
       paid_accounts: acc.size, vendors: vend.length, distinct_counterparties: counterparties.size,
       outside_the_team: [...counterparties].filter((a) => kind(a) === 'not known').length },
   };
