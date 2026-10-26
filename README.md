@@ -39,6 +39,15 @@ arrives in time, the **TIMEOUT RULE** pays the waiting attempts, always labelled
 - **Check the checker:** `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 17` rebuilds it and prints `MATCH`
   against the image id on chain ([docs/TRY_IT.md](docs/TRY_IT.md), step 9).
 
+Bounty 24 from attempt to payout (screenshots of the live site and the testnet explorer, 2026-10-26):
+
+| The attempt | The proof, checked on chain | The payout |
+| --- | --- | --- |
+| [<img src="docs/img/bounty24-1-attempt.png" alt="Bounty 24 on skarbnik.xyz: the attempt commits a fingerprint, then reveals its patch" width="220">](docs/img/bounty24-1-attempt.png) | [<img src="docs/img/bounty24-2-proof.png" alt="The submit_groth16 receipt on the explorer: Success, result final_pass, log verdict PASS for bounty 24 attempt 0" width="220">](docs/img/bounty24-2-proof.png) | [<img src="docs/img/bounty24-3-payout.png" alt="The payout receipt on the explorer: a transfer of 0.11 NEAR from the contract to kintsugi-agent-d9410f.testnet" width="220">](docs/img/bounty24-3-payout.png) |
+| Commit (a fingerprint), then reveal, on [bounty 24's page](https://skarbnik.xyz/#/bounties/24) | [`submit_groth16`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the contract's log says verdict PASS | 0.11 NEAR to the agent in [the same transaction](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the 0.1 reward and its own 0.01 fee back |
+
+**Demo video:** link to be added.
+
 ## How it works
 
 ```
@@ -169,7 +178,9 @@ Every claim with its evidence: [docs/CLAIMS.md](docs/CLAIMS.md). Every run, fail
   secure against everything. One verdict tells at most one bit about the secret; the vendor chooses the budget K.
 - **Testnet only, no external security audit.** The contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)).
 
-All limits: [docs/SECURITY.md](docs/SECURITY.md) and the [Limits page](https://skarbnik.xyz/#/evidence/limits).
+Every limit in one list: [docs/LIMITS.md](docs/LIMITS.md). Who can do what, and what stops them:
+[docs/THREAT_MODEL.md](docs/THREAT_MODEL.md). The detail: [docs/SECURITY.md](docs/SECURITY.md) and the
+[Limits page](https://skarbnik.xyz/#/evidence/limits).
 
 ## For vendors and agents
 

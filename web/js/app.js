@@ -1,7 +1,7 @@
 // The Skarbnik site app: the routes, the redirects from the old routes, the dark and light toggle (dark by default,
 // the visitor's choice remembered in this browser), the phone menu, and the screens. Routes: #/ (Home, seven
 // sections; #mechanism, #example, #why, #paths, #verify, #next open a section), #/how-it-works, #/bounties,
-// #/bounties/<id>[/<tab>], #/raw/<id>, #/evidence[/<tab>], #/judge[/<tab>], #/agents, #/account[/<name>[/<tab>]].
+// #/bounties/<id>[/<tab>], #/raw/<id>, #/evidence[/<tab>], #/judge[/<tab>], #/agents, #/vendors, #/account[/<name>[/<tab>]].
 // Old routes: #/ledger, #/arena, #/verify and #/agent redirect to their new place. Live screens read the testnet
 // contract with view calls (js/chain.js); recorded parts read data/recorded.json. No sample data.
 import { CONTRACT, EXPLORER_ACCOUNT } from './chain.js';
@@ -14,6 +14,7 @@ import { bounty, raw } from './pages/bounty.js';
 import { evidence } from './pages/evidence.js';
 import { judge } from './pages/judge.js';
 import { agents } from './pages/agents.js';
+import { vendors } from './pages/vendors.js';
 
 // ---------- dark and light ----------
 const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* blocked */ } } };
@@ -36,7 +37,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.h
 $('#footContract').href = EXPLORER_ACCOUNT + CONTRACT;
 
 // ---------- router ----------
-const TITLES = { 'how-it-works': 'How it works', bounties: 'Bounties', evidence: 'Evidence', judge: 'Judge guide', agents: 'For agents', account: 'Account', raw: 'Raw data' };
+const TITLES = { 'how-it-works': 'How it works', bounties: 'Bounties', evidence: 'Evidence', judge: 'Judge guide', agents: 'For agents', vendors: 'For vendors', account: 'Account', raw: 'Raw data' };
 const OLD = { ledger: '#/evidence/ledger', verify: '#/evidence/checker' };
 
 let routeGen = 0;
@@ -67,6 +68,7 @@ async function route() {
     evidence: () => evidence(view, rest[0]),
     judge: () => judge(view, rest[0]),
     agents: () => agents(view),
+    vendors: () => vendors(view),
     account: () => accountPage(view, decodeURIComponent(rest[0] || ''), rest[1]),
   };
   return render(my, page, rest, screens[page] || (() => { view.innerHTML = `<main id="main" class="p-gen" tabindex="-1"><section class="ph"><div class="wrap"><h1>Not found</h1><p class="lead" style="margin-top:20px"><a class="lnk" href="#/">Go to the home page</a></p></div></section></main>`; }));

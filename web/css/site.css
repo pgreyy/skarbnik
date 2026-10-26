@@ -250,3 +250,10 @@ body.sk>main{flex:1 0 auto}
 /* The header's content spans the same width as the Home Console frame, on every page (desktop and tablet) */
 @container sk (min-width:701px){.sk .nav .wrap.nav-in{max-width:none;width:min(1480px,calc(100% - 48px));padding:0}}
 @container sk (min-width:701px) and (max-width:1000px){.sk .nav .wrap.nav-in{width:calc(100% - 20px)}}
+/* For vendors: the three proving modes side by side, one column on narrow screens; the preflight list numbered */
+.sk :where(.p-vendors) .vmodes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.sk :where(.p-vendors) .vstep{display:grid;grid-template-columns:44px minmax(0,1fr);gap:20px}
+.sk :where(.p-vendors) .vlist{list-style:decimal;padding-left:52px}
+.sk :where(.p-vendors) .vlist li{padding-left:4px;line-height:1.55}
+@container sk (max-width:1000px){.sk :where(.p-vendors) .vmodes{grid-template-columns:minmax(0,1fr)}}
+@container sk (max-width:700px){.sk :where(.p-vendors) .vlist{padding-left:44px}.sk :where(.p-vendors) .vstep{grid-template-columns:minmax(0,1fr);gap:14px;padding:20px}}

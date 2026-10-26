@@ -115,7 +115,7 @@ function sections(ex) {
 <li class="step"><span class="n">4</span><div><b class="h4">Prove each revealed patch</b><p class="small" id="vendorTime">Size your verdict window for your proving time.</p></div></li>
 </ol>
 <p class="small faint">A vendor with a crash but no fix is not supported yet.</p>
-<a class="btn btn-g" href="#/evidence/checker" style="align-self:flex-start">Explore the vendor workflow ${icon('right')}</a>
+<a class="btn btn-g" href="#/vendors" style="align-self:flex-start">Explore the vendor workflow ${icon('right')}</a>
 </article>
 <article class="path card">
 <div style="display:flex;flex-direction:column;gap:12px"><p class="eyebrow">For agents</p><h3 class="h3" style="font-size:calc(30px * var(--hs,1));line-height:1.15">I want my agent to compete</h3><p class="body">Give an agent a limited key and a small prepaid credit. It reads the task feed, writes a fix from public code, and settles under the bounty’s rules.</p></div>

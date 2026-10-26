@@ -2,6 +2,22 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: Bounty 24 screenshot strip, threat model and limits pages, judge guide lines, For vendors page
+
+- README: a three image strip under the 2 minute path: bounty 24's commit and reveal on the live site, the
+  `submit_groth16` receipt with the contract's log `"verdict": "PASS"`, and the 0.11 NEAR transfer to the agent, both
+  on testnet.nearblocks.io; light theme, taken in a headless browser on 2026-10-26, compressed to `docs/img/` (17 to 36 KB
+  each). A placeholder line for the demo video, with no link yet.
+- docs/THREAT_MODEL.md (vendor, agent, agent key, the public, the owner, the prover machine) and docs/LIMITS.md (every
+  limit, one line each), both summarising and linking docs/SECURITY.md; linked from the README and docs/README.md.
+- JUDGE_GUIDE.md: every step of Level A and Level B now has Expect, What this proves and What it does not prove.
+- Site: the Security Lab tab says which attack it covers (learning the secret through many yes or no attempts) and that
+  it does not cover others. New page #/vendors (`web/js/pages/vendors.js`) from docs/VENDOR.md: who it is for and
+  Proof 0 first, the six steps with their commands, the preflight checks, time and cost of one proof (laptop, rented GPU,
+  and the VPS marked "Measuring" from `data/numbers.json` until its proof is in), the proving modes, every command. No
+  forms and no files. Home section 05's "Explore the vendor workflow" and the footer's "For vendors" open it. Checked
+  locally at 1440 and 390 px in light and dark: no horizontal overflow, no console errors.
+
 ## 2026-10-27: README restyled; licence files
 
 - README.md rewritten to about 215 lines: badges, the Vinyl lockup (light and dark), the tagline, the opening paragraph,

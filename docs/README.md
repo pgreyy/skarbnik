@@ -7,6 +7,8 @@
 | [CLAIMS.md](CLAIMS.md) | What is shown and what is not, the measured numbers, what is built, what is not, every known limit |
 | [OVERVIEW.md](OVERVIEW.md) | The three parties, why a vendor or an agent takes part, how NEAR fits |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | How the pieces fit together, folder by folder |
+| [THREAT_MODEL.md](THREAT_MODEL.md) | Who can do what (vendor, agent, the public, the owner, the prover machine) and what stops them |
+| [LIMITS.md](LIMITS.md) | Every known limit in one list |
 | [SECURITY.md](SECURITY.md) | The guards, the attacks tried and their results, known limits, changelog |
 | [AUDIT.md](AUDIT.md) | The AI review passes of the contract: findings, fixes and suggested hardening |
 | [EVIDENCE.md](EVIDENCE.md) | One section per spike and run: the question, the command, the raw output, the verdict; failures stay in |

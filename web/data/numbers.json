@@ -49,5 +49,10 @@
  "allowlist_tx": {
   "tx": "BLQoFNQ7Vz3Le4TruAgU4YkeKDtexYquQSTcZALpRvWM",
   "source": "docs/AUDIT.md, finding 6"
+ },
+ "vps_prove": {
+  "status": "measuring",
+  "text": "Measuring: the first CPU proof on the 4 core VPS (Proof 0 of the demo program) has been running since 2026-10-26 22:15 UTC",
+  "source": "docs/numbers.md, once measured"
  }
 }

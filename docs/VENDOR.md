@@ -2,6 +2,7 @@
 
 A vendor should not have to be a cryptography operator. `tools/skarbnik-vendor` (Python 3.11 or later, no packages)
 takes a private Level 2 bounty from a config file to an open bounty, and then proves every revealed attempt by itself.
+The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors
 It calls the project's own programs (`skarbnik-host`, `skarbnik-check`), `scripts/s2_measure.sh` for timing and the
 memory guard, and NEAR CLI (near-cli-rs) for transactions. Testnet only.
 
