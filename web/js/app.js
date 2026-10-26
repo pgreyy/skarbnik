@@ -18,7 +18,8 @@ const levelText = (l) => (l === 2 ? 'The contract checks a Groth16 proof of the 
 const testNote = (b) => recorded && recorded.test_bounties && recorded.test_bounties[String(b.id)];
 const isDemo = (b) => recorded && b.exploit_commitment === recorded.notes.demo_exploit_commitment.commitment;
 const newModule = (b) => recorded && recorded.new_module_bounties && recorded.new_module_bounties[String(b.id)];
-const inputLabel = (b) => (newModule(b) ? 'Private bounty, new module' : isDemo(b) ? (testNote(b) ? 'Test bounty · demo input' : 'Demo input') : 'Private secret input');
+const judgeNote = (b) => recorded && recorded.judge_bounties && recorded.judge_bounties[String(b.id)];
+const inputLabel = (b) => (judgeNote(b) ? 'Judge bounty' : newModule(b) ? 'Private bounty, new module' : isDemo(b) ? (testNote(b) ? 'Test bounty · demo input' : 'Demo input') : 'Private secret input');
 const bountyLinks = (b) => `<span class="k-links"><a href="${EXPLORER_ACCOUNT}${CONTRACT}" rel="noopener" target="_blank">Contract</a><a href="#/raw/${esc(b.id)}">Raw data</a></span>`;
 const typeText = (b) => inputLabel(b);
 // How a paid bounty was paid: the outcome of its winning attempt (TimedOut means paid by the timeout rule).
@@ -187,7 +188,8 @@ async function bounty(main, id, tab) {
   $('#btitle').insertAdjacentHTML('beforeend', `${badge(st.v, st.t)}${testNote(b) ? '<span class="m-tok">Test bounty</span>' : demo ? '<span class="m-tok">Demo input</span>' : `<span class="m-tok">${esc(inputLabel(b))}</span>`}<span class="m-tok">Level ${b.level}</span>${bountyLinks(b)}`);
   // What the secret input is for this bounty, then the site's secrecy sentence.
   const secretLine = demo ? (testNote(b) ? 'This test bounty uses the public demo input.' : 'This demo bounty uses the public demo input (data/demo/exploit.hex), so anyone can check it.')
-    : newModule(b) ? 'Sealed: only its commitment is on chain. The program (data/unpack/) is new, and its reference fix is not in the repository.'
+    : judgeNote(b) ? `Sealed: only its commitment is on chain. ${judgeNote(b)}`
+    : newModule(b) ? `Sealed: only its commitment is on chain. The program (${(recorded.new_module_programs || {})[String(b.id)] || 'data/unpack/'}) is new, and its reference fix is not in the repository.`
       : Number(b.id) === 12 ? 'Sealed: only its commitment is on chain. This bounty uses the public demo bug, so anyone can submit the public fixed.wasm, and if the vendor stays silent the timeout rule can pay out without any proof.'
         : 'Sealed: only its commitment is on chain.';
   $('#b').innerHTML = `

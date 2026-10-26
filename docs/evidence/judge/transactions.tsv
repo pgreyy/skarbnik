@@ -1,0 +1,10 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+judge_create_1	create_bounty	kintsugi-vendor-prnvm.testnet	9uxVRwJ35KmVXCRp2PBhqci8tBUQv3jsKv14SxGTKYyS	0.353 Tgas	0.000035278682467	0	6.57
+judge_create_2	create_bounty	kintsugi-vendor-prnvm.testnet	ALHkwHuptq5m3qAY4wffBe74mMxMbvg5YPGhJhZJ79WE	0.353 Tgas	0.000035278682467	0	6.17
+judge_create_3	create_bounty	kintsugi-vendor-prnvm.testnet	EH2soCJ9SY2XZXGrVaGLF6gtL7TDqScCnmzJKoVuYgAq	0.353 Tgas	0.000035278682467	0	5.86
+judge_create_4	create_bounty	kintsugi-vendor-prnvm.testnet	DCtsH68ukAWFDdD3VtWPfVL8qsDiXYDhm8mzZEUz5xpD	0.353 Tgas	0.000035278682467	0	5.96
+judge_create_5	create_bounty	kintsugi-vendor-prnvm.testnet	GSbqghysUCSoefGti3kViacqgnZUBf3zZzYZozVMY2jh	0.353 Tgas	0.000035278682467	0	5.44
+judge_tester_account	create-account	skarbnik-judge-47afb3.testnet	AFXZdwrcsru78mknvZn3FM9nksQFjrgyVh6j5TPmTNxz	-	-	0	3.5
+judge_open_18	open_with_groth16	skarbnik-judge-47afb3.testnet	GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb	0.377 Tgas	0.000037681941703	0	6.25
+judge_open_again_18	open_with_groth16	skarbnik-judge-47afb3.testnet	BVMoi97TTU9bZDqNukW8Loor6dcBocyWHdtVff9Kx1dg	-	-	rpc:failed	-
+judge_refusal_other_seal_22	open_with_groth16	skarbnik-judge-47afb3.testnet	5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj	-	-	rpc:failed	-

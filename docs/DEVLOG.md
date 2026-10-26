@@ -2,6 +2,28 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Judge bounties, README for judges, vendor script for any module
+
+- Judge bounties 18 to 22 (`scripts/judge_bounties.sh`): Level 2, the same hashes as private bounty 17, created closed;
+  bounty 18 opened from a throwaway account with bounty 17's stored Groth16 Proof 0 (tx
+  `GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`, 35.247 Tgas); a proof with the right journal and another proof's seal
+  refused at the pairing check on bounty 22 (tx `5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`, 34.856 Tgas). EVIDENCE,
+  "Judge bounties". The site labels them "Judge bounty".
+- README rewritten for judges: what it is, the problem, how NEAR fits, nine "do X, see Y" steps (read the chain, the
+  allowlist, which judge bounties are closed, the site, open one yourself, a refusal at the proof check, the tests, the
+  optional rebuild and local verify), a numbers table, honest wording (AI review passes, Level 1 not built, paid by proof
+  versus paid by timeout). The step that sent an old receipt again is gone; `docs/evidence/receipts/README.md` now leads
+  with the judge receipts and keeps the old ones as history.
+- Checked as written: steps 1 to 3 (exact output), 5 and 6 (`file-args` reach the contract). Not yet run from a fresh
+  clone: steps 7 to 9 (builds); they wait until no proof is running.
+- `scripts/private_bounty.sh` (MODULE=<name>): the private bounty steps for any program, with 24 hour verdict window
+  settings, an `attempt` phase for the GPU pod and a `groth16` phase that wraps a GPU succinct receipt on the laptop.
+  `scripts/unpack_bounty.sh`: the succinct limit raised from 3,600 s to 21,600 s (it stopped bounty 17's evidence proof),
+  and its check phase calls `skarbnik-check` (the old name was gone since the rename).
+- New program `data/smooth/` (a smoothing filter, its own bug, no hint in the source) for Task 1's private bounty; the
+  secret input and reference fix are in a private folder outside the repository. Native checks: six seeds, Proof 0 PASS,
+  reference fix PASS, original FAIL (`docs/evidence/smooth/native_check.txt`). Its Proof 0 is running on the laptop.
+
 ## 2026-10-26: Rename finished; checker image id unchanged; skarbnik.xyz live
 
 - The scripts that waited for the bounty 17 proof now call `skarbnik-host` (`scripts/unpack_bounty.sh`,

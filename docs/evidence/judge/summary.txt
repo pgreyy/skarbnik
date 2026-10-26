@@ -1,0 +1,5 @@
+2026-10-26T10:40:43Z judge bounties created: 18 19 20 21 22
+2026-10-26T10:40:43Z argument files written for:18 19 20 21 22
+2026-10-26T10:41:23Z bounty 18 opened by skarbnik-judge-47afb3.testnet (not the vendor): opened True, tx GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb, gas 35.247 Tgas
+2026-10-26T10:41:41Z refusal on bounty 22: tx 5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj, gas 34.856 Tgas, opened stays False
+2026-10-26T10:42:55Z argument files written for:18 19 20 21 22

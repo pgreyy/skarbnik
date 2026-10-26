@@ -1,45 +1,42 @@
 # Stored receipts
 
-Two real Level 2 submissions to `kintsugi-l2-cihdp.testnet`, saved exactly as they were sent: each file is the
-`submit_groth16` argument object (bounty id, attempt index, Groth16 seal and journal, base64), read back from the chain
-with the FastNEAR transaction index. Both carry the same proof: the PASS proof of bounty 1, attempt 0 (the honest fix
-`data/demo/fixed.wasm`), made on the laptop in spike S6c. Its hex form is `docs/evidence/S6c/a0_args.json`, and the
-unit tests use the same bytes (`contract/src/groth16_attempt_vectors.rs`, `SEAL_A0`, `JOURNAL_A0`).
+Real Groth16 proofs, saved exactly as the contract `kintsugi-l2-cihdp.testnet` reads them (a 256 byte seal and a 780 byte
+journal, base64 in the argument files), all under the published checker image id
+`dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`. None of them holds a secret input: a journal holds
+only hashes, the seed, counts, the submission id and the verdict.
 
-## 1. A valid receipt: `valid_pass_bounty1_attempt0.json`
+## For judges: open a judge bounty with a real proof
 
-What it is: the proof that bounty 1's attempt 0 passed, bound to that bounty, that attempt, its revealed patch and the
-seed recorded at reveal, under the checker image id `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`.
+| File | What it is |
+| --- | --- |
+| `bounty17_proof0_groth16.bin` | private bounty 17's Groth16 Proof 0 receipt (2,057 bytes), from `scripts/unpack_bounty.sh proof0`; journal sha256 `cc7aeb44...efaef`, equal to bounty 17's `proof0_journal_hash` on chain |
+| `bounty17_proof0_args.json` | the same proof as hex (`skarbnik-host groth16-args`) |
+| `judge_open_<id>.json` | `open_with_groth16` arguments for judge bounty `<id>` (18 to 22): that proof, unchanged |
+| `judge_refuse_<id>.json` | the refusal case for judge bounty `<id>` (19 to 22): bounty 17's Proof 0 journal with the seal of another real proof (`demo_proof0_args.json`, the demo's Proof 0), so it passes every cheap check and fails at the pairing check |
+| `demo_proof0_args.json` | the demo's Groth16 Proof 0 (the proof that opened bounties 1, 7 and the test bounties) |
 
-Real run: transaction `CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY` (accepted, bounty 1 paid, 36.392 Tgas;
-`docs/evidence/S6c/gas_level2.txt`).
+Judge bounties 18 to 22 (`scripts/judge_bounties.sh`) have the same hashes as bounty 17, the smallest reward (0.1 NEAR),
+a 24 hour verdict window and an expiry 40 days after 2026-10-26. They were created closed. Each can be opened once, by
+anyone, with `judge_open_<id>.json`; the README's "Try it" steps 3, 5 and 6 give the commands and the expected output.
+Results so far (`docs/evidence/judge/summary.txt`):
 
-Check it today, offline, on a copy of bounty 1 rebuilt in the contract's unit test (same account, ids and seeds):
+- bounty 18 opened by a throwaway account that is not the vendor: tx `GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`,
+  35.247 Tgas; the same call again was refused, "bounty is already open" (tx `BVMoi97TTU9bZDqNukW8Loor6dcBocyWHdtVff9Kx1dg`);
+- the refusal case on closed bounty 22: tx `5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`, "the Groth16 proof does not
+  verify for this bounty's image id and this journal", 34.856 Tgas (the pairing check ran); bounty 22 stayed closed.
 
-    cargo test -p kintsugi-contract --offline s1_real_attempt_proofs_fail_then_pass
+Local check (after building the host, README step 9): `./target/release/skarbnik-host verify
+docs/evidence/receipts/bounty17_proof0_groth16.bin` prints `VALID` and the journal (`docs/evidence/judge/verify_bounty17_proof0.txt`).
 
-Expected: `test tests_level2_attempts::s1_real_attempt_proofs_fail_then_pass ... ok` (the contract accepts the proof and
-pays). Sending the file to the chain again is refused with "bounty is closed", because bounty 1 is already paid
-(checked 2026-10-25: transaction `B5P2njJbm56sYPzHRJgACQWdUKWd7dPLGgMsgfdbCkDo`, `steps/resubmit_valid_pass_bounty1_attempt0.txt`):
+## History: receipts of decided attempts (cannot be sent again)
 
-    near contract call-function as-transaction kintsugi-l2-cihdp.testnet submit_groth16 file-args docs/evidence/receipts/valid_pass_bounty1_attempt0.json prepaid-gas '300 Tgas' attached-deposit '0 NEAR' sign-as <your testnet account> network-config testnet sign-with-legacy-keychain send
+These two files are the PASS proof of bounty 1, attempt 0 (the honest fix `data/demo/fixed.wasm`, spike S6c), read back
+from the chain. They are kept as a record. Sending them to the chain again is refused before the proof check ("bounty is
+closed"), because both bounties are closed, so they are not a check a judge can run on chain.
 
-## 2. A wrong-bounty receipt: `wrong_bounty_11_attempt0.json`
+- `valid_pass_bounty1_attempt0.json`: accepted and paid, tx `CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY` (36.392 Tgas).
+- `wrong_bounty_11_attempt0.json`: the same proof sent for bounty 11, refused "the journal belongs to another bounty or
+  attempt (submission id)", tx `8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM` (2.35 Tgas, refused before the pairing check).
 
-What it is: the same valid proof, sent for bounty 11, attempt 0. The proof is real, but it belongs to another bounty, so
-the contract must refuse it.
-
-Real run: transaction `8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM`, refused: "the journal belongs to another bounty
-or attempt (submission id)", 2.35 Tgas, refused before the pairing check
-(`docs/evidence/hardening/steps/s3_proof_of_another_bounty.txt`).
-
-Check it today, offline:
-
-    cargo test -p kintsugi-contract --offline s1_the_same_proof_is_refused_on_another_bounty
-
-Expected: `test tests_level2_attempts::s1_the_same_proof_is_refused_on_another_bounty - should panic ... ok` (refused
-with the submission id message). Sending the file to the chain again is refused with "bounty is closed", because
-bounty 11 is closed now (checked 2026-10-25: transaction `5tQCugrfkRPHSeo3NdVY2DRYrdA7GQZpyQdF3WSCu1z9`,
-`steps/resubmit_wrong_bounty_11_attempt0.txt`):
-
-    near contract call-function as-transaction kintsugi-l2-cihdp.testnet submit_groth16 file-args docs/evidence/receipts/wrong_bounty_11_attempt0.json prepaid-gas '300 Tgas' attached-deposit '0 NEAR' sign-as <your testnet account> network-config testnet sign-with-legacy-keychain send
+The same bytes run in the contract's unit tests (`contract/src/groth16_attempt_vectors.rs`):
+`cargo test -p kintsugi-contract --offline s1_` (5 tests).

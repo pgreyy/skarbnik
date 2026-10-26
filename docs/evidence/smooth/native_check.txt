@@ -1,0 +1,60 @@
+seed ea6444c6bac1043493d245a36f58a26e23595ef5ecbb2b5046e00d70a55a6093
+proof0: PASS
+reason (internal): -
+stats: runs=302 max_fuel_candidate=11679 max_fuel_original=11756 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+PASS
+reason (internal): -
+stats: runs=279 max_fuel_candidate=11679 max_fuel_original=7069 fairness_original_traps=1 fairness_original_errors=4 variants_original_traps=62
+FAIL
+reason (internal): 2 exploit: trapped (wasm `unreachable` instruction executed)
+stats: runs=1 max_fuel_candidate=141 max_fuel_original=0 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+seed 726b01401d7c0fc7234ec1ab83c9449f60c6efee1ee52fa036642efc0dad9bd1
+proof0: PASS
+reason (internal): -
+stats: runs=302 max_fuel_candidate=11679 max_fuel_original=11756 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+PASS
+reason (internal): -
+stats: runs=279 max_fuel_candidate=11679 max_fuel_original=6964 fairness_original_traps=1 fairness_original_errors=3 variants_original_traps=62
+FAIL
+reason (internal): 2 exploit: trapped (wasm `unreachable` instruction executed)
+stats: runs=1 max_fuel_candidate=141 max_fuel_original=0 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+seed 7f3cee03ca02b0527d33650a8735304da2fa0aa670599f2c12889e8640bfa236
+proof0: PASS
+reason (internal): -
+stats: runs=302 max_fuel_candidate=11679 max_fuel_original=11756 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+PASS
+reason (internal): -
+stats: runs=279 max_fuel_candidate=11679 max_fuel_original=6384 fairness_original_traps=0 fairness_original_errors=4 variants_original_traps=61
+FAIL
+reason (internal): 2 exploit: trapped (wasm `unreachable` instruction executed)
+stats: runs=1 max_fuel_candidate=141 max_fuel_original=0 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+seed b3ac0da213c70d06aa0f0804cbcf3a059d3dc22b8c02fbf26d3b45f73a6fdb0e
+proof0: PASS
+reason (internal): -
+stats: runs=302 max_fuel_candidate=11679 max_fuel_original=11756 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+PASS
+reason (internal): -
+stats: runs=279 max_fuel_candidate=11679 max_fuel_original=7343 fairness_original_traps=0 fairness_original_errors=3 variants_original_traps=59
+FAIL
+reason (internal): 2 exploit: trapped (wasm `unreachable` instruction executed)
+stats: runs=1 max_fuel_candidate=141 max_fuel_original=0 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+seed 2d3e070258c29efead85b96238c3a73f7f4925d060641bd85e7d50a3090897b3
+proof0: PASS
+reason (internal): -
+stats: runs=302 max_fuel_candidate=11679 max_fuel_original=11756 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+PASS
+reason (internal): -
+stats: runs=279 max_fuel_candidate=11679 max_fuel_original=11198 fairness_original_traps=0 fairness_original_errors=3 variants_original_traps=58
+FAIL
+reason (internal): 2 exploit: trapped (wasm `unreachable` instruction executed)
+stats: runs=1 max_fuel_candidate=141 max_fuel_original=0 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+seed 71642c21c56bfc7a32c0b4832ed4e57fd5c5edcbd3e3329df5b675d7926e5d73
+proof0: PASS
+reason (internal): -
+stats: runs=302 max_fuel_candidate=11679 max_fuel_original=11756 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0
+PASS
+reason (internal): -
+stats: runs=279 max_fuel_candidate=11679 max_fuel_original=6757 fairness_original_traps=1 fairness_original_errors=3 variants_original_traps=58
+FAIL
+reason (internal): 2 exploit: trapped (wasm `unreachable` instruction executed)
+stats: runs=1 max_fuel_candidate=141 max_fuel_original=0 fairness_original_traps=0 fairness_original_errors=0 variants_original_traps=0

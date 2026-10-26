@@ -5,6 +5,37 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Judge bounties: a real proof any judge can check on chain (2026-10-26)
+
+- Question: our stored receipts are all for decided attempts or closed bounties, so they cannot be replayed. Can a judge
+  still send a real proof that the contract checks itself, from their own account?
+- Script: `./scripts/judge_bounties.sh create|argfiles|opentest|refusal|status`. Raw output: `docs/evidence/judge/`
+  (`summary.txt`, `transactions.tsv`, `steps/`). Receipt files: `docs/evidence/receipts/` (its README).
+- Five Level 2 bounties, 18 to 22, with every hash of private bounty 17 (program `data/unpack/`, secret commitment, public
+  tests, reference fix, Proof 0 journal), 0.1 NEAR each, K = 3, a 24 hour verdict window, expiry 40 days after creation
+  (2026-12-05), created closed by the vendor account: `9uxVRwJ35KmVXCRp2PBhqci8tBUQv3jsKv14SxGTKYyS`,
+  `ALHkwHuptq5m3qAY4wffBe74mMxMbvg5YPGhJhZJ79WE`, `EH2soCJ9SY2XZXGrVaGLF6gtL7TDqScCnmzJKoVuYgAq`,
+  `DCtsH68ukAWFDdD3VtWPfVL8qsDiXYDhm8mzZEUz5xpD`, `GSbqghysUCSoefGti3kViacqgnZUBf3zZzYZozVMY2jh`.
+- Open test from a new faucet account that is not the vendor (`skarbnik-judge-47afb3.testnet`): `open_with_groth16` on
+  bounty 18 with bounty 17's stored Groth16 Proof 0 (`docs/evidence/receipts/bounty17_proof0_args.json`, journal sha256
+  equal to bounty 17's `proof0_journal_hash`): accepted, bounty opened, event `bounty_opened` with `"by":"groth16"`, tx
+  `GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`, 35.247 Tgas burned in total (the contract ran the pairing check). The
+  same call again: refused, "bounty is already open", tx `BVMoi97TTU9bZDqNukW8Loor6dcBocyWHdtVff9Kx1dg`.
+- Refusal that reaches the proof check: bounty 17's real Proof 0 journal (so the journal hash, field, candidate, Proof 0 id
+  and verdict checks all pass) with the seal of another real Groth16 proof (the demo's Proof 0), sent to closed bounty 22:
+  refused, "the Groth16 proof does not verify for this bounty's image id and this journal", tx
+  `5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`, 34.856 Tgas burned. That message is the one `groth16::verify` returns
+  (`contract/src/lib.rs`, `open_with_groth16`), and refusals from the earlier checks cost about 2 Tgas, so the pairing
+  check itself refused it. Bounty 22 stayed closed.
+- Local check: `./target/release/skarbnik-host verify docs/evidence/receipts/bounty17_proof0_groth16.bin`: VALID, verdict
+  PASS (`docs/evidence/judge/verify_bounty17_proof0.txt`).
+- README commands checked as written: steps 1 to 3 printed the expected lines; steps 5 and 6 with `file-args`, sent from
+  the test account, reached the contract (step 5 aimed at the already open bounty 18 so that no closed bounty was used up:
+  "bounty is already open"; step 6 on bounty 22: the proof check refusal again). The success path of step 5 is the open
+  test above, with the same arguments.
+- Verdict: PASS. Closed at writing: 19, 20, 21, 22. Note: an opened judge bounty is a real bounty: anyone may commit to it,
+  and with the vendor silent the timeout rule would pay a revealed attempt.
+
 ## The model-driven agent (dry run)
 
 Question: does the agent go from the feed to a ready commit and reveal, using only checked public code, a fix that

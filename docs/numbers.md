@@ -42,6 +42,8 @@ Groth16 container's peak was between 6,832 and 7,325 MiB; peaks are samples, so 
 | A real FAIL proof accepted (`submit_groth16`) | 35.603 Tgas | same file (tx `6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca`) |
 | A Proof 0 accepted (`open_with_groth16`) | 35.225 Tgas | same file (tx `E3RTxNVVVGvV2NNTFcMgwNgKagpHPmMnsNBNbu1ZoCx8`) |
 | A proof for the wrong bounty, refused before the pairing check | 2.35 Tgas | docs/evidence/hardening/steps/s3_proof_of_another_bounty.txt |
+| A judge opening bounty 18 with bounty 17's Proof 0 (`open_with_groth16`, sent by a non-vendor account) | 35.247 Tgas | docs/evidence/judge/summary.txt (tx `GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`) |
+| A proof refused at the pairing check (right journal, another proof's seal) | 34.856 Tgas | docs/evidence/judge/summary.txt (tx `5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`) |
 | The Groth16 check alone in the spike contract | 34.569 Tgas (pairing check 30.136 Tgas) | docs/evidence/S6b/gas.txt |
 
 Varies: about 35 to 36.4 Tgas per accepted proof, from the work around the check (reading arguments, storage, payout).

@@ -79,6 +79,23 @@ BOUNTY_STEPS = [
     ("docs/evidence/agent/transactions.tsv", "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py",
      {16: ["agent_bounty_", "agent_live_", "agent_submit_groth16_"], 17: ["unpack_bounty_", "unpack_live_", "unpack_submit_groth16_", "unpack_claim_timeout_"]}),
 ]
+# Judge bounties (scripts/judge_bounties.sh): same hashes as bounty 17, created closed, opened by anyone with its Proof 0.
+_jenv = os.path.join(ROOT, "docs/evidence/judge/run.env")
+JUDGE_IDS = []
+if os.path.exists(_jenv):
+    JUDGE_IDS = [int(x) for x in dict(l.strip().split("=", 1) for l in open(_jenv) if "=" in l).get("JUDGE_IDS", "").strip('"').split()]
+    BOUNTY_STEPS.append(("docs/evidence/judge/transactions.tsv", "scripts/judge_bounties.sh",
+                         {j: [f"judge_create_{i + 1}", f"judge_open_{j}", f"judge_open_again_{j}", f"judge_refusal_other_seal_{j}"]
+                          for i, j in enumerate(JUDGE_IDS)}))
+# Private bounties on other new modules (scripts/private_bounty.sh, MODULE=<name>): their own evidence folder and run.env.
+NEW_MODULES = ["smooth"]
+for _m in NEW_MODULES:
+    _env = os.path.join(ROOT, f"docs/evidence/{_m}/run.env")
+    if os.path.exists(_env):
+        _n = dict(l.strip().split("=", 1) for l in open(_env) if "=" in l).get("NBOUNTY")
+        if _n:
+            BOUNTY_STEPS.append((f"docs/evidence/{_m}/transactions.tsv", "scripts/private_bounty.sh, agent/skarbnik_agent.py",
+                                 {int(_n): [f"{_m}_bounty_", f"{_m}_live_", f"{_m}_submit_groth16_", f"{_m}_claim_timeout_"]}))
 # Steps whose name starts like another bounty's prefix but belong elsewhere
 EXCLUDE = {13: {"web_commit_no_credit"}}
 
@@ -201,10 +218,20 @@ if "CBOUNTY" in runenv:
 # The test bounty for the model-driven agent's real run (scripts/agent_testnet.sh bounty)
 agentenv = dict(l.strip().split("=", 1) for l in open(os.path.join(ROOT, "docs/evidence/agent/run.env")) if "=" in l)
 out["new_module_bounties"] = {}
+out["new_module_programs"] = {}
 if "NBOUNTY" in agentenv:
     out["new_module_bounties"][agentenv["NBOUNTY"]] = "Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/unpack/) is new, with no hint at its bug."
+    out["new_module_programs"][agentenv["NBOUNTY"]] = "data/unpack/"
+for _m in NEW_MODULES:
+    _env = os.path.join(ROOT, f"docs/evidence/{_m}/run.env")
+    _n = dict(l.strip().split("=", 1) for l in open(_env) if "=" in l).get("NBOUNTY") if os.path.exists(_env) else None
+    if _n:
+        out["new_module_bounties"][_n] = f"Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/{_m}/) is new, with no hint at its bug."
+        out["new_module_programs"][_n] = f"data/{_m}/"
 if "ABOUNTY" in agentenv:
     out["test_bounties"][agentenv["ABOUNTY"]] = "Test bounty: made for the real run of the model-driven agent (agent/)."
+
+out["judge_bounties"] = {str(j): "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself." for j in JUDGE_IDS}
 
 dst = os.path.join(ROOT, "web/data/recorded.json")
 with open(dst, "w") as f:

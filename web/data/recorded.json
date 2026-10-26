@@ -1076,6 +1076,96 @@
     "script": "scripts/agent_testnet.sh, scripts/unpack_bounty.sh, agent/skarbnik_agent.py"
    }
   ],
+  "18": [
+   {
+    "step": "judge_create_1",
+    "method": "create_bounty",
+    "tx": "9uxVRwJ35KmVXCRp2PBhqci8tBUQv3jsKv14SxGTKYyS",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_open_18",
+    "method": "open_with_groth16",
+    "tx": "GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 10:41 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_open_again_18",
+    "method": "open_with_groth16",
+    "tx": "BVMoi97TTU9bZDqNukW8Loor6dcBocyWHdtVff9Kx1dg",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 10:41 UTC",
+    "result": "refused by the contract",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "19": [
+   {
+    "step": "judge_create_2",
+    "method": "create_bounty",
+    "tx": "ALHkwHuptq5m3qAY4wffBe74mMxMbvg5YPGhJhZJ79WE",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "20": [
+   {
+    "step": "judge_create_3",
+    "method": "create_bounty",
+    "tx": "EH2soCJ9SY2XZXGrVaGLF6gtL7TDqScCnmzJKoVuYgAq",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:40 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "21": [
+   {
+    "step": "judge_create_4",
+    "method": "create_bounty",
+    "tx": "DCtsH68ukAWFDdD3VtWPfVL8qsDiXYDhm8mzZEUz5xpD",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:40 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "22": [
+   {
+    "step": "judge_create_5",
+    "method": "create_bounty",
+    "tx": "GSbqghysUCSoefGti3kViacqgnZUBf3zZzYZozVMY2jh",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:40 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_refusal_other_seal_22",
+    "method": "open_with_groth16",
+    "tx": "5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 10:41 UTC",
+    "result": "refused by the contract",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
   "8": [
    {
     "step": "audit8_claim_timeout",
@@ -1300,5 +1390,15 @@
  },
  "new_module_bounties": {
   "17": "Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/unpack/) is new, with no hint at its bug."
+ },
+ "new_module_programs": {
+  "17": "data/unpack/"
+ },
+ "judge_bounties": {
+  "18": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",
+  "19": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",
+  "20": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",
+  "21": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",
+  "22": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself."
  }
 }

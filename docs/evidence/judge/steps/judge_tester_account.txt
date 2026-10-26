@@ -1,0 +1,22 @@
+$ near account create-account sponsor-by-faucet-service skarbnik-judge-47afb3.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
+utc_start=2026-10-26T10:41:01.230587728Z
+├  Your transaction:
+│    signer_id:    testnet
+│    actions:
+│       -- create account:      skarbnik-judge-47afb3.testnet
+│       -- add access key:     
+│                       public key:   ed25519:GqZeFvF7uth9WYKqSy85qSgEcD7XkX9RQyXf9SP9UV3
+│                       permission:   FullAccess
+│     
+├  Transaction Execution Info:
+│    Transaction ID: AFXZdwrcsru78mknvZn3FM9nksQFjrgyVh6j5TPmTNxz
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/AFXZdwrcsru78mknvZn3FM9nksQFjrgyVh6j5TPmTNxz
+
+New account <skarbnik-judge-47afb3.testnet> created successfully.
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=3.5

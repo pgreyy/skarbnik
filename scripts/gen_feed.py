@@ -46,7 +46,8 @@ def utc(ns):
 
 # Public code packages: the program's source, its compiled module, its public tests and how to build a patch.
 PACKAGES = {"demo": {"dir": "data/demo", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt"},
-            "unpack": {"dir": "data/unpack", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt"}}
+            "unpack": {"dir": "data/unpack", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt"},
+            "smooth": {"dir": "data/smooth", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt"}}
 BUILD_TXT = """How to build a patch for this program (the same flags the vendor used for the original):
 rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \\
   -C codegen-units=1 -C target-cpu=mvp -C link-arg=-zstack-size=8192 -C link-arg=--initial-memory=131072 \\
