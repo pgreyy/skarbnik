@@ -3,6 +3,7 @@
 // vendor's proof), and the read only agent page. Every payment goes through a confirm step and then the wallet; the
 // page shows only what the chain says. Attempt fees are taken from credit deposited in the contract first.
 import { CONTRACT, EXPLORER_ACCOUNT, view, near, utc, span, commitBy, nsToDate, allBounties, submissions, accessKeys } from './chain.js';
+import { TX_INDEX } from './config.js';
 import * as W from './wallet.js';
 import { fingerprint, newNonce, hex, b64, sha256, putAttempt, attemptsFor, dropAttempt, downloadRecord, toYocto } from './attempt.js';
 import { $, esc, badge, tx, acct, toast, passStamp, table, facts, bothTimes, tabbed, hashCell } from './ui.js';
@@ -288,7 +289,7 @@ function confirmSheet(info, onYes) {
 
 // ---------- activity and the Account page ----------
 const OUT_LABEL = { Passed: ['ok', '✓ PASSED'], Failed: ['bad', '✕ FAILED'], TimedOut: ['info', 'TIMEOUT'], Released: ['info', 'RELEASED'] };
-const FASTNEAR_TX = 'https://tx.test.fastnear.com/v0';
+const FASTNEAR_TX = TX_INDEX; // the transaction index, from the site config
 const fastPost = async (path, body) => (await fetch(`${FASTNEAR_TX}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json();
 const localTime = (ms) => new Date(ms).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 

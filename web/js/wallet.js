@@ -15,8 +15,9 @@ export const state = { status: 'off', account: null, wallet: null, error: '' }; 
 function set(patch) { Object.assign(state, patch); listeners.forEach((f) => f(state)); }
 export function onChange(f) { listeners.add(f); return () => listeners.delete(f); }
 
-// A testnet account is a named account under .testnet or a 64 character implicit account.
-export const isTestnetAccount = (a) => /\.testnet$/.test(a) || /^[0-9a-f]{64}$/.test(a);
+// An account of the configured network (js/config.js): .testnet (or .near on mainnet), or a 64 character implicit account.
+import { isNetworkAccount, NETWORK } from './config.js';
+export const isTestnetAccount = isNetworkAccount;
 
 function fromAccounts(accounts, walletName) {
   const a = accounts && accounts[0] ? accounts[0].accountId : null;
@@ -51,7 +52,7 @@ async function manifest() {
 
 export async function init() {
   try {
-    connector = new NearConnector({ network: 'testnet', manifest: await manifest(), footerBranding: null, providers: { testnet: RPCS } });
+    connector = new NearConnector({ network: NETWORK, manifest: await manifest(), footerBranding: null, providers: { [NETWORK]: RPCS } });
     connector.on('wallet:signIn', async (e) => { const w = await connector.wallet().catch(() => null); fromAccounts(e.accounts, w && w.manifest ? w.manifest.name : null); });
     connector.on('wallet:signOut', () => set({ status: 'off', account: null, wallet: null }));
     const c = await connector.getConnectedWallet().catch(() => null);

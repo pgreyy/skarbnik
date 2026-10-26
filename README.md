@@ -12,9 +12,9 @@ checker_image_id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2
 official_demo_bounty: 7
 private_demo_bounty: 12
 test_bounties: 14, 15, 16
-site_url: https://skarbnik-near.vercel.app
-feed_url: https://skarbnik-near.vercel.app/feed.json
-agent_quickstart_url: https://skarbnik-near.vercel.app/agent-quickstart.txt
+site_url: https://skarbnik.xyz
+feed_url: https://skarbnik.xyz/feed.json
+agent_quickstart_url: https://skarbnik.xyz/agent-quickstart.txt
 site_source: web/index.html
 feed: web/feed.json
 agent_quickstart: web/agent-quickstart.txt
@@ -55,8 +55,8 @@ Rust toolchain (cargo downloads the contract's crates, about 3 minutes the first
    - the same receipt sent for the wrong bounty:
      https://testnet.nearblocks.io/txns/8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM
      See: a failed `submit_groth16` call, "the journal belongs to another bounty or attempt (submission id)".
-4. Open the live site, https://skarbnik-near.vercel.app/#/bounties/7 . See: "Bounty 7", the state OPEN, "Checked by Level 2" and "Demo input",
-   read live from testnet. https://skarbnik-near.vercel.app/#/bounties/12 shows "Private secret input"; the list at https://skarbnik-near.vercel.app/#/bounties tags
+4. Open the live site, https://skarbnik.xyz/#/bounties/7 . See: "Bounty 7", the state OPEN, "Checked by Level 2" and "Demo input",
+   read live from testnet. https://skarbnik.xyz/#/bounties/12 shows "Private secret input"; the list at https://skarbnik.xyz/#/bounties tags
    test bounties 14, 15 and 16 "Test bounty". The same site runs from this repository with
    `python3 -m http.server 8000 --directory web` and http://localhost:8000/#/bounties/7 .
 5. Replay both stored receipts offline:
@@ -132,7 +132,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | A live Level 2 bounty whose secret input is not in the repository, with a private salt | works on testnet: bounty 12 | `scripts/s18_live_bounty.sh` (EVIDENCE, S18) |
 | Attempt fees are taken from credit deposited in the contract first; unspent credit can be withdrawn with a wallet approval (1 yoctoNEAR) | works on testnet | `scripts/web_testnet.sh` (EVIDENCE, "Site: wallet, credit and attempts") |
 | An agent's limited key (commit and reveal only) cannot withdraw or change limits; with `set_agent_limits` it cannot spend more than the chosen fee per attempt or send winnings elsewhere; it can still spend the whole credit over many attempts | works on testnet on this contract | `./scripts/web_testnet.sh agentkey`, unit tests `audit_s6_*` (EVIDENCE, "Site: wallet, credit and attempts") |
-| A site: live bounties, bounty pages, the recorded probe arena, how to verify, an operator panel per account, a page for agents, `feed.json` and `agent-quickstart.txt`; Dark and Light themes whose text pairs all reach 4.5:1 (`node scripts/contrast_check.mjs`) | live at https://skarbnik-near.vercel.app (Vercel, built from branch ui-preview with no build step); checked in a browser on the live domain (docs/evidence/web/live_site.txt) | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py` (quick check, step 4) |
+| A site: live bounties, bounty pages, the recorded probe arena, how to verify, an operator panel per account, a page for agents, `feed.json` and `agent-quickstart.txt`; Dark and Light themes whose text pairs all reach 4.5:1 (`node scripts/contrast_check.mjs`) | live at https://skarbnik.xyz (Vercel, built from branch ui-preview with no build step); checked in a browser on the live domain (docs/evidence/web/live_site.txt) | `web/`, `scripts/gen_feed.py`, `scripts/gen_site_recorded.py` (quick check, step 4) |
 | Wallet connect on the site through NEAR Connect: Intear Wallet and NEAR CLI (MyNearWallet, retired on 31 October 2026, is not offered). Credit (deposit and withdraw) and attempts (commit, reveal) from the page | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Intear only loaded | `scripts/web_testnet.sh` and EVIDENCE, "Site: wallet, credit and attempts" |
 | An agent driven by a language model (NEAR AI Cloud by default, provider in `agent/config.toml`): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, then commits and reveals with a limited key | works on testnet: on test bounty 16 the model's fix was committed and revealed with the limited key, proven PASS by the vendor and paid (0.1 NEAR plus the fee back); dry run tests 9 of 9 | `./scripts/agent_testnet.sh`, `agent/skarbnik_agent.py` (docs/evidence/agent/live_bounty16/, EVIDENCE "The model-driven agent") |
 | The operator panel stops an account's agents with one wallet approval (max fee per attempt set to 0); the next commit by its limited key is refused | works on testnet, through the site with the NEAR CLI wallet | docs/evidence/web/steps/operator_stop_set_limits.txt, operator_stop_commit_refused.txt (docs/SECURITY.md, "The site") |

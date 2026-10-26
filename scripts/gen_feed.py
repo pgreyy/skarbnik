@@ -15,8 +15,11 @@ import sys
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONTRACT = "kintsugi-l2-cihdp.testnet"
-RPC = os.environ.get("RPC", "https://test.rpc.fastnear.com")
+# The site address, network, contract and RPC come from the one site config (web/site.config.json).
+SITE = json.load(open(os.path.join(ROOT, "web/site.config.json")))
+CONTRACT = SITE["contract"]
+RPC = os.environ.get("RPC", SITE["rpc_urls"][0])
+SITE_URL = SITE["site_url"].rstrip("/")
 YOCTO = 10 ** 24
 
 
@@ -119,7 +122,8 @@ for i in range(n):
 feed = {
     "name": "Skarbnik",
     "contract": CONTRACT,
-    "network": "testnet",
+    "site_url": SITE_URL,
+    "network": SITE["network"],
     "generated_at_utc": utc(now_ns),
     "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
     "allowed_image_ids": allowed,
@@ -127,7 +131,8 @@ feed = {
     "test_bounty_note": "Test bounties are for trying the site and the wallet flow, not demos.",
     "open_bounties": open_bounties,
     "public_code_note": "public_code paths are relative to this file. Check sha256(module) == original_hash and the tests' corpus_hash before you use them.",
-    "quickstart": "/agent-quickstart.txt",
+    "quickstart": "agent-quickstart.txt",
+    "quickstart_url": f"{SITE_URL}/agent-quickstart.txt",
 }
 dst = os.path.join(ROOT, "web/feed.json")
 with open(dst, "w") as f:

@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: The site works on any domain; one config for the address and the chain
+
+- `web/site.config.json` holds site_url (https://skarbnik.xyz), network, contract, RPC addresses, explorer bases and the
+  transaction index; the site reads it through `web/js/config.js` (chain.js, wallet.js, account-ui.js import from it);
+  `scripts/gen_feed.py` and `scripts/gen_site_recorded.py` read it; `scripts/apply_site_config.py` writes site_url into
+  the files that cannot read it at load time (index.html canonical, og:url and og:image; sitemap.xml; robots.txt;
+  agent-quickstart.txt; README; ARCHITECTURE). Links inside the site are relative.
+- skarbnik.xyz is not live yet: its DNS points at 2.57.91.91 (Hostinger), not at Vercel, and nothing answers there.
+
 ## 2026-10-26: Kintsugi renamed to Skarbnik where safe
 
 - Renamed: the agent (`agent/skarbnik_agent.py`), the host program (`skarbnik-host`, built at

@@ -1,10 +1,8 @@
 // Read only access to the Skarbnik contract on NEAR testnet: JSON-RPC "call_function" view calls, no keys, no wallet,
 // nothing is ever signed or sent. Also the small helpers that turn chain values into text (NEAR amounts, UTC times).
-export const CONTRACT = 'kintsugi-l2-cihdp.testnet';
-export const RPCS = ['https://test.rpc.fastnear.com', 'https://rpc.testnet.near.org'];
-export const EXPLORER_TX = 'https://testnet.nearblocks.io/txns/';
-export const EXPLORER_ACCOUNT = 'https://testnet.nearblocks.io/address/';
-export const PUBLISHED_IMAGE_ID = 'dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc';
+// The contract, RPC addresses, explorer and published checker image id come from the one site config (js/config.js).
+import { CONTRACT, RPCS, EXPLORER_TX, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, NETWORK } from './config.js';
+export { CONTRACT, RPCS, EXPLORER_TX, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, NETWORK };
 
 const b64 = (s) => btoa(unescape(encodeURIComponent(s)));
 const cache = new Map();

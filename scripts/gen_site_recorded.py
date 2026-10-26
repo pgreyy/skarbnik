@@ -8,7 +8,8 @@ import os
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONTRACT = "kintsugi-l2-cihdp.testnet"
+SITE = json.load(open(os.path.join(ROOT, "web/site.config.json")))  # the one site config
+CONTRACT = SITE["contract"]
 
 
 def tsv(path):
@@ -81,7 +82,7 @@ BOUNTY_STEPS = [
 # Steps whose name starts like another bounty's prefix but belong elsewhere
 EXCLUDE = {13: {"web_commit_no_credit"}}
 
-out = {"contract": CONTRACT, "network": "testnet", "bounties": {}, "notes": {}}
+out = {"contract": CONTRACT, "network": SITE["network"], "bounties": {}, "notes": {}}
 
 for path, script, rules in BOUNTY_STEPS:
     rows_all = tsv(path)
