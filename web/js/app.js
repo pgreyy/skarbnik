@@ -29,7 +29,7 @@ function explorerOf(b) {
 const closesText = (b) => { const cl = left(commitBy(b)); return b.state !== 'Open' ? 'Closed' : cl ? `in ${cl.replace(' left', '')}` : `expires ${utc(b.expires_at_ns)}`; };
 const cmd = (text) => `<div class="m-cmd"><code>${esc(text)}</code><button class="k-mini" type="button" data-copy-text="${esc(text)}">Copy</button></div>`;
 // The home page shows the check command only after ./scripts/check_image_id.sh (no arguments) was run and printed MATCH.
-const SHOW_CHECK_CMD = false;
+const SHOW_CHECK_CMD = true;
 // A real commit fingerprint (bounty 16, attempt 0, read from the chain), shown blurred on the home page.
 const SAMPLE_FINGERPRINT = 'd8c2c76d001ff41c192daddf542d39dd2fe3dbe045d987145340f4aa1ae842dd';
 const failBox = (e) => `<div class="k-state" role="alert"><p class="k-err">Could not read the contract on testnet.</p><p class="m-note">${esc(e.message)}. Check your connection and reload.</p></div>`;

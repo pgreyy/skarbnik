@@ -1252,9 +1252,9 @@
   "16": "Test bounty: made for the real run of the model-driven agent (agent/)."
  },
  "last_image_check": {
-  "utc": "2026-10-25 19:53 UTC",
+  "utc": "2026-10-26 04:17 UTC",
   "result": "MATCH",
-  "source": "docs/evidence/judge/check_image_id.txt"
+  "source": "docs/evidence/judge/check_image_id_home.txt"
  },
  "new_module_bounties": {
   "17": "Private bounty, new module: the secret input and the reference fix are not in the repository, and the program (data/unpack/) is new, with no hint at its bug."

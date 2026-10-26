@@ -1,0 +1,6 @@
+$ target/debug/kintsugi-check check --candidate <bounty 17 attempt 0 patch, read from the chain> --original data/unpack/original.wasm --tests data/unpack/public_tests.txt --exploit <private secret> --seed 7481e21dc852c915116e5b102879c599e545bee4a9eab64a660bba1b57c2224a --fuzz-count 16 --variants 32 --explain
+utc=2026-10-26T04:17:37Z
+PASS
+reason (internal): -
+stats: runs=114 max_fuel_candidate=8769 max_fuel_original=6058 fairness_original_traps=0 fairness_original_errors=14 variants_original_traps=14
+exit=0
