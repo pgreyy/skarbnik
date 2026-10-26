@@ -217,7 +217,8 @@ toolchain. Steps 9 and 10 are optional and need Docker.
 
        cargo test -p kintsugi-contract
 
-   See: `test result: ok. 135 passed; 0 failed` (119 before the per-account cap tests of commit 79900dd; a fresh clone at 04b0933 gave 119, docs/evidence/judge/fresh_clone_2026-10-26.txt).
+   See: `test result: ok. 135 passed; 0 failed` (steps 8 to 10 from a fresh clone at 15b8a8b:
+   docs/evidence/judge/fresh_clone_2026-10-26b.txt).
 
 9. **Optional: rebuild the checker and compare its image id.** Downloads RISC Zero's guest builder image
    `risczero/risc0-guest-builder:r0.1.97.0` (7.46 GB) and needs Docker with buildx, RISC Zero's toolchain

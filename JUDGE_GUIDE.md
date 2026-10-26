@@ -91,7 +91,7 @@ evidence is never shown as done.
 | An agent's limited key can commit and reveal but cannot withdraw or change limits | Demonstrated | [docs/EVIDENCE.md](docs/EVIDENCE.md), "Site: wallet, credit and attempts on testnet" (limited agent key) |
 | An agent can be set up from the site: limits, a key made in the browser and added by the wallet | Demonstrated | [`docs/evidence/web/partd_transactions.tsv`](docs/evidence/web/partd_transactions.tsv); EVIDENCE, "Site in the final design" |
 | The attempt cap K limits what repeated probes learn | Demonstrated | bounty 23 (3 of 12 probe commits counted); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Arena: guarded and unguarded" |
-| The checker rebuilds to the image id on chain | Demonstrated | MATCH: [`docs/evidence/judge/fresh_clone_2026-10-26.txt`](docs/evidence/judge/fresh_clone_2026-10-26.txt); B5 |
+| The checker rebuilds to the image id on chain | Demonstrated | MATCH from a fresh clone: [`docs/evidence/judge/fresh_clone_2026-10-26b.txt`](docs/evidence/judge/fresh_clone_2026-10-26b.txt); B5 |
 | 135 contract unit tests pass | Implemented | `cargo test -p kintsugi-contract`; [`docs/evidence/account_cap/contract_unit_tests.txt`](docs/evidence/account_cap/contract_unit_tests.txt) |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | Implemented | `cargo test -p kintsugi-check`; [docs/EVIDENCE.md](docs/EVIDENCE.md), S1 |
 | A per-account cap on attempt slots | Implemented | written and tested, not deployed: [`docs/evidence/account_cap/PLAN.md`](docs/evidence/account_cap/PLAN.md) |

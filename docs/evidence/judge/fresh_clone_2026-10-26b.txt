@@ -1,0 +1,39 @@
+# README steps 8 to 10 run in a fresh clone of github.com/pgreyy/skarbnik, branch ui-preview at 15b8a8b (git clone), on the development laptop with the RISC Zero Docker images already cached. Commands exactly as the README writes them.
+== step 8 21:34:48
+   Compiling thiserror v2.0.21
+   Compiling thiserror-impl v2.0.21
+    Finished `test` profile [optimized + debuginfo] target(s) in 1m 59s
+test tests_level2::journal_layout_matches_the_real_proof0 ... ok
+test tests_level2::level2_changed_journal_refused - should panic ... ok
+test tests_level2_attempts::s2_an_attempt_journal_is_refused_as_proof0 - should panic ... ok
+test tests_level2_attempts::s2_a_proof0_journal_is_refused_as_an_attempt - should panic ... ok
+test tests_level2_attempts::s2_journal_of_779_bytes_is_refused - should panic ... ok
+test tests_level2_attempts::s2_empty_journal_is_refused - should panic ... ok
+test tests_level2_attempts::s2_journal_of_781_bytes_is_refused - should panic ... ok
+test tests_level2_attempts::s1_a_damaged_seal_with_a_correct_journal_is_refused_by_the_pairing_check - should panic ... ok
+test result: ok. 135 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+wall 120.64 s, max rss 1611564 KB, exit 0
+== step 9 21:36:49
+   Compiling thiserror v2.0.21
+   Compiling thiserror-impl v2.0.21
+    Finished `release` profile [optimized] target(s) in 2m 50s
+rebuilt checker image id:   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+published checker image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+image id of bounty 17 on kintsugi-l2-cihdp.testnet: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+MATCH
+wall 175.59 s, max rss 399092 KB, exit 0
+== step 10 21:39:44
+   Compiling thiserror v2.0.21
+    Finished `release` profile [optimized] target(s) in 3m 18s
+receipt file: docs/evidence/receipts/bounty17_proof0_groth16.bin (2057 bytes)
+image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+verify seconds: 0.008
+VALID
+journal sha256: cc7aeb44e12433964ba9ff1b76a0207a5c78d3e3b5e46d8dc2d3c462554efaef
+journal.verdict: PASS
+journal.candidate_hash: da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81
+journal.original_hash: 7911181d1c1981a0f4b76a5a8345bf0ea21d5c82514ba24847f926a5304e8bc5
+journal.exploit_commitment: 7bbb06210771226d10c73f4d6b9ad7cb19a88dd0e0ce2a72adadaa44666ba443
+journal.corpus_hash: 2c13167325b3eff2cc1c25352d31d9fa21eefd3c06099fc50b99efb87475c1bb
+wall 198.21 s, max rss 616116 KB, exit 0
+== done 21:43:03
