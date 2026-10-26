@@ -1,0 +1,49 @@
+{
+ "secret_bits": 12,
+ "note": "The probe agent's plan: one yes or no question per attempt about one bit of a 12 bit secret (4,096 values, the S8 arena).",
+ "guarded": {
+  "label": "real",
+  "where": "NEAR testnet, kintsugi-l2-cihdp.testnet bounty 23",
+  "cap_K": 3,
+  "attempts_sent": 12,
+  "attempts_counted": 3,
+  "fees_near": 0.045,
+  "gas_near": 0.0028686434536098,
+  "bits_at_most": 3,
+  "bits_learned_in_run": 0,
+  "share_exposed_at_most": 0.25,
+  "account": "skarbnik-probe-eb33d2.testnet",
+  "account_kind": "seeded",
+  "txs": [
+   "Hx8jW2LjwDqD39bQL6nA7PkQzZz4zKgZMHsSbodW1h7r",
+   "7JNC1kxgPpeduvrPy9tAfUM5QXPD3dxcD3CeLCkPZ3h",
+   "9cFyd3zYZrWXYdofg3AoWE1UnU3KWRP3KjbWbewtgL1Y",
+   "JCCiTAX1H3ZMzMVaAUTJMxFtdmeyLs9TorfWC6j6gjGz",
+   "78QhQDNZ872Sui1DoznqKenpQ1XcZx3C5nbh6e7hgNWP",
+   "HsZvFr94zeoNjcUyrpNvLaQBzZo92ynUDDBLSQYzvgtY",
+   "79kaL3bSoGg3pLS6trCcptLhYEpWnko6YRA8WxiUfC1n",
+   "EYJNFFSeA23GFaodrtGPSkNXcDkVyioXCNhLorU4cX1i",
+   "J4rrYSeueSP7kycL8V7fzBnu5yVD4cMqAJveDgPZdz5s",
+   "YLQxpBN2feV1Ybnh3Cu4DtfUeP9UjHrsvzLcPGvpLvp",
+   "2p3FHEBoRDW79SMXqtbYc9xFB8cTkhKycGTP3CZDGYr3",
+   "GjhQhQcYp5Cy75rRMhf73dZLvjmQbz4mfe9Ek7LmkJJu"
+  ],
+  "why_0_bits": "the probes were committed but not revealed, so no verdict was asked for; with K counted attempts no play can learn more than K bits"
+ },
+ "unguarded": {
+  "label": "simulated",
+  "where": "this machine only (native checker), never on the contract; no cap, no fee, crash-variant check off",
+  "attempts_sent": 12,
+  "attempts_counted": 12,
+  "fees_near": 0,
+  "bits_learned": 12,
+  "share_exposed": 1.0,
+  "with_variant_check_on": "every probe FAILs: 0 bits"
+ },
+ "sources": [
+  "docs/evidence/arena_probe/guarded_live.json",
+  "docs/evidence/arena_probe/unguarded_sim.json",
+  "docs/evidence/arena_probe/summary.txt",
+  "scripts/arena_probe.sh"
+ ]
+}

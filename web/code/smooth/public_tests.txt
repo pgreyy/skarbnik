@@ -1,0 +1,27 @@
+# Public tests for the smoothing filter (data/smooth/original.rs).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+# The expected values were produced by running the original module:
+#   target/debug/skarbnik-check run --module data/smooth/original.wasm --input <hex>
+# Proof 0 (`skarbnik-check proof0`) re-checks that the original returns every one of them.
+- -1
+01 -3
+05aabbcc -3
+13101010 1082812802
+21ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00 -2
+013a 755388932
+017444f8cf2d04cdb5 1551214689
+02a9ae 664731569
+03628affaebe1b6fbffe69 1996321201
+14fe42c6d19d6f 1809161596
+25c8dda59123adbf4bd8a49df4bcefad651c4e684f 105265123
+3172f37a1fd9 1718337083
+4fc939ca9e057223e741c8541c8e8c33 544156197
+5fb6308196ec29d32897059aa0298818061d38b45ee5b4c8fc126e2ae392a1fbdf58b99ac3e6dbd9e7 1616456603
+672844a2aa2712f4 1819549431
+72bdb7629c9a869851b5afc8d2eb63bbd8a44a99ea2b6dc4b0d648e981e6ba63d37063508eb64143add0f697d0322e9939f0e6445ad2093a1c4bef72ad006caa93 885744
+8847081d7f6f1621a9e74e2527 2054651838
+a3dad6b2f7c324aafc7f 350316128
+c4f8c5c0e6295d016f340f34a5051f4adf7cc80e4cb088f034e4a77ae08c34 1791748260
+f17ec0ab 1217785948
+9ef450c5f5635c2060e37a63872da5dba0 1217785948
+0b8f6c498d590412b8ec0842 740610519

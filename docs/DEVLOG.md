@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-26: Arena recording, guarded and unguarded (Task 4)
+
+- `scripts/arena_probe.sh`: one probe agent, 12 one-bit probes. Unguarded, simulated on this machine only (no cap, no fee,
+  variant check off): 12 bits, the whole secret. Guarded, real on testnet bounty 23 (K = 3, rising fee): 12 commits sent,
+  3 counted, 9 ignored at no cost, 0.045 NEAR fees and 0.0029 NEAR gas, at most 3 of 12 bits (0 learned in the run: no
+  reveal). EVIDENCE, "Arena: guarded and unguarded".
+- Arena page: a new first tab "Guarded vs unguarded" with both runs side by side (attempts, NEAR spent, bits learned,
+  share of the secret exposed), each labelled real or simulated. README step 7 reads bounty 23 from the chain.
+- Checked: the Arena page at 1280 and 390 px in dark and light (no sideways scroll, no script errors). A layout bug in my
+  first version (a facts table pulled into the panel's edges by an existing rule) was fixed with a more specific rule.
+
 ## 2026-10-26: Proof Ledger (Task 3)
 
 - New page `#/ledger` (menu key 5) and `web/ledger.json`: every account the contract has paid, each paid fix with how it

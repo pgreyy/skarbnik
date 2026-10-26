@@ -1,0 +1,46 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args {"bounty_id":"23","fingerprint":"89d2027cdc1d6c3b1e51d4d246a108f365f38faeba0e0736d2ff4b0830a637b8","payout":"skarbnik-probe-eb33d2.testnet"} prepaid-gas 30 Tgas attached-deposit 0 NEAR sign-as skarbnik-probe-eb33d2.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-26T10:58:06.054112606Z
+├  Unsigned transaction:
+│    signer_id:    skarbnik-probe-eb33d2.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  commit
+│                       args:         {
+│                                       "bounty_id": "23",
+│                                       "fingerprint": "89d2027cdc1d6c3b1e51d4d246a108f365f38faeba0e0736d2ff4b0830a637b8",
+│                                       "payout": "skarbnik-probe-eb33d2.testnet"
+│                                     }
+│                       gas:          30.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:52jLSEoAmoHvZ9FfK3KaCViesQTAYSeM677LF5v5cmYz
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.316 Tgas
+│    Transaction fee: 0.000031502132239 NEAR
+│    Transaction ID: JCCiTAX1H3ZMzMVaAUTJMxFtdmeyLs9TorfWC6j6gjGz
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/JCCiTAX1H3ZMzMVaAUTJMxFtdmeyLs9TorfWC6j6gjGz
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"commit_ignored","data":[{"bounty_id":"23","committer":"skarbnik-probe-eb33d2.testnet","reason":"max_commits reached"}]}
+│    Logs [skarbnik-probe-eb33d2.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+null
+
+
+The "commit" call to <kintsugi-l2-cihdp.testnet> on behalf of <skarbnik-probe-eb33d2.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args '{"bounty_id":"23","fingerprint":"89d2027cdc1d6c3b1e51d4d246a108f365f38faeba0e0736d2ff4b0830a637b8","payout":"skarbnik-probe-eb33d2.testnet"}' prepaid-gas '30.0 Tgas' attached-deposit '0 NEAR' sign-as skarbnik-probe-eb33d2.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=5.55

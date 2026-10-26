@@ -1,0 +1,17 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+arena_guarded_create	create_bounty	kintsugi-vendor-prnvm.testnet	GbxtbMdjcWfkQcBZh8Ywi1b9VT8329fsm4zuVGg5godw	0.353 Tgas	0.000035269145724	0	6.51
+arena_guarded_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	BWHJxHauB9SxjyxdvkG6Uk8xJhJzj33T2v6HBvJXEaE1	0.377 Tgas	0.000037681941703	0	5.41
+arena_prober_account	create-account	skarbnik-probe-eb33d2.testnet	HFbu6mVyTzgpNEvy9KehUeWGgp7WHVhQg57W7HnwrUCK	-	-	0	4.47
+arena_prober_deposit	deposit_credit	skarbnik-probe-eb33d2.testnet	EGaKxFBGSPJHNxHsBa2UigSfC8updfsAbnsJmuzixHbd	0.310 Tgas	0.0000309633062595	0	6.25
+arena_probe_commit_1	commit	skarbnik-probe-eb33d2.testnet	Hx8jW2LjwDqD39bQL6nA7PkQzZz4zKgZMHsSbodW1h7r	0.316 Tgas	0.000031502132239	0	5.95
+arena_probe_commit_2	commit	skarbnik-probe-eb33d2.testnet	7JNC1kxgPpeduvrPy9tAfUM5QXPD3dxcD3CeLCkPZ3h	0.316 Tgas	0.000031502132239	0	6.51
+arena_probe_commit_3	commit	skarbnik-probe-eb33d2.testnet	9cFyd3zYZrWXYdofg3AoWE1UnU3KWRP3KjbWbewtgL1Y	0.316 Tgas	0.000031502132239	0	5.33
+arena_probe_commit_4	commit	skarbnik-probe-eb33d2.testnet	JCCiTAX1H3ZMzMVaAUTJMxFtdmeyLs9TorfWC6j6gjGz	0.316 Tgas	0.000031502132239	0	5.55
+arena_probe_commit_5	commit	skarbnik-probe-eb33d2.testnet	78QhQDNZ872Sui1DoznqKenpQ1XcZx3C5nbh6e7hgNWP	0.316 Tgas	0.000031502132239	0	5.77
+arena_probe_commit_6	commit	skarbnik-probe-eb33d2.testnet	HsZvFr94zeoNjcUyrpNvLaQBzZo92ynUDDBLSQYzvgtY	0.316 Tgas	0.000031502132239	0	6.38
+arena_probe_commit_7	commit	skarbnik-probe-eb33d2.testnet	79kaL3bSoGg3pLS6trCcptLhYEpWnko6YRA8WxiUfC1n	0.316 Tgas	0.000031502132239	0	6.27
+arena_probe_commit_8	commit	skarbnik-probe-eb33d2.testnet	EYJNFFSeA23GFaodrtGPSkNXcDkVyioXCNhLorU4cX1i	0.316 Tgas	0.000031502132239	0	5.54
+arena_probe_commit_9	commit	skarbnik-probe-eb33d2.testnet	J4rrYSeueSP7kycL8V7fzBnu5yVD4cMqAJveDgPZdz5s	0.316 Tgas	0.000031502132239	0	6.07
+arena_probe_commit_10	commit	skarbnik-probe-eb33d2.testnet	YLQxpBN2feV1Ybnh3Cu4DtfUeP9UjHrsvzLcPGvpLvp	0.316 Tgas	0.000031502132239	0	5.66
+arena_probe_commit_11	commit	skarbnik-probe-eb33d2.testnet	2p3FHEBoRDW79SMXqtbYc9xFB8cTkhKycGTP3CZDGYr3	0.316 Tgas	0.000031502132239	0	6.29
+arena_probe_commit_12	commit	skarbnik-probe-eb33d2.testnet	GjhQhQcYp5Cy75rRMhf73dZLvjmQbz4mfe9Ek7LmkJJu	0.316 Tgas	0.000031502132239	0	5.77

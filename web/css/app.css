@@ -339,6 +339,10 @@ b,strong{font-weight:600}
 .k-stats dd{font-family:var(--mono);font-weight:400;font-size:26px;line-height:1.25;font-variant-numeric:tabular-nums}
 .k-stats4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .k-pad16{padding:16px 18px}
+.k-sharebar{display:inline-block;vertical-align:middle;width:120px;height:10px;border:1px solid var(--line);background:var(--bg)}
+.k-sharebar i{display:block;height:100%;background:var(--data)}
+.k-kvline{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.m-panel.k-tablepanel>.k-kv{margin:12px 0 0;width:100%}
 .k-ophead{display:flex;align-items:center;gap:12px;margin:40px 0 18px}
 .k-ophead .m-h2{font-size:26px;margin:0}
 .k-agentname b{display:block;font-weight:600}

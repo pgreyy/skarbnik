@@ -1,0 +1,22 @@
+$ near account create-account sponsor-by-faucet-service skarbnik-probe-eb33d2.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
+utc_start=2026-10-26T10:57:08.820266764Z
+├  Your transaction:
+│    signer_id:    testnet
+│    actions:
+│       -- create account:      skarbnik-probe-eb33d2.testnet
+│       -- add access key:     
+│                       public key:   ed25519:52jLSEoAmoHvZ9FfK3KaCViesQTAYSeM677LF5v5cmYz
+│                       permission:   FullAccess
+│     
+├  Transaction Execution Info:
+│    Transaction ID: HFbu6mVyTzgpNEvy9KehUeWGgp7WHVhQg57W7HnwrUCK
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/HFbu6mVyTzgpNEvy9KehUeWGgp7WHVhQg57W7HnwrUCK
+
+New account <skarbnik-probe-eb33d2.testnet> created successfully.
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=4.47

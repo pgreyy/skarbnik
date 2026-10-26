@@ -87,6 +87,11 @@ if os.path.exists(_jenv):
     BOUNTY_STEPS.append(("docs/evidence/judge/transactions.tsv", "scripts/judge_bounties.sh",
                          {j: [f"judge_create_{i + 1}", f"judge_open_{j}", f"judge_open_again_{j}", f"judge_refusal_other_seal_{j}"]
                           for i, j in enumerate(JUDGE_IDS)}))
+# The arena's guarded probe run (scripts/arena_probe.sh guarded): one bounty with the real cap and fee.
+_aenv = os.path.join(ROOT, "docs/evidence/arena_probe/run.env")
+ARENA_BOUNTY = dict(l.strip().split("=", 1) for l in open(_aenv) if "=" in l).get("GBOUNTY") if os.path.exists(_aenv) else None
+if ARENA_BOUNTY:
+    BOUNTY_STEPS.append(("docs/evidence/arena_probe/transactions.tsv", "scripts/arena_probe.sh", {int(ARENA_BOUNTY): ["arena_guarded_", "arena_probe_commit_"]}))
 # Private bounties on other new modules (scripts/private_bounty.sh, MODULE=<name>): their own evidence folder and run.env.
 NEW_MODULES = ["smooth"]
 for _m in NEW_MODULES:
@@ -231,6 +236,8 @@ for _m in NEW_MODULES:
 if "ABOUNTY" in agentenv:
     out["test_bounties"][agentenv["ABOUNTY"]] = "Test bounty: made for the real run of the model-driven agent (agent/)."
 
+if ARENA_BOUNTY:
+    out["test_bounties"][ARENA_BOUNTY] = "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
 out["judge_bounties"] = {str(j): "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself." for j in JUDGE_IDS}
 
 dst = os.path.join(ROOT, "web/data/recorded.json")

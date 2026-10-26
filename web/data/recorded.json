@@ -1166,6 +1166,148 @@
     "script": "scripts/judge_bounties.sh"
    }
   ],
+  "23": [
+   {
+    "step": "arena_guarded_create",
+    "method": "create_bounty",
+    "tx": "GbxtbMdjcWfkQcBZh8Ywi1b9VT8329fsm4zuVGg5godw",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:56 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_guarded_open",
+    "method": "open_with_groth16",
+    "tx": "BWHJxHauB9SxjyxdvkG6Uk8xJhJzj33T2v6HBvJXEaE1",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 10:57 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_1",
+    "method": "commit",
+    "tx": "Hx8jW2LjwDqD39bQL6nA7PkQzZz4zKgZMHsSbodW1h7r",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:57 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_2",
+    "method": "commit",
+    "tx": "7JNC1kxgPpeduvrPy9tAfUM5QXPD3dxcD3CeLCkPZ3h",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:57 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_3",
+    "method": "commit",
+    "tx": "9cFyd3zYZrWXYdofg3AoWE1UnU3KWRP3KjbWbewtgL1Y",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:57 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_4",
+    "method": "commit",
+    "tx": "JCCiTAX1H3ZMzMVaAUTJMxFtdmeyLs9TorfWC6j6gjGz",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:58 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_5",
+    "method": "commit",
+    "tx": "78QhQDNZ872Sui1DoznqKenpQ1XcZx3C5nbh6e7hgNWP",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:58 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_6",
+    "method": "commit",
+    "tx": "HsZvFr94zeoNjcUyrpNvLaQBzZo92ynUDDBLSQYzvgtY",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:58 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_7",
+    "method": "commit",
+    "tx": "79kaL3bSoGg3pLS6trCcptLhYEpWnko6YRA8WxiUfC1n",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:58 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_8",
+    "method": "commit",
+    "tx": "EYJNFFSeA23GFaodrtGPSkNXcDkVyioXCNhLorU4cX1i",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:58 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_9",
+    "method": "commit",
+    "tx": "J4rrYSeueSP7kycL8V7fzBnu5yVD4cMqAJveDgPZdz5s",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:59 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_10",
+    "method": "commit",
+    "tx": "YLQxpBN2feV1Ybnh3Cu4DtfUeP9UjHrsvzLcPGvpLvp",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:59 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_11",
+    "method": "commit",
+    "tx": "2p3FHEBoRDW79SMXqtbYc9xFB8cTkhKycGTP3CZDGYr3",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:59 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   },
+   {
+    "step": "arena_probe_commit_12",
+    "method": "commit",
+    "tx": "GjhQhQcYp5Cy75rRMhf73dZLvjmQbz4mfe9Ek7LmkJJu",
+    "what": "Attempt committed",
+    "time": "2026-10-26 10:59 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/arena_probe/transactions.tsv",
+    "script": "scripts/arena_probe.sh"
+   }
+  ],
   "8": [
    {
     "step": "audit8_claim_timeout",
@@ -1381,7 +1523,8 @@
   "13": "Test bounty: made for the scripted testnet run of the site's wallet features.",
   "14": "Test bounty: made for trying the wallet flow by hand. Not a demo.",
   "15": "Test bounty: made for the scripted run of the site with the NEAR CLI wallet.",
-  "16": "Test bounty: made for the real run of the model-driven agent (agent/)."
+  "16": "Test bounty: made for the real run of the model-driven agent (agent/).",
+  "23": "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
  },
  "last_image_check": {
   "utc": "2026-10-26 04:17 UTC",

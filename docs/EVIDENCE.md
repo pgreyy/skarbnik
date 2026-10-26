@@ -5,6 +5,27 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Arena: guarded and unguarded (2026-10-26)
+
+- Question: how much does a probe agent learn about the secret before the attempt cap stops it, and how much without the
+  cap? Script: `./scripts/arena_probe.sh unguarded|guarded|summary`. Raw output: `docs/evidence/arena_probe/`
+  (`summary.txt`, `guarded_live.json`, `unguarded_sim.json`, `transactions.tsv`, `steps/`). Page data: `web/data/arena_probe.json`.
+- The probe agent: the secret is one of 4,096 values (12 bits, the S8 arena module `data/arena/`). Probe b fixes the crash
+  only when bit b of the secret is 1, so its verdict answers one yes or no question. The same 12 probes in both runs.
+- Unguarded, **simulated on this machine only** (never on the contract): no cap, no fee, verdicts from the native checker
+  with the crash-variant check off (the worst case). 12 probes, 12 bits: the probes named the value 1305, and the secret
+  drawn for the run and revealed afterwards was 1305. With the variant check on, every probe FAILed (0 bits), as in S8.
+- Guarded, **real, on testnet**: bounty 23 (Level 2, demo program, K = 3, fee 0.01 NEAR then +0.005 NEAR, opened with the
+  demo's Groth16 Proof 0; create `GbxtbMdjcWfkQcBZh8Ywi1b9VT8329fsm4zuVGg5godw`, open
+  `BWHJxHauB9SxjyxdvkG6Uk8xJhJzj33T2v6HBvJXEaE1`). A seeded probe account (`skarbnik-probe-eb33d2.testnet`) deposited
+  0.2 NEAR credit and sent 12 probe commits. The contract counted the first 3 (`Hx8jW2LjwDqD39bQL6nA7PkQzZz4zKgZMHsSbodW1h7r`,
+  `7JNC1kxgPpeduvrPy9tAfUM5QXPD3dxcD3CeLCkPZ3h`, `9cFyd3zYZrWXYdofg3AoWE1UnU3KWRP3KjbWbewtgL1Y`; fees 0.01, 0.015, 0.02 NEAR from
+  credit) and ignored the other 9 at no fee (event `commit_ignored`, "max_commits reached"; first one
+  `JCCiTAX1H3ZMzMVaAUTJMxFtdmeyLs9TorfWC6j6gjGz`). Spent: 0.045 NEAR in fees and 0.0029 NEAR in gas. The probes were not
+  revealed, so this run asked for no verdict and learned 0 bits; with 3 counted attempts no play could learn more than 3
+  of 12 bits (25%). Its unrevealed commits' fees go to the protocol fee pool after the reveal window (release or expire).
+- Verdict: the cap held on chain; the side by side is on the Arena page, first tab, each run labelled real or simulated.
+
 ## Judge bounties: a real proof any judge can check on chain (2026-10-26)
 
 - Question: our stored receipts are all for decided attempts or closed bounties, so they cannot be replayed. Can a judge

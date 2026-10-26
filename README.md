@@ -38,8 +38,8 @@ handoff: docs/handoff/README.md
 ## Try it
 
 Run these from the root of a fresh clone (`git clone https://github.com/pgreyy/skarbnik && cd skarbnik`). Steps 1 to 4
-need only `curl` and `python3`. Steps 5 and 6 need near-cli-rs 0.30.1 and a testnet account. Step 7 needs the Rust
-toolchain. Steps 8 and 9 are optional and need Docker.
+need only `curl` and `python3`. Steps 5 and 6 need near-cli-rs 0.30.1 and a testnet account. Step 8 needs the Rust
+toolchain. Steps 9 and 10 are optional and need Docker.
 
 1. **Read the official demo bounty from the chain.**
 
@@ -89,14 +89,23 @@ toolchain. Steps 8 and 9 are optional and need Docker.
    tx [`5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj),
    34.856 Tgas burned: the pairing check ran (refusals from the earlier state checks cost about 2 Tgas).
 
-7. **Run the contract's tests** (cargo downloads the contract's crates, about 3 minutes the first time). They include the
+7. **See the attempt cap stop a probe agent.** A seeded probe account sent 12 probe commits to bounty 23 (the real cap
+   K = 3 and rising fee); the contract counted 3 and ignored 9 at no cost, so at most 3 of the 12 bits of the probe's
+   target could ever be learned. The same probe with no cap, simulated on our machine only, learned all 12.
+
+       curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiIyMyJ9"}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["commits"], b["max_commits"], b["fees_collected"])'
+
+   See: `23 3 3 45000000000000000000000` (3 commits counted of a cap of 3, 0.045 NEAR of fees: 0.01, 0.015 and 0.02). Both
+   runs side by side, labelled real and simulated: https://skarbnik.xyz/#/arena (docs/evidence/arena_probe/).
+
+8. **Run the contract's tests** (cargo downloads the contract's crates, about 3 minutes the first time). They include the
    two real attempt proofs of bounty 1 from testnet, checked natively.
 
        cargo test -p kintsugi-contract
 
    See: `test result: ok. 119 passed; 0 failed`.
 
-8. **Optional: rebuild the checker and compare its image id.** Downloads RISC Zero's guest builder image
+9. **Optional: rebuild the checker and compare its image id.** Downloads RISC Zero's guest builder image
    `risczero/risc0-guest-builder:r0.1.97.0` (7.46 GB) and needs Docker with buildx, RISC Zero's toolchain
    (docs/VERSIONS.md) and about 10 GB of free disk.
 
@@ -111,7 +120,7 @@ toolchain. Steps 8 and 9 are optional and need Docker.
 
    (docs/evidence/check_image_id_after_rename.txt)
 
-9. **Optional: check the stored receipt on your machine.** After step 8:
+10. **Optional: check the stored receipt on your machine.** After step 9:
 
        cargo build --release -p skarbnik-host
        ./target/release/skarbnik-host verify docs/evidence/receipts/bounty17_proof0_groth16.bin
@@ -153,12 +162,12 @@ Each claim names the file and the command that show it. Full results, failures i
 | An agent driven by a language model (NEAR AI Cloud by default): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, commits and reveals with a limited key | works on testnet: on test bounty 16 the model's fix was proven PASS and paid; on private bounty 17 (a new program, secret and reference fix outside the repository) the model's fix was the reference fix byte for byte, but the vendor's proof did not finish inside the verdict window, so it was **paid by timeout, not by a proof** | `agent/skarbnik_agent.py`; EVIDENCE "The model-driven agent", "Private bounty 17" |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | 19 of 20 as expected; the one difference (`memory_grow`) is explained | `cargo test -p kintsugi-check`; EVIDENCE, S1 |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |
-| Anyone can rebuild the checker and get the published image id | MATCH | step 8 |
+| Anyone can rebuild the checker and get the published image id | MATCH | step 9 |
 | Level 0: two registered verifiers check a receipt and attest | works on testnet; all verifier accounts are run by the project | `scripts/s4_testnet.sh` (EVIDENCE, S4) |
 | An agent's limited key cannot withdraw, change limits or exceed its fee limit; the operator panel's stop button stops it | works on testnet | `./scripts/web_testnet.sh agentkey`; docs/SECURITY.md, "The site" |
 | A site with live bounties, bounty pages, the arena, how to verify, an operator panel, a page for agents, `feed.json` | live at https://skarbnik.xyz (Vercel, branch ui-preview, no build step), checked in a browser on the live domain | `web/`; docs/evidence/web/live_domain_2026-10-26.txt |
 | Wallets through NEAR Connect, every wallet script pinned by sha256 | NEAR CLI clicked through on testnet (deposit, commit, reveal, withdraw); Meteor, Intear, Ledger, MyNearWallet (until it closes on 31 October 2026), Nightly and Ethereum Wallets only loaded | docs/evidence/web/wallets_2026-10-26.txt |
-| A probe agent learns at most one bit per verdict, capped by the attempt budget K | works (native verdicts in the recorded arena run) | `scripts/s8_arena.sh`, `scripts/s8_chain.sh` (EVIDENCE, S8) |
+| A probe agent learns at most one bit per verdict, capped by the attempt budget K | works: recorded run with native verdicts (S8); a real run on testnet where the contract counted 3 of 12 probe commits (at most 3 of 12 bits); the same probe with no cap, simulated only, learned all 12 bits | `scripts/s8_arena.sh`, `scripts/arena_probe.sh` (EVIDENCE, S8 and "Arena: guarded and unguarded"; step 7) |
 | Fees of commits never revealed go to a protocol fee pool, never to the vendor | works on testnet | `get_protocol_pool` (EVIDENCE, S6c) |
 | A Proof Ledger: every paid account, each paid fix with how it was paid (proof or timeout) and its transaction, each vendor's on-time record, distinct counterparties; every account is labelled team-run or seeded (all of them are today) | live, read from the chain | https://skarbnik.xyz/#/ledger, `web/ledger.json` (`node scripts/gen_ledger.mjs`) |
 

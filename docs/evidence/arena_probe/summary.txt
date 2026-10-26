@@ -1,0 +1,2 @@
+2026-10-26T10:56:44Z unguarded (SIMULATED, this machine, no cap, no fee, variant check off): 12 probes, 12 bits learned, value from the probes 1305, the secret revealed after the run 1305, match yes; with the variant check on every probe FAILs (0 bits)
+2026-10-26T10:59:58Z guarded (REAL, testnet bounty 23, K = 3): 12 probe commits sent by skarbnik-probe-eb33d2.testnet; counted by the contract 3; fees from credit 0.045 NEAR; gas and other costs from the wallet 0.0028686434536098 NEAR; not revealed, so 0 bits learned in this run; at most 3 bits however it played

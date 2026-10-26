@@ -304,7 +304,26 @@ async function arena(main, tab) {
       <p class="m-sub">${rec('docs/evidence/S8/arena_run.txt')}</p></section>`;
   const chain = `<section class="m-panel k-tablepanel" aria-label="On testnet"><p class="m-sub k-pad">The same cap on chain, on the older contract ${esc(r.chain.contract)}: the fourth probe commit was ignored.</p>
       ${txTable(r.chain.steps)}<p class="m-sub k-pad">${rec(r.chain.source)}</p></section>`;
-  tabbed($('#atabs'), [{ id: 'run', label: 'Recorded run', html: run }, { id: 'control', label: 'Control', html: control }, { id: 'chain', label: 'On testnet', html: chain }],
+  // Guarded (real, testnet) and unguarded (simulated, never on the contract) runs of the same probe agent (scripts/arena_probe.sh).
+  let gu = null; try { gu = await (await fetch('data/arena_probe.json')).json(); } catch { gu = null; }
+  const pct = (x) => `${Math.round(x * 100)}%`;
+  const bar = (x) => `<span class="k-sharebar" role="img" aria-label="${pct(x)} of the secret"><i style="width:${Math.round(x * 100)}%"></i></span>`;
+  const side = (title, chip, rows, foot) => `<section class="m-panel k-tablepanel" aria-label="${esc(title)}"><h2 class="m-h2 k-pad">${esc(title)} <span class="m-tok">${esc(chip)}</span></h2>
+      <table class="k-kv k-kvline"><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${v}</td></tr>`).join('')}</tbody></table><p class="m-sub k-pad">${foot}</p></section>`;
+  const vs = !gu ? '<p class="k-state">The guarded and unguarded runs are not recorded yet.</p>' : `
+    <p class="m-lead">The same probe agent asks one yes or no question per attempt about one bit of a ${esc(gu.secret_bits)} bit secret. Without a cap it learns the whole secret; on the contract the cap stops it after ${esc(gu.guarded.attempts_counted)} counted attempts, so it can learn at most ${esc(gu.guarded.bits_at_most)} of ${esc(gu.secret_bits)} bits.</p>
+    <div class="m-two">
+      ${side('Guarded', 'Real · testnet', [['Attempts sent', `<span class="k-mono">${esc(gu.guarded.attempts_sent)}</span>`], ['Attempts counted', `<span class="k-mono">${esc(gu.guarded.attempts_counted)} (cap K = ${esc(gu.guarded.cap_K)}; the rest ignored at no cost)</span>`],
+        ['NEAR spent', `<span class="k-mono">${esc(gu.guarded.fees_near)} NEAR in fees (0.01, 0.015, 0.02) + ${esc(gu.guarded.gas_near.toFixed(4))} NEAR gas</span>`], ['Bits learned', `<span class="k-mono">at most ${esc(gu.guarded.bits_at_most)}</span><span class="m-sub">0 in this run: the probes were not revealed, so no verdict was asked for</span>`],
+        ['Share of the secret exposed', `${bar(gu.guarded.share_exposed_at_most)} <span class="k-mono">at most ${pct(gu.guarded.share_exposed_at_most)}</span>`]],
+        `<a href="#/bounties/${esc(gu.guarded.where.match(/bounty (\d+)/)[1])}">${esc(gu.guarded.where)}</a>, probe account ${acct(gu.guarded.account)} <span class="m-tok">seeded</span>. First commit ${tx(gu.guarded.txs[0])}, first ignored commit ${tx(gu.guarded.txs[gu.guarded.attempts_counted])}.`)}
+      ${side('Unguarded', 'Simulated · this machine', [['Attempts sent', `<span class="k-mono">${esc(gu.unguarded.attempts_sent)}</span>`], ['Attempts counted', `<span class="k-mono">${esc(gu.unguarded.attempts_counted)} (no cap)</span>`],
+        ['NEAR spent', '<span class="k-mono">0 (no fee)</span>'], ['Bits learned', `<span class="k-mono">${esc(gu.unguarded.bits_learned)}</span><span class="m-sub">the probes named the secret's value, checked against the secret revealed after the run</span>`],
+        ['Share of the secret exposed', `${bar(gu.unguarded.share_exposed)} <span class="k-mono">${pct(gu.unguarded.share_exposed)}</span>`]],
+        `Never run against the contract: ${esc(gu.unguarded.where)}. With the crash-variant check on, every probe FAILs and learns 0 bits.`)}
+    </div>
+    <p class="m-sub">${rec('docs/evidence/arena_probe/')}</p>`;
+  tabbed($('#atabs'), [{ id: 'vs', label: 'Guarded vs unguarded', html: vs }, { id: 'run', label: 'Recorded run', html: run }, { id: 'control', label: 'Control', html: control }, { id: 'chain', label: 'On testnet', html: chain }],
     tab, '#/arena', 'Arena sections', (id) => { if (id === 'run' && document.getElementById('replay')) setTimeout(() => play(), 0); });
   let timers = [];
   const play = () => {

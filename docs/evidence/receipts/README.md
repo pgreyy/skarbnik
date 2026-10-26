@@ -25,7 +25,7 @@ Results so far (`docs/evidence/judge/summary.txt`):
 - the refusal case on closed bounty 22: tx `5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`, "the Groth16 proof does not
   verify for this bounty's image id and this journal", 34.856 Tgas (the pairing check ran); bounty 22 stayed closed.
 
-Local check (after building the host, README step 9): `./target/release/skarbnik-host verify
+Local check (after building the host, README step 10): `./target/release/skarbnik-host verify
 docs/evidence/receipts/bounty17_proof0_groth16.bin` prints `VALID` and the journal (`docs/evidence/judge/verify_bounty17_proof0.txt`).
 
 ## History: receipts of decided attempts (cannot be sent again)
