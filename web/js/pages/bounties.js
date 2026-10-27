@@ -1,5 +1,6 @@
 // Bounties: every bounty on the contract, newest first, read live from testnet. A "Reading the status" key, four
-// count tiles, a filter per status that is present (with counts), and one row per bounty: id, title and kind,
+// count tiles, a filter per status that is present (with counts; one line that scrolls sideways when it does not fit,
+// arrow keys move between them), and one row per bounty: id, title and kind,
 // reward, attempts, status with a plain line, and its evidence (the payout or creation transaction from
 // data/recorded.json) with a link. On narrow screens the rows stack into cards.
 import { near, utcShort, commitBy, CONTRACT } from '../chain.js';
@@ -105,6 +106,21 @@ ${snapshot ? `<div style="margin-top:24px">${note(snapshot.err ? `The contract c
 <div style="margin-top:24px">${note(`Every bounty on this contract is listed, read live from testnet. Test, demo and judge bounties are labelled. Titles are short descriptions; every status, amount and count comes from the chain.`)}</div>
 <div style="margin-top:12px">${note('On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.', 'eyeoff')}</div>`;
     $('#blist').querySelectorAll('[data-f]').forEach((btn) => btn.addEventListener('click', () => { filter = btn.dataset.f; draw(); const b = $(`[data-f="${CSS.escape(filter)}"]`); if (b) b.focus(); }));
+    // The filter row scrolls sideways when it does not fit: a fade at the right edge while more is hidden; arrow keys,
+    // Home and End move between the filters.
+    const seg = $('#blist .seg');
+    if (seg) {
+      const fade = () => seg.toggleAttribute('data-more', seg.scrollWidth - seg.clientWidth - seg.scrollLeft > 2);
+      seg.addEventListener('scroll', fade, { passive: true });
+      if (window.ResizeObserver) new ResizeObserver(fade).observe(seg);
+      fade();
+      seg.addEventListener('keydown', (e) => {
+        const btns = [...seg.querySelectorAll('[data-f]')], i = btns.indexOf(document.activeElement);
+        const n = i < 0 ? null : e.key === 'ArrowRight' ? Math.min(btns.length - 1, i + 1) : e.key === 'ArrowLeft' ? Math.max(0, i - 1) : e.key === 'Home' ? 0 : e.key === 'End' ? btns.length - 1 : null;
+        if (n === null) return;
+        e.preventDefault(); btns[n].focus();
+      });
+    }
   };
   draw();
   goLive.then(() => { if ($('#blist')) draw(); }, () => { if ($('#blist')) draw(); });

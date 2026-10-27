@@ -267,3 +267,9 @@ body.sk>main{flex:1 0 auto}
 .sk :where(.p-judge) .lrow.l3,.sk :where(.p-judge) .lhead.l3{grid-template-columns:minmax(0,1.4fr) 150px minmax(0,1.6fr)}
 @container sk (max-width:1100px){.sk :where(.p-judge) .lrow.l3{grid-template-columns:minmax(0,1fr)}}
 @container sk (max-width:700px){.sk :where(.p-judge) .pn,.sk :where(.p-judge) .cmd-m.m3{grid-template-columns:minmax(0,1fr)}}
+/* Bounties: the status filters stay on one line (desktop and phones). If they do not fit, the row scrolls sideways inside
+   its own box, with a soft fade at the right edge while more filters are hidden (data-more, set by js/pages/bounties.js) */
+.sk :where(.p-bounties) .bar .seg{display:flex;flex-wrap:nowrap;flex:0 1 auto;gap:2px;padding:3px;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+.sk :where(.p-bounties) .bar .seg button{flex:0 0 auto;min-height:44px;padding:0 12px;white-space:nowrap}
+.sk :where(.p-bounties) .bar .seg[data-more]{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
+@container sk (max-width:700px){.sk :where(.p-bounties) .bar .seg{width:100%}}
