@@ -5,6 +5,46 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## The vendor tool: watch proves and submits with no one's help, on a rented GPU (2026-10-27)
+
+Question: once a researcher reveals an attempt, does `tools/skarbnik-vendor watch` on the vendor's machine prove it and
+send `submit_groth16` on its own, with the secret never leaving the vendor's machines except into a rented GPU's RAM?
+
+- Setup: Proof 0 of the VPS test bounty on the VPS CPU (docs/numbers.md, 36,708.46 s). Published from the laptop with
+  `tools/skarbnik-vendor publish` (verdict window 24 h; the window rule needs at least 1 x 10 h 12 min x 1.5): bounty 32,
+  create `8vAT8wZQNwcGMz1heC5v7nWrCeHdPorgVNmGRBDJLL6J`, open `ErytPEKYGSZNWMjWFJWjS5xmGZ8RqWZ3ixEf39EZLnQM`. Its
+  secret was made on the VPS; the program is the public demo. Watch runs on the VPS in tmux with a restart runner and
+  an `@reboot` crontab line, mode gpu (`docs/evidence/vendor_tool/watch.toml`), covering bounty 32 and judge bounties
+  27 to 31. The RunPod API key stays in a mode 600 file on the VPS; it appears in no log.
+- Bounty 32: a researcher account committed the demo fix with its limited key (`86dYS838ZfwHPnJepKcpL3t5SYQ93hsUJbEcEmgBUyhg`),
+  revealed it 57 s later and was refused ("reveal gap has not passed"), then revealed at 08:45:31 UTC
+  (`HCjck1DLb5GS4YcRWH3oozJ9gm2EhJejkHyVrcJJQN4L`). From there, nobody did anything. Watch's log
+  (`docs/evidence/vendor_tool/watch.log`): 08:46:17 proving; 08:46:19 pod created (L40S, EU-NL-1, $1.09/h); 08:46:42 ssh
+  ready; 08:56:01 CUDA binary built on the pod (559 s, embeds the published checker id) and kept; 08:56:41 proved in
+  35.24 s, PASS, secret wiped; 08:57:10 pod terminated (652 s, $0.1974); 09:02:35 Groth16 on the VPS (324.86 s), VALID;
+  09:02:40 `submit_groth16` `9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y`, outcome Passed. Bounty 32 is Paid. 17 min
+  9 s from reveal to submit.
+- Judge bounty 27 (opened earlier by a judge test): the same account committed bounty 17's public fix
+  (`7nYk5ZcgcLTRXYfSbS8J9M15JZ1c1QykbYuDwfzDyrdc`) and revealed it (`GsWfYoUJfTCyrM5fRTEEMjGAuXLHDQNxaSeZUikdYLXQ`).
+  What went wrong, in order, and what was fixed:
+  1. Two pods with the cached binary failed with exit 127: the prove command used `/usr/bin/time`, which only the first
+     pod had installed. Both pods confirmed the secret wiped and were terminated (73 s and 100 s). After two failures
+     watch fell back to the VPS CPU with a WARNING line, as designed. Fix: no `/usr/bin/time` on the pod; the CPU job was
+     stopped by its process ids so GPU mode could retry.
+  2. The retry proved on an L40S in 29.32 s (pod 123 s, $0.0372), Groth16 289.24 s on the VPS, but `submit_groth16`
+     failed: near-cli said "Transaction has expired". Its "testnet" connection is FastNEAR's archival RPC, which can
+     hand out an old block hash. Watch then started a new pod for the same attempt; the runner and watch were stopped
+     and that pod terminated (53 s, $0.016). Fixes: the watch config signs through `testnet-fastnear`; `send` tries a
+     transient failure 3 times; a proof that exists is only submitted again, never proved again.
+  3. Restarted: "the proof is already made; submitting it again", `submit_groth16`
+     `73xzLn4vmLyma5wF7qm9KY7qJoJz7ZkNJ2sAR4bTfipG`, outcome Passed, no new pod.
+- Cost: five pods, $0.303 in all (`docs/evidence/vendor_tool/gpu_spend.json`); one proof with the cached binary costs
+  $0.04. Every pod's termination was confirmed by the RunPod API; no pod is left on the account.
+
+Verdict: PASS. Watch proved and submitted bounty 32's attempt on its own, and judge bounty 27's after two fixes. Limits:
+two attempts, one GPU type; the secret is in a rented machine's RAM during each proof; the demo program and bounty 17's
+program only.
+
 ## Judge bounties, round 2: 27 to 31 (2026-10-27)
 
 Judge bounties 18 to 22 (round 1: K = 3, 24 h window) are retired. Round 2 replaces them with the same hashes as

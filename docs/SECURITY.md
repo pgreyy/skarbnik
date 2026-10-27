@@ -88,7 +88,18 @@ Each guard: what it stops, where it lives, and what shows it works.
 | The model's answer is refused if it uses `include!`, `include_str!`, `include_bytes!`, `env!`, `option_env!`, `extern crate`, `mod x;` or `#[path]`, and it is built with an environment holding no API key | An answer (for example after a prompt injection in the public code) that pulls a local file or the key into the patch, which is published on chain at reveal | case 5 |
 | The API key comes only from an environment variable or a file outside the repository, and is never printed or logged | Leaking the key into logs, evidence files or git | case 2: the key is in no log or file of the run |
 
-### The MCP server (tools/skarbnik-mcp/)
+### The vendor's GPU proving (tools/skarbnik_gpu.py, watch in mode gpu)
+
+| Guard | What it stops | Shown by |
+| --- | --- | --- |
+| The secret input and the bounty's salt go to the pod only into a RAM folder (`/dev/shm`), are shredded right after the prove step whether it worked or not, and the wipe is confirmed before anything else runs | The secret staying on a rented machine's disk | the watch log line "secret wiped" (EVIDENCE, "The vendor tool") |
+| Every pod is terminated in a `finally` block, also on any failure; every step's time limit is cut to what is left of a 45 minute hard cap; pods this tool left behind (a crash) are terminated at the next start | A forgotten pod billing for hours | the watch log's "terminated" line with the pod's life in seconds |
+| No new pod starts once the logged spend (each pod's hourly price times its life) reaches the budget ($6); the attempt is then proved on the vendor's own CPU, with a warning | Spending past the owner's limit | `~/skarbnik-vendor/gpu_spend.json` on the vendor machine |
+| The RunPod API key is read from its file (mode 600) for each request and never printed, logged or copied; error text is cleaned of it | Leaking the key | `tools/skarbnik_gpu.py` (`RunPod`) |
+| A GPU binary built on a pod must embed the published checker image id; a cached binary must match its recorded sha256 and load on the pod; the proof is still verified, wrapped and checked (verdict, submission id, secret commitment) on the vendor machine before submit | A wrong checker or a changed binary | `put_binary`, `prove_attempt` |
+| After two failed pods for one attempt, the attempt is proved on the vendor's CPU, with a warning | A RunPod outage leaving an attempt unproved | watch log; it happened once (bounty 27, EVIDENCE, "The vendor tool") |
+| Once a proof exists, a failed submit is only sent again (up to 10 times); no new pod starts for that attempt | Paying for the same proof again after a submit fails | bounty 27's second submit (EVIDENCE, "The vendor tool") |
+
 
 | Guard | What it stops | Shown by |
 | --- | --- | --- |
@@ -304,6 +315,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-27: GPU proving in the vendor's watch (`tools/skarbnik_gpu.py`): a RunPod pod per revealed attempt, secret in
+  RAM only and wiped after the prove step, pod always terminated with a 45 minute cap, a $6 spend cap, CPU fallback after
+  two failed pods. Judge bounties 18 to 22 retired; 27 to 31 replace them (K = 2, 1 per account).
 
 - 2026-10-27: new guards in `tools/skarbnik-mcp/` (an MCP server for agents): only a key limited to commit and reveal,
   key and nonce files of mode 600, no key or nonce in any output, mainnet only with a flag, no early reveal. Tested on

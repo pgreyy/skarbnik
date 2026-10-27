@@ -64,16 +64,43 @@ receipts and their hashes leave the machine.
 | Mode | Privacy | Speed | Status |
 | --- | --- | --- | --- |
 | Your own machine (`cpu`) | strongest: the secret never leaves a machine you control | slowest; measure it before choosing the windows | built |
-| A GPU you rent for the job | the secret sits in the rented machine's memory during the proof, then is wiped | under a minute for bounty 24's attempt (docs/numbers.md) | measured by hand once (notes in docs/EVIDENCE.md, "Bounty 24"); not yet built into `watch` |
+| A GPU you rent for the job (`gpu`) | the secret sits in the rented machine's memory (RAM only) during the proof, then is wiped | under a minute to prove and shrink bounty 24's attempt; one pod per attempt, end to end (docs/numbers.md) | built into `watch` (below) |
 | A Skarbnik-hosted proving service | the service would see the secret | | not offered |
 
 The Groth16 wrap needs an x86 machine with Docker and about 7 GiB of memory, whichever mode proves.
 
+## GPU mode
+
+With `mode = "gpu"` in a watch config, `watch` proves each revealed attempt on a RunPod pod
+(`tools/skarbnik_gpu.py`) and wraps it to Groth16 on its own machine:
+
+1. It refuses to start a pod once the logged GPU spend reaches the budget, and terminates pods it left behind.
+2. It creates a Secure Cloud pod: the GPU types in order (L40S, then RTX 6000 Ada, then RTX A6000), the data centers in
+   order, the image `runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404` (PyTorch 2.8.0, CUDA 12.8.1, Ubuntu 24.04).
+3. It puts the CUDA build of `skarbnik-host` on the pod: the cached copy, or a build on the first pod (Rust, RISC Zero,
+   the committed source and the reproducible guest files; the build must embed the published checker id), kept for the
+   next pods.
+4. It copies the secret input and the salt into the pod's RAM (`/dev/shm`) only, proves, and shreds them right after,
+   whether the proof worked or not; then verifies, shrinks to a succinct receipt on the GPU and fetches it.
+5. It terminates the pod, in every case. No pod lives longer than 45 minutes: every step's time limit is cut to what
+   is left. The pod's cost (hourly price times its life) goes to the log and to `gpu_spend.json`.
+6. It wraps to Groth16, verifies, checks the verdict, the submission id and the secret commitment, and submits.
+
+After two failed pods for one attempt, or at the spend cap, it proves on its own CPU and writes a WARNING line. Once a
+proof exists, a failed submit is only sent again (up to 10 times); no new pod starts for that attempt. One proof cost
+$0.04 on an L40S with the cached binary (docs/numbers.md). Set `network = "testnet-fastnear"` in the watch config's
+`[chain]`: near-cli then signs against the regular RPC rather than the archival one, whose old block hash once made a
+submit expire. The
+`[gpu]` section: `api_key_file` (mode 600; never printed, logged or copied), `gpu_types`, `data_centers`, `cap_minutes`
+(45), `budget_usd` (6), and optionally `image`, `spend_file`, `ssh_key`, `binary_cache`, `src_tarball`, `guests_dir`,
+`po2` (19).
+
 ## The project's own vendor machine
 
-The project runs `watch` on a rented VPS (4 cores, 7.8 GiB of memory, 8 GiB of swap). That VPS is a vendor-controlled
-machine: it holds the secrets of the bounties it proves and nothing else (judge bounties 18 to 22 use bounty 17's
-secret and salt; the test bounty its own, generated on the VPS), plus the key of a dedicated testnet account that only
+The project runs `watch` on a rented VPS (4 cores, 7.8 GiB of memory, 8 GiB of swap), in GPU mode: one CPU proof there
+takes 10 h 12 min (docs/numbers.md), too slow for judging. That VPS is a vendor-controlled
+machine: it holds the secrets of the bounties it proves and nothing else (judge bounties 27 to 31, like the retired 18 to
+22, use bounty 17's secret and salt; the test bounty its own, generated on the VPS), plus the key of a dedicated testnet account that only
 sends `submit_groth16`. It runs everything as one ordinary user, in that user's home folder, with no system-wide
 changes:
 
@@ -94,4 +121,5 @@ tools/skarbnik-vendor publish --config ~/skarbnik-vendor/mybounty.toml
 tools/skarbnik-vendor status --config ~/skarbnik-vendor/watch.toml
 ```
 
-The end to end run of all of this on a new testnet bounty is in docs/EVIDENCE.md, "The vendor tool".
+The end to end run of all of this on a new testnet bounty (bounty 32), and on judge bounty 27, is in docs/EVIDENCE.md,
+"The vendor tool".

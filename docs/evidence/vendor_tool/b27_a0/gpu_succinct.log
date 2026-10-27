@@ -1,0 +1,5 @@
+input receipt: run/u.bin (7751658 bytes)
+compressed to: succinct
+compress seconds: 18.75
+verify seconds: 0.025
+output receipt: run/u_succinct.bin (224786 bytes)

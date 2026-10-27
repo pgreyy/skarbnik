@@ -1,0 +1,11 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+partc_bounty_create	create_bounty	kintsugi-vendor-prnvm.testnet	8vAT8wZQNwcGMz1heC5v7nWrCeHdPorgVNmGRBDJLL6J	-	-	0	-
+partc_bounty_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	ErytPEKYGSZNWMjWFJWjS5xmGZ8RqWZ3ixEf39EZLnQM	-	-	0	-
+partc_commit	commit	skarbnik-agentsmd-960210.testnet	86dYS838ZfwHPnJepKcpL3t5SYQ93hsUJbEcEmgBUyhg	-	-	0	-
+partc_reveal_too_early	reveal	skarbnik-agentsmd-960210.testnet	-	-	-	1	-
+partc_reveal	reveal	skarbnik-agentsmd-960210.testnet	HCjck1DLb5GS4YcRWH3oozJ9gm2EhJejkHyVrcJJQN4L	-	-	0	-
+partc_watch_submit_groth16	submit_groth16	skarbnik-prover-bb2d00.testnet	9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y	-	-	0	-
+judge27_commit	commit	skarbnik-agentsmd-960210.testnet	7nYk5ZcgcLTRXYfSbS8J9M15JZ1c1QykbYuDwfzDyrdc	-	-	0	-
+judge27_reveal	reveal	skarbnik-agentsmd-960210.testnet	GsWfYoUJfTCyrM5fRTEEMjGAuXLHDQNxaSeZUikdYLXQ	-	-	0	-
+judge27_watch_submit_expired	submit_groth16	skarbnik-prover-bb2d00.testnet	-	-	-	1	-
+judge27_watch_submit_groth16	submit_groth16	skarbnik-prover-bb2d00.testnet	73xzLn4vmLyma5wF7qm9KY7qJoJz7ZkNJ2sAR4bTfipG	-	-	0	-

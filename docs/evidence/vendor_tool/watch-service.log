@@ -1,0 +1,56 @@
+2026-10-27T08:43:15Z watch starting
+2026-10-27T08:43:15Z watch started (mode gpu, bounties 32, 27, 28, 29, 30, 31, one job at a time)
+2026-10-27T08:43:15Z GPU mode: RunPod NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA RTX A6000 in EU-RO-1, EU-CZ-1, EU-SE-1, EU-NL-1, US-TX-3, cap 45 min per pod, spend so far $0 of a $6.0 budget
+2026-10-27T08:46:17Z bounty 32 attempt 0: proving (patch sha256 42edaaf57b1b428b..., seed f6f91a120a772cfb..., deadline 2026-10-28 08:45 UTC)
+2026-10-27T08:46:19Z bounty 32 attempt 0: pod e73v53inmllggg created: None in EU-NL-1, $1.09/h, hard cap 45 min
+2026-10-27T08:46:42Z bounty 32 attempt 0: pod e73v53inmllggg: ssh ready after 24 s
+2026-10-27T08:56:01Z bounty 32 attempt 0: pod e73v53inmllggg: built the GPU binary in 559 s (sha256 d71c9469f749d05d...), kept for the next pods
+2026-10-27T08:56:41Z bounty 32 attempt 0: pod e73v53inmllggg: proved in 35.24 s, secret wiped; segments: 27 journal.verdict: PASS
+2026-10-27T08:57:10Z bounty 32 attempt 0: pod e73v53inmllggg terminated: 652 s, $0.1974 ($1.09/h); GPU spend so far $0.1974
+2026-10-27T09:02:35Z bounty 32 attempt 0: proof ready, verdict PASS; prove 35.24 s, succinct 23.84 s, Groth16 324.86 s
+2026-10-27T09:02:40Z bounty 32 attempt 0: submit_groth16 9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y ok; outcome on chain Passed
+2026-10-27T09:04:09Z watch stopped (exit 0); restarting in 60 s
+2026-10-27T09:05:09Z watch starting
+2026-10-27T09:05:09Z watch started (mode gpu, bounties 32, 27, 28, 29, 30, 31, one job at a time)
+2026-10-27T09:05:09Z GPU mode: RunPod NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA RTX A6000 in EU-RO-1, EU-CZ-1, EU-SE-1, EU-NL-1, US-TX-3, cap 45 min per pod, spend so far $0.1974 of a $6.0 budget
+2026-10-27T09:08:12Z bounty 27 attempt 0: proving (patch sha256 da3536562e17993d..., seed 552cdb36c0d02a7a..., deadline 2026-10-29 02:07 UTC)
+2026-10-27T09:08:14Z bounty 27 attempt 0: pod 6mh62r8hn45foq created: NVIDIA L40S in US-TX-3, $1.09/h, hard cap 45 min
+2026-10-27T09:08:48Z bounty 27 attempt 0: pod 6mh62r8hn45foq: ssh ready after 36 s, GPU NVIDIA L40S
+2026-10-27T09:09:03Z bounty 27 attempt 0: pod 6mh62r8hn45foq: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-10-27T09:09:26Z bounty 27 attempt 0: pod 6mh62r8hn45foq terminated: 73 s, $0.0221 ($1.09/h); GPU spend so far $0.2195
+2026-10-27T09:09:26Z bounty 27 attempt 0: GPU try 1 of 2 failed (pod step failed (exit 127): SECRET_WIPED)
+2026-10-27T09:09:28Z bounty 27 attempt 0: pod 37vky5d8k5t2mp created: NVIDIA L40S in US-TX-3, $1.09/h, hard cap 45 min
+2026-10-27T09:09:51Z bounty 27 attempt 0: pod 37vky5d8k5t2mp: ssh ready after 25 s, GPU NVIDIA L40S
+2026-10-27T09:10:06Z bounty 27 attempt 0: pod 37vky5d8k5t2mp: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-10-27T09:11:06Z bounty 27 attempt 0: pod 37vky5d8k5t2mp terminated: 100 s, $0.0303 ($1.09/h); GPU spend so far $0.2498
+2026-10-27T09:11:06Z bounty 27 attempt 0: GPU try 2 of 2 failed (pod step failed (exit 127): SECRET_WIPED)
+2026-10-27T09:11:06Z WARNING bounty 27 attempt 0: the GPU path did not give a proof; falling back to cpu on this machine (about 10 h here)
+  ... prove_u.log: 1 min 00 s, available memory 5196 MiB
+2026-10-27T09:12:49Z watch stopped (exit 0); restarting in 60 s
+2026-10-27T09:13:49Z watch starting
+2026-10-27T09:13:49Z watch started (mode gpu, bounties 32, 27, 28, 29, 30, 31, one job at a time)
+2026-10-27T09:13:49Z GPU mode: RunPod NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA RTX A6000 in EU-RO-1, EU-CZ-1, EU-SE-1, EU-NL-1, US-TX-3, cap 45 min per pod, spend so far $0.2498 of a $6.0 budget
+2026-10-27T09:13:50Z bounty 27 attempt 0: proving (patch sha256 da3536562e17993d..., seed 552cdb36c0d02a7a..., deadline 2026-10-29 02:07 UTC)
+2026-10-27T09:13:52Z bounty 27 attempt 0: pod yr05zm47fccnpo created: NVIDIA L40S in US-TX-3, $1.09/h, hard cap 45 min
+2026-10-27T09:14:15Z bounty 27 attempt 0: pod yr05zm47fccnpo: ssh ready after 25 s, GPU NVIDIA L40S
+2026-10-27T09:14:29Z bounty 27 attempt 0: pod yr05zm47fccnpo: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-10-27T09:15:17Z bounty 27 attempt 0: pod yr05zm47fccnpo: proved in 29.32 s, secret wiped; segments: 29 journal.verdict: PASS
+2026-10-27T09:15:54Z bounty 27 attempt 0: pod yr05zm47fccnpo terminated: 123 s, $0.0372 ($1.09/h); GPU spend so far $0.287
+2026-10-27T09:20:43Z bounty 27 attempt 0: proof ready, verdict PASS; prove 29.32 s, succinct 20.84 s, Groth16 289.24 s; on NVIDIA L40S, pod 123 s, $0.0372
+2026-10-27T09:20:44Z bounty 27 attempt 0: submit_groth16 None FAILED:  or re-run:
+    ~/skarbnik/bin/near contract call-function as-transaction kintsugi-l2-cihdp.testnet submit_groth16 file-args ~/skarbnik-vendor/watch-work/b27_a0/u_call.json prepaid-gas '300.0 Tgas' attached-deposit '0 NEAR' sign-as skarbnik-prover-bb2d00.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: Transaction has expired.
+
+Location:; outcome on chain Open
+2026-10-27T09:20:44Z bounty 27 attempt 0: proving (patch sha256 da3536562e17993d..., seed 552cdb36c0d02a7a..., deadline 2026-10-29 02:07 UTC)
+2026-10-27T09:20:47Z bounty 27 attempt 0: pod 7c77ikygqmhh04 created: NVIDIA L40S in US-TX-3, $1.09/h, hard cap 45 min
+2026-10-27T09:21:21Z bounty 27 attempt 0: pod 7c77ikygqmhh04: ssh ready after 36 s, GPU NVIDIA L40S
+2026-10-27T09:23:02Z watch starting
+2026-10-27T09:23:02Z watch started (mode gpu, bounties 32, 27, 28, 29, 30, 31, one job at a time)
+2026-10-27T09:23:02Z GPU mode: RunPod NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA RTX A6000 in EU-RO-1, EU-CZ-1, EU-SE-1, EU-NL-1, US-TX-3, cap 45 min per pod, spend so far $0.303 of a $6.0 budget
+2026-10-27T09:23:03Z bounty 27 attempt 0: proving (patch sha256 da3536562e17993d..., seed 552cdb36c0d02a7a..., deadline 2026-10-29 02:07 UTC)
+2026-10-27T09:23:03Z bounty 27 attempt 0: the proof is already made; submitting it again (try 2)
+2026-10-27T09:23:03Z bounty 27 attempt 0: proof ready, verdict PASS; prove 29.32 s, succinct 20.84 s, Groth16 289.24 s; on NVIDIA L40S, pod 123 s, $0.0372
+2026-10-27T09:23:07Z bounty 27 attempt 0: submit_groth16 73xzLn4vmLyma5wF7qm9KY7qJoJz7ZkNJ2sAR4bTfipG ok; outcome on chain Passed

@@ -1,0 +1,8 @@
+{
+ "sha256": "d71c9469f749d05d4b0ca8778a948d8811795ea646c96a0de6c196c22688568d",
+ "built_utc": "2026-10-27T08:56:01Z",
+ "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+ "gpu": null,
+ "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+ "build_seconds": 559
+}

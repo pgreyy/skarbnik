@@ -11,7 +11,10 @@ A vendor should not have to be a cryptography operator. Commands:
   publish  shows the preview, asks for confirmation, creates and opens the bounty, prints the transactions
   watch    the auto prover: polls the chain for revealed attempts on the bounties in the watch config, proves each one
            (oldest first) with the attempt's seed and submission id, checks the verdict and the secret commitment, and
-           submits the Groth16 proof (submit_groth16, which anyone may send); warns when a window is at risk
+           submits the Groth16 proof (submit_groth16, which anyone may send); warns when a window is at risk. Prover
+           mode cpu proves on this machine; mode gpu proves and shrinks on a RunPod pod per attempt
+           (tools/skarbnik_gpu.py: secret in the pod's RAM only, pod always terminated, 45 minute cap, spend cap),
+           then wraps to Groth16 here; after two failed pods, or at the spend cap, it falls back to cpu and warns
   status   each watched bounty and attempt, its state and the next action needed
 
 Secrets (the secret input, the salt, the reference fix) stay on the machine that proves, in files of mode 600 outside
@@ -21,6 +24,8 @@ packages. Usage: tools/skarbnik-vendor <command> --config <file.toml> (see tools
 """
 import argparse, base64, fcntl, hashlib, json, os, re, subprocess, sys, time, tomllib, urllib.request
 from datetime import datetime, timezone
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import skarbnik_gpu as gpu  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEC = 10**9
@@ -80,8 +85,12 @@ def send(cfg, signer, method, args_file, deposit='0 NEAR', gas='300 Tgas', log=N
     cmd = [binpath(cfg, 'near'), 'contract', 'call-function', 'as-transaction', cfg['chain']['contract'], method, 'file-args', args_file,
            'prepaid-gas', gas, 'attached-deposit', deposit, 'sign-as', signer, 'network-config', cfg['chain'].get('network', 'testnet'),
            'sign-with-legacy-keychain', 'send']
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    out = r.stdout + '\n' + r.stderr
+    for attempt in range(3):  # a transient error ("Transaction has expired", a busy RPC) is tried again; a refusal is not
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        out = r.stdout + '\n' + r.stderr
+        if r.returncode == 0 or 'Smart contract panicked' in out or re.search(r'Transaction ID: ', out): break
+        if log: open(log, 'a').write(f'$ near ... {method}: try {attempt + 1} of 3 did not go through; trying again in 15 s\n')
+        time.sleep(15)
     # keep only lines that are safe to show: no keys, signatures or long base58 strings
     safe = '\n'.join(l for l in re.sub(r'\x1b\[[0-9;]*m', '', out).splitlines()
                      if not re.search(r'private|secret|seed.?phrase|signature', l, re.I) and not re.search(r'[1-9A-HJ-NP-Za-km-z]{80,}', l))
@@ -160,17 +169,23 @@ def _prove_chain(cfg, w, name, candidate, module, secret, seed, fuzz, variants, 
     times['prove'] = measured(cfg, f'{w}/prove_{tag}.log', argv, cfg['prover'].get('prove_max_s', 43200), cfg['prover'].get('min_avail_mib', 300))
     times['succinct'] = measured(cfg, f'{w}/succinct_{tag}.log', [host, 'compress', f'{w}/{tag}.bin', f'{w}/{tag}_succinct.bin', 'succinct'], cfg['prover'].get('succinct_max_s', 43200), cfg['prover'].get('min_avail_mib', 300))
     os.remove(f'{w}/{tag}.bin')  # the composite receipt is large and no longer needed
+    v, times['groth16'] = wrap(cfg, w, tag)
+    return v, times
+
+def wrap(cfg, w, tag):
+    """Groth16 wrap of {tag}_succinct.bin -> verify -> contract arguments, in workdir w. Returns the verify text and seconds."""
+    host = binpath(cfg, 'host'); log = f'{w}/run.log'
     wait_memory(GROTH16_NEED_MIB, log, 'the Groth16 wrap')
     t0 = time.time()
     g = subprocess.run(['/usr/bin/time', '-v', host, 'compress', f'{w}/{tag}_succinct.bin', f'{w}/{tag}_groth16.bin', 'groth16'], capture_output=True, text=True, env=dict(os.environ, RISC0_DEV_MODE='0'))
     open(f'{w}/groth16_{tag}.log', 'w').write(g.stdout + g.stderr)
-    times['groth16'] = round(time.time() - t0, 2)
+    secs = round(time.time() - t0, 2)
     if g.returncode != 0: raise RuntimeError(f'the Groth16 wrap failed (groth16_{tag}.log)')
     v = subprocess.run([host, 'verify', f'{w}/{tag}_groth16.bin'], capture_output=True, text=True).stdout
     open(f'{w}/verify_{tag}.txt', 'w').write(v)
     if not re.search(r'^VALID', v, re.M): raise RuntimeError('the Groth16 receipt does not verify')
     subprocess.run([host, 'groth16-args', f'{w}/{tag}_groth16.bin', f'{w}/{tag}_args.json'], check=True, capture_output=True)
-    return v, times
+    return v, secs
 
 def journal(v, field):
     m = re.search(rf'^journal\.{field}: (\S+)', v, re.M); return m.group(1) if m else None
@@ -356,18 +371,46 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
     sid = view(wcfg, 'get_submission_id', {'bounty_id': bid, 'index': i})
     module = os.path.join(ROOT, e['module']) if not os.path.isabs(e['module']) else e['module']
     log_line(wcfg, f'bounty {bid} attempt {i}: proving (patch sha256 {sha_file(patch)[:16]}..., seed {s["seed"][:16]}..., deadline {datetime.fromtimestamp(int(s["deadline_ns"]) / 1e9, timezone.utc):%Y-%m-%d %H:%M} UTC)')
-    st[key] = {'state': 'proving', 'started': now()}; state_save(wcfg, st)
-    v, t = prove_chain(wcfg, w, e['name'], patch, module, os.path.expanduser(e['secret']), s['seed'], b['fuzz_count'], b['variant_count'], int(e.get('po2', 18)), sid=sid)
+    prev = st.get(key, {})
+    v = t = None
+    if prev.get('state') in ('proof ready', 'submit failed') and os.path.exists(f'{w}/u_args.json') and os.path.exists(f'{w}/verify_u.txt'):
+        # The proof exists: only the submit is tried again; no new pod and no new proving for this attempt.
+        v, t = open(f'{w}/verify_u.txt').read(), prev.get('times_s', {})
+        log_line(wcfg, f'bounty {bid} attempt {i}: the proof is already made; submitting it again (try {prev.get("submit_failures", 0) + 1})')
+    else:
+        st[key] = {'state': 'proving', 'started': now()}; state_save(wcfg, st)
+        if wcfg['prover']['mode'] == 'gpu':
+            job = {'bounty_id': bid, 'index': i, 'name': e['name'], 'module': module, 'patch': patch, 'secret': os.path.expanduser(e['secret']),
+                   'salt': os.path.expanduser(f'~/.kintsugi-salts/{e["name"]}.salt'), 'seed': s['seed'], 'sid': sid, 'fuzz': b['fuzz_count'],
+                   'variants': b['variant_count'], 'image_id': b['image_id'], 'workdir': w}
+            for n in (1, 2):
+                try:
+                    with ProverLock():
+                        _, t = gpu.prove_on_gpu(wcfg, job, lambda m: log_line(wcfg, f'bounty {bid} attempt {i}: {m}'))
+                        v, t['groth16'] = wrap(wcfg, w, 'u')
+                    break
+                except gpu.BudgetReached as ex:
+                    log_line(wcfg, f'WARNING bounty {bid} attempt {i}: {ex}; proving on this machine (cpu) instead'); break
+                except Exception as ex:  # noqa: BLE001
+                    log_line(wcfg, f'bounty {bid} attempt {i}: GPU try {n} of 2 failed ({ex})')
+            if v is None:
+                log_line(wcfg, f'WARNING bounty {bid} attempt {i}: the GPU path did not give a proof; falling back to cpu on this machine (about 10 h here)')
+        if v is None:
+            v, t = prove_chain(wcfg, w, e['name'], patch, module, os.path.expanduser(e['secret']), s['seed'], b['fuzz_count'], b['variant_count'], int(e.get('po2', 18)), sid=sid)
     if journal(v, 'exploit_commitment') != b['exploit_commitment']: raise RuntimeError('the proof\'s secret commitment is not the bounty\'s (wrong secret or salt); not submitting')
     if journal(v, 'submission_id') != sid: raise RuntimeError('the proof is for another submission id; not submitting')
     verdict = journal(v, 'verdict')
-    log_line(wcfg, f'bounty {bid} attempt {i}: proof ready, verdict {verdict}; prove {t["prove"]} s, succinct {t["succinct"]} s, Groth16 {t["groth16"]} s')
+    extra = f'; on {t["gpu"]}, pod {t["pod_seconds"]} s, ${t["cost_usd"]}' if t.get('gpu') else ''
+    log_line(wcfg, f'bounty {bid} attempt {i}: proof ready, verdict {verdict}; prove {t.get("prove")} s, succinct {t.get("succinct")} s, Groth16 {t.get("groth16")} s{extra}')
+    st[key] = {'state': 'proof ready', 'verdict': verdict, 'times_s': t, 'submit_failures': prev.get('submit_failures', 0)}; state_save(wcfg, st)
     fresh = view(wcfg, 'get_submission', {'bounty_id': bid, 'index': i})
     if fresh['outcome'] != 'Open': log_line(wcfg, f'bounty {bid} attempt {i}: already decided on chain ({fresh["outcome"]}); not submitting'); st[key] = {'state': 'decided elsewhere', 'outcome': fresh['outcome']}; return
     tx, ok, why = send(wcfg, wcfg['chain']['submit_account'], 'submit_groth16', proof_args(w, 'u', {'bounty_id': bid, 'index': i}), log=f'{w}/run.log')
     after = view(wcfg, 'get_submission', {'bounty_id': bid, 'index': i})
     log_line(wcfg, f'bounty {bid} attempt {i}: submit_groth16 {tx} {"ok" if ok else "FAILED: " + why}; outcome on chain {after["outcome"]}')
-    st[key] = {'state': 'submitted' if ok else 'submit failed', 'tx': tx, 'verdict': verdict, 'outcome': after['outcome'], 'times_s': t, 'done': now()}
+    st[key] = {'state': 'submitted' if ok else 'submit failed', 'tx': tx, 'verdict': verdict, 'outcome': after['outcome'], 'times_s': t, 'done': now(),
+               'submit_failures': prev.get('submit_failures', 0) + (0 if ok else 1)}
+    if not ok: return
     for f in ('u_succinct.bin',):
         if os.path.exists(f'{w}/{f}'): os.remove(f'{w}/{f}')
 
@@ -380,19 +423,23 @@ def scan(wcfg, st):
         for i, s in enumerate(subs):
             if s['outcome'] != 'Open' or not s.get('revealed_at_ns'): continue
             done = st.get(f'{bid}:{i}', {})
-            if done.get('state') in ('submitted', 'decided elsewhere', 'deadline passed') or done.get('failures', 0) >= 2: continue
+            if done.get('state') in ('submitted', 'decided elsewhere', 'deadline passed') or done.get('failures', 0) >= 2 or done.get('submit_failures', 0) >= 10: continue
             jobs.append((int(s['revealed_at_ns']), bid, e, b, i, s))
     return sorted(jobs, key=lambda j: j[0])
 
 def cmd_watch(a):
     wcfg = load(a.config); st = state_load(wcfg)
     log_line(wcfg, f'watch started (mode {wcfg["prover"]["mode"]}, bounties {", ".join(b for b, _ in watched(wcfg))}, one job at a time)')
-    if wcfg['prover']['mode'] != 'cpu': log_line(wcfg, 'GPU mode is not built yet; proving on this machine (cpu)')
+    if wcfg['prover']['mode'] == 'gpu':
+        g = gpu.settings(wcfg)
+        log_line(wcfg, f'GPU mode: RunPod {", ".join(g["gpu_types"])} in {", ".join(g["data_centers"])}, cap {g["cap_minutes"]} min per pod, '
+                       f'spend so far ${gpu.spend_total(g)} of a ${g["budget_usd"]} budget')
     while True:
         jobs = scan(wcfg, st)
         nowns = time.time() * SEC
         for _, bid, e, b, i, s in jobs:
-            est, _ = proof_time('cpu', e['module'], None, wcfg['prover'].get('machine', 'this machine')); left = (int(s['deadline_ns']) - nowns) / SEC
+            est = 60 * float(gpu.settings(wcfg)['cap_minutes']) + 900 if wcfg['prover']['mode'] == 'gpu' else proof_time('cpu', e['module'], None, wcfg['prover'].get('machine', 'this machine'))[0]
+            left = (int(s['deadline_ns']) - nowns) / SEC
             if left <= 0: log_line(wcfg, f'bounty {bid} attempt {i}: its verdict deadline has passed; the timeout rule decides it'); st[f'{bid}:{i}'] = {'state': 'deadline passed'}; state_save(wcfg, st); continue
             if est and left < est * 1.2: log_line(wcfg, f'WINDOW AT RISK: bounty {bid} attempt {i} has {hm(left)} left; one proof here takes about {hm(est)}')
         jobs = [j for j in jobs if st.get(f'{j[1]}:{j[4]}', {}).get('state') != 'deadline passed']

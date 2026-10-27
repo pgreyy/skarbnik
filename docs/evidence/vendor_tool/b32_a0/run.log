@@ -1,0 +1,47 @@
+$ near ... submit_groth16 sign-as skarbnik-prover-bb2d00.testnet
+"final_pass"
+
+├  Unsigned transaction:
+│    signer_id:    skarbnik-prover-bb2d00.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  submit_groth16
+│                       args:         {
+│                                       "bounty_id": "32",
+│                                       "index": 0,
+│                                       "seal": "A66Bix8p8ktWSvrnQUKNDIuaT1kaJyUXGi/KEyCqP6sRQZCFdjbCpCnL8xA+owa+bWVO3VI+EmHFxxPZqj5y9AA8yqmcph5kUaH6KyMiCPbQCr+Pg3OnI1SMJMU88CEpJk3F0dcOoGznvN+XFUZZxNalWpYp55dcri4C2U76z0oo1kF1dfYCFYLes3H1G6Vn9Jto+g77CouzyRFwkEW34QdDplREgBmszvtOKMC/oAy/wMLf57s1XsPpE8wAm+sMFpzZ7XweMO/t7n82lfR/u9aH+Ex8QXlFEvXALopwKtIVekNlv8Jy7NafLXyGpT+IcnF8j8oz1iZt8P0FDIl0ZA=="
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:9hMazYpAgzvsxZLofm6X2cGjJEPz4BJHCPCwxaHQr1Z5
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.378 Tgas
+│    Transaction fee: 0.000037748698904 NEAR
+│    Transaction ID: 9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"groth16_verified","data":[{"bounty_id":"32","index":0,"verdict":"PASS","caller":"skarbnik-prover-bb2d00.testnet"}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"paid","data":[{"bounty_id":"32","index":0,"reason":"groth16_pass","to":"skarbnik-agentsmd-960210.testnet","amount":"100000000000000000000000"}]}
+│    Logs [skarbnik-agentsmd-960210.testnet]:   No logs
+│    Logs [skarbnik-prover-bb2d00.testnet]:   No logs
+│    Logs [skarbnik-prover-bb2d00.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+
+
+The "submit_groth16" call to <kintsugi-l2-cihdp.testnet> on behalf of <skarbnik-prover-bb2d00.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    ~/skarbnik/bin/near contract call-function as-transaction kintsugi-l2-cihdp.testnet submit_groth16 file-args ~/skarbnik-vendor/watch-work/b32_a0/u_call.json prepaid-gas '300.0 Tgas' attached-deposit '0 NEAR' sign-as skarbnik-prover-bb2d00.testnet network-config testnet sign-with-legacy-keychain send
+

@@ -47,5 +47,5 @@ team (the Ledger labels each one).
   agent never holds the owner's wallet.
 
 The platform promise is proof-checked payouts. "Paid by proof" is used only for a specific bounty where a PASS proof was
-accepted (bounties 1, 16 and 24).
+accepted (bounties 1, 16, 24, 27 and 32).
 

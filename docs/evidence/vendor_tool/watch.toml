@@ -1,0 +1,44 @@
+# skarbnik-vendor watch config on the project VPS: GPU mode (RunPod), the part C test bounty and the round 2 judge bounties
+[watch]
+state = "~/skarbnik-vendor/watch_state.json"
+log = "~/skarbnik-vendor/watch.log"
+workdir = "~/skarbnik-vendor/watch-work"
+poll_s = 60
+
+[prover]
+mode = "gpu"
+machine = "contabo-vps-4core"
+min_avail_mib = 300
+
+[gpu]
+api_key_file = "~/.runpod_key"
+gpu_types = ["NVIDIA L40S", "NVIDIA RTX 6000 Ada Generation", "NVIDIA RTX A6000"]
+data_centers = ["EU-RO-1", "EU-CZ-1", "EU-SE-1", "EU-NL-1", "US-TX-3"]
+cap_minutes = 45
+budget_usd = 6.0
+
+[chain]
+network = "testnet-fastnear"   # near-cli connection for signing: the regular RPC, not the archival one
+contract = "kintsugi-l2-cihdp.testnet"
+rpc_urls = ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"]
+image_id = "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
+submit_account = "skarbnik-prover-bb2d00.testnet"
+
+[paths]
+host = "~/skarbnik/bin/skarbnik-host"
+check = "~/skarbnik/bin/skarbnik-check"
+near = "~/skarbnik/bin/near"
+
+[[bounties]]
+name = "vpsdemo"
+ids = [32]
+module = "data/demo"
+secret = "~/.skarbnik-vendor/vpsdemo/exploit.hex"
+po2 = 18
+
+[[bounties]]
+name = "unpack"
+ids = [27, 28, 29, 30, 31]
+module = "data/unpack"
+secret = "~/.skarbnik-vendor/unpack/exploit.hex"
+po2 = 18

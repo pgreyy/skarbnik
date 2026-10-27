@@ -155,10 +155,14 @@ Nothing outside is patched: every crate, package and image above is used at its 
 | Compress to succinct | 5,591.59 s | **21.71 s** |
 | Groth16 wrap (Docker, x86) | 252.93 s | 337.73 s on the VPS (no Docker on the pod) |
 
-- **Payouts:** bounties 1, 16 and 24 were paid by proof; 4, 9, 11, 13 and 17 by the timeout rule (and 8 on paper only:
-  its transfer failed). The [Ledger](https://skarbnik.xyz/#/evidence/ledger) lists each with its transaction.
+- **Payouts:** bounties 1, 16, 24, 27 and 32 were paid by proof (27 and 32 proved by the vendor's `watch` on a rented
+  GPU with no one's help); 4, 9, 11, 13, 14, 15 and 17 by the timeout rule (and 8 on paper only: its transfer failed). The [Ledger](https://skarbnik.xyz/#/evidence/ledger) lists each with its transaction.
 - **Attacks:** 9 proof attacks refused on chain: a proof of another attempt or bounty, a FAIL shown as a PASS, a flipped
   bit, a changed journal, another checker image id, second proofs and a proof after expiry (docs/EVIDENCE.md, S6c).
+- **The vendor tool, end to end:** `tools/skarbnik-vendor watch` on the project's VPS saw bounty 32's attempt revealed,
+  proved it on a rented L40S, wrapped it to Groth16 on the VPS and sent `submit_groth16` 17 min after the reveal (tx
+  [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y)); one GPU proof cost
+  $0.04 with the cached GPU binary, $0.20 for the first pod, which also built it (docs/numbers.md).
 - **Arena:** a probe agent sent 12 commits to bounty 23; the contract counted 3, so at most 3 of 12 bits of the secret
   could be learned. The same probe with no cap, simulated only, learned all 12 ([Arena](https://skarbnik.xyz/#/evidence/lab)).
 - **MATCH:** the rebuilt checker's image id equals the published one and bounty 17's on chain

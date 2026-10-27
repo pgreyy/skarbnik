@@ -1240,6 +1240,120 @@
     "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
    }
   ],
+  "32": [
+   {
+    "step": "partc_bounty_create",
+    "method": "create_bounty",
+    "tx": "8vAT8wZQNwcGMz1heC5v7nWrCeHdPorgVNmGRBDJLL6J",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key"
+   },
+   {
+    "step": "partc_bounty_open",
+    "method": "open_with_groth16",
+    "tx": "ErytPEKYGSZNWMjWFJWjS5xmGZ8RqWZ3ixEf39EZLnQM",
+    "what": "Opened with its Proof 0",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key"
+   },
+   {
+    "step": "partc_commit",
+    "method": "commit",
+    "tx": "86dYS838ZfwHPnJepKcpL3t5SYQ93hsUJbEcEmgBUyhg",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key"
+   },
+   {
+    "step": "partc_reveal",
+    "method": "reveal",
+    "tx": "HCjck1DLb5GS4YcRWH3oozJ9gm2EhJejkHyVrcJJQN4L",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key"
+   },
+   {
+    "step": "partc_watch_submit_groth16",
+    "method": "submit_groth16",
+    "tx": "9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y",
+    "what": "Proof of an attempt sent",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key"
+   }
+  ],
+  "27": [
+   {
+    "step": "judge27_commit",
+    "method": "commit",
+    "tx": "7nYk5ZcgcLTRXYfSbS8J9M15JZ1c1QykbYuDwfzDyrdc",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key"
+   },
+   {
+    "step": "judge27_reveal",
+    "method": "reveal",
+    "tx": "GsWfYoUJfTCyrM5fRTEEMjGAuXLHDQNxaSeZUikdYLXQ",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key"
+   },
+   {
+    "step": "judge27_watch_submit_groth16",
+    "method": "submit_groth16",
+    "tx": "73xzLn4vmLyma5wF7qm9KY7qJoJz7ZkNJ2sAR4bTfipG",
+    "what": "Proof of an attempt sent",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key"
+   },
+   {
+    "step": "judge_create_1",
+    "method": "create_bounty",
+    "tx": "B3Z22LnCp1qRjf1hj7Z3m4Shh5BFn6TD2LARHqk1hgyS",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_open_27",
+    "method": "open_with_groth16",
+    "tx": "FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-27 08:34 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_open_again_27",
+    "method": "open_with_groth16",
+    "tx": "FehQ8siwReoi46uCgQjTgZwRUyGnbryjNuqTjZNMnRMp",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-27 08:35 UTC",
+    "result": "refused by the contract",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
   "18": [
    {
     "step": "judge_create_1",
@@ -1328,38 +1442,6 @@
     "result": "refused by the contract",
     "source": "docs/evidence/judge/transactions.tsv",
     "script": "scripts/judge_bounties.sh"
-   }
-  ],
-  "27": [
-   {
-    "step": "judge_create_1",
-    "method": "create_bounty",
-    "tx": "B3Z22LnCp1qRjf1hj7Z3m4Shh5BFn6TD2LARHqk1hgyS",
-    "what": "Bounty created",
-    "time": "2026-10-27 08:33 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge2/transactions.tsv",
-    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
-   },
-   {
-    "step": "judge_open_27",
-    "method": "open_with_groth16",
-    "tx": "FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV",
-    "what": "Opened with its Proof 0",
-    "time": "2026-10-27 08:34 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge2/transactions.tsv",
-    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
-   },
-   {
-    "step": "judge_open_again_27",
-    "method": "open_with_groth16",
-    "tx": "FehQ8siwReoi46uCgQjTgZwRUyGnbryjNuqTjZNMnRMp",
-    "what": "Opened with its Proof 0",
-    "time": "2026-10-27 08:35 UTC",
-    "result": "refused by the contract",
-    "source": "docs/evidence/judge2/transactions.tsv",
-    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
    }
   ],
   "28": [

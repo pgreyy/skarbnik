@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: GPU mode in the vendor's watch; part C end to end on bounty 32 and judge bounty 27
+
+- `tools/skarbnik_gpu.py` (RunPod REST API; secret in the pod's RAM only, wiped after proving; pod always terminated,
+  45 minute cap, $6 spend cap, leftovers terminated at start; CUDA binary built once and cached) and watch's GPU mode
+  with a CPU fallback after two failed pods. Bounty 32 published from the laptop; watch on the VPS proved and submitted
+  its attempt with no one's help (`9B7FPyju...`, 17 min after the reveal) and judge bounty 27's after fixing a missing
+  `/usr/bin/time` on cached pods and an expired submit (`73xzLn4v...`). GPU spend $0.303; one proof $0.04.
+
 ## 2026-10-27: Site fonts: Chakra Petch and Fira Code
 
 - The four font variables in `web/css/panyl.css` (the only place the site sets fonts; no component names a font) now

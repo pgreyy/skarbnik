@@ -213,9 +213,9 @@
    "evidence": "deployed 2026-10-26 (tx <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">DVv7N9o1…</span></a>); bounty 25: a second commit by one account refused (<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/evidence/account_cap/deploy_summary.txt\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">docs/evidence/account_cap/deploy_summary.txt</span></a>)"
   },
   {
-   "claim": "Vendor proving on a rented GPU (29.82 s prove, 21.71 s shrink) with the secret in memory only",
-   "label": "exp",
-   "evidence": "one run, one machine: <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/evidence/smooth/gpu/\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">docs/evidence/smooth/gpu/</span></a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/numbers.md\" target=\"_blank\" rel=\"noopener\">docs/numbers.md</a>"
+   "claim": "The vendor's <span class=\"mono\">watch</span> proves revealed attempts on a rented GPU (secret in the pod's RAM only, pod always terminated) and submits with no one's help",
+   "label": "demo",
+   "evidence": "bounty 32, tx <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">9B7FPyju…</span></a>, and judge bounty 27, tx <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/73xzLn4vmLyma5wF7qm9KY7qJoJz7ZkNJ2sAR4bTfipG\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">73xzLn4v…</span></a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/EVIDENCE.md\" target=\"_blank\" rel=\"noopener\">docs/EVIDENCE.md</a>, \"The vendor tool\"; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/numbers.md\" target=\"_blank\" rel=\"noopener\">docs/numbers.md</a>"
   },
   {
    "claim": "The Groth16 wrap on a separate Docker machine (337.73 s, 6.82 GiB peak)",

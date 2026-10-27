@@ -1,0 +1,14 @@
+receipt file: ~/skarbnik-vendor/watch-work/b27_a0/u_groth16.bin (2057 bytes)
+image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+verify seconds: 0.010
+VALID
+journal sha256: 847b06285226df674bd3ab9618f1ebfdbd482b6b5c1ac6ff5b2e3aaab1e61d1b
+journal.verdict: PASS
+journal.candidate_hash: da3536562e17993d22eb40d41fc34dc8f6ad400b9352ed3788f02f9b56e58e81
+journal.original_hash: 7911181d1c1981a0f4b76a5a8345bf0ea21d5c82514ba24847f926a5304e8bc5
+journal.exploit_commitment: 7bbb06210771226d10c73f4d6b9ad7cb19a88dd0e0ce2a72adadaa44666ba443
+journal.corpus_hash: 2c13167325b3eff2cc1c25352d31d9fa21eefd3c06099fc50b99efb87475c1bb
+journal.fuzz_seed: 552cdb36c0d02a7a6744c466f008ff277c2938761979e19f1e94a182ed8e6a41
+journal.fuzz_count: 16
+journal.variant_count: 32
+journal.submission_id: 602e574f77622eb8e33d75b02d67f48c5c4bd253eae01a2373e89f0af2a06c50

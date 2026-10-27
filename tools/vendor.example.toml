@@ -39,3 +39,28 @@ vendor_account = "you.testnet"
 # host = "~/skarbnik/bin/skarbnik-host"
 # check = "~/skarbnik/bin/skarbnik-check"
 # near = "~/skarbnik/bin/near"
+
+# A watch config (tools/skarbnik-vendor watch --config <file>) has these sections instead of [bounty] and [secrets]:
+# [watch]
+# state = "~/skarbnik-vendor/watch_state.json"
+# log = "~/skarbnik-vendor/watch.log"
+# workdir = "~/skarbnik-vendor/watch-work"
+# poll_s = 60
+# [prover]
+# mode = "gpu"                 # or "cpu"
+# machine = "my-vps"
+# [gpu]                        # only for mode "gpu" (docs/VENDOR.md, "GPU mode")
+# api_key_file = "~/.runpod_key"   # mode 600; never printed, logged or copied
+# gpu_types = ["NVIDIA L40S", "NVIDIA RTX 6000 Ada Generation", "NVIDIA RTX A6000"]
+# data_centers = ["EU-RO-1", "EU-CZ-1", "EU-SE-1", "EU-NL-1", "US-TX-3"]
+# cap_minutes = 45
+# budget_usd = 6.0
+# [chain]                      # as above, plus the account that signs submit_groth16; for a watch, sign through the
+# network = "testnet-fastnear" # regular RPC (near-cli's "testnet" connection is the archival one)
+# submit_account = "your-prover.testnet"
+# [[bounties]]                 # one block per secret
+# name = "mybounty"            # also names the salt: ~/.kintsugi-salts/mybounty.salt
+# ids = [33]
+# module = "data/mymodule"
+# secret = "/path/outside/the/repository/exploit.hex"
+# po2 = 18                     # for cpu proving

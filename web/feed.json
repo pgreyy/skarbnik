@@ -16,7 +16,7 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-10-27T08:47:45Z",
+ "generated_at_utc": "2026-10-27T09:25:56Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -282,56 +282,6 @@
    "expires_at_utc": "2026-10-30T00:25:56Z",
    "bounty_amount": "0.1 NEAR",
    "test_bounty": true
-  },
-  {
-   "bounty_id": 27,
-   "status": "Open for attempts",
-   "kind": "private",
-   "judge_bounty": true,
-   "retired_judge_bounty": false,
-   "accepts_commits": true,
-   "level": 2,
-   "program": "unpack",
-   "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
-   "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
-   "max_patch_bytes": 1024,
-   "reward_yocto": "100000000000000000000000",
-   "reward": "0.1 NEAR",
-   "max_commits": 2,
-   "attempts_used": 0,
-   "slots_in_use": 0,
-   "max_commits_per_account": 1,
-   "fee_schedule": {
-    "base_yocto": "10000000000000000000000",
-    "step_yocto": "5000000000000000000000",
-    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
-   },
-   "next_fee_yocto": "10000000000000000000000",
-   "next_fee": "0.01 NEAR",
-   "windows": {
-    "reveal_gap_ns": "60000000000",
-    "reveal_window_ns": "3600000000000",
-    "verdict_window_ns": "147600000000000",
-    "commit_deadline_utc": "2026-12-04T14:33:18Z",
-    "expires_at_utc": "2026-12-06T08:33:18Z"
-   },
-   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
-   "image_id_allowed": true,
-   "original_hash": "7911181d1c1981a0f4b76a5a8345bf0ea21d5c82514ba24847f926a5304e8bc5",
-   "corpus_hash": "2c13167325b3eff2cc1c25352d31d9fa21eefd3c06099fc50b99efb87475c1bb",
-   "public_code": {
-    "source": "code/unpack/original.rs",
-    "module": "code/unpack/original.wasm",
-    "tests": "code/unpack/public_tests.txt",
-    "build": "code/unpack/BUILD.txt",
-    "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
-   },
-   "slots_left": 2,
-   "commit_deadline_utc": "2026-12-04T14:33:18Z",
-   "expires_at_utc": "2026-12-06T08:33:18Z",
-   "bounty_amount": "0.1 NEAR",
-   "test_bounty": false
   }
  ],
  "bounties": [
@@ -1552,11 +1502,11 @@
   },
   {
    "bounty_id": 27,
-   "status": "Open for attempts",
+   "status": "Proof verified",
    "kind": "private",
    "judge_bounty": true,
    "retired_judge_bounty": false,
-   "accepts_commits": true,
+   "accepts_commits": false,
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
@@ -1565,16 +1515,16 @@
    "reward_yocto": "100000000000000000000000",
    "reward": "0.1 NEAR",
    "max_commits": 2,
-   "attempts_used": 0,
-   "slots_in_use": 0,
+   "attempts_used": 1,
+   "slots_in_use": 1,
    "max_commits_per_account": 1,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
     "step_yocto": "5000000000000000000000",
     "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
    },
-   "next_fee_yocto": "10000000000000000000000",
-   "next_fee": "0.01 NEAR",
+   "next_fee_yocto": "15000000000000000000000",
+   "next_fee": "0.015 NEAR",
    "windows": {
     "reveal_gap_ns": "60000000000",
     "reveal_window_ns": "3600000000000",
@@ -1777,7 +1727,7 @@
   },
   {
    "bounty_id": 32,
-   "status": "Demo or test only",
+   "status": "Proof verified",
    "kind": "test",
    "judge_bounty": false,
    "retired_judge_bounty": false,

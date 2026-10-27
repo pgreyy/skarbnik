@@ -1,0 +1,70 @@
+{
+ "pods": [
+  {
+   "id": "e73v53inmllggg",
+   "label": "b32a0",
+   "created_utc": "2026-10-27T08:46:18Z",
+   "gpu": null,
+   "data_center": "EU-NL-1",
+   "cost_per_hr": 1.09,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-10-27T08:57:10Z",
+   "seconds": 652,
+   "cost_usd": 0.1974,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "6mh62r8hn45foq",
+   "label": "b27a0",
+   "created_utc": "2026-10-27T09:08:12Z",
+   "gpu": "NVIDIA L40S",
+   "data_center": "US-TX-3",
+   "cost_per_hr": 1.09,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-10-27T09:09:26Z",
+   "seconds": 73,
+   "cost_usd": 0.0221,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "37vky5d8k5t2mp",
+   "label": "b27a0",
+   "created_utc": "2026-10-27T09:09:26Z",
+   "gpu": "NVIDIA L40S",
+   "data_center": "US-TX-3",
+   "cost_per_hr": 1.09,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-10-27T09:11:06Z",
+   "seconds": 100,
+   "cost_usd": 0.0303,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "yr05zm47fccnpo",
+   "label": "b27a0",
+   "created_utc": "2026-10-27T09:13:50Z",
+   "gpu": "NVIDIA L40S",
+   "data_center": "US-TX-3",
+   "cost_per_hr": 1.09,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-10-27T09:15:54Z",
+   "seconds": 123,
+   "cost_usd": 0.0372,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "7c77ikygqmhh04",
+   "label": "b27a0",
+   "created_utc": "2026-10-27T09:20:45Z",
+   "gpu": "NVIDIA L40S",
+   "data_center": "US-TX-3",
+   "cost_per_hr": 1.09,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-10-27T09:21:37Z",
+   "seconds": 53,
+   "cost_usd": 0.016,
+   "terminate_confirmed": true
+  }
+ ],
+ "total_usd": 0.303
+}

@@ -62,7 +62,22 @@ slower than the laptop (198 s against 62 s per segment at `--po2 18`, bounty 24'
 time `tools/proof_times.json` holds for `cpu@contabo-vps-4core:demo`. Bounty 17's program (`data/unpack/`) was not
 proved on the VPS; its attempt took 102 segments at `--po2 18` on the laptop, fewer than this run's 112.
 
-## Proof sizes
+## One proof by the vendor's watch in GPU mode (RunPod, NVIDIA L40S, 2026-10-27)
+
+`tools/skarbnik-vendor watch` on the VPS, mode gpu: a Secure Cloud pod per attempt (image
+`runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404`, $1.09 an hour), prove and shrink on the pod, Groth16 on the VPS.
+The cost is the pod's hourly price times its life from create to terminate, as watch logs it
+(`docs/evidence/vendor_tool/gpu_spend.json`).
+
+| Run | Pod life | Prove (segments) | Shrink | Groth16 on the VPS | GPU cost | Source |
+| --- | --- | --- | --- | --- | --- | --- |
+| Bounty 32, first pod: builds the CUDA binary (559 s) and keeps it | 652 s | 35.24 s (27) | 23.84 s | 324.86 s | $0.1974 | docs/evidence/vendor_tool/b32_a0/ |
+| Judge bounty 27, cached binary | 123 s | 29.32 s (29) | 20.84 s | 289.24 s | **$0.0372** | docs/evidence/vendor_tool/b27_a0/ |
+
+From reveal to `submit_groth16`: 17 min 9 s for bounty 32 (with the build), about 6 min of proving and wrapping for
+bounty 27 (its first submit failed, see docs/EVIDENCE.md, "The vendor tool"). Three more pods were started and
+terminated without a proof while a bug was fixed (73 s, 100 s and 53 s; $0.0684 together). All GPU spend so far: $0.303.
+
 
 | What | Size | Source |
 | --- | --- | --- |

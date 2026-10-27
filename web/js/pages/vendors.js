@@ -37,8 +37,8 @@ export async function vendors(viewEl) {
   ];
   const MODES = [
     ['cpu', 'Your own machine', chip('k-proof', 'Built', 'check'), 'Strongest: the secret never leaves a machine you control.', 'Slowest. Measure it before you choose the windows.'],
-    ['server', 'A VPS you control', chip('k-proof', 'Built', 'check'), 'The secret sits on a rented server only you use, in files of mode 600; watch runs there unattended and restarts itself.', 'The same cpu mode, so the same speed class as its cores. The project’s own 4 core VPS is being set up this way; its first measured proof is running.'],
-    ['cube', 'A GPU you rent for the job', chip('k-test', 'Measured by hand once', 'flask'), 'The secret sits in the rented machine’s memory during the proof, then is wiped.', 'Under a minute to prove and shrink bounty 24’s attempt. Not yet built into watch.'],
+    ['server', 'A VPS you control', chip('k-proof', 'Built', 'check'), 'The secret sits on a rented server only you use, in files of mode 600; watch runs there unattended and restarts itself.', 'The same cpu mode, so the same speed class as its cores: one proof on the project’s 4 core VPS took 10 h 12 min, so that VPS runs watch in GPU mode and keeps the CPU as the fallback.'],
+    ['cube', 'A GPU you rent for the job', chip('k-proof', 'Built', 'check'), 'The secret sits in the rented machine’s RAM during the proof, then is wiped; one pod per attempt, always terminated, at most 45 minutes, with a spend cap.', 'Under a minute to prove and shrink bounty 24’s attempt. watch in GPU mode wraps the proof to Groth16 on your own machine and submits it.'],
   ];
 
   viewEl.innerHTML = `<main id="main" class="p-gen p-vendors" tabindex="-1">

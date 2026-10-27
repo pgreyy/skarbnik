@@ -86,6 +86,11 @@ BOUNTY_STEPS = [
     # The agent access test bounty (scripts/agent_access_test.sh): AGENTS.md followed literally, then the MCP server
     ("docs/evidence/agent_access/transactions.tsv", "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp",
      {26: ["access_create", "access_open", "agentsmd_commit", "agentsmd_reveal", "mcp_commit", "mcp_reveal"]}),
+    # The vendor tool end to end (part C): bounty 32 published with tools/skarbnik-vendor, and judge bounty 27; watch on
+    # the VPS proved both attempts on a rented GPU and sent submit_groth16 with no one's help
+    ("docs/evidence/vendor_tool/transactions.tsv", "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key",
+     {32: ["partc_bounty_create", "partc_bounty_open", "partc_commit", "partc_reveal", "partc_watch_submit_groth16"],
+      27: ["judge27_commit", "judge27_reveal", "judge27_watch_submit_groth16"]}),
 ]
 # Judge bounties (scripts/judge_bounties.sh): same hashes as bounty 17, created closed, opened by anyone with its Proof 0.
 _jenv = os.path.join(ROOT, "docs/evidence/judge/run.env")
