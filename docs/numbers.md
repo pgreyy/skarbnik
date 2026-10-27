@@ -44,6 +44,24 @@ the seed recorded at reveal and the attempt's submission id; Proof 0 uses Proof 
 | Whole pod use, first check to fetch | | 706 s: setup 554 s (Rust and RISC Zero install 86 s, code 38 s, build 425 s, image id check), secret in 48 s, prove and wipe, verify, shrink, fetch | docs/evidence/smooth/gpu/*.log |
 | Cost | electricity and time | **$0.60**: RunPod balance $9.46 to $8.86, reported by the owner (it may include a first pod that stayed on "Initializing" and was terminated) | owner |
 
+## One CPU proof on the project's VPS (4 cores, `data/demo/`, `--po2 18`)
+
+Proof 0 of the VPS test bounty (`tools/skarbnik-vendor prove0`, the demo program with a secret generated on the VPS,
+112 segments), on the rented VPS that runs `watch`: x86_64, 4 cores (AMD EPYC), 7.8 GiB of memory, 8 GiB of swap,
+Ubuntu 24.04, CPU proving, RISC Zero 3.0.6. 2026-10-26 22:15 to 2026-10-27 08:28 UTC.
+
+| Step | Time | Peak memory (sampled) | Source |
+| --- | --- | --- | --- |
+| Prove | 22,228.44 s (112 segments) | r0vm 2,399 MiB; lowest available 4,863 MiB | docs/evidence/vps_demo/prove_p0.log |
+| Shrink to succinct | 14,179.08 s | r0vm 1,533 MiB; lowest available 5,587 MiB | docs/evidence/vps_demo/succinct_p0.log |
+| Groth16 wrap (Docker) | 300.94 s | host process 1,409 MiB (`/usr/bin/time`); the container itself was not sampled in this run (bounty 24's wrap on the same VPS: 6.82 GiB) | docs/evidence/vps_demo/groth16_p0.log |
+| **One proof, end to end** | **36,708.46 s (10 h 12 min)** | | docs/evidence/vps_demo/proof0_times.json |
+
+The result verified (VALID, PASS, `docs/evidence/vps_demo/verify_p0.txt`). Per segment the VPS proved about 3.2 times
+slower than the laptop (198 s against 62 s per segment at `--po2 18`, bounty 24's Proof 0 on the laptop). This is the
+time `tools/proof_times.json` holds for `cpu@contabo-vps-4core:demo`. Bounty 17's program (`data/unpack/`) was not
+proved on the VPS; its attempt took 102 segments at `--po2 18` on the laptop, fewer than this run's 112.
+
 ## Proof sizes
 
 | What | Size | Source |
@@ -69,7 +87,8 @@ Varies: about 35 to 36.4 Tgas per accepted proof, from the work around the check
 
 ## Not measured
 
-- Proving time for programs other than the demo record parser, `data/unpack/` and `data/smooth/`.
+- Proving time for programs other than the demo record parser, `data/unpack/` and `data/smooth/`; on the VPS, any
+  program other than the demo record parser.
 - The first GPU run (NVIDIA L40S, 22.65 s prove, docs/evidence/S2/gpu/) produced a different image id than the laptop
   build, so it is not the same program and is not used as a result; the bounty 24 run above used the published image id.
 - Groth16 on a GPU (the `cuda-prove-only` build has no Groth16 part).

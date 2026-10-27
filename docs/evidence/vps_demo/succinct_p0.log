@@ -1,0 +1,13 @@
+$ RISC0_DEV_MODE=0 ~/skarbnik/bin/skarbnik-host compress ~/skarbnik-vendor/vpsdemo-work/p0.bin ~/skarbnik-vendor/vpsdemo-work/p0_succinct.bin succinct
+utc_start=2026-10-27T04:26:37Z
+limits: max_rss_mib=6144 min_avail_mib=300 max_seconds=43200
+input receipt: ~/skarbnik-vendor/vpsdemo-work/p0.bin (28644272 bytes)
+compressed to: succinct
+compress seconds: 14175.18
+verify seconds: 0.060
+output receipt: ~/skarbnik-vendor/vpsdemo-work/p0_succinct.bin (224786 bytes)
+exit=0
+wall_seconds=14179.08
+r0vm_peak_rss_mib=1533 (VmHWM, sampled every 5 s)
+min_available_mib=5587
+result: finished

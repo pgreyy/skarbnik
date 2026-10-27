@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: One CPU proof on the VPS, measured
+
+- `tools/skarbnik-vendor prove0` of the VPS test bounty (demo program, a secret made on the VPS, 112 segments at
+  `--po2 18`) on the 4 core VPS, in tmux, 2026-10-26 22:15 to 2026-10-27 08:28 UTC: prove 22,228.44 s, succinct
+  14,179.08 s, Groth16 300.94 s, 36,708.46 s in all; r0vm peaks 2,399 MiB (prove) and 1,533 MiB (shrink); VALID, PASS.
+  docs/numbers.md, `tools/proof_times.json` (`cpu@contabo-vps-4core:demo`), the For vendors page's VPS row (no longer
+  "Measuring"), logs in `docs/evidence/vps_demo/`. The wrap container's peak was not sampled in this run.
+
 ## 2026-10-27: tools/skarbnik-mcp, an MCP server for agents, tested on bounty 26
 
 - `tools/skarbnik-mcp/server.py` (Python standard library, near-cli-rs signs): list_bounties, get_bounty (with the

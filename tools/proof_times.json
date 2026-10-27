@@ -1,5 +1,9 @@
 {
  "note": "Measured time to prove one attempt end to end (prove, shrink to succinct, Groth16 wrap), by prover mode and module, used by `skarbnik-vendor check` for the verdict window rule (window >= K x time x 1.5) and by `watch` for its early warning. Each entry names the run that measured it; docs/numbers.md has the details. A module that is not listed must be measured first (prove0 measures it).",
- "per_attempt_seconds": {},
- "sources": {}
+ "per_attempt_seconds": {
+  "cpu@contabo-vps-4core:demo": 36708.46
+ },
+ "sources": {
+  "cpu@contabo-vps-4core:demo": "Proof 0 of the VPS test bounty (demo program, 112 segments at po2 18) on the project's 4 core VPS, 2026-10-26 22:15 to 2026-10-27 08:28 UTC: prove 22,228.44 s, succinct 14,179.08 s, Groth16 300.94 s (docs/numbers.md)"
+ }
 }

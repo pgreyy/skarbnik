@@ -51,8 +51,13 @@
   "source": "docs/AUDIT.md, finding 6"
  },
  "vps_prove": {
-  "status": "measuring",
-  "text": "Measuring: the first CPU proof on the 4 core VPS (Proof 0 of the demo program) has been running since 2026-10-26 22:15 UTC",
-  "source": "docs/numbers.md, once measured"
+  "status": "measured",
+  "prove": 22228.44,
+  "shrink": 14179.08,
+  "wrap": 300.94,
+  "total": 36708.46,
+  "program": "demo program, 112 segments at po2 18",
+  "text": "36,708.46 s (10 h 12 min) for one CPU proof on the 4 core VPS: prove 22,228.44 s, shrink 14,179.08 s, Groth16 wrap 300.94 s (Proof 0 of the demo program, 112 segments)",
+  "source": "docs/numbers.md"
  }
 }
