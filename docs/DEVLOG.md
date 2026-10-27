@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: AGENTS.md, served at /agents.md and listed in /llms.txt; followed literally on test bounty 26
+
+- AGENTS.md at the repository root, written to an AI agent: the feed's fields, the checks before a commit, the
+  fingerprint exactly as `commit_fingerprint` in `contract/src/lib.rs`, commit and reveal with a limited key file
+  (real arguments from the run), credit and fees, and what PASS, FAIL and timeout mean for payment.
+  `scripts/sync_agents_md.py` copies it to `web/agents.md` (repository links become GitHub links); `web/llms.txt`
+  points to it; `web/vercel.json` serves `.md` as text/markdown; the For agents page and the README link it.
+- Test bounty 26 (`./scripts/agent_access_test.sh bounty`). A new throwaway account followed AGENTS.md command by
+  command: commit `GKPxnpw4qpkMWG2fZXpKv7QAkHaDkuWBDaCYrNmY8vtL`, reveal `YsJj7AAkiQWjgamBGFJ7NTKaYAmLaJNXAVDwgxhLZUa`
+  (an earlier reveal inside the 60 s gap was refused). Four fixes to AGENTS.md came from following it
+  (docs/EVIDENCE.md, "Following AGENTS.md"). Bounty 26 is labelled a test bounty and the account seeded.
+
 ## 2026-10-27: The site's Judge guide page matches JUDGE_GUIDE.md
 
 - `scripts/gen_judge_data.py` reads JUDGE_GUIDE.md and writes `web/data/judge.json`: the intro, the 6 Level A steps

@@ -1,0 +1,1 @@
+2026-10-27T00:26:06Z test bounty 26: opened True, K 4, cap per account 1, next fee 10000000000000000000000

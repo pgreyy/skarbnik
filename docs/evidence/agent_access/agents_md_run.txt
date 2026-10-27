@@ -1,0 +1,87 @@
+# AGENTS.md followed literally from a new throwaway account on test bounty 26, 2026-10-27. Commands as written in AGENTS.md with the placeholders filled; only public result lines kept.
+== 3a_create  2026-10-27T00:27:19Z
+$ near account create-account sponsor-by-faucet-service skarbnik-agentsmd-960210.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
+   │                       permission:   FullAccess
+   │    Transaction ID: C3W82abyXRpQgPRW2qx8sN7r6mpZUjjv1oap5KD4rEYE
+   exit 0
+== 3b_deposit  2026-10-27T00:27:41Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args {"account_id":null} prepaid-gas 30 Tgas attached-deposit 0.05 NEAR sign-as skarbnik-agentsmd-960210.testnet network-config testnet sign-with-legacy-keychain send
+   │    Transaction ID: 7omBybb7NdNzNv65Uxx9rhc4sppSqtfGo4u4AV4T1nwm
+   Function execution return value (printed to stdout):
+   exit 0
+== 3c_limits  2026-10-27T00:27:47Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_agent_limits json-args {"max_fee_per_commit":"20000000000000000000000","fixed_payout":"skarbnik-agentsmd-960210.testnet"} prepaid-gas 30 Tgas attached-deposit 1 yoctoNEAR sign-as skarbnik-agentsmd-960210.testnet network-config testnet sign-with-legacy-keychain send
+   │    Transaction ID: BxZ4opUPeXhpU2LdaSReyNKs428zpmffnAiwAdfcHsmZ
+   Function execution return value (printed to stdout):
+   exit 0
+== 3d_addkey  2026-10-27T00:27:53Z
+$ near account add-key skarbnik-agentsmd-960210.testnet grant-function-call-access --allowance 0.25 NEAR --contract-account-id kintsugi-l2-cihdp.testnet --function-names commit, reveal autogenerate-new-keypair save-to-legacy-keychain network-config testnet sign-with-legacy-keychain send
+   │                       permission:   FunctionCall(FunctionCallPermission { allowance: Some(NearToken { inner: 250000000000000000000000 }), receiver_id: "kintsugi-l2-cihdp.testnet", method_names: ["commit", "reveal"] })
+   │    Transaction ID: HVUkb3796Q5AVovwuTgMwBVo5eEbm3yN5U4TGrqM91sS
+   exit 0
+== 3e_listkeys  2026-10-27T00:28:40Z
+$ near account list-keys skarbnik-agentsmd-960210.testnet network-config testnet now
+   | 1 | ed25519:DwGHGoXjEaeiGrGSSnzhMjFKcEfoskZRLyzzdpEHfbJ  | 274924932000003 | full access                                                                                             |
+   | 2 | ed25519:72NAP2LFxMW9Dcz8CtCSQT14XJWjpkd4jjnht5XUM58p | 274924975000000 | only do ["commit", "reveal"] function calls on kintsugi-l2-cihdp.testnet with an allowance of 0.25 NEAR |
+   exit 0
+== 3f_chmod  2026-10-27T00:28:41Z
+$ chmod 600 <near-cli credentials folder>/testnet/skarbnik-agentsmd-960210.testnet/ed25519_72NAP2LFxMW9Dcz8CtCSQT14XJWjpkd4jjnht5XUM58p.json
+   exit 0
+== 2_get_bounty  2026-10-27T00:28:41Z
+$ near contract call-function as-read-only kintsugi-l2-cihdp.testnet get_bounty json-args {"bounty_id":"26"} network-config testnet now
+   Function execution return value (printed to stdout):
+     "active": 0,
+     "expires_at_ns": "1793319956090936921",
+     "image_id_allowed": true,
+     "level": 2,
+     "max_commits": 4,
+     "max_commits_per_account": 1,
+     "next_fee": "10000000000000000000000",
+     "opened": true,
+     "state": "Open",
+   exit 0
+== 2_hashes  2026-10-27T00:28:55Z  (step 2's description, computed from the files the feed points to)
+   sha256(module) = fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8
+   tests hash     = 736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b
+     "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+     "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+     "max_patch_bytes": 1024,
+     "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+     "reveal_window_ns": "7200000000000",
+     "verdict_window_ns": "14400000000000",
+== 2_slots  2026-10-27T00:28:56Z
+$ near contract call-function as-read-only kintsugi-l2-cihdp.testnet get_account_slots json-args {"bounty_id":"26","account_id":"skarbnik-agentsmd-960210.testnet"} network-config testnet now
+   Function execution return value (printed to stdout):
+   0
+   exit 0
+== 2_credit  2026-10-27T00:29:08Z
+$ near contract call-function as-read-only kintsugi-l2-cihdp.testnet get_credit json-args {"account_id":"skarbnik-agentsmd-960210.testnet"} network-config testnet now
+   Function execution return value (printed to stdout):
+   "50000000000000000000000"
+   exit 0
+== 2_limits  2026-10-27T00:29:08Z
+$ near contract call-function as-read-only kintsugi-l2-cihdp.testnet get_agent_limits json-args {"account_id":"skarbnik-agentsmd-960210.testnet"} network-config testnet now
+   Function execution return value (printed to stdout):
+     "fixed_payout": "skarbnik-agentsmd-960210.testnet",
+     "max_fee_per_commit": "20000000000000000000000"
+   exit 0
+== 4_fingerprint  2026-10-27T00:29:39Z  (the Python block of AGENTS.md section 4, copied from the file, run in a work folder)
+$ python3 -I - fix.wasm skarbnik-agentsmd-960210.testnet nonce.hex <<'PY' ... PY   (fix.wasm = data/demo/fixed.wasm, 556 bytes)
+   fingerprint 00f3ab8aefe45946e706011c412175701098a1e1825f8edd51c7f24d4ecc5e47
+   nonce.hex mode 600 (kept private until the reveal)
+== 5_commit  2026-10-27T00:29:45Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet commit json-args {"bounty_id":"26","fingerprint":"00f3ab8aefe45946e706011c412175701098a1e1825f8edd51c7f24d4ecc5e47","payout":"skarbnik-agentsmd-960210.testnet"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as skarbnik-agentsmd-960210.testnet network-config testnet sign-with-access-key-file <near-cli credentials folder>/testnet/skarbnik-agentsmd-960210.testnet/ed25519_72NAP2LFxMW9Dcz8CtCSQT14XJWjpkd4jjnht5XUM58p.json send
+   │    Transaction ID: GKPxnpw4qpkMWG2fZXpKv7QAkHaDkuWBDaCYrNmY8vtL
+   Function execution return value (printed to stdout):
+   0
+   exit 0
+== 5_reveal  2026-10-27T00:30:16Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet reveal json-args "{\"bounty_id\":\"26\",\"index\":0,\"patch\":\"$(base64 -w0 fix.wasm)\",\"nonce\":\"$(cat nonce.hex)\"}" prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as skarbnik-agentsmd-960210.testnet network-config testnet sign-with-access-key-file "$KEY" send
+   Error: 
+      0: Error: An error occurred during a `FunctionCall` action.
+         ExecutionError("Smart contract panicked: reveal gap has not passed")
+   exit 1
+== 5_reveal (second try, after the gap)  2026-10-27T00:31:43Z
+$ (the same reveal command)
+   │    Transaction ID: YsJj7AAkiQWjgamBGFJ7NTKaYAmLaJNXAVDwgxhLZUa
+   exit 0

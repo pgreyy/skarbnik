@@ -20,7 +20,8 @@
   "ghost-kintsugi-audit-zqx.testnet": "seeded",
   "skarbnik-probe-eb33d2.testnet": "seeded",
   "skarbnik-partd-461f99.testnet": "seeded",
-  "skarbnik-prover-bb2d00.testnet": "team-run"
+  "skarbnik-prover-bb2d00.testnet": "team-run",
+  "skarbnik-agentsmd-960210.testnet": "seeded"
  },
  "source": "docs/EVIDENCE.md and the scripts that made each account (docs/evidence/*/run.env, accounts.env)",
  "hashed_accounts": {

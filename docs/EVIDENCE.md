@@ -5,6 +5,37 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Following AGENTS.md: commit and reveal from a new account, exactly as written (2026-10-27)
+
+Question: can an agent follow AGENTS.md as written, from nothing, to a commit and a reveal on a live bounty?
+
+- Test bounty 26 (`./scripts/agent_access_test.sh bounty`): the demo program, K = 4, at most 1 slot per account,
+  0.1 NEAR, fees 0.01 + 0.005 per attempt, reveal gap 60 s, reveal window 2 h, verdict window 4 h, expiry 3 days;
+  created `6EyDQfBjhcjZwqgKYMkeTEUwC7j8wC8XFMguVPZNxzcb`, opened with the demo's Groth16 Proof 0
+  `FiqKB7nSS8yHPeAyijCuyP3xVEHaAVTS8EWvWgDnpD7z`.
+- A new throwaway account, `skarbnik-agentsmd-960210.testnet`, made with AGENTS.md section 3's own command. Every
+  command was run as AGENTS.md writes it, placeholders filled; the log keeps each command and only its public result
+  lines (`docs/evidence/agent_access/agents_md_run.txt`):
+  - setup: account `C3W82abyXRpQgPRW2qx8sN7r6mpZUjjv1oap5KD4rEYE`, 0.05 NEAR credit
+    `7omBybb7NdNzNv65Uxx9rhc4sppSqtfGo4u4AV4T1nwm`, limits (max fee 0.02 NEAR, fixed payout itself)
+    `BxZ4opUPeXhpU2LdaSReyNKs428zpmffnAiwAdfcHsmZ`, a key limited to commit and reveal (allowance 0.25 NEAR)
+    `HVUkb3796Q5AVovwuTgMwBVo5eEbm3yN5U4TGrqM91sS`;
+  - checks (section 2): open, opened, Level 2, the published checker on the allowlist; sha256 of the feed's module and
+    the tests hash computed from section 2's description equal `original_hash` and `corpus_hash`; 0 slots held of a
+    cap of 1; credit 0.05 NEAR, next fee 0.01 NEAR, within the 0.02 NEAR limit;
+  - fingerprint (section 4's Python block, copied from the file): `00f3ab8a...5e47` for `data/demo/fixed.wasm`;
+  - commit with the limited key file: `GKPxnpw4qpkMWG2fZXpKv7QAkHaDkuWBDaCYrNmY8vtL`, returned index 0;
+  - reveal: the first try, 27 s after the commit, was refused by the contract ("reveal gap has not passed"; near-cli
+    printed no transaction id); the second, after the 60 s gap: `YsJj7AAkiQWjgamBGFJ7NTKaYAmLaJNXAVDwgxhLZUa`. The
+    chain then shows attempt 0 revealed, outcome Open.
+- What following the file changed in it: near-cli's credentials folder can be set in its config, so section 3 now
+  reads the folder from near-cli's config (checked afterwards: it resolves to the limited key file this run used); the account's key folder also holds a copy of the full access key, so section 3 now picks the limited
+  key file by the public key `list-keys` shows; `list-keys` prints "only do [...] function calls", so the expected
+  output is quoted as printed; section 5 says an early reveal is refused and still burns gas.
+
+Verdict: PASS. AGENTS.md is enough to go from a new account to a revealed attempt, with a key that can only commit
+and reveal. Not shown here: a verdict on this attempt (bounty 26 is a test bounty; no proof is planned for it).
+
 ## Bounty 24: an AI agent fixes a private bug it cannot see, paid by proof (2026-10-26)
 
 Question: can a model-driven agent fix a new private bug from public code alone, and can the vendor prove the result

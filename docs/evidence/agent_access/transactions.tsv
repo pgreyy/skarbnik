@@ -1,0 +1,10 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+access_create	create_bounty	kintsugi-vendor-prnvm.testnet	6EyDQfBjhcjZwqgKYMkeTEUwC7j8wC8XFMguVPZNxzcb	0.355 Tgas	0.0000354074284975	0	8.74
+access_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	FiqKB7nSS8yHPeAyijCuyP3xVEHaAVTS8EWvWgDnpD7z	0.377 Tgas	0.000037681941703	0	5.9
+agentsmd_create_account	create-account	faucet	C3W82abyXRpQgPRW2qx8sN7r6mpZUjjv1oap5KD4rEYE	-	-	0	-
+agentsmd_deposit	deposit_credit	skarbnik-agentsmd-960210.testnet	7omBybb7NdNzNv65Uxx9rhc4sppSqtfGo4u4AV4T1nwm	-	-	0	-
+agentsmd_limits	set_agent_limits	skarbnik-agentsmd-960210.testnet	BxZ4opUPeXhpU2LdaSReyNKs428zpmffnAiwAdfcHsmZ	-	-	0	-
+agentsmd_add_limited_key	add-key	skarbnik-agentsmd-960210.testnet	HVUkb3796Q5AVovwuTgMwBVo5eEbm3yN5U4TGrqM91sS	-	-	0	-
+agentsmd_commit	commit	skarbnik-agentsmd-960210.testnet	GKPxnpw4qpkMWG2fZXpKv7QAkHaDkuWBDaCYrNmY8vtL	-	-	0	-
+agentsmd_reveal_too_early	reveal	skarbnik-agentsmd-960210.testnet	-	-	-	1	-
+agentsmd_reveal	reveal	skarbnik-agentsmd-960210.testnet	YsJj7AAkiQWjgamBGFJ7NTKaYAmLaJNXAVDwgxhLZUa	-	-	0	-

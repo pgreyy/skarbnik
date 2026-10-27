@@ -83,6 +83,9 @@ BOUNTY_STEPS = [
     ("docs/evidence/account_cap/transactions.tsv", "scripts/cap_deploy.sh", {25: ["cap_test_create", "cap_test_open", "cap_test_commit_"], 15: ["cap_claim_timeout_b15_"], 14: ["cap_claim_timeout_b14_"]}),
     ("docs/evidence/web/partd_transactions.tsv", "the site's Account and bounty pages, NEAR CLI wallet; agent/skarbnik_agent.py",
      {14: ["partd_commit_", "partd_reveal_"]}),
+    # The agent access test bounty (scripts/agent_access_test.sh): AGENTS.md followed literally, then the MCP server
+    ("docs/evidence/agent_access/transactions.tsv", "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp",
+     {26: ["access_create", "access_open", "agentsmd_commit", "agentsmd_reveal", "mcp_commit", "mcp_reveal"]}),
 ]
 # Judge bounties (scripts/judge_bounties.sh): same hashes as bounty 17, created closed, opened by anyone with its Proof 0.
 _jenv = os.path.join(ROOT, "docs/evidence/judge/run.env")
@@ -243,6 +246,7 @@ if "ABOUNTY" in agentenv:
     out["test_bounties"][agentenv["ABOUNTY"]] = "Test bounty: made for the real run of the model-driven agent (agent/)."
 
 out["test_bounties"]["25"] = "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo."
+out["test_bounties"]["26"] = "Test bounty: made for the agent access tests (AGENTS.md followed literally, and the MCP server). Not a demo."
 if ARENA_BOUNTY:
     out["test_bounties"][ARENA_BOUNTY] = "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
 out["judge_bounties"] = {str(j): "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself." for j in JUDGE_IDS}

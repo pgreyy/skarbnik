@@ -1178,6 +1178,48 @@
     "script": "scripts/cap_deploy.sh"
    }
   ],
+  "26": [
+   {
+    "step": "access_create",
+    "method": "create_bounty",
+    "tx": "6EyDQfBjhcjZwqgKYMkeTEUwC7j8wC8XFMguVPZNxzcb",
+    "what": "Bounty created",
+    "time": "2026-10-27 00:25 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/agent_access/transactions.tsv",
+    "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
+   },
+   {
+    "step": "access_open",
+    "method": "open_with_groth16",
+    "tx": "FiqKB7nSS8yHPeAyijCuyP3xVEHaAVTS8EWvWgDnpD7z",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-27 00:25 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/agent_access/transactions.tsv",
+    "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
+   },
+   {
+    "step": "agentsmd_commit",
+    "method": "commit",
+    "tx": "GKPxnpw4qpkMWG2fZXpKv7QAkHaDkuWBDaCYrNmY8vtL",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/agent_access/transactions.tsv",
+    "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
+   },
+   {
+    "step": "agentsmd_reveal",
+    "method": "reveal",
+    "tx": "YsJj7AAkiQWjgamBGFJ7NTKaYAmLaJNXAVDwgxhLZUa",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/agent_access/transactions.tsv",
+    "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
+   }
+  ],
   "18": [
    {
     "step": "judge_create_1",
@@ -1680,6 +1722,7 @@
   "15": "Test bounty: made for the scripted run of the site with the NEAR CLI wallet.",
   "16": "Test bounty: made for the real run of the model-driven agent (agent/).",
   "25": "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo.",
+  "26": "Test bounty: made for the agent access tests (AGENTS.md followed literally, and the MCP server). Not a demo.",
   "23": "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
  },
  "last_image_check": {
