@@ -1,5 +1,5 @@
 // Builds the Vinyl lockup for the README: the Vinyl mark (web/img/vinyl-mark-<mode>.svg) and the wordmark "Skarbnik"
-// as it is in the site header (Unbounded 600, 22 px next to a 38 px mark, 12 px apart, heading tracking -0.006 em).
+// as it is in the site header (Chakra Petch 600, 22 px next to a 38 px mark, 12 px apart, heading tracking -0.006 em).
 // The letters are turned into outlines, so the SVG needs no font where it is shown (GitHub loads no web fonts).
 // Writes web/img/vinyl-lockup-light.svg (dark letters, for light pages) and web/img/vinyl-lockup-dark.svg.
 // Needs opentype.js 1.3.4 and wawoff2 2.0.1. Usage, from the repo root:
@@ -10,7 +10,7 @@ const require = createRequire(process.env.NODE_PATH ? process.env.NODE_PATH + '/
 const opentype = require('opentype.js');
 const wawoff2 = require('wawoff2');
 
-const ttf = await wawoff2.decompress(readFileSync('web/fonts/unbounded-latin-600-normal.woff2'));
+const ttf = await wawoff2.decompress(readFileSync('web/fonts/chakra-petch-latin-600-normal.woff2'));
 const font = opentype.parse(ttf.buffer.slice(ttf.byteOffset, ttf.byteOffset + ttf.byteLength));
 const MARK = 38, GAP = 12, SIZE = 22, TRACK = -0.006 * SIZE, H = 40;
 const text = { light: '#1B2632', dark: '#E8E9DC' };

@@ -1,16 +1,12 @@
 /* Skarbnik site, Panyl design layer: tokens (dark = Vinyl, light = Palladian), decor, shared components, the Home
    Console and Dock layout, the hero logo, the who sees what matrix, and the page rules, each scoped to its page
    (main.p-<page>). Every colour is a variable from the token blocks. Site components are in css/site.css. */
-@font-face{font-family:'Unbounded';font-weight:400;font-style:normal;font-display:swap;src:url(../fonts/unbounded-latin-400-normal.woff2) format('woff2')}
-@font-face{font-family:'Unbounded';font-weight:500;font-style:normal;font-display:swap;src:url(../fonts/unbounded-latin-500-normal.woff2) format('woff2')}
-@font-face{font-family:'Unbounded';font-weight:600;font-style:normal;font-display:swap;src:url(../fonts/unbounded-latin-600-normal.woff2) format('woff2')}
-@font-face{font-family:'Unbounded';font-weight:700;font-style:normal;font-display:swap;src:url(../fonts/unbounded-latin-700-normal.woff2) format('woff2')}
-@font-face{font-family:'DM Sans';font-weight:400;font-style:normal;font-display:swap;src:url(../fonts/dm-sans-latin-400-normal.woff2) format('woff2')}
-@font-face{font-family:'DM Sans';font-weight:500;font-style:normal;font-display:swap;src:url(../fonts/dm-sans-latin-500-normal.woff2) format('woff2')}
-@font-face{font-family:'DM Sans';font-weight:600;font-style:normal;font-display:swap;src:url(../fonts/dm-sans-latin-600-normal.woff2) format('woff2')}
-@font-face{font-family:'DM Sans';font-weight:700;font-style:normal;font-display:swap;src:url(../fonts/dm-sans-latin-700-normal.woff2) format('woff2')}
-@font-face{font-family:'DM Mono';font-weight:400;font-style:normal;font-display:swap;src:url(../fonts/dm-mono-latin-400-normal.woff2) format('woff2')}
-@font-face{font-family:'DM Mono';font-weight:500;font-style:normal;font-display:swap;src:url(../fonts/dm-mono-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Chakra Petch';font-weight:400;font-style:normal;font-display:swap;src:url(../fonts/chakra-petch-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Chakra Petch';font-weight:500;font-style:normal;font-display:swap;src:url(../fonts/chakra-petch-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Chakra Petch';font-weight:600;font-style:normal;font-display:swap;src:url(../fonts/chakra-petch-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Chakra Petch';font-weight:700;font-style:normal;font-display:swap;src:url(../fonts/chakra-petch-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Fira Code';font-weight:400;font-style:normal;font-display:swap;src:url(../fonts/fira-code-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Fira Code';font-weight:500;font-style:normal;font-display:swap;src:url(../fonts/fira-code-latin-500-normal.woff2) format('woff2')}
 
 /* Skarbnik, Panyl theme tokens. Dark = Vinyl palette, light = Palladian palette. */
 /* Set data-th="panyl" and data-md="dark" or "light" on the root element (.sk in the design files). */
@@ -83,15 +79,15 @@
   --rs:0.3
 }
 
-/* Fonts (original mix): headings Unbounded, body DM Sans, buttons and labels DM Sans, facts DM Mono */
+/* Fonts: headings, body, buttons and labels Chakra Petch; facts, ids and numbers Fira Code */
 .sk{
-  --fd:'Unbounded',system-ui,sans-serif;
-  --fb:'DM Sans',system-ui,sans-serif;
-  --fu:'DM Sans',system-ui,sans-serif;
-  --fm:'DM Mono',ui-monospace,monospace;
-  --wd:600;      /* heading weight (Unbounded 600) */
+  --fd:'Chakra Petch',system-ui,sans-serif;   /* headings */
+  --fb:'Chakra Petch',system-ui,sans-serif;   /* body */
+  --fu:'Chakra Petch',system-ui,sans-serif;   /* buttons and labels */
+  --fm:'Fira Code',ui-monospace,monospace;    /* facts, ids, numbers */
+  --wd:600;      /* heading weight (Chakra Petch 600) */
   --trk:.3;      /* heading tracking scale */
-  --hs:.76;      /* heading size scale, Unbounded is wide so every heading size is multiplied by this */
+  --hs:.9;       /* heading size scale: every heading size written as calc(<size> * var(--hs)) is multiplied by this */
 }
 
 /* Panyl only. Dark uses the Vinyl decor, light uses the Palladian decor. */

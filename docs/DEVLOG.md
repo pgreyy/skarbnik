@@ -2,6 +2,22 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: Site fonts: Chakra Petch and Fira Code
+
+- The four font variables in `web/css/panyl.css` (the only place the site sets fonts; no component names a font) now
+  read Chakra Petch for headings, body, buttons and labels, and Fira Code for facts, ids and numbers; the heading scale
+  `--hs` is .9 (was .76). `@font-face` rules, the two preloads in `web/index.html` and `web/fonts/` hold Chakra Petch
+  400 to 700 and Fira Code 400 and 500; the Unbounded, DM Sans and DM Mono files are removed. The README lockup and the
+  social card set "Skarbnik" in Chakra Petch 600 (`scripts/logo/lockup.mjs`, `scripts/logo/build.sh`; the mark and the
+  other icons unchanged).
+- Measured in a headless browser at 1440 and 390, dark and light: Home hero 55.73 px (line 54.61 px, letter spacing
+  -0.585 px) and 39.6 px; section headings 45 px and 28.8 px; Home figures 36 px; Home card headings 27 px; wordmark
+  22 px and 17.48 px; page headings 76, 68 and 60 px (40, 40 and 36 px on phones) unchanged; eyebrow Fira Code 400 in
+  dark, Chakra Petch 600 in light; rail numbers and the section counter Fira Code 500. On phones the TESTNET tag clears
+  the first header button by 76 px. Every page and tab (27 routes, both modes, both widths): no horizontal overflow, no
+  clipped text, no big figure wrapping. Differences from the reference: the Bounties strip figures are 30 px on phones
+  (the site's own 24cqi cap) against 30.6 px, and the Home primary button is 235 px wide against 228 px.
+
 ## 2026-10-27: Judge bounties round 2 (27 to 31); 18 to 22 retired
 
 - `scripts/judge_bounties.sh` takes K, a per-account cap and the window as settings (round 1 unchanged). Round 2: 27 to

@@ -122,7 +122,7 @@ every attack tried: [docs/SECURITY.md](docs/SECURITY.md).
 | `serde`; `bincode` (receipt files) | 1.0.229; 1.3.3 | MIT OR Apache-2.0; MIT |
 | NEAR Connect (`@hot-labs/near-connect`), the site's wallet connector | 0.11.4 | MIT |
 | NEAR AI Cloud, the agent's default model provider (`z-ai/glm-5.3-flash`) | a hosted service | its own terms |
-| Fonts Unbounded, DM Sans, DM Mono (self-hosted in `web/fonts`) | 1.701, 4.004, 1.000 | SIL Open Font License 1.1 |
+| Fonts Chakra Petch, Fira Code (self-hosted in `web/fonts`) | 1.000, 5.002 | SIL Open Font License 1.1 |
 
 Tools: near-cli-rs 0.30.1, cargo-near 0.22.0, Docker with buildx. Every version: [docs/VERSIONS.md](docs/VERSIONS.md).
 Every outside file and its licence: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
