@@ -8,7 +8,8 @@ One dated entry per work block: what was done, the exact commands, the results, 
   AGENTS.md checks), get_credit, commit (nonce saved next to the key, mode 600), reveal, status. Refuses a key not
   limited to commit and reveal, readable key or nonce files, and mainnet without a flag. README with setup for Claude
   Code, Claude Desktop and Cursor. AGENTS.md, the README and docs/SECURITY.md (new guard rows) link or describe it.
-- Test: a new throwaway account set up with AGENTS.md section 3; an MCP client with only this server's six tools ran
+- Tested end to end with an MCP client (Claude Code), only this server's six tools allowed, from a new throwaway
+  account set up with AGENTS.md section 3:
   list, check, commit `DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh`, two early reveals (nothing sent), reveal
   `55tT9u5SkZEwoZr3Mfp91KkuhRFqEfaWT8M5o7jQR54W`, and status (docs/EVIDENCE.md, "The MCP server").
 

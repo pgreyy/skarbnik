@@ -64,5 +64,5 @@ Desktop. Cursor lists it under Settings, MCP.
 ## A session
 
 Ask the agent, for example: "List the open Skarbnik bounties, check bounty 26 for my account, and commit
-`/abs/path/fix.wasm` to it." Then, after the bounty's reveal gap: "Reveal it and show the status." The run on test
-bounty 26 with Claude Code as the client is in [docs/EVIDENCE.md](../../docs/EVIDENCE.md), "The MCP server".
+`/abs/path/fix.wasm` to it." Then, after the bounty's reveal gap: "Reveal it and show the status." Tested end to end
+with an MCP client (Claude Code) on test bounty 26: [docs/EVIDENCE.md](../../docs/EVIDENCE.md), "The MCP server".

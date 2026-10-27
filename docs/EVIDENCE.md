@@ -18,7 +18,7 @@ reveal, with an MCP client driving it?
 - The account was set up with AGENTS.md section 3: `247CRiBczj7bApcSp5M3gS8j1WmfGdNdCkNtV8KGiE3W` (account),
   `52mk8aJ5QcXWeAVgLnmhjjuq58so3FRsByQS4AR84E6N` (0.05 NEAR credit), `4A3J5NxzEUEtY2Ad7f5KxmJfbw427NnyJpEN7UtPyj4H`
   (limits), `8HcEuZquKUq5jEvECFZvtuSQQhnxHkg6pbV6473j19ey` (limited key).
-- Client: Claude Code 2.1.309 in print mode, with only this server loaded (`--strict-mcp-config`), its built-in tools
+- Tested end to end with an MCP client (Claude Code 2.1.309, print mode), with only this server loaded (`--strict-mcp-config`), its built-in tools
   off and only the six skarbnik tools allowed; three sessions on test bounty 26
   (`docs/evidence/agent_access/mcp_sessions.txt`):
   1. list_bounties, then get_bounty 26 (all eight checks true for the account), then commit of `data/demo/fixed.wasm`:

@@ -1,4 +1,4 @@
-# tools/skarbnik-mcp end to end on test bounty 26, 2026-10-27, with Claude Code 2.1.309 as the MCP client (claude -p, --strict-mcp-config, built-in tools off, only the six skarbnik tools allowed). Account skarbnik-mcp-2fe414.testnet, signing with its key limited to commit and reveal. Tool calls and results as the client logged them; the client folder's path is shown as <client folder>.
+# tools/skarbnik-mcp end to end on test bounty 26, 2026-10-27, tested end to end with an MCP client (Claude Code 2.1.309; print mode, --strict-mcp-config, built-in tools off, only the six skarbnik tools allowed). Account skarbnik-mcp-2fe414.testnet, signing with its key limited to commit and reveal. Tool calls and results as the client logged them; the client folder's path is shown as <client folder>.
 
 == session 1
 CALL mcp__skarbnik__list_bounties {}
