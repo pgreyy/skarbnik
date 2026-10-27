@@ -1,5 +1,5 @@
 {
- "made_at": "2026-10-27T00:34:17Z",
+ "made_at": "2026-10-27T00:41:40Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Every account in this ledger is run by the Skarbnik team or was seeded by its scripts (accounts.kinds). No scores, no ranks, no credit for unpaid attempts. Amounts in yoctoNEAR; a paid fix also got its own attempt fee back.",
@@ -425,6 +425,20 @@
    "kind": "seeded",
    "attempts": 1,
    "fees_spent_yocto": "10000000000000000000000",
+   "fees_returned_yocto": "0",
+   "gross_rewards_yocto": "0",
+   "proof_checked_passes": 0,
+   "timeout_payouts": 0,
+   "rejected_by_a_fail_proof": 0,
+   "released_unrevealed": 0,
+   "waiting": 1,
+   "model_and_compute_cost": null
+  },
+  {
+   "account": "skarbnik-mcp-2fe414.testnet",
+   "kind": "seeded",
+   "attempts": 1,
+   "fees_spent_yocto": "15000000000000000000000",
    "fees_returned_yocto": "0",
    "gross_rewards_yocto": "0",
    "proof_checked_passes": 0,

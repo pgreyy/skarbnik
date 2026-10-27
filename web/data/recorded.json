@@ -1218,6 +1218,26 @@
     "result": "succeeded",
     "source": "docs/evidence/agent_access/transactions.tsv",
     "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
+   },
+   {
+    "step": "mcp_commit",
+    "method": "commit",
+    "tx": "DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/agent_access/transactions.tsv",
+    "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
+   },
+   {
+    "step": "mcp_reveal",
+    "method": "reveal",
+    "tx": "55tT9u5SkZEwoZr3Mfp91KkuhRFqEfaWT8M5o7jQR54W",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/agent_access/transactions.tsv",
+    "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
    }
   ],
   "18": [

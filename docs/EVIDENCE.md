@@ -5,6 +5,35 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## The MCP server: list, commit, reveal and status from an MCP client (2026-10-27)
+
+Question: can an agent work a bounty through `tools/skarbnik-mcp`, signing only with a key limited to commit and
+reveal, with an MCP client driving it?
+
+- Server checks, run directly (`SKARBNIK_KEY_FILE=... python3 -I tools/skarbnik-mcp/server.py --check`): the limited
+  key of `skarbnik-mcp-2fe414.testnet` passes ("limited to commit and reveal on kintsugi-l2-cihdp.testnet"); the same
+  account's full access key is refused ("is a full access key"); `SKARBNIK_NETWORK=mainnet` without
+  `SKARBNIK_ALLOW_MAINNET=1` is refused; a key file of mode 644 is refused. A stdio session answered initialize,
+  tools/list (six tools), list_bounties, get_bounty 26 and get_credit.
+- The account was set up with AGENTS.md section 3: `247CRiBczj7bApcSp5M3gS8j1WmfGdNdCkNtV8KGiE3W` (account),
+  `52mk8aJ5QcXWeAVgLnmhjjuq58so3FRsByQS4AR84E6N` (0.05 NEAR credit), `4A3J5NxzEUEtY2Ad7f5KxmJfbw427NnyJpEN7UtPyj4H`
+  (limits), `8HcEuZquKUq5jEvECFZvtuSQQhnxHkg6pbV6473j19ey` (limited key).
+- Client: Claude Code 2.1.309 in print mode, with only this server loaded (`--strict-mcp-config`), its built-in tools
+  off and only the six skarbnik tools allowed; three sessions on test bounty 26
+  (`docs/evidence/agent_access/mcp_sessions.txt`):
+  1. list_bounties, then get_bounty 26 (all eight checks true for the account), then commit of `data/demo/fixed.wasm`:
+     `DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh`, index 1, fee 0.015 NEAR. The nonce file next to the key was
+     written with mode 600 (774 bytes; not read here).
+  2. reveal 36 s before the gap ended: the server sent nothing and answered "wait 36 seconds"; status showed the
+     attempt Open, not revealed.
+  3. reveal (twice more too early, nothing sent), then `55tT9u5SkZEwoZr3Mfp91KkuhRFqEfaWT8M5o7jQR54W`; status: Open,
+     revealed, verdict deadline 2026-10-27 04:39:48 UTC.
+- The chain afterwards (`./scripts/agent_access_test.sh show`): bounty 26 has two revealed attempts, #0 (AGENTS.md)
+  and #1 (MCP server), both Open. No key, nonce or key file path appears in any tool result or in the log.
+
+Verdict: PASS. Limits: one client, one bounty, one patch; bounty 26 is a test bounty and no proof is planned for its
+attempts, so the timeout rule will settle them.
+
 ## Following AGENTS.md: commit and reveal from a new account, exactly as written (2026-10-27)
 
 Question: can an agent follow AGENTS.md as written, from nothing, to a commit and a reveal on a live bounty?

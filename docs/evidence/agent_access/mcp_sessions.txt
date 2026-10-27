@@ -1,0 +1,280 @@
+# tools/skarbnik-mcp end to end on test bounty 26, 2026-10-27, with Claude Code 2.1.309 as the MCP client (claude -p, --strict-mcp-config, built-in tools off, only the six skarbnik tools allowed). Account skarbnik-mcp-2fe414.testnet, signing with its key limited to commit and reveal. Tool calls and results as the client logged them; the client folder's path is shown as <client folder>.
+
+== session 1
+CALL mcp__skarbnik__list_bounties {}
+CALL mcp__skarbnik__get_bounty {"bounty_id": "26"}
+RESULT {
+ "feed": "https://skarbnik.xyz/feed.json",
+ "generated_at_utc": "2026-10-27T00:33:19Z",
+ "note": "A snapshot; get_bounty reads the live state before you commit.",
+ "bounties": [
+  {
+   "bounty_id": 7,
+   "status": "Demo or test only",
+   "kind": "demo",
+   "accepts_commits": true,
+   "reward": "0.5 NEAR",
+   "next_fee": "0.01 NEAR",
+   "max_commits": 3,
+   "slots_in_use": 0,
+   "max_commits_per_account": null,
+   "max_patch_bytes": 1024,
+   "windows": {
+    "reveal_gap_ns": "2000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "14400000000000",
+    "commit_deadline_utc": "2026-11-23T19:19:44Z",
+    "expires_at_utc": "2026-11-24T00:19:44Z"
+   },
+   "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
+   "public_code": {
+    "source": "https://skarbnik.xyz/code/demo/original.rs",
+    "module": "https://skarbnik.xyz/code/demo/original.wasm",
+    "tests": "https://skarbnik.xyz/code/demo/public_tests.txt",
+    "build": "https://skarbnik.xyz/code/demo/BUILD.txt"
+   }
+  },
+  {
+   "bounty_id": 12,
+   "status": "Awaiting evaluation",
+   "kind": "private",
+   "accepts_commits": true,
+   "reward": "0.5 NEAR",
+   "next_fee": "0.015 NEAR",
+   "max_commits": 3,
+   "slots_in_use": 1,
+   "max_commits_per_account": null,
+   "max_patch_bytes": 1024,
+   "windows": {
+    "reveal_gap_ns": "2000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "14400000000000",
+    "commit_deadline_utc": "2026-11-23T22:49:12Z",
+    "expires_at_utc": "2026-11-24T03:49:12Z"
+   },
+   "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
+   "public_code": {
+    "source": "https://skarbnik.xyz/code/demo/original.rs",
+    "module": "https://skarbnik.xyz/code/demo/original.wasm",
+    "tests": "https://skarbnik.xyz/code/demo/public_tests.txt",
+    "build": "https://skarbnik.xyz/code/demo/BUILD.txt"
+   }
+  },
+  {
+   "bounty_id": 18,
+   "status": "Open for attempts",
+   "kind": "private",
+   "accepts_commits": true,
+   "reward": "0.1 NEAR",
+   "next_fee": "0.01 NEAR",
+   "max_commits": 3,
+   "slots_in_use": 0,
+   "max_commits_per_account": null,
+   "max_patch_bytes": 1024,
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "86400000000000",
+    "commit_deadline_utc": "2026-12-04T09:39:50Z",
+    "expires_at_utc": "2026-12-05T10:39:50Z"
+   },
+   "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
+   "public_code": {
+    "source": "https://skarbnik.xyz/code/unpack/original.rs",
+    "module": "https://skarbnik.xyz/code/unpack/original.wasm",
+    "tests": "https://skarbnik.xyz/code/unpack/public_tests.txt",
+    "build": "https://skarbnik.xyz/code/unpack/BUILD.txt"
+   }
+  },
+  {
+   "bounty_id": 25,
+   "status": "Demo or test only",
+   "kind": "test",
+   "ac
+RESULT {
+ "bounty": {
+  "id": "26",
+  "state": "Open",
+  "opened": true,
+  "level": 2,
+  "amount": "100000000000000000000000",
+  "max_commits": 4,
+  "active": 1,
+  "commits": 1,
+  "pending": 1,
+  "max_commits_per_account": 1,
+  "next_fee": "15000000000000000000000",
+  "max_patch_bytes": 1024,
+  "reveal_gap_ns": "60000000000",
+  "reveal_window_ns": "7200000000000",
+  "verdict_window_ns": "14400000000000",
+  "expires_at_ns": "1793319956090936921",
+  "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+  "image_id_allowed": true,
+  "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+  "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+  "winner": null
+ },
+ "expires_at_utc": "2026-10-30T00:25:56Z",
+ "checks": {
+  "open": true,
+  "level_2": true,
+  "published_checker": true,
+  "free_slot": true,
+  "time_left": true,
+  "credit_covers_fee": true,
+  "fee_within_limit": true,
+  "account_below_cap": true,
+  "ok_to_commit": true
+ },
+ "checks_for_account": "skarbnik-mcp-2fe414.testnet"
+}
+CALL mcp__skarbnik__commit {"bounty_id": "26", "patch_path": "<client folder>/fix.wasm"}
+RESULT {
+ "committed": true,
+ "tx": "DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh",
+ "bounty_id": "26",
+ "index": 1,
+ "fingerprint": "2e20a26a48d9ce179a660c06c3a6141e5ed3c61a42bcba7bbde5c51a392715a0",
+ "payout": "skarbnik-mcp-2fe414.testnet",
+ "fee_yocto": "15000000000000000000000",
+ "reveal_after_seconds": 60.0,
+ "reveal_within_seconds": 7200.0,
+ "next": "call reveal with bounty_id 26 and index 1 after 60 s and within 7200 s"
+}
+FINAL **1) list_bounties:** 5 open bounties: 7, 12, 18, 25 and 26. Bounty 26 is a test bounty with a 0.1 NEAR reward, a 0.015 NEAR fee, and 1 of 4 attempt slots in use.
+
+**2) Bounty 26 checks** (for account skarbnik-mcp-2fe414.testnet): all 8 checks passed (open, level_2, published_checker, free_slot, time_left, credit_covers_fee, fee_within_limit, account_below_cap), so ok_to_commit is **true**.
+
+**3) Commit:** tx `DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh`, attempt index `1`.
+
+The 0.015 NEAR fee (testnet) came out of credit. I haven't revealed the patch yet. Revealing makes it public. It has to happen at least 60 seconds after the commit and no more than 2 hours after, so the deadline is about 2 hours from now. Tell me if you want me to reveal it. | turns 4 | cost_usd 0.1146621
+
+== session 2
+CALL mcp__skarbnik__reveal {"bounty_id": "26", "index": 1}
+RESULT {
+ "revealed": false,
+ "wait_seconds": 36,
+ "reason": "the reveal gap has not passed yet; nothing was sent"
+}
+CALL mcp__skarbnik__status {"bounty_id": "26"}
+RESULT {
+ "account": "skarbnik-mcp-2fe414.testnet",
+ "attempts": [
+  {
+   "contract": "kintsugi-l2-cihdp.testnet",
+   "network": "testnet",
+   "bounty_id": "26",
+   "index": 1,
+   "account": "skarbnik-mcp-2fe414.testnet",
+   "payout": "skarbnik-mcp-2fe414.testnet",
+   "patch_path": "<client folder>/fix.wasm",
+   "patch_sha256": "42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97",
+   "patch_len": 556,
+   "fingerprint": "2e20a26a48d9ce179a660c06c3a6141e5ed3c61a42bcba7bbde5c51a392715a0",
+   "fee_yocto": "15000000000000000000000",
+   "committed_at_utc": "2026-10-27T00:38:41Z",
+   "commit_tx": "DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh",
+   "outcome": "Open",
+   "verdict": null,
+   "revealed_at_utc": null,
+   "deadline_utc": null
+  }
+ ],
+ "meaning": {
+  "Open": "waiting (not revealed, or revealed and waiting for the vendor's proof)",
+  "Passed": "PASS: paid by proof",
+  "Failed": "FAIL: attempt spent",
+  "TimedOut": "paid by the timeout rule (not a verdict)",
+  "Released": "not revealed in time; slot freed"
+ }
+}
+FINAL No reveal transaction was sent, so there's no transaction id: the reveal gap hadn't passed yet (36 seconds left), and bounty 26, attempt 1 is still **Open** (commit tx `DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh`, not revealed). Tell me to try again and I'll call reveal now that the 36 seconds are up. | turns 3 | cost_usd 0.0642115
+
+== session 3
+CALL mcp__skarbnik__reveal {"bounty_id": "26", "index": 1}
+RESULT {
+ "revealed": false,
+ "wait_seconds": 13,
+ "reason": "the reveal gap has not passed yet; nothing was sent"
+}
+CALL mcp__skarbnik__status {"bounty_id": "26"}
+RESULT {
+ "account": "skarbnik-mcp-2fe414.testnet",
+ "attempts": [
+  {
+   "contract": "kintsugi-l2-cihdp.testnet",
+   "network": "testnet",
+   "bounty_id": "26",
+   "index": 1,
+   "account": "skarbnik-mcp-2fe414.testnet",
+   "payout": "skarbnik-mcp-2fe414.testnet",
+   "patch_path": "<client folder>/fix.wasm",
+   "patch_sha256": "42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97",
+   "patch_len": 556,
+   "fingerprint": "2e20a26a48d9ce179a660c06c3a6141e5ed3c61a42bcba7bbde5c51a392715a0",
+   "fee_yocto": "15000000000000000000000",
+   "committed_at_utc": "2026-10-27T00:38:41Z",
+   "commit_tx": "DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh",
+   "outcome": "Open",
+   "verdict": null,
+   "revealed_at_utc": null,
+   "deadline_utc": null
+  }
+ ],
+ "meaning": {
+  "Open": "waiting (not revealed, or revealed and waiting for the vendor's proof)",
+  "Passed": "PASS: paid by proof",
+  "Failed": "FAIL: attempt spent",
+  "TimedOut": "paid by the timeout rule (not a verdict)",
+  "Released": "not revealed in time; slot freed"
+ }
+}
+CALL mcp__skarbnik__reveal {"bounty_id": "26", "index": 1}
+RESULT {
+ "revealed": false,
+ "wait_seconds": 6,
+ "reason": "the reveal gap has not passed yet; nothing was sent"
+}
+CALL mcp__skarbnik__reveal {"bounty_id": "26", "index": 1}
+RESULT {
+ "revealed": true,
+ "tx": "55tT9u5SkZEwoZr3Mfp91KkuhRFqEfaWT8M5o7jQR54W",
+ "bounty_id": "26",
+ "index": 1,
+ "next": "the vendor now proves the patch; call status to see the outcome (PASS pays, FAIL spends the attempt, a timeout splits the reward among waiting attempts)"
+}
+CALL mcp__skarbnik__status {"bounty_id": "26"}
+RESULT {
+ "account": "skarbnik-mcp-2fe414.testnet",
+ "attempts": [
+  {
+   "contract": "kintsugi-l2-cihdp.testnet",
+   "network": "testnet",
+   "bounty_id": "26",
+   "index": 1,
+   "account": "skarbnik-mcp-2fe414.testnet",
+   "payout": "skarbnik-mcp-2fe414.testnet",
+   "patch_path": "<client folder>/fix.wasm",
+   "patch_sha256": "42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97",
+   "patch_len": 556,
+   "fingerprint": "2e20a26a48d9ce179a660c06c3a6141e5ed3c61a42bcba7bbde5c51a392715a0",
+   "fee_yocto": "15000000000000000000000",
+   "committed_at_utc": "2026-10-27T00:38:41Z",
+   "commit_tx": "DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh",
+   "reveal_tx": "55tT9u5SkZEwoZr3Mfp91KkuhRFqEfaWT8M5o7jQR54W",
+   "outcome": "Open",
+   "verdict": null,
+   "revealed_at_utc": "2026-10-27T00:39:48Z",
+   "deadline_utc": "2026-10-27T04:39:48Z"
+  }
+ ],
+ "meaning": {
+  "Open": "waiting (not revealed, or revealed and waiting for the vendor's proof)",
+  "Passed": "PASS: paid by proof",
+  "Failed": "FAIL: attempt spent",
+  "TimedOut": "paid by the timeout rule (not a verdict)",
+  "Released": "not revealed in time; slot freed"
+ }
+}
+FINAL Patch revealed in transaction `55tT9u5SkZEwoZr3Mfp91KkuhRFqEfaWT8M5o7jQR54W`; attempt 1 on bounty 26 is still **Open** with no verdict yet, waiting for the vendor's check until 2026-10-27 04:39:48 UTC (the first two reveal calls came before the required waiting time had passed and sent nothing). | turns 6 | cost_usd 0.047700200000000005

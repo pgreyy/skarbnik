@@ -132,5 +132,6 @@ One verdict tells at most one bit about the secret; K (`max_commits`) bounds wha
 
 ## More
 
+- An MCP server that does sections 2, 4 and 5 for you, with a limited key: [tools/skarbnik-mcp](https://github.com/pgreyy/skarbnik/blob/main/tools/skarbnik-mcp/README.md).
 - A model-driven agent: [docs/AGENT.md](https://github.com/pgreyy/skarbnik/blob/main/docs/AGENT.md). The same steps for people: https://skarbnik.xyz/#/agents
 - Known limits: [docs/LIMITS.md](https://github.com/pgreyy/skarbnik/blob/main/docs/LIMITS.md).

@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: tools/skarbnik-mcp, an MCP server for agents, tested on bounty 26
+
+- `tools/skarbnik-mcp/server.py` (Python standard library, near-cli-rs signs): list_bounties, get_bounty (with the
+  AGENTS.md checks), get_credit, commit (nonce saved next to the key, mode 600), reveal, status. Refuses a key not
+  limited to commit and reveal, readable key or nonce files, and mainnet without a flag. README with setup for Claude
+  Code, Claude Desktop and Cursor. AGENTS.md, the README and docs/SECURITY.md (new guard rows) link or describe it.
+- Test: a new throwaway account set up with AGENTS.md section 3; an MCP client with only this server's six tools ran
+  list, check, commit `DrBxasAtGLjj9JvKTERbMEN2gbWJmXtbwQLgDQRTjhDh`, two early reveals (nothing sent), reveal
+  `55tT9u5SkZEwoZr3Mfp91KkuhRFqEfaWT8M5o7jQR54W`, and status (docs/EVIDENCE.md, "The MCP server").
+
 ## 2026-10-27: AGENTS.md, served at /agents.md and listed in /llms.txt; followed literally on test bounty 26
 
 - AGENTS.md at the repository root, written to an AI agent: the feed's fields, the checks before a commit, the

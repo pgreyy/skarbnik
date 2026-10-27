@@ -16,7 +16,7 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-10-27T00:33:19Z",
+ "generated_at_utc": "2026-10-27T00:40:44Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -242,16 +242,16 @@
    "reward_yocto": "100000000000000000000000",
    "reward": "0.1 NEAR",
    "max_commits": 4,
-   "attempts_used": 1,
-   "slots_in_use": 1,
+   "attempts_used": 2,
+   "slots_in_use": 2,
    "max_commits_per_account": 1,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
     "step_yocto": "5000000000000000000000",
     "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
    },
-   "next_fee_yocto": "15000000000000000000000",
-   "next_fee": "0.015 NEAR",
+   "next_fee_yocto": "20000000000000000000000",
+   "next_fee": "0.02 NEAR",
    "windows": {
     "reveal_gap_ns": "60000000000",
     "reveal_window_ns": "7200000000000",
@@ -271,7 +271,7 @@
     "program": "demo",
     "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
    },
-   "slots_left": 3,
+   "slots_left": 2,
    "commit_deadline_utc": "2026-10-29T18:25:56Z",
    "expires_at_utc": "2026-10-30T00:25:56Z",
    "bounty_amount": "0.1 NEAR",
@@ -1437,16 +1437,16 @@
    "reward_yocto": "100000000000000000000000",
    "reward": "0.1 NEAR",
    "max_commits": 4,
-   "attempts_used": 1,
-   "slots_in_use": 1,
+   "attempts_used": 2,
+   "slots_in_use": 2,
    "max_commits_per_account": 1,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
     "step_yocto": "5000000000000000000000",
     "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
    },
-   "next_fee_yocto": "15000000000000000000000",
-   "next_fee": "0.015 NEAR",
+   "next_fee_yocto": "20000000000000000000000",
+   "next_fee": "0.02 NEAR",
    "windows": {
     "reveal_gap_ns": "60000000000",
     "reveal_window_ns": "7200000000000",

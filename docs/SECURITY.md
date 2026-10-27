@@ -88,6 +88,16 @@ Each guard: what it stops, where it lives, and what shows it works.
 | The model's answer is refused if it uses `include!`, `include_str!`, `include_bytes!`, `env!`, `option_env!`, `extern crate`, `mod x;` or `#[path]`, and it is built with an environment holding no API key | An answer (for example after a prompt injection in the public code) that pulls a local file or the key into the patch, which is published on chain at reveal | case 5 |
 | The API key comes only from an environment variable or a file outside the repository, and is never printed or logged | Leaking the key into logs, evidence files or git | case 2: the key is in no log or file of the run |
 
+### The MCP server (tools/skarbnik-mcp/)
+
+| Guard | What it stops | Shown by |
+| --- | --- | --- |
+| Before every commit and reveal it reads the key's permission from the chain and refuses unless it is a function call key for the contract limited to `commit` and `reveal` | An agent signing with a full access key | `server.py --check` with the full access key: refused (EVIDENCE, "The MCP server") |
+| It refuses a key file or nonce file that other users can read; the nonce file is written with mode 600 before the commit is sent | Another local user reading the key or the nonces; losing a nonce of a commit already sent | `--check` with a mode 644 copy: refused; the nonce file's mode after the commit: 600 |
+| No tool result or log line carries the key, the key file's contents or a nonce; near-cli's error lines are filtered before they are returned | Leaking a key or nonce into the client's transcript | `docs/evidence/agent_access/mcp_sessions.txt` |
+| Mainnet is refused unless `SKARBNIK_ALLOW_MAINNET=1` | Spending real money by accident | `SKARBNIK_NETWORK=mainnet ... --check`: refused |
+| A reveal before the reveal gap sends nothing and says how long to wait | Burning gas on a reveal the contract would refuse | sessions 2 and 3 |
+
 ### Keys
 
 | Guard | What it stops | Shown by |
@@ -294,6 +304,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-27: new guards in `tools/skarbnik-mcp/` (an MCP server for agents): only a key limited to commit and reveal,
+  key and nonce files of mode 600, no key or nonce in any output, mainnet only with a flag, no early reveal. Tested on
+  test bounty 26 (EVIDENCE, "The MCP server").
 
 - 2026-10-26: per-account cap deployed on `kintsugi-l2-cihdp.testnet` (wasm sha256 `b863487e...1024`, tx
   `DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7`); every saved view of bounties 7, 12, 14, 15 and 18 to 24, the pool and

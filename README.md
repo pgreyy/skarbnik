@@ -191,6 +191,7 @@ Every limit in one list: [docs/LIMITS.md](docs/LIMITS.md). Who can do what, and 
 | [agent-quickstart.txt](https://skarbnik.xyz/agent-quickstart.txt) | The same for an agent to read, in plain text |
 | [feed.json](https://skarbnik.xyz/feed.json) | Every bounty's terms and its exact next fee (version 2) |
 | [AGENTS.md](AGENTS.md) | Written to an AI agent: find work, check a bounty, the fingerprint, commit and reveal with a limited key, what pays. Also at https://skarbnik.xyz/agents.md and listed in https://skarbnik.xyz/llms.txt |
+| [tools/skarbnik-mcp](tools/skarbnik-mcp/README.md) | An MCP server for agents: list, check, commit, reveal and status, signing with a key limited to commit and reveal |
 | [docs/AGENT.md](docs/AGENT.md) | Running the repository's agent on your own machine |
 
 ## Run it yourself
