@@ -103,6 +103,7 @@ except (OSError, ValueError):
     _recorded = {}
 test_ids = set(_recorded.get("test_bounties", {}))
 judge_ids = set(_recorded.get("judge_bounties", {}))
+retired_judge_ids = set(_recorded.get("retired_judge_bounties", []))
 demo_commitment = (_recorded.get("notes", {}).get("demo_exploit_commitment") or {}).get("commitment")
 # Successful claim_timeout transactions recorded in the repository, per bounty (web/data/recorded.json).
 try:
@@ -148,7 +149,7 @@ for i in range(n):
     pc = public_code.get((b["original_hash"], b["corpus_hash"]))
     all_bounties.append({
         "bounty_id": int(b["id"]), "status": status_of(b, subs, kind, accepting), "kind": kind,
-        "judge_bounty": str(i) in judge_ids, "accepts_commits": accepting, "level": b["level"],
+        "judge_bounty": str(i) in judge_ids, "retired_judge_bounty": str(i) in retired_judge_ids, "accepts_commits": accepting, "level": b["level"],
         "program": pc["program"] if pc else None, "module_description": pc["description"] if pc else None,
         "target": TARGET, "max_patch_bytes": b["max_patch_bytes"],
         "reward_yocto": b["amount"], "reward": near(b["amount"]),

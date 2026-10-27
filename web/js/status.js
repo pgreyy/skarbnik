@@ -24,6 +24,7 @@ export function kindOf(b, rec) {
 }
 export const isJudge = (b, rec) => !!(rec && rec.judge_bounties && rec.judge_bounties[String(b.id)]);
 export const isNewModule = (b, rec) => !!(rec && rec.new_module_bounties && rec.new_module_bounties[String(b.id)]);
+export const isRetiredJudge = (b, rec) => !!(rec && (rec.retired_judge_bounties || []).includes(String(b.id)));
 
 // Accepts a commit right now: open, opened, before the last commit time, and a free slot.
 export const accepting = (b, now = Date.now()) => b.state === 'Open' && b.opened && nsToDate(commitBy(b)).getTime() > now && b.max_commits - b.active > 0;
@@ -50,6 +51,7 @@ export function kindChips(b, rec) {
   if (k === 'test' && b.exploit_commitment === (rec.notes.demo_exploit_commitment || {}).commitment) out.push(['Public demo input', 'k-test']);
   if (k === 'private') out.push(['Private secret', 'k-priv']);
   if (isJudge(b, rec)) out.push(['Judge bounty', 'k-test']);
+  if (isRetiredJudge(b, rec)) out.push(['Retired', 'k-refund']);
   if (isNewModule(b, rec)) out.push(['New module', 'k-test']);
   return out;
 }

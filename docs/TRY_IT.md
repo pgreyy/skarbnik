@@ -12,7 +12,8 @@ network: NEAR testnet
 checker_image_id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
 official_demo_bounty: 7
 private_demo_bounty: 12
-judge_bounties_closed_at_writing: 19, 20, 21, 22
+judge_bounties: 27, 28, 29, 30, 31 (closed at writing: 28, 29, 30, 31)
+retired_judge_bounties: 18, 19, 20, 21, 22
 paid_by_proof: 1, 16, 24
 paid_by_timeout: 4, 9, 11, 13, 17 (and 8 on paper only: its transfer failed, finding 8)
 feed_url: https://skarbnik.xyz/feed.json
@@ -42,14 +43,17 @@ toolchain. Steps 9 and 10 are optional and need Docker.
 
    See: `['dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc'] MATCH`.
 
-3. **See which judge bounties are still closed.** Judge bounties 18 to 22 have the same hashes as private bounty 17 and
-   were created closed, so anyone can open one with a real proof (step 5). Each can be opened once.
+3. **See which judge bounties are still closed.** Judge bounties 27 to 31 have the same hashes as private bounty 17 and
+   were created closed, so anyone can open one with a real proof (step 5). Each can be opened once. They take K = 2
+   attempts, at most 1 per account, with a 41 hour verdict window; the vendor's watch proves their attempts on a rented
+   GPU. Judge bounties 18 to 22 (round 1) are retired: they stay on chain for the record.
 
-       for i in 18 19 20 21 22; do curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"kintsugi-l2-cihdp.testnet\",\"method_name\":\"get_bounty\",\"args_base64\":\"$(printf '{"bounty_id":"%s"}' $i | base64)\"}}" | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], "opened" if b["opened"] else "closed")'; done
+       for i in 27 28 29 30 31; do curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"kintsugi-l2-cihdp.testnet\",\"method_name\":\"get_bounty\",\"args_base64\":\"$(printf '{"bounty_id":"%s"}' $i | base64)\"}}" | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], "opened" if b["opened"] else "closed")'; done
 
-   See, as of 2026-10-26: `18 opened` (opened by our test from a throwaway account, tx
-   [`GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`](https://testnet.nearblocks.io/txns/GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb),
-   35.247 Tgas), then `19 closed`, `20 closed`, `21 closed`, `22 closed`. A bounty another judge opened shows `opened`.
+   See, as of 2026-10-27: `27 opened` (opened by our test from a throwaway account, tx
+   [`FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV`](https://testnet.nearblocks.io/txns/FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV),
+   35.251 Tgas), then `28 closed`, `29 closed`, `30 closed`, `31 closed`. A bounty another judge opened shows `opened`.
+   (Round 1's test opened 18: [`GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb`](https://testnet.nearblocks.io/txns/GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb), 35.247 Tgas.)
 
 4. **Open the live site.** https://skarbnik.xyz/#/bounties/7 shows "Bounty 7: official demo" with the chips "Demo",
    "Public input" and "Level 2", read live from testnet. https://skarbnik.xyz/#/bounties/17 shows "Timeout settlement"
@@ -57,25 +61,25 @@ toolchain. Steps 9 and 10 are optional and need Docker.
    The same site runs from this clone with `python3 -m http.server 8000 --directory web` and http://localhost:8000/#/bounties/7 .
 
 5. **Open a closed judge bounty with a real proof, from your own account.** Make a testnet account from the faucet, then
-   send bounty 17's stored Groth16 Proof 0 to one bounty that step 3 shows as closed (here 19; use 20, 21 or 22 if 19 is
+   send bounty 17's stored Groth16 Proof 0 to one bounty that step 3 shows as closed (here 28; use 29, 30 or 31 if 28 is
    already open). The contract checks the proof on chain and opens the bounty.
 
        near account create-account sponsor-by-faucet-service <you>.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
-       near contract call-function as-transaction kintsugi-l2-cihdp.testnet open_with_groth16 file-args docs/evidence/receipts/judge_open_19.json prepaid-gas '300 Tgas' attached-deposit '0 NEAR' sign-as <you>.testnet network-config testnet sign-with-legacy-keychain send
+       near contract call-function as-transaction kintsugi-l2-cihdp.testnet open_with_groth16 file-args docs/evidence/receipts/judge_open_28.json prepaid-gas '300 Tgas' attached-deposit '0 NEAR' sign-as <you>.testnet network-config testnet sign-with-legacy-keychain send
 
-   See: the log line `EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_opened","data":[{"bounty_id":"19","by":"groth16","caller":"<you>.testnet"}]}`
+   See: the log line `EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_opened","data":[{"bounty_id":"28","by":"groth16","caller":"<you>.testnet"}]}`
    and the return value `"opened"`; about 35 Tgas burned in total (the pairing check alone is about 30 Tgas). Step 3 then
-   shows `19 opened`. Sent again, the same call is refused: "bounty is already open" (tx
-   [`BVMoi97TTU9bZDqNukW8Loor6dcBocyWHdtVff9Kx1dg`](https://testnet.nearblocks.io/txns/BVMoi97TTU9bZDqNukW8Loor6dcBocyWHdtVff9Kx1dg)).
+   shows `28 opened`. Sent again, the same call is refused: "bounty is already open" (our run on 27: tx
+   [`FehQ8siwReoi46uCgQjTgZwRUyGnbryjNuqTjZNMnRMp`](https://testnet.nearblocks.io/txns/FehQ8siwReoi46uCgQjTgZwRUyGnbryjNuqTjZNMnRMp)).
 
 6. **See the contract refuse a proof at the proof check itself.** `judge_refuse_<id>.json` holds bounty 17's real Proof 0
    journal (so every cheaper check passes) with the seal of another real Groth16 proof (the demo's Proof 0). Send it to a
    closed judge bounty; it stays closed, so this step can be repeated.
 
-       near contract call-function as-transaction kintsugi-l2-cihdp.testnet open_with_groth16 file-args docs/evidence/receipts/judge_refuse_22.json prepaid-gas '300 Tgas' attached-deposit '0 NEAR' sign-as <you>.testnet network-config testnet sign-with-legacy-keychain send
+       near contract call-function as-transaction kintsugi-l2-cihdp.testnet open_with_groth16 file-args docs/evidence/receipts/judge_refuse_31.json prepaid-gas '300 Tgas' attached-deposit '0 NEAR' sign-as <you>.testnet network-config testnet sign-with-legacy-keychain send
 
-   See: `Smart contract panicked: the Groth16 proof does not verify for this bounty's image id and this journal`. Our run:
-   tx [`5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj),
+   See: `Smart contract panicked: the Groth16 proof does not verify for this bounty's image id and this journal`. Our run (on
+   bounty 22, round 1, with the same journal and seal): tx [`5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj),
    34.856 Tgas burned: the pairing check ran (refusals from the earlier state checks cost about 2 Tgas).
 
 7. **See the attempt cap stop a probe agent.** A seeded probe account sent 12 probe commits to bounty 23 (the real cap

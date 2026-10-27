@@ -95,6 +95,14 @@ if os.path.exists(_jenv):
     BOUNTY_STEPS.append(("docs/evidence/judge/transactions.tsv", "scripts/judge_bounties.sh",
                          {j: [f"judge_create_{i + 1}", f"judge_open_{j}", f"judge_open_again_{j}", f"judge_refusal_other_seal_{j}"]
                           for i, j in enumerate(JUDGE_IDS)}))
+# Round 2 (JUDGE_ROUND=2): K = 2, a cap of 1 per account, the window from the measured proof time; round 1 is retired.
+_jenv2 = os.path.join(ROOT, "docs/evidence/judge2/run.env")
+JUDGE_IDS_2 = []
+if os.path.exists(_jenv2):
+    JUDGE_IDS_2 = [int(x) for x in dict(l.strip().split("=", 1) for l in open(_jenv2) if "=" in l).get("JUDGE_IDS", "").strip('"').split()]
+    BOUNTY_STEPS.append(("docs/evidence/judge2/transactions.tsv", "JUDGE_ROUND=2 scripts/judge_bounties.sh",
+                         {j: [f"judge_create_{i + 1}", f"judge_open_{j}", f"judge_open_again_{j}", f"judge_refusal_other_seal_{j}"]
+                          for i, j in enumerate(JUDGE_IDS_2)}))
 # The arena's guarded probe run (scripts/arena_probe.sh guarded): one bounty with the real cap and fee.
 _aenv = os.path.join(ROOT, "docs/evidence/arena_probe/run.env")
 ARENA_BOUNTY = dict(l.strip().split("=", 1) for l in open(_aenv) if "=" in l).get("GBOUNTY") if os.path.exists(_aenv) else None
@@ -247,9 +255,13 @@ if "ABOUNTY" in agentenv:
 
 out["test_bounties"]["25"] = "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo."
 out["test_bounties"]["26"] = "Test bounty: made for the agent access tests (AGENTS.md followed literally, and the MCP server). Not a demo."
+out["test_bounties"]["32"] = "Test bounty: made for the vendor tool's end to end test (tools/skarbnik-vendor watch proves its attempt on a rented GPU with no one's help). Its secret is private, made on the vendor's VPS, but the program is the public demo."
 if ARENA_BOUNTY:
     out["test_bounties"][ARENA_BOUNTY] = "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
 out["judge_bounties"] = {str(j): "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself." for j in JUDGE_IDS}
+out["judge_bounties"].update({str(j): "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties " + (f"{JUDGE_IDS_2[0]} to {JUDGE_IDS_2[-1]}" if JUDGE_IDS_2 else "of round 2") + " instead. After its expiry anyone can call expire, which refunds the vendor." for j in JUDGE_IDS})
+out["judge_bounties"].update({str(j): "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU." for j in JUDGE_IDS_2})
+out["retired_judge_bounties"] = [str(j) for j in JUDGE_IDS]
 
 dst = os.path.join(ROOT, "web/data/recorded.json")
 with open(dst, "w") as f:

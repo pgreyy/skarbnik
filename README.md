@@ -29,8 +29,8 @@ arrives in time, the **TIMEOUT RULE** pays the waiting attempts, always labelled
 - **A private bug fixed and paid by proof:** [bounty 24](https://skarbnik.xyz/#/bounties/24). An AI agent fixed a bug
   it could not see, and the contract checked the proof and paid: tx
   [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR).
-- **A forged proof refused:** bounty 17's real journal with another proof's seal, sent to judge bounty 22, refused at
-  the pairing check: tx [`5uKLepww…`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj).
+- **A forged proof refused:** bounty 17's real journal with another proof's seal, sent to judge bounty 22 (now
+  retired; the current judge bounties are 27 to 31), refused at the pairing check: tx [`5uKLepww…`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj).
   [9 more attacks](https://skarbnik.xyz/#/evidence/contract) were refused on chain, each with its transaction.
 - **An honest timeout:** [bounty 17](https://skarbnik.xyz/#/bounties/17). The agent's fix equalled the reference fix,
   but the laptop proof was too slow for the 4 hour window, so it was paid by the timeout rule, not by proof (claim tx

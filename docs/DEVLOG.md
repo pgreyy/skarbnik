@@ -2,6 +2,13 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: Judge bounties round 2 (27 to 31); 18 to 22 retired
+
+- `scripts/judge_bounties.sh` takes K, a per-account cap and the window as settings (round 1 unchanged). Round 2: 27 to
+  31, K = 2, cap 1, 41 h (2 x K x the measured VPS proof time, rounded up), open test on 27 `FPuvqMBp...`. README,
+  JUDGE_GUIDE.md (and the site's Judge page, regenerated from it), docs/TRY_IT.md, docs/VENDOR.md, feed.json
+  (`retired_judge_bounty`) and the site (a Retired chip) point to the new bounties.
+
 ## 2026-10-27: One CPU proof on the VPS, measured
 
 - `tools/skarbnik-vendor prove0` of the VPS test bounty (demo program, a secret made on the VPS, 112 segments at

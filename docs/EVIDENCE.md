@@ -5,6 +5,27 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Judge bounties, round 2: 27 to 31 (2026-10-27)
+
+Judge bounties 18 to 22 (round 1: K = 3, 24 h window) are retired. Round 2 replaces them with the same hashes as
+private bounty 17: `JUDGE_ROUND=2 JUDGE_K=2 JUDGE_CAP=1 JUDGE_VERDICT_H=41 ./scripts/judge_bounties.sh create argfiles
+opentest` (output `docs/evidence/judge2/`).
+
+- The window: at least 24 h and at least 2 x K x the measured proof time on the vendor's machine. When they were
+  made, the measured time was the VPS CPU proof, 36,708.46 s (docs/numbers.md), so 4 x 36,708.46 s = 40.8 h, rounded
+  up to 41 h. (The owner then moved judging to GPU mode, whose window would be 24 h; the windows on chain cannot change,
+  and 41 h is above that minimum.)
+- Created, closed, 0.1 NEAR each, K = 2, at most 1 attempt per account, expiry 2026-12-06: 27
+  `B3Z22LnCp1qRjf1hj7Z3m4Shh5BFn6TD2LARHqk1hgyS`, 28 `AUJpCpUEST1RuGL9ibeVtDygL8kcK1cJWbLDwocYbRJK`, 29
+  `4JJGk3dbjtP9M6GFNLdMBypTKwdkbgAvafLhxopTb8NQ`, 30 `4WwGk3aH8QdTzqVeMo8PvtfeorBQ32y31yE9usTPvzEf`, 31
+  `J2gUsJsLy968sSYJ1uidNKMhu119WYmw9gEsW5drZ2jV`.
+- Open test from a new throwaway account, `skarbnik-judge-14c4e8.testnet`: bounty 27 opened by bounty 17's stored
+  Groth16 Proof 0, `FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV`, 35.251 Tgas; sent again, refused ("bounty is already
+  open"), `FehQ8siwReoi46uCgQjTgZwRUyGnbryjNuqTjZNMnRMp`. 28 to 31 stay closed for judges.
+- The vendor's watch on the VPS covers 27 to 31 (bounty 17's secret and salt are there, mode 600).
+- Round 1 stays on chain. 18 was opened by our test; 19 to 22 were never opened. After their expiry anyone can call
+  `expire`, which refunds the vendor; nothing happens to them by itself.
+
 ## The MCP server: list, commit, reveal and status from an MCP client (2026-10-27)
 
 Question: can an agent work a bounty through `tools/skarbnik-mcp`, signing only with a key limited to commit and

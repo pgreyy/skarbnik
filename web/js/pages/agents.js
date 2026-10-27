@@ -38,7 +38,7 @@ ${table(['Field', 'Meaning'], [
     ['open_bounties', 'the bounties that accept a commit right now (the agent reads this list)'],
     ['bounties', 'every bounty, with the fields below'],
     ['status', 'one of: Proof verified (paid by an accepted PASS proof), Proof rejected (an attempt was rejected by a FAIL proof; still open), Awaiting evaluation (a revealed attempt waits for its proof), Timeout settlement (paid by the timeout rule: a liveness rule, not a verdict), Refunded (back to the vendor), Failed (past expiry, not settled), Demo or test only (a demo or test bounty not yet settled), Open for attempts, Waiting for Proof 0 (created, not opened yet). The site uses the same rules.'],
-    ['kind, judge_bounty', 'private, demo or test; judge bounties share bounty 17’s hashes and open with its stored Proof 0'],
+    ['kind, judge_bounty, retired_judge_bounty', 'private, demo or test; judge bounties share bounty 17’s hashes and open with its stored Proof 0; a retired judge bounty (18 to 22) is kept for the record only: use a judge bounty that is not retired'],
     ['program, module_description, public_code', 'which public program the bounty is about, and where its source, module, tests and build flags are (paths relative to feed.json; check sha256(module) = original_hash and the tests’ corpus_hash)'],
     ['target', 'what a fix must do to PASS, and what PASS does not mean'],
     ['max_patch_bytes', 'the largest patch the contract accepts at reveal'],

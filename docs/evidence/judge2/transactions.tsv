@@ -1,0 +1,9 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+judge_create_1	create_bounty	kintsugi-vendor-prnvm.testnet	B3Z22LnCp1qRjf1hj7Z3m4Shh5BFn6TD2LARHqk1hgyS	0.355 Tgas	0.0000354169652405	0	6.79
+judge_create_2	create_bounty	kintsugi-vendor-prnvm.testnet	AUJpCpUEST1RuGL9ibeVtDygL8kcK1cJWbLDwocYbRJK	0.355 Tgas	0.0000354169652405	0	6.53
+judge_create_3	create_bounty	kintsugi-vendor-prnvm.testnet	4JJGk3dbjtP9M6GFNLdMBypTKwdkbgAvafLhxopTb8NQ	0.355 Tgas	0.0000354169652405	0	6.1
+judge_create_4	create_bounty	kintsugi-vendor-prnvm.testnet	4WwGk3aH8QdTzqVeMo8PvtfeorBQ32y31yE9usTPvzEf	0.355 Tgas	0.0000354169652405	0	6.41
+judge_create_5	create_bounty	kintsugi-vendor-prnvm.testnet	J2gUsJsLy968sSYJ1uidNKMhu119WYmw9gEsW5drZ2jV	0.355 Tgas	0.0000354169652405	0	6.76
+judge_tester_account	create-account	skarbnik-judge-14c4e8.testnet	G4N9z557Akoha3DZe1scc8GW9g5Fbifk9QjL66RRUhzy	-	-	0	5.0
+judge_open_27	open_with_groth16	skarbnik-judge-14c4e8.testnet	FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV	0.377 Tgas	0.000037681941703	0	6.76
+judge_open_again_27	open_with_groth16	skarbnik-judge-14c4e8.testnet	FehQ8siwReoi46uCgQjTgZwRUyGnbryjNuqTjZNMnRMp	-	-	rpc:failed	-

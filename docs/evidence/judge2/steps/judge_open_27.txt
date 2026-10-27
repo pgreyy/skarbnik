@@ -1,0 +1,43 @@
+utc_start=2026-10-27T08:34:46.626274266Z
+├  Unsigned transaction:
+│    signer_id:    skarbnik-judge-14c4e8.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  open_with_groth16
+│                       args:         {
+│                                       "bounty_id": "27",
+│                                       "seal": "INFEAVzsCt7Bo01gl0IedebIphug4a3x+oY5hPjQVK0Fgx3e7PHDYHna/wIKUh4odMGNJzUpQAE6riyM6BcJNBXL9pko0SQrH4u0wOoRPWk3LSxBFxIt9+YRoq3RrHmNDrb03NeKax3DGDUI4HFbDYJrNdcJaJnj/fKFrA5pDZISMeAyt0utPHKlbc3geGEB1U2SzADzL+xfGF6yjoJ7HCpdEk3wEubwtVORRHDk/HmsxuGZf9wNC+ZRnqIOt87VJrOGy6MnffbisaXkRAlt4K4VZFjOSPhHj8U9vmxC1K0DuT8UDS9V2T9poUDnxxGKyEWO8SW2/d8f99fycOioeQ=="
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DR6tCAFAgBN92q1AZK1Y3R9qCKUufAzfKTTNJGLET73W
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.377 Tgas
+│    Transaction fee: 0.000037681941703 NEAR
+│    Transaction ID: FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_opened","data":[{"bounty_id":"27","by":"groth16","caller":"skarbnik-judge-14c4e8.testnet"}]}
+│    Logs [skarbnik-judge-14c4e8.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"opened"
+
+
+The "open_with_groth16" call to <kintsugi-l2-cihdp.testnet> on behalf of <skarbnik-judge-14c4e8.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+
+exit=0
+wall_seconds=6.76

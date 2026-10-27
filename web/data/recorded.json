@@ -1330,6 +1330,86 @@
     "script": "scripts/judge_bounties.sh"
    }
   ],
+  "27": [
+   {
+    "step": "judge_create_1",
+    "method": "create_bounty",
+    "tx": "B3Z22LnCp1qRjf1hj7Z3m4Shh5BFn6TD2LARHqk1hgyS",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_open_27",
+    "method": "open_with_groth16",
+    "tx": "FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-27 08:34 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_open_again_27",
+    "method": "open_with_groth16",
+    "tx": "FehQ8siwReoi46uCgQjTgZwRUyGnbryjNuqTjZNMnRMp",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-27 08:35 UTC",
+    "result": "refused by the contract",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
+  "28": [
+   {
+    "step": "judge_create_2",
+    "method": "create_bounty",
+    "tx": "AUJpCpUEST1RuGL9ibeVtDygL8kcK1cJWbLDwocYbRJK",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
+  "29": [
+   {
+    "step": "judge_create_3",
+    "method": "create_bounty",
+    "tx": "4JJGk3dbjtP9M6GFNLdMBypTKwdkbgAvafLhxopTb8NQ",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
+  "30": [
+   {
+    "step": "judge_create_4",
+    "method": "create_bounty",
+    "tx": "4WwGk3aH8QdTzqVeMo8PvtfeorBQ32y31yE9usTPvzEf",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
+  "31": [
+   {
+    "step": "judge_create_5",
+    "method": "create_bounty",
+    "tx": "J2gUsJsLy968sSYJ1uidNKMhu119WYmw9gEsW5drZ2jV",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
   "23": [
    {
     "step": "arena_guarded_create",
@@ -1743,6 +1823,7 @@
   "16": "Test bounty: made for the real run of the model-driven agent (agent/).",
   "25": "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo.",
   "26": "Test bounty: made for the agent access tests (AGENTS.md followed literally, and the MCP server). Not a demo.",
+  "32": "Test bounty: made for the vendor tool's end to end test (tools/skarbnik-vendor watch proves its attempt on a rented GPU with no one's help). Its secret is private, made on the vendor's VPS, but the program is the public demo.",
   "23": "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
  },
  "last_image_check": {
@@ -1759,10 +1840,22 @@
   "24": "data/smooth/"
  },
  "judge_bounties": {
-  "18": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",
-  "19": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",
-  "20": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",
-  "21": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself.",
-  "22": "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself."
- }
+  "18": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
+  "19": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
+  "20": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
+  "21": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
+  "22": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
+  "27": "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU.",
+  "28": "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU.",
+  "29": "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU.",
+  "30": "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU.",
+  "31": "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU."
+ },
+ "retired_judge_bounties": [
+  "18",
+  "19",
+  "20",
+  "21",
+  "22"
+ ]
 }

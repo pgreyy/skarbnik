@@ -74,7 +74,8 @@ open the testnet explorer.
 
 ## Level B: reproduce (optional)
 
-Commands run from the root of a clone of the repository. What each step needs:
+Commands run from the root of a clone of the repository. The judge bounties for B2 and B3 are 27 to 31 (K = 2, at most
+1 attempt per account, 41 h verdict window); 18 to 22 are retired. What each step needs:
 
 | Step | What it shows | Needs | Download | Memory |
 | --- | --- | --- | --- | --- |
@@ -126,7 +127,7 @@ evidence is never shown as done.
 | An AI agent fixed a private bug on a new program it could not see, and the contract paid it by proof | Demonstrated | bounty 24, tx [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Bounty 24" |
 | The contract checks a Groth16 proof itself and pays on PASS | Demonstrated | tx [`CczggiUN…`](https://testnet.nearblocks.io/txns/CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY); about 36 Tgas |
 | Nine proof attacks are refused on chain | Demonstrated | [docs/EVIDENCE.md](docs/EVIDENCE.md), S6c; [`docs/evidence/S6c/transactions.tsv`](docs/evidence/S6c/transactions.tsv) |
-| Anyone can open a judge bounty with a real proof; a wrong seal is refused at the pairing check | Demonstrated | txs [`GhjkpLgk…`](https://testnet.nearblocks.io/txns/GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb), [`5uKLepww…`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj); docs/TRY_IT.md, steps 5 and 6 |
+| Anyone can open a judge bounty with a real proof; a wrong seal is refused at the pairing check | Demonstrated | txs [`FPuvqMBp…`](https://testnet.nearblocks.io/txns/FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV) (bounty 27), [`GhjkpLgk…`](https://testnet.nearblocks.io/txns/GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb) (18, retired), [`5uKLepww…`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj); docs/TRY_IT.md, steps 5 and 6 |
 | A silent vendor does not block payment (the timeout rule, not a verdict) | Demonstrated | claims on bounties 4 and 17: [`2Ga3oSGc…`](https://testnet.nearblocks.io/txns/2Ga3oSGcrgfMdbKoLCEUK8FwGrpnqMk9ex2Kp2oj6Tiq), [`BLcWs7dp…`](https://testnet.nearblocks.io/txns/BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh) |
 | An agent's limited key can commit and reveal but cannot withdraw or change limits | Demonstrated | [docs/EVIDENCE.md](docs/EVIDENCE.md), "Site: wallet, credit and attempts on testnet" (limited agent key) |
 | An agent can be set up from the site: limits, a key made in the browser and added by the wallet | Demonstrated | [`docs/evidence/web/partd_transactions.tsv`](docs/evidence/web/partd_transactions.tsv); EVIDENCE, "Site in the final design" |

@@ -12,10 +12,16 @@
 #   refusal    a proof the contract must refuse at the proof check itself: bounty 17's Proof 0 journal (so every cheap
 #              check passes) with the seal of another real Groth16 proof (the demo's Proof 0), sent to a closed one
 #   status     which judge bounties are still closed
-# Usage, from the repo root: ./scripts/judge_bounties.sh <phase>. Testnet only. Output: docs/evidence/judge/.
+# Round 2 (JUDGE_ROUND=2): the same, with K, the per-account cap and the verdict window set by JUDGE_K, JUDGE_CAP and
+# JUDGE_VERDICT_H (the window from the measured VPS proof time); output in docs/evidence/judge2/. Round 1 (18 to 22):
+# K = 3, no cap, 24 h.
+# Usage, from the repo root: [JUDGE_ROUND=2 JUDGE_K=2 JUDGE_CAP=1 JUDGE_VERDICT_H=<h>] ./scripts/judge_bounties.sh <phase>.
+# Testnet only. Output: docs/evidence/judge/ (round 1) or docs/evidence/judge2/ (round 2).
 set -euo pipefail
 cd "$(dirname "$0")/.."
-OUTDIR=docs/evidence/judge; mkdir -p "$OUTDIR/steps"
+ROUND=${JUDGE_ROUND:-1}; K=${JUDGE_K:-3}; VH=${JUDGE_VERDICT_H:-24}
+CAPARG=""; [ -n "${JUDGE_CAP:-}" ] && CAPARG=",\"max_commits_per_account\":$JUDGE_CAP"
+OUTDIR=docs/evidence/judge; [ "$ROUND" = 1 ] || OUTDIR=docs/evidence/judge$ROUND; mkdir -p "$OUTDIR/steps"
 export OUT="$OUTDIR" CONTRACT=kintsugi-l2-cihdp.testnet
 source scripts/s3_lib.sh; source docs/evidence/S3b/accounts.env
 SEC=1000000000; P0=docs/evidence/receipts/bounty17_proof0_args.json; DEMO_P0=docs/evidence/receipts/demo_proof0_args.json
@@ -38,7 +44,7 @@ create)
   # Expiry: 40 days from now (after 30 November 2026 when created on 26 October), within the 366 day cap.
   for i in 1 2 3 4 5; do
     T=$(view get_next_bounty_id '{}' | tr -d '"')
-    call "judge_create_$i" "$VENDOR" create_bounty "{\"original_hash\":\"$(field "$B" original_hash)\",\"corpus_hash\":\"$(field "$B" corpus_hash)\",\"image_id\":\"$(field "$B" image_id)\",\"exploit_commitment\":\"$(field "$B" exploit_commitment)\",\"proof0_receipt_hash\":\"$(field "$B" proof0_receipt_hash)\",\"max_commits\":3,\"max_patch_bytes\":1024,\"reveal_gap_ns\":\"$(( 60 * SEC ))\",\"verdict_window_ns\":\"$(( 24 * 3600 * SEC ))\",\"attest_window_ns\":\"$(( 3600 * SEC ))\",\"expiry_ns\":\"$(( 40 * 24 * 3600 * SEC ))\",\"attempt_fee\":\"10000000000000000000000\",\"fee_step\":\"5000000000000000000000\",\"reference_fix_hash\":\"$(field "$B" reference_fix_hash)\",\"proof0_journal_hash\":\"$(field "$B" proof0_journal_hash)\",\"reveal_window_ns\":\"$(( 3600 * SEC ))\",\"fuzz_count\":16,\"variant_count\":32,\"level\":2}" "0.1 NEAR"
+    call "judge_create_$i" "$VENDOR" create_bounty "{\"original_hash\":\"$(field "$B" original_hash)\",\"corpus_hash\":\"$(field "$B" corpus_hash)\",\"image_id\":\"$(field "$B" image_id)\",\"exploit_commitment\":\"$(field "$B" exploit_commitment)\",\"proof0_receipt_hash\":\"$(field "$B" proof0_receipt_hash)\",\"max_commits\":$K,\"max_patch_bytes\":1024,\"reveal_gap_ns\":\"$(( 60 * SEC ))\",\"verdict_window_ns\":\"$(( VH * 3600 * SEC ))\",\"attest_window_ns\":\"$(( 3600 * SEC ))\",\"expiry_ns\":\"$(( 40 * 24 * 3600 * SEC ))\",\"attempt_fee\":\"10000000000000000000000\",\"fee_step\":\"5000000000000000000000\",\"reference_fix_hash\":\"$(field "$B" reference_fix_hash)\",\"proof0_journal_hash\":\"$(field "$B" proof0_journal_hash)\",\"reveal_window_ns\":\"$(( 3600 * SEC ))\",\"fuzz_count\":16,\"variant_count\":32,\"level\":2$CAPARG}" "0.1 NEAR"
     ids="$ids $T"; sleep 2
   done
   save JUDGE_IDS "\"${ids# }\""

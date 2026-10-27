@@ -70,7 +70,7 @@
   }
  ],
  "b_intro": [
-  "Commands run from the root of a clone of the repository. What each step needs:"
+  "Commands run from the root of a clone of the repository. The judge bounties for B2 and B3 are 27 to 31 (K = 2, at most 1 attempt per account, 41 h verdict window); 18 to 22 are retired. What each step needs:"
  ],
  "b": [
   {
@@ -170,7 +170,7 @@
   {
    "claim": "Anyone can open a judge bounty with a real proof; a wrong seal is refused at the pairing check",
    "label": "demo",
-   "evidence": "txs <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">GhjkpLgk…</span></a>, <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">5uKLepww…</span></a>; docs/TRY_IT.md, steps 5 and 6"
+   "evidence": "txs <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">FPuvqMBp…</span></a> (bounty 27), <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">GhjkpLgk…</span></a> (18, retired), <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">5uKLepww…</span></a>; docs/TRY_IT.md, steps 5 and 6"
   },
   {
    "claim": "A silent vendor does not block payment (the timeout rule, not a verdict)",
