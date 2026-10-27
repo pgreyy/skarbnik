@@ -64,6 +64,11 @@ proved on the VPS; its attempt took 102 segments at `--po2 18` on the laptop, fe
 
 ## One proof by the vendor's watch in GPU mode (RunPod, NVIDIA L40S, 2026-10-27)
 
+In short: **about 17 minutes from reveal to `submit_groth16`** (bounty 32: 17 min 9 s, measured end to end, including
+the one-time 559 s build of the CUDA binary), and **about $0.04 of GPU per proof** with the cached binary ($0.0372;
+$0.1974 for the first run, which built it). The CPU paths are the slow alternatives: the laptop takes about 4 h per
+proof, the 4 core VPS 10 h 12 min (sections above).
+
 `tools/skarbnik-vendor watch` on the VPS, mode gpu: a Secure Cloud pod per attempt (image
 `runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404`, $1.09 an hour), prove and shrink on the pod, Groth16 on the VPS.
 The cost is the pod's hourly price times its life from create to terminate, as watch logs it

@@ -35,11 +35,11 @@
   "source": "docs/numbers.md"
  },
  "gpu_prove": {
-  "text": "29.82 s to prove and 21.71 s to shrink bounty 24's attempt on one rented NVIDIA L40S, under the published checker image id",
-  "source": "docs/numbers.md, docs/evidence/smooth/gpu/"
+  "text": "29.32 s to prove and 20.84 s to shrink on one rented NVIDIA L40S (the vendor's watch in GPU mode, judge bounty 27); about 17 minutes from reveal to submit_groth16 and about $0.04 of GPU a proof",
+  "source": "docs/numbers.md, docs/evidence/vendor_tool/"
  },
  "vendor_time": {
-  "text": "About 1.5 to 2.5 hours per attempt on a laptop CPU; under a minute on one rented GPU (bounty 24: 29.82 s to prove, 21.71 s to shrink). Size your verdict window for it.",
+  "text": "About 17 minutes from reveal to submit on a rented GPU with watch in GPU mode (about $0.04 a proof); about 4 hours on a laptop CPU, 10 hours on a 4 core VPS. Size your verdict window for it.",
   "source": "docs/numbers.md"
  },
  "last_deploy": {

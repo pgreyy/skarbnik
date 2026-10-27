@@ -31,6 +31,9 @@ arrives in time, the **TIMEOUT RULE** pays the waiting attempts, always labelled
 - **A private bug fixed and paid by proof:** [bounty 24](https://skarbnik.xyz/#/bounties/24). An AI agent fixed a bug
   it could not see, and the contract checked the proof and paid: tx
   [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR).
+- **The vendor side with no human:** [bounty 32](https://skarbnik.xyz/#/bounties/32). The vendor's `watch` saw the
+  reveal, proved the attempt on a rented GPU and sent the proof itself, 17 min later: tx
+  [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y).
 - **A forged proof refused:** bounty 17's real journal with another proof's seal, sent to judge bounty 22 (now
   retired; the current judge bounties are 27 to 31), refused at the pairing check: tx [`5uKLepww…`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj).
   [9 more attacks](https://skarbnik.xyz/#/evidence/contract) were refused on chain, each with its transaction.
@@ -147,22 +150,23 @@ Nothing outside is patched: every crate, package and image above is used at its 
   VALID (`docs/evidence/judge/fresh_clone_2026-10-26b.txt`).
 - **Bounty 24:** revealed 15:11:48 UTC; proved on a rented GPU in 29.82 s and shrunk in 21.71 s; wrapped to Groth16 in
   337.73 s on a 4 core VPS; paid by proof at 21:22 UTC, 18 hours before its deadline (docs/EVIDENCE.md, "Bounty 24").
-- **Laptop or GPU,** the same kind of proof (bounty 24's program; full table in [docs/numbers.md](docs/numbers.md)):
+- **Bounty 32, the vendor side fully automatic:** `tools/skarbnik-vendor watch` on the project's VPS saw the attempt
+  revealed, proved it on a rented L40S, wrapped it to Groth16 on the VPS and sent `submit_groth16` 17 min after the
+  reveal, with no human (tx [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y);
+  docs/EVIDENCE.md, "The vendor tool"). Bounty 24 is the AI agent side; bounty 32 is the vendor side.
+- **One proof, by machine** (the CPU rows are the slow fallback; GPU: judge bounty 27's attempt, laptop: bounty 24's
+  program, VPS: the demo program; full tables in [docs/numbers.md](docs/numbers.md)):
 
-| Step | Laptop CPU (i7-1360P) | 1x NVIDIA L40S (RunPod) |
-| --- | --- | --- |
-| Prove | 8,679.49 s, peak 2,418 MiB | **29.82 s**, peak GPU memory 9,275 MiB |
-| Compress to succinct | 5,591.59 s | **21.71 s** |
-| Groth16 wrap (Docker, x86) | 252.93 s | 337.73 s on the VPS (no Docker on the pod) |
+| One proof on | Prove | Shrink | Groth16 wrap | End to end | Cost |
+| --- | --- | --- | --- | --- | --- |
+| Rented L40S, `watch` in GPU mode | **29.32 s** | **20.84 s** | 289.24 s on the VPS | about 17 min from reveal to `submit_groth16` | **about $0.04** of GPU ($0.20 the first run, which built the binary) |
+| Laptop CPU (i7-1360P) | 8,679.49 s | 5,591.59 s | 252.93 s | about 4 h | electricity |
+| VPS CPU (4 cores) | 22,228.44 s | 14,179.08 s | 300.94 s | 10 h 12 min | the VPS's rent |
 
 - **Payouts:** bounties 1, 16, 24, 27 and 32 were paid by proof (27 and 32 proved by the vendor's `watch` on a rented
   GPU with no one's help); 4, 9, 11, 13, 14, 15 and 17 by the timeout rule (and 8 on paper only: its transfer failed). The [Ledger](https://skarbnik.xyz/#/evidence/ledger) lists each with its transaction.
 - **Attacks:** 9 proof attacks refused on chain: a proof of another attempt or bounty, a FAIL shown as a PASS, a flipped
   bit, a changed journal, another checker image id, second proofs and a proof after expiry (docs/EVIDENCE.md, S6c).
-- **The vendor tool, end to end:** `tools/skarbnik-vendor watch` on the project's VPS saw bounty 32's attempt revealed,
-  proved it on a rented L40S, wrapped it to Groth16 on the VPS and sent `submit_groth16` 17 min after the reveal (tx
-  [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y)); one GPU proof cost
-  $0.04 with the cached GPU binary, $0.20 for the first pod, which also built it (docs/numbers.md).
 - **Arena:** a probe agent sent 12 commits to bounty 23; the contract counted 3, so at most 3 of 12 bits of the secret
   could be learned. The same probe with no cap, simulated only, learned all 12 ([Arena](https://skarbnik.xyz/#/evidence/lab)).
 - **MATCH:** the rebuilt checker's image id equals the published one and bounty 17's on chain

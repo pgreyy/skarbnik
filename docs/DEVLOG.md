@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: Numbers updated with the GPU-mode results
+
+- docs/numbers.md, the README (a table per machine), the For vendors page and the site's numbers now give the measured
+  GPU-mode values: about 17 minutes from reveal to `submit_groth16`, about $0.04 of GPU a proof with the cached binary
+  ($0.20 the first run); the laptop and the VPS CPU stay as the slow alternatives. Bounty 32 (the vendor side with no
+  human) sits next to bounty 24 (the AI agent side) in the README and in JUDGE_GUIDE.md step 2 (the site's Judge page
+  regenerated). docs/VENDOR.md: never rebuild `web/css/panyl.css` from the old design package.
+
 ## 2026-10-27: GPU mode in the vendor's watch; part C end to end on bounty 32 and judge bounty 27
 
 - `tools/skarbnik_gpu.py` (RunPod REST API; secret in the pod's RAM only, wiped after proving; pod always terminated,

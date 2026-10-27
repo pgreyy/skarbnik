@@ -9,9 +9,10 @@ import { getNumbers } from '../data.js';
 const VENDOR_MD = 'https://github.com/pgreyy/skarbnik/blob/main/docs/VENDOR.md';
 const T = 'tools/skarbnik-vendor';
 
-// One proof of bounty 24's program (data/smooth/), docs/numbers.md: prove, compress to succinct, Groth16 wrap.
+// One proof, docs/numbers.md: prove, compress to succinct, Groth16 wrap. Laptop: bounty 24's program (data/smooth/).
+// GPU: watch in GPU mode on judge bounty 27 (cached binary), the wrap on the VPS.
 const LAPTOP = { prove: 8679.49, shrink: 5591.59, wrap: 252.93 };
-const GPU = { prove: 29.82, shrink: 21.71, wrap: 337.73 };
+const GPU = { prove: 29.32, shrink: 20.84, wrap: 289.24 };
 const sum = (m) => m.prove + m.shrink + m.wrap;
 const s = (x) => `${x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} s`;
 const hm = (x) => (x >= 3600 ? `about ${(x / 3600).toFixed(1)} h` : `about ${Math.round(x / 60)} min`);
@@ -38,7 +39,7 @@ export async function vendors(viewEl) {
   const MODES = [
     ['cpu', 'Your own machine', chip('k-proof', 'Built', 'check'), 'Strongest: the secret never leaves a machine you control.', 'Slowest. Measure it before you choose the windows.'],
     ['server', 'A VPS you control', chip('k-proof', 'Built', 'check'), 'The secret sits on a rented server only you use, in files of mode 600; watch runs there unattended and restarts itself.', 'The same cpu mode, so the same speed class as its cores: one proof on the project’s 4 core VPS took 10 h 12 min, so that VPS runs watch in GPU mode and keeps the CPU as the fallback.'],
-    ['cube', 'A GPU you rent for the job', chip('k-proof', 'Built', 'check'), 'The secret sits in the rented machine’s RAM during the proof, then is wiped; one pod per attempt, always terminated, at most 45 minutes, with a spend cap.', 'Under a minute to prove and shrink bounty 24’s attempt. watch in GPU mode wraps the proof to Groth16 on your own machine and submits it.'],
+    ['cube', 'A GPU you rent for the job', chip('k-proof', 'Built', 'check'), 'The secret sits in the rented machine’s RAM during the proof, then is wiped; one pod per attempt, always terminated, at most 45 minutes, with a spend cap.', 'About 17 minutes from reveal to submit_groth16 and about $0.04 of GPU a proof, measured (bounties 32 and 27). watch in GPU mode wraps the proof to Groth16 on your own machine and submits it.'],
   ];
 
   viewEl.innerHTML = `<main id="main" class="p-gen p-vendors" tabindex="-1">
@@ -60,9 +61,9 @@ ${STEPS.map(([h, c, body], i) => `<div class="card pad28 vstep"><span class="vic
 <ol class="card pad28 stack g12 vlist">${PREFLIGHT.map((p) => `<li class="small">${esc(p)}</li>`).join('')}</ol></div>
 
 <div class="stack g16"><p class="eyebrow">Measured, per proof</p><h2 class="h2s">Time and cost of one proof</h2>
-<p class="body" style="max-width:780px">One proof means prove, shrink to a succinct receipt, and wrap to Groth16, the form the contract checks. Laptop and GPU are the same patch of bounty 24’s program under the same checker; the VPS row is the demo program (112 segments), so compare it by machine, not by program. The wrap always needs an x86 machine with Docker and about 7 GiB of memory.</p>
+<p class="body" style="max-width:780px">One proof means prove, shrink to a succinct receipt, and wrap to Groth16, the form the contract checks. The GPU row is watch in GPU mode on judge bounty 27 (bounty 17’s program), the laptop row bounty 24’s program, the VPS row the demo program (112 segments): compare by machine, not by program. The CPU rows are the slow alternatives. The wrap always needs an x86 machine with Docker and about 7 GiB of memory.</p>
 <div id="vcost"><p class="small">Reading the measured numbers…</p></div>
-<p class="small faint">Sources: docs/numbers.md (bounty 24, <span class="mono">data/smooth/</span>; the VPS run, <span class="mono">data/demo/</span>), docs/evidence/smooth/ and docs/evidence/vps_demo/. The GPU’s pod setup took a further 554 s once (install and build).</p></div>
+<p class="small faint">Sources: docs/numbers.md; docs/evidence/vendor_tool/ (GPU mode, bounties 32 and 27), docs/evidence/smooth/ (laptop) and docs/evidence/vps_demo/ (VPS). The first GPU run also built the CUDA binary on its pod (559 s); later pods reuse it.</p></div>
 
 <div class="stack g16"><p class="eyebrow">Where proving runs</p><h2 class="h2s">The proving modes</h2>
 <p class="body" style="max-width:780px">You choose where proving runs, and the secret sits wherever it runs.</p>
@@ -88,7 +89,7 @@ ${table(['Command', 'What it does'], [
     const vpsCell = (x) => (measuring ? chip('k-test', 'Measuring', 'hourglass') : x);
     const rows = [
       ['Laptop CPU (i7-1360P, 16 threads)', s(LAPTOP.prove), s(LAPTOP.shrink), s(LAPTOP.wrap), `<b class="txt">${hm(sum(LAPTOP))}</b>`, 'electricity'],
-      ['1 rented NVIDIA L40S (RunPod)', s(GPU.prove), s(GPU.shrink), `${s(GPU.wrap)} on the VPS (no Docker on the pod)`, `<b class="txt">${hm(sum(GPU))}</b>`, '$0.60 for the pod session'],
+      ['1 rented NVIDIA L40S (RunPod), watch in GPU mode', s(GPU.prove), s(GPU.shrink), `${s(GPU.wrap)} on the VPS (no Docker on the pod)`, '<b class="txt">about 17 min</b> from reveal to submit', '<b class="txt">about $0.04</b> of GPU a proof ($0.20 the first run, which built the binary)'],
       [`VPS CPU (4 cores, 7.8 GiB, 8 GiB swap)${vps.program ? `<br><span class="small faint">${esc(vps.program)}</span>` : ''}`, vpsCell(vps.prove ? s(vps.prove) : ''), vpsCell(vps.shrink ? s(vps.shrink) : ''), s(vps.wrap || GPU.wrap), vpsCell(vps.total ? `<b class="txt">${hm(vps.total)}</b>` : ''), 'the VPS’s rent'],
     ];
     $('#vcost').innerHTML = `${table(['Machine', 'Prove', 'Shrink', 'Groth16 wrap', 'One proof', 'Cost'], rows, 'wide', 'Time and cost of one proof')}

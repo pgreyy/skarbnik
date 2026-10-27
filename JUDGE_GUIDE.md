@@ -20,21 +20,26 @@ open the testnet explorer.
    - What it does not prove: that the deployed code is built from this repository; the contract build is not
      reproducible yet.
 
-2. **See an AI agent fix a private bug and get paid by proof: bounty 24** (2 min)
-   - Do: open its three calls in order: commit
+2. **See both sides work: bounty 24 (an AI agent) and bounty 32 (the vendor, with no human)** (3 min)
+   - Do: open bounty 24's three calls in order: commit
      [`4G48c6wa…`](https://testnet.nearblocks.io/txns/4G48c6waZdz7Qc3maVdXsXx9u3kwzfDWbXhW2toszvkG), reveal
      [`3rBVkucS…`](https://testnet.nearblocks.io/txns/3rBVkucSk1jxirbayxz7GYX1cfurgLAYoRXjiB9HmVhc), proof
-     [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR).
-   - Expect: a commit holding only a fingerprint, a reveal that publishes the patch, then a `submit_groth16` call that
-     pays 0.11 NEAR (the 0.1 NEAR reward and the agent's own 0.01 NEAR fee back).
+     [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR). Then bounty 32's
+     reveal [`HCjck1DL…`](https://testnet.nearblocks.io/txns/HCjck1DLb5GS4YcRWH3oozJ9gm2EhJejkHyVrcJJQN4L) and proof
+     [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y).
+   - Expect: on bounty 24, a commit holding only a fingerprint, a reveal that publishes the patch, then a
+     `submit_groth16` call that pays 0.11 NEAR (the 0.1 NEAR reward and the agent's own 0.01 NEAR fee back). On bounty
+     32, a `submit_groth16` sent by the vendor's prover account 17 minutes after the reveal, with no human between them.
    - Verify: https://skarbnik.xyz/#/bounties/24 shows "Proof verified" and "Private secret"; the program
      (`data/smooth/`) is public, its secret input and reference fix are not in the repository
      ([docs/EVIDENCE.md](docs/EVIDENCE.md), "Bounty 24", including how it was checked that the agent could not see the
-     reference fix).
-   - What this proves: the contract paid this attempt only after checking a Groth16 proof that says PASS for this
-     patch, under the published checker.
+     reference fix). https://skarbnik.xyz/#/bounties/32 shows "Proof verified"; the vendor's `watch` log, with each
+     step's time, the rented GPU and its cost, is in [docs/EVIDENCE.md](docs/EVIDENCE.md), "The vendor tool".
+   - What this proves: the contract paid each attempt only after checking a Groth16 proof that says PASS for that
+     patch, under the published checker; and the vendor side (prove on a rented GPU, wrap, submit) runs on its own.
    - What it does not prove: that the patch is secure beyond this checker's tests; that nothing could have read the
-     private folder (the agent ran on the same machine, as the same user); more than one run on one bug.
+     private folder (bounty 24's agent ran on the same machine, as the same user); more than a few runs; bounty 32 uses
+     the public demo program, so its fix was known.
 
 3. **Compare with bounties 16 and 17** (2 min)
    - Do: open bounty 16's proof

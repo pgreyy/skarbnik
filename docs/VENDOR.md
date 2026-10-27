@@ -95,6 +95,12 @@ submit expire. The
 (45), `budget_usd` (6), and optionally `image`, `spend_file`, `ssh_key`, `binary_cache`, `src_tarball`, `guests_dir`,
 `po2` (19).
 
+## The site's CSS
+
+`web/css/panyl.css` was made once from the design package (by a private build script) and has been changed by hand since,
+the fonts among other things (Chakra Petch and Fira Code, docs/DEVLOG.md). Never rebuild it from the old design package:
+the live CSS in this repository is the source.
+
 ## The project's own vendor machine
 
 The project runs `watch` on a rented VPS (4 cores, 7.8 GiB of memory, 8 GiB of swap), in GPU mode: one CPU proof there
