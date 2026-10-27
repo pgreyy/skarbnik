@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-27: The site's Judge guide page matches JUDGE_GUIDE.md
+
+- `scripts/gen_judge_data.py` reads JUDGE_GUIDE.md and writes `web/data/judge.json`: the intro, the 6 Level A steps
+  (Do, Expect, Verify, What this proves, What it does not prove), the 7 Level B steps (what each shows, needs, download,
+  memory, and the same three lines), the notes, and the 21 claims with their labels and evidence links. It stops if
+  the guide's shape changes. `web/js/pages/judge.js` now only renders that file, so the page and the guide cannot
+  differ; after any edit to the guide, run the script again.
+- The script found that step 1 of the guide had lost its Verify line in the previous edit; restored.
+- Checked locally with a headless browser at 1440 and 390 px, light and dark, every tab: all 30 Level A fields, all 21
+  Level B lines and all 21 claims (text, label and evidence) equal the guide's text; no horizontal overflow; no console
+  errors.
+
 ## 2026-10-27: Bounty 24 screenshot strip, threat model and limits pages, judge guide lines, For vendors page
 
 - README: a three image strip under the 2 minute path: bounty 24's commit and reveal on the live site, the

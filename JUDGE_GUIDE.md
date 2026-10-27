@@ -15,6 +15,7 @@ open the testnet explorer.
 1. **Find the contract** (1 min)
    - Do: open https://testnet.nearblocks.io/address/kintsugi-l2-cihdp.testnet
    - Expect: a testnet account with a deployed contract and a code hash.
+   - Verify: the code hash equals the one the site reads live on https://skarbnik.xyz/#/evidence/contract
    - What this proves: the contract the documents name is deployed on testnet, and the site reads that contract.
    - What it does not prove: that the deployed code is built from this repository; the contract build is not
      reproducible yet.
