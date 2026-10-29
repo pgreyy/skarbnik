@@ -2,7 +2,8 @@
 // the visitor's choice remembered in this browser), the phone menu, and the screens. Routes: #/ (Home, seven
 // sections; #mechanism, #example, #why, #paths, #verify, #next open a section), #/how-it-works, #/bounties,
 // #/bounties/<id>[/<tab>], #/raw/<id>, #/evidence[/<tab>], #/judge[/<tab>], #/agents, #/vendors, #/account[/<name>[/<tab>]].
-// Old routes: #/ledger, #/arena, #/verify and #/agent redirect to their new place. Live screens read the testnet
+// Old routes: #/ledger, #/arena, #/verify and #/agent redirect to their new place. A saved copy at a real path (/judge/)
+// opens its #/ route. Live screens read the testnet
 // contract with view calls (js/chain.js); recorded parts read data/recorded.json. No sample data.
 import { CONTRACT, EXPLORER_ACCOUNT } from './chain.js';
 import { $, esc, initUi } from './ui.js';
@@ -93,6 +94,10 @@ async function render(my, page, rest, draw) {
   return h1;
 }
 
+// A saved copy of a page (scripts/snapshot_pages.mjs) lives at a real path such as /judge/ or /bounties/24/: with
+// JavaScript, that path becomes its #/ route and the live page is drawn over the copy.
+const savedPath = location.pathname.replace(/^\/+|\/+$/g, '');
+if (!location.hash && savedPath && savedPath !== 'index.html') history.replaceState(null, '', `/#/${savedPath}`);
 window.addEventListener('hashchange', async () => { const h1 = await route(); if (h1) { h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true }); } });
 initUi();
 initAccountUi();

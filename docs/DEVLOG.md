@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: Pages for readers without JavaScript
+
+- `scripts/snapshot_pages.mjs` opens seven routes in a headless Chromium against a local copy of `web/`, waits for the
+  chain data, shows every tab as a section and saves the page as real HTML: `/bounties/24/`, `/bounties/32/`,
+  `/bounties/17/`, `/evidence/`, `/judge/`, `/vendors/`, `/agents/` (4,000 to 27,000 characters of text each, a
+  snapshot time on top). `js/app.js` turns such a path into its `#/` route, so with JavaScript the live page is drawn.
+  The home page's `<noscript>` now summarises the project and links agents.md, llms.txt, feed.json and the saved pages;
+  the sitemap and llms.txt list them. `scripts/rebuild_site_data.sh` runs every data script, then the snapshots.
+- Checked in a browser with JavaScript off (styled text on all three sampled pages) and on (`/judge/` opens `#/judge`).
+
 ## 2026-10-29: The contract, redeployed as a reproducible build
 
 - `contract/Cargo.toml`: `[package.metadata.near.reproducible_build]` (image `sourcescan/cargo-near:0.22.0-rust-1.99.1`
