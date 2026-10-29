@@ -142,6 +142,16 @@
    "Expect": "11 of 11 checks pass, and nothing is sent.",
    "What this proves": "the agent refuses a key not limited to commit and reveal, overspending, and a fix that reads files or the environment.",
    "What it does not prove": "that a model writes good fixes."
+  },
+  {
+   "n": "B8",
+   "shows": "Verify the contract yourself: rebuild it from its commit with <span class=\"mono\">cargo near build reproducible-wasm</span> and compare with the code hash on chain (<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/TRY_IT.md\" target=\"_blank\" rel=\"noopener\">docs/TRY_IT.md</a>, step 11)",
+   "needs": "Docker, cargo-near 0.22.0",
+   "download": "the build image <span class=\"mono\">sourcescan/cargo-near:0.22.0-rust-1.99.1</span>, about 0.5 GB",
+   "memory": "about 2 GB",
+   "Expect": "sha256 <span class=\"mono\">ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e</span>, whose base58 form <span class=\"mono\">Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u</span> equals the contract's code hash on chain.",
+   "What this proves": "the code running on chain is built from the published commit <span class=\"mono\">c74bd5c</span>, so reading that source is reading the contract.",
+   "What it does not prove": "that the source is free of bugs, or that the owner will not deploy other code later (the testnet contract keeps its full access key on purpose; every deploy is listed in docs/EVIDENCE.md)."
   }
  ],
  "b_notes": [
@@ -205,6 +215,12 @@
    "label": "demo",
    "label_note": null,
    "evidence": "MATCH from a fresh clone: <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/evidence/judge/fresh_clone_2026-10-26b.txt\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">docs/evidence/judge/fresh_clone_2026-10-26b.txt</span></a>; B5"
+  },
+  {
+   "claim": "The contract on chain is a reproducible build of a published commit",
+   "label": "demo",
+   "label_note": null,
+   "evidence": "code hash <span class=\"mono\">Gx1JfW7G…</span> = the base58 sha256 of <span class=\"mono\">cargo near build reproducible-wasm</span> at commit <span class=\"mono\">c74bd5c</span> (two builds, the same hash); deploy tx <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">83biMoi8…</span></a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/EVIDENCE.md\" target=\"_blank\" rel=\"noopener\">docs/EVIDENCE.md</a>, \"Contract code and every deploy, and the reproducible build\"; B8"
   },
   {
    "claim": "135 contract unit tests pass",

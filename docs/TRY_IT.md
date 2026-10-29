@@ -1,4 +1,4 @@
-# Try it: ten steps from a fresh clone
+# Try it: eleven steps from a fresh clone
 
 Every step names the command and what it prints, with the run that produced it. The 5 to 10 minute tour with no
 install is [JUDGE_GUIDE.md](../JUDGE_GUIDE.md); this is its hands-on part (Level B).
@@ -129,3 +129,22 @@ toolchain. Steps 9 and 10 are optional and need Docker.
 
    The journal sha256 equals bounty 17's `proof0_journal_hash` on chain (`get_bounty`).
 
+
+11. **Verify the contract yourself.** Rebuild the deployed contract from its commit and compare it with the code on
+    chain. Needs Docker and cargo-near 0.22.0 (docs/VERSIONS.md); the build image
+    `sourcescan/cargo-near:0.22.0-rust-1.99.1` (about 0.5 GB) is pinned by digest in `contract/Cargo.toml`.
+
+        git checkout c74bd5c820c1ce684f81e3f794a8e3e804b3d2b5
+        (cd contract && cargo near build reproducible-wasm)
+        sha256sum target/near/kintsugi_contract/kintsugi_contract.wasm
+        python3 -c "import hashlib,sys; A='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'; n=int.from_bytes(hashlib.sha256(open(sys.argv[1],'rb').read()).digest(),'big'); print(''.join(reversed([A[(n//58**i)%58] for i in range(50) if n//58**i])))" target/near/kintsugi_contract/kintsugi_contract.wasm
+
+    See: `ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e` from `sha256sum`, and
+    `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u` from the last line, the same as the chain's code hash:
+
+        curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"kintsugi-l2-cihdp.testnet"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'
+
+    The contract also names its own source: `near contract call-function as-read-only kintsugi-l2-cihdp.testnet
+    contract_source_metadata json-args {} network-config testnet now` returns the commit link
+    `https://github.com/pgreyy/skarbnik/tree/c74bd5c820c1ce684f81e3f794a8e3e804b3d2b5` and the build image. Our two builds:
+    104 s with the image present (docs/EVIDENCE.md, "Contract code and every deploy, and the reproducible build").

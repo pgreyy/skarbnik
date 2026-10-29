@@ -1,0 +1,31 @@
+$ near contract deploy kintsugi-l2-cihdp.testnet use-file target/repro-deploy/new.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+utc_start=2026-10-29T20:33:52.199059444Z
+Migrating config.toml from V4 to V5...
+Note: `near` CLI configuration is stored in "~/.config/near-cli/config.toml"
+├  Unsigned transaction:
+│    signer_id:    kintsugi-l2-cihdp.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- deploy code <Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u> to a account <kintsugi-l2-cihdp.testnet>
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:A1kuE8J7zaYKoErnxQpMLauqVmrp3UVvNiYuamXtLDjN
+│     
+├  Transaction Execution Info:
+│    Gas burned: 2.5 Tgas
+│    Transaction fee: 0.0002468536041653 NEAR
+│    Transaction ID: 83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP
+│     
+
+Contract code has been successfully deployed.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract deploy kintsugi-l2-cihdp.testnet use-file target/repro-deploy/new.wasm without-init-call network-config testnet sign-with-legacy-keychain send
+
+exit=0
+wall_seconds=8.03

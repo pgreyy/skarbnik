@@ -100,7 +100,7 @@ def main():
         if m.group(1) not in LABELS:
             sys.exit(f'{SRC}: unknown label "{cells[1]}" for "{cells[0]}"')
         claims.append({'claim': inline(cells[0]), 'label': LABELS[m.group(1)], 'label_note': m.group(2), 'evidence': inline(cells[2])})
-    if len(steps) != 6 or len(bsteps) != len(lines) or len(bsteps) != 7 or not claims:
+    if len(steps) != 6 or len(bsteps) != len(lines) or len(bsteps) < 7 or not claims:
         sys.exit(f'{SRC}: found {len(steps)} Level A steps, {len(bsteps)} Level B rows, {len(lines)} Level B line sets, {len(claims)} claims')
     data = {'source': SRC, 'intro': paras(intro), 'a_intro': paras(a), 'a': steps, 'b_intro': [bparas[0]], 'b': bsteps,
             'b_notes': bparas[2:], 'claims_intro': paras(c), 'claims': claims}

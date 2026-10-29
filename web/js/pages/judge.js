@@ -1,6 +1,6 @@
 // Judge guide: the same guide as JUDGE_GUIDE.md, read from data/judge.json (made from it by scripts/gen_judge_data.py),
 // so the page and the file never differ. Three tabs. Level A, the evidence tour: six steps, each with Do, Expect,
-// Verify, What this proves and What it does not prove. Level B, local reproduction: seven steps, each with what it
+// Verify, What this proves and What it does not prove. Level B, local reproduction: eight steps, each with what it
 // shows, what it needs, its download and memory, and the same three lines. Claims and evidence: every claim with its
 // one label (Implemented, Demonstrated, Experimental, Planned, Not claimed) and its evidence, filterable.
 import { $, icon, note, tabbed, seg, bindSeg } from '../ui.js';

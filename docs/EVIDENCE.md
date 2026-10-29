@@ -5,18 +5,30 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
-## Contract code and every deploy (2026-10-29)
+## Contract code and every deploy, and the reproducible build (2026-10-29)
 
 The testnet contract's account keeps a full access key, so its owner can replace the code under live bounties. This is
 deliberate: it's an experimental testnet contract that will keep changing. The mainnet contract (skarbnik.near) is
 planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a
 delay).
 
-The live code, read with `view_account` on 2026-10-27 and again on 2026-10-29: code hash `DQmpjLzrVdipS17krqBymQsLaNadxw3THnaGR5Kpxx8B`, which is
-the base58 form of the wasm's sha256 `b863487e3d402251eb385e0b2eae3e85e19843751b4b71800dabcf242da61024` (the
-per-account cap build, `target/cap-deploy/new.wasm`, 318,809 bytes). Every deploy to the account, from our scripts'
-records (`docs/evidence/{S6c,audit1,hardening,account_cap}/transactions.tsv`), each read back from the chain (the
-transaction's `DeployContract` action carries the code's sha256):
+The live code since 2026-10-29 20:34 UTC is a reproducible build: code hash
+`Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u`, the base58 form of the wasm's sha256
+`ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e` (319,347 bytes), built from commit
+`c74bd5c820c1ce684f81e3f794a8e3e804b3d2b5` with `cd contract && cargo near build reproducible-wasm` in
+`sourcescan/cargo-near:0.22.0-rust-1.99.1@sha256:c9655eaf7436b90c87ea8b25739f91063032c5c30ba24cfeafe72c142943b5bb`
+(pinned in `contract/Cargo.toml`). Two builds of that commit gave the same sha256; the build took 104 s with the image
+already present. The contract itself names the commit and the image: `contract_source_metadata` returns
+`docs/evidence/repro_deploy/contract_source_metadata.json` (NEP-330, link `https://github.com/pgreyy/skarbnik/tree/c74bd5c...`).
+
+The redeploy (`./scripts/repro_deploy.sh build before deploy after`, watch on the VPS paused for it, no proof in
+flight): the previous code (`b863487e...1024`) kept in `target/repro-deploy/old.wasm` for a rollback; every bounty's
+`get_bounty` (33), `get_protocol_pool`, `get_allowed_image_ids` and `get_owner` saved before and after the deploy and
+compared byte for byte: 37 of 37 the same (`docs/evidence/repro_deploy/deploy_comparison.txt`). The source is the same as
+the per-account cap build; only the build changed (the build record above is new in the wasm).
+
+Every deploy to the account, from our scripts' records (`docs/evidence/{S6c,audit1,hardening,account_cap,repro_deploy}/`),
+each read back from the chain (the transaction's `DeployContract` action carries the code's sha256):
 
 | When | What | Transaction | wasm sha256 |
 | --- | --- | --- | --- |
@@ -27,12 +39,14 @@ transaction's `DeployContract` action carries the code's sha256):
 | 2026-10-25 02:20 UTC | audit hardening | [`9vrrJwCswthVioqgPtrSnc6phWh2KDyzHKuBSuTEPqFz`](https://testnet.nearblocks.io/txns/9vrrJwCswthVioqgPtrSnc6phWh2KDyzHKuBSuTEPqFz) | `7d936eeea4f486e30ce6d568fcadbfcad1599c20488f8b61a406f08d4e33c836` |
 | 2026-10-25 03:46 UTC | hardening, the final review's fix | [`EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W`](https://testnet.nearblocks.io/txns/EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W) | `938d5456cad92d66ab1d20c77dfc6badcc830e4a69f5cbb48035a8bfd427d1b7` |
 | 2026-10-26 22:38 UTC | per-account cap | [`DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7`](https://testnet.nearblocks.io/txns/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7) | `b863487e3d402251eb385e0b2eae3e85e19843751b4b71800dabcf242da61024` |
+| 2026-10-29 20:34 UTC | the same source, reproducible build (commit `c74bd5c`) | [`83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP`](https://testnet.nearblocks.io/txns/83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP) | `ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e` |
 
 How to check it yourself:
 
     curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"kintsugi-l2-cihdp.testnet"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'
 
-It must print `DQmpjLzrVdipS17krqBymQsLaNadxw3THnaGR5Kpxx8B`. A different hash means a deploy that is not in this list.
+It must print `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u`. A different hash means a deploy that is not in this list.
+To rebuild the same wasm yourself: docs/TRY_IT.md, step 11.
 The explorer shows each deploy above with its time; its index API returned no transactions for this account when we
 tried to list deploys through it, so the list comes from our records and the chain, not from that index.
 

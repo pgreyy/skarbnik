@@ -320,6 +320,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 
 ## 4. Changelog (newest first)
 
+- 2026-10-29: the contract redeployed as a reproducible build of the same source (commit `c74bd5c`, wasm sha256
+  `ecf697be...421e`, code hash `Gx1JfW7G...BX6u`, tx `83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP`); every saved view
+  unchanged (37 of 37). Anyone can rebuild it and compare (TRY_IT.md, step 11). No guard changed.
+
 - 2026-10-29: the testnet contract keeps its full access key on purpose (an experimental contract; owner's decision,
   D13); the mainnet contract is planned without an upgrade key the owner controls alone. The live code hash and every
   deploy transaction are published (EVIDENCE, "Contract code and every deploy"). No guard changed.

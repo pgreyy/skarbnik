@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: The contract, redeployed as a reproducible build
+
+- `contract/Cargo.toml`: `[package.metadata.near.reproducible_build]` (image `sourcescan/cargo-near:0.22.0-rust-1.99.1`
+  pinned by digest) and the repository link fixed to github.com/pgreyy/skarbnik; committed as `c74bd5c`.
+- `./scripts/repro_deploy.sh build before deploy after` (watch on the VPS paused, no proof in flight): wasm 319,347
+  bytes, sha256 `ecf697be...421e` (two builds, the same), deploy tx `83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP`, new code
+  hash `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u`; 37 of 37 saved views byte for byte the same; the old wasm kept for
+  a rollback; `contract_source_metadata` names the commit and the image. Watch resumed.
+- docs/EVIDENCE.md lists the 8th deploy; docs/TRY_IT.md step 11 and JUDGE_GUIDE.md B8: verify the contract yourself;
+  claim "reproducible build" Demonstrated.
+
 ## 2026-10-29: Bounty 12 settled by timeout, from a team-run account
 
 - Bounty 12's one attempt (revealed 2026-10-27 00:04 UTC) came from the owner's own testnet account, run with external

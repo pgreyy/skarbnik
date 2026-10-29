@@ -3,7 +3,7 @@
 | Read | For |
 | --- | --- |
 | [../JUDGE_GUIDE.md](../JUDGE_GUIDE.md) | A 5 to 10 minute evidence tour with no install, an optional local reproduction, every claim mapped to its evidence |
-| [TRY_IT.md](TRY_IT.md) | Ten steps from a fresh clone, each with its command and the output it prints |
+| [TRY_IT.md](TRY_IT.md) | Eleven steps from a fresh clone, each with its command and the output it prints |
 | [CLAIMS.md](CLAIMS.md) | What is shown and what is not, the measured numbers, what is built, what is not, every known limit |
 | [OVERVIEW.md](OVERVIEW.md) | The three parties, why a vendor or an agent takes part, how NEAR fits |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | How the pieces fit together, folder by folder |

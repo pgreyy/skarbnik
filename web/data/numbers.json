@@ -43,8 +43,8 @@
   "source": "docs/numbers.md"
  },
  "last_deploy": {
-  "tx": "EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W",
-  "source": "docs/AUDIT.md (the final review's fix), docs/EVIDENCE.md"
+  "tx": "83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP",
+  "source": "docs/EVIDENCE.md, \"Contract code and every deploy\" (the reproducible build of commit c74bd5c)"
  },
  "allowlist_tx": {
   "tx": "BLQoFNQ7Vz3Le4TruAgU4YkeKDtexYquQSTcZALpRvWM",

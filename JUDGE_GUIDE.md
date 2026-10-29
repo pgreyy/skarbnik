@@ -92,6 +92,7 @@ Commands run from the root of a clone of the repository. The judge bounties for 
 | B5 | Rebuild the checker and compare its image id: `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 17` (docs/TRY_IT.md, step 9) | Docker with buildx, RISC Zero's toolchain, about 10 GB of free disk | RISC Zero's guest builder image, 7.46 GB | a few GB for the build container |
 | B6 | Verify a stored proof: `cargo build --release -p skarbnik-host`, then `./target/release/skarbnik-host verify docs/evidence/receipts/bounty17_proof0_groth16.bin` (docs/TRY_IT.md, step 10) | after B5 | none more | under 1 GB |
 | B7 | The agent's checks without a model key: `./scripts/agent_dry_run_test.sh` | Rust with the `wasm32-unknown-unknown` target, `agent/config.local.toml` from `./scripts/agent_testnet.sh setup` (a testnet account) | none | small |
+| B8 | Verify the contract yourself: rebuild it from its commit with `cargo near build reproducible-wasm` and compare with the code hash on chain ([docs/TRY_IT.md](docs/TRY_IT.md), step 11) | Docker, cargo-near 0.22.0 | the build image `sourcescan/cargo-near:0.22.0-rust-1.99.1`, about 0.5 GB | about 2 GB |
 
 Each Level B step, in three lines:
 
@@ -115,6 +116,11 @@ Each Level B step, in three lines:
 - **B7.** Expect: 11 of 11 checks pass, and nothing is sent. What this proves: the agent refuses a key not limited to
   commit and reveal, overspending, and a fix that reads files or the environment. What it does not prove: that a model
   writes good fixes.
+- **B8.** Expect: sha256 `ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e`, whose base58 form
+  `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u` equals the contract's code hash on chain. What this proves: the code
+  running on chain is built from the published commit `c74bd5c`, so reading that source is reading the contract. What
+  it does not prove: that the source is free of bugs, or that the owner will not deploy other code later (the testnet
+  contract keeps its full access key on purpose; every deploy is listed in docs/EVIDENCE.md).
 
 Expected results are written next to each command in [docs/TRY_IT.md](docs/TRY_IT.md), with the run that produced them in
 [docs/EVIDENCE.md](docs/EVIDENCE.md). No step needs real money or a mainnet wallet.
@@ -139,6 +145,7 @@ evidence is never shown as done.
 | An agent can be set up from the site: limits, a key made in the browser and added by the wallet | Demonstrated | [`docs/evidence/web/partd_transactions.tsv`](docs/evidence/web/partd_transactions.tsv); EVIDENCE, "Site in the final design" |
 | The attempt cap K limits what repeated probes learn | Demonstrated | bounty 23 (3 of 12 probe commits counted); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Arena: guarded and unguarded" |
 | The checker rebuilds to the image id on chain | Demonstrated | MATCH from a fresh clone: [`docs/evidence/judge/fresh_clone_2026-10-26b.txt`](docs/evidence/judge/fresh_clone_2026-10-26b.txt); B5 |
+| The contract on chain is a reproducible build of a published commit | Demonstrated | code hash `Gx1JfW7G…` = the base58 sha256 of `cargo near build reproducible-wasm` at commit `c74bd5c` (two builds, the same hash); deploy tx [`83biMoi8…`](https://testnet.nearblocks.io/txns/83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy, and the reproducible build"; B8 |
 | 135 contract unit tests pass | Implemented | `cargo test -p kintsugi-contract`; [`docs/evidence/account_cap/contract_unit_tests.txt`](docs/evidence/account_cap/contract_unit_tests.txt) |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | Implemented | `cargo test -p kintsugi-check`; [docs/EVIDENCE.md](docs/EVIDENCE.md), S1 |
 | A per-account cap on attempt slots | Demonstrated | deployed 2026-10-26 (tx [`DVv7N9o1…`](https://testnet.nearblocks.io/txns/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7)); bounty 25: a second commit by one account refused ([`docs/evidence/account_cap/deploy_summary.txt`](docs/evidence/account_cap/deploy_summary.txt)) |
