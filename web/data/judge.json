@@ -271,7 +271,7 @@
    "evidence": "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>"
   },
   {
-   "claim": "Confidential proving in a GPU TEE (attested hardware; the secret released only to an attested prover)",
+   "claim": "Confidential proving in a GPU TEE (planned, not built, not tested)",
    "label": "plan",
    "label_note": null,
    "evidence": "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/GPU_TEE.md\" target=\"_blank\" rel=\"noopener\">docs/GPU_TEE.md</a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>, item 1"

@@ -2,6 +2,11 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: GPU TEE note cut to what it is
+
+- docs/GPU_TEE.md is now a short roadmap note: planned, not built, not tested; the idea, the open questions, and the
+  next step (a small spike). The README, docs/ROADMAP.md, docs/README.md and JUDGE_GUIDE.md say the same.
+
 ## 2026-10-29: README rewritten
 
 - README.md in plain language, problem first: the problem, how it works, what the checker tests and what it doesn't, a

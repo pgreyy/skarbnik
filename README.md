@@ -177,8 +177,8 @@ also cap how many attempts one account holds (the per-account cap, live since 20
 
 ## Roadmap
 
-1. **Confidential proving in a GPU TEE:** prove inside attested confidential hardware, so even a rented GPU can't read
-   the secret ([docs/GPU_TEE.md](docs/GPU_TEE.md)).
+1. **Confidential proving in a GPU TEE** (planned, not built, not tested): prove inside attested confidential
+   hardware, so even a rented GPU can't read the secret. Next step: a small spike ([docs/GPU_TEE.md](docs/GPU_TEE.md)).
 2. **Bounties with no reference fix:** Proof 0 proves only that the original crashes on the secret.
 3. **A vendor liveness bond and a fallback evaluator,** to make silence costly and timeouts rare.
 4. **Agent earnings after costs** on the Proof Ledger.

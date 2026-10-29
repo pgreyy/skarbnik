@@ -2,9 +2,8 @@
 
 Planned work, most important first. Nothing here is built yet; what is built is in [CLAIMS.md](CLAIMS.md).
 
-1. **Confidential proving in a GPU TEE.** Prove inside attested confidential hardware (a CPU TEE with a GPU in
-   confidential computing mode), and release the secret only to an attested prover, so even a rented GPU can't read it.
-   Design: [GPU_TEE.md](GPU_TEE.md).
+1. **Confidential proving in a GPU TEE.** Planned, not built, not tested. Prove inside attested confidential hardware,
+   so even a rented GPU can't read the secret. Open questions and the next step (a small spike): [GPU_TEE.md](GPU_TEE.md).
 2. **Bounties with no reference fix.** A mode where Proof 0 proves only that the original crashes on the secret, so no
    reference fix is needed. It needs a new checker guest and a new image id.
 3. **A vendor liveness bond and a fallback evaluator.** Ideas to make vendor silence costlier and timeouts rarer. Not

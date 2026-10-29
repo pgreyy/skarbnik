@@ -154,7 +154,7 @@ evidence is never shown as done.
 | Level 1 verification through OutLayer | Experimental | built, never answered on testnet: [docs/EVIDENCE.md](docs/EVIDENCE.md), S4/S5 |
 | No upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay) | Planned (mainnet) | the mainnet contract `skarbnik.near`; the testnet contract keeps its full access key on purpose ([docs/LIMITS.md](docs/LIMITS.md)); its live code hash and every deploy: [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy" |
 | Unresolved bug bounties (no reference fix needed) | Planned | [docs/ROADMAP.md](docs/ROADMAP.md) |
-| Confidential proving in a GPU TEE (attested hardware; the secret released only to an attested prover) | Planned | [docs/GPU_TEE.md](docs/GPU_TEE.md); [docs/ROADMAP.md](docs/ROADMAP.md), item 1 |
+| Confidential proving in a GPU TEE (planned, not built, not tested) | Planned | [docs/GPU_TEE.md](docs/GPU_TEE.md); [docs/ROADMAP.md](docs/ROADMAP.md), item 1 |
 | Vendor liveness bond and fallback evaluator | Planned | [docs/ROADMAP.md](docs/ROADMAP.md) |
 | Agent earnings after model and compute costs | Planned | [docs/ROADMAP.md](docs/ROADMAP.md); the Ledger's empty cost column |
 | An external security audit | Not claimed | none; the contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)) |
