@@ -5,6 +5,37 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Contract code and every deploy (2026-10-29)
+
+The testnet contract's account keeps a full access key, so its owner can replace the code under live bounties. This is
+deliberate: it's an experimental testnet contract that will keep changing. The mainnet contract (skarbnik.near) is
+planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a
+delay).
+
+The live code, read with `view_account` on 2026-10-27 and again on 2026-10-29: code hash `DQmpjLzrVdipS17krqBymQsLaNadxw3THnaGR5Kpxx8B`, which is
+the base58 form of the wasm's sha256 `b863487e3d402251eb385e0b2eae3e85e19843751b4b71800dabcf242da61024` (the
+per-account cap build, `target/cap-deploy/new.wasm`, 318,809 bytes). Every deploy to the account, from our scripts'
+records (`docs/evidence/{S6c,audit1,hardening,account_cap}/transactions.tsv`), each read back from the chain (the
+transaction's `DeployContract` action carries the code's sha256):
+
+| When | What | Transaction | wasm sha256 |
+| --- | --- | --- | --- |
+| 2026-10-24 21:42 UTC | first deploy (S6c, Level 2) | [`6iJ6MUvBG6AzBYrYHoo3yYezHJiGEGgoRMYnxRRXTdBi`](https://testnet.nearblocks.io/txns/6iJ6MUvBG6AzBYrYHoo3yYezHJiGEGgoRMYnxRRXTdBi) | `cf61a43fee5bb748ee5f401488a9353e05242161cf8756dee843965bbd200121` |
+| 2026-10-24 23:14 UTC | protocol fee pool | [`DwMvVopM2BGSWFb4PH1LvXhJC7cyiWdbJY8qcAua1uhL`](https://testnet.nearblocks.io/txns/DwMvVopM2BGSWFb4PH1LvXhJC7cyiWdbJY8qcAua1uhL) | `396d14e0adf82fa3c0d2f00eaefc9811e40aaa8ca063a91908bf7d1c91275aad` |
+| 2026-10-25 01:17 UTC | AI review passes, round 1 fixes | [`Gr63BrfkdxGDcnvQGBrtrpu4rtRsF1ZYVorsCqFk4Qjq`](https://testnet.nearblocks.io/txns/Gr63BrfkdxGDcnvQGBrtrpu4rtRsF1ZYVorsCqFk4Qjq) | `2e798b7051e2876ef66b8874d2e85c117404ad4ade3d0e00481ebcad11ddf9d7` |
+| 2026-10-25 02:01 UTC | round 2, fix 6 | [`7EL7CrM2iGs6cbBXa9QXCDLcSDFPNeRxz9Rb9U75nSLK`](https://testnet.nearblocks.io/txns/7EL7CrM2iGs6cbBXa9QXCDLcSDFPNeRxz9Rb9U75nSLK) | `e4e2b923e7993476390b74e9de96e9fece0c20dda61c55af6bb9fc8aae9659ed` |
+| 2026-10-25 02:20 UTC | audit hardening | [`9vrrJwCswthVioqgPtrSnc6phWh2KDyzHKuBSuTEPqFz`](https://testnet.nearblocks.io/txns/9vrrJwCswthVioqgPtrSnc6phWh2KDyzHKuBSuTEPqFz) | `7d936eeea4f486e30ce6d568fcadbfcad1599c20488f8b61a406f08d4e33c836` |
+| 2026-10-25 03:46 UTC | hardening, the final review's fix | [`EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W`](https://testnet.nearblocks.io/txns/EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W) | `938d5456cad92d66ab1d20c77dfc6badcc830e4a69f5cbb48035a8bfd427d1b7` |
+| 2026-10-26 22:38 UTC | per-account cap | [`DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7`](https://testnet.nearblocks.io/txns/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7) | `b863487e3d402251eb385e0b2eae3e85e19843751b4b71800dabcf242da61024` |
+
+How to check it yourself:
+
+    curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"kintsugi-l2-cihdp.testnet"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'
+
+It must print `DQmpjLzrVdipS17krqBymQsLaNadxw3THnaGR5Kpxx8B`. A different hash means a deploy that is not in this list.
+The explorer shows each deploy above with its time; its index API returned no transactions for this account when we
+tried to list deploys through it, so the list comes from our records and the chain, not from that index.
+
 ## The vendor tool: watch proves and submits with no one's help, on a rented GPU (2026-10-27)
 
 Question: once a researcher reveals an attempt, does `tools/skarbnik-vendor watch` on the vendor's machine prove it and

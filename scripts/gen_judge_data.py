@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # Builds web/data/judge.json, the data of the site's Judge guide page, from JUDGE_GUIDE.md, which is the source: the
 # intro, the Level A steps (Do, Expect, Verify, What this proves, What it does not prove), the Level B table and the
-# three lines of each Level B step, the notes under Level B, and every claim with its label and evidence. Inline
+# three lines of each Level B step, the notes under Level B, and every claim with its label (and an optional note in
+# brackets, such as "Planned (mainnet)") and its evidence. Inline
 # Markdown (code, bold, links, bare addresses) becomes HTML; links to skarbnik.xyz become routes on the site, links to
 # files in the repository become GitHub links. Fails if the guide's shape changes (steps, fields or claim count).
 # Usage, from the repo root: python3 -I scripts/gen_judge_data.py
@@ -95,9 +96,10 @@ def main():
         cells = [x.strip() for x in l.strip().strip('|').split('|')] if l.startswith('| ') else None
         if not cells or cells[0] in ('Claim', '---'):
             continue
-        if cells[1] not in LABELS:
+        m = re.fullmatch(r'(.+?)(?: \((.+)\))?', cells[1])  # a label, with an optional note: "Planned (mainnet)"
+        if m.group(1) not in LABELS:
             sys.exit(f'{SRC}: unknown label "{cells[1]}" for "{cells[0]}"')
-        claims.append({'claim': inline(cells[0]), 'label': LABELS[cells[1]], 'evidence': inline(cells[2])})
+        claims.append({'claim': inline(cells[0]), 'label': LABELS[m.group(1)], 'label_note': m.group(2), 'evidence': inline(cells[2])})
     if len(steps) != 6 or len(bsteps) != len(lines) or len(bsteps) != 7 or not claims:
         sys.exit(f'{SRC}: found {len(steps)} Level A steps, {len(bsteps)} Level B rows, {len(lines)} Level B line sets, {len(claims)} claims')
     data = {'source': SRC, 'intro': paras(intro), 'a_intro': paras(a), 'a': steps, 'b_intro': [bparas[0]], 'b': bsteps,

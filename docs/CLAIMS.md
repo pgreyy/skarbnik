@@ -35,7 +35,9 @@ The short version is in the [README](../README.md); every claim with its status 
   minute, but the secret then sits in that machine's memory for the run (wiped afterwards), and the Groth16 wrap needs
   a separate x86 machine with Docker and about 7 GiB of memory.
 - The vendor must stay online; if it goes silent, the timeout rule pays whatever was revealed.
-- The contract account still has a full access key, so its code can still be replaced (planned to be removed last).
+- The testnet contract's account keeps a full access key, so its owner can replace the code under live bounties. This
+  is deliberate (an experimental testnet contract); the mainnet contract (skarbnik.near) is planned without an upgrade
+  key the owner controls alone. The live code hash and every deploy: docs/EVIDENCE.md, "Contract code and every deploy".
 
 **Still needs hardening** (docs/AUDIT.md, findings and suggested hardening):
 
@@ -111,7 +113,9 @@ Each claim names the file and the command that show it. Full results, failures i
 
 - The contract was checked by AI review passes, not by an independent security audit. Their findings led to seven fixes;
   the unfixed findings are stated as known limits in [docs/AUDIT.md](AUDIT.md) and [docs/SECURITY.md](SECURITY.md).
-- The contract account still has a full access key, so its code can still be replaced (planned to be removed last).
+- The testnet contract's account keeps a full access key, so its owner can replace the code under live bounties. This
+  is deliberate (an experimental testnet contract); the mainnet contract (skarbnik.near) is planned without an upgrade
+  key the owner controls alone. The live code hash and every deploy: docs/EVIDENCE.md, "Contract code and every deploy".
 - One verdict tells a researcher at most one bit about the secret; the vendor chooses the budget K.
 - If the vendor stays silent, the bounty is split equally among every revealed attempt still waiting, whatever they
   contain. In the worst case an honest fix gets only 1/K of the bounty (docs/AUDIT.md, finding 3 and hardening S7).

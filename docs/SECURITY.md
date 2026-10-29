@@ -290,8 +290,12 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - Owner powers, stated in full: the owner (`get_owner`) registers verifiers, sets the Level 1 OutLayer settings, and adds
   checker image ids to the allowlist (`allow_image_id`). Once the list holds an id, `create_bounty` refuses every other
   id, so the owner decides which checker programs bounties may use; there is no call to remove an id. Bounties created
-  before an id was listed keep their id and show `image_id_allowed: false`. The contract account's full access key can
-  also replace the code; removing or escrowing that key is planned as the last step before submission (S14), not done.
+  before an id was listed keep their id and show `image_id_allowed: false`. The testnet contract's account keeps a full
+  access key, so its owner can replace the code under live bounties. This is deliberate: it's an experimental testnet
+  contract that will keep changing. The mainnet contract (skarbnik.near) is planned without an upgrade key the owner
+  controls alone (key removed, or upgrades behind a multisig or DAO with a delay). Anyone can check that the code has
+  not changed silently: the live code hash must equal the last deploy in EVIDENCE.md, "Contract code and every deploy",
+  which lists the current code hash, its wasm sha256 and every deploy transaction (owner's decision, 2026-10-27).
 - The protocol fee pool (fees of commits never revealed, and Level 2 fees of decided attempts) stays locked in the
   contract as a reserve for storage. No method withdraws it, by design (owner's decision, 2026-10-25): it pays no one,
   so no one profits from junk or missed reveals. `get_protocol_pool` shows its size.
@@ -315,6 +319,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-10-29: the testnet contract keeps its full access key on purpose (an experimental contract; owner's decision,
+  D13); the mainnet contract is planned without an upgrade key the owner controls alone. The live code hash and every
+  deploy transaction are published (EVIDENCE, "Contract code and every deploy"). No guard changed.
 
 - 2026-10-27: GPU proving in the vendor's watch (`tools/skarbnik_gpu.py`): a RunPod pod per revealed attempt, secret in
   RAM only and wiped after the prove step, pod always terminated with a 45 minute cap, a $6 spend cap, CPU fallback after

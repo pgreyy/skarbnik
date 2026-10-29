@@ -2,6 +2,19 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: The testnet contract's full access key, stated as a decision
+
+- Owner's decision (D13): `kintsugi-l2-cihdp.testnet` keeps its full access key, as an experimental testnet contract;
+  the mainnet contract `skarbnik.near` is planned without an upgrade key the owner controls alone. Stated the same way in
+  the README, docs/LIMITS.md, docs/THREAT_MODEL.md, docs/SECURITY.md (owner powers), docs/AUDIT.md (S14), docs/CLAIMS.md,
+  docs/ROADMAP.md and the site's Limits and Contract tabs; "remove the key before submission" is gone from every plan.
+- docs/EVIDENCE.md, "Contract code and every deploy": the live code hash `DQmpjLzr...` (read 2026-10-27 and 2026-10-29)
+  is the cap deploy's wasm `b863487e...1024`; the seven deploys from our records, each read back from the chain through
+  the archival RPC (the `DeployContract` action carries the code's sha256). The explorer's index API returned nothing for
+  this account, so the list rests on our records and the chain.
+- JUDGE_GUIDE.md: step 6 checks the code hash too; a claim "No upgrade key the owner controls alone" marked Planned
+  (mainnet). `scripts/gen_judge_data.py` accepts a note after a label; the site's chip shows it.
+
 ## 2026-10-27: Numbers updated with the GPU-mode results
 
 - docs/numbers.md, the README (a table per machine), the For vendors page and the site's numbers now give the measured

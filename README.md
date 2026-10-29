@@ -176,7 +176,11 @@ Every claim with its evidence: [docs/CLAIMS.md](docs/CLAIMS.md). Every run, fail
 
 ## Honest limits
 
-- **The contract account still has a full access key,** so its owner can still replace its code (to be removed last).
+- **The testnet contract's account keeps a full access key,** so its owner can replace the code under live bounties.
+  This is deliberate: it's an experimental testnet contract that will keep changing. The mainnet contract
+  (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig
+  or DAO with a delay). To check that the code has not changed silently, compare the live code hash with the last
+  deploy in docs/EVIDENCE.md, "Contract code and every deploy".
 - **A bounty needs a reference fix:** Proof 0 must pass before it opens, so a bug with no fix yet cannot be posted.
 - **The timeout pays without looking at the fix.** If the vendor goes silent, every revealed attempt still waiting gets
   an equal share, whatever it contains; in the worst case an honest fix gets 1/K of the reward.

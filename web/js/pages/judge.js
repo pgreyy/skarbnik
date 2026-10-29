@@ -20,7 +20,7 @@ export async function judge(viewEl, tab) {
   const cmds = g.b.map((s) => `<div class="card cmd"><div class="sn"><b>${s.n}</b></div><div><h3 class="h3 bshow">${s.shows}</h3>
     <div class="cmd-m m3"><div><b>Needs</b><p>${s.needs}</p></div><div><b>Download</b><p>${s.download}</p></div><div><b>Memory</b><p>${s.memory}</p></div></div>
     <div class="dev one mt16"><div class="do"><h4>${icon('eye')} Expect</h4><p>${s.Expect}</p></div></div>${pn(s)}</div></div>`).join('');
-  const crows = (f) => g.claims.filter((c) => f === 'all' || c.label === f).map((c) => `<div class="lrow l3" role="listitem"><b style="color:var(--tx);font-weight:600">${c.claim}</b><div><span class="chip ${CL[c.label][0]}"${c.label === 'none' ? ' style="color:var(--tx2);border-color:var(--ln2)"' : ''}>${CL[c.label][1]}</span></div><p class="small cev">${c.evidence}</p></div>`).join('');
+  const crows = (f) => g.claims.filter((c) => f === 'all' || c.label === f).map((c) => `<div class="lrow l3" role="listitem"><b style="color:var(--tx);font-weight:600">${c.claim}</b><div><span class="chip ${CL[c.label][0]}"${c.label === 'none' ? ' style="color:var(--tx2);border-color:var(--ln2)"' : ''}>${CL[c.label][1]}${c.label_note ? ` (${c.label_note})` : ''}</span></div><p class="small cev">${c.evidence}</p></div>`).join('');
   const head = '<div class="lhead l3" aria-hidden="true"><span>Claim</span><span>Label</span><span>Evidence</span></div>';
   const count = (k) => g.claims.filter((c) => c.label === k).length;
   viewEl.innerHTML = `<main id="main" class="p-judge" tabindex="-1">

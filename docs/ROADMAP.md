@@ -3,6 +3,9 @@
 Planned work, most important first. Nothing here is built yet; what is built is in [CLAIMS.md](CLAIMS.md).
 
 
+- **Planned: a mainnet contract with no lone upgrade key.** `skarbnik.near` without an upgrade key the owner controls
+  alone: the key removed, or upgrades behind a multisig or DAO with a delay. The testnet contract keeps its full access
+  key on purpose, as an experimental contract that will keep changing (docs/LIMITS.md).
 - **Planned: unresolved bug bounties.** A mode where Proof 0 proves only that the original crashes on the secret, so no
   reference fix is needed. It needs a new checker guest and a new image id.
 - **Planned: proving inside sealed hardware.** Proving in a confidential computing environment (a TEE with

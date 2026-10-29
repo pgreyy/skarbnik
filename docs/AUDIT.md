@@ -110,8 +110,10 @@ The owner account (`get_owner`) can register verifiers (`register_verifier`), se
 (`set_outlayer`) and add checker image ids to the allowlist (`allow_image_id`). The allowlist stays on (owner's decision,
 2026-10-25): once it holds an id, `create_bounty` refuses every other id, so the owner decides which checker programs
 bounties may use; an id cannot be removed, and bounties created before an id was listed show `image_id_allowed: false`.
-The contract account's full access key can replace the code; removing or escrowing it (S14) is planned as the last step
-before submission and is not done. Nothing else is owner-only; in particular the owner cannot move bounties, credit or
+The testnet contract's account keeps a full access key, so its owner can replace the code under live bounties. This is
+deliberate (owner's decision, 2026-10-27): it's an experimental testnet contract that will keep changing. The mainnet
+contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades behind a
+multisig or DAO with a delay). The live code hash and every deploy are in EVIDENCE.md, "Contract code and every deploy". Nothing else is owner-only; in particular the owner cannot move bounties, credit or
 the pool.
 
 ## The skeptical judge (review passes' views)
@@ -221,7 +223,7 @@ Evidence: EVIDENCE, "Audit hardening round"; raw output `docs/evidence/hardening
 | S16 | applied | `scripts/agent_preflight.sh` (payout account exists, image id on a non-empty allowlist, windows, fees, K), wired into `scripts/s7_agent.sh` | `docs/evidence/hardening/preflight.txt` |
 | S18 | done | bounty 12, Level 2, private salt, secret kept outside the repository, opened by its own Proof 0; `check_image_id.sh` MATCH. It uses the public demo bug: anyone can submit the public `fixed.wasm`, and a silent vendor's timeout can pay without any proof. Possible later improvement: a new original module with its own bug | EVIDENCE, S18; txs `ByJpYtUh5QJcgeVnYuroFFvMWnCGncRc7bMM5T1dTFQw`, `AwktYGNHGijdv2LWwQYeuc7yFyLoDs41AuJckxUQuPSJ` |
 | S4 | not built (owner's decision) | known limit, finding 8; S16 refuses a missing payout account | |
-| S14 | not done yet | planned as the last step before submission | |
+| S14 | decided 2026-10-27: not on testnet | the testnet contract keeps its full access key on purpose (an experimental contract); planned for the mainnet contract (no upgrade key the owner controls alone); the owner's powers and every deploy are documented (SECURITY, EVIDENCE) | |
 | Pool | decided: locked (option A) | no withdraw method | section "Where the protocol fee pool's fees should go" |
 | Allowlist | kept, documented as an owner power | | section "Owner powers" |
 

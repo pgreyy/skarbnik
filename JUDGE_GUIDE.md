@@ -71,9 +71,10 @@ open the testnet explorer.
 
 6. **Read what is not claimed** (1 min)
    - Do: open https://skarbnik.xyz/#/evidence/limits or the README's "Honest limits" (every limit: [docs/CLAIMS.md](docs/CLAIMS.md), "Known limits").
-   - Expect: plain limits, among them: no external audit (only AI review passes), a full access key still on the
-     contract account, testnet only.
-   - Verify: the access key with a `view_access_key_list` call on `kintsugi-l2-cihdp.testnet`.
+   - Expect: plain limits, among them: no external audit (only AI review passes), a full access key kept on purpose on
+     the testnet contract (an experimental contract; the mainnet contract is planned without one), testnet only.
+   - Verify: the access key with a `view_access_key_list` call on `kintsugi-l2-cihdp.testnet`, and the live code hash
+     against the last deploy in [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy".
    - What this proves: the limits are published, and the full access key can be seen on chain.
    - What it does not prove: that the list is complete; no one outside the project has audited the contract.
 
@@ -144,6 +145,7 @@ evidence is never shown as done.
 | The vendor's `watch` proves revealed attempts on a rented GPU (secret in the pod's RAM only, pod always terminated) and submits with no one's help | Demonstrated | bounty 32, tx [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y), and judge bounty 27, tx [`73xzLn4v…`](https://testnet.nearblocks.io/txns/73xzLn4vmLyma5wF7qm9KY7qJoJz7ZkNJ2sAR4bTfipG); [docs/EVIDENCE.md](docs/EVIDENCE.md), "The vendor tool"; [docs/numbers.md](docs/numbers.md) |
 | The Groth16 wrap on a separate Docker machine (337.73 s, 6.82 GiB peak) | Experimental | one run: [`docs/evidence/smooth/vps/groth16.log`](docs/evidence/smooth/vps/groth16.log) |
 | Level 1 verification through OutLayer | Experimental | built, never answered on testnet: [docs/EVIDENCE.md](docs/EVIDENCE.md), S4/S5 |
+| No upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay) | Planned (mainnet) | the mainnet contract `skarbnik.near`; the testnet contract keeps its full access key on purpose ([docs/LIMITS.md](docs/LIMITS.md)); its live code hash and every deploy: [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy" |
 | Unresolved bug bounties (no reference fix needed) | Planned | [docs/ROADMAP.md](docs/ROADMAP.md) |
 | Proving inside sealed hardware (a TEE with attestation) | Planned | [docs/ROADMAP.md](docs/ROADMAP.md) |
 | Vendor liveness bond and fallback evaluator | Planned | [docs/ROADMAP.md](docs/ROADMAP.md) |
