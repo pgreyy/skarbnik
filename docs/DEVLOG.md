@@ -2,6 +2,13 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: Bounty 12 settled by timeout, from a team-run account
+
+- Bounty 12's one attempt (revealed 2026-10-27 00:04 UTC) came from the owner's own testnet account, run with external
+  agent software; it is team-run (the account is already on the team list by the hash of its name). The vendor's watch
+  does not cover bounty 12, so no proof was made and the timeout rule paid. Bounty 12 joins the timeout lists (README,
+  docs/TRY_IT.md, docs/CLAIMS.md) and carries a note on its page; the Ledger still counts 0 accounts outside the team.
+
 ## 2026-10-29: The testnet contract's full access key, stated as a decision
 
 - Owner's decision (D13): `kintsugi-l2-cihdp.testnet` keeps its full access key, as an experimental testnet contract;

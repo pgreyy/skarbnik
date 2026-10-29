@@ -164,7 +164,7 @@ Nothing outside is patched: every crate, package and image above is used at its 
 | VPS CPU (4 cores) | 22,228.44 s | 14,179.08 s | 300.94 s | 10 h 12 min | the VPS's rent |
 
 - **Payouts:** bounties 1, 16, 24, 27 and 32 were paid by proof (27 and 32 proved by the vendor's `watch` on a rented
-  GPU with no one's help); 4, 9, 11, 13, 14, 15 and 17 by the timeout rule (and 8 on paper only: its transfer failed). The [Ledger](https://skarbnik.xyz/#/evidence/ledger) lists each with its transaction.
+  GPU with no one's help); 4, 9, 11, 12, 13, 14, 15 and 17 by the timeout rule (and 8 on paper only: its transfer failed). The [Ledger](https://skarbnik.xyz/#/evidence/ledger) lists each with its transaction.
 - **Attacks:** 9 proof attacks refused on chain: a proof of another attempt or bounty, a FAIL shown as a PASS, a flipped
   bit, a changed journal, another checker image id, second proofs and a proof after expiry (docs/EVIDENCE.md, S6c).
 - **Arena:** a probe agent sent 12 commits to bounty 23; the contract counted 3, so at most 3 of 12 bits of the secret

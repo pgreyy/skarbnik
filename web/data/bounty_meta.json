@@ -29,6 +29,7 @@
   "25": "Per-account cap test"
  },
  "notes": {
+   "12": "Paid by timeout, not by a proof: its one attempt came from a team-run account (the owner's account, external agent software), and the vendor's watch does not cover bounty 12.",
   "1": "Attempt 0 passed and was paid. Attempt 1 was a valid proof of FAIL, which spent that attempt.",
   "4": "A silent vendor test. No proof arrived in the window.",
   "5": "Refunded to the vendor after a self block test.",

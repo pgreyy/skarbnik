@@ -1,13 +1,13 @@
 {
- "made_at": "2026-10-27T09:27:25Z",
+ "made_at": "2026-10-29T20:28:05Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Computed from the chain only (every bounty and attempt), with the proving machine from web/data/provers.json. Same rules as the Ledger page.",
- "decided_attempts": 19,
+ "decided_attempts": 20,
  "settled_by_proof": 7,
- "settled_by_timeout": 12,
- "share_settled_by_proof": 0.3684210526315789,
- "timeout_rate": 0.631578947368421,
+ "settled_by_timeout": 13,
+ "share_settled_by_proof": 0.35,
+ "timeout_rate": 0.65,
  "reveal_to_settlement_seconds": {
   "proof, laptop": {
    "attempts": 4,
@@ -15,8 +15,8 @@
    "slowest": 5111.346138547
   },
   "timeout, none (no proof)": {
-   "attempts": 12,
-   "median": 7800,
+   "attempts": 13,
+   "median": 14400,
    "slowest": 14400
   },
   "proof, rented GPU (prove and shrink), then a Docker VPS (Groth16)": {
