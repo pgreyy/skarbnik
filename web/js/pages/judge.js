@@ -32,7 +32,7 @@ ${g.intro.map((p, i) => `<p class="${i ? 'body' : 'lead'}">${p}</p>`).join('')}
 </div>
 <div style="display:flex;flex-direction:column;gap:14px">
 <div class="card lv"><span class="vico">${icon('eye')}</span><div><b class="h4">Level A, evidence tour</b><p class="small" style="margin-top:4px">5 to 10 minutes. A browser and the explorer. No install.</p></div></div>
-<div class="card lv"><span class="vico">${icon('term')}</span><div><b class="h4">Level B, local reproduction</b><p class="small" style="margin-top:4px">Optional. From a clone of the repository.</p></div></div>
+<div class="card lv"><span class="vico">${icon('term')}</span><div><b class="h4">Level B, local reproduction</b><p class="small" style="margin-top:4px">Optional. From a clone of the repository: <a href="https://github.com/pgreyy/skarbnik" target="_blank" rel="noopener">github.com/pgreyy/skarbnik</a>.</p></div></div>
 </div></div></div></section>
 <section style="padding:0 0 112px"><div class="wrap" id="jtabs"></div></section></main>`;
   tabbed($('#jtabs'), [
