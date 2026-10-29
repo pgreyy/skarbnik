@@ -121,8 +121,10 @@ Each claim names the file and the command that show it. Full results, failures i
 - If the vendor stays silent, the bounty is split equally among every revealed attempt still waiting, whatever they
   contain. In the worst case an honest fix gets only 1/K of the bounty (docs/AUDIT.md, finding 3 and hardening S7).
 - Proving is slow on a laptop CPU: one passing proof with compression takes 1.5 to 4 hours, which is why bounty 17 was
-  paid by timeout. A rented GPU did bounty 24's in under a minute (one run, one machine), with the secret in that
-  machine's memory for the run.
+  paid by timeout. On a rented GPU, bounty 24's prove and shrink took under a minute (51.5 s); with the Groth16 wrap
+  on another machine (337.73 s) the whole proof took about 6.5 minutes of work, and that run, done by hand, reached the
+  contract 6 h 10 min after the reveal. The vendor's watch in GPU mode does it automatically: 17 min 8 s from reveal to
+  verdict for bounty 32. The secret sits in the rented machine's memory for each run.
 - Bounty 12 keeps its secret private but uses the public demo bug. Bounty 7 and the demo bounties use the public demo input.
 - A payout to an account that does not exist is lost (docs/AUDIT.md, finding 8); the site and
   `scripts/agent_preflight.sh` refuse such an account before sending.

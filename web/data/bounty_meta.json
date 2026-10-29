@@ -74,8 +74,8 @@
   },
   "24": {
    "title": "A private bug fixed without seeing it",
-   "body": "A language model agent on NEAR AI Cloud read only the public code of a new module, found its division by zero, and committed and revealed a fix with a key limited to those two calls. The vendor's proof was produced on a rented GPU in under a minute, and the contract paid when it accepted the proof.",
-   "note": "Bounty 24 is a private bounty: its secret input and reference fix never left the vendor, and the bug is not named in the public source. The proof took 29.82 s to prove and 21.71 s to shrink on one rented GPU, then was wrapped to Groth16 on a separate machine.",
+   "body": "A language model agent on NEAR AI Cloud read only the public code of a new module, found its division by zero, and committed and revealed a fix with a key limited to those two calls. On a rented GPU the vendor proved and shrank the fix in under a minute (51.5 s); with the Groth16 wrap on a separate machine (337.73 s) the whole proof took about 6.5 minutes of work, and this run, done by hand, reached the contract 6 h 10 min after the reveal. The contract paid when it accepted the proof.",
+   "note": "Bounty 24 is a private bounty: its secret input and reference fix never left the vendor, and the bug is not named in the public source. The proof took 29.82 s to prove and 21.71 s to shrink on one rented GPU, then 337.73 s to wrap to Groth16 on a separate machine; by hand, from reveal to the accepted proof, 6 h 10 min.",
    "input": "Defined checker, private secret input",
    "shows": "an agent fixed a private bug from public code alone, a limited key committed and revealed, and the contract checked the proof itself and paid.",
    "not_shown": "skill on harder bugs (this is a one line fix), production security or an external audit."

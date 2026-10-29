@@ -2,6 +2,13 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: No stage quoted as end to end
+
+- Bounty 24's text on the site (`web/data/bounty_meta.json`), docs/CLAIMS.md and docs/VENDOR.md said "under a minute"
+  for the GPU proof. They now say what that was (prove and shrink, 51.5 s), what the whole proof took (about 6.5 minutes of
+  work with the Groth16 wrap, 337.73 s) and the run's real total (by hand, 6 h 10 min from reveal to the accepted proof);
+  the automatic path is 17 min 8 s from reveal to verdict (bounty 32). Saved pages refreshed.
+
 ## 2026-10-29: Pages for readers without JavaScript
 
 - `scripts/snapshot_pages.mjs` opens seven routes in a headless Chromium against a local copy of `web/`, waits for the

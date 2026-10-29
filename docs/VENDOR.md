@@ -64,7 +64,7 @@ receipts and their hashes leave the machine.
 | Mode | Privacy | Speed | Status |
 | --- | --- | --- | --- |
 | Your own machine (`cpu`) | strongest: the secret never leaves a machine you control | slowest; measure it before choosing the windows | built |
-| A GPU you rent for the job (`gpu`) | the secret sits in the rented machine's memory (RAM only) during the proof, then is wiped | under a minute to prove and shrink bounty 24's attempt; one pod per attempt, end to end (docs/numbers.md) | built into `watch` (below) |
+| A GPU you rent for the job (`gpu`) | the secret sits in the rented machine's memory (RAM only) during the proof, then is wiped | prove and shrink under a minute on an L40S; the whole proof, from reveal to `submit_groth16` with the Groth16 wrap on your machine, about 17 minutes (bounty 32: 17 min 8 s; docs/numbers.md) | built into `watch` (below) |
 | A Skarbnik-hosted proving service | the service would see the secret | | not offered |
 
 The Groth16 wrap needs an x86 machine with Docker and about 7 GiB of memory, whichever mode proves.
