@@ -5,6 +5,21 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Confidential proving spike: a sealed checker in a Phala Cloud CPU CVM (2026-10-29)
+
+Question: can a vendor check that a rented confidential VM (Intel TDX on Phala Cloud) runs our exact program, send it
+the secret input so only that program can read it, and get back a verdict only that program could have written?
+
+- Command (on the VPS): `python3 tools/tee-spike/phala.py deploy skarbnik-tee-check compose.yaml tdx.small`, then
+  `vendor.py verify <url> compose.yaml <deploy.json> <image> <out>`, `vendor.py check ...` twice, `phala.py delete`.
+- Result: quote UpToDate with Intel's certificates (dcap-qvl 0.6.6) and verified by Phala's verifier; report_data
+  binds the served key; RTMR3 replayed; compose hash matches the deploy and our compose file with the image digest.
+  Then PASS (demo secret, `fixed.wasm`) and FAIL (fresh private secret, `wrong_fix.wasm`), each answer sealed to the
+  request. CVM deleted; list empty. Cost $0.002725. Raw files: `docs/evidence/tee_spike/checker_run/`; the write-up
+  with every step and time, including two failed verify tries (our bugs): `docs/evidence/tee_spike/README.md`.
+- Verdict: PASS for the checker. Not shown: the OS image against a rebuild, a vendor nonce in the quote, a
+  reproducible image (prebuilt binaries). The prove step inside the CVM: part 2, running.
+
 ## Contract code and every deploy, and the reproducible build (2026-10-29)
 
 The testnet contract's account keeps a full access key, so its owner can replace the code under live bounties. This is

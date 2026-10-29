@@ -1,0 +1,10 @@
+# What Phala Cloud runs in the CVM for the confidential proving spike: our sealed checker and prover image, pinned by
+# digest, with the dstack guest agent socket (for TDX quotes) and port 8080 behind Phala's gateway.
+services:
+  tee:
+    image: ghcr.io/pgreyy/skarbnik-tee@sha256:9a425458da58606807b6bf3028eaa9f26acf830b6a70cd3bd4bf701160fd7261
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+    restart: on-failure

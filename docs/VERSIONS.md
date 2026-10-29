@@ -117,6 +117,19 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | Default model | `z-ai/glm-5.3-flash` | listed by `curl -s https://cloud-api.near.ai/v1/models`, 2026-10-25 (61 models) |
 | Python (the agent, standard library only) | 3.14.4 | `python3 --version` |
 
+## Confidential proving spike (tools/tee-spike, docs/evidence/tee_spike/)
+
+| Item | Version | Checked |
+| --- | --- | --- |
+| Phala Cloud CVM OS image | `dstack-0.6.1` (os_image_hash `ec43cb8c5e04b6bb6c53b33b16076a01d83d01f7f4b703f2f78a0d947d6247e6`) | `phala.py deploy` request and the CVM's `/info`, 2026-10-29 |
+| Container base | `python:3.12-slim-trixie@sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159` | `docker inspect` on the VPS, 2026-10-29 |
+| dstack-sdk (in the CVM) | 0.5.4 | `container/requirements.txt` (hashes) |
+| cryptography | 50.0.1 (CVM and vendor side) | `container/requirements.txt`, `vendor-requirements.txt` |
+| dcap-qvl (vendor side) | 0.6.6 | `vendor-requirements.txt` |
+| pip-tools (to pin the hashes) | 7.5.1 | `pip-compile --generate-hashes` in the base image |
+| Docker on the VPS | 29.9.2 | `docker --version` |
+| Python on the VPS | 3.12.3 (Ubuntu 24.04.5) | `python3 --version` |
+
 ## Other
 
 | Tool | Version | Command |

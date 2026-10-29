@@ -1,0 +1,6 @@
+2026-10-29T23:11:21Z delete: HTTP 204 {}
+2026-10-29T23:11:22Z still there: status deleting
+2026-10-29T23:11:33Z still there: status deleting
+2026-10-29T23:11:44Z gone: HTTP 404 None
+2026-10-29T23:11:44Z CVM list: HTTP 200, 0 CVM(s) []
+2026-10-29T23:11:44Z balance $4.997275

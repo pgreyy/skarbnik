@@ -1,0 +1,116 @@
+{
+ "at": "2026-10-29T23:10:36Z",
+ "url": "https://b7fb9416331f716bf2d3551aae6165f19610ba7d-8080.dstack-pha-prod5.phala.network",
+ "checks": {
+  "tdx_quote_dcap_qvl": {
+   "ok": true,
+   "status": "UpToDate",
+   "advisory_ids": [],
+   "dcap_qvl": "0.6.6"
+  },
+  "tdx_quote_phala_api": {
+   "ok": true,
+   "verified": true
+  },
+  "report_data_binds_key": {
+   "ok": true,
+   "quote_report_data": "06b102709ac8092ea903a358fe5f2656c659d80692f77b0f279f7dac415175e60000000000000000000000000000000000000000000000000000000000000000",
+   "sha256_public_key_plus_zeros": "06b102709ac8092ea903a358fe5f2656c659d80692f77b0f279f7dac415175e60000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "rtmr3_replay": {
+   "ok": true,
+   "replayed": "75d3be652f8e394236fc8156c5d728e4851d5fe411d4f6d24145361d75f5b796095cf3a75c7d74abb45040421b7aa86a",
+   "quote": "75d3be652f8e394236fc8156c5d728e4851d5fe411d4f6d24145361d75f5b796095cf3a75c7d74abb45040421b7aa86a",
+   "events": [
+    {
+     "event": "system-preparing",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "app-id",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "compose-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "gpu-policy-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "instance-id",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "boot-mr-done",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "os-image-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "key-provider",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "storage-fs",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "storage-encrypted",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "system-ready",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    }
+   ]
+  },
+  "compose_hash": {
+   "ok": true,
+   "sha256_app_compose": "cadab313685b897513650042278b2fd767bed8f865f1133b8fe74cc236afeb43",
+   "event_log_compose_hash": "cadab313685b897513650042278b2fd767bed8f865f1133b8fe74cc236afeb43",
+   "phala_deploy_compose_hash": "cadab313685b897513650042278b2fd767bed8f865f1133b8fe74cc236afeb43"
+  },
+  "compose_is_ours": {
+   "ok": true,
+   "image": "ghcr.io/pgreyy/skarbnik-tee@sha256:9a425458da58606807b6bf3028eaa9f26acf830b6a70cd3bd4bf701160fd7261",
+   "compose_file_sha256": "4dc769b0f9b3d506c449148c655c3d7b0d451b3d5dd29a9257fb65515d2bd056"
+  }
+ },
+ "quote_bytes": 5010,
+ "quote_sha256": "4a65c31c9ac8d09c010662775bf65f9820e9cab3afe80590c56f53975ff3290f",
+ "quote_fields": {
+  "mr_td": "2a674327c50218dba880066b349b8d559d749ed68dce33fd651c184a877d084b07a9e583767a7ad5da13ed91deec2b70",
+  "rtmr0": "68102e7b524af310f7b7d426ce75481e36c40f5d513a9009c046e9d37e31551f0134d954b496a3357fd61d03f07ffe96",
+  "rtmr1": "89ef86c5125b986c325f0a94acfa87718a4ef3a4d4f237dbb72dda3cf777fd2c054555fb4407eb53338d7d67329a7333",
+  "rtmr2": "e9000e338f33233e8f51b7fd031e1c158bdcf8572eab041c0bc8eb7fef48b23259a6a556e6c8e2af99999fc39c793179",
+  "rtmr3": "75d3be652f8e394236fc8156c5d728e4851d5fe411d4f6d24145361d75f5b796095cf3a75c7d74abb45040421b7aa86a",
+  "report_data": "06b102709ac8092ea903a358fe5f2656c659d80692f77b0f279f7dac415175e60000000000000000000000000000000000000000000000000000000000000000",
+  "version": 4,
+  "tee_type": "81000000"
+ },
+ "dstack_info": {
+  "os_image_hash": "ec43cb8c5e04b6bb6c53b33b16076a01d83d01f7f4b703f2f78a0d947d6247e6",
+  "compose_hash": "cadab313685b897513650042278b2fd767bed8f865f1133b8fe74cc236afeb43",
+  "app_id": "b7fb9416331f716bf2d3551aae6165f19610ba7d",
+  "instance_id": "7798f2dbe62532e0734e5b6b3e4a8631dcbab9e5",
+  "mr_aggregated": "2963bbd6866ea4bf1f80fff743192fe76aaf49e9ae1a948608ade8e291b53d54",
+  "device_id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "ok": true,
+ "public_key": "937a3780e0e294506b14edb5194bc96ecb2f0572626e27e901e9d48ebcd27f74"
+}

@@ -1,0 +1,14 @@
+$ RISC0_DEV_MODE=0 ~/skarbnik/bin/skarbnik-host prove ~/.skarbnik-vendor/teespike/fixed.wasm --proof0 --bounty teespike --exploit ~/.skarbnik-vendor/teespike/exploit.hex --original ~/skarbnik/data/demo/original.wasm --tests ~/skarbnik/data/demo/public_tests.txt --fuzz-count 16 --variants 32 --po2 18 --seed 822267b9ff4da3862cf52db512c24fe9d31580f049b025dce29c15daf33842de --out ~/skarbnik-vendor/teespike-work/p0.bin
+utc_start=2026-10-29T22:33:56Z
+limits: max_rss_mib=6144 min_avail_mib=300 max_seconds=43200
+salt: a new private salt for bounty teespike, kept in ~/.kintsugi-salts/ (never printed)
+error: No such file or directory (os error 2)
+exit=2
+wall_seconds=5.28
+r0vm_peak_rss_mib=0 (VmHWM, sampled every 5 s)
+min_available_mib=7355
+result: finished
+----
+  File "~/skarbnik/tools/skarbnik-vendor", line 144, in measured
+    raise RuntimeError(f'{os.path.basename(log)} did not finish: {(re.findall(r"^exit=.*", text, re.M) or ["no exit"])[-1]}, {(re.findall(r"^result: .*", text, re.M) or ["no result"])[-1]} {err}'.strip())
+RuntimeError: prove_p0.log did not finish: exit=2, result: finished error: No such file or directory (os error 2)

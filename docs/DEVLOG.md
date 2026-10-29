@@ -2,6 +2,19 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: Confidential proving spike, part 1: the checker sealed in a Phala CPU CVM
+
+- `tools/tee-spike/`: a sealed checker and prover (`container/server.py`: an X25519 key made in memory, a TDX quote
+  with sha256 of the key in report_data, the secret decrypted into RAM only, `skarbnik-check` and `skarbnik-host`
+  inside), the vendor side (`vendor.py`: dcap-qvl against Intel's certificates, Phala's verifier, the key binding, an
+  RTMR3 replay, the compose hash and image digest; then sealed requests), and `phala.py` (Phala REST API). Image
+  `ghcr.io/pgreyy/skarbnik-tee@sha256:9a425458...` (public), built and pushed from the VPS.
+- `tdx.small` CVM: deployed, running in about 65 s, all six checks passed on the third try (two bugs in our verifier
+  side: an async call, Docker DNS), PASS with the public demo secret and `fixed.wasm`, FAIL with a fresh private
+  secret and `wrong_fix.wasm`, deleted, CVM list empty. Cost $0.002725. docs/evidence/tee_spike/.
+- Part 2 (the prove step inside a 16 GB CVM) waits for the new test bounty's Proof 0 on the VPS (started 22:36 UTC;
+  the first start failed in 5 s, `r0vm` not on the PATH).
+
 ## 2026-10-29: README merged with the owner's proposal
 
 - From the proposal: the opening explanation and status line, "The problem", the five steps of "How it works", what the
