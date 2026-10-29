@@ -20,4 +20,5 @@
 | [DECISIONS.md](DECISIONS.md) | Every design decision with its date and reason |
 | [DEVLOG.md](DEVLOG.md) | The work log, one entry per work block |
 | [ROADMAP.md](ROADMAP.md) | Planned work |
+| [GPU_TEE.md](GPU_TEE.md) | Design: confidential proving in a GPU TEE (roadmap item 1) |
 | [../THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) | Files from other projects, with their sources, versions and licences |

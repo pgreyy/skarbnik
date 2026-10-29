@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: README rewritten
+
+- README.md in plain language, problem first: the problem, how it works, what the checker tests and what it doesn't, a
+  2 minute proof (bounty 24 the agent side, bounty 32 the vendor side with no human, a cheat refused on bounty 22, an
+  honest timeout, open a judge bounty yourself, verify the contract yourself), the screenshot strip, evidence with the
+  status of every bounty, cost and latency, trust assumptions (with the full access key and its reason), who would use
+  it first, the comparison with private CI, agents and vendors (AGENTS.md, the MCP server, `watch`), roadmap, run and
+  reproduce, built on, licence. Facts as read from the chain on 2026-10-29.
+- Roadmap item 1 is confidential proving in a GPU TEE, with a design note (docs/GPU_TEE.md); docs/ROADMAP.md reordered;
+  JUDGE_GUIDE.md points to the README's "Trust assumptions" and the design note. Every local link exists; every outside
+  link answered 200, the explorer's in a browser (it answers 403 to curl).
+
 ## 2026-10-29: No stage quoted as end to end
 
 - Bounty 24's text on the site (`web/data/bounty_meta.json`), docs/CLAIMS.md and docs/VENDOR.md said "under a minute"

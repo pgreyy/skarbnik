@@ -62,7 +62,7 @@
    "n": "6",
    "title": "Read what is not claimed",
    "time": "1 min",
-   "Do": "open <a href=\"#/evidence/limits\">https://skarbnik.xyz/#/evidence/limits</a> or the README's \"Honest limits\" (every limit: <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/CLAIMS.md\" target=\"_blank\" rel=\"noopener\">docs/CLAIMS.md</a>, \"Known limits\").",
+   "Do": "open <a href=\"#/evidence/limits\">https://skarbnik.xyz/#/evidence/limits</a> or the README's \"Trust assumptions\" (every limit: <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/CLAIMS.md\" target=\"_blank\" rel=\"noopener\">docs/CLAIMS.md</a>, \"Known limits\").",
    "Expect": "plain limits, among them: no external audit (only AI review passes), a full access key kept on purpose on the testnet contract (an experimental contract; the mainnet contract is planned without one), testnet only.",
    "Verify": "the access key with a <span class=\"mono\">view_access_key_list</span> call on <span class=\"mono\">kintsugi-l2-cihdp.testnet</span>, and the live code hash against the last deploy in <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/EVIDENCE.md\" target=\"_blank\" rel=\"noopener\">docs/EVIDENCE.md</a>, \"Contract code and every deploy\".",
    "What this proves": "the limits are published, and the full access key can be seen on chain.",
@@ -271,10 +271,10 @@
    "evidence": "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>"
   },
   {
-   "claim": "Proving inside sealed hardware (a TEE with attestation)",
+   "claim": "Confidential proving in a GPU TEE (attested hardware; the secret released only to an attested prover)",
    "label": "plan",
    "label_note": null,
-   "evidence": "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>"
+   "evidence": "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/GPU_TEE.md\" target=\"_blank\" rel=\"noopener\">docs/GPU_TEE.md</a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>, item 1"
   },
   {
    "claim": "Vendor liveness bond and fallback evaluator",
