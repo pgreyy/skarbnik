@@ -5,7 +5,7 @@ description = "Kintsugi bounty contract (S3: minimal bounty lifecycle)"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.93"
-repository = "https://github.com/pgreyy/farbox"
+repository = "https://github.com/pgreyy/skarbnik"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -20,3 +20,11 @@ near-sdk = { version = "5.29.1", features = ["unit-testing"] }
 [lints.rust.unexpected_cfgs]
 level = "warn"
 check-cfg = ['cfg(near)']
+
+# Reproducible build (`cargo near build reproducible-wasm`): the build runs in this pinned Docker image, from the
+# committed source, so anyone can rebuild the deployed wasm and get the same sha256 (docs/TRY_IT.md, docs/EVIDENCE.md).
+[package.metadata.near.reproducible_build]
+image = "sourcescan/cargo-near:0.22.0-rust-1.99.1"
+image_digest = "sha256:c9655eaf7436b90c87ea8b25739f91063032c5c30ba24cfeafe72c142943b5bb"
+passed_env = []
+container_build_command = ["cargo", "near", "build", "non-reproducible-wasm", "--locked"]
