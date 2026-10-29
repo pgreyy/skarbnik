@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-29: README merged with the owner's proposal
+
+- From the proposal: the opening explanation and status line, "The problem", the five steps of "How it works", what the
+  checker can't test (a SQL injection, a smart contract bug, a cloud misconfiguration), who might use it first with the
+  private CI comparison, who has used it so far (all team-run, 0 outside), the cost section (proving is one stage), and
+  Why NEAR. Kept from ours: the 2 minute proof (with a PASS and a FAIL on bounty 1), the screenshot strip, the status
+  table, the reproducible contract and its upgrade key line, agents and vendors, roadmap, reproduce, built on, licence.
+  Facts as checked on chain on 2026-10-29. Every local link exists; every outside link answered (the explorer's in a
+  browser).
+
 ## 2026-10-29: GPU TEE note cut to what it is
 
 - docs/GPU_TEE.md is now a short roadmap note: planned, not built, not tested; the idea, the open questions, and the
