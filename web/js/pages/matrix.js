@@ -1,6 +1,7 @@
 // The "who sees what" matrix, used on Home and on How it works: four parties (vendor, agent, public observer, NEAR
 // contract) and what each holds, sees, sees only as a hash, or cannot see. Pick a party and its column lights up and
-// the summary says what it knows and what it cannot do. Four states, four icons, four words: never colour alone.
+// the summary says what it knows and what it cannot do. Four states, four icons, four words: never colour alone. The
+// wrapper (.mech-c) is a size container: css/revamp.css fits the picker and all four columns to the matrix's own width.
 import { esc, icon } from '../ui.js';
 
 const P = [
@@ -21,7 +22,7 @@ const R = [
   ['Payout', [['sees', 'Funds it'], ['sees', 'Receives'], ['sees', 'Sees'], ['holds', 'Enforces']]],
 ];
 
-const html = (sel) => `<div class="mech">
+const html = (sel) => `<div class="mech-c"><div class="mech">
 <div>
 <div class="pick" role="group" aria-label="Choose a party">${P.map((p, i) => `<button class="pbtn" type="button" data-party="${i}" aria-pressed="${i === sel}"><span class="pico">${icon(p.icon)}</span><span><b class="h4" style="display:block">${esc(p.name)}</b><span class="small faint">${esc(p.role)}</span></span></button>`).join('')}</div>
 <div class="card" style="padding:24px;margin-top:16px;display:flex;flex-direction:column;gap:14px" aria-live="polite">
@@ -39,6 +40,7 @@ const html = (sel) => `<div class="mech">
 </table>
 </div>
 <div class="legend"><span><span class="cell t-holds" style="min-height:28px;padding:0 8px">${icon('key')} Holds</span> holds or produces it</span><span><span class="cell t-sees" style="min-height:28px;padding:0 8px">${icon('eye')} Sees</span> can read it</span><span><span class="cell t-hash" style="min-height:28px;padding:0 8px">${icon('hash')} Hash only</span> a fingerprint, not the thing</span><span><span class="cell t-hidden" style="min-height:28px;padding:0 8px">${icon('eyeoff')} Hidden</span> cannot see it</span></div>
+</div>
 </div>
 </div>`;
 
