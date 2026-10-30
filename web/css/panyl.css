@@ -460,9 +460,7 @@
 
 /* Page specific CSS for bounties */
 
-.sk :where(.p-bounties) .ph{padding:72px 0 56px;background:radial-gradient(800px 380px at 88% -10%,rgba(var(--am-rgb),.06),transparent 70%),var(--bg)}
 .sk :where(.p-bounties) .ph-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:64px;align-items:end}
-.sk :where(.p-bounties) .ph h1{font:var(--wd) clamp(40px,5cqw,68px)/1 var(--fd);letter-spacing:calc(-.03em * var(--trk))}
 .sk :where(.p-bounties) .key{padding:22px 24px;display:flex;flex-direction:column;gap:16px}
 .sk :where(.p-bounties) .key-row{display:grid;grid-template-columns:172px minmax(0,1fr);gap:14px;align-items:start}
 .sk :where(.p-bounties) .key-row .chip{justify-self:start}
@@ -505,7 +503,6 @@
  .sk :where(.p-bounties) .lbl{display:block}
 }
 @container sk (max-width:700px){
- .sk :where(.p-bounties) .ph{padding:48px 0 40px}
  .sk :where(.p-bounties) .key-row{grid-template-columns:minmax(0,1fr);gap:6px}
  .sk :where(.p-bounties) .strip{grid-template-columns:repeat(2,minmax(0,1fr))}
  .sk :where(.p-bounties) .strip>div:nth-child(2){border-right:0}
@@ -632,8 +629,6 @@
 
 /* Page specific CSS for judge */
 
-.sk :where(.p-judge) .ph{padding:72px 0 56px;background:radial-gradient(800px 380px at 88% -10%,rgba(var(--am-rgb),.06),transparent 70%),var(--bg)}
-.sk :where(.p-judge) .ph h1{font:var(--wd) clamp(40px,5cqw,68px)/1 var(--fd);letter-spacing:calc(-.03em * var(--trk));text-wrap:balance}
 .sk :where(.p-judge) .ph-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:64px;align-items:end}
 .sk :where(.p-judge) .lv{padding:22px 24px;display:grid;grid-template-columns:44px minmax(0,1fr);gap:16px}
 .sk :where(.p-judge) .h2s{font:var(--wd) clamp(28px,3cqw,40px)/1.1 var(--fd);letter-spacing:calc(-.02em * var(--trk));text-wrap:balance}
@@ -671,7 +666,6 @@
  .sk :where(.p-judge) .legend4{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @container sk (max-width:700px){
- .sk :where(.p-judge) .ph{padding:48px 0 40px}
  .sk :where(.p-judge) .step,.sk :where(.p-judge) .cmd{grid-template-columns:minmax(0,1fr);gap:14px;padding:22px 20px}
  .sk :where(.p-judge) .sn{flex-direction:row;align-items:baseline;gap:12px}
  .sk :where(.p-judge) .cmd-m,.sk :where(.p-judge) .legend4{grid-template-columns:minmax(0,1fr)}

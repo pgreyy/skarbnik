@@ -12,7 +12,7 @@ const pn = (s) => `<div class="pn"><div><b>${icon('check')} What this proves</b>
 export async function judge(viewEl, tab) {
   let g;
   try { g = await json('data/judge.json'); } catch (e) {
-    viewEl.innerHTML = `<main id="main" class="p-judge" tabindex="-1"><section class="ph"><div class="wrap"><h1>Judge guide</h1><p class="ferr" style="margin-top:20px">Could not read the guide: ${e.message}. It is JUDGE_GUIDE.md in the repository.</p></div></section></main>`;
+    viewEl.innerHTML = `<main id="main" class="p-judge" tabindex="-1"><section class="n-ph"><div class="wrap"><h1>Judge guide</h1><p class="ferr" style="margin-top:20px">Could not read the guide: ${e.message}. It is JUDGE_GUIDE.md in the repository.</p></div></section></main>`;
     return;
   }
   const steps = g.a.map((s) => `<div class="card step"><div class="sn"><b>${s.n}</b><span>${s.time}</span></div><div><h3 class="h3" style="margin-bottom:18px">${s.title}</h3><div class="dev">
@@ -24,7 +24,7 @@ export async function judge(viewEl, tab) {
   const head = '<div class="lhead l3" aria-hidden="true"><span>Claim</span><span>Label</span><span>Evidence</span></div>';
   const count = (k) => g.claims.filter((c) => c.label === k).length;
   viewEl.innerHTML = `<main id="main" class="p-judge" tabindex="-1">
-<section class="ph"><div class="wrap"><div class="ph-grid">
+<section class="n-ph"><div class="wrap"><div class="ph-grid">
 <div style="display:flex;flex-direction:column;gap:24px;max-width:660px">
 <p class="eyebrow">Judge guide</p>
 <h1>Check the claims yourself in ten minutes</h1>

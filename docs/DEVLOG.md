@@ -2,6 +2,19 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-30: One page header size on How it works, Judge guide and Bounties
+
+- How it works, Judge guide and Bounties now use the same page header block as For vendors, For agents and Proof and
+  evidence (`.n-ph` in `web/css/revamp.css`): title 55.8 px at 1440 wide and 30.6 px at 390, line height 1.06, padding
+  80/56 px (52/40 px at 700 px and below), 24 px between eyebrow, title, intro and buttons, and the same background glow.
+  How it works lost its own inline title size (76 px at 1440) and its text column is 820 px like For vendors. Judge
+  guide and Bounties keep their side cards, so their text columns stay narrower. The old one off header rules for these
+  three pages are removed from `web/css/panyl.css` and `web/css/site.css`. Saved pages regenerated
+  (`node scripts/snapshot_pages.mjs`).
+- Checked in a headless Chromium at 1440, 1100 and 390 wide, dark and light: on all four pages the title font, size,
+  line height and tracking, the padding, the gap, the eyebrow position (80 px from the section top, 52 px on phones) and
+  the intro size are identical; no sideways scroll, nothing past the right edge, no script errors.
+
 ## 2026-10-30: Tab icon follows light and dark
 
 - `web/favicon.svg` carries both colour sets: the colours of `img/vinyl-mark-light.svg` by default and those of

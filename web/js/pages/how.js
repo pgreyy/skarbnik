@@ -30,11 +30,10 @@ export async function how(viewEl) {
   const st = { step: 0, lens: 'agent', phase: 'commit', path: 'proof', tech: false, playing: false };
   let timer = null, tick = 0;
   viewEl.innerHTML = `<main id="main" class="p-how" tabindex="-1">
-<section style="background:radial-gradient(900px 400px at 85% 0%,rgba(var(--am-rgb),.06),transparent 70%),var(--bg)">
-<div class="wrap ihd">
-<div style="display:flex;flex-direction:column;gap:22px;max-width:860px">
+<section class="n-ph"><div class="wrap">
+<div style="max-width:820px;display:flex;flex-direction:column;gap:24px">
 <p class="eyebrow">How it works</p>
-<h1 class="h1" style="font-size:clamp(40px,5.4cqw,76px)">Inside a private repair challenge</h1>
+<h1>Inside a private repair challenge</h1>
 <p class="lead">Four short scenes and a timeout branch, about a minute. Press play, or click through at your own pace. The scenes match the five stages on the Home page: stage 1 is The secret, stage 2 The agent, stages 3 and 4 The proof, stage 5 The contract. Everything shown is also written out below.</p>
 <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><button class="btn btn-p" type="button" data-play></button><a class="lnk" href="#/bounties">Skip this, browse open bounties ${icon('right')}</a></div>
 <p class="small faint">An illustrative walkthrough. It is not connected to the contract. Real bounties are on the <a class="lnk" href="#/bounties">Bounties</a> page.</p>

@@ -242,8 +242,6 @@ body.sk>main{flex:1 0 auto}
 }
 @media (prefers-reduced-motion:reduce){.sk[data-lay="cdock"] .lay-body{transition:none}}
 /* How it works: the page header around the eyebrow, heading and lead */
-.sk :where(.p-how) .ihd{padding-top:72px;padding-bottom:40px}
-@container sk (max-width:700px){.sk :where(.p-how) .ihd{padding-top:48px;padding-bottom:40px}}
 /* The header's content spans the same width as the Home Console frame, on every page (desktop and tablet) */
 @container sk (min-width:701px){.sk .nav .wrap.nav-in{max-width:none;width:min(1480px,calc(100% - 48px));padding:0}}
 @container sk (min-width:701px) and (max-width:1000px){.sk .nav .wrap.nav-in{width:calc(100% - 20px)}}
@@ -265,7 +263,7 @@ body.sk>main{flex:1 0 auto}
 .sk :where(.p-judge) .cmd-m.m3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .sk :where(.p-judge) .bshow{font-size:calc(20px * var(--hs,1));line-height:1.4}
 .sk :where(.p-judge) .bshow .mono,.sk :where(.p-judge) .cev .mono,.sk :where(.p-judge) .dev .mono,.sk :where(.p-judge) .pn .mono,.sk :where(.p-judge) .cmd-m .mono{overflow-wrap:anywhere}
-.sk :where(.p-judge) .dev a,.sk :where(.p-judge) .cev a,.sk :where(.p-judge) .cmd-m a,.sk :where(.p-judge) .ph a{overflow-wrap:anywhere}
+.sk :where(.p-judge) .dev a,.sk :where(.p-judge) .cev a,.sk :where(.p-judge) .cmd-m a,.sk :where(.p-judge) .n-ph a{overflow-wrap:anywhere}
 .sk :where(.p-judge) .lrow.l3,.sk :where(.p-judge) .lhead.l3{grid-template-columns:minmax(0,1.4fr) 150px minmax(0,1.6fr)}
 @container sk (max-width:1100px){.sk :where(.p-judge) .lrow.l3{grid-template-columns:minmax(0,1fr)}}
 @container sk (max-width:700px){.sk :where(.p-judge) .pn,.sk :where(.p-judge) .cmd-m.m3{grid-template-columns:minmax(0,1fr)}}

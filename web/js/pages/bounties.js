@@ -39,7 +39,7 @@ function evidenceOf(x, rec) {
 
 export async function bounties(viewEl) {
   viewEl.innerHTML = `<main id="main" class="p-bounties" tabindex="-1">
-<section class="ph">
+<section class="n-ph">
 <div class="wrap ph-grid">
 <div style="display:flex;flex-direction:column;gap:24px;max-width:640px">
 <p class="eyebrow">Bounties on NEAR testnet</p>
