@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Builds web/data/judge.json, the data of the site's Judge guide page, from JUDGE_GUIDE.md, which is the source: the
-# intro, the Level A steps (Do, Expect, Verify, What this proves, What it does not prove), the Level B table and the
+# intro, the Level A steps (Do, Expect, Verify, What this proves, What this does not prove), the Level B table and the
 # three lines of each Level B step, the notes under Level B, and every claim with its label (and an optional note in
 # brackets, such as "Planned (mainnet)") and its evidence. Inline
 # Markdown (code, bold, links, bare addresses) becomes HTML; links to skarbnik.xyz become routes on the site, links to
@@ -14,8 +14,8 @@ import sys
 SRC, OUT = 'JUDGE_GUIDE.md', 'web/data/judge.json'
 REPO = 'https://github.com/pgreyy/skarbnik/blob/main/'
 LABELS = {'Implemented': 'impl', 'Demonstrated': 'demo', 'Experimental': 'exp', 'Planned': 'plan', 'Not claimed': 'none'}
-A_FIELDS = ['Do', 'Expect', 'Verify', 'What this proves', 'What it does not prove']
-B_FIELDS = ['Expect', 'What this proves', 'What it does not prove']
+A_FIELDS = ['Do', 'Expect', 'Verify', 'What this proves', 'What this does not prove']
+B_FIELDS = ['Expect', 'What this proves', 'What this does not prove']
 
 
 def href(url):

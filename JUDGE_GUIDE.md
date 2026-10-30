@@ -1,6 +1,7 @@
 # Judge guide
 
-Check Skarbnik yourself: do something, expect a result, verify it against the chain, not against this page. Level A
+Check the claims yourself in ten minutes. Each step says what to do, what you should see, and how to verify it on your
+own, against the chain and not against this page. Under every step is what it proves and what it does not. Level A
 needs only a browser (5 to 10 minutes, no install). Level B is optional and reproduces things on your machine. The same
 guide is on the site: https://skarbnik.xyz/#/judge
 
@@ -9,16 +10,18 @@ never see the secret input. Demo bounties use a public input so anyone can check
 
 ## Level A: evidence tour (5 to 10 minutes, no install)
 
-Each step: **Do**, **Expect**, **Verify**, then **What this proves** and **What it does not prove**. Transaction links
-open the testnet explorer.
+Six steps. Each has the same five parts: **Do**, **Expect**, **Verify**, **What this proves** and **What this does not
+prove**. The real transactions are linked, so you can check every result on the chain and not on this page.
 
 1. **Find the contract** (1 min)
    - Do: open https://testnet.nearblocks.io/address/kintsugi-l2-cihdp.testnet
-   - Expect: a testnet account with a deployed contract and a code hash.
-   - Verify: the code hash equals the one the site reads live on https://skarbnik.xyz/#/evidence/contract
-   - What this proves: the contract the documents name is deployed on testnet, and the site reads that contract.
-   - What it does not prove: that the deployed code is built from this repository; the contract build is not
-     reproducible yet.
+   - Expect: a testnet account with a deployed contract and this code hash: `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u`.
+   - Verify: the same code hash appears on the site's Evidence page, Contract tab, read live:
+     https://skarbnik.xyz/#/evidence/contract
+   - What this proves: the contract is real, deployed on NEAR testnet, and the site reads that contract. B8 rebuilds
+     the same code hash from the published commit.
+   - What this does not prove: that the code has no bugs, or that anyone audited it. It has not been externally
+     audited.
 
 2. **See both sides work: bounty 24 (an AI agent) and bounty 32 (the vendor, with no human)** (3 min)
    - Do: open bounty 24's three calls in order: commit
@@ -27,17 +30,17 @@ open the testnet explorer.
      [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR). Then bounty 32's
      reveal [`HCjck1DL…`](https://testnet.nearblocks.io/txns/HCjck1DLb5GS4YcRWH3oozJ9gm2EhJejkHyVrcJJQN4L) and proof
      [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y).
-   - Expect: on bounty 24, a commit holding only a fingerprint, a reveal that publishes the patch, then a
-     `submit_groth16` call that pays 0.11 NEAR (the 0.1 NEAR reward and the agent's own 0.01 NEAR fee back). On bounty
-     32, a `submit_groth16` sent by the vendor's prover account 17 minutes after the reveal, with no human between them.
+   - Expect: on bounty 24, a commit that holds only a fingerprint, a reveal that publishes the patch, then a
+     `submit_groth16` call that pays 0.11 NEAR (the 0.1 NEAR reward plus the agent's own 0.01 NEAR fee back). On bounty
+     32, a `submit_groth16` sent by the vendor's prover account 17 minutes after the reveal, with no one at the keyboard.
    - Verify: https://skarbnik.xyz/#/bounties/24 shows "Proof verified" and "Private secret"; the program
      (`data/smooth/`) is public, its secret input and reference fix are not in the repository
      ([docs/EVIDENCE.md](docs/EVIDENCE.md), "Bounty 24", including how it was checked that the agent could not see the
      reference fix). https://skarbnik.xyz/#/bounties/32 shows "Proof verified"; the vendor's `watch` log, with each
      step's time, the rented GPU and its cost, is in [docs/EVIDENCE.md](docs/EVIDENCE.md), "The vendor tool".
-   - What this proves: the contract paid each attempt only after checking a Groth16 proof that says PASS for that
-     patch, under the published checker; and the vendor side (prove on a rented GPU, wrap, submit) runs on its own.
-   - What it does not prove: that the patch is secure beyond this checker's tests; that nothing could have read the
+   - What this proves: the contract checks a proof itself and pays only when the proof says PASS for that patch, under
+     the published checker; and the vendor side (prove on a rented GPU, wrap, submit) runs by itself.
+   - What this does not prove: that the patch is secure beyond this checker's tests; that nothing could have read the
      private folder (bounty 24's agent ran on the same machine, as the same user); more than a few runs; bounty 32 uses
      the public demo program, so its fix was known.
 
@@ -45,43 +48,47 @@ open the testnet explorer.
    - Do: open bounty 16's proof
      [`5NH9rhRM…`](https://testnet.nearblocks.io/txns/5NH9rhRMdLxRtKBtjxAsqQwFWejtu2tU9oNf69G2yUq9) and bounty 17's
      claim [`BLcWs7dp…`](https://testnet.nearblocks.io/txns/BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh).
-   - Expect: bounty 16 paid by a proof on the public demo bug; bounty 17 paid by `claim_timeout`, with no
-     `submit_groth16` for its attempt.
+   - Expect: bounty 16 paid by a proof on the public demo bug; bounty 17 paid by a `claim_timeout` call, a Paid by
+     timeout label, and no `submit_groth16` call for its attempt.
    - Verify: https://skarbnik.xyz/#/bounties/17 says "Timeout settlement" and "Why this is not “Proof verified”": the
      laptop proof was too slow for the 4 hour window. Bounty 24 was the same kind of task, proven on a GPU instead.
-   - What this proves: proof-checked and timeout payouts are kept apart, and a silent vendor does not block payment.
-   - What it does not prove: that bounty 17's fix passed; the timeout pays without any verdict.
+   - What this proves: a silent vendor cannot block payment, and a timeout is shown as a timeout, apart from payments
+     by proof.
+   - What this does not prove: that bounty 17's patch passed. No proof was checked for that attempt.
 
 4. **See a proof pay and a proof fail on the same bounty** (2 min)
    - Do: open bounty 1's PASS
      [`CczggiUN…`](https://testnet.nearblocks.io/txns/CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY) and FAIL
      [`6B9ocDas…`](https://testnet.nearblocks.io/txns/6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca).
-   - Expect: two `submit_groth16` calls of about 36 Tgas; only the PASS moves NEAR.
-   - Verify: they are different attempts on the same bounty.
+   - Expect: two `submit_groth16` calls of about 36 Tgas. Only the PASS moves NEAR; the FAIL pays nothing.
+   - Verify: the two calls are different attempts on the same bounty, and only the PASS paid.
    - What this proves: the contract applies the verdict inside the proof: a PASS pays, a FAIL spends the attempt.
-   - What it does not prove: that every forged proof is refused; the attacks tried are listed in
+   - What this does not prove: that every forged proof is refused; the attacks tried are listed in
      [docs/SECURITY.md](docs/SECURITY.md#2-attacks-we-tried).
 
 5. **Compare the checker id** (1 min)
    - Do: read the allowlist with any view call to `get_allowed_image_ids` (or [docs/TRY_IT.md](docs/TRY_IT.md), step 2).
    - Expect: exactly one id, `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc`.
    - Verify: it equals the image id inside bounty 24's proof (the site's Checker tab; Level B rebuilds it from source).
-   - What this proves: new bounties can only use this one checker, and bounty 24 was decided by it.
-   - What it does not prove: that the id is built from this source (B5 shows that) or that the checker has no bugs.
+   - What this proves: only this one approved checker can open or settle a new bounty, and bounty 24 was decided by it.
+   - What this does not prove: that the id is built from this source (B5 shows that) or that the checker itself is free
+     of bugs.
 
 6. **Read what is not claimed** (1 min)
    - Do: open https://skarbnik.xyz/#/evidence/limits or the README's "Trust assumptions" (every limit: [docs/CLAIMS.md](docs/CLAIMS.md), "Known limits").
-   - Expect: plain limits, among them: no external audit (only AI review passes), a full access key kept on purpose on
-     the testnet contract (an experimental contract; the mainnet contract is planned without one), testnet only.
+   - Expect: twelve limits in plain words on the site, among them: no external audit (only AI review passes), a full
+     access key kept on purpose on the testnet contract (an experimental contract; the mainnet contract is planned
+     without one), testnet only.
    - Verify: the access key with a `view_access_key_list` call on `kintsugi-l2-cihdp.testnet`, and the live code hash
      against the last deploy in [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy".
-   - What this proves: the limits are published, and the full access key can be seen on chain.
-   - What it does not prove: that the list is complete; no one outside the project has audited the contract.
+   - What this proves: the known limits are published, not hidden, and the full access key can be seen on chain.
+   - What this does not prove: that no other limits exist. It lists the ones found so far; no one outside the project
+     has audited the contract.
 
 ## Level B: reproduce (optional)
 
-Commands run from the root of a clone of the repository. The judge bounties for B2 and B3 are 27 to 31 (K = 2, at most
-1 attempt per account, 41 h verdict window); 18 to 22 are retired. What each step needs:
+Commands run from the root of a clone of the repository. The judge bounties still to open, for B2 and B3, are 28 to 31 (27
+is used; K = 2, at most 1 attempt per account, 41 h verdict window); 18 to 22 are retired. What each step needs:
 
 | Step | What it shows | Needs | Download | Memory |
 | --- | --- | --- | --- | --- |
@@ -97,29 +104,29 @@ Commands run from the root of a clone of the repository. The judge bounties for 
 Each Level B step, in three lines:
 
 - **B1.** Expect: bounty 7 is Level 2, open and opened by its Proof 0; the allowlist prints MATCH; the judge bounties
-  show opened or closed. What this proves: the chain holds what the documents say. What it does not prove: anything
+  show opened or closed. What this proves: the chain holds what the documents say. What this does not prove: anything
   about a proof.
 - **B2.** Expect: the return value `"opened"`, a `bounty_opened` event naming your account, about 35 Tgas. What this
-  proves: any account can make the contract check a real Groth16 proof on chain. What it does not prove: anything
+  proves: any account can make the contract check a real Groth16 proof on chain. What this does not prove: anything
   about attempts; it reuses bounty 17's Proof 0.
 - **B3.** Expect: "the Groth16 proof does not verify for this bounty's image id and this journal", about 34.9 Tgas.
-  What this proves: a wrong seal is refused by the pairing check itself, after every cheaper check passed. What it
+  What this proves: a wrong seal is refused by the pairing check itself, after every cheaper check passed. What this
   does not prove: that every other kind of forgery is refused (see the attacks in docs/SECURITY.md).
 - **B4.** Expect: `135 passed; 0 failed`. What this proves: the contract's rules behave as the tests say, including
-  bounty 1's two real proofs checked natively. What it does not prove: behaviour on chain (B2 and B3 show that); the
+  bounty 1's two real proofs checked natively. What this does not prove: behaviour on chain (B2 and B3 show that); the
   tests were written by the same team.
 - **B5.** Expect: `MATCH` on the last line. What this proves: the checker id on chain is built from this source. What
-  it does not prove: that the checker is free of bugs or that its checks are enough.
+  this does not prove: that the checker is free of bugs or that its checks are enough.
 - **B6.** Expect: `VALID`, and a journal sha256 equal to bounty 17's `proof0_journal_hash` on chain. What this proves:
   the stored proof verifies on your machine for the published id, and its journal is the one recorded on chain. What
-  it does not prove: anything about the secret input or about later attempts.
+  this does not prove: anything about the secret input or about later attempts.
 - **B7.** Expect: 11 of 11 checks pass, and nothing is sent. What this proves: the agent refuses a key not limited to
-  commit and reveal, overspending, and a fix that reads files or the environment. What it does not prove: that a model
+  commit and reveal, overspending, and a fix that reads files or the environment. What this does not prove: that a model
   writes good fixes.
 - **B8.** Expect: sha256 `ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e`, whose base58 form
   `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u` equals the contract's code hash on chain. What this proves: the code
   running on chain is built from the published commit `c74bd5c`, so reading that source is reading the contract. What
-  it does not prove: that the source is free of bugs, or that the owner will not deploy other code later (the testnet
+  this does not prove: that the source is free of bugs, or that the owner will not deploy other code later (the testnet
   contract keeps its full access key on purpose; every deploy is listed in docs/EVIDENCE.md).
 
 Expected results are written next to each command in [docs/TRY_IT.md](docs/TRY_IT.md), with the run that produced them in

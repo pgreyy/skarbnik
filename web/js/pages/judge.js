@@ -1,13 +1,13 @@
 // Judge guide: the same guide as JUDGE_GUIDE.md, read from data/judge.json (made from it by scripts/gen_judge_data.py),
 // so the page and the file never differ. Three tabs. Level A, the evidence tour: six steps, each with Do, Expect,
-// Verify, What this proves and What it does not prove. Level B, local reproduction: eight steps, each with what it
+// Verify, What this proves and What this does not prove. Level B, local reproduction: eight steps, each with what it
 // shows, what it needs, its download and memory, and the same three lines. Claims and evidence: every claim with its
 // one label (Implemented, Demonstrated, Experimental, Planned, Not claimed) and its evidence, filterable.
 import { $, icon, note, tabbed, seg, bindSeg } from '../ui.js';
 
 const json = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`); return r.json(); });
 const CL = { impl: ['l-impl', 'Implemented'], demo: ['l-demo', 'Demonstrated'], exp: ['l-exp', 'Experimental'], plan: ['l-plan', 'Planned'], none: ['k-fail', 'Not claimed'] };
-const pn = (s) => `<div class="pn"><div><b>${icon('check')} What this proves</b><p>${s['What this proves']}</p></div><div><b>${icon('x')} What it does not prove</b><p>${s['What it does not prove']}</p></div></div>`;
+const pn = (s) => `<div class="pn"><div><b>${icon('check')} What this proves</b><p>${s['What this proves']}</p></div><div><b>${icon('x')} What this does not prove</b><p>${s['What this does not prove']}</p></div></div>`;
 
 export async function judge(viewEl, tab) {
   let g;
@@ -27,12 +27,12 @@ export async function judge(viewEl, tab) {
 <section class="ph"><div class="wrap"><div class="ph-grid">
 <div style="display:flex;flex-direction:column;gap:24px;max-width:660px">
 <p class="eyebrow">Judge guide</p>
-<h1>Check it in ten minutes</h1>
+<h1>Check the claims yourself in ten minutes</h1>
 ${g.intro.map((p, i) => `<p class="${i ? 'body' : 'lead'}">${p}</p>`).join('')}
 </div>
 <div style="display:flex;flex-direction:column;gap:14px">
 <div class="card lv"><span class="vico">${icon('eye')}</span><div><b class="h4">Level A, evidence tour</b><p class="small" style="margin-top:4px">5 to 10 minutes. A browser and the explorer. No install.</p></div></div>
-<div class="card lv"><span class="vico">${icon('term')}</span><div><b class="h4">Level B, local reproduction</b><p class="small" style="margin-top:4px">Optional. From a clone of the repository: <a href="https://github.com/pgreyy/skarbnik" target="_blank" rel="noopener">github.com/pgreyy/skarbnik</a>.</p></div></div>
+<div class="card lv"><span class="vico">${icon('term')}</span><div><b class="h4">Level B, local reproduction</b><p class="small" style="margin-top:4px">Optional. Docker and Rust, from a clone of the repository: <a href="https://github.com/pgreyy/skarbnik" target="_blank" rel="noopener">github.com/pgreyy/skarbnik</a>.</p></div></div>
 </div></div></div></section>
 <section style="padding:0 0 112px"><div class="wrap" id="jtabs"></div></section></main>`;
   tabbed($('#jtabs'), [

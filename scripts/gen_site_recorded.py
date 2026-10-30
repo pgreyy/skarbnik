@@ -267,7 +267,7 @@ out["test_bounties"]["32"] = "Test bounty: made for the vendor tool's end to end
 if ARENA_BOUNTY:
     out["test_bounties"][ARENA_BOUNTY] = "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
 out["judge_bounties"] = {str(j): "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself." for j in JUDGE_IDS}
-out["judge_bounties"].update({str(j): "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties " + (f"{JUDGE_IDS_2[0]} to {JUDGE_IDS_2[-1]}" if JUDGE_IDS_2 else "of round 2") + " instead. After its expiry anyone can call expire, which refunds the vendor." for j in JUDGE_IDS})
+out["judge_bounties"].update({str(j): "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use a judge bounty still to open instead: " + (f"{JUDGE_IDS_2[1]} to {JUDGE_IDS_2[-1]} ({JUDGE_IDS_2[0]} is used)" if len(JUDGE_IDS_2) > 1 else "one of round 2") + ". After its expiry anyone can call expire, which refunds the vendor." for j in JUDGE_IDS})
 out["judge_bounties"].update({str(j): "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU." for j in JUDGE_IDS_2})
 out["retired_judge_bounties"] = [str(j) for j in JUDGE_IDS]
 

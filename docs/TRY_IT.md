@@ -44,7 +44,8 @@ toolchain. Steps 9 and 10 are optional and need Docker.
    See: `['dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc'] MATCH`.
 
 3. **See which judge bounties are still closed.** Judge bounties 27 to 31 have the same hashes as private bounty 17 and
-   were created closed, so anyone can open one with a real proof (step 5). Each can be opened once. They take K = 2
+   were created closed, so anyone can open one with a real proof (step 5). Each can be opened once; 27 is used, so the
+   ones still to open are 28 to 31. They take K = 2
    attempts, at most 1 per account, with a 41 hour verdict window; the vendor's watch proves their attempts on a rented
    GPU. Judge bounties 18 to 22 (round 1) are retired: they stay on chain for the record.
 
