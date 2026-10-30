@@ -1,14 +1,16 @@
-// Evidence: five tabs. Ledger: every settled bounty, paid by proof or by timeout (kept apart), with its transactions,
+// Evidence: first four real examples (bounty 24 paid by proof, 32 paid by proof by the vendor's watch, 17 paid by
+// timeout, 33 paid by proof with its prove step inside sealed hardware), the team run note with the bounties paid by
+// a proof read live, then the technical record in five tabs. Ledger: every settled bounty, paid by proof or by timeout (kept apart), with its transactions,
 // then the Proof Ledger read live from the chain (paid accounts, earnings, the numbers, vendors; rules in
 // js/ledger-core.js, the same as ledger.json). Checker: the approved image id, the rebuild command (shown only after
 // scripts/check_image_id.sh printed MATCH) and what the checker runs. Contract: the deployment read live (code hash,
-// owner, fee pool, full access keys), what was tested, refused attacks, who may call what, where every fee goes.
+// owner, fee pool, full access keys), how to verify the build yourself, what was tested, refused attacks, who may call what, where every fee goes.
 // Security Lab: how much repeated attempts can learn, the recorded probe run, and the guarded (real, testnet) vs
 // unguarded (simulated) recording. Limits: what is not claimed. Then the status vocabulary.
 import { CONTRACT, RPCS, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, near, submissions, accessKeys } from '../chain.js';
-import { $, esc, icon, chip, tx, acct, hashCell, table, note, cmd, tabbed, seg, bindSeg } from '../ui.js';
+import { $, esc, icon, chip, tx, acct, hashCell, table, note, cmd, facts, tabbed, seg, bindSeg } from '../ui.js';
 import { STATUS } from '../status.js';
-import { loadAll, fromFeed, getRecorded, getMeta, getNumbers, txsOf } from '../data.js';
+import { loadAll, fromFeed, getRecorded, getMeta, getNumbers, txsOf, paidByProof } from '../data.js';
 import { buildLedger } from '../ledger-core.js';
 import { hex } from '../attempt.js';
 
@@ -40,24 +42,47 @@ const LIMITS = (live) => [
   ['wallet', '', 'Wallets are mostly untested', 'NEAR CLI was clicked through to real transactions. The other wallets were only loaded, not signed in.'],
 ];
 
+const GH = 'https://github.com/pgreyy/skarbnik';
+const kv = (rows) => `<div class="n-kv">${rows.map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}</div>`;
+const proofChip = chip('k-proof', 'Paid by proof', 'check');
+// The four examples: fixed facts of settled bounties (docs/CLAIMS.md, docs/evidence/), each with its deciding transaction.
+const EXAMPLES = () => `<div class="n-ex3 n-ex4" style="margin-top:0">
+<article class="card n-ex"><div style="display:flex;flex-wrap:wrap;gap:8px">${proofChip}</div><p class="eyebrow" style="color:var(--tx3)">Bounty 24</p><h3 class="h3">Private repair, paid by proof</h3>
+<p class="body">A private secret and a new bug, a division by zero. An AI agent wrote the fix. The vendor proved it on a rented GPU, and the contract checked the proof and paid.</p>
+${kv([['Reward', '0.11 NEAR'], ['Verdict after reveal', '6 h 10 min'], ['Proving', 'Rented GPU, run by hand']])}
+<div class="txs">${tx('9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR', 'Proof and payment')}<a class="lnk sm" href="#/bounties/24">Bounty 24 ${icon('right')}</a></div></article>
+<article class="card n-ex"><div style="display:flex;flex-wrap:wrap;gap:8px">${proofChip}${chip('k-test', 'Public demo program', 'flask')}</div><p class="eyebrow" style="color:var(--tx3)">Bounty 32</p><h3 class="h3">Automatic vendor proving</h3>
+<p class="body">The vendor tool watched the bounty, proved the revealed patch and sent the proof with no one at the keyboard. The program is the public demo. The secret was private, made on the vendor’s server.</p>
+${kv([['Reveal to verdict', '17 min 8 s'], ['Proving', 'Automatic, skarbnik-vendor watch']])}
+<div class="txs">${tx('9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y', 'Proof and payment')}<a class="lnk sm" href="#/bounties/32">Bounty 32 ${icon('right')}</a></div></article>
+<article class="card n-ex"><div style="display:flex;flex-wrap:wrap;gap:8px">${chip('k-timeout', 'Paid by timeout', 'hourglass')}</div><p class="eyebrow" style="color:var(--tx3)">Bounty 17</p><h3 class="h3">Timeout settlement, not a PASS</h3>
+<p class="body">The vendor’s proof finished after the 4 hour window, so the contract paid by the timeout rule. No proof was checked. This is not a proven pass.</p>
+${kv([['What it shows', 'The timeout rule works'], ['Proof checked', 'No']])}
+<div class="txs">${tx('BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh', 'Timeout claim')}<a class="lnk sm" href="#/bounties/17">Bounty 17 ${icon('right')}</a></div></article>
+<article class="card n-ex"><div style="display:flex;flex-wrap:wrap;gap:8px">${proofChip}${chip('k-test', 'Team run test', 'flask')}</div><p class="eyebrow" style="color:var(--tx3)">Bounty 33</p><h3 class="h3">Proved inside sealed hardware (Phala TEE, Intel TDX)</h3>
+<p class="body">The prove step of one attempt ran inside a confidential VM on Phala Cloud that held the secret in memory only. The receipt came out, the VM was deleted, and the contract checked the Groth16 proof and paid. One test of the planned managed proving, not a service yet.</p>
+${kv([['Reveal to payout', '2 h 10 min'], ['Sealed compute', 'About $0.84'], ['Proving', 'Intel TDX confidential VM, CPU']])}
+<div class="txs">${tx('Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS', 'Proof and payment')}<a class="lnk sm" href="${GH}/tree/main/docs/evidence/tee_spike" target="_blank" rel="noopener">docs/evidence/tee_spike/ ${icon('ext')}</a><a class="lnk sm" href="${GH}/blob/main/docs/CONFIDENTIAL_PROVING.md" target="_blank" rel="noopener">docs/CONFIDENTIAL_PROVING.md ${icon('ext')}</a></div></article>
+</div>`;
+
 const VOCAB = ['Proof verified', 'Proof rejected', 'Awaiting evaluation', 'Timeout settlement', 'Refunded', 'Failed', 'Demo or test only', 'Open for attempts', 'Waiting for Proof 0'];
 
 export async function evidence(viewEl, tab) {
   viewEl.innerHTML = `<main id="main" class="p-evidence" tabindex="-1">
-<section class="ph"><div class="wrap"><div class="ph-grid">
-<div style="display:flex;flex-direction:column;gap:24px;max-width:640px">
-<p class="eyebrow">Evidence</p>
-<h1>Built for verification</h1>
-<p class="lead">Every claim here points to a transaction, a file or a command. Where something is not proven, the label says so.</p>
-<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/judge">Take the judge tour ${icon('right')}</a><a class="lnk" href="#vocab" id="vocabLink">What the status labels mean</a></div>
-</div>
-<div class="card" style="padding:24px 26px;display:flex;flex-direction:column;gap:14px">
-<p class="eyebrow" style="color:var(--tx3)">Contract on NEAR testnet</p>
-<a class="tx" style="align-self:flex-start" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">${esc(CONTRACT)} ${icon('ext')}</a>
-<p class="small" id="ctSum">Reading the contract…</p>
-</div>
+<section class="n-ph"><div class="wrap">
+<div style="max-width:820px;display:flex;flex-direction:column;gap:24px">
+<p class="eyebrow">Proof &amp; evidence</p>
+<h1>Read the real examples first. Then check the record.</h1>
+<p class="lead">Every claim here points to a transaction, a file or a command. Where something is not proven, the label says so. The examples below show the outcomes a bounty can have.</p>
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/judge">Take the judge tour ${icon('right')}</a><a class="lnk" href="#deeper" id="deeperLink">Go to the technical record</a><a class="lnk" href="#vocab" id="vocabLink">What the status labels mean</a></div>
 </div></div></section>
 <section style="padding:0 0 112px"><div class="wrap">
+${EXAMPLES()}
+<div class="note" style="margin-top:28px">${icon('info')}<p>These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside customers. <span id="paidSoFar">Paid by proof so far: reading the contract…</span></p></div>
+<div class="note" style="margin-top:16px">${icon('info')}<p><b style="color:var(--tx)">What these show:</b> the path works on testnet. <b style="color:var(--tx)">What they do not show:</b> that every bug can be handled, that the system is production ready, or that an external audit has happened.</p></div>
+<h2 class="n-h2" id="deeper" tabindex="-1" style="margin-top:72px">The technical record</h2>
+<p class="lead" style="margin-top:14px;max-width:720px">On chain transactions, the commit and reveal lifecycle, proof checks, the checker fingerprint, failed proofs, the settlement ledger and the known limits. Use the tabs below.</p>
+<p class="small" id="ctSum" style="margin:14px 0 32px">Reading the contract…</p>
 <div class="nums" role="list" aria-label="Key numbers" id="nums"><div role="listitem"><b>…</b><span>Reading from testnet</span></div></div>
 <div style="margin-top:56px" id="etabs"></div>
 <div id="vocab" style="margin-top:104px">
@@ -69,6 +94,10 @@ export async function evidence(viewEl, tab) {
 </div></div>
 </div></section></main>`;
   $('#vocabLink').addEventListener('click', (e) => { e.preventDefault(); $('#vocab').scrollIntoView(); });
+  $('#deeperLink').addEventListener('click', (e) => { e.preventDefault(); $('#deeper').scrollIntoView(); $('#deeper').focus({ preventScroll: true }); });
+  // the bounties paid by a checked proof, read live from the contract (the ledger decides the list)
+  paidByProof().then((ids) => { const el = $('#paidSoFar'); if (el) el.textContent = ids.length ? `Paid by proof so far, read live from the contract: bounties ${ids.length > 1 ? `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}` : ids[0]}.` : 'No bounty has been paid by proof yet.'; })
+    .catch(() => { const el = $('#paidSoFar'); if (el) el.textContent = 'The list of bounties paid by proof could not be read just now; the ledger below has it.'; });
   let all, rec, meta, nums, snapshot = null;
   try { [rec, meta, nums] = await Promise.all([getRecorded(), getMeta(), getNumbers()]); } catch (e) {
     if ($('#etabs')) $('#etabs').innerHTML = note(`Could not load the site's data: ${esc(e.message)}. Reload to try again.`, 'alert'); return;
@@ -82,10 +111,10 @@ export async function evidence(viewEl, tab) {
   if (!$('#etabs')) return;
   const nProof = all.filter((x) => x.status === 'Proof verified').length, nTime = all.filter((x) => x.status === 'Timeout settlement').length;
   const attacks = (rec.attacks_s6c || []).filter((a) => /refused/.test(a.result)).length;
-  $('#nums').innerHTML = [[`${nProof}`, 'Bounties paid by a verified proof'], [`${nTime}`, 'Settled by timeout, never called proven'], [`${nums.contract_unit_tests.value}`, 'Contract unit tests pass in the repository'], [`${attacks}`, 'Proof attacks refused on chain'], [`${nums.accepted_proof_tgas.value}<small>Tgas</small>`, `About, per accepted proof (${nums.accepted_proof_tgas.range})`]]
+  $('#nums').innerHTML = [[`${nProof}`, 'Paid by a verified proof'], [`${nTime}`, 'Paid by timeout, never called proven'], [`${nums.contract_unit_tests.value}`, 'Contract unit tests passed'], [`${attacks}`, 'Proof attacks refused on chain'], [`${nums.accepted_proof_tgas.value}<small>Tgas</small>`, `About, per accepted proof (${nums.accepted_proof_tgas.range})`]]
     .map(([v, t]) => `<div role="listitem"><b>${v}</b><span>${esc(t)}</span></div>`).join('');
   if (snapshot) $('#etabs').insertAdjacentHTML('beforebegin', `<div style="margin-top:24px">${note(`The contract could not be read just now (${esc(snapshot.err)}). The numbers and the ledger below are the snapshots made at ${esc(snapshot.at)} (feed.json, ledger.json): reload to read them live.`, 'alert')}</div>`);
-  $('#ctSum').textContent = `One approved checker id, ${all.length} bounties, and no mainnet contract. Read it on the explorer, not on this page.`;
+  $('#ctSum').innerHTML = `The contract on NEAR testnet: <a class="tx" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">${esc(CONTRACT)} ${icon('ext')}</a>. One approved checker id, ${all.length} bounties, and no mainnet contract. Read it on the explorer, not on this page.`;
 
   // ---- Ledger: the settled bounties, then the Proof Ledger
   const settled = all.filter((x) => x.status === 'Proof verified' || x.status === 'Timeout settlement').slice().sort((a, b) => (a.status === b.status ? Number(b.b.id) - Number(a.b.id) : a.status === 'Proof verified' ? -1 : 1));
@@ -155,6 +184,13 @@ export async function evidence(viewEl, tab) {
     <p class="small"><b class="txt">${attacks}</b> proof attacks were refused on chain: ${esc((rec.attacks_s6c || []).map((a) => a.what.charAt(0).toLowerCase() + a.what.slice(1)).join(', '))}.</p>
     <p class="small">A proof for the wrong bounty fails cheaply, at ${esc(nums.wrong_bounty_tgas.value)} Tgas. ${tx(rec.wrong_bounty_refused.tx)}</p>
     ${note('These are AI review passes and tests. There is no external security audit.', 'shield')}</div></div>
+    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><h3 class="h3">Contract build and source</h3><span class="chip l-demo">${icon('check')} Reproducible build</span></div>
+    <p class="small">The contract is built reproducibly from the public source, so its code hash can be rebuilt and compared. The code hash on chain is the base58 form of the wasm’s sha256.</p>
+    ${facts([['Source', `<a class="lnk sm" href="${GH}/tree/c74bd5c820c1ce684f81e3f794a8e3e804b3d2b5" target="_blank" rel="noopener">github.com/pgreyy/skarbnik, commit c74bd5c ${icon('ext')}</a>`], ['Code hash', '<span class="mono txt" style="overflow-wrap:anywhere">Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u</span> (compare with the one read live above)'], ['Deploy', tx(nums.last_deploy.tx)]])}
+    <h4 class="h4" style="margin-top:6px">Verify the contract yourself</h4>
+    <p class="small">1. Get the source at the deployed commit. 2. Build it with the reproducible build (Docker and cargo-near 0.22.0; the build image is pinned in contract/Cargo.toml). 3. Hash the wasm and compare with the code hash NEAR shows for ${esc(CONTRACT)}. From a clone of the repository:</p>
+    <div class="stack g8">${cmd('git checkout c74bd5c820c1ce684f81e3f794a8e3e804b3d2b5')}${cmd('(cd contract && cargo near build reproducible-wasm)')}${cmd('sha256sum target/near/kintsugi_contract/kintsugi_contract.wasm')}${cmd(`python3 -c "import hashlib,sys; A='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'; n=int.from_bytes(hashlib.sha256(open(sys.argv[1],'rb').read()).digest(),'big'); print(''.join(reversed([A[(n//58**i)%58] for i in range(50) if n//58**i])))" target/near/kintsugi_contract/kintsugi_contract.wasm`)}${cmd(`curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"${CONTRACT}"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'`)}</div>
+    <p class="small">Expect <span class="mono txt">ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e</span> from sha256sum, and <span class="mono txt">Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u</span> from the last two lines. Our two builds gave the same hash. docs/TRY_IT.md, step 11; docs/EVIDENCE.md, “Contract code and every deploy”.</p></div>
     <div id="keyNote"></div>
     <div><h3 class="h3">Refused attacks on testnet</h3><div class="mt16">${table(['What was tried', 'Result', 'Transaction'], (rec.attacks_s6c || []).map((a) => [esc(a.what), /refused/.test(a.result) ? chip('k-reject', 'Refused', 'x') : chip('k-refund', esc(a.result)), tx(a.tx)]), 'mid', 'Refused attacks')}</div><p class="small faint mt8">Recorded in docs/evidence/S6c/transactions.tsv.</p></div>
     <div><h3 class="h3">Who may call what</h3><div class="mt16">${table(['Method', 'Caller', 'Rule'], [
