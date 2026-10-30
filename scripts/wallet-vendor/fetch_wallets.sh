@@ -6,10 +6,8 @@
 # a script on a wallet's own site has no versioned address and is pinned by its sha256 only (a new release there stops
 # that wallet on this site until this script runs again). Every wallet in NEAR Connect's list is kept with its own
 # features; NEAR Connect itself shows on testnet only the wallets whose features say testnet. Two changes from upstream:
-# MyNearWallet is marked testnet capable (its script has a testnet connector, https://testnet.mynearwallet.com, which it
-# may open) and gets
-# an end date (it closes on 31 October 2026, after which the site drops it); NEAR CLI stays at the commit tested on
-# testnet through the site. Usage, from the repo root: ./scripts/wallet-vendor/fetch_wallets.sh
+# MyNearWallet is left out (it no longer connected on testnet; removed 2026-10-30, before its 31 October 2026 closing);
+# NEAR CLI stays at the commit tested on testnet through the site. Usage, from the repo root: ./scripts/wallet-vendor/fetch_wallets.sh
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 SELECTOR=5385297f1ebd21af648c99fa347eac28ba55d462     # hot-dao/near-selector main, 2026-10-26
@@ -41,6 +39,8 @@ def pin(url, wid):
     raise SystemExit(f"cannot pin {wid}: {url}")
 out = []
 for w in src["wallets"]:
+    if w["id"] == "mynearwallet":
+        continue  # no longer connects; left out of the site's list
     w = dict(w)
     url = pin(w["executor"], w["id"])
     req = urllib.request.Request(url, headers={"User-Agent": "skarbnik-wallet-pin"})
@@ -52,11 +52,6 @@ for w in src["wallets"]:
     if isinstance(perms.get("allowsOpen"), list):  # drop the wallets' own development addresses
         perms["allowsOpen"] = [u for u in perms["allowsOpen"] if "localhost" not in u and ".local" not in u]
     w["permissions"] = perms
-    if w["id"] == "mynearwallet":
-        w["features"] = dict(w.get("features", {}), testnet=True)
-        perms["allowsOpen"] = perms.get("allowsOpen", []) + ["https://testnet.mynearwallet.com"]  # its testnet wallet
-        w["until"] = "2026-10-31T23:59:59Z"
-        w["until_note"] = "closes 31 Oct"
     out.append(w)
     print(f"{h}  {w['id']:<18} testnet={str(bool(w.get('features', {}).get('testnet'))):<5} {url}")
 json.dump({"version": src["version"], "wallets": out}, open(out_path, "w"), indent=1)

@@ -1,6 +1,7 @@
 // Wallet connection for the site, NEAR testnet only, through NEAR Connect (vendor/near-connect.js, the connector the NEAR
-// docs recommend). The wallets offered are listed in vendor/wallets/manifest.json: Intear Wallet and NEAR CLI (signs in
-// your own terminal). MyNearWallet is not offered: it is retired on 31 October 2026. Each wallet's script is loaded from its
+// docs recommend). The wallets offered are listed in vendor/wallets/manifest.json (on testnet: Meteor, Intear, Ledger,
+// Nightly, Ethereum Wallets and NEAR CLI, which signs in your own terminal). MyNearWallet is not offered: it no longer
+// connected and closes on 31 October 2026. Each wallet's script is loaded from its
 // official address and must match the sha256 in that list before NEAR Connect may keep or run it (pinScripts below);
 // a script whose bytes differ is refused. Each wallet's script runs in a sandboxed frame. This page's own code never creates, stores or prints a key; a wallet's script may keep its own session key in
 // the browser (Intear does; it cannot spend on chain). Every transaction is approved in the wallet.
@@ -45,14 +46,9 @@ function pinScripts(wallets) {
 }
 
 // The wallet list: NEAR Connect's own list, pinned (vendor/wallets/manifest.json, scripts/wallet-vendor/fetch_wallets.sh).
-// A wallet with an end date ("until", MyNearWallet closes on 31 October 2026) carries a short note in its name until
-// then and drops out of the list after it, so nobody is sent to a closed wallet. NEAR Connect itself shows on testnet
-// only the wallets whose features say testnet.
+// NEAR Connect itself shows on testnet only the wallets whose features say testnet.
 async function manifest() {
   const m = await (await fetch('vendor/wallets/manifest.json')).json();
-  const now = Date.now();
-  m.wallets = m.wallets.filter((w) => !w.until || Date.parse(w.until) > now)
-    .map((w) => (w.until_note ? { ...w, name: `${w.name} · ${w.until_note}` } : w));
   pinScripts(m.wallets);
   return m;
 }

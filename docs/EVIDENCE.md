@@ -5,6 +5,18 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Wallet list without MyNearWallet (2026-10-30)
+
+- Question: with MyNearWallet taken out of `web/vendor/wallets/manifest.json` (it no longer connected), does the wallet
+  picker still open, and do the other wallets still load their pinned scripts?
+- Command: a headless Chromium against a local copy of `web/` (a private test tool): open the picker from the header
+  Wallet button at 1440 px and from the phone menu at 390 px, read the wallets it lists, then open each wallet in a
+  fresh page and record its script's HTTP status and whether the pin check refused it.
+- Result, the same at 1440 and 390 px: the picker opens; MyNearWallet is not listed; listed: Meteor Wallet, Intear
+  Wallet, Ledger, Nightly Wallet, Ethereum Wallets, NEAR CLI; each one's script HTTP 200 and accepted by the pin
+  check; no page errors. The list's sha256 is now `12d338823e493f4827287511ce867cd9f3bd9060cfce5b6d25d0fb5f7b215133`.
+- Not run: signing in with any wallet (only NEAR CLI was ever clicked through to a transaction, in earlier runs).
+
 ## Testnet cleanup: expired bounties closed by claim_timeout and expire (2026-10-30)
 
 - Question: can every bounty past its expiry be closed with the contract's public methods, with the money going where
@@ -538,6 +550,9 @@ local stand-in of an OpenAI compatible API exercises the NEAR AI Cloud code path
 | HOT, OKX, NEAR Mobile, Trezu, Hana | hidden | their entries in NEAR Connect's list say no testnet; HOT's and NEAR Mobile's scripts have no testnet address | no |
 
 - MyNearWallet drops out by itself: with the page clock moved to 2026-11-01 it is no longer listed, the rest are.
+- 2026-10-30: MyNearWallet was taken out of the list and its pinned script ahead of 31 October, because it no longer
+  connected (owner's decision); the end-date code went with it. Check after the change: below, "Wallet list without
+  MyNearWallet".
 - An installed extension: when a wallet extension announces itself (simulated here for Meteor, no real extension in the
   test browser), it is listed at the top as "Meteor Wallet · installed".
 - A changed byte is still refused: pin check run 1 and 2, tampered case, NEAR CLI refused with "NEAR CLI changed its

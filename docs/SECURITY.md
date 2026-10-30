@@ -72,7 +72,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 
 | Guard | What it stops | Shown by |
 | --- | --- | --- |
-| Wallets through NEAR Connect (on testnet: Meteor, Intear, Ledger, MyNearWallet until 31 October 2026, Nightly, Ethereum Wallets and NEAR CLI), each wallet's script loaded from its official address, refused unless its sha256 matches the pin in the wallet list, and run in a sandboxed frame; sign in asks for no contract key; every transaction is approved in the wallet | The page signing for the visitor; wallet code changing under the site | `web/vendor/wallets/manifest.json` (pins), `web/js/wallet.js` (`pinScripts`); `docs/evidence/web/pinned_wallets.txt` (a changed byte is refused); `docs/evidence/web/` (NEAR CLI run through the page) |
+| Wallets through NEAR Connect (on testnet: Meteor, Intear, Ledger, Nightly, Ethereum Wallets and NEAR CLI), each wallet's script loaded from its official address, refused unless its sha256 matches the pin in the wallet list, and run in a sandboxed frame; sign in asks for no contract key; every transaction is approved in the wallet | The page signing for the visitor; wallet code changing under the site | `web/vendor/wallets/manifest.json` (pins), `web/js/wallet.js` (`pinScripts`); `docs/evidence/web/pinned_wallets.txt` (a changed byte is refused); `docs/evidence/web/` (NEAR CLI run through the page) |
 | A confirm step before every payment (deposit, withdraw, commit), showing the amount with its unit; a commit's confirm shows the fee, slots left of the cap and "Each attempt returns one yes or no." | Paying by accident | `web/js/account-ui.js` |
 | Before a commit the page reads the chain again and stops, without sending, what the contract would refuse: bounty closed, cap full, not enough credit, a fee above the account's own limit, a payout the limits do not allow, a payout that is the vendor, a verifier or the contract, or one that does not exist | Lost fees and lost payouts (review finding 8) | `web/js/account-ui.js` (`review`) |
 | Operator panel stop button, shown only to the connected owner of the account: one wallet approved call, `set_agent_limits` with a max fee of 0 (1 yoctoNEAR attached, so a limited agent key cannot undo it); every later commit by that account is refused, since every attempt fee is above 0 (`create_bounty` requires it) | A runaway or stolen agent key spending the account's credit | `docs/evidence/web/steps/operator_stop_set_limits.txt` (tx `7xhHyQEn76dztS4MHLQRPW3zod6wfMxLmFAGt6bop1NG`), `operator_stop_commit_refused.txt` (tx `CKSC5CiimdJqdLHTvzxYfYhFbhdmq7WY5B8YiaSxrVrm`, refused: "the attempt fee is above this account's max_fee_per_commit") |
@@ -306,10 +306,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
   docs/VERSIONS.md). The page's own code holds no key, but Intear Wallet's script keeps a wallet session key in the
   browser's storage for this site (it cannot spend on chain; owner's decision, 2026-10-25). Intear's script has no
   versioned address, so the copy is pinned by sha256 and must be refreshed by hand if Intear changes it; the same holds
-  for NEAR Mobile, Trezu and Ethereum Wallets. MyNearWallet is listed until 31 October 2026 23:59:59 UTC (the day it
-  closes) and drops out by itself after that. Only NEAR CLI was clicked through to a transaction; the other wallets were
+  for NEAR Mobile, Trezu and Ethereum Wallets. MyNearWallet is not in the list (removed 2026-10-30: it no longer
+  connected, and it closes on 31 October 2026). Only NEAR CLI was clicked through to a transaction; the other wallets were
   only loaded (docs/EVIDENCE.md, "Site: more wallets"). Meteor's and Nightly's scripts can talk to their browser
-  extensions, Meteor's and MyNearWallet's can open their wallet sites. Licences of the vendored files: THIRD_PARTY_NOTICES.
+  extensions, Meteor's can open its wallet site. Licences of the vendored files: THIRD_PARTY_NOTICES.
 - Agent limits are stored per account under a raw storage key with no storage deposit, like the rest of the contract
   (audit finding 12).
 - The AI review passes (docs/AUDIT.md) list every finding, its status and the suggested hardening.
@@ -339,6 +339,9 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - 2026-10-26: per-account cap deployed on `kintsugi-l2-cihdp.testnet` (wasm sha256 `b863487e...1024`, tx
   `DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7`); every saved view of bounties 7, 12, 14, 15 and 18 to 24, the pool and
   the allowlist unchanged apart from the new `max_commits_per_account` field (null on old bounties); live test on bounty 25.
+
+- 2026-10-30: MyNearWallet taken out of the wallet list and its pinned script, ahead of its 31 October closing,
+  because it no longer connected; the end-date code that would have dropped it is gone too.
 
 - 2026-10-26: more wallets: all of NEAR Connect's list, pinned (GitHub scripts to a commit, every script by sha256);
   on testnet Meteor, Intear, Ledger, MyNearWallet (until 31 October), Nightly, Ethereum Wallets and NEAR CLI are shown.

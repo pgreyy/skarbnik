@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-30: MyNearWallet taken out of the wallet list
+
+- It no longer connected, so it was removed now rather than on 31 October: its entry and pinned script left
+  `web/vendor/wallets/manifest.json` (SHA256SUMS updated), `scripts/wallet-vendor/fetch_wallets.sh` leaves it out, and
+  the end-date code in `web/js/wallet.js` (the "closes 31 Oct" label and the date filter) is gone. THIRD_PARTY_NOTICES,
+  docs/VERSIONS.md, SECURITY (with a changelog line), CLAIMS, ARCHITECTURE and EVIDENCE updated.
+- Checked in a headless Chromium at 1440 and 390 px: the picker opens and lists Meteor, Intear, Ledger, Nightly,
+  Ethereum Wallets and NEAR CLI, each script HTTP 200 and accepted by the pin check (EVIDENCE, "Wallet list without
+  MyNearWallet").
+
 ## 2026-10-30: Testnet cleanup: expired bounties closed
 
 - Read every bounty: 0, 2, 3, 10, 23, 25 and 26 were past their expiry and still open. `claim_timeout` on 3
