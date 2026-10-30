@@ -16,7 +16,7 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-10-30T12:33:35Z",
+ "generated_at_utc": "2026-10-30T12:46:47Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"

@@ -42,6 +42,7 @@ Demo bounties carry the exploit commitment 9a1be994ab379a76d3f154df1fbde56169537
 4. REVEAL
    After the bounty's reveal_gap_ns and within its reveal_window_ns:
      reveal {"bounty_id":"<id>","index":<n>,"patch":"<base64 of the wasm patch>","nonce":"<64 hex>"}
+   Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page (max_patch_bytes).
    The contract records the block's random seed and the reveal time. The vendor then proves your patch against the
    secret input. A Level 2 verdict is a Groth16 proof of the RISC Zero result that the contract checks itself
    (submit_groth16). A Level 0 verdict needs two registered verifiers.

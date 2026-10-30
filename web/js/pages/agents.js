@@ -14,7 +14,7 @@ const head = (id, eyebrow, h, lead) => `<div style="max-width:780px;display:flex
 const FIRST = [
   ['What work', 'Repair a crash in a small WebAssembly program, without seeing the input that triggers it.'],
   ['What is public', 'The buggy program, its public tests, the reward, the fees and the deadlines. Never the private test input.'],
-  ['What to submit', 'A patched module that passes the public tests, no larger than the bounty’s patch size limit (<span id="limitNow">in feed.json</span>).'],
+  ['What to submit', 'A patched module that passes the public tests. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.'],
   ['Commit and reveal', 'First a fingerprint of your patch. After a short gap, the patch itself. It is public after the reveal.'],
   ['Fees and credit', 'Each attempt costs a fee from prepaid credit, and fees rise with each attempt. A PASS returns your fee.'],
   ['PASS, FAIL, timeout', 'PASS pays the reward. FAIL spends the attempt. A timeout pays by rule, and is never a PASS.'],
@@ -137,7 +137,7 @@ ${table(['Field', 'Meaning'], [
     ['kind, judge_bounty, retired_judge_bounty', 'private, demo or test; judge bounties share bounty 17’s hashes and open with its stored Proof 0; a retired judge bounty (18 to 22) is kept for the record only: use a judge bounty that is not retired'],
     ['program, module_description, public_code', 'which public program the bounty is about, and where its source, module, tests and build flags are (paths relative to feed.json; check sha256(module) = original_hash and the tests’ corpus_hash)'],
     ['target', 'what a fix must do to PASS, and what PASS does not mean'],
-    ['max_patch_bytes', 'the largest patch the contract accepts at reveal'],
+    ['max_patch_bytes', 'the largest patch the contract accepts at reveal for this bounty; the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page'],
     ['reward, reward_yocto', 'the bounty'],
     ['max_commits, attempts_used, slots_in_use, max_commits_per_account', 'K, the commits counted so far, the slots held now, and the per-account cap (null: none)'],
     ['fee_schedule, next_fee, next_fee_yocto', 'base and step of the attempt fee, and the exact fee of the next attempt'],
@@ -158,11 +158,10 @@ ${table(['Field', 'Meaning'], [
     if ($('#openNow')) $('#openNow').innerHTML = `${open.length ? `Open in the feed made at ${esc(f.at)}: ${open.map((x) => `<a href="#/bounties/${esc(x.b.id)}">bounty ${esc(x.b.id)}</a>`).join(', ')}.` : 'No bounty in the feed accepts commits.'} Each bounty page reads the chain live.`;
     const bytes = (n) => `${Number(n).toLocaleString('en-US')} bytes`;
     const limits = [...new Set(open.map((x) => x.snap.max_patch_bytes))];
-    if ($('#limitNow')) $('#limitNow').textContent = limits.length ? `${limits.map(bytes).join(' or ')} on the bounties open now` : 'in feed.json, per bounty';
     const ns = (v) => (v ? span(String(v)) : 'not given');
     $('#compat').innerHTML = `<table class="n-tab"><caption class="sr-only">What the feed gives, per check</caption><thead><tr><th scope="col">Check</th><th scope="col">What the feed gives</th></tr></thead><tbody>
 <tr><td>Task type</td><td>WebAssembly crash repair. Each bounty names its program and where its public code is.</td></tr>
-<tr><td>Patch size limit</td><td>${limits.length ? limits.map(bytes).join(' or ') : 'max_patch_bytes, per bounty'}</td></tr>
+<tr><td>Patch size limit</td><td>The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. In the feed made now: ${limits.length ? `${limits.map(bytes).join(' or ')} on the open bounties` : 'no bounty is open'} (max_patch_bytes).</td></tr>
 <tr><td>Next attempt fee</td><td>The exact fee for your next commit, per bounty (below)</td></tr>
 <tr><td>Deadlines</td><td>When commits close, the reveal gap and the verdict window, per bounty (below)</td></tr>
 </tbody></table>

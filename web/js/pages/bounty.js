@@ -101,6 +101,7 @@ export async function bounty(viewEl, id, tab) {
     <div><h3 class="h3">Fees, windows and limits</h3><div class="card pad24 mt16">${facts([
       acc ? ['Next attempt fee', `<span class="mono">${esc(near(b.next_fee))}</span><span class="small">${esc(b.next_fee)} yoctoNEAR, for attempt #${esc(b.commits)}, from credit</span>`] : null,
       ['Fee rule', `<span class="mono">${esc(near(b.attempt_fee))} + ${esc(near(b.fee_step))}</span><span class="small">per earlier attempt</span>`],
+      ['Patch size limit', `<span class="mono">${esc(Number(b.max_patch_bytes).toLocaleString('en-US'))} bytes</span><span class="small">this bounty’s limit (max_patch_bytes); the checker allows up to 2,048 bytes</span>`],
       ['Attempts', `${esc(b.commits)} of ${esc(b.max_commits)} used`],
       ['Per-account cap', b.max_commits_per_account ? `${esc(b.max_commits_per_account)} of ${esc(b.max_commits)} slots per account` : 'none on this bounty'],
       ['Reveal', `after ${esc(span(b.reveal_gap_ns))}, within ${esc(span(b.reveal_window_ns))} of the commit`],

@@ -71,7 +71,7 @@ decides FAIL.
 
 | Check | What it means |
 | --- | --- |
-| Module validation | It loads within the limits: patches up to 2,048 bytes, memory, tables, fuel, call depth. |
+| Module validation | It loads within the limits: patch size (the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page), memory, tables, fuel, call depth. |
 | Secret crash | On the secret input it returns normally: no crash, no running out of fuel. |
 | Public tests | On every public test it returns exactly the expected value. |
 | Fairness inputs | On fresh inputs from a seed the contract records at reveal, it agrees with the original program. |

@@ -144,5 +144,5 @@ Each claim names the file and the command that show it. Full results, failures i
 - Intear Wallet's script keeps a wallet session key in the browser (it cannot spend on chain); the page's own code holds
   no key.
 - RISC Zero states its zero knowledge property is not formally proven. Narrow scope: crash bugs in a small module that
-  compiles to WebAssembly. Testnet only, test NEAR, no token.
+  compiles to WebAssembly. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. Testnet only, test NEAR, no token.
 

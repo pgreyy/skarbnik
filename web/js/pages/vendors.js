@@ -39,7 +39,7 @@ const CMDS = [
   [`${T} status --config ~/skarbnik-vendor/watch.toml`, 'Shows attempts, verdicts and payments for your bounty, and the next action needed.'],
 ];
 const PREFLIGHT = [
-  'The module exists and is within the checker’s limits (2,048 bytes); the public tests are there.',
+  'The module exists and is within the checker’s limits; the public tests are there. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page (max_patch_bytes).',
   'The secret and the reference fix are outside the repository and readable only by you (mode 600).',
   'The original crashes on the secret input (the checker’s own run).',
   'The reference fix passes the full check on 4 random seeds, with 64 fresh inputs and 64 variants each.',
@@ -101,7 +101,7 @@ ${tab(['You provide', 'What it is for'], [
 <section class="sec n-sec rule" id="v-eval" aria-labelledby="v-eval-h" style="background:var(--bg2)"><div class="wrap">
 ${head('v-eval-h', 'How a repair is evaluated', 'How is a repair evaluated?', 'The same approved checker runs every patch. A patch passes only if all of these hold.')}
 ${tab(null, [
-    ['It is a valid small module', 'No imports, within the size and memory limits, with the expected entry points.'],
+    ['It is a valid small module', 'No imports, within the size and memory limits, with the expected entry points. The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.'],
     ['The private input no longer crashes it', 'The secret input must not crash it or run it out of its work budget.'],
     ['Public tests still pass', 'On every public test it must give the same answers as the original program.'],
     ['Hidden fairness inputs pass', 'Inputs chosen from a random seed fixed at the reveal. A fix cannot be tailored to them.'],

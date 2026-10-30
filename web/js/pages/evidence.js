@@ -35,7 +35,7 @@ const LIMITS = (live) => [
   ['cpu', '', 'GPU proving rents a machine', 'The vendor’s watch proves each attempt on a rented GPU (bounties 32 and 27): about 17 minutes from reveal to submit, about $0.04 of GPU a proof. The secret sits in that machine’s RAM during the proof, then is wiped. The Groth16 wrap needs Docker on an x86 machine.'],
   ['hourglass', '', 'A timeout pays whatever was revealed', 'The contract does not read the fix. Under a silent vendor, an honest fix may get as little as 1/K of the bounty.'],
   ['eye', '', 'Revealed fixes are public', 'After the reveal a patch is on chain. A one line fix is often the reference fix byte for byte, so a secret reference fix protects little.'],
-  ['cube', '', 'Narrow scope', 'Crash bugs in small WebAssembly modules, patches up to 2,048 bytes. A vendor with a crash but no fix is not supported.'],
+  ['cube', '', 'Narrow scope', 'Crash bugs in small WebAssembly modules. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. A vendor with a crash but no fix is not supported.'],
   ['coin', '', 'A payout to a missing account is lost', 'Bounty 8 shows it. The site and the agent check the account before a commit, but the contract does not.'],
   ['hash', '', 'One verdict leaks one bit', 'K is the leak budget. A per-account cap (deployed 2026-10-26) limits how many slots one account holds, but one person with many accounts can still fill a bounty’s slots.'],
   ['link', '', 'Level 1 is not built', 'The OutLayer path exists but never answered on testnet. Every current bounty is Level 2 or the older Level 0.'],
@@ -162,7 +162,7 @@ ${EXAMPLES()}
     </div></div>
     <div><h3 class="h3">What the checker runs on every patch</h3>
     <div class="card" style="padding:8px 28px;margin-top:16px"><div class="steps">
-    ${[['Validate the module', 'No imports, at most 2,048 bytes, at most 2 memory pages, checked exports.'], ['Run the secret input', 'It must not crash or run out of fuel, 50,000 units per input, in a fresh interpreter each time.'], ['Run the public tests', 'Every answer must match the original program’s.'], ['Run fairness inputs', 'Drawn from the reveal seed, so a patch cannot be tailored to them. They must match the original.'], ['Run crash variants', 'One or two byte changes of the secret must not crash where the original crashes.']]
+    ${[['Validate the module', 'No imports, at most 2 memory pages, checked exports. The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.'], ['Run the secret input', 'It must not crash or run out of fuel, 50,000 units per input, in a fresh interpreter each time.'], ['Run the public tests', 'Every answer must match the original program’s.'], ['Run fairness inputs', 'Drawn from the reveal seed, so a patch cannot be tailored to them. They must match the original.'], ['Run crash variants', 'One or two byte changes of the secret must not crash where the original crashes.']]
       .map(([h, p], i) => `<div class="st"><span class="n">${i + 1}</span><div><b class="h4">${esc(h)}</b><p class="small" style="margin-top:4px">${esc(p)}</p></div></div>`).join('')}
     </div></div></div>
     <div><h3 class="h3">Check it from the repository</h3><p class="small" style="margin-top:8px">Commands run from the root of the Skarbnik repository.</p>

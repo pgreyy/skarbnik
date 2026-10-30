@@ -24,7 +24,8 @@ outside the repository (for example `~/skarbnik-vendor/<name>.toml`, mode 600). 
 
 - `[bounty]`: name (also names the bounty's private salt), module folder (`original.wasm`, `public_tests.txt`),
   reward, K, the fee of the first attempt and the step per later attempt, the reveal gap and window, the verdict window,
-  the expiry, the patch size limit, the check size and the proof segment size (`po2`: 18 needs about 2.5 GiB, 19 about
+  the expiry, the patch size limit (the checker allows up to 2,048 bytes; each bounty sets its own, and the
+  open bounties use 1,024), the check size and the proof segment size (`po2`: 18 needs about 2.5 GiB, 19 about
   5 GiB).
 - `[secrets]`: the secret crashing input and the reference fix. Files of mode 600, outside the repository.
 - `[prover]`: the mode (`cpu`), the machine's name (proof times differ by machine), the work folder.
@@ -37,7 +38,8 @@ the secret file and `po2`.
 
 ## What the preflight checks
 
-1. The module exists and is within the checker's limits (2,048 bytes); the public tests are there.
+1. The module exists and is within the checker's limits; the public tests are there. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page
+   (`max_patch_bytes`).
 2. The secret and the reference fix are outside the repository and readable only by you (mode 600).
 3. The original crashes on the secret input (the checker's own run).
 4. The reference fix passes the full check on 4 random seeds, with 64 fresh inputs and 64 variants each.

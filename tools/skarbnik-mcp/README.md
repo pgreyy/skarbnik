@@ -9,7 +9,7 @@ follow the outcome. It signs with a key limited to `commit` and `reveal` and ref
 | `list_bounties` | Bounties from https://skarbnik.xyz/feed.json (a snapshot): terms, next fee, slots, windows, public code links |
 | `get_bounty` | One bounty read live from the contract, with the checks of [AGENTS.md](../../AGENTS.md) section 2 for your account |
 | `get_credit` | Your credit in the contract and your agent limits |
-| `commit` | Checks the bounty and the key, makes a nonce, builds the fingerprint, saves the nonce, sends `commit` |
+| `commit` | Checks the bounty and the key, makes a nonce, builds the fingerprint, saves the nonce, sends `commit`; refuses a patch above the bounty's `max_patch_bytes` (the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page) |
 | `reveal` | Sends `reveal` after the reveal gap (if it is too early, it sends nothing and says how long to wait) |
 | `status` | Your attempts and their outcome on chain: Open, Passed, Failed, TimedOut, Released |
 
