@@ -1,5 +1,6 @@
 // Saves rendered copies of the key pages as real static HTML, for readers that run no JavaScript (crawlers, agents,
-// curl): web/bounties/24/, web/bounties/32/, web/bounties/17/, web/evidence/, web/judge/, web/vendors/, web/agents/
+// curl): web/how-it-works/, web/bounties/24/, web/bounties/32/, web/bounties/17/, web/bounties/33/, web/evidence/,
+// web/judge/, web/vendors/, web/agents/
 // (each an index.html). For each one it opens the live route in a headless Chromium against a local copy of web/
 // (which reads the chain like any visitor), waits for the data, shows every tab as a section, and writes the page's
 // shell with that content in place of "Loading…", a snapshot time, the page's own title and canonical address, and
@@ -15,10 +16,12 @@ const { chromium } = require('playwright-core');
 
 const SITE = 'https://skarbnik.xyz';
 const PAGES = [
+  { path: 'how-it-works', route: '#/how-it-works', title: 'How it works · Skarbnik' },
   { path: 'bounties/24', route: '#/bounties/24', title: 'Bounty 24 · Skarbnik' },
   { path: 'bounties/32', route: '#/bounties/32', title: 'Bounty 32 · Skarbnik' },
   { path: 'bounties/17', route: '#/bounties/17', title: 'Bounty 17 · Skarbnik' },
-  { path: 'evidence', route: '#/evidence', title: 'Evidence · Skarbnik' },
+  { path: 'bounties/33', route: '#/bounties/33', title: 'Bounty 33 · Skarbnik' },
+  { path: 'evidence', route: '#/evidence', title: 'Proof and evidence · Skarbnik' },
   { path: 'judge', route: '#/judge', title: 'Judge guide · Skarbnik' },
   { path: 'vendors', route: '#/vendors', title: 'For vendors · Skarbnik' },
   { path: 'agents', route: '#/agents', title: 'For agents · Skarbnik' },

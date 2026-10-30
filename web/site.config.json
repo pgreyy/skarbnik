@@ -1,5 +1,5 @@
 {
- "note": "The one place for the site's own address and the chain it reads. The browser reads it through web/js/config.js; scripts/gen_feed.py and scripts/gen_site_recorded.py read it too, and scripts/apply_site_config.py writes site_url into the static files (index.html meta tags, sitemap.xml, agent-quickstart.txt, README). Switching to mainnet: change network, contract, rpc_urls, explorer_tx, explorer_account and tx_index here. home_example_bounty: the bounty Home section 03 shows end to end (switch it to another bounty paid by proof).",
+ "note": "The one place for the site's own address and the chain it reads. The browser reads it through web/js/config.js; scripts/gen_feed.py and scripts/gen_site_recorded.py read it too, and scripts/apply_site_config.py writes site_url into the static files (index.html meta tags, sitemap.xml, agent-quickstart.txt, README). Switching to mainnet: change network, contract, rpc_urls, explorer_tx, explorer_account and tx_index here.",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
@@ -10,6 +10,5 @@
  "explorer_tx": "https://testnet.nearblocks.io/txns/",
  "explorer_account": "https://testnet.nearblocks.io/address/",
  "tx_index": "https://tx.test.fastnear.com/v0",
- "published_image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
- "home_example_bounty": "24"
+ "published_image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
 }

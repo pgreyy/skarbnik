@@ -2,6 +2,35 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-30: Site Revamp: plain language copy and new structure
+
+- Built the Revamp from the design package (its copy, markup and CSS), on top of the live Panyl theme and fonts.
+  Design tooling (the version switch, the style panel, the hero picture setting) was not built.
+- Header: Bounties, How it works, For vendors, For agents, Proof & evidence, Judge guide; the wallet button, then the
+  theme toggle at the far right; the links fold into the menu below 1240 px. Footer: Explore, Check it, On the network
+  (GitHub link kept). New `web/css/revamp.css`.
+- Home: seven sections (Overview, The problem, How it works, Real examples, Take part, Why trust it, Check it), the
+  Vinyl logo with a static lifecycle caption, the five step strip, "Who can see what" open by default, a rail with
+  labels and hints, and on phones a pill naming the section. Old links are replaced in place: #mechanism to #how,
+  #example to #proof, #why to #rules, #verify and #next to #check (checked in a browser: #mechanism opens #how).
+- How it works: "See it for real" removed, "What Skarbnik is, and isn't" added; the plain text story kept.
+- For vendors: rebuilt; the commands are the real `tools/skarbnik-vendor` syntax (its argparse); the machine row
+  names sealed proving (tested once, bounty 33; planned as a managed service); the preflight and the measured time
+  per proof kept.
+- For agents: rebuilt; the compatibility panel fills each open bounty's patch limit, next fee and deadlines from
+  feed.json (the open bounties take 1,024 byte patches, not the design's 2,048); the setup commands, reference agent,
+  feed fields and quickstart kept.
+- Proof & evidence: four examples (24, 32 and 33 paid by proof, 17 paid by timeout) with their transactions; the
+  team run note lists the bounties paid by proof read live (1, 16, 24, 27, 32 and 33 on 2026-10-30); the Contract tab
+  gains "Contract build and source" with the commands of docs/TRY_IT.md, step 11.
+- Judge guide: JUDGE_GUIDE.md in plainer words (every fact, transaction and command kept; step 1 now names the code
+  hash `Gx1JfW7G…` and no longer says the build is not reproducible; the field is "What this does not prove"),
+  `python3 -I scripts/gen_judge_data.py` (6 Level A steps, 8 Level B steps, 24 claims). Judge bounties still to open:
+  28 to 31.
+- llms.txt, sitemap.xml and the no JavaScript block updated; saved pages added for How it works and bounty 33;
+  `./scripts/rebuild_site_data.sh` rerun. Checked with a headless Chromium at 1440 and 390 px, dark and light: no
+  sideways scroll and no console errors on every route.
+
 ## 2026-10-30: Confidential proving spike, part 2: bounty 33's prove step sealed, paid by proof
 
 - On the owner's order the VPS CPU Proof 0 was stopped (by exact PIDs, 23:28 UTC) and all proving now runs on RunPod

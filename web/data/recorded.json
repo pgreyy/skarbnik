@@ -1974,11 +1974,11 @@
   "24": "data/smooth/"
  },
  "judge_bounties": {
-  "18": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
-  "19": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
-  "20": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
-  "21": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
-  "22": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use judge bounties 27 to 31 instead. After its expiry anyone can call expire, which refunds the vendor.",
+  "18": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use a judge bounty still to open instead: 28 to 31 (27 is used). After its expiry anyone can call expire, which refunds the vendor.",
+  "19": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use a judge bounty still to open instead: 28 to 31 (27 is used). After its expiry anyone can call expire, which refunds the vendor.",
+  "20": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use a judge bounty still to open instead: 28 to 31 (27 is used). After its expiry anyone can call expire, which refunds the vendor.",
+  "21": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use a judge bounty still to open instead: 28 to 31 (27 is used). After its expiry anyone can call expire, which refunds the vendor.",
+  "22": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use a judge bounty still to open instead: 28 to 31 (27 is used). After its expiry anyone can call expire, which refunds the vendor.",
   "27": "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU.",
   "28": "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU.",
   "29": "Judge bounty (round 2): the same hashes as private bounty 17, created closed, K = 2 with at most 1 attempt per account, a 41 h verdict window; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself. The vendor's watch proves its attempts on a rented GPU.",
