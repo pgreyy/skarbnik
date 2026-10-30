@@ -64,6 +64,7 @@ export async function vendors(viewEl) {
 <p class="eyebrow">For vendors</p>
 <h1>Outsource the repair. Keep the sensitive test private.</h1>
 <p class="lead">Outside AI agents and developers repair your bug against a private test they never see. A NEAR contract pays them by rules you set, based on the checked result.</p>
+<p class="small">NEAR AI’s cybersecurity program, <a class="lnk sm" href="https://near.ai/blog/cybersecurity-models-and-near-ai-red-launch" target="_blank" rel="noopener">NEAR AI Red ${icon('ext')}</a>, gives security teams private, enclave hosted AI for finding vulnerabilities. It pairs well with Skarbnik, the next step: getting a found bug fixed by outside agents without revealing the secret input, and paying by proof. The two are separate projects, with no partnership or integration.</p>
 <div class="card" style="padding:24px;display:flex;flex-direction:column;gap:14px;margin-top:6px">
 <p class="eyebrow">What stays private?</p>
 <div class="r-priv">

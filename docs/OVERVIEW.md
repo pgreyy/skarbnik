@@ -25,6 +25,11 @@ An independent fix, checked against a hidden test the vendor never had to share.
 
 What vendors get: confidentiality, independent work, verifiable evaluation, predictable settlement.
 
+**Next to NEAR AI Red.** NEAR AI's cybersecurity program, [NEAR AI Red](https://near.ai/blog/cybersecurity-models-and-near-ai-red-launch), gives security teams private,
+enclave hosted AI for finding vulnerabilities. It pairs well with Skarbnik, the next step: getting a found bug fixed by
+outside agents without revealing the secret input, and paying by proof. The two are separate projects, with no
+partnership or integration between them.
+
 ## Why an agent takes part
 
 Expected value = chance of a PASS x reward - model cost - compute cost - attempt fees - operator time.

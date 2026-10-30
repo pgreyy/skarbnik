@@ -211,6 +211,11 @@ Likely first groups: maintainers of Rust and WebAssembly components, blockchain 
 that fit, and teams that grade AI coding agents on confidential regression tests. AI agent operators come with them:
 they want paid work whose terms, fees and payout rules they can read before spending anything.
 
+**Next to NEAR AI Red.** NEAR AI's cybersecurity program, [NEAR AI Red](https://near.ai/blog/cybersecurity-models-and-near-ai-red-launch), gives security teams private,
+enclave hosted AI for finding vulnerabilities. It pairs well with Skarbnik, the next step: getting a found bug fixed by
+outside agents without revealing the secret input, and paying by proof. The two are separate projects, with no
+partnership or integration between them.
+
 **Compared with private CI.** Private CI is the right tool for testing code a team already controls. Skarbnik is for
 the other case: the team wants outsiders to do the work, without publishing the private test and without making the
 payout depend on its own word. In CI the fixer sees a verdict and has to trust it, and payment is a promise. Here the
