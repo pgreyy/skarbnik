@@ -22,7 +22,9 @@ body.sk>main{flex:1 0 auto}
 .sk .md-btn{width:44px;height:44px;border-radius:calc(12px * var(--rs));border:1px solid var(--ln2);background:var(--s1);color:var(--tx);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:border-color .25s,color .25s}
 .sk .md-btn:hover{border-color:var(--am);color:var(--am)}
 .sk .md-btn svg.i{width:19px;height:19px}
-.sk[data-md="dark"] .md-moon,.sk[data-md="light"] .md-sun{display:none}
+/* the theme button shows the current mode: a monitor for System, a sun for Light, a moon for Dark */
+.sk .md-btn svg.i{display:none}
+.sk[data-pref="system"] .md-btn .md-sys,.sk[data-pref="light"] .md-btn .md-sun,.sk[data-pref="dark"] .md-btn .md-moon,.sk:not([data-pref]) .md-btn .md-sys{display:block}
 .sk .nav{position:relative;z-index:50}
 .sk .nav-cta .wallet{display:flex;align-items:center;gap:8px}
 .sk .menu-btn{color:var(--tx)}

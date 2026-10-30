@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-30: Theme button with System
+
+- The header's theme button cycles System, Light, Dark (still one button after the wallet button). System follows the
+  device setting and changes live; a first visit starts on System; the choice is kept in this browser. The icon shows
+  the current mode (a monitor, a sun, a moon) and the label says the mode and the next one ("Theme: System (click for
+  Light)"). `web/index.html` (the mode set before the first paint), `web/js/app.js`, `web/css/site.css`; saved pages
+  regenerated.
+- Checked in a headless Chromium at 1440 and 390 px with the device set to light and to dark: first visit on System,
+  a live device switch, the cycle by click, Enter and Space, a focus ring on keyboard focus, the choice kept after a
+  reload, 44 by 44 px.
+
 ## 2026-10-30: MyNearWallet taken out of the wallet list
 
 - It no longer connected, so it was removed now rather than on 31 October: its entry and pinned script left

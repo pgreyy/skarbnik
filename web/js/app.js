@@ -1,7 +1,8 @@
-// The Skarbnik site app: the routes, the redirects from the old routes, the dark and light toggle (dark by default,
-// the visitor's choice remembered in this browser), the phone menu, and the screens. Routes: #/ (Home, seven
-// sections; #problem, #how, #proof, #paths, #rules, #check open a section, and the old Home section links #mechanism,
-// #example, #why, #verify and #next are replaced by their new place), #/how-it-works, #/bounties,
+// The Skarbnik site app: the routes, the redirects from the old routes, the theme button (System, Light, Dark; System
+// on a first visit, following the device; the visitor's choice remembered in this browser), the phone menu, and the
+// screens. Routes: #/ (Home, seven sections; #problem, #how, #proof, #paths, #rules, #check open a section, and the
+// old Home section links #mechanism, #example, #why, #verify and #next are replaced by their new place),
+// #/how-it-works, #/bounties,
 // #/bounties/<id>[/<tab>], #/raw/<id>, #/evidence[/<tab>], #/judge[/<tab>], #/agents, #/vendors, #/account[/<name>[/<tab>]].
 // Old routes: #/ledger, #/arena, #/verify and #/agent redirect to their new place. A saved copy at a real path (/judge/)
 // opens its #/ route. Live screens read the testnet
@@ -18,16 +19,30 @@ import { judge } from './pages/judge.js';
 import { agents } from './pages/agents.js';
 import { vendors } from './pages/vendors.js';
 
-// ---------- dark and light ----------
+// ---------- the theme: System, Light, Dark ----------
 const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* blocked */ } } };
-function applyMode(m) {
-  document.documentElement.setAttribute('data-md', m);
-  document.body.setAttribute('data-md', m);
-  const b = $('#modeBtn'), label = m === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+// One button cycles System → Light → Dark → System. System follows the device setting, live; the choice is kept in this
+// browser ('skarbnik-mode': light or dark; no entry means System, the first visit's mode). The icon shows the current
+// mode; the label says it and what the next click does.
+const NEXT = { system: 'light', light: 'dark', dark: 'system' };
+const NAME = { system: 'System', light: 'Light', dark: 'Dark' };
+const deviceLight = matchMedia('(prefers-color-scheme: light)');
+let pref = ['light', 'dark'].includes(store.get('skarbnik-mode')) ? store.get('skarbnik-mode') : 'system';
+function applyMode() {
+  const m = pref === 'system' ? (deviceLight.matches ? 'light' : 'dark') : pref;
+  for (const el of [document.documentElement, document.body]) { el.setAttribute('data-md', m); el.setAttribute('data-pref', pref); }
+  const b = $('#modeBtn'), label = `Theme: ${NAME[pref]} (click for ${NAME[NEXT[pref]]})`;
   b.setAttribute('aria-label', label); b.title = label;
+  const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = m === 'light' ? '#EEE9DF' : '#12120C';
 }
-applyMode(store.get('skarbnik-mode') === 'light' ? 'light' : 'dark');
-$('#modeBtn').addEventListener('click', () => { const m = document.body.getAttribute('data-md') === 'dark' ? 'light' : 'dark'; store.set('skarbnik-mode', m); applyMode(m); });
+applyMode();
+deviceLight.addEventListener('change', () => { if (pref === 'system') applyMode(); });
+$('#modeBtn').addEventListener('click', () => {
+  pref = NEXT[pref];
+  if (pref === 'system') { try { localStorage.removeItem('skarbnik-mode'); } catch { /* storage blocked */ } } else store.set('skarbnik-mode', pref);
+  applyMode();
+  $('#live').textContent = `Theme: ${NAME[pref]}`;
+});
 
 // ---------- phone menu ----------
 const menuBtn = $('#menuBtn'), sheet = $('#menuSheet');
