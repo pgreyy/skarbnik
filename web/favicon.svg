@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" role="img" aria-label="Skarbnik">
-<circle cx="20" cy="20" r="18" fill="#1C1B13" stroke="#77745A" stroke-width="1.2"/>
-<circle cx="20" cy="20" r="14.2" fill="none" stroke="#34321F" stroke-width="1"/>
-<circle cx="20" cy="20" r="11.2" fill="none" stroke="#34321F" stroke-width="1"/>
+<style>
+.disc{fill:#F7F3EA;stroke:#857C69}.groove{stroke:#D3CABA}.label{fill:#964A32}.hole{fill:#EEE9DF}
+@media (prefers-color-scheme: dark){.disc{fill:#1C1B13;stroke:#77745A}.groove{stroke:#34321F}.label{fill:#EE9438}.hole{fill:#12120C}}
+</style>
+<circle class="disc" cx="20" cy="20" r="18" stroke-width="1.2"/>
+<circle class="groove" cx="20" cy="20" r="14.2" fill="none" stroke-width="1"/>
+<circle class="groove" cx="20" cy="20" r="11.2" fill="none" stroke-width="1"/>
 <path d="M20 2A18 18 0 0 1 38 20" fill="none" stroke="#2B9AB0" stroke-width="2.4" stroke-linecap="round"/>
-<circle cx="20" cy="20" r="6.8" fill="#EE9438"/>
-<circle cx="20" cy="20" r="1.5" fill="#12120C"/>
+<circle class="label" cx="20" cy="20" r="6.8"/>
+<circle class="hole" cx="20" cy="20" r="1.5"/>
 </svg>

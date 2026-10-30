@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-30: Tab icon follows light and dark
+
+- `web/favicon.svg` carries both colour sets: the colours of `img/vinyl-mark-light.svg` by default and those of
+  `img/vinyl-mark-dark.svg` under `@media (prefers-color-scheme: dark)`; the teal arc is the same in both. The PNG and
+  ICO fallbacks and the apple touch icon are unchanged; the SVG link is now `favicon.svg?v=r2` so browsers fetch it
+  again. Checked in a headless Chromium with the device set to light and to dark: every part's computed colour equals
+  the matching mark's. Not checked: the icon in a real browser tab (the headless browser has no tab strip).
+
 ## 2026-10-30: Theme button with System
 
 - The header's theme button cycles System, Light, Dark (still one button after the wallet button). System follows the
