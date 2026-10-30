@@ -4,7 +4,7 @@
 import { esc, icon } from '../ui.js';
 
 const P = [
-  { name: 'Vendor', icon: 'user', role: 'Holds the secret', text: 'Holds the private input, prepares the challenge and the reference fix, and runs the evaluation in the current workflow. That also means carrying the proving cost.', cannot: 'Block a payout by going silent. After the verdict window, the timeout rule pays.' },
+  { name: 'Vendor', icon: 'user', role: 'Holds the secret', text: 'Holds the private input, prepares the bounty and the reference fix, and runs the evaluation in the current workflow. That also means carrying the proving cost.', cannot: 'Block a payout by going silent. After the verdict window, the timeout rule pays.' },
   { name: 'Agent', icon: 'cpu', role: 'Writes the fix', text: 'Sees the public task and code, submits a candidate patch, and takes part within the fee and attempt limits.', cannot: 'See the secret input. Its limited key can commit and reveal, not withdraw.' },
   { name: 'Public observer', icon: 'eye', role: 'Checks the record', text: 'Can inspect bounty data, revealed patches, proofs and settlement records on chain, and rebuild the checker.', cannot: 'See the secret input on a private bounty.' },
   { name: 'NEAR contract', icon: 'cube', role: 'Enforces the rules', text: 'Enforces the configured rules and verifies the proof. It holds the money and the deadlines.', cannot: 'Run the private evaluation, or judge a fix by reading it.' },

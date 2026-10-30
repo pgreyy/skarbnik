@@ -3,10 +3,8 @@
 // previous, next, replay, the step tabs (arrow keys, Home and End), a "Try it" control per step, the technical detail
 // toggle, and a proof path and a timeout path at step 4 (the timeout path says "This is not a proof"). An illustrative
 // walkthrough, not connected to the contract; the same story is written out in plain text below it, then the "who
-// sees what" matrix and two real bounties, read live: 16 (paid by proof) and 17 (paid by timeout).
-import { $, esc, icon, chip, note } from '../ui.js';
-import { STATUS } from '../status.js';
-import { loadSome } from '../data.js';
+// sees what" matrix and "What Skarbnik is, and isn't" (the scope, in two lists).
+import { $, esc, icon, note } from '../ui.js';
 import { matrix } from './matrix.js';
 import { PUBLISHED_IMAGE_ID } from '../chain.js';
 
@@ -15,7 +13,7 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 const STEPS = (proof) => [
   { num: '01', label: 'The secret', title: 'A bug exists. The exploit cannot be shared.',
     p1: 'The vendor has a private input that crashes its program. The input is needed to check a fix, but handing it to every outside agent would hand it to attackers too.',
-    p2: 'So it stays with the vendor and only a fingerprint goes on chain. The vendor first proves its own reference fix passes, called Proof 0. The bounty opens only after that.' },
+    p2: 'So it stays on the vendor’s machine and only a fingerprint goes on chain. The vendor first proves its own reference fix passes, called Proof 0. The bounty opens only after that.' },
   { num: '02', label: 'The agent', title: 'An agent fixes it without seeing it.',
     p1: 'The agent reads the public task and code, writes a patch, and tests it against the public tests only. It then commits a fingerprint of the patch and, after a short gap, reveals the patch itself.',
     p2: 'It acts through a key limited to commit and reveal, and pays a rising attempt fee from credit prepaid into the contract.' },
@@ -35,11 +33,11 @@ export async function how(viewEl) {
 <section style="background:radial-gradient(900px 400px at 85% 0%,rgba(var(--am-rgb),.06),transparent 70%),var(--bg)">
 <div class="wrap ihd">
 <div style="display:flex;flex-direction:column;gap:22px;max-width:860px">
-<p class="eyebrow">Interactive introduction</p>
+<p class="eyebrow">How it works</p>
 <h1 class="h1" style="font-size:clamp(40px,5.4cqw,76px)">Inside a private repair challenge</h1>
-<p class="lead">Four steps and a timeout branch, about a minute. Press play, or click through at your own pace. Skip any time. Everything shown is also written out below it.</p>
-<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><button class="btn btn-p" type="button" data-play></button><a class="lnk" href="#/bounties">Skip the intro, browse bounties ${icon('right')}</a></div>
-<p class="small faint">An illustrative walkthrough. It is not connected to the contract. Real bounties are linked at the end.</p>
+<p class="lead">Four short scenes and a timeout branch, about a minute. Press play, or click through at your own pace. The scenes match the five stages on the Home page: stage 1 is The secret, stage 2 The agent, stages 3 and 4 The proof, stage 5 The contract. Everything shown is also written out below.</p>
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><button class="btn btn-p" type="button" data-play></button><a class="lnk" href="#/bounties">Skip this, browse open bounties ${icon('right')}</a></div>
+<p class="small faint">An illustrative walkthrough. It is not connected to the contract. Real bounties are on the <a class="lnk" href="#/bounties">Bounties</a> page.</p>
 </div></div></section>
 <section style="padding-bottom:96px"><div class="wrap"><div class="card story" id="story"></div></div></section>
 <section class="sec rule" aria-labelledby="plain-h"><div class="wrap"><div style="max-width:760px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">The same story in plain text</p><h2 class="h2" id="plain-h">Four steps, written out</h2>
@@ -49,10 +47,12 @@ ${STEPS(true).map((s, i) => `<div><h3 class="h4" style="margin-top:8px">${i + 1}
 <section class="sec rule" aria-labelledby="who-h" style="background:var(--bg2)"><div class="wrap">
 <div style="max-width:720px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Who knows what</p><h2 class="h2" id="who-h">What can each party see?</h2><p class="lead">The same story as a table. The contract enforces rules and checks the proof. It does not run the private evaluation.</p></div>
 <div id="howMatrix"></div></div></section>
-<section class="sec rule" aria-labelledby="real-h"><div class="wrap" style="display:flex;flex-direction:column;gap:28px;align-items:flex-start">
-<p class="eyebrow">See it for real</p><h2 class="h2" id="real-h" style="max-width:760px">Two real bounties, two different endings</h2>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:24px;width:100%" id="real"></div>
-</div></section></main>`;
+<section class="sec rule" id="scope" aria-labelledby="isnt-h"><div class="wrap">
+<div style="max-width:720px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Scope</p><h2 class="h2" id="isnt-h">What Skarbnik is, and isn’t</h2></div>
+<div class="r-isnt">
+<div class="card"><p class="eyebrow" style="color:var(--mn)">It is</p><ul class="n-ul"><li>${icon('check')}<span>A private repair bounty system on NEAR testnet</span></li><li>${icon('check')}<span>For small WebAssembly programs with a known crash and a reference fix</span></li><li>${icon('check')}<span>A way to check a fix against a hidden test, with a proof of that one check</span></li><li>${icon('check')}<span>A NEAR contract that holds the reward and pays by fixed rules</span></li><li>${icon('check')}<span>Open to AI agents and to independent developers</span></li></ul></div>
+<div class="card"><p class="eyebrow" style="color:var(--co)">It isn’t</p><ul class="n-ul no"><li>${icon('x')}<span>A security audit, or proof that a program is safe against everything</span></li><li>${icon('x')}<span>A tool for any kind of software, firmware or vulnerability</span></li><li>${icon('x')}<span>Production ready, or live on mainnet</span></li><li>${icon('x')}<span>A place where the secret goes on chain. Only its fingerprint does</span></li><li>${icon('x')}<span>A proof when a bounty is paid by timeout. A timeout is never a PASS</span></li></ul></div>
+</div></div></section></main>`;
   matrix($('#howMatrix'));
 
   const story = $('#story');
@@ -120,15 +120,4 @@ ${STEPS(true).map((s, i) => `<div><h3 class="h4" style="margin-top:8px">${i + 1}
     if (e.target.closest('[data-tech]')) { stop(); st.tech = !st.tech; draw(); const t = story.querySelector('[data-tech]'); if (t) t.focus(); }
   });
   draw();
-
-  // the two real bounties, with their status read live
-  try {
-    const all = await loadSome(['16', '17']);
-    const card = (id, text, link) => {
-      const x = all.find((e) => String(e.b.id) === id); if (!x) return '';
-      const s = STATUS[x.status];
-      return `<a class="card" href="#/bounties/${id}" style="padding:28px;display:flex;flex-direction:column;gap:14px;text-decoration:none"><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span class="eyebrow" style="color:var(--tx3)">Bounty ${id}</span>${chip(s.cls, x.status, s.icon)}${x.kind === 'test' ? chip('k-test', 'Test bounty', 'flask') : ''}</div><p class="body">${esc(text)}</p><span class="lnk" style="align-self:flex-start">${esc(link)} ${icon('right')}</span></a>`;
-    };
-    if ($('#real')) $('#real').innerHTML = card('16', 'The contract checked a proof and paid the agent. The shortest path through everything above.', 'See the transactions') + card('17', 'A private bounty. The proof finished after the window, so the timeout rule paid. Not a proof.', 'Read the full account');
-  } catch (e) { if ($('#real')) $('#real').innerHTML = note(`Could not read the two bounties from testnet: ${esc(e.message)}`, 'alert'); }
 }

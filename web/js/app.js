@@ -1,6 +1,7 @@
 // The Skarbnik site app: the routes, the redirects from the old routes, the dark and light toggle (dark by default,
 // the visitor's choice remembered in this browser), the phone menu, and the screens. Routes: #/ (Home, seven
-// sections; #mechanism, #example, #why, #paths, #verify, #next open a section), #/how-it-works, #/bounties,
+// sections; #problem, #how, #proof, #paths, #rules, #check open a section, and the old Home section links #mechanism,
+// #example, #why, #verify and #next are replaced by their new place), #/how-it-works, #/bounties,
 // #/bounties/<id>[/<tab>], #/raw/<id>, #/evidence[/<tab>], #/judge[/<tab>], #/agents, #/vendors, #/account[/<name>[/<tab>]].
 // Old routes: #/ledger, #/arena, #/verify and #/agent redirect to their new place. A saved copy at a real path (/judge/)
 // opens its #/ route. Live screens read the testnet
@@ -8,7 +9,7 @@
 import { CONTRACT, EXPLORER_ACCOUNT } from './chain.js';
 import { $, esc, initUi } from './ui.js';
 import { initAccountUi, accountPage } from './account-ui.js';
-import { home, HOME_IDS, showSection } from './pages/home.js';
+import { home, HOME_IDS, OLD_IDS, showSection } from './pages/home.js';
 import { how } from './pages/how.js';
 import { bounties } from './pages/bounties.js';
 import { bounty, raw } from './pages/bounty.js';
@@ -38,7 +39,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.h
 $('#footContract').href = EXPLORER_ACCOUNT + CONTRACT;
 
 // ---------- router ----------
-const TITLES = { 'how-it-works': 'How it works', bounties: 'Bounties', evidence: 'Evidence', judge: 'Judge guide', agents: 'For agents', vendors: 'For vendors', account: 'Account', raw: 'Raw data' };
+const TITLES = { 'how-it-works': 'How it works', bounties: 'Bounties', evidence: 'Proof and evidence', judge: 'Judge guide', agents: 'For agents', vendors: 'For vendors', account: 'Account', raw: 'Raw data' };
 const OLD = { ledger: '#/evidence/ledger', verify: '#/evidence/checker' };
 
 let routeGen = 0;
@@ -46,8 +47,9 @@ let onHome = false;
 async function route() {
   const my = ++routeGen;
   const hash = location.hash;
-  // Home and its sections: '', '#', '#/', '#top', '#mechanism' ... '#next'
+  // Home and its sections: '', '#', '#/', '#top', '#problem' ... '#check'; an old section link is replaced in place
   const sec = hash.replace(/^#/, '');
+  if (OLD_IDS[sec]) { location.replace(`#${OLD_IDS[sec]}`); return null; }
   if (!hash || hash === '#' || hash === '#/' || HOME_IDS.includes(sec)) {
     const i = Math.max(0, HOME_IDS.indexOf(sec));
     if (onHome && $('main.home')) { showSection(i, true); return null; }

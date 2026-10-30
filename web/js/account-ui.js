@@ -40,7 +40,8 @@ function walletHtml(where) {
   if (s.status === 'connecting') return '<button class="btn btn-g btn-s" type="button" disabled aria-busy="true">Connecting…</button>';
   if (s.status === 'wrongnet') return `${BAD('Not a testnet account')}<button class="btn btn-g btn-s" type="button" data-w="out">Disconnect</button>`;
   if (s.status === 'failed') return `<span class="werr" role="alert">${esc(s.error || 'The wallet did not connect.')}</span><button class="btn btn-g btn-s" type="button" data-w="connect">Try again</button>`;
-  return `<button class="btn btn-g btn-s" type="button" data-w="connect">${icon('wallet')} Connect wallet</button>`;
+  // the header button says Wallet (the six page links need the room); the phone menu says Connect wallet
+  return `<button class="btn btn-g btn-s" type="button" data-w="connect"${where === 'top' ? ' aria-label="Connect wallet"' : ''}>${icon('wallet')} ${where === 'top' ? 'Wallet' : 'Connect wallet'}</button>`;
 }
 function renderWallet() {
   for (const [id, where] of [['#walletArea', 'top'], ['#sheetWallet', 'sheet']]) {
