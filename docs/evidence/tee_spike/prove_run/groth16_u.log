@@ -1,0 +1,28 @@
+input receipt: ~/skarbnik-tee/run2/u_succinct.bin (224786 bytes)
+compressed to: groth16
+compress seconds: 379.51
+verify seconds: 0.027
+output receipt: ~/skarbnik-tee/run2/u_groth16.bin (2057 bytes)
+	Command being timed: "~/skarbnik/bin/skarbnik-host compress ~/skarbnik-tee/run2/u_succinct.bin ~/skarbnik-tee/run2/u_groth16.bin groth16"
+	User time (seconds): 810.17
+	System time (seconds): 7.99
+	Percent of CPU this job got: 215%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 6:19.62
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1444112
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 213
+	Minor (reclaiming a frame) page faults: 379433
+	Voluntary context switches: 2592
+	Involuntary context switches: 99023
+	Swaps: 0
+	File system inputs: 46752
+	File system outputs: 1936
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

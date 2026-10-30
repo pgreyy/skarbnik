@@ -1,0 +1,27 @@
+{
+ "at": "2026-10-29T23:58:30Z",
+ "user_config_http": 200,
+ "user_config": {
+  "hostname": "skarbnik-tee-prove",
+  "ssh_authorized_keys": [],
+  "default_gateway_domain": "dstack-pha-prod5.phala.network"
+ },
+ "account_ssh_keys_http": 200,
+ "account_ssh_keys_count": 0,
+ "outside": {
+  "ssh route -22": {
+   "host": "338906be7ffbc09adc8ff02f7451839049162925-22.dstack-pha-prod5.phala.network",
+   "tls": "TLSv1.2",
+   "first_bytes": ""
+  },
+  "ssh route -22s": {
+   "host": "338906be7ffbc09adc8ff02f7451839049162925-22s.dstack-pha-prod5.phala.network",
+   "error": "SSLEOFError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)"
+  },
+  "guest agent page -8090": {
+   "url": "https://338906be7ffbc09adc8ff02f7451839049162925-8090.dstack-pha-prod5.phala.network/",
+   "http": 200,
+   "title": "Worker Information"
+  }
+ }
+}

@@ -1,0 +1,245 @@
+{
+ "app_id": "338906be7ffbc09adc8ff02f7451839049162925",
+ "instance_id": "201b2e948dfa9542a47baae097a44d419d7cee11",
+ "app_cert": "-----BEGIN CERTIFICATE-----\nMIIl9TCCJZqgAwIBAgIUNrmAXKy/Rk3Qg7dQ/I/7EoptO3UwCgYIKoZIzj0EAwIw\nKTEPMA0GA1UECgwGRHN0YWNrMRYwFAYDVQQDDA1Ec3RhY2sgQXBwIENBMB4XDTc1\nMDEwMTAwMDAwMFoXDTM2MTAyNjIzNTY1OFowFDESMBAGA1UEAwwJZGVtby1jZXJ0\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHruSGWGDisZj8fIHHPqa2Z4DHkbv\njSlupLyKDQFttE0NAxEPFp2/Fyz5Zs7DW4bDaOr1Vxv8WiMZ580M064uRaOCJLMw\ngiSvMA8GA1UdDwEB/wQFAwMHgAAwEwYDVR0lBAwwCgYIKwYBBQUHAwIwJAYKKwYB\nBAGD5z0BAwQWBBQziQa+f/vAmtyP8C90UYOQSRYpJTAaBgorBgEEAYPnPQEEBAwE\nCmFwcDpjdXN0b20wgiRDBgorBgEEAYPnPQEIBIIkMwSCJC8AAElOBAACAIEAAAAA\nAAAAk5pyM/ecTKmUCg2zlX8GByKLGyUzQWVhUFttbvQjbHkAAAAACwEFAAAAAAAA\nAAAAAAAAAHvwYygOlPsFH13XsfxZzpqsQruWHfjUS3Ccmw/4entN9khle6bRGJWJ\n/qsdWjyanQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAHAgAAAAAAACpnQyfFAhjbqIAGazSbjVWd\ndJ7Wjc4z/WUcGEqHfQhLB6nlg3Z6etXaE+2R3uwrcAOFZPqIdT4g93SY734HI4e2\nGgWHLQxoVIymYrAFSkZDiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOwhbx0dWRRo/0dBubGS8Bay\nbT+QMDv6nbuXVXJzhTGDmB8hpLyzrpCCR1ONNxrQconvhsUSW5hsMl8KlKz6h3GK\nTvOk1PI327ct2jz3d/0sBUVV+0QH61MzjX1nMppzM+kADjOPMyM+j1G3/QMeHBWL\n3PhXLqsEHAvI63/vSLIyWaalVubI4q+ZmZ/DnHkxeROMp1Lmy+XYdVRqOrbdxERz\n6i6IInAHFEhXSGEg1AmdEL5NYMLIiDXx0sKBOphar3Ub3gB0aMxtHChj/2c0lD5m\nvXdZyhTuM8Yr9SLwqZyjEb4P7Xza044CyW7f3K+6SMvFl7y49fk8doU6XNpkOnHQ\nEAAAF3Ajx2Vnml+UhXmAmBUdEc1MIRhoVOdUkymGBh2Jn1QgjzzIdAtPaH+w414y\nB6yCknvf2OWeZAso9H10/hV1QtSuoKsqXP3EeeKwJZnY4w19y8wRvFUGgaFdB3fS\nmIZ0Za3aCHejG/SoDdIn0LHFPyY6/lE2CBaY/4kQFiLFYW8GAEoQAAAFBQoKBf8A\nAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVAAAAAAAA\nAAcAAAAAAAAA5aOntdgwwpU7mFNMbFmjo0/cNOkz9/WJjwqFzwiEa8oAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANyeKnxvlI8XR040p/xD7QMPfBVj8bq9\n32NAyC4OVKjFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAgAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALv18v3R/R/C4W4TgQsi0Z3tEC1H3N42\nvrU3s3cwYl+qAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABCGgThhWWs\nEraBj9w5wG5xjhfPyfwVFv1FrX9sXSk/ns9TXL/m8m6BBY9IXQhls+I+XrbS2pWz\nMGRS0JFmOGeAIAAAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHwUAYg4A\nAC0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlFOGpDQ0JKaWdBd0lCQWdJ\nVkFOWkJNQnJxdVQzV1VVVWI0NUJsT2N6M2M2aUJNQW9HQ0NxR1NNNDlCQU1DCk1I\nQXhJakFnQmdOVkJBTU1HVWx1ZEdWc0lGTkhXQ0JRUTBzZ1VHeGhkR1p2Y20wZ1Ew\nRXhHakFZQmdOVkJBb00KRVVsdWRHVnNJRU52Y25CdmNtRjBhVzl1TVJRd0VnWURW\nUVFIREF0VFlXNTBZU0JEYkdGeVlURUxNQWtHQTFVRQpDQXdDUTBFeEN6QUpCZ05W\nQkFZVEFsVlRNQjRYRFRJMk1ERXlPVEExTXpJd05sb1hEVE16TURFeU9UQTFNekl3\nCk5sb3djREVpTUNBR0ExVUVBd3daU1c1MFpXd2dVMGRZSUZCRFN5QkRaWEowYVda\ncFkyRjBaVEVhTUJnR0ExVUUKQ2d3UlNXNTBaV3dnUTI5eWNHOXlZWFJwYjI0eEZE\nQVNCZ05WQkFjTUMxTmhiblJoSUVOc1lYSmhNUXN3Q1FZRApWUVFJREFKRFFURUxN\nQWtHQTFVRUJoTUNWVk13V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNB\nQVI5CkYwRVF1VVgrQ3Rmd1FqYXJqa0JwQ29OZGNhdGZCUDFoRE4vd2Z3OXBCeXhR\nWEtCRkx0aW5ubFhjenhWYWlIVEwKck8vY1J2T3Q3VWN1dk15MjF3L1hvNElERFRD\nQ0F3a3dId1lEVlIwakJCZ3dGb0FVbFc5ZHpiMGI0ZWxBU2NuVQo5RFBPQVZjTDNs\nUXdhd1lEVlIwZkJHUXdZakJnb0Y2Z1hJWmFhSFIwY0hNNkx5OWhjR2t1ZEhKMWMz\nUmxaSE5sCmNuWnBZMlZ6TG1sdWRHVnNMbU52YlM5elozZ3ZZMlZ5ZEdsbWFXTmhk\nR2x2Ymk5Mk5DOXdZMnRqY213L1kyRTkKY0d4aGRHWnZjbTBtWlc1amIyUnBibWM5\nWkdWeU1CMEdBMVVkRGdRV0JCUlR6dE1TQTVDdjlMZ1RnMUw3QzE2VApLUHlVMERB\nT0JnTlZIUThCQWY4RUJBTUNCc0F3REFZRFZSMFRBUUgvQkFJd0FEQ0NBam9HQ1Nx\nR1NJYjRUUUVOCkFRU0NBaXN3Z2dJbk1CNEdDaXFHU0liNFRRRU5BUUVFRUQ0d2Jo\nTTdmOXFudTNuMmRqVExVZ3d3Z2dGa0Jnb3EKaGtpRytFMEJEUUVDTUlJQlZEQVFC\nZ3NxaGtpRytFMEJEUUVDQVFJQkJUQVFCZ3NxaGtpRytFMEJEUUVDQWdJQgpCVEFR\nQmdzcWhraUcrRTBCRFFFQ0F3SUJBakFRQmdzcWhraUcrRTBCRFFFQ0JBSUJBakFR\nQmdzcWhraUcrRTBCCkRRRUNCUUlCQlRBUkJnc3Foa2lHK0UwQkRRRUNCZ0lDQVA4\nd0VBWUxLb1pJaHZoTkFRMEJBZ2NDQVFBd0VBWUwKS29aSWh2aE5BUTBCQWdnQ0FR\nSXdFQVlMS29aSWh2aE5BUTBCQWdrQ0FRQXdFQVlMS29aSWh2aE5BUTBCQWdvQwpB\nUUF3RUFZTEtvWklodmhOQVEwQkFnc0NBUUF3RUFZTEtvWklodmhOQVEwQkFnd0NB\nUUF3RUFZTEtvWklodmhOCkFRMEJBZzBDQVFBd0VBWUxLb1pJaHZoTkFRMEJBZzRD\nQVFBd0VBWUxLb1pJaHZoTkFRMEJBZzhDQVFBd0VBWUwKS29aSWh2aE5BUTBCQWhB\nQ0FRQXdFQVlMS29aSWh2aE5BUTBCQWhFQ0FRMHdId1lMS29aSWh2aE5BUTBCQWhJ\nRQpFQVVGQWdJRi93QUNBQUFBQUFBQUFBQXdFQVlLS29aSWh2aE5BUTBCQXdRQ0FB\nQXdGQVlLS29aSWh2aE5BUTBCCkJBUUdJS0J2QUFBQU1BOEdDaXFHU0liNFRRRU5B\nUVVLQVFFd0hnWUtLb1pJaHZoTkFRMEJCZ1FRcEVIYy9lNU0KeEtDRFY2MGZRdHky\nZmpCRUJnb3Foa2lHK0UwQkRRRUhNRFl3RUFZTEtvWklodmhOQVEwQkJ3RUJBZjh3\nRUFZTApLb1pJaHZoTkFRMEJCd0lCQWY4d0VBWUxLb1pJaHZoTkFRMEJCd01CQWY4\nd0NnWUlLb1pJemowRUF3SURTQUF3ClJRSWdRUUcxTld1elVkdWYxektRZWFWL1Zh\nbS9DWHZXUGdSVE96c2IyaUE2bEdnQ0lRRFI1MUZwY291clR6TlcKeFcrYlZvNDgr\nemt6MTJlVzlTK0svUUdkTVR2UjNRPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0t\nLQotLS0tLUJFR0lOIENFUlRJRklDQVRFLS0tLS0KTUlJQ2xqQ0NBajJnQXdJQkFn\nSVZBSlZ2WGMyOUcrSHBRRW5KMVBRenpnRlhDOTVVTUFvR0NDcUdTTTQ5QkFNQwpN\nR2d4R2pBWUJnTlZCQU1NRVVsdWRHVnNJRk5IV0NCU2IyOTBJRU5CTVJvd0dBWURW\nUVFLREJGSmJuUmxiQ0JECmIzSndiM0poZEdsdmJqRVVNQklHQTFVRUJ3d0xVMkZ1\nZEdFZ1EyeGhjbUV4Q3pBSkJnTlZCQWdNQWtOQk1Rc3cKQ1FZRFZRUUdFd0pWVXpB\nZUZ3MHhPREExTWpFeE1EVXdNVEJhRncwek16QTFNakV4TURVd01UQmFNSEF4SWpB\nZwpCZ05WQkFNTUdVbHVkR1ZzSUZOSFdDQlFRMHNnVUd4aGRHWnZjbTBnUTBFeEdq\nQVlCZ05WQkFvTUVVbHVkR1ZzCklFTnZjbkJ2Y21GMGFXOXVNUlF3RWdZRFZRUUhE\nQXRUWVc1MFlTQkRiR0Z5WVRFTE1Ba0dBMVVFQ0F3Q1EwRXgKQ3pBSkJnTlZCQVlU\nQWxWVE1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRU5TQi83dDIx\nbFhTTwoyQ3V6cHh3NzRlSkI3MkV5REdnVzVyWEN0eDJ0VlRMcTZoS2s2eitVaVJa\nQ25xUjdwc092Z3FGZVN4bG1UbEpsCmVUbWkyV1l6M3FPQnV6Q0J1REFmQmdOVkhT\nTUVHREFXZ0JRaVpReldXcDAwaWZPRHRKVlN2MUFiT1NjR3JEQlMKQmdOVkhSOEVT\nekJKTUVlZ1JhQkRoa0ZvZEhSd2N6b3ZMMk5sY25ScFptbGpZWFJsY3k1MGNuVnpk\nR1ZrYzJWeQpkbWxqWlhNdWFXNTBaV3d1WTI5dEwwbHVkR1ZzVTBkWVVtOXZkRU5C\nTG1SbGNqQWRCZ05WSFE0RUZnUVVsVzlkCnpiMGI0ZWxBU2NuVTlEUE9BVmNMM2xR\nd0RnWURWUjBQQVFIL0JBUURBZ0VHTUJJR0ExVWRFd0VCL3dRSU1BWUIKQWY4Q0FR\nQXdDZ1lJS29aSXpqMEVBd0lEUndBd1JBSWdYc1ZraTB3K2k2VllHVzNVRi8yMnVh\nWGUwWUpEajFVZQpuQStUakQxYWk1Y0NJQ1liMVNBbUQ1eGtmVFZwdm80VW95aVNZ\neHJEV0xtVVI0Q0k5Tkt5ZlBOKwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCi0t\nLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlDanpDQ0FqU2dBd0lCQWdJVUlt\nVU0xbHFkTkluemc3U1ZVcjlRR3prbkJxd3dDZ1lJS29aSXpqMEVBd0l3CmFERWFN\nQmdHQTFVRUF3d1JTVzUwWld3Z1UwZFlJRkp2YjNRZ1EwRXhHakFZQmdOVkJBb01F\nVWx1ZEdWc0lFTnYKY25CdmNtRjBhVzl1TVJRd0VnWURWUVFIREF0VFlXNTBZU0JE\nYkdGeVlURUxNQWtHQTFVRUNBd0NRMEV4Q3pBSgpCZ05WQkFZVEFsVlRNQjRYRFRF\nNE1EVXlNVEV3TkRVeE1Gb1hEVFE1TVRJek1USXpOVGsxT1Zvd2FERWFNQmdHCkEx\nVUVBd3dSU1c1MFpXd2dVMGRZSUZKdmIzUWdRMEV4R2pBWUJnTlZCQW9NRVVsdWRH\nVnNJRU52Y25CdmNtRjAKYVc5dU1SUXdFZ1lEVlFRSERBdFRZVzUwWVNCRGJHRnlZ\nVEVMTUFrR0ExVUVDQXdDUTBFeEN6QUpCZ05WQkFZVApBbFZUTUZrd0V3WUhLb1pJ\nemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQzZuRXdNRElZWk9qL2lQV3NDemFFS2k3\nCjFPaU9TTFJGaFdHamJuQlZKZlZua1k0dTNJamtEWVlMME14TzRtcXN5WWpsQmFs\nVFZZeEZQMnNKQks1emxLT0IKdXpDQnVEQWZCZ05WSFNNRUdEQVdnQlFpWlF6V1dw\nMDBpZk9EdEpWU3YxQWJPU2NHckRCU0JnTlZIUjhFU3pCSgpNRWVnUmFCRGhrRm9k\nSFJ3Y3pvdkwyTmxjblJwWm1sallYUmxjeTUwY25WemRHVmtjMlZ5ZG1salpYTXVh\nVzUwClpXd3VZMjl0TDBsdWRHVnNVMGRZVW05dmRFTkJMbVJsY2pBZEJnTlZIUTRF\nRmdRVUltVU0xbHFkTkluemc3U1YKVXI5UUd6a25CcXd3RGdZRFZSMFBBUUgvQkFR\nREFnRUdNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUV3Q2dZSQpLb1pJemowRUF3\nSURTUUF3UmdJaEFPVy81UWtSK1M5Q2lTRGNOb293THVQUkxzV0dmL1lpN0dTWDk0\nQmd3VHdnCkFpRUE0SjBsckhvTXMrWG81by9zWDZPOVFXeEhSQXZaVUdPZFJRN2N2\ncVJYYXFJPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCgAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAOAAAAAAKAAAAwG2uFRcMn+pkVWgeP4OJQaZC/5ABoCozPpyoVJrx\n20ukfwFAPjHavm6KC0Hd04ttmSxhY3BpLWxvYWRlciRBQ1BJIERBVEEAAAAACgAA\nAMCzpiIy72vgZMziWouSz1XUpsCZ7nqcCFLODH1XI5Pa6EiVwPWanbUADws0qQwb\nG+wkYWNwaS1yc2RwJEFDUEkgREFUQQAAAAAKAAAAwLbtj/P8o8MI8/HseIkFTMkA\nscba2bFK7dAUTQRmJsgaXbrkeTf0lJuy1nSgvWmaeyxhY3BpLXRhYmxlcyRBQ1BJ\nIERBVEEDAAAAAQAACMD5l0Ag71BwaBgzE9DKgI4NHKmy0a0MYfV4TnFXw2LAZTb1\n3aza1EUWk/SPzHL/9iRAc3lzdGVtLXByZXBhcmluZwADAAAAAQAACMCmOXrTCApF\nW+aoN3FoMefps3WUrK4YpE5IiT6E8QwNgciuxTzvQ9AUscpJ4VxH/rkYYXBwLWlk\nUDOJBr5/+8Ca3I/wL3RRg5BJFiklAwAAAAEAAAjA0QxMviksN17Rx44UstlR5yKP\nJ8YWlCHJI2EHJPQAHziT6/zQIbnQaaxTVldp7ZtuMGNvbXBvc2UtaGFzaID4c9M8\nDS4tZjSq9+xcMVysg3eu0sqzusqaxZcQBLhSIgMAAAABAAAIwKoluDfYEJjVbnJs\n39RmTq6aEmk2JHl1PQS9/SOaRTiKBW8kWEGRCTHqCf+CeLnUgjxncHUtcG9saWN5\nLWhhc2iARBNvo1WzZ4oRRq0W9+hknpT7T8If536DEMBg9hyq/4oDAAAAAQAACMC7\ndJ4qJb1ZcVvz1NZr8VvuLpd1YaMxd1SE1QaJWUWxMjWYnB32joosFxZiIzU6+iks\naW5zdGFuY2UtaWRQIBsulI36lUKke6rgl6RNQZ187hEDAAAAAQAACMCYvX5r05Un\nILZQJ/1JSDQEXQa0pxS/c3oGuHRjiz6gD/QC9/WD4+OwXpIchXBDOsYwYm9vdC1t\nci1kb25lAAMAAAABAAAIwMWVK6dqTxH+1Gw48d1B+TGxxK6+Kw3eTQzWA71MCQv8\nrmiavBYy8jil0j46GSTbSTRvcy1pbWFnZS1oYXNogOxDy4xeBLa7bFOzOxYHagHY\nPQH39LcD8veKDZR9YkfmAwAAAAEAAAjAgzaLQ6D8b4JPWpIgWS34X9MOLUBey9JT\npcY1SvY+bJtBrsVXw4o440irh/msj8aMMGtleS1wcm92aWRlcjEDeyJuYW1lIjoi\na21zIiwiaWQiOiIzMDU5MzAxMzA2MDcyYTg2NDhjZTNkMDIwMTA2MDgyYTg2NDhj\nZTNkMDMwMTA3MDM0MjAwMDQ4ODQ0ZWI0MmNjZGY4YzUyZmQ0ZjE3NGYzNjJmY2I5\nYmJkMTljNDVmZDQ4ZjFlZGVjMmQ4ZjFjYTIzNTM2ZWMxYTc0MDIxYjRjZWU2MTBj\nMDc0ZjgyOTRkNDMxYjJiN2ZlZTJjMzllNTMzM2ZkYWYwYTQ1MjJkNDNmYjE1OWQ5\nZiJ9AwAAAAEAAAjAulEQRjaQAmiw4Fn6PSZkGdB50elK6ib7n8u412S/TImmesJx\nuKDRo5iZRRMqER/HKHN0b3JhZ2UtZnMMemZzAwAAAAEAAAjAOx59oi11A0FW5uaw\nHjNlGzy9OO2HWrAdoF8DPgtLBDAEwLZpKrvvfi3DZv/7Dl5eRHN0b3JhZ2UtZW5j\ncnlwdGVkBDEDAAAAAQAACMAadrKoCgvnHq5Z+AlF2HY1Gno/uOn9H/HO3lc0qoTq\nEf1ytO37tvBOWoXt0RTHUb0wc3lzdGVtLXJlYWR5ACxAc3lzdGVtLXByZXBhcmlu\nZwAYYXBwLWlkUDOJBr5/+8Ca3I/wL3RRg5BJFiklMGNvbXBvc2UtaGFzaID4c9M8\nDS4tZjSq9+xcMVysg3eu0sqzusqaxZcQBLhSIjxncHUtcG9saWN5LWhhc2iARBNv\no1WzZ4oRRq0W9+hknpT7T8If536DEMBg9hyq/4osaW5zdGFuY2UtaWRQIBsulI36\nlUKke6rgl6RNQZ187hEwYm9vdC1tci1kb25lADRvcy1pbWFnZS1oYXNogOxDy4xe\nBLa7bFOzOxYHagHYPQH39LcD8veKDZR9YkfmMGtleS1wcm92aWRlcjEDeyJuYW1l\nIjoia21zIiwiaWQiOiIzMDU5MzAxMzA2MDcyYTg2NDhjZTNkMDIwMTA2MDgyYTg2\nNDhjZTNkMDMwMTA3MDM0MjAwMDQ4ODQ0ZWI0MmNjZGY4YzUyZmQ0ZjE3NGYzNjJm\nY2I5YmJkMTljNDVmZDQ4ZjFlZGVjMmQ4ZjFjYTIzNTM2ZWMxYTc0MDIxYjRjZWU2\nMTBjMDc0ZjgyOTRkNDMxYjJiN2ZlZTJjMzllNTMzM2ZkYWYwYTQ1MjJkNDNmYjE1\nOWQ5ZiJ9KHN0b3JhZ2UtZnMMemZzRHN0b3JhZ2UtZW5jcnlwdGVkBDEwc3lzdGVt\nLXJlYWR5AHUb3gB0aMxtHChj/2c0lD5mvXdZyhTuM8Yr9SLwqZyjEb4P7Xza044C\nyW7f3K+6SMvFl7y49fk8doU6XNpkOnElJHsib3NfaW1hZ2VfaGFzaCI6ImVjNDNj\nYjhjNWUwNGI2YmI2YzUzYjMzYjE2MDc2YTAxZDgzZDAxZjdmNGI3MDNmMmY3OGEw\nZDk0N2Q2MjQ3ZTYiLCJjcHVfY291bnQiOjgsIm1lbW9yeV9zaXplIjoxNzE3OTg2\nOTE4NCwicWVtdV9zaW5nbGVfcGFzc19hZGRfcGFnZXMiOnRydWUsInBpYyI6dHJ1\nZSwicWVtdV92ZXJzaW9uIjoiOC4yLjIiLCJwY2lfaG9sZTY0X3NpemUiOjAsImh1\nZ2VwYWdlcyI6ZmFsc2UsIm51bV9ncHVzIjowLCJudW1fbnZzd2l0Y2hlcyI6MCwi\naG90cGx1Z19vZmYiOmZhbHNlLCJpbWFnZSI6ImRzdGFjay0wLjYuMSIsImhvc3Rf\nc2hhcmVfbW9kZSI6IjlwIiwib3ZtZl92YXJpYW50IjoicHJlMjAyNTA1IiwidGR4\nX2F0dGVzdGF0aW9uX3ZhcmlhbnQiOiJsaXRlIiwidGR4X21lYXN1cmVtZW50Ijp7\nImNoZWNrc3VtX2ZpbGUiOiJZMkU1WmpGaFl6Sm1aakkxTURrMlpqQXpOak5tT0RV\nME5UQmtZemRrWWpVNFl6SmtZekkzTUdNeU56RTVPR1EzT1RCak1HVXpNR1ZoWW1R\nd01XTTRZeUFnYjNadFppNW1aQW96Wldaa056RmtNalprTVdJMk9XWmtORFUwTnpN\nME56WXpabUpoTm1VM01HVTJOamMxTWpBeFlqUTJNbVpoTTJVelpUWmhZMk13WWpF\nMFl6STVOVFl4SUNCaWVrbHRZV2RsQ21abE9HWTRPRFJoTkRnNE5URTNNVEJrTkRJ\nME5XVmxPVGd3TXpGalpUbGxNamxqTkRoak1qSXdaVFJtT0dWallUWmxOVEE1WVRN\nMk9XRXpaV1E1Tm1VZ0lHbHVhWFJ5WVcxbWN5NWpjR2x2TG1kNkNtRTNNalJtTUdW\nbE1tSmpPV00yTVRrek4ySXhZV0V5Tm1ObE1UQmtZV0k1WWpJNE9XSXhaV0UyWWpR\neVpERXdZalEwTmpSa1pqZ3lOR1ZoTlRNek1Ua2dJRzFsZEdGa1lYUmhMbXB6YjI0\nS05HTTROamRpTW1KbVkySmtZbVUyTnpBMU1UZGhaRFk1TWpReFptSmlNR1E0WWpF\nek1tSmxaV0l4WXpsbVl6WXdORGhrTlRZeFlUa3daV1kxWWpGaFpDQWdiV1ZoYzNW\neVpXMWxiblF1ZEdSNExtTmliM0lLWkRFME1EYzRNVFF6TUdKa016ZzBPV05tTVdW\nak56WmtZak15WVRVNFltUmlaalEzWVdVMU1tVmlOVEUxWTJZellXUXlZalZoWm1J\nM00yUmpOMkU1WVNBZ2JXVmhjM1Z5WlcxbGJuUXVjMjV3TG1OaWIzSUtOV001WXps\nbFpqZzRORFk0TlRCbE5XUXdaVGRsWXpOak5UTmpabUZtWXpCallUazBabU16WVRj\nMVlUWmlZelppTUdJME5qVXdOMlppT0RBM1lUZGxNaUFnYldWaGMzVnlaVzFsYm5R\ndVoyTndMbU5pYjNJS016a3haVFl5TURCbE1EaGlPVEExTnpVMllUVTJaRGRoTTJZ\neFltRXhaak13TkdWaE1HUXdZemxtWlRnM01ERTROamxrT0RSak5HSTVOR05pTWpJ\nMk5DQWdiV1ZoYzNWeVpXMWxiblF1WVhkekxtTmliM0lLWlRreU0yWTBNalJtTVRZ\nd1lXRmhNR1pqWWprNE1qUmlZakJrTkRKaU5qQXdZVGRpWlRNMU16ZzFZVGMyTXpk\na05HWXdZV05pWkRWalkyTTBNVFpqTVNBZ2JXVmhjM1Z5WlcxbGJuUXVZWGR6TG5K\nbGNHeGhlUzVxYzI5dUNnPT0iLCJtZWFzdXJlbWVudCI6Im8yZDJaWEp6YVc5dUJH\nVnBiV0ZuWmFSblkyMWtiR2x1WlhrQkVtTnZibk52YkdVOWRIUjVVekFnYVc1cGRE\nMHZhVzVwZENCd1lXNXBZejB4SUc1bGRDNXBabTVoYldWelBUQWdZbWx2YzJSbGRt\nNWhiV1U5TUNCdFkyVTliMlptSUc5dmNITTljR0Z1YVdNZ2NHTnBQVzV2WldGeWJI\na2djbUZ1Wkc5dExuUnlkWE4wWDJOd2RUMTVJSEpoYm1SdmJTNTBjblZ6ZEY5aWIy\nOTBiRzloWkdWeVBXNGdkSE5qUFhKbGJHbGhZbXhsSUc1dkxXdDJiV05zYjJOcklH\nUnpkR0ZqYXk1eWIyOTBabk5mYUdGemFEMDVOVEF5TTJSbU1HVmlabU0zTldNM1lX\nWTFZalk1TmprME1XSTNOemsxTWpFMVpXWTFNbVUzTTJNMk1EWXhZall6WVdZME5E\nVTVNams1WWpGbVltSm1JR1J6ZEdGamF5NXliMjkwWm5OZmMybDZaVDAxT1RJek16\nZzVORFJ6YTJWeWJtVnNYMkYxZEdobGJuUnBZMjlrWlZnd1Z6MS9tMjlISThyem9P\ndlc0aUs4MjFyQzRkdDJvQXJWUjM0Vmw5T2p3bVBsS1BEYm84L0ZnUUhRaE1EcXlo\naWxlQmhyWlhKdVpXeGZhR1ZoWkdWeVgyNXZjbTFoYkdsNlpXVDFiV2x1YVhSeVpG\nOXphR0V6T0RSWU1IcVBnUGE4aXBFdkJmWXA1bWdUdFpaamwrT1RCQ3g0M0ZzSVdD\nMUhNNktJWkJjKzJlN05KZEJJbGQzVWllUmU1V1IwWkhabW8yUnZkbTFtYVhCeVpU\nSXdNalV3TldSdGNuUmtvbXR6YVc1bmJHVmZjR0Z6YzFnd2c3cndCS0JzZy9ZM0hV\nMmVHY2k3SHExelM2ZHBibGJXdFNKeEFST1VwdkpPL3N3bnJ6dGNIYVFWbE52NmNH\nNlhhSFIzYjE5d1lYTnpXREFxWjBNbnhRSVkyNmlBQm1zMG00MVZuWFNlMW8zT00v\nMWxIQmhLaDMwSVN3ZXA1WU4yZW5yVjJoUHRrZDdzSzNCbWRHUmZhRzlpVElBUUNR\nUUFCZ2tDQ3dJUUVBPT0ifSwic3BlY192ZXJzaW9uIjoxfTAKBggqhkjOPQQDAgNJ\nADBGAiEAmuVvvD+8Cbu5jlP1aHhl0NKcJ+3hElphD7ZNA8vJzv8CIQCgpyjD1poF\nypXmkKCc95mJMPxc6VY19OfW26HEQCEAVg==\n-----END CERTIFICATE-----\n\n-----BEGIN CERTIFICATE-----\nMIIB2jCCAYCgAwIBAgIUYuDECykrA2Xn1st7ErzWbCtNNrswCgYIKoZIzj0EAwIw\nKTEPMA0GA1UECgwGRHN0YWNrMRYwFAYDVQQDDA1Ec3RhY2sgS01TIENBMB4XDTc1\nMDEwMTAwMDAwMFoXDTM2MTAyNjIzNTY1OFowKTEPMA0GA1UECgwGRHN0YWNrMRYw\nFAYDVQQDDA1Ec3RhY2sgQXBwIENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE\n/xT6T2rJZ5BySHaDUJQBnOe4col5MeixQ/wE9czQ7fuXCWLWK3+S8hIH3hUu5bzg\n/zmZkTwakkTkTPTHMBtdiaOBhTCBgjAPBgNVHQ8BAf8EBQMDB4YAMB0GA1UdDgQW\nBBTS9PihVVx1HdrEmc+x4+7moXHLFTASBgNVHRMBAf8ECDAGAQH/AgEAMCQGCisG\nAQQBg+c9AQMEFgQUM4kGvn/7wJrcj/AvdFGDkEkWKSUwFgYKKwYBBAGD5z0BBAQI\nBAZhcHA6Y2EwCgYIKoZIzj0EAwIDSAAwRQIgDEbWAIXaVewRytZOY05HaDZDYgDq\nLwKYerDv4Apa+9UCIQCy6067Sob3dB5STKbZ0XYHvsLjwynuiL/jVeN7QOBtSQ==\n-----END CERTIFICATE-----\n\n-----BEGIN CERTIFICATE-----\nMIIBmTCCAUCgAwIBAgIULjTIbT0W9/cnScGFas7c8wR0Mj0wCgYIKoZIzj0EAwIw\nKTEPMA0GA1UECgwGRHN0YWNrMRYwFAYDVQQDDA1Ec3RhY2sgS01TIENBMB4XDTc1\nMDEwMTAwMDAwMFoXDTM2MTAxOTIyMTUzNFowKTEPMA0GA1UECgwGRHN0YWNrMRYw\nFAYDVQQDDA1Ec3RhY2sgS01TIENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE\niETrQszfjFL9TxdPNi/Lm70ZxF/Ujx7ewtjxyiNTbsGnQCG0zuYQwHT4KU1DGyt/\n7iw55TM/2vCkUi1D+xWdn6NGMEQwDwYDVR0PAQH/BAUDAweGADAdBgNVHQ4EFgQU\nO5r1Q7cheZKAuj8FzvKpOu49meQwEgYDVR0TAQH/BAgwBgEB/wIBATAKBggqhkjO\nPQQDAgNHADBEAiBlWjnSHS1Q3gHx5nrH2S7hIlKUCGtUKqOZP8hALbN6qAIgAwXT\ndfnWFJb0LKL7zRU4IO03mpLJ38YxmPCST1UNQlQ=\n-----END CERTIFICATE-----\n",
+ "tcb_info": {
+  "mrtd": "2a674327c50218dba880066b349b8d559d749ed68dce33fd651c184a877d084b07a9e583767a7ad5da13ed91deec2b70",
+  "rtmr0": "ec216f1d1d591468ff4741b9b192f016b26d3f90303bfa9dbb97557273853183981f21a4bcb3ae908247538d371ad072",
+  "rtmr1": "89ef86c5125b986c325f0a94acfa87718a4ef3a4d4f237dbb72dda3cf777fd2c054555fb4407eb53338d7d67329a7333",
+  "rtmr2": "e9000e338f33233e8f51b7fd031e1c158bdcf8572eab041c0bc8eb7fef48b23259a6a556e6c8e2af99999fc39c793179",
+  "rtmr3": "138ca752e6cbe5d875546a3ab6ddc44473ea2e88227007144857486120d4099d10be4d60c2c88835f1d2c2813a985aaf",
+  "app_compose": "{\"allowed_envs\":[],\"docker_compose_file\":\"# What Phala Cloud runs in the CVM for the confidential proving spike: our sealed checker and prover image, pinned by\\n# digest, with the dstack guest agent socket (for TDX quotes) and port 8080 behind Phala's gateway.\\nservices:\\n  tee:\\n    image: ghcr.io/pgreyy/skarbnik-tee@sha256:60f6bcf3862b67e91bb92858831c1279f28e6167131ee5eae94793933fabeb3d\\n    ports:\\n      - \\\"8080:8080\\\"\\n    volumes:\\n      - /var/run/dstack.sock:/var/run/dstack.sock\\n    restart: on-failure\\n\",\"features\":[\"kms\",\"tproxy-net\"],\"gateway_enabled\":true,\"init_script\":[],\"key_provider\":\"kms\",\"key_provider_id\":\"3059301306072a8648ce3d020106082a8648ce3d030107034200048844eb42ccdf8c52fd4f174f362fcb9bbd19c45fd48f1edec2d8f1ca23536ec1a74021b4cee610c074f8294d431b2b7fee2c39e5333fdaf0a4522d43fb159d9f\",\"kms_enabled\":true,\"local_key_provider_enabled\":false,\"manifest_version\":\"3\",\"name\":\"skarbnik-tee-prove\",\"no_instance_id\":false,\"pre_launch_script\":\"#!/bin/bash\\necho \\\"----------------------------------------------\\\"\\necho \\\"Running Phala Cloud Pre-Launch Script v0.0.20\\\"\\necho \\\"----------------------------------------------\\\"\\nset -e\\n\\n# Function: notify host\\n\\nnotify_host() {\\n    if command -v dstack-util >/dev/null 2>&1; then\\n        dstack-util notify-host -e \\\"$1\\\" -d \\\"$2\\\"\\n    else\\n        tdxctl notify-host -e \\\"$1\\\" -d \\\"$2\\\"\\n    fi\\n}\\n\\nnotify_host_hoot_info() {\\n    notify_host \\\"boot.progress\\\" \\\"$1\\\"\\n}\\n\\nnotify_host_hoot_error() {\\n    notify_host \\\"boot.error\\\" \\\"$1\\\"\\n}\\n\\n# Function: Perform Docker cleanup\\nperform_cleanup() {\\n    echo \\\"Pruning unused images\\\"\\n    docker image prune -af\\n    echo \\\"Pruning unused volumes\\\"\\n    docker volume prune -f\\n    notify_host_hoot_info \\\"docker cleanup completed\\\"\\n}\\n\\n# Function: Check Docker login status without exposing credentials\\ncheck_docker_login() {\\n    local registry=\\\"${1-}\\\"\\n\\n    # When registry is specified, check auth entry for that registry in Docker config\\n    if [[ -n \\\"$registry\\\" ]]; then\\n        local docker_config_path=\\\"${DOCKER_CONFIG:-${HOME:-}/.docker}/config.json\\\"\\n        if [[ -f \\\"$docker_config_path\\\" ]] && grep -q \\\"$registry\\\" \\\"$docker_config_path\\\"; then\\n            return 0\\n        else\\n            return 1\\n        fi\\n    fi\\n\\n    # Fallback check when no explicit registry is provided\\n    if docker info 2>/dev/null | grep -q \\\"Username\\\"; then\\n        return 0\\n    else\\n        return 1\\n    fi\\n}\\n\\n# Function: print the SHA256 fingerprint of every authorized key\\n#\\n# Output matches `ssh-keygen -lf` and the fingerprints GitHub and Phala Cloud\\n# display, so an operator can match the boot log against the account's key list.\\n# The guest image ships neither ssh-keygen nor a base64 applet (BusyBox has\\n# base32 only), so openssl does both the decode and the digest.\\nprint_authorized_key_fingerprints() {\\n    local file=\\\"$1\\\"\\n    if ! command -v openssl >/dev/null 2>&1; then\\n        echo \\\"openssl not available; skipping SSH key fingerprints\\\"\\n        return 0\\n    fi\\n\\n    # Locals start unset under bash; initialize so set -u (inherited from\\n    # dstack app-compose.sh source) does not trip the read loop guard.\\n    local key_type=\\\"\\\" blob=\\\"\\\" comment=\\\"\\\" decoded_bytes=\\\"\\\" fingerprint=\\\"\\\"\\n    # `|| [[ -n \\\"$key_type\\\" ]]` keeps the final line when the file does not end\\n    # with a newline; read returns non-zero there but still fills the variables.\\n    while read -r key_type blob comment || [[ -n \\\"$key_type\\\" ]]; do\\n        if [[ -z \\\"$blob\\\" ]]; then\\n            continue\\n        fi\\n        # openssl exits 0 on undecodable input and emits nothing, which would\\n        # otherwise print the SHA256 of the empty string as a real fingerprint.\\n        decoded_bytes=$(printf '%s' \\\"$blob\\\" | openssl base64 -d -A 2>/dev/null | wc -c || true)\\n        if [[ \\\"$decoded_bytes\\\" -eq 0 ]]; then\\n            echo \\\"  $key_type <unreadable key>\\\"\\n            continue\\n        fi\\n        fingerprint=$(printf '%s' \\\"$blob\\\" | openssl base64 -d -A 2>/dev/null | openssl dgst -sha256 -binary 2>/dev/null | openssl base64 -A 2>/dev/null | tr -d '=' || true)\\n        echo \\\"  $key_type SHA256:$fingerprint\\\"\\n    done < \\\"$file\\\"\\n}\\n\\n# Main logic starts here\\necho \\\"Starting login process...\\\"\\n\\n# Optional env vars below use ${VAR-} / ${VAR:-} so this script stays safe when\\n# app-compose.sh sources it under `set -euo pipefail` without registry/SSH/root\\n# credentials set. Bare \\\"$VAR\\\" throws \\\"unbound variable\\\" under nounset.\\nDOCKER_REGISTRY_TARGET=\\\"${DSTACK_DOCKER_REGISTRY:-docker.io}\\\"\\n\\n# Check if Docker credentials exist\\nif [[ -n \\\"${DSTACK_DOCKER_USERNAME-}\\\" && -n \\\"${DSTACK_DOCKER_PASSWORD-}\\\" ]]; then\\n    echo \\\"Docker credentials found\\\"\\n    echo \\\"Target Docker registry: $DOCKER_REGISTRY_TARGET\\\"\\n\\n    # Check if already logged in\\n    if check_docker_login \\\"${DSTACK_DOCKER_REGISTRY-}\\\"; then\\n        echo \\\"Already logged in to Docker registry: $DOCKER_REGISTRY_TARGET\\\"\\n    else\\n        echo \\\"Logging in to Docker registry: $DOCKER_REGISTRY_TARGET\\\"\\n        # Login without exposing password in process list\\n        if [[ -n \\\"${DSTACK_DOCKER_REGISTRY-}\\\" ]]; then\\n            if ! echo \\\"$DSTACK_DOCKER_PASSWORD\\\" | docker login -u \\\"$DSTACK_DOCKER_USERNAME\\\" --password-stdin \\\"$DSTACK_DOCKER_REGISTRY\\\"; then\\n                echo \\\"Docker login failed: $DOCKER_REGISTRY_TARGET\\\"\\n                notify_host_hoot_error \\\"docker login failed\\\"\\n                exit 1\\n            fi\\n        elif ! echo \\\"$DSTACK_DOCKER_PASSWORD\\\" | docker login -u \\\"$DSTACK_DOCKER_USERNAME\\\" --password-stdin; then\\n            echo \\\"Docker login failed: $DOCKER_REGISTRY_TARGET\\\"\\n            notify_host_hoot_error \\\"docker login failed\\\"\\n            exit 1\\n        fi\\n        echo \\\"Docker login successful: $DOCKER_REGISTRY_TARGET\\\"\\n    fi\\n# Check if AWS ECR credentials exist\\nelif [[ -n \\\"${DSTACK_AWS_ACCESS_KEY_ID-}\\\" && -n \\\"${DSTACK_AWS_SECRET_ACCESS_KEY-}\\\" && -n \\\"${DSTACK_AWS_REGION-}\\\" && -n \\\"${DSTACK_AWS_ECR_REGISTRY-}\\\" ]]; then\\n    echo \\\"AWS ECR credentials found\\\"\\n\\n    # Check if AWS CLI is installed\\n    if [ ! -f \\\"./aws/dist/aws\\\" ]; then\\n        notify_host_hoot_info \\\"awscli not installed, installing...\\\"\\n        echo \\\"AWS CLI not installed, installing...\\\"\\n        if ! curl \\\"https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.24.14.zip\\\" -o \\\"awscliv2.zip\\\"; then\\n            echo \\\"AWS CLI download failed\\\"\\n            notify_host_hoot_error \\\"awscli install failed\\\"\\n            exit 1\\n        fi\\n        if ! echo \\\"6ff031a26df7daebbfa3ccddc9af1450 awscliv2.zip\\\" | md5sum -c; then\\n            echo \\\"MD5 checksum failed\\\"\\n            notify_host_hoot_error \\\"awscli install failed\\\"\\n            exit 1\\n        fi\\n        unzip awscliv2.zip &> /dev/null\\n    else\\n        echo \\\"AWS CLI is already installed: ./aws/dist/aws\\\"\\n    fi\\n\\n    # Set AWS credentials as environment variables\\n    export AWS_ACCESS_KEY_ID=\\\"$DSTACK_AWS_ACCESS_KEY_ID\\\"\\n    export AWS_SECRET_ACCESS_KEY=\\\"$DSTACK_AWS_SECRET_ACCESS_KEY\\\"\\n    export AWS_DEFAULT_REGION=\\\"$DSTACK_AWS_REGION\\\"\\n\\n    # Set session token if provided (for temporary credentials)\\n    if [[ -n \\\"${DSTACK_AWS_SESSION_TOKEN-}\\\" ]]; then\\n        echo \\\"AWS session token found, using temporary credentials\\\"\\n        export AWS_SESSION_TOKEN=\\\"$DSTACK_AWS_SESSION_TOKEN\\\"\\n    fi\\n\\n    # Test AWS credentials before attempting ECR login\\n    echo \\\"Testing AWS credentials...\\\"\\n    if ! ./aws/dist/aws sts get-caller-identity &> /dev/null; then\\n        echo \\\"AWS credentials test failed\\\"\\n        # For session token credentials, this might be expected if they're expired\\n        # Log warning but don't fail startup\\n        if [[ -n \\\"${DSTACK_AWS_SESSION_TOKEN-}\\\" ]]; then\\n            echo \\\"Warning: AWS temporary credentials may have expired, continuing startup\\\"\\n            notify_host_hoot_info \\\"AWS temporary credentials may have expired\\\"\\n        else\\n            echo \\\"AWS credentials test failed\\\"\\n            notify_host_hoot_error \\\"Invalid AWS credentials\\\"\\n            exit 1\\n        fi\\n    else\\n        echo \\\"Logging in to AWS ECR...\\\"\\n        if ./aws/dist/aws ecr get-login-password --region \\\"$DSTACK_AWS_REGION\\\" | docker login --username AWS --password-stdin \\\"$DSTACK_AWS_ECR_REGISTRY\\\"; then\\n            echo \\\"AWS ECR login successful\\\"\\n            notify_host_hoot_info \\\"AWS ECR login successful\\\"\\n        else\\n            echo \\\"AWS ECR login failed\\\"\\n            # For session token credentials, don't fail startup if login fails\\n            if [[ -n \\\"${DSTACK_AWS_SESSION_TOKEN-}\\\" ]]; then\\n                echo \\\"Warning: AWS ECR login failed with temporary credentials, continuing startup\\\"\\n                notify_host_hoot_info \\\"AWS ECR login failed with temporary credentials\\\"\\n            else\\n                notify_host_hoot_error \\\"AWS ECR login failed\\\"\\n                exit 1\\n            fi\\n        fi\\n    fi\\nfi\\n\\nperform_cleanup\\n\\n#\\n# GHCR image pull access verification (pure HTTP, no docker daemon)\\n#\\nif [[ \\\"$DOCKER_REGISTRY_TARGET\\\" == \\\"ghcr.io\\\" && -n \\\"${DSTACK_DOCKER_USERNAME-}\\\" && -n \\\"${DSTACK_DOCKER_PASSWORD-}\\\" ]]; then\\n    # Strip surrounding quotes from compose image refs. Two tr calls keep the\\n    # intent obvious inside this Python string (no quote-concatenation idiom).\\n    COMPOSE_IMAGES=$(grep 'image:' /dstack/docker-compose.yaml 2>/dev/null | awk '{print $2}' | tr -d '\\\"' | tr -d \\\"'\\\" || true)\\n    HEADER=\\\"Accept: application/vnd.oci.image.index.v1+json,application/vnd.oci.image.manifest.v1+json,application/vnd.docker.distribution.manifest.list.v2+json,application/vnd.docker.distribution.manifest.v2+json\\\"\\n    for img in $COMPOSE_IMAGES; do\\n        [[ \\\"$img\\\" != ghcr.io/* ]] && continue\\n        ref=\\\"${img#ghcr.io/}\\\"\\n        # Digest-pinned refs (repo@sha256:...) use the digest as the manifest\\n        # reference; tag refs (repo:tag) use the tag, defaulting to latest.\\n        if [[ \\\"$ref\\\" == *@* ]]; then\\n            repo=\\\"${ref%%@*}\\\"\\n            reference=\\\"${ref#*@}\\\"\\n        else\\n            repo=\\\"${ref%%:*}\\\"\\n            reference=\\\"${ref##*:}\\\"\\n            [[ \\\"$reference\\\" == \\\"$ref\\\" ]] && reference=\\\"latest\\\"\\n        fi\\n        echo \\\"Verifying GHCR pull access: $img\\\"\\n        token=$(curl -sf -u \\\"$DSTACK_DOCKER_USERNAME:$DSTACK_DOCKER_PASSWORD\\\" \\\"https://ghcr.io/token?service=ghcr.io&scope=repository:${repo}:pull\\\" | jq -r '.token // empty' || true)\\n        if [[ -z \\\"${token-}\\\" ]]; then\\n            echo \\\"ERROR: GHCR token exchange failed for $img\\\"\\n            notify_host_hoot_error \\\"GHCR token exchange failed: $img\\\"\\n            exit 1\\n        fi\\n        http_code=$(curl -s -o /dev/null -w \\\"%{http_code}\\\" -H \\\"Authorization: Bearer $token\\\" -H \\\"$HEADER\\\" \\\"https://ghcr.io/v2/${repo}/manifests/${reference}\\\")\\n        if [[ \\\"$http_code\\\" != \\\"200\\\" ]]; then\\n            echo \\\"ERROR: GHCR pull access denied for $img (HTTP $http_code)\\\"\\n            notify_host_hoot_error \\\"GHCR pull access denied: $img (HTTP $http_code)\\\"\\n            exit 1\\n        fi\\n        echo \\\"GHCR pull access OK: $img\\\"\\n    done\\nfi\\n\\n#\\n# Pull latest images from docker-compose.yaml so existing CVMs pick up new tags.\\n# Pull is fail-soft: short-lived tokens may expire between login and pull, but\\n# falling back to already-cached images is preferable to blocking boot.\\n#\\necho \\\"Images before pull:\\\"\\ndocker images --format '{{.Repository}}:{{.Tag}} {{.ID}} ({{.CreatedSince}})'\\n\\necho \\\"Pulling latest images from /dstack/docker-compose.yaml...\\\"\\nif docker compose -f /dstack/docker-compose.yaml pull; then\\n    echo \\\"docker compose pull completed\\\"\\n    notify_host_hoot_info \\\"docker compose pull completed\\\"\\nelse\\n    echo \\\"WARNING: docker compose pull failed; continuing with existing images\\\"\\n    notify_host_hoot_info \\\"docker compose pull failed; using existing images\\\"\\nfi\\n\\necho \\\"Images after pull:\\\"\\ndocker images --format '{{.Repository}}:{{.Tag}} {{.ID}} ({{.CreatedSince}})'\\n\\n#\\n# Set root password.\\n#\\necho \\\"Setting root password..\\\"\\n\\n# Check if password files are writable\\nPASSWD_WRITABLE=true\\nif [ ! -w /etc/passwd ]; then\\n    echo \\\"Warning: /etc/passwd is read-only\\\"\\n    PASSWD_WRITABLE=false\\nfi\\nif [ ! -w /etc/shadow ]; then\\n    echo \\\"Warning: /etc/shadow is read-only\\\"\\n    PASSWD_WRITABLE=false\\nfi\\n\\nif [ \\\"$PASSWD_WRITABLE\\\" = \\\"false\\\" ]; then\\n    echo \\\"Skipping password setup due to read-only file system\\\"\\nelse\\n    # Check if chpasswd is available\\n    if command -v chpasswd >/dev/null 2>&1; then\\n        echo \\\"Using chpasswd method\\\"\\n\\n        if [ -n \\\"${DSTACK_ROOT_PASSWORD-}\\\" ]; then\\n            echo \\\"Setting root password from user..\\\"\\n            echo \\\"root:$DSTACK_ROOT_PASSWORD\\\" | chpasswd\\n            unset DSTACK_ROOT_PASSWORD\\n            echo \\\"Root password set/updated from DSTACK_ROOT_PASSWORD\\\"\\n        elif [ -z \\\"$(grep '^root:' /etc/shadow 2>/dev/null | cut -d: -f2)\\\" ]; then\\n            echo \\\"Setting random root password..\\\"\\n            # dstack guest busybox lacks head -c (FANCY_HEAD off); dd is the\\n            # last pipeline command, so its 0 status masks tr's SIGPIPE exit.\\n            DSTACK_ROOT_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | dd bs=1 count=32 2>/dev/null)\\n            echo \\\"root:$DSTACK_ROOT_PASSWORD\\\" | chpasswd\\n            unset DSTACK_ROOT_PASSWORD\\n            echo \\\"Root password set (random auto-init)\\\"\\n        else\\n            echo \\\"Root password already set; no changes.\\\"\\n        fi\\n    else\\n        # No chpasswd: do not pipe into interactive passwd(1). It often reads\\n        # /dev/tty and fails with \\\"password for root is unchanged\\\" during boot.\\n        echo \\\"Using passwd method\\\"\\n\\n        if [ -n \\\"${DSTACK_ROOT_PASSWORD-}\\\" ]; then\\n            echo \\\"Setting root password from user..\\\"\\n            if command -v passwd >/dev/null 2>&1 && passwd --help 2>&1 | grep -q -- '--stdin'; then\\n                echo \\\"$DSTACK_ROOT_PASSWORD\\\" | passwd --stdin root\\n            elif command -v openssl >/dev/null 2>&1; then\\n                # busybox passwd has no --stdin; write the SHA-512 crypt hash\\n                # into /etc/shadow directly instead of driving interactive passwd.\\n                HASHED_ROOT_PASSWORD=$(openssl passwd -6 \\\"$DSTACK_ROOT_PASSWORD\\\")\\n                sed -i \\\"s|^root:[^:]*:|root:${HASHED_ROOT_PASSWORD}:|\\\" /etc/shadow\\n                unset HASHED_ROOT_PASSWORD\\n            else\\n                echo \\\"Error: cannot set DSTACK_ROOT_PASSWORD non-interactively\\\"\\n                echo \\\"Need chpasswd, passwd --stdin, or openssl\\\"\\n                exit 1\\n            fi\\n            unset DSTACK_ROOT_PASSWORD\\n            echo \\\"Root password set/updated from DSTACK_ROOT_PASSWORD\\\"\\n        elif [ -z \\\"$(grep '^root:' /etc/shadow 2>/dev/null | cut -d: -f2)\\\" ]; then\\n            # Never lock the account here: sshd built without PAM (dstack dev\\n            # images) treats a locked account as \\\"deny all authentication\\\",\\n            # which breaks public-key SSH too. Set a discarded random password\\n            # by writing its crypt hash into /etc/shadow directly.\\n            if command -v openssl >/dev/null 2>&1; then\\n                echo \\\"Setting random root password..\\\"\\n                DSTACK_ROOT_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | dd bs=1 count=32 2>/dev/null)\\n                HASHED_ROOT_PASSWORD=$(openssl passwd -6 \\\"$DSTACK_ROOT_PASSWORD\\\")\\n                sed -i \\\"s|^root:[^:]*:|root:${HASHED_ROOT_PASSWORD}:|\\\" /etc/shadow\\n                unset DSTACK_ROOT_PASSWORD HASHED_ROOT_PASSWORD\\n                echo \\\"Root password set (random auto-init)\\\"\\n            else\\n                echo \\\"Warning: no openssl to hash a random password; leaving root password empty\\\"\\n            fi\\n        else\\n            echo \\\"Root password already set; no changes.\\\"\\n        fi\\n    fi\\nfi\\n\\n#\\n# Set SSH authorized keys\\n#\\nif mkdir -p /home/root/.ssh 2>/dev/null; then\\n    if [[ -n \\\"${DSTACK_ROOT_PUBLIC_KEY-}\\\" ]]; then\\n        echo \\\"$DSTACK_ROOT_PUBLIC_KEY\\\" > /home/root/.ssh/authorized_keys\\n        unset DSTACK_ROOT_PUBLIC_KEY\\n        echo \\\"Root public key set\\\"\\n    fi\\n    if [[ -n \\\"${DSTACK_AUTHORIZED_KEYS-}\\\" ]]; then\\n        echo \\\"$DSTACK_AUTHORIZED_KEYS\\\" > /home/root/.ssh/authorized_keys\\n        unset DSTACK_AUTHORIZED_KEYS\\n        echo \\\"Root authorized_keys set\\\"\\n    fi\\n\\n    if [[ -f /dstack/user_config ]] && jq empty /dstack/user_config 2>/dev/null; then\\n        if [[ $(jq 'has(\\\"ssh_authorized_keys\\\")' /dstack/user_config 2>/dev/null) == \\\"true\\\" ]]; then\\n            # jq -r terminates the value with a newline; jq -j does not, which\\n            # both concatenated the next appended key onto the same line and\\n            # made line-based counting report one key fewer than the file holds.\\n            jq -r '.ssh_authorized_keys' /dstack/user_config >> /home/root/.ssh/authorized_keys\\n            # Drop duplicates and the blank line an empty key list produces.\\n            sort -u /home/root/.ssh/authorized_keys > /home/root/.ssh/authorized_keys.tmp\\n            mv /home/root/.ssh/authorized_keys.tmp /home/root/.ssh/authorized_keys\\n            KEY_COUNT=$(grep -c '^[^[:space:]]' /home/root/.ssh/authorized_keys || true)\\n            echo \\\"Set root authorized_keys from user preferences, total $KEY_COUNT keys\\\"\\n            print_authorized_key_fingerprints /home/root/.ssh/authorized_keys\\n        fi\\n    fi\\nelse\\n    echo \\\"Warning: Cannot create /home/root/.ssh directory (read-only file system?)\\\"\\n    echo \\\"Skipping SSH key setup\\\"\\nfi\\n\\nif [[ -S /var/run/dstack.sock ]]; then\\n    export DSTACK_APP_ID=$(curl -s --unix-socket /var/run/dstack.sock http://dstack/Info | jq -j .app_id)\\nelif [[ -S /var/run/tappd.sock ]]; then\\n    export DSTACK_APP_ID=$(curl -s --unix-socket /var/run/tappd.sock http://dstack/prpc/Tappd.Info | jq -j .app_id)\\nfi\\n# Check if DSTACK_GATEWAY_DOMAIN is not set, try to get it from user_config or app-compose.json\\n# Priority: user_config > app-compose.json\\nif [[ -z \\\"${DSTACK_GATEWAY_DOMAIN-}\\\" ]]; then\\n    # First try to get from /dstack/user_config if it exists and is valid JSON\\n    if [[ -f /dstack/user_config ]] && jq empty /dstack/user_config 2>/dev/null; then\\n        if [[ $(jq 'has(\\\"default_gateway_domain\\\")' /dstack/user_config 2>/dev/null) == \\\"true\\\" ]]; then\\n            export DSTACK_GATEWAY_DOMAIN=$(jq -j '.default_gateway_domain' /dstack/user_config)\\n        fi\\n    fi\\n\\n    # If still not set, try to get from app-compose.json\\n    if [[ -z \\\"${DSTACK_GATEWAY_DOMAIN-}\\\" ]] && [[ -f app-compose.json ]] && [[ $(jq 'has(\\\"default_gateway_domain\\\")' app-compose.json) == \\\"true\\\" ]]; then\\n        export DSTACK_GATEWAY_DOMAIN=$(jq -j '.default_gateway_domain' app-compose.json)\\n    fi\\nfi\\nif [[ -n \\\"${DSTACK_GATEWAY_DOMAIN-}\\\" && -n \\\"${DSTACK_APP_ID-}\\\" ]]; then\\n    export DSTACK_APP_DOMAIN=$DSTACK_APP_ID\\\".\\\"$DSTACK_GATEWAY_DOMAIN\\nfi\\n\\necho \\\"----------------------------------------------\\\"\\necho \\\"Script execution completed\\\"\\necho \\\"----------------------------------------------\\\"\\n\",\"public_logs\":true,\"public_sysinfo\":true,\"public_tcbinfo\":true,\"runner\":\"docker-compose\",\"secure_time\":false,\"storage_fs\":\"zfs\",\"tproxy_enabled\":true}",
+  "event_log": [
+   {
+    "imr": 0,
+    "event_type": 2147483659,
+    "digest": "cd2312a0d87ef3c4a928df87088969a80b33d7bf3fc584bdde637b09ed808a8d821a56b78a13a6eb506db7578444abbe",
+    "event": "",
+    "event_payload": "095464785461626c65000100000000000000af96bb93f2b9b84e9462e0ba745642360090800000000000"
+   },
+   {
+    "imr": 0,
+    "event_type": 2147483658,
+    "digest": "344bc51c980ba621aaa00da3ed7436f7d6e549197dfe699515dfa2c6583d95e6412af21c097d473155875ffd561d6790",
+    "event": "",
+    "event_payload": "2946762858585858585858582d585858582d585858582d585858582d58585858585858585858585829000000c0ff000000000040080000000000"
+   },
+   {
+    "imr": 0,
+    "event_type": 2147483649,
+    "digest": "9dc3a1f80bcec915391dcda5ffbb15e7419f77eab462bbf72b42166fb70d50325e37b36f93537a863769bcf9bedae6fb",
+    "event": "",
+    "event_payload": "61dfe48bca93d211aa0d00e098032b8c0a00000000000000000000000000000053006500630075007200650042006f006f007400"
+   },
+   {
+    "imr": 0,
+    "event_type": 2147483649,
+    "digest": "6f2e3cbc14f9def86980f5f66fd85e99d63e69a73014ed8a5633ce56eca5b64b692108c56110e22acadcef58c3250f1b",
+    "event": "",
+    "event_payload": "61dfe48bca93d211aa0d00e098032b8c0200000000000000000000000000000050004b00"
+   },
+   {
+    "imr": 0,
+    "event_type": 2147483649,
+    "digest": "d607c0efb41c0d757d69bca0615c3a9ac0b1db06c557d992e906c6b7dee40e0e031640c7bfd7bcd35844ef9edeadc6f9",
+    "event": "",
+    "event_payload": "61dfe48bca93d211aa0d00e098032b8c030000000000000000000000000000004b0045004b00"
+   },
+   {
+    "imr": 0,
+    "event_type": 2147483649,
+    "digest": "08a74f8963b337acb6c93682f934496373679dd26af1089cb4eaf0c30cf260a12e814856385ab8843e56a9acea19e127",
+    "event": "",
+    "event_payload": "cbb219d73a3d9645a3bcdad00e67656f0200000000000000000000000000000064006200"
+   },
+   {
+    "imr": 0,
+    "event_type": 2147483649,
+    "digest": "18cc6e01f0c6ea99aa23f8a280423e94ad81d96d0aeb5180504fc0f7a40cb3619dd39bd6a95ec1680a86ed6ab0f9828d",
+    "event": "",
+    "event_payload": "cbb219d73a3d9645a3bcdad00e67656f03000000000000000000000000000000640062007800"
+   },
+   {
+    "imr": 0,
+    "event_type": 4,
+    "digest": "394341b7182cd227c5c6b07ef8000cdfd86136c4292b8e576573ad7ed9ae41019f5818b4b971c9effc60e1ad9f1289f0",
+    "event": "",
+    "event_payload": "00000000"
+   },
+   {
+    "imr": 0,
+    "event_type": 10,
+    "digest": "6dae15170c9fea6455681e3f838941a642ff9001a02a333e9ca8549af1db4ba47f01403e31dabe6e8a0b41ddd38b6d99",
+    "event": "acpi-loader",
+    "event_payload": "414350492044415441"
+   },
+   {
+    "imr": 0,
+    "event_type": 10,
+    "digest": "b3a62232ef6be064cce25a8b92cf55d4a6c099ee7a9c0852ce0c7d572393dae84895c0f59a9db5000f0b34a90c1b1bec",
+    "event": "acpi-rsdp",
+    "event_payload": "414350492044415441"
+   },
+   {
+    "imr": 0,
+    "event_type": 10,
+    "digest": "b6ed8ff3fca3c308f3f1ec7889054cc900b1c6dad9b14aedd0144d046626c81a5dbae47937f4949bb2d674a0bd699a7b",
+    "event": "acpi-tables",
+    "event_payload": "414350492044415441"
+   },
+   {
+    "imr": 1,
+    "event_type": 2147483651,
+    "digest": "573d7f9b6f4723caf3a0ebd6e222bcdb5ac2e1db76a00ad5477e1597d3a3c263e528f0dba3cfc58101d084c0eaca18a5",
+    "event": "",
+    "event_payload": "18e0897a0000000000c2c9000000000000000000000000002a000000000000000403140072f728144ab61e44b8c39ebdd7f893c7040412006b00650072006e0065006c0000007fff0400"
+   },
+   {
+    "imr": 0,
+    "event_type": 2147483650,
+    "digest": "1dd6f7b457ad880d840d41c961283bab688e94e4b59359ea45686581e90feccea3c624b1226113f824f315eb60ae0a7c",
+    "event": "",
+    "event_payload": "61dfe48bca93d211aa0d00e098032b8c0900000000000000020000000000000042006f006f0074004f0072006400650072000000"
+   },
+   {
+    "imr": 0,
+    "event_type": 2147483650,
+    "digest": "23ada07f5261f12f34a0bd8e46760962d6b4d576a416f1fea1c64bc656b1d28eacf7047ae6e967c58fd2a98bfa74c298",
+    "event": "",
+    "event_payload": "61dfe48bca93d211aa0d00e098032b8c08000000000000003e0000000000000042006f006f0074003000300030003000090100002c0055006900410070007000000004071400c9bdb87cebf8344faaea3ee4af6516a10406140021aa2c4614760345836e8ab6f46623317fff0400"
+   },
+   {
+    "imr": 1,
+    "event_type": 2147483655,
+    "digest": "77a0dab2312b4e1e57a84d865a21e5b2ee8d677a21012ada819d0a98988078d3d740f6346bfe0abaa938ca20439a8d71",
+    "event": "",
+    "event_payload": "43616c6c696e6720454649204170706c69636174696f6e2066726f6d20426f6f74204f7074696f6e"
+   },
+   {
+    "imr": 1,
+    "event_type": 4,
+    "digest": "394341b7182cd227c5c6b07ef8000cdfd86136c4292b8e576573ad7ed9ae41019f5818b4b971c9effc60e1ad9f1289f0",
+    "event": "",
+    "event_payload": "00000000"
+   },
+   {
+    "imr": 2,
+    "event_type": 6,
+    "digest": "38b1f2dc03d7cf2cf15936efd6a442dbb52e86319a5eeda8b3a7096f8c2fe15f0bcc26a67dd0f001370655163380b863",
+    "event": "",
+    "event_payload": "ed223b8f1a0000004c4f414445445f494d4147453a3a4c6f61644f7074696f6e7300"
+   },
+   {
+    "imr": 2,
+    "event_type": 6,
+    "digest": "7a8f80f6bc8a912f05f629e66813b5966397e393042c78dc5b08582d4733a28864173ed9eecd25d04895ddd489e45ee5",
+    "event": "",
+    "event_payload": "ec223b8f0d0000004c696e757820696e6974726400"
+   },
+   {
+    "imr": 1,
+    "event_type": 2147483655,
+    "digest": "214b0bef1379756011344877743fdc2a5382bac6e70362d624ccf3f654407c1b4badf7d8f9295dd3dabdef65b27677e0",
+    "event": "",
+    "event_payload": "4578697420426f6f7420536572766963657320496e766f636174696f6e"
+   },
+   {
+    "imr": 1,
+    "event_type": 2147483655,
+    "digest": "0a2e01c85deae718a530ad8c6d20a84009babe6c8989269e950d8cf440c6e997695e64d455c4174a652cd080f6230b74",
+    "event": "",
+    "event_payload": "4578697420426f6f742053657276696365732052657475726e656420776974682053756363657373"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "f9974020ef507068183313d0ca808e0d1ca9b2d1ad0c61f5784e7157c362c06536f5ddacdad4451693f48fcc72fff624",
+    "event": "system-preparing",
+    "event_payload": ""
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "a6397ad3080a455be6a837716831e7e9b37594acae18a44e48893e84f10c0d81c8aec53cef43d014b1ca49e15c47feb9",
+    "event": "app-id",
+    "event_payload": "338906be7ffbc09adc8ff02f7451839049162925"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "d10c4cbe292c375ed1c78e14b2d951e7228f27c6169421c923610724f4001f3893ebfcd021b9d069ac53565769ed9b6e",
+    "event": "compose-hash",
+    "event_payload": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "aa25b837d81098d56e726cdfd4664eae9a1269362479753d04bdfd239a45388a056f245841910931ea09ff8278b9d482",
+    "event": "gpu-policy-hash",
+    "event_payload": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "bb749e2a25bd59715bf3d4d66bf15bee2e977561a331775484d506895945b13235989c1df68e8a2c17166223353afa29",
+    "event": "instance-id",
+    "event_payload": "201b2e948dfa9542a47baae097a44d419d7cee11"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "98bd7e6bd3952720b65027fd494834045d06b4a714bf737a06b874638b3ea00ff402f7f583e3e3b05e921c8570433ac6",
+    "event": "boot-mr-done",
+    "event_payload": ""
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "c5952ba76a4f11fed46c38f1dd41f931b1c4aebe2b0dde4d0cd603bd4c090bfcae689abc1632f238a5d23e3a1924db49",
+    "event": "os-image-hash",
+    "event_payload": "ec43cb8c5e04b6bb6c53b33b16076a01d83d01f7f4b703f2f78a0d947d6247e6"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "83368b43a0fc6f824f5a9220592df85fd30e2d405ecbd253a5c6354af63e6c9b41aec557c38a38e348ab87f9ac8fc68c",
+    "event": "key-provider",
+    "event_payload": "7b226e616d65223a226b6d73222c226964223a223330353933303133303630373261383634386365336430323031303630383261383634386365336430333031303730333432303030343838343465623432636364663863353266643466313734663336326663623962626431396334356664343866316564656332643866316361323335333665633161373430323162346365653631306330373466383239346434333162326237666565326333396535333333666461663061343532326434336662313539643966227d"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "ba51104636900268b0e059fa3d266419d079d1e94aea26fb9fcbb8d764bf4c89a67ac271b8a0d1a3989945132a111fc7",
+    "event": "storage-fs",
+    "event_payload": "7a6673"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "3b1e7da22d75034156e6e6b01e33651b3cbd38ed875ab01da05f033e0b4b043004c0b6692abbef7e2dc366fffb0e5e5e",
+    "event": "storage-encrypted",
+    "event_payload": "31"
+   },
+   {
+    "imr": 3,
+    "event_type": 134217729,
+    "digest": "1a76b2a80a0be71eae59f80945d876351a7a3fb8e9fd1ff1cede5734aa84ea11fd72b4edfbb6f04e5a85edd114c751bd",
+    "event": "system-ready",
+    "event_payload": ""
+   }
+  ],
+  "mr_aggregated": "6edb69cfe439189773e2c59e744c00b48375d97bd44576fb55ee8375eae89966",
+  "os_image_hash": "ec43cb8c5e04b6bb6c53b33b16076a01d83d01f7f4b703f2f78a0d947d6247e6",
+  "compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222",
+  "device_id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "app_name": "skarbnik-tee-prove",
+ "device_id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "mr_aggregated": "6edb69cfe439189773e2c59e744c00b48375d97bd44576fb55ee8375eae89966",
+ "os_image_hash": "ec43cb8c5e04b6bb6c53b33b16076a01d83d01f7f4b703f2f78a0d947d6247e6",
+ "key_provider_info": "{\"name\":\"kms\",\"id\":\"3059301306072a8648ce3d020106082a8648ce3d030107034200048844eb42ccdf8c52fd4f174f362fcb9bbd19c45fd48f1edec2d8f1ca23536ec1a74021b4cee610c074f8294d431b2b7fee2c39e5333fdaf0a4522d43fb159d9f\"}",
+ "compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222",
+ "vm_config": "{\"os_image_hash\":\"ec43cb8c5e04b6bb6c53b33b16076a01d83d01f7f4b703f2f78a0d947d6247e6\",\"cpu_count\":8,\"memory_size\":17179869184,\"qemu_single_pass_add_pages\":true,\"pic\":true,\"qemu_version\":\"8.2.2\",\"pci_hole64_size\":0,\"hugepages\":false,\"num_gpus\":0,\"num_nvswitches\":0,\"hotplug_off\":false,\"image\":\"dstack-0.6.1\",\"host_share_mode\":\"9p\",\"ovmf_variant\":\"pre202505\",\"tdx_attestation_variant\":\"lite\",\"tdx_measurement\":{\"checksum_file\":\"Y2E5ZjFhYzJmZjI1MDk2ZjAzNjNmODU0NTBkYzdkYjU4YzJkYzI3MGMyNzE5OGQ3OTBjMGUzMGVhYmQwMWM4YyAgb3ZtZi5mZAozZWZkNzFkMjZkMWI2OWZkNDU0NzM0NzYzZmJhNmU3MGU2Njc1MjAxYjQ2MmZhM2UzZTZhY2MwYjE0YzI5NTYxICBiekltYWdlCmZlOGY4ODRhNDg4NTE3MTBkNDI0NWVlOTgwMzFjZTllMjljNDhjMjIwZTRmOGVjYTZlNTA5YTM2OWEzZWQ5NmUgIGluaXRyYW1mcy5jcGlvLmd6CmE3MjRmMGVlMmJjOWM2MTkzN2IxYWEyNmNlMTBkYWI5YjI4OWIxZWE2YjQyZDEwYjQ0NjRkZjgyNGVhNTMzMTkgIG1ldGFkYXRhLmpzb24KNGM4NjdiMmJmY2JkYmU2NzA1MTdhZDY5MjQxZmJiMGQ4YjEzMmJlZWIxYzlmYzYwNDhkNTYxYTkwZWY1YjFhZCAgbWVhc3VyZW1lbnQudGR4LmNib3IKZDE0MDc4MTQzMGJkMzg0OWNmMWVjNzZkYjMyYTU4YmRiZjQ3YWU1MmViNTE1Y2YzYWQyYjVhZmI3M2RjN2E5YSAgbWVhc3VyZW1lbnQuc25wLmNib3IKNWM5YzllZjg4NDY4NTBlNWQwZTdlYzNjNTNjZmFmYzBjYTk0ZmMzYTc1YTZiYzZiMGI0NjUwN2ZiODA3YTdlMiAgbWVhc3VyZW1lbnQuZ2NwLmNib3IKMzkxZTYyMDBlMDhiOTA1NzU2YTU2ZDdhM2YxYmExZjMwNGVhMGQwYzlmZTg3MDE4NjlkODRjNGI5NGNiMjI2NCAgbWVhc3VyZW1lbnQuYXdzLmNib3IKZTkyM2Y0MjRmMTYwYWFhMGZjYjk4MjRiYjBkNDJiNjAwYTdiZTM1Mzg1YTc2MzdkNGYwYWNiZDVjY2M0MTZjMSAgbWVhc3VyZW1lbnQuYXdzLnJlcGxheS5qc29uCg==\",\"measurement\":\"o2d2ZXJzaW9uBGVpbWFnZaRnY21kbGluZXkBEmNvbnNvbGU9dHR5UzAgaW5pdD0vaW5pdCBwYW5pYz0xIG5ldC5pZm5hbWVzPTAgYmlvc2Rldm5hbWU9MCBtY2U9b2ZmIG9vcHM9cGFuaWMgcGNpPW5vZWFybHkgcmFuZG9tLnRydXN0X2NwdT15IHJhbmRvbS50cnVzdF9ib290bG9hZGVyPW4gdHNjPXJlbGlhYmxlIG5vLWt2bWNsb2NrIGRzdGFjay5yb290ZnNfaGFzaD05NTAyM2RmMGViZmM3NWM3YWY1YjY5Njk0MWI3Nzk1MjE1ZWY1MmU3M2M2MDYxYjYzYWY0NDU5Mjk5YjFmYmJmIGRzdGFjay5yb290ZnNfc2l6ZT01OTIzMzg5NDRza2VybmVsX2F1dGhlbnRpY29kZVgwVz1/m29HI8rzoOvW4iK821rC4dt2oArVR34Vl9OjwmPlKPDbo8/FgQHQhMDqyhileBhrZXJuZWxfaGVhZGVyX25vcm1hbGl6ZWT1bWluaXRyZF9zaGEzODRYMHqPgPa8ipEvBfYp5mgTtZZjl+OTBCx43FsIWC1HM6KIZBc+2e7NJdBIld3UieRe5WR0ZHZmo2Rvdm1maXByZTIwMjUwNWRtcnRkomtzaW5nbGVfcGFzc1gwg7rwBKBsg/Y3HU2eGci7Hq1zS6dpblbWtSJxAROUpvJO/swnrztcHaQVlNv6cG6XaHR3b19wYXNzWDAqZ0MnxQIY26iABms0m41VnXSe1o3OM/1lHBhKh30ISwep5YN2enrV2hPtkd7sK3BmdGRfaG9iTIAQCQQABgkCCwIQEA==\"},\"spec_version\":1}",
+ "cloud_vendor": "dstack",
+ "cloud_product": "dstack"
+}

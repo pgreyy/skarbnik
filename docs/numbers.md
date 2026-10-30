@@ -91,6 +91,22 @@ terminated without a proof while a bug was fixed (73 s, 100 s and 53 s; $0.0684 
 | Groth16 receipt file | 2,057 bytes | docs/evidence/S6c/groth16_a0.log, groth16_a1.log |
 | Groth16 seal the contract checks | 256 bytes, with a 780 byte journal | docs/evidence/S6c/a0_args.json |
 
+## One attempt proved inside a confidential VM (Phala Cloud `tdx.xlarge`, 2026-10-30)
+
+Bounty 33 (`data/demo/`, `--po2 18`), the prove step inside an Intel TDX VM with 8 vCPU and 16 GB, run by
+`tools/tee-spike/attempt_in_tee.py` on the VPS (docs/evidence/tee_spike/README.md, "Part 2"):
+
+| Step | Time | Where |
+| --- | --- | --- |
+| Prove (101 segments, peak 3,288 MiB used in the VM) | 6,226.5 s | inside the CVM (sealed status, `prove_run/prove_status.json`) |
+| CVM life, create to delete | 6,491 s; $0.826278 | Phala balance before and after |
+| Shrink | 58.63 s; pod 170 s, $0.0515 | RunPod L40S (`prove_run/gpu_shrink.json`) |
+| Groth16 | 379.81 s | the VPS, Docker (`prove_run/groth16_u.log`) |
+| Reveal to `submit_groth16` | 2 h 10 min 34 s | 23:44:17 to 01:54:51 UTC |
+
+Proof 0 of the same bounty on a RunPod L40S: prove 30.21 s (32 segments, `--po2 19`), shrink 21.85 s, pod 135 s,
+$0.0409; Groth16 on the VPS 387.44 s (`proof0_gpu/`).
+
 ## Gas on NEAR testnet
 
 | Call | Gas burnt | Source |

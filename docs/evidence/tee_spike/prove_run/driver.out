@@ -1,0 +1,70 @@
+2026-10-29T23:56:18Z bounty 33 attempt 0: patch sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97, seed 847163a8c8b6b0cf39164570220a57470400f3c1e2c47d7ba0b5535bcfc5a685, submission id c9d56663067f3d34baf1e29376b09d42ef3d4e4755c527d90e3f37cb3b5b06a9, deadline 1793403859534380832
+2026-10-29T23:56:19Z Phala balance before: $4.988095
+2026-10-29T23:56:23Z deploy tdx.xlarge: exit 0
+2026-10-29T23:58:21Z CVM running and answering at https://338906be7ffbc09adc8ff02f7451839049162925-8080.dstack-pha-prod5.phala.network, 118 s after create
+2026-10-29T23:58:28Z verify: ok   tdx_quote_dcap_qvl | ok   tdx_quote_phala_api | ok   report_data_binds_key | ok   rtmr3_replay | ok   compose_hash | ok   compose_is_ours | 2026-10-29T23:58:28Z verification PASSED; quote sha256 607ebd28dae59d22..., RTMR3 138ca752e6cbe5d8...
+2026-10-29T23:58:33Z logins: outside, ssh route -22: {"host": "338906be7ffbc09adc8ff02f7451839049162925-22.dstack-pha-prod5.phala.network", "tls": "TLSv1.2", "first_bytes": ""} | outside, ssh route -22s: {"host": "338906be7ffbc09adc8ff02f7451839049162925-22s.dstack-pha-prod5.phala.network", "error": "SSLEOFError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)"} | outside, guest agent page -8090: {"url": "https://338906be7ffbc09adc8ff02f7451839049162925-8090.dstack-pha-prod5.phala.network/", "http": 200, "title": "Worker Information"}
+2026-10-29T23:59:18Z probe: 2026-10-29T23:59:18Z 172.18.0.1: 2 open TCP port(s): 8080 '', 8090 '' | 2026-10-29T23:59:18Z 10.4.65.100: 2 open TCP port(s): 8080 '', 8090 '' | sockets in the container: {'/var/run/dstack.sock': True, '/var/run/docker.sock': False, '/var/run/tappd.sock': False}; capabilities 00000000a80425fb
+2026-10-29T23:59:25Z fresh quote: ok   fresh tdx_quote_dcap_qvl | ok   fresh tdx_quote_phala_api | ok   fresh report_data | ok   fresh rtmr3_replay | ok   fresh same_key | ok   fresh same_measurements | ok   fresh same_compose_hash | 2026-10-29T23:59:24Z fresh quote PASSED: nonce made 2026-10-29T23:59:20Z, answered in 1.88 s, quote sha256 671c17e685fd407d...
+2026-10-29T23:59:28Z prove sent: 2026-10-29T23:59:27Z prove: {'state': 'started', 'patch_sha256': '42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97'}
+2026-10-30T00:01:35Z status proving, 124.0 s, memory used 3103 MiB (peak 3125), balance $4.97238
+2026-10-30T00:03:41Z status proving, 251.3 s, memory used 1728 MiB (peak 3223), balance $4.97238
+2026-10-30T00:05:45Z status proving, 375.8 s, memory used 2550 MiB (peak 3223), balance $4.97238
+2026-10-30T00:07:49Z status proving, 500.7 s, memory used 2539 MiB (peak 3258), balance $4.97238
+2026-10-30T00:09:55Z status proving, 625.7 s, memory used 2551 MiB (peak 3258), balance $4.97238
+2026-10-30T00:11:59Z status proving, 750.1 s, memory used 2530 MiB (peak 3258), balance $4.97238
+2026-10-30T00:14:06Z status proving, 874.8 s, memory used 3117 MiB (peak 3261), balance $4.97238
+2026-10-30T00:16:12Z status proving, 1002.9 s, memory used 3119 MiB (peak 3261), balance $4.97238
+2026-10-30T00:18:24Z status proving, 1133.3 s, memory used 3098 MiB (peak 3261), balance $4.97238
+2026-10-30T00:20:29Z status proving, 1259.3 s, memory used 3092 MiB (peak 3261), balance $4.97238
+2026-10-30T00:22:34Z status proving, 1384.7 s, memory used 3093 MiB (peak 3261), balance $4.97238
+2026-10-30T00:24:40Z status proving, 1509.9 s, memory used 3092 MiB (peak 3261), balance $4.97238
+2026-10-30T00:26:44Z status proving, 1634.3 s, memory used 3083 MiB (peak 3261), balance $4.97238
+2026-10-30T00:30:03Z status proving, 1758.4 s, memory used 3096 MiB (peak 3261), balance $4.97238
+2026-10-30T00:32:08Z status proving, 1958.6 s, memory used 1303 MiB (peak 3261), balance $4.97238
+2026-10-30T00:34:12Z status proving, 2083.2 s, memory used 1103 MiB (peak 3261), balance $4.97238
+2026-10-30T00:36:18Z status proving, 2208.1 s, memory used 1297 MiB (peak 3261), balance $4.97238
+2026-10-30T00:39:32Z status proving, 2332.6 s, memory used 2467 MiB (peak 3261), balance $4.97238
+2026-10-30T00:41:36Z status proving, 2527.3 s, memory used 2517 MiB (peak 3261), balance $4.97238
+2026-10-30T00:43:40Z status proving, 2651.2 s, memory used 3092 MiB (peak 3261), balance $4.97238
+2026-10-30T00:45:44Z status proving, 2774.4 s, memory used 3090 MiB (peak 3261), balance $4.97238
+2026-10-30T00:47:49Z status proving, 2899.0 s, memory used 3122 MiB (peak 3261), balance $4.97238
+2026-10-30T00:49:53Z status proving, 3023.9 s, memory used 3102 MiB (peak 3261), balance $4.97238
+2026-10-30T00:51:57Z status proving, 3148.3 s, memory used 3103 MiB (peak 3261), balance $4.97238
+2026-10-30T00:54:03Z status proving, 3272.7 s, memory used 3093 MiB (peak 3261), balance $4.97238
+2026-10-30T00:56:11Z status proving, 3400.8 s, memory used 3076 MiB (peak 3261), balance $4.97238
+2026-10-30T00:58:15Z status proving, 3526.4 s, memory used 3089 MiB (peak 3261), balance $4.97238
+2026-10-30T01:00:20Z status proving, 3650.8 s, memory used 3073 MiB (peak 3261), balance $4.97238
+2026-10-30T01:02:26Z status proving, 3776.3 s, memory used 3067 MiB (peak 3261), balance $4.5056
+2026-10-30T01:04:30Z status proving, 3901.5 s, memory used 3067 MiB (peak 3261), balance $4.5056
+2026-10-30T01:06:34Z status proving, 4025.6 s, memory used 3086 MiB (peak 3261), balance $4.5056
+2026-10-30T01:08:38Z status proving, 4148.7 s, memory used 3116 MiB (peak 3261), balance $4.5056
+2026-10-30T01:10:41Z status proving, 4272.2 s, memory used 3115 MiB (peak 3261), balance $4.5056
+2026-10-30T01:12:46Z status proving, 4396.4 s, memory used 3072 MiB (peak 3261), balance $4.5056
+2026-10-30T01:14:49Z status proving, 4520.6 s, memory used 3072 MiB (peak 3261), balance $4.5056
+2026-10-30T01:16:54Z status proving, 4644.7 s, memory used 3140 MiB (peak 3261), balance $4.5056
+2026-10-30T01:19:04Z status proving, 4774.3 s, memory used 3072 MiB (peak 3282), balance $4.5056
+2026-10-30T01:21:08Z status proving, 4899.6 s, memory used 3132 MiB (peak 3282), balance $4.5056
+2026-10-30T01:23:12Z status proving, 5022.9 s, memory used 3140 MiB (peak 3282), balance $4.5056
+2026-10-30T01:25:16Z status proving, 5146.7 s, memory used 3138 MiB (peak 3283), balance $4.5056
+2026-10-30T01:27:22Z status proving, 5273.4 s, memory used 3135 MiB (peak 3283), balance $4.5056
+2026-10-30T01:29:27Z status proving, 5397.7 s, memory used 3137 MiB (peak 3283), balance $4.5056
+2026-10-30T01:31:32Z status proving, 5522.8 s, memory used 3140 MiB (peak 3283), balance $4.5056
+2026-10-30T01:33:39Z status proving, 5648.7 s, memory used 3142 MiB (peak 3283), balance $4.5056
+2026-10-30T01:35:44Z status proving, 5774.5 s, memory used 3141 MiB (peak 3283), balance $4.5056
+2026-10-30T01:37:50Z status proving, 5901.3 s, memory used 3269 MiB (peak 3283), balance $4.5056
+2026-10-30T01:39:53Z status proving, 6024.8 s, memory used 3268 MiB (peak 3283), balance $4.5056
+2026-10-30T01:41:58Z status proving, 6149.1 s, memory used 3278 MiB (peak 3283), balance $4.5056
+2026-10-30T01:44:03Z status done, 6226.5 s, memory used 886 MiB (peak 3288), balance $4.5056
+2026-10-30T01:44:10Z 2026-10-30T01:44:09Z receipt: 25841722 bytes, sha256 4e949347eb3315aa..., matches the sealed status: True
+2026-10-30T01:44:34Z CVM deleted (6491 s after create): gone: HTTP 404 None | CVM list: HTTP 200, 0 CVM(s) []
+2026-10-30T01:45:34Z Phala balance after: $4.161817
+2026-10-30T01:45:36Z pod 33j7t680hnyniq created: NVIDIA L40S in None, $1.09/h, hard cap 45 min
+2026-10-30T01:47:08Z pod 33j7t680hnyniq: ssh ready after 93 s, GPU NVIDIA L40S
+2026-10-30T01:47:16Z pod 33j7t680hnyniq: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-10-30T01:48:23Z pod 33j7t680hnyniq: shrank the receipt in 58.63 s
+2026-10-30T01:48:25Z pod 33j7t680hnyniq terminated: 170 s, $0.0515 ($1.09/h); GPU spend so far $0.3954
+2026-10-30T01:48:25Z succinct on a GPU pod: 58.63 s (NVIDIA L40S, pod 170 s, $0.0515)
+2026-10-30T01:54:45Z Groth16 on the VPS: 379.81 s; verify: receipt file: ~/skarbnik-tee/run2/u_groth16.bin (2057 bytes)
+2026-10-30T01:54:45Z journal: verdict PASS, secret commitment matches the bounty, submission id matches
+2026-10-30T01:54:51Z submit_groth16 Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS ok; outcome on chain Passed

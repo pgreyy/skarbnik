@@ -1,0 +1,24 @@
+teespike-work:
+failed-1
+gpu_prove.log
+gpu_succinct.log
+groth16_p0.log
+p0_args.json
+p0_groth16.bin
+p0_succinct.bin
+proof0_seed.txt
+proof0_times.json
+stopped-cpu-run
+verify_p0.txt
+
+teespike-work/stopped-cpu-run:
+gpu_try1_no_instances.out
+prove_p0.log
+teespike-prove0.out
+2026-10-29T23:31:16Z Proof 0 of teespike on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/teespike-work)
+2026-10-29T23:31:18Z pod bhdjz0kzp5godo created: NVIDIA L40S in US-MO-1, $1.09/h, hard cap 45 min
+2026-10-29T23:31:52Z pod bhdjz0kzp5godo: ssh ready after 36 s, GPU NVIDIA L40S
+2026-10-29T23:32:06Z pod bhdjz0kzp5godo: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-10-29T23:32:53Z pod bhdjz0kzp5godo: proved in 30.21 s, secret wiped; segments: 32 journal.verdict: PASS
+2026-10-29T23:33:31Z pod bhdjz0kzp5godo terminated: 135 s, $0.0409 ($1.09/h); GPU spend so far $0.3439
+2026-10-29T23:39:59Z Proof 0 ready: VALID, PASS; prove 30.21 s, succinct 21.85 s, Groth16 387.44 s. Next: publish

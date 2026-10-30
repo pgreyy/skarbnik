@@ -20,5 +20,5 @@
 | [DECISIONS.md](DECISIONS.md) | Every design decision with its date and reason |
 | [DEVLOG.md](DEVLOG.md) | The work log, one entry per work block |
 | [ROADMAP.md](ROADMAP.md) | Planned work |
-| [GPU_TEE.md](GPU_TEE.md) | Roadmap note: confidential proving in a GPU TEE (planned, not built, not tested) |
+| [CONFIDENTIAL_PROVING.md](CONFIDENTIAL_PROVING.md) | Managed confidential proving (planned): the goal, the vendor flow, the trust model, what the CPU TEE spike showed and did not, providers, economics |
 | [../THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) | Files from other projects, with their sources, versions and licences |

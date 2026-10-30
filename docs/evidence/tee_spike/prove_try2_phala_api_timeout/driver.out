@@ -1,0 +1,12 @@
+2026-10-29T23:51:43Z bounty 33 attempt 0: patch sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97, seed 847163a8c8b6b0cf39164570220a57470400f3c1e2c47d7ba0b5535bcfc5a685, submission id c9d56663067f3d34baf1e29376b09d42ef3d4e4755c527d90e3f37cb3b5b06a9, deadline 1793403859534380832
+2026-10-29T23:51:44Z Phala balance before: $4.997275
+2026-10-29T23:51:47Z deploy tdx.xlarge: exit 0
+2026-10-29T23:54:13Z CVM deleted (146 s after create): gone: HTTP 404 None | CVM list: HTTP 200, 0 CVM(s) []
+2026-10-29T23:55:14Z Phala balance after: $4.988095
+Traceback (most recent call last):
+  File "~/skarbnik-tee/vendor/attempt_in_tee.py", line 146, in <module>
+    main(*sys.argv[1:])
+  File "~/skarbnik-tee/vendor/attempt_in_tee.py", line 83, in main
+    if code or not urls: raise RuntimeError('the CVM did not answer')
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: the CVM did not answer

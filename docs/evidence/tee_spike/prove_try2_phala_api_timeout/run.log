@@ -1,0 +1,64 @@
+2026-10-29T23:51:43Z bounty 33 attempt 0: patch sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97, seed 847163a8c8b6b0cf39164570220a57470400f3c1e2c47d7ba0b5535bcfc5a685, submission id c9d56663067f3d34baf1e29376b09d42ef3d4e4755c527d90e3f37cb3b5b06a9, deadline 1793403859534380832
+$ python3 ~/skarbnik-tee/vendor/phala.py balance
+2026-10-29T23:51:44Z balance $4.997275
+2026-10-29T23:51:44Z Phala balance before: $4.997275
+$ python3 ~/skarbnik-tee/vendor/phala.py deploy skarbnik-tee-prove ~/skarbnik-tee/vendor/compose.yaml tdx.xlarge
+2026-10-29T23:51:46Z provision: HTTP 200 {"app_id": "ef9b7ff242a892b5add45378d0831f79d10b8a52", "app_env_encrypt_pubkey": "287fc9eee4f6512956d42e95455d5b8d26c459b4f558f1bfe8e13f54210aed07", "compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222", "compose_file": "{\"allowed_envs\":[],\"docker_compose_file\":\"# What Phala Cloud runs in the CVM for the confidential proving spike: our sealed checker and prover image, pinned by\\n# digest, with the dstack guest agent socket (for TDX quotes) and port 8080 behind Phala's gateway.\\nservices:\\n  tee:\\n    image: ghcr.io/pgreyy/skarbnik-tee@sha256:60f6bcf3862b67
+2026-10-29T23:51:47Z create: HTTP 200 {"id": "cvm_NjJMvLwo", "vm_uuid": "81efaeb4-a0e0-4813-bc26-0d3c97f5337c", "app_id": "ef9b7ff242a892b5add45378d0831f79d10b8a52", "name": "skarbnik-tee-prove", "status": "starting", "vcpu": 8, "memory": 16384, "disk_size": 20, "base_image": null, "teepod": {"id": 26, "name": "prod5"}}
+2026-10-29T23:51:47Z deploy tdx.xlarge: exit 0
+$ python3 ~/skarbnik-tee/vendor/phala.py wait 81efaeb4-a0e0-4813-bc26-0d3c97f5337c
+Traceback (most recent call last):
+  File "~/skarbnik-tee/vendor/phala.py", line 159, in <module>
+    fn(rest)
+  File "~/skarbnik-tee/vendor/phala.py", line 88, in cmd_wait
+    s, vm = call('GET', f'/cvms/{cvm_id(a[0])}')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik-tee/vendor/phala.py", line 34, in call
+    with urllib.request.urlopen(req, timeout=120) as r:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 515, in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 532, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 1392, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 1348, in do_open
+    r = h.getresponse()
+        ^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/http/client.py", line 1457, in getresponse
+    response.begin()
+  File "/usr/lib/python3.12/http/client.py", line 336, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/http/client.py", line 297, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/ssl.py", line 1252, in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/ssl.py", line 1104, in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: The read operation timed out
+$ python3 ~/skarbnik-tee/vendor/phala.py delete 81efaeb4-a0e0-4813-bc26-0d3c97f5337c
+2026-10-29T23:53:50Z delete: HTTP 204 {}
+2026-10-29T23:53:51Z still there: status deleting
+2026-10-29T23:54:01Z still there: status deleting
+2026-10-29T23:54:12Z gone: HTTP 404 None
+2026-10-29T23:54:13Z CVM list: HTTP 200, 0 CVM(s) []
+2026-10-29T23:54:13Z CVM deleted (146 s after create): gone: HTTP 404 None | CVM list: HTTP 200, 0 CVM(s) []
+$ python3 ~/skarbnik-tee/vendor/phala.py balance
+2026-10-29T23:55:13Z balance $4.988095
+2026-10-29T23:55:14Z Phala balance after: $4.988095

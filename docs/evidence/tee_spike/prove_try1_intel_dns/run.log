@@ -1,0 +1,35 @@
+2026-10-29T23:46:33Z bounty 33 attempt 0: patch sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97, seed 847163a8c8b6b0cf39164570220a57470400f3c1e2c47d7ba0b5535bcfc5a685, submission id c9d56663067f3d34baf1e29376b09d42ef3d4e4755c527d90e3f37cb3b5b06a9, deadline 1793403859534380832
+$ python3 ~/skarbnik-tee/vendor/phala.py balance
+2026-10-29T23:46:33Z balance $4.997275
+2026-10-29T23:46:34Z Phala balance before: $4.997275
+$ python3 ~/skarbnik-tee/vendor/phala.py deploy skarbnik-tee-prove ~/skarbnik-tee/vendor/compose.yaml tdx.xlarge
+2026-10-29T23:46:37Z provision: HTTP 200 {"app_id": "df2ab7974401cfb27f529435964d9678346febd9", "app_env_encrypt_pubkey": "e7fd149252594b51404ed17a37a57ef52e8d6055540d4a52f7b3fcff0e0eeb7e", "compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222", "compose_file": "{\"allowed_envs\":[],\"docker_compose_file\":\"# What Phala Cloud runs in the CVM for the confidential proving spike: our sealed checker and prover image, pinned by\\n# digest, with the dstack guest agent socket (for TDX quotes) and port 8080 behind Phala's gateway.\\nservices:\\n  tee:\\n    image: ghcr.io/pgreyy/skarbnik-tee@sha256:60f6bcf3862b67
+2026-10-29T23:46:38Z create: HTTP 200 {"id": "cvm_5wVkPOjd", "vm_uuid": "0a8dac3f-8588-4dfd-87e4-ecdbb5962b85", "app_id": "df2ab7974401cfb27f529435964d9678346febd9", "name": "skarbnik-tee-prove", "status": "starting", "vcpu": 8, "memory": 16384, "disk_size": 20, "base_image": null, "teepod": {"id": 26, "name": "prod5"}}
+2026-10-29T23:46:38Z deploy tdx.xlarge: exit 0
+$ python3 ~/skarbnik-tee/vendor/phala.py wait 0a8dac3f-8588-4dfd-87e4-ecdbb5962b85
+2026-10-29T23:46:41Z +2 s status processing online False urls ['https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network']
+2026-10-29T23:47:03Z +23 s status processing online False urls ['https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network']
+2026-10-29T23:47:25Z +46 s status processing online True urls ['https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network']
+2026-10-29T23:47:49Z +70 s status processing online True urls ['https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network']
+2026-10-29T23:48:12Z +93 s status running online True urls ['https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network']
+2026-10-29T23:48:12Z https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network/ answers HTTP 200: {"service": "skarbnik-tee-v1", "endpoints": ["/attestation", "/info", "/check", "/prove", "/prove/status", "/prove/receipt", "/fresh-quote", "/probe"]}
+2026-10-29T23:48:13Z CVM running and answering at https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network, 94 s after create
+$ docker run --rm --network host -v ~/skarbnik-tee:/w -v ~/.skarbnik-vendor/teespike/exploit.hex:/s/secret.hex:ro -v ~/.kintsugi-salts/teespike.salt:/s/salt:ro -w /w skarbnik-tee-vendor:local verify https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network run2/compose.yaml run2/skarbnik-tee-prove.deploy.json ghcr.io/pgreyy/skarbnik-tee@sha256:60f6bcf3862b67e91bb92858831c1279f28e6167131ee5eae94793933fabeb3d run2
+FAIL tdx_quote_dcap_qvl
+ok   tdx_quote_phala_api
+ok   report_data_binds_key
+ok   rtmr3_replay
+ok   compose_hash
+ok   compose_is_ours
+2026-10-29T23:48:20Z verification FAILED; quote sha256 e15ef7411329c5a2..., RTMR3 84cda9d2efc4afbf...
+2026-10-29T23:48:21Z verify: FAIL tdx_quote_dcap_qvl | ok   tdx_quote_phala_api | ok   report_data_binds_key | ok   rtmr3_replay | ok   compose_hash | ok   compose_is_ours | 2026-10-29T23:48:20Z verification FAILED; quote sha256 e15ef7411329c5a2..., RTMR3 84cda9d2efc4afbf...
+$ python3 ~/skarbnik-tee/vendor/phala.py delete 0a8dac3f-8588-4dfd-87e4-ecdbb5962b85
+2026-10-29T23:48:22Z delete: HTTP 204 {}
+2026-10-29T23:48:23Z still there: status deleting
+2026-10-29T23:48:34Z still there: status deleting
+2026-10-29T23:48:45Z gone: HTTP 404 None
+2026-10-29T23:48:45Z CVM list: HTTP 200, 0 CVM(s) []
+2026-10-29T23:48:45Z CVM deleted (127 s after create): gone: HTTP 404 None | CVM list: HTTP 200, 0 CVM(s) []
+$ python3 ~/skarbnik-tee/vendor/phala.py balance
+2026-10-29T23:49:45Z balance $4.997275
+2026-10-29T23:49:46Z Phala balance after: $4.997275

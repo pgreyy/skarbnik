@@ -1,0 +1,37 @@
+{
+ "scanned": [
+  "172.18.0.1",
+  "10.4.65.100"
+ ],
+ "ports_1_to_65535_open": {
+  "172.18.0.1": [
+   {
+    "port": 8080,
+    "first_bytes": ""
+   },
+   {
+    "port": 8090,
+    "first_bytes": ""
+   }
+  ],
+  "10.4.65.100": [
+   {
+    "port": 8080,
+    "first_bytes": ""
+   },
+   {
+    "port": 8090,
+    "first_bytes": ""
+   }
+  ]
+ },
+ "scan_seconds": 40.8,
+ "container_sockets": {
+  "/var/run/dstack.sock": true,
+  "/var/run/docker.sock": false,
+  "/var/run/tappd.sock": false
+ },
+ "container_capabilities_effective": "00000000a80425fb",
+ "container_user": 0,
+ "at": "2026-10-29T23:59:18Z"
+}

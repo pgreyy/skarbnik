@@ -14,7 +14,7 @@ official_demo_bounty: 7
 private_demo_bounty: 12
 judge_bounties: 27, 28, 29, 30, 31 (closed at writing: 28, 29, 30, 31)
 retired_judge_bounties: 18, 19, 20, 21, 22
-paid_by_proof: 1, 16, 24, 27, 32
+paid_by_proof: 1, 16, 24, 27, 32, 33
 paid_by_timeout: 4, 9, 11, 12, 13, 14, 15, 17 (and 8 on paper only: its transfer failed, finding 8)
 feed_url: https://skarbnik.xyz/feed.json
 ledger_url: https://skarbnik.xyz/#/evidence/ledger

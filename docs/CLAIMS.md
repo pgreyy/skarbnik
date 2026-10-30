@@ -46,6 +46,15 @@ The short version is in the [README](../README.md); every claim with its status 
   unversioned (finding 11).
 - One person can use many accounts; the per-account cap (deployed 2026-10-26) limits one account, not one person.
 
+**Experimental (one spike):**
+
+- **One attempt's prove step ran sealed in a CPU TEE.** Bounty 33: Proof 0 on a normal rented GPU; the attempt's RISC
+  Zero prove step inside a Phala Cloud Intel TDX VM, after the vendor checked the quote against Intel's certificates,
+  the key binding, the compose hash and image digest, and a fresh quote bound to its own nonce; no SSH keys and no
+  open port but ours and Phala's info page; receipt out, VM deleted, shrink on a rented GPU, Groth16 and
+  `submit_groth16` `Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS`, Passed. Not shown: the OS image rebuilt, a
+  reproducible image, a GPU TEE ([evidence/tee_spike/README.md](evidence/tee_spike/README.md)).
+
 **Narrow claims:**
 
 - PASS means the patch passed this checker against the secret and the public tests; it does not prove the patch is
@@ -88,7 +97,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | Claim | Status | Shown by |
 | --- | --- | --- |
 | Level 2: the contract opens and decides a bounty from Groth16 proofs it checks itself, with no verifier signatures; a proof must belong to that bounty and attempt; replayed, changed, late or repeated proofs are refused | works on testnet: one PASS paid, one FAIL spent, nine attacks refused; anyone can open a judge bounty (TRY_IT.md, steps 5 and 6) | `scripts/s6c_testnet.sh`, `scripts/judge_bounties.sh`, `cargo test -p kintsugi-contract` (EVIDENCE, S6c and "Judge bounties") |
-| Proof-checked payouts versus timeout payouts | bounties 1, 16, 24, 27 and 32 were paid by a proof (`submit_groth16` PASS; 27 and 32 by the vendor's `watch` on a rented GPU; bounty 24: a private bounty on a new module, tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); bounties 4, 9, 11, 12, 13, 14, 15 and 17 were paid by the timeout rule (a liveness rule, not a verdict), and bounty 8 on paper only (its transfer failed, finding 8), with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `web/data/recorded.json` (`scripts/gen_site_recorded.py`); the bounty pages |
+| Proof-checked payouts versus timeout payouts | bounties 1, 16, 24, 27, 32 and 33 were paid by a proof (`submit_groth16` PASS; 27 and 32 by the vendor's `watch` on a rented GPU; 33 with its prove step inside a confidential VM; bounty 24: a private bounty on a new module, tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); bounties 4, 9, 11, 12, 13, 14, 15 and 17 were paid by the timeout rule (a liveness rule, not a verdict), and bounty 8 on paper only (its transfer failed, finding 8), with no proof checked for the paid attempt; the site shows those as "Paid by timeout" | `web/data/recorded.json` (`scripts/gen_site_recorded.py`); the bounty pages |
 | An agent driven by a language model (NEAR AI Cloud by default): reads the feed, checks the public code against the bounty's hashes, asks the model for a fix, builds it, runs the public tests, commits and reveals with a limited key | works on testnet: on private bounty 24 (a new program) the model's fix was proven PASS on a rented GPU and paid by proof (tx `9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR`); on test bounty 16 the model's fix was proven PASS and paid; on private bounty 17 (a new program, secret and reference fix outside the repository) the model's fix was the reference fix byte for byte, but the vendor's proof did not finish inside the verdict window, so it was **paid by timeout, not by a proof** | `agent/skarbnik_agent.py`; EVIDENCE "Bounty 24", "The model-driven agent", "Private bounty 17" |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | 19 of 20 as expected; the one difference (`memory_grow`) is explained | `cargo test -p kintsugi-check`; EVIDENCE, S1 |
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |
@@ -109,6 +118,8 @@ Each claim names the file and the command that show it. Full results, failures i
   answered our jobs on testnet (8 of 8 timed out), so no Level 1 verdict exists (EVIDENCE, "OutLayer (Level 1) on testnet").
 - On the site: creating a bounty.
 - A mainnet contract.
+- Managed confidential proving (one sealed prover for many vendors) and proving in a GPU TEE
+  ([CONFIDENTIAL_PROVING.md](CONFIDENTIAL_PROVING.md)).
 
 ## Known limits
 

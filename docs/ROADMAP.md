@@ -2,8 +2,10 @@
 
 Planned work, most important first. Nothing here is built yet; what is built is in [CLAIMS.md](CLAIMS.md).
 
-1. **Confidential proving in a GPU TEE.** Planned, not built, not tested. Prove inside attested confidential hardware,
-   so even a rented GPU can't read the secret. Open questions and the next step (a small spike): [GPU_TEE.md](GPU_TEE.md).
+1. **Managed confidential proving.** Planned. One shared sealed prover for many vendors, so neither we nor the host
+   can read a secret. A CPU spike has run (bounty 33's prove step inside an attested Phala TDX VM, paid by proof); the
+   service and a GPU TEE are not built or tested. Details, gaps and the next step (a GPU spike):
+   [CONFIDENTIAL_PROVING.md](CONFIDENTIAL_PROVING.md).
 2. **Bounties with no reference fix.** A mode where Proof 0 proves only that the original crashes on the secret, so no
    reference fix is needed. It needs a new checker guest and a new image id.
 3. **A vendor liveness bond and a fallback evaluator.** Ideas to make vendor silence costlier and timeouts rarer. Not

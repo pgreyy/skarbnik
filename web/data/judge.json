@@ -271,10 +271,16 @@
    "evidence": "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>"
   },
   {
-   "claim": "Confidential proving in a GPU TEE (planned, not built, not tested)",
+   "claim": "One attempt's prove step ran sealed in a CPU TEE (Phala Cloud, Intel TDX) after the vendor checked the attestation and a fresh nonce quote; paid by proof",
+   "label": "exp",
+   "label_note": null,
+   "evidence": "one testnet spike: bounty 33, tx <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">Gg81ZZgd…</span></a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/evidence/tee_spike/README.md\" target=\"_blank\" rel=\"noopener\">docs/evidence/tee_spike/README.md</a>"
+  },
+  {
+   "claim": "Managed confidential proving (one shared sealed prover for many vendors; a GPU TEE)",
    "label": "plan",
    "label_note": null,
-   "evidence": "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/GPU_TEE.md\" target=\"_blank\" rel=\"noopener\">docs/GPU_TEE.md</a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>, item 1"
+   "evidence": "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/CONFIDENTIAL_PROVING.md\" target=\"_blank\" rel=\"noopener\">docs/CONFIDENTIAL_PROVING.md</a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>, item 1"
   },
   {
    "claim": "Vendor liveness bond and fallback evaluator",

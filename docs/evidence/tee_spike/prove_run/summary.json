@@ -1,0 +1,19 @@
+{
+ "prove_in_cvm_s": 6226.5,
+ "cvm_life_s": 6467,
+ "succinct_s": 58.63,
+ "shrink_gpu": {
+  "pod_ready": 93,
+  "binary": "cached",
+  "upload": 2.06,
+  "succinct": 58.63,
+  "pod_seconds": 170,
+  "cost_usd": 0.0515,
+  "gpu": "NVIDIA L40S",
+  "pod": "33j7t680hnyniq"
+ },
+ "groth16_s": 379.81,
+ "tx": "Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS",
+ "outcome": "Passed",
+ "vps_after_receipt_s": 556
+}

@@ -1,0 +1,1 @@
+{"times_s": {"pod_ready": 36, "binary": "cached", "setup": 50, "prove": 30.21, "succinct": 21.85, "pod_seconds": 135, "cost_usd": 0.0409, "gpu": "NVIDIA L40S", "pod": "bhdjz0kzp5godo", "groth16": 387.44}, "at": "2026-10-29T23:39:59Z"}

@@ -1,0 +1,4 @@
+$ RISC0_DEV_MODE=0 ~/skarbnik/bin/skarbnik-host prove ~/.skarbnik-vendor/teespike/fixed.wasm --proof0 --bounty teespike --exploit ~/.skarbnik-vendor/teespike/exploit.hex --original ~/skarbnik/data/demo/original.wasm --tests ~/skarbnik/data/demo/public_tests.txt --fuzz-count 16 --variants 32 --po2 18 --seed 822267b9ff4da3862cf52db512c24fe9d31580f049b025dce29c15daf33842de --out ~/skarbnik-vendor/teespike-work/p0.bin
+utc_start=2026-10-29T22:36:04Z
+limits: max_rss_mib=6144 min_avail_mib=300 max_seconds=43200
+salt: the private salt of bounty teespike (existing)

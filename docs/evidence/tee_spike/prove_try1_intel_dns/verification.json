@@ -1,0 +1,114 @@
+{
+ "at": "2026-10-29T23:48:15Z",
+ "url": "https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network",
+ "checks": {
+  "tdx_quote_dcap_qvl": {
+   "ok": false,
+   "error": "Failed to get collateral: error sending request for url (https://api.trustedservices.intel.com/sgx/certification/v4/pckcrl?ca=platform&encoding=der)"
+  },
+  "tdx_quote_phala_api": {
+   "ok": true,
+   "verified": true
+  },
+  "report_data_binds_key": {
+   "ok": true,
+   "quote_report_data": "15ef38f9a5189a4b7382f3ad3b9c8a2074bc3bf9a348bb6ca9dad218c854eba20000000000000000000000000000000000000000000000000000000000000000",
+   "sha256_public_key_plus_zeros": "15ef38f9a5189a4b7382f3ad3b9c8a2074bc3bf9a348bb6ca9dad218c854eba20000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "rtmr3_replay": {
+   "ok": true,
+   "replayed": "84cda9d2efc4afbff4cd1a5ca5b757694a501e6a2115f66bd0e2eb118aba0fda969d711101008aca7651fb1df86a9360",
+   "quote": "84cda9d2efc4afbff4cd1a5ca5b757694a501e6a2115f66bd0e2eb118aba0fda969d711101008aca7651fb1df86a9360",
+   "events": [
+    {
+     "event": "system-preparing",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "app-id",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "compose-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "gpu-policy-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "instance-id",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "boot-mr-done",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "os-image-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "key-provider",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "storage-fs",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "storage-encrypted",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "system-ready",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    }
+   ]
+  },
+  "compose_hash": {
+   "ok": true,
+   "sha256_app_compose": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222",
+   "event_log_compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222",
+   "phala_deploy_compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222"
+  },
+  "compose_is_ours": {
+   "ok": true,
+   "image": "ghcr.io/pgreyy/skarbnik-tee@sha256:60f6bcf3862b67e91bb92858831c1279f28e6167131ee5eae94793933fabeb3d",
+   "compose_file_sha256": "ed73a945c168b44a33e47c0801e97e434951f59033e8af496834d5c85030a05f"
+  }
+ },
+ "quote_bytes": 5010,
+ "quote_sha256": "e15ef7411329c5a20405dc387d0b88d43408ea74248c9e7644533ccbaa417cfe",
+ "quote_fields": {
+  "mr_td": "2a674327c50218dba880066b349b8d559d749ed68dce33fd651c184a877d084b07a9e583767a7ad5da13ed91deec2b70",
+  "rtmr0": "ec216f1d1d591468ff4741b9b192f016b26d3f90303bfa9dbb97557273853183981f21a4bcb3ae908247538d371ad072",
+  "rtmr1": "89ef86c5125b986c325f0a94acfa87718a4ef3a4d4f237dbb72dda3cf777fd2c054555fb4407eb53338d7d67329a7333",
+  "rtmr2": "e9000e338f33233e8f51b7fd031e1c158bdcf8572eab041c0bc8eb7fef48b23259a6a556e6c8e2af99999fc39c793179",
+  "rtmr3": "84cda9d2efc4afbff4cd1a5ca5b757694a501e6a2115f66bd0e2eb118aba0fda969d711101008aca7651fb1df86a9360",
+  "report_data": "15ef38f9a5189a4b7382f3ad3b9c8a2074bc3bf9a348bb6ca9dad218c854eba20000000000000000000000000000000000000000000000000000000000000000",
+  "version": 4,
+  "tee_type": "81000000"
+ },
+ "dstack_info": {
+  "os_image_hash": "ec43cb8c5e04b6bb6c53b33b16076a01d83d01f7f4b703f2f78a0d947d6247e6",
+  "compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222",
+  "app_id": "df2ab7974401cfb27f529435964d9678346febd9",
+  "instance_id": "fdc471c86f1d3eb98b78ce02ada89b7d33612b9c",
+  "mr_aggregated": "ae67ba430f10bea9fe0c98789354cf540e292f7bd841cd2fdf02355d55e5bd0d",
+  "device_id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "ok": false,
+ "public_key": "3cc38df9a5a2b72abcc7a6b50e56722bf776e065c7275394387158607bdeb939"
+}

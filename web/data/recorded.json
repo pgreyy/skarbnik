@@ -1354,6 +1354,58 @@
     "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
    }
   ],
+  "33": [
+   {
+    "step": "teespike_bounty_create",
+    "method": "create_bounty",
+    "tx": "5kDG7MMat1VtLcLJibSafMSfzpqS87fCXZ3jKVuG9tnN",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/tee_spike/transactions.tsv",
+    "script": "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py"
+   },
+   {
+    "step": "teespike_bounty_open",
+    "method": "open_with_groth16",
+    "tx": "2c5HgCeL9jTHRJTAPeWXcYSkBUxPmecLViZzVdy7dJD7",
+    "what": "Opened with its Proof 0",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/tee_spike/transactions.tsv",
+    "script": "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py"
+   },
+   {
+    "step": "teespike_commit",
+    "method": "commit",
+    "tx": "8Bs9mYwhw7JusbXyLaPkQN86ekc3sRHB6gnrToWWiYnQ",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/tee_spike/transactions.tsv",
+    "script": "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py"
+   },
+   {
+    "step": "teespike_reveal",
+    "method": "reveal",
+    "tx": "6hxzXjgaJC8yREyBvfAem9d6u2AZL9YqPwhonYo48i2d",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/tee_spike/transactions.tsv",
+    "script": "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py"
+   },
+   {
+    "step": "teespike_submit_groth16",
+    "method": "submit_groth16",
+    "tx": "Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS",
+    "what": "Proof of an attempt sent",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/tee_spike/transactions.tsv",
+    "script": "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py"
+   }
+  ],
   "18": [
    {
     "step": "judge_create_1",

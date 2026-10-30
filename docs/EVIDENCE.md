@@ -5,6 +5,29 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Confidential proving spike, part 2: a real attempt's prove step inside a Phala Cloud CVM, paid by proof (2026-10-30)
+
+Question: can the RISC Zero prove step of a revealed attempt run inside an attested confidential VM, with the secret
+sent only after a fresh quote and a check that nobody can log in, and the result still settle on chain by proof?
+
+- Setup: test bounty 33 (public demo program, fresh private secret). Proof 0 on a normal RunPod L40S (prove 30.21 s,
+  shrink 21.85 s, $0.0409; a CPU Proof 0 on the VPS was stopped on the owner's order). Published: create
+  `5kDG7MMat1VtLcLJibSafMSfzpqS87fCXZ3jKVuG9tnN`, open `2c5HgCeL9jTHRJTAPeWXcYSkBUxPmecLViZzVdy7dJD7`. Attempt with a
+  limited key through `tools/skarbnik-mcp`: commit `8Bs9mYwhw7JusbXyLaPkQN86ekc3sRHB6gnrToWWiYnQ`, reveal
+  `6hxzXjgaJC8yREyBvfAem9d6u2AZL9YqPwhonYo48i2d`.
+- Command (on the VPS, in tmux, with `cvm_watchdog.sh` beside it):
+  `python3 tools/tee-spike/attempt_in_tee.py <config> 33 0 <out> tdx.xlarge`.
+- Result: tries 1 and 2 stopped before anything was sent (Intel's certificate service did not resolve on the VPS;
+  Phala's API went quiet for two minutes) and their CVMs were deleted automatically. Try 3: the six checks passed; no
+  SSH keys in the user config or on the account; a scan of every TCP port inside the VM found only 8080 (ours) and
+  8090 (Phala's info page); a fresh quote bound to a nonce made seconds before passed the same checks with the same
+  key and measurements. The prove step ran 6,226.5 s inside the CVM, PASS, the secret erased; the receipt came out with
+  the hash the sealed status gave; the CVM was deleted (6,491 s after create); shrink on a RunPod L40S (58.63 s,
+  $0.0515); Groth16 on the VPS (379.81 s); `submit_groth16` `Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS`: Passed,
+  bounty 33 Paid. Phala $0.838183 for the whole spike, RunPod $0.0924. Raw files: `docs/evidence/tee_spike/prove_run/`,
+  `prove_try1_intel_dns/`, `prove_try2_phala_api_timeout/`, `proof0_gpu/`; write-up `docs/evidence/tee_spike/README.md`.
+- Verdict: PASS. Not shown: the OS image against a rebuild of Phala's dstack OS; a reproducible image; a GPU TEE.
+
 ## Confidential proving spike: a sealed checker in a Phala Cloud CPU CVM (2026-10-29)
 
 Question: can a vendor check that a rented confidential VM (Intel TDX on Phala Cloud) runs our exact program, send it
@@ -17,8 +40,8 @@ the secret input so only that program can read it, and get back a verdict only t
   Then PASS (demo secret, `fixed.wasm`) and FAIL (fresh private secret, `wrong_fix.wasm`), each answer sealed to the
   request. CVM deleted; list empty. Cost $0.002725. Raw files: `docs/evidence/tee_spike/checker_run/`; the write-up
   with every step and time, including two failed verify tries (our bugs): `docs/evidence/tee_spike/README.md`.
-- Verdict: PASS for the checker. Not shown: the OS image against a rebuild, a vendor nonce in the quote, a
-  reproducible image (prebuilt binaries). The prove step inside the CVM: part 2, running.
+- Verdict: PASS for the checker. Not shown: the OS image against a rebuild, a vendor nonce in the quote (added in part
+  2), a reproducible image (prebuilt binaries). The prove step inside the CVM: part 2, above.
 
 ## Contract code and every deploy, and the reproducible build (2026-10-29)
 

@@ -1,0 +1,10 @@
+{
+ "pod_ready": 93,
+ "binary": "cached",
+ "upload": 2.06,
+ "succinct": 58.63,
+ "pod_seconds": 170,
+ "cost_usd": 0.0515,
+ "gpu": "NVIDIA L40S",
+ "pod": "33j7t680hnyniq"
+}

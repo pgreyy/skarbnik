@@ -1,13 +1,13 @@
 {
- "made_at": "2026-10-29T20:28:05Z",
+ "made_at": "2026-10-30T09:19:00Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Computed from the chain only (every bounty and attempt), with the proving machine from web/data/provers.json. Same rules as the Ledger page.",
- "decided_attempts": 20,
- "settled_by_proof": 7,
+ "decided_attempts": 21,
+ "settled_by_proof": 8,
  "settled_by_timeout": 13,
- "share_settled_by_proof": 0.35,
- "timeout_rate": 0.65,
+ "share_settled_by_proof": 0.38095238095238093,
+ "timeout_rate": 0.6190476190476191,
  "reveal_to_settlement_seconds": {
   "proof, laptop": {
    "attempts": 4,
@@ -25,9 +25,9 @@
    "slowest": 22231.844960858
   },
   "proof, not recorded": {
-   "attempts": 2,
-   "median": 986.307542306,
-   "slowest": 1027.759551886
+   "attempts": 3,
+   "median": 1027.759551886,
+   "slowest": 7828.404930129
   }
  },
  "timing_note": "by proof: from the reveal to the proof accepted on chain; by timeout: from the reveal to the verdict deadline (the claim came later).",

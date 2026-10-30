@@ -1,0 +1,13 @@
+{
+ "state": "started",
+ "patch_sha256": "42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97",
+ "at": "2026-10-29T23:59:27Z",
+ "job": {
+  "bounty": "teespike",
+  "seed": "847163a8c8b6b0cf39164570220a57470400f3c1e2c47d7ba0b5535bcfc5a685",
+  "submission_id": "c9d56663067f3d34baf1e29376b09d42ef3d4e4755c527d90e3f37cb3b5b06a9",
+  "fuzz": 16,
+  "variants": 32,
+  "po2": 18
+ }
+}

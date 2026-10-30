@@ -1,0 +1,117 @@
+{
+ "at": "2026-10-29T23:58:23Z",
+ "url": "https://338906be7ffbc09adc8ff02f7451839049162925-8080.dstack-pha-prod5.phala.network",
+ "checks": {
+  "tdx_quote_dcap_qvl": {
+   "ok": true,
+   "status": "UpToDate",
+   "advisory_ids": [],
+   "dcap_qvl": "0.6.6",
+   "collateral_from": "Intel PCS"
+  },
+  "tdx_quote_phala_api": {
+   "ok": true,
+   "verified": true
+  },
+  "report_data_binds_key": {
+   "ok": true,
+   "quote_report_data": "c10702666a63e6a2314afb49118090772a9ad0d563f1f65e29e838fe1c3f78f80000000000000000000000000000000000000000000000000000000000000000",
+   "sha256_public_key_plus_zeros": "c10702666a63e6a2314afb49118090772a9ad0d563f1f65e29e838fe1c3f78f80000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "rtmr3_replay": {
+   "ok": true,
+   "replayed": "138ca752e6cbe5d875546a3ab6ddc44473ea2e88227007144857486120d4099d10be4d60c2c88835f1d2c2813a985aaf",
+   "quote": "138ca752e6cbe5d875546a3ab6ddc44473ea2e88227007144857486120d4099d10be4d60c2c88835f1d2c2813a985aaf",
+   "events": [
+    {
+     "event": "system-preparing",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "app-id",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "compose-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "gpu-policy-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "instance-id",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "boot-mr-done",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "os-image-hash",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "key-provider",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "storage-fs",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "storage-encrypted",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    },
+    {
+     "event": "system-ready",
+     "digest_recomputed": true,
+     "rule": "type_le32:name:payload"
+    }
+   ]
+  },
+  "compose_hash": {
+   "ok": true,
+   "sha256_app_compose": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222",
+   "event_log_compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222",
+   "phala_deploy_compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222"
+  },
+  "compose_is_ours": {
+   "ok": true,
+   "image": "ghcr.io/pgreyy/skarbnik-tee@sha256:60f6bcf3862b67e91bb92858831c1279f28e6167131ee5eae94793933fabeb3d",
+   "compose_file_sha256": "ed73a945c168b44a33e47c0801e97e434951f59033e8af496834d5c85030a05f"
+  }
+ },
+ "quote_bytes": 5010,
+ "quote_sha256": "607ebd28dae59d22a8d6b2e4e274b85264604b3bf6e427b2f2e6a6e92d7d3dd8",
+ "quote_fields": {
+  "mr_td": "2a674327c50218dba880066b349b8d559d749ed68dce33fd651c184a877d084b07a9e583767a7ad5da13ed91deec2b70",
+  "rtmr0": "ec216f1d1d591468ff4741b9b192f016b26d3f90303bfa9dbb97557273853183981f21a4bcb3ae908247538d371ad072",
+  "rtmr1": "89ef86c5125b986c325f0a94acfa87718a4ef3a4d4f237dbb72dda3cf777fd2c054555fb4407eb53338d7d67329a7333",
+  "rtmr2": "e9000e338f33233e8f51b7fd031e1c158bdcf8572eab041c0bc8eb7fef48b23259a6a556e6c8e2af99999fc39c793179",
+  "rtmr3": "138ca752e6cbe5d875546a3ab6ddc44473ea2e88227007144857486120d4099d10be4d60c2c88835f1d2c2813a985aaf",
+  "report_data": "c10702666a63e6a2314afb49118090772a9ad0d563f1f65e29e838fe1c3f78f80000000000000000000000000000000000000000000000000000000000000000",
+  "version": 4,
+  "tee_type": "81000000"
+ },
+ "dstack_info": {
+  "os_image_hash": "ec43cb8c5e04b6bb6c53b33b16076a01d83d01f7f4b703f2f78a0d947d6247e6",
+  "compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222",
+  "app_id": "338906be7ffbc09adc8ff02f7451839049162925",
+  "instance_id": "201b2e948dfa9542a47baae097a44d419d7cee11",
+  "mr_aggregated": "6edb69cfe439189773e2c59e744c00b48375d97bd44576fb55ee8375eae89966",
+  "device_id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "ok": true,
+ "public_key": "e9a336c40b30385615fe76a3232290ba9b20ac9060ccb1399c08b9e864ed9f03"
+}

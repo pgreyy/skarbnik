@@ -154,7 +154,8 @@ evidence is never shown as done.
 | Level 1 verification through OutLayer | Experimental | built, never answered on testnet: [docs/EVIDENCE.md](docs/EVIDENCE.md), S4/S5 |
 | No upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay) | Planned (mainnet) | the mainnet contract `skarbnik.near`; the testnet contract keeps its full access key on purpose ([docs/LIMITS.md](docs/LIMITS.md)); its live code hash and every deploy: [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy" |
 | Unresolved bug bounties (no reference fix needed) | Planned | [docs/ROADMAP.md](docs/ROADMAP.md) |
-| Confidential proving in a GPU TEE (planned, not built, not tested) | Planned | [docs/GPU_TEE.md](docs/GPU_TEE.md); [docs/ROADMAP.md](docs/ROADMAP.md), item 1 |
+| One attempt's prove step ran sealed in a CPU TEE (Phala Cloud, Intel TDX) after the vendor checked the attestation and a fresh nonce quote; paid by proof | Experimental | one testnet spike: bounty 33, tx [`Gg81ZZgd…`](https://testnet.nearblocks.io/txns/Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS); [docs/evidence/tee_spike/README.md](docs/evidence/tee_spike/README.md) |
+| Managed confidential proving (one shared sealed prover for many vendors; a GPU TEE) | Planned | [docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md); [docs/ROADMAP.md](docs/ROADMAP.md), item 1 |
 | Vendor liveness bond and fallback evaluator | Planned | [docs/ROADMAP.md](docs/ROADMAP.md) |
 | Agent earnings after model and compute costs | Planned | [docs/ROADMAP.md](docs/ROADMAP.md); the Ledger's empty cost column |
 | An external security audit | Not claimed | none; the contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)) |

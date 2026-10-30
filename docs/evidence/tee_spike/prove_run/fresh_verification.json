@@ -1,0 +1,48 @@
+{
+ "nonce_made_at": "2026-10-29T23:59:20Z",
+ "nonce": "3eb43d64a6fa21db8a4585b429292e580b1b5f951ca7a6418bfb159edc75ff8d",
+ "round_trip_seconds": 1.88,
+ "quote_sha256": "671c17e685fd407d15d8997093f6fa9741f31235944eb3b03e42435f1e73c7ad",
+ "differs_from_first_quote": true,
+ "checks": {
+  "tdx_quote_dcap_qvl": {
+   "ok": true,
+   "status": "UpToDate",
+   "advisory_ids": [],
+   "collateral_from": "Intel PCS"
+  },
+  "tdx_quote_phala_api": {
+   "ok": true,
+   "verified": true
+  },
+  "report_data": {
+   "ok": true,
+   "quote": "3270449e4c0606e742f1009a6bddd77fabd4128c8781b6d74b34905765558fed0000000000000000000000000000000000000000000000000000000000000000",
+   "expected": "3270449e4c0606e742f1009a6bddd77fabd4128c8781b6d74b34905765558fed0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "rtmr3_replay": {
+   "ok": true,
+   "replayed": "138ca752e6cbe5d875546a3ab6ddc44473ea2e88227007144857486120d4099d10be4d60c2c88835f1d2c2813a985aaf",
+   "quote": "138ca752e6cbe5d875546a3ab6ddc44473ea2e88227007144857486120d4099d10be4d60c2c88835f1d2c2813a985aaf",
+   "events": 11
+  },
+  "same_key": {
+   "ok": true
+  },
+  "same_measurements": {
+   "ok": true,
+   "compared": [
+    "mr_td",
+    "rtmr0",
+    "rtmr1",
+    "rtmr2",
+    "rtmr3"
+   ]
+  },
+  "same_compose_hash": {
+   "ok": true,
+   "compose_hash": "f873d33c0d2e2d6634aaf7ec5c315cac8377aed2cab3baca9ac5971004b85222"
+  }
+ },
+ "ok": true
+}

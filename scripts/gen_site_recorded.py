@@ -91,6 +91,9 @@ BOUNTY_STEPS = [
     ("docs/evidence/vendor_tool/transactions.tsv", "tools/skarbnik-vendor (publish, watch in GPU mode); the researcher by hand with a limited key",
      {32: ["partc_bounty_create", "partc_bounty_open", "partc_commit", "partc_reveal", "partc_watch_submit_groth16"],
       27: ["judge27_commit", "judge27_reveal", "judge27_watch_submit_groth16"]}),
+    # The confidential proving spike: bounty 33's Proof 0 on a rented GPU, its attempt's prove step inside a Phala TDX VM
+    ("docs/evidence/tee_spike/transactions.tsv", "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py",
+     {33: ["teespike_bounty_create", "teespike_bounty_open", "teespike_commit", "teespike_reveal", "teespike_submit_groth16"]}),
 ]
 # Judge bounties (scripts/judge_bounties.sh): same hashes as bounty 17, created closed, opened by anyone with its Proof 0.
 _jenv = os.path.join(ROOT, "docs/evidence/judge/run.env")

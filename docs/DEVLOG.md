@@ -2,6 +2,26 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-30: Confidential proving spike, part 2: bounty 33's prove step sealed, paid by proof
+
+- On the owner's order the VPS CPU Proof 0 was stopped (by exact PIDs, 23:28 UTC) and all proving now runs on RunPod
+  GPUs: `tools/skarbnik-vendor prove0` gained a GPU mode (`tools/skarbnik_gpu.py`: Proof 0 on a pod, and
+  `shrink_on_gpu` for a receipt made elsewhere); an empty `data_centers` lets RunPod pick any data center (the first
+  try found no free GPU in the five listed); the window rule now adds only the prove, shrink and Groth16 times.
+- Bounty 33 (`teespike`): Proof 0 on an L40S ($0.0409), published from the laptop (reward 0.1 NEAR; a 0.05 NEAR create
+  was refused, the minimum is 0.1), one attempt through `tools/skarbnik-mcp` with a limited key.
+- `tools/tee-spike/`: a fresh quote bound to a vendor nonce (`POST /fresh-quote`, `vendor.py fresh`), login checks
+  (`phala.py logins`, `POST /probe`), `attempt_in_tee.py` (the whole attempt, run by the VPS alone) and
+  `cvm_watchdog.sh`. Two tries stopped safely and auto-deleted (Intel's address did not resolve on the VPS: retries
+  and Phala's mirror of Intel's collateral; Phala's API timed out: retries for reads and deletes). Try 3: prove inside
+  `tdx.xlarge` 6,226.5 s, CVM deleted, shrink on a GPU, Groth16 on the VPS, `submit_groth16`
+  `Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS` Passed. Phala $0.838183 in all, RunPod $0.0924.
+- docs/CONFIDENTIAL_PROVING.md replaces docs/GPU_TEE.md (planned: the goal, the vendor flow, the trust model, what the
+  spike showed and did not, providers, economics). README roadmap, docs/ROADMAP.md, docs/CLAIMS.md, JUDGE_GUIDE.md (a
+  new Experimental claim; judge.json regenerated), docs/numbers.md, docs/ARCHITECTURE.md, the site's records for
+  bounty 33 and every generated site file (`scripts/rebuild_site_data.sh`).
+- A crontab line to restart the watchdog after a VPS reboot was refused as unapproved persistence and not added.
+
 ## 2026-10-29: Confidential proving spike, part 1: the checker sealed in a Phala CPU CVM
 
 - `tools/tee-spike/`: a sealed checker and prover (`container/server.py`: an X25519 key made in memory, a TDX quote

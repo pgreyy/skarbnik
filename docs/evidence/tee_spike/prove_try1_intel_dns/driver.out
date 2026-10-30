@@ -1,0 +1,14 @@
+2026-10-29T23:46:33Z bounty 33 attempt 0: patch sha256 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97, seed 847163a8c8b6b0cf39164570220a57470400f3c1e2c47d7ba0b5535bcfc5a685, submission id c9d56663067f3d34baf1e29376b09d42ef3d4e4755c527d90e3f37cb3b5b06a9, deadline 1793403859534380832
+2026-10-29T23:46:34Z Phala balance before: $4.997275
+2026-10-29T23:46:38Z deploy tdx.xlarge: exit 0
+2026-10-29T23:48:13Z CVM running and answering at https://df2ab7974401cfb27f529435964d9678346febd9-8080.dstack-pha-prod5.phala.network, 94 s after create
+2026-10-29T23:48:21Z verify: FAIL tdx_quote_dcap_qvl | ok   tdx_quote_phala_api | ok   report_data_binds_key | ok   rtmr3_replay | ok   compose_hash | ok   compose_is_ours | 2026-10-29T23:48:20Z verification FAILED; quote sha256 e15ef7411329c5a2..., RTMR3 84cda9d2efc4afbf...
+2026-10-29T23:48:45Z CVM deleted (127 s after create): gone: HTTP 404 None | CVM list: HTTP 200, 0 CVM(s) []
+2026-10-29T23:49:46Z Phala balance after: $4.997275
+Traceback (most recent call last):
+  File "~/skarbnik-tee/vendor/attempt_in_tee.py", line 139, in <module>
+    main(*sys.argv[1:])
+  File "~/skarbnik-tee/vendor/attempt_in_tee.py", line 80, in main
+    if 'verification PASSED' not in t: raise RuntimeError('the attestation did not pass; nothing sent')
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: the attestation did not pass; nothing sent

@@ -26,10 +26,11 @@
   "22": "Judge bounty",
   "23": "Arena guarded probe",
   "24": "Second new module, private secret",
-  "25": "Per-account cap test"
+  "25": "Per-account cap test",
+  "33": "Sealed prove step (TEE spike)"
  },
  "notes": {
-   "12": "Paid by timeout, not by a proof: its one attempt came from a team-run account (the owner's account, external agent software), and the vendor's watch does not cover bounty 12.",
+  "12": "Paid by timeout, not by a proof: its one attempt came from a team-run account (the owner's account, external agent software), and the vendor's watch does not cover bounty 12.",
   "1": "Attempt 0 passed and was paid. Attempt 1 was a valid proof of FAIL, which spent that attempt.",
   "4": "A silent vendor test. No proof arrived in the window.",
   "5": "Refunded to the vendor after a self block test.",
@@ -40,7 +41,8 @@
   "16": "The agent's fix on the public demo module was proven PASS and paid. It shows the path, not a model's skill: the demo bug is named in the module's comments.",
   "17": "The vendor's proof finished after the 4 hour window, so the contract paid by timeout. Not a proof.",
   "24": "An AI agent's fix of a private bug it could not see, proven PASS and paid by the contract. Proved and shrunk on a rented GPU, wrapped to Groth16 on a separate Docker machine; the secret never left the vendor's control.",
-  "25": "A throwaway bounty for the live test of the per-account cap: one account's second commit was refused."
+  "25": "A throwaway bounty for the live test of the per-account cap: one account's second commit was refused.",
+  "33": "A team-run test of the confidential proving spike: Proof 0 on a rented GPU; the attempt's prove step ran inside an attested Phala Cloud confidential VM (Intel TDX), then the shrink on a rented GPU and the Groth16 proof the contract checked. The researcher account is the project's own test account. docs/evidence/tee_spike/README.md"
  },
  "agent_runs": {
   "16": {

@@ -140,7 +140,7 @@ Every bounty today, read from the chain:
 
 | Status | Bounties |
 | --- | --- |
-| Paid by a checked proof | 1, 16, 24, 27, 32 |
+| Paid by a checked proof | 1, 16, 24, 27, 32, 33 (33: the sealed prove step test) |
 | Paid by the timeout rule | 4, 9, 11, 12, 13, 14, 15, 17 (and 8 on paper only: its transfer failed) |
 | Refunded to the vendor | 5, 6 |
 | Demo or test bounties, not settled | 0, 2, 3, 7, 10, 23, 25, 26 |
@@ -230,8 +230,9 @@ also cap how many attempts one account holds (the per-account cap, live since 20
 
 ## Roadmap
 
-1. **Confidential proving in a GPU TEE** (planned, not built, not tested): prove inside attested confidential
-   hardware, so even a rented GPU can't read the secret. Next step: a small spike ([docs/GPU_TEE.md](docs/GPU_TEE.md)).
+1. **Managed confidential proving** (planned): one shared sealed prover for many vendors, so no host can read the
+   secret. A CPU spike ran on testnet: bounty 33's prove step ran inside an attested Phala TDX VM and was paid by
+   proof; a GPU TEE is not tested ([docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md)).
 2. **Bounties with no reference fix:** Proof 0 proves only that the original crashes on the secret.
 3. **A vendor liveness bond and a fallback evaluator,** to make silence costly and timeouts rare.
 4. **Agent earnings after costs** on the Proof Ledger.

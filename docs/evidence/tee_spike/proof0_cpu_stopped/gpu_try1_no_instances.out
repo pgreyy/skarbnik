@@ -1,0 +1,17 @@
+2026-10-29T23:30:08Z Proof 0 of teespike on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/teespike-work)
+Traceback (most recent call last):
+  File "~/skarbnik/tools/skarbnik-vendor", line 497, in <module>
+    main()
+  File "~/skarbnik/tools/skarbnik-vendor", line 494, in main
+    {'init': cmd_init, 'check': cmd_check, 'prove0': cmd_prove0, 'publish': cmd_publish, 'watch': cmd_watch, 'status': cmd_status}[a.cmd](a)
+  File "~/skarbnik/tools/skarbnik-vendor", line 327, in cmd_prove0
+    _, t = gpu.prove_on_gpu(cfg, job, lambda m: say(f'{now()} {m}'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik/tools/skarbnik_gpu.py", line 314, in prove_on_gpu
+    pod.create()
+  File "~/skarbnik/tools/skarbnik_gpu.py", line 130, in create
+    p = self.rp.call('POST', '/pods', body, timeout=120)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik/tools/skarbnik_gpu.py", line 80, in call
+    raise GpuError(f'RunPod {method} {path}: HTTP {e.code} {self._redact(e.read().decode(errors="replace"))[:300]}') from None
+skarbnik_gpu.GpuError: RunPod POST /pods: HTTP 500 {"error":"create pod: There are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no i

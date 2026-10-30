@@ -1,0 +1,6 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+teespike_bounty_create	create_bounty	kintsugi-vendor-prnvm.testnet	5kDG7MMat1VtLcLJibSafMSfzpqS87fCXZ3jKVuG9tnN	-	-	0	-
+teespike_bounty_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	2c5HgCeL9jTHRJTAPeWXcYSkBUxPmecLViZzVdy7dJD7	-	-	0	-
+teespike_commit	commit	skarbnik-mcp-2fe414.testnet	8Bs9mYwhw7JusbXyLaPkQN86ekc3sRHB6gnrToWWiYnQ	-	-	0	-
+teespike_reveal	reveal	skarbnik-mcp-2fe414.testnet	6hxzXjgaJC8yREyBvfAem9d6u2AZL9YqPwhonYo48i2d	-	-	0	-
+teespike_submit_groth16	submit_groth16	skarbnik-prover-bb2d00.testnet	Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS	36.4 Tgas	-	0	-
