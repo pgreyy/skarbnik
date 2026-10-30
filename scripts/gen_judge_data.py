@@ -5,6 +5,8 @@
 # brackets, such as "Planned (mainnet)") and its evidence. Inline
 # Markdown (code, bold, links, bare addresses) becomes HTML; links to skarbnik.xyz become routes on the site, links to
 # files in the repository become GitHub links. Fails if the guide's shape changes (steps, fields or claim count).
+# The page leaves out each step's What this proves and What this does not prove (the guide keeps them; the page links
+# to it), so those two fields are dropped here and the two intro sentences that name them are adjusted to match.
 # Usage, from the repo root: python3 -I scripts/gen_judge_data.py
 import html
 import json
@@ -16,6 +18,12 @@ REPO = 'https://github.com/pgreyy/skarbnik/blob/main/'
 LABELS = {'Implemented': 'impl', 'Demonstrated': 'demo', 'Experimental': 'exp', 'Planned': 'plan', 'Not claimed': 'none'}
 A_FIELDS = ['Do', 'Expect', 'Verify', 'What this proves', 'What this does not prove']
 B_FIELDS = ['Expect', 'What this proves', 'What this does not prove']
+PAGE_SKIP = ['What this proves', 'What this does not prove']
+# Sentences of the guide that describe the skipped fields, and what the page says instead
+PAGE_TEXT = [('intro', ' Under every step is what it proves and what it does not.', ''),
+             ('a_intro', 'Each has the same five parts: <b class="txt">Do</b>, <b class="txt">Expect</b>, <b class="txt">Verify</b>, '
+              '<b class="txt">What this proves</b> and <b class="txt">What this does not prove</b>.',
+              'On this page each has three parts: <b class="txt">Do</b>, <b class="txt">Expect</b> and <b class="txt">Verify</b>.')]
 
 
 def href(url):
@@ -104,6 +112,13 @@ def main():
         sys.exit(f'{SRC}: found {len(steps)} Level A steps, {len(bsteps)} Level B rows, {len(lines)} Level B line sets, {len(claims)} claims')
     data = {'source': SRC, 'intro': paras(intro), 'a_intro': paras(a), 'a': steps, 'b_intro': [bparas[0]], 'b': bsteps,
             'b_notes': bparas[2:], 'claims_intro': paras(c), 'claims': claims}
+    for s in steps + bsteps:
+        for k in PAGE_SKIP:
+            del s[k]
+    for key, old, new in PAGE_TEXT:
+        if sum(p.count(old) for p in data[key]) != 1:
+            sys.exit(f'{SRC}: the {key} sentence about the step fields changed; update PAGE_TEXT in this script')
+        data[key] = [p.replace(old, new) for p in data[key]]
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
         f.write('\n')

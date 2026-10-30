@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-30: Judge guide page keeps Do, Expect and Verify
+
+- The Judge guide page no longer shows the What this proves and What this does not prove boxes under each Level A and
+  Level B step. `JUDGE_GUIDE.md` is unchanged and keeps both fields. `scripts/gen_judge_data.py` drops the two fields
+  from `web/data/judge.json` and adjusts the two intro sentences that named them (it stops if those sentences change);
+  the page header adds one line: "What each step proves, and what it doesn't, is in JUDGE_GUIDE.md on GitHub", linked to
+  the file. The unused box styles are removed from `web/css/site.css`; `web/llms.txt` points to the file for the same
+  two fields. Commands: `python3 -I scripts/gen_judge_data.py` (6 Level A steps, 8 Level B steps, 24 claims) and
+  `node scripts/snapshot_pages.mjs`. The saved page `web/judge/index.html` has 0 of the two field titles and 1 link line.
+- Checked in a headless Chromium at 1440 and 390, dark and light, Level A and Level B tabs: no sideways scroll, no
+  script errors.
+
 ## 2026-10-30: One page header size on How it works, Judge guide and Bounties
 
 - How it works, Judge guide and Bounties now use the same page header block as For vendors, For agents and Proof and

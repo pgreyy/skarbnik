@@ -1,13 +1,13 @@
 // Judge guide: the same guide as JUDGE_GUIDE.md, read from data/judge.json (made from it by scripts/gen_judge_data.py),
-// so the page and the file never differ. Three tabs. Level A, the evidence tour: six steps, each with Do, Expect,
-// Verify, What this proves and What this does not prove. Level B, local reproduction: eight steps, each with what it
-// shows, what it needs, its download and memory, and the same three lines. Claims and evidence: every claim with its
+// so the page and the file never differ. What each step proves and does not prove stays in the file only; the page
+// links to it. Three tabs. Level A, the evidence tour: six steps, each with Do, Expect and Verify. Level B, local
+// reproduction: eight steps, each with what it shows, what it needs, its download and memory, and what to expect.
+// Claims and evidence: every claim with its
 // one label (Implemented, Demonstrated, Experimental, Planned, Not claimed) and its evidence, filterable.
 import { $, icon, note, tabbed, seg, bindSeg } from '../ui.js';
 
 const json = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`); return r.json(); });
 const CL = { impl: ['l-impl', 'Implemented'], demo: ['l-demo', 'Demonstrated'], exp: ['l-exp', 'Experimental'], plan: ['l-plan', 'Planned'], none: ['k-fail', 'Not claimed'] };
-const pn = (s) => `<div class="pn"><div><b>${icon('check')} What this proves</b><p>${s['What this proves']}</p></div><div><b>${icon('x')} What this does not prove</b><p>${s['What this does not prove']}</p></div></div>`;
 
 export async function judge(viewEl, tab) {
   let g;
@@ -16,10 +16,10 @@ export async function judge(viewEl, tab) {
     return;
   }
   const steps = g.a.map((s) => `<div class="card step"><div class="sn"><b>${s.n}</b><span>${s.time}</span></div><div><h3 class="h3" style="margin-bottom:18px">${s.title}</h3><div class="dev">
-    <div class="do"><h4>${icon('right')} Do</h4><p>${s.Do}</p></div><div><h4>${icon('eye')} Expect</h4><p>${s.Expect}</p></div><div><h4>${icon('check')} Verify</h4><p>${s.Verify}</p></div></div>${pn(s)}</div></div>`).join('');
+    <div class="do"><h4>${icon('right')} Do</h4><p>${s.Do}</p></div><div><h4>${icon('eye')} Expect</h4><p>${s.Expect}</p></div><div><h4>${icon('check')} Verify</h4><p>${s.Verify}</p></div></div></div></div>`).join('');
   const cmds = g.b.map((s) => `<div class="card cmd"><div class="sn"><b>${s.n}</b></div><div><h3 class="h3 bshow">${s.shows}</h3>
     <div class="cmd-m m3"><div><b>Needs</b><p>${s.needs}</p></div><div><b>Download</b><p>${s.download}</p></div><div><b>Memory</b><p>${s.memory}</p></div></div>
-    <div class="dev one mt16"><div class="do"><h4>${icon('eye')} Expect</h4><p>${s.Expect}</p></div></div>${pn(s)}</div></div>`).join('');
+    <div class="dev one mt16"><div class="do"><h4>${icon('eye')} Expect</h4><p>${s.Expect}</p></div></div></div></div>`).join('');
   const crows = (f) => g.claims.filter((c) => f === 'all' || c.label === f).map((c) => `<div class="lrow l3" role="listitem"><b style="color:var(--tx);font-weight:600">${c.claim}</b><div><span class="chip ${CL[c.label][0]}"${c.label === 'none' ? ' style="color:var(--tx2);border-color:var(--ln2)"' : ''}>${CL[c.label][1]}${c.label_note ? ` (${c.label_note})` : ''}</span></div><p class="small cev">${c.evidence}</p></div>`).join('');
   const head = '<div class="lhead l3" aria-hidden="true"><span>Claim</span><span>Label</span><span>Evidence</span></div>';
   const count = (k) => g.claims.filter((c) => c.label === k).length;
@@ -29,6 +29,7 @@ export async function judge(viewEl, tab) {
 <p class="eyebrow">Judge guide</p>
 <h1>Check the claims yourself in ten minutes</h1>
 ${g.intro.map((p, i) => `<p class="${i ? 'body' : 'lead'}">${p}</p>`).join('')}
+<p class="small">What each step proves, and what it doesn’t, is in <a class="lnk sm" href="https://github.com/pgreyy/skarbnik/blob/main/JUDGE_GUIDE.md" target="_blank" rel="noopener">JUDGE_GUIDE.md on GitHub ${icon('ext')}</a>.</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:14px">
 <div class="card lv"><span class="vico">${icon('eye')}</span><div><b class="h4">Level A, evidence tour</b><p class="small" style="margin-top:4px">5 to 10 minutes. A browser and the explorer. No install.</p></div></div>
