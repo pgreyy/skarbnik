@@ -13,12 +13,18 @@ whose report_data is sha256(public key) followed by 32 zero bytes, and serves:
                       Zero prove step (skarbnik-host prove) in the background
   POST /prove/status  an encrypted request: the prove job's state, its time so far and the end of its log
   GET  /prove/receipt the composite receipt once the job has finished (it holds no secret, only the journal)
+  POST /fresh-quote   {nonce}: a new TDX quote with report_data = sha256(public key || nonce) followed by 32 zero
+                      bytes, so the vendor can tell that the quote was made just now by the holder of that key
+  POST /probe         {hosts}: from inside the VM, which TCP ports answer on the VM itself (the container's default
+                      gateway) and on the given private addresses, with the first bytes each port sends (an SSH
+                      server says "SSH-2.0..."), and what the container can reach (sockets, capabilities)
 Requests are encrypted to the attested key: the vendor makes a one time X25519 key, both sides derive a key with
 HKDF-SHA256, and the body is sealed with ChaCha20-Poly1305. Answers are sealed with a second key from the same
 exchange, bound to the request, so only the holder of the attested private key could have written them.
 The secret input and the salt are kept in RAM only (/dev/shm, a memory file system) and erased when the run ends.
 """
-import base64, hashlib, json, os, re, shutil, subprocess, threading, time
+import base64, hashlib, ipaddress, json, os, re, shutil, socket, subprocess, threading, time
+from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from cryptography.hazmat.primitives import hashes, serialization
@@ -178,6 +184,47 @@ def do_prove(req):
     return {'state': 'started', 'patch_sha256': patch_sha}
 
 
+def fresh_quote(req):
+    nonce = bytes.fromhex(req['nonce'])
+    if len(nonce) != 32: raise ValueError('nonce: 32 bytes as hex')
+    rd = hashlib.sha256(PUB + nonce).digest() + bytes(32)
+    t0 = time.time(); fq = dstack.get_quote(rd)
+    return {'version': VERSION, 'public_key': PUB.hex(), 'nonce': nonce.hex(), 'report_data': rd.hex(), 'quote': fq.quote,
+            'event_log': fq.event_log, 'quote_seconds': round(time.time() - t0, 3), 'uptime_seconds': round(time.time() - STARTED)}
+
+
+def default_gateway():
+    for line in open('/proc/net/route').read().splitlines()[1:]:
+        f = line.split()
+        if f[1] == '00000000': return socket.inet_ntoa(bytes.fromhex(f[2])[::-1])
+
+
+def port_open(host, port):
+    try:
+        with socket.create_connection((host, port), timeout=0.5) as c:
+            if c.getsockname() == c.getpeername(): return None  # a TCP self-connect on loopback, not a listener
+            c.settimeout(1.5)
+            try: banner = c.recv(120)
+            except OSError: banner = b''
+            return port, banner.decode('latin-1')
+    except OSError:
+        return None
+
+
+def probe(req):
+    gw = default_gateway(); hosts = [gw] if gw else []
+    for h in req.get('hosts', []):
+        if ipaddress.ip_address(h).is_private and h not in hosts: hosts.append(h)
+    t0 = time.time(); found = {}
+    with ThreadPoolExecutor(max_workers=256) as ex:
+        for h in hosts:
+            found[h] = [{'port': p, 'first_bytes': b} for r in ex.map(lambda p: port_open(h, p), range(1, 65536)) if r for p, b in [r]]
+    status = dict(l.split(':\t', 1) for l in open('/proc/self/status').read().splitlines() if ':\t' in l)
+    return {'scanned': hosts, 'ports_1_to_65535_open': found, 'scan_seconds': round(time.time() - t0, 1),
+            'container_sockets': {p: os.path.exists(p) for p in ('/var/run/dstack.sock', '/var/run/docker.sock', '/var/run/tappd.sock')},
+            'container_capabilities_effective': status.get('CapEff', '').strip(), 'container_user': os.getuid()}
+
+
 def job_status(_req):
     s = {k: v for k, v in JOB.items() if k != 'pid'}
     if 'started' in s: s['elapsed_seconds'] = round((s.get('prove_seconds') or time.time() - s['started']), 1)
@@ -204,10 +251,15 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == '/prove/receipt':
             if JOB.get('state') != 'done': return self.reply(409, {'error': f'no receipt (job {JOB.get("state")})'})
             return self.reply(200, open(f'{WORK}/u.bin', 'rb').read(), 'application/octet-stream')
-        if self.path == '/': return self.reply(200, {'service': VERSION, 'endpoints': ['/attestation', '/info', '/check', '/prove', '/prove/status', '/prove/receipt']})
+        if self.path == '/': return self.reply(200, {'service': VERSION, 'endpoints': ['/attestation', '/info', '/check', '/prove', '/prove/status', '/prove/receipt', '/fresh-quote', '/probe']})
         return self.reply(404, {'error': 'not found'})
 
     def do_POST(self):
+        plain = {'/fresh-quote': fresh_quote, '/probe': probe}.get(self.path)
+        if plain:  # public requests: no secret goes in or out
+            try: return self.reply(200, plain(json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')))
+            except Exception as e:  # noqa: BLE001
+                return self.reply(400, {'error': str(e)[:300]})
         fn = {'/check': do_check, '/prove': do_prove, '/prove/status': job_status}.get(self.path)
         if not fn: return self.reply(404, {'error': 'not found'})
         try:

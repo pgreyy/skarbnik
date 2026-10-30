@@ -12,9 +12,12 @@ Commands:
   show <cvm id>                   the CVM, its network addresses
   delete <cvm id>                 deletes the CVM (not just stops it), then waits until it is gone
   list                            every CVM in the workspace (the spike ends with this list empty)
+  logins <cvm id> <app url>       who could log in: the SSH keys in the CVM's user config and on the account, and
+                                  from outside, what Phala's gateway answers for the SSH route (<app id>-22) and the
+                                  guest agent's page (<app id>-8090)
 The API key is read from ~/.phala_key for each request and is never printed, logged or copied.
 """
-import json, os, sys, time, urllib.error, urllib.request
+import http.client, json, os, sys, time, urllib.error, urllib.request
 
 API = 'https://cloud-api.phala.com/api/v1'
 KEY_FILE = os.path.expanduser('~/.phala_key')
@@ -23,18 +26,28 @@ OS_IMAGE = 'dstack-0.6.1'
 
 
 def call(method, path, body=None, ok=(200, 201, 202, 204)):
+    """One API request. Reads (GET) and deletes are tried up to 5 times when Phala's API does not answer (it went quiet
+    for two minutes once during the spike); a create (POST) is sent once, so it can never make two CVMs. A request that
+    never got an answer returns status 0."""
     key = open(KEY_FILE).read().strip()
-    req = urllib.request.Request(API + path, method=method, data=json.dumps(body).encode() if body is not None else None,
-                                 headers={'X-API-Key': key, 'Content-Type': 'application/json', 'Accept': 'application/json',
-                                          'User-Agent': 'skarbnik-tee-spike/1'})
-    try:
-        with urllib.request.urlopen(req, timeout=120) as r:
-            text = r.read().decode()
-            return r.status, json.loads(text) if text else {}
-    except urllib.error.HTTPError as e:
-        text = e.read().decode()[:2000]
-        try: return e.code, json.loads(text)
-        except ValueError: return e.code, {'raw': text}
+    tries = 1 if method == 'POST' else 5
+    for n in range(tries):
+        req = urllib.request.Request(API + path, method=method, data=json.dumps(body).encode() if body is not None else None,
+                                     headers={'X-API-Key': key, 'Content-Type': 'application/json', 'Accept': 'application/json',
+                                              'User-Agent': 'skarbnik-tee-spike/1'})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                text = r.read().decode()
+                return r.status, json.loads(text) if text else {}
+        except urllib.error.HTTPError as e:
+            text = e.read().decode()[:2000]
+            try: return e.code, json.loads(text)
+            except ValueError: return e.code, {'raw': text}
+        except (OSError, http.client.HTTPException) as e:  # timeouts, refused or reset connections, DNS
+            err = f'{type(e).__name__}: {str(e)[:150]}'
+            print(f'{utc()} {method} {path}: no answer from Phala ({err}); try {n + 1} of {tries}', flush=True)
+            if n + 1 < tries: time.sleep(15)
+    return 0, {'error': err}
 
 
 def utc(): return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
@@ -42,7 +55,8 @@ def utc(): return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
 
 def balance():
     s, d = call('GET', '/auth/me')
-    if s != 200: sys.exit(f'Phala rejected the API key (HTTP {s}); check ~/.phala_key')
+    if s == 401: sys.exit('Phala rejected the API key (HTTP 401); check ~/.phala_key')
+    if s != 200: sys.exit(f'could not read the balance (HTTP {s} {json.dumps(d)[:150]})')
     return float(d['credits']['balance'])
 
 
@@ -109,6 +123,40 @@ def cmd_delete(a):
     cmd_list([])
 
 
+def cmd_logins(a):
+    import socket, ssl
+    vm, url = a
+    s1, uc = call('GET', f'/cvms/{cvm_id(vm)}/user_config')
+    s2, keys = call('GET', '/user/ssh-keys')
+    res = {'at': utc(), 'user_config_http': s1, 'user_config': uc, 'account_ssh_keys_http': s2,
+           'account_ssh_keys_count': len(keys) if isinstance(keys, list) else None, 'outside': {}}
+    host = url.split('//')[1].split('/')[0]; app, rest = host.split('-8080.', 1)
+    for label, h in (('ssh route -22', f'{app}-22.{rest}'), ('ssh route -22s', f'{app}-22s.{rest}')):
+        r = {'host': h}
+        try:
+            raw = socket.create_connection((h, 443), timeout=15)
+            tls = ssl.create_default_context().wrap_socket(raw, server_hostname=h); tls.settimeout(10)
+            r['tls'] = tls.version()
+            try: r['first_bytes'] = tls.recv(200).decode('latin-1')
+            except (socket.timeout, ssl.SSLError, OSError) as e: r['first_bytes'] = f'(none: {type(e).__name__} {e})'
+            tls.close()
+        except Exception as e:  # noqa: BLE001
+            r['error'] = f'{type(e).__name__}: {str(e)[:200]}'
+        res['outside'][label] = r
+    for label, h in (('guest agent page -8090', f'https://{app}-8090.{rest}/'),):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(h, headers={'User-Agent': 'skarbnik-tee-spike/1'}), timeout=20) as r:
+                body = r.read(4000).decode(errors='replace')
+                res['outside'][label] = {'url': h, 'http': r.status, 'title': (body.split('<title>')[1].split('</title>')[0] if '<title>' in body else body[:120])}
+        except urllib.error.HTTPError as e:
+            res['outside'][label] = {'url': h, 'http': e.code}
+        except Exception as e:  # noqa: BLE001
+            res['outside'][label] = {'url': h, 'error': f'{type(e).__name__}: {str(e)[:200]}'}
+    json.dump(res, open('logins.json', 'w'), indent=1)
+    print(f'{utc()} user config: HTTP {s1}, ssh_authorized_keys {uc.get("ssh_authorized_keys") if isinstance(uc, dict) else uc}; account SSH keys: {res["account_ssh_keys_count"]}')
+    for k, v in res['outside'].items(): print(f'{utc()} outside, {k}: {json.dumps(v)[:300]}')
+
+
 def cmd_list(_a):
     s, d = call('GET', '/cvms')
     items = d if isinstance(d, list) else d.get('items', d.get('data', []))
@@ -117,6 +165,6 @@ def cmd_list(_a):
 
 if __name__ == '__main__':
     cmd, *rest = sys.argv[1:] or ['help']
-    fn = {'balance': cmd_balance, 'deploy': cmd_deploy, 'wait': cmd_wait, 'show': cmd_show, 'delete': cmd_delete, 'list': cmd_list}.get(cmd)
+    fn = {'balance': cmd_balance, 'deploy': cmd_deploy, 'wait': cmd_wait, 'show': cmd_show, 'delete': cmd_delete, 'list': cmd_list, 'logins': cmd_logins}.get(cmd)
     if not fn: print(__doc__); sys.exit(1)
     fn(rest)

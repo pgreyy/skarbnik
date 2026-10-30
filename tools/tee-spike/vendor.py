@@ -12,6 +12,10 @@ Commands (all write their results as JSON into the output folder; no secret is e
           5. replays RTMR3 from the event log (each event's digest recomputed) and compares it with the quote
           6. the compose-hash event == sha256(app_compose from /info) == the compose hash Phala gave at deploy, and
              app_compose holds our compose file byte for byte, which names our image by its sha256 digest
+  fresh   <url> <out>   right before the secret goes: a random 32 byte nonce, a new quote (POST /fresh-quote) with
+          report_data = sha256(public key || nonce) + 32 zero bytes, checked like the first (dcap-qvl, Phala's
+          verifier, RTMR3 replay), with the same key and the same measurements (MRTD, RTMR0 to RTMR3) as the verified one
+  probe   <url> <out> [private ip ...]   what answers on the VM's TCP ports, seen from inside (POST /probe)
   check   <url> <out> <secret file> <patch.wasm> <tag>     one checker run (POST /check) after a passed verify
   prove   <url> <out> <secret file> <salt file> <patch.wasm> <job.json>   start the prove step (POST /prove)
   status  <url> <out>                                      the prove job's state (POST /prove/status)
@@ -87,15 +91,14 @@ def cmd_verify(url, compose_path, deploy_path, image_ref, out):
     c = res['checks']
     # 2. local check against Intel's certificates
     try:
-        coll = dcap_qvl.get_collateral_from_pcs(q)
-        if inspect.isawaitable(coll): coll = asyncio.run(coll)  # an async function in dcap-qvl's Python package
+        coll, source = collateral(q)
         rep = dcap_qvl.verify(q, coll, int(time.time()))
         if inspect.isawaitable(rep): rep = asyncio.run(rep)
         r = json.loads(rep.to_json()) if hasattr(rep, 'to_json') else {k: getattr(rep, k) for k in dir(rep) if not k.startswith('_') and not callable(getattr(rep, k))}
         save(out, 'dcap_qvl_report.json', r)
         status = r.get('status')
         c['tdx_quote_dcap_qvl'] = {'ok': status in ('UpToDate', 'SWHardeningNeeded', 'ConfigurationNeeded', 'ConfigurationAndSWHardeningNeeded'),
-                                   'status': status, 'advisory_ids': r.get('advisory_ids'), 'dcap_qvl': dcap_qvl.__version__ if hasattr(dcap_qvl, '__version__') else '0.6.6'}
+                                   'status': status, 'advisory_ids': r.get('advisory_ids'), 'dcap_qvl': '0.6.6', 'collateral_from': source}
     except Exception as e:  # noqa: BLE001
         c['tdx_quote_dcap_qvl'] = {'ok': False, 'error': str(e)[:400]}
     # 3. Phala's public verifier
@@ -134,10 +137,80 @@ def cmd_verify(url, compose_path, deploy_path, image_ref, out):
     return res
 
 
+def collateral(q):
+    """Intel's collateral for the quote (certificate revocation lists, TCB info, QE identity, all signed by Intel and
+    checked against Intel's root by dcap-qvl): from Intel PCS, tried three times, else from Phala's PCCS mirror.
+    Returns (collateral, source)."""
+    errs = []
+    for n in range(3):
+        try:
+            c = dcap_qvl.get_collateral_from_pcs(q)
+            return (asyncio.run(c) if inspect.isawaitable(c) else c), 'Intel PCS'
+        except Exception as e:  # noqa: BLE001
+            errs.append(str(e)[:120]); time.sleep(5)
+    c = dcap_qvl.get_collateral(dcap_qvl.PHALA_PCCS_URL, q)
+    return (asyncio.run(c) if inspect.isawaitable(c) else c), f'Phala PCCS mirror ({dcap_qvl.PHALA_PCCS_URL}) after Intel PCS failed 3 times: {errs[-1]}'
+
+
+def quote_checks(qhex, event_log, want_report_data, out, tag):
+    """The checks that a quote is genuine and current: dcap-qvl with Intel's certificates, Phala's verifier, the
+    report_data, and the RTMR3 replay. Returns (checks, quote fields, events)."""
+    q = bytes.fromhex(qhex); f = quote_fields(q); c = {}
+    try:
+        coll, source = collateral(q)
+        rep = dcap_qvl.verify(q, coll, int(time.time()))
+        if inspect.isawaitable(rep): rep = asyncio.run(rep)
+        r = json.loads(rep.to_json()) if hasattr(rep, 'to_json') else {k: getattr(rep, k) for k in dir(rep) if not k.startswith('_') and not callable(getattr(rep, k))}; save(out, f'dcap_qvl_report_{tag}.json', r)
+        c['tdx_quote_dcap_qvl'] = {'ok': r.get('status') == 'UpToDate', 'status': r.get('status'), 'advisory_ids': r.get('advisory_ids'), 'collateral_from': source}
+    except Exception as e:  # noqa: BLE001
+        c['tdx_quote_dcap_qvl'] = {'ok': False, 'error': str(e)[:400]}
+    try:
+        pv = post('https://cloud-api.phala.com/api/v1/attestations/verify', {'hex': qhex}, timeout=120); save(out, f'phala_verify_{tag}.json', pv)
+        c['tdx_quote_phala_api'] = {'ok': bool(pv.get('quote', {}).get('verified')), 'verified': pv.get('quote', {}).get('verified')}
+    except Exception as e:  # noqa: BLE001
+        c['tdx_quote_phala_api'] = {'ok': False, 'error': str(e)[:400]}
+    c['report_data'] = {'ok': f['report_data'] == want_report_data, 'quote': f['report_data'], 'expected': want_report_data}
+    events = json.loads(event_log) if isinstance(event_log, str) else event_log
+    rtmr3, ev = replay_rtmr3(events)
+    c['rtmr3_replay'] = {'ok': rtmr3 == f['rtmr3'] and all(x['digest_recomputed'] for x in ev), 'replayed': rtmr3, 'quote': f['rtmr3'], 'events': len(ev)}
+    return c, f, events
+
+
+def cmd_fresh(url, out):
+    url = url.rstrip('/'); v = json.load(open(os.path.join(out, 'verification.json')))
+    if not v['ok']: sys.exit('REFUSED: the first attestation did not pass')
+    pub = bytes.fromhex(v['public_key']); nonce = os.urandom(32); t0 = utc(); s0 = time.time()
+    fq = post(f'{url}/fresh-quote', {'nonce': nonce.hex()}, timeout=120)
+    took = round(time.time() - s0, 2)
+    save(out, 'fresh_quote.json', fq)
+    want = (hashlib.sha256(pub + nonce).digest() + bytes(32)).hex()
+    c, f, events = quote_checks(fq['quote'], fq['event_log'], want, out, 'fresh')
+    c['same_key'] = {'ok': fq['public_key'] == v['public_key']}
+    c['same_measurements'] = {'ok': all(f[k] == v['quote_fields'][k] for k in ('mr_td', 'rtmr0', 'rtmr1', 'rtmr2', 'rtmr3')),
+                              'compared': ['mr_td', 'rtmr0', 'rtmr1', 'rtmr2', 'rtmr3']}
+    attested = next((e.get('event_payload') for e in events if e.get('event') == 'compose-hash'), None)
+    c['same_compose_hash'] = {'ok': attested == v['checks']['compose_hash']['event_log_compose_hash'], 'compose_hash': attested}
+    res = {'nonce_made_at': t0, 'nonce': nonce.hex(), 'round_trip_seconds': took, 'quote_sha256': hashlib.sha256(bytes.fromhex(fq['quote'])).hexdigest(),
+           'differs_from_first_quote': hashlib.sha256(bytes.fromhex(fq['quote'])).hexdigest() != v['quote_sha256'], 'checks': c,
+           'ok': all(x['ok'] for x in c.values())}
+    save(out, 'fresh_verification.json', res)
+    for k, x in c.items(): print(f'{"ok  " if x["ok"] else "FAIL"} fresh {k}')
+    print(f'{utc()} fresh quote {"PASSED" if res["ok"] else "FAILED"}: nonce made {t0}, answered in {took} s, quote sha256 {res["quote_sha256"][:16]}...')
+
+
+def cmd_probe(url, out, *hosts):
+    r = post(url.rstrip('/') + '/probe', {'hosts': list(hosts)}, timeout=900)
+    save(out, 'probe.json', dict(r, at=utc()))
+    for h, ports in r['ports_1_to_65535_open'].items():
+        print(f'{utc()} {h}: {len(ports)} open TCP port(s): ' + ', '.join(f'{p["port"]} {p["first_bytes"][:30]!r}' for p in ports))
+    print(f'sockets in the container: {r["container_sockets"]}; capabilities {r["container_capabilities_effective"]}')
+
+
 # ---------------------------------------------------------------- sealed requests
-def verified_key(out):
+def verified_key(out, need_fresh=False):
     v = json.load(open(os.path.join(out, 'verification.json')))
     if not v['ok']: sys.exit('REFUSED: the attestation did not pass; nothing is sent')
+    if need_fresh and not json.load(open(os.path.join(out, 'fresh_verification.json')))['ok']: sys.exit('REFUSED: the fresh quote did not pass; nothing is sent')
     return bytes.fromhex(v['public_key'])
 
 
@@ -168,7 +241,7 @@ def cmd_check(url, out, secret_path, patch_path, tag):
 
 
 def cmd_prove(url, out, secret_path, salt_path, patch_path, job_path):
-    pub = verified_key(out); job = json.load(open(job_path))
+    pub = verified_key(out, need_fresh=True); job = json.load(open(job_path))
     req = dict(job, secret_hex=open(secret_path).read().strip(), salt_b64=base64.b64encode(open(salt_path, 'rb').read()).decode(),
                candidate_b64=base64.b64encode(open(patch_path, 'rb').read()).decode())
     ans, _ = sealed_call(url, pub, '/prove', req); del req
@@ -193,6 +266,6 @@ def cmd_receipt(url, out, path):
 
 if __name__ == '__main__':
     cmd, *a = sys.argv[1:] or ['help']
-    fn = {'verify': cmd_verify, 'check': cmd_check, 'prove': cmd_prove, 'status': cmd_status, 'receipt': cmd_receipt}.get(cmd)
+    fn = {'verify': cmd_verify, 'fresh': cmd_fresh, 'probe': cmd_probe, 'check': cmd_check, 'prove': cmd_prove, 'status': cmd_status, 'receipt': cmd_receipt}.get(cmd)
     if not fn: print(__doc__); sys.exit(1)
     fn(*a)

@@ -6,7 +6,8 @@ A vendor should not have to be a cryptography operator. Commands:
   check    the preflight: module, public tests, the secret crashes the original, the reference fix passes on several
            seeds, memory for the prover mode, the checker id on the allowlist, the vendor's balance, and the verdict
            window against K times the measured proof time; prints a preview and refuses with a plain reason
-  prove0   Proof 0 of the reference fix: prove, shrink to succinct, Groth16, verify, the contract arguments; one job at a
+  prove0   Proof 0 of the reference fix: prove, shrink to succinct, Groth16, verify, the contract arguments (mode gpu:
+           prove and shrink on a RunPod pod, Groth16 here); one job at a
            time, memory watched (scripts/s2_measure.sh)
   publish  shows the preview, asks for confirmation, creates and opens the bounty, prints the transactions
   watch    the auto prover: polls the chain for revealed attempts on the bounties in the watch config, proves each one
@@ -107,7 +108,9 @@ def proof_time(mode, module, workdir=None, machine='this machine'):
     key = f'{mode}@{machine}:{os.path.basename(module.rstrip("/"))}'
     if key in t['per_attempt_seconds']: return t['per_attempt_seconds'][key], t
     w = os.path.expanduser(workdir) if workdir else None
-    if w and os.path.exists(f'{w}/proof0_times.json'): return round(sum(json.load(open(f'{w}/proof0_times.json'))['times_s'].values())), t
+    if w and os.path.exists(f'{w}/proof0_times.json'):
+        times = json.load(open(f'{w}/proof0_times.json'))['times_s']  # a GPU run also records the pod, the GPU and its cost
+        return round(sum(float(times[k]) for k in ('prove', 'succinct', 'groth16') if k in times)), t
     return None, t
 
 def window_rule(cfg, est):
@@ -210,7 +213,7 @@ QUESTIONS = [
     ('bounty', 'po2', 'proof segment size (18 needs about 2.5 GiB, 19 about 5 GiB)', '18'),
     ('secrets', 'secret', 'path of the secret crashing input (hex), outside the repository', '~/.skarbnik-vendor/mybounty/exploit.hex'),
     ('secrets', 'reference_fix', 'path of your reference fix (.wasm), outside the repository', '~/.skarbnik-vendor/mybounty/fixed.wasm'),
-    ('prover', 'mode', 'where proving runs: cpu (this machine); gpu is not built yet', 'cpu'),
+    ('prover', 'mode', 'where proving runs: gpu (a RunPod pod per proof) or cpu (this machine)', 'gpu'),
     ('prover', 'workdir', 'folder for receipts and logs, outside the repository', '~/skarbnik-vendor/mybounty'),
     ('chain', 'vendor_account', 'your vendor account (signs create and open)', 'you.testnet'),
 ]
@@ -287,7 +290,7 @@ def cmd_check(a):
     need = max(PROVE_NEED_MIB.get(po2, 5000), GROTH16_NEED_MIB)
     if avail + min(swap, 2048) < need: problems.append(f'not enough memory here for {pr["mode"]} proving: {avail} MiB available + {swap} MiB swap, needs about {need} MiB (the Groth16 wrap)')
     else: ok(f'memory: {avail} MiB available, {swap} MiB swap; proving needs about {PROVE_NEED_MIB.get(po2)} MiB at --po2 {po2}, the Groth16 wrap about {GROTH16_NEED_MIB} MiB')
-    if pr['mode'] != 'cpu': problems.append(f'prover mode {pr["mode"]} is not built yet; use cpu')
+    if pr['mode'] not in ('cpu', 'gpu'): problems.append(f'prover mode {pr["mode"]} is not known; use gpu or cpu')
     try:
         allowed = view(cfg, 'get_allowed_image_ids')
         if cfg['chain']['image_id'] in allowed: ok(f'checker image id {cfg["chain"]["image_id"][:16]}... is on the contract\'s allowlist')
@@ -314,8 +317,21 @@ def cmd_prove0(a):
         fd = os.open(seedf, os.O_WRONLY | os.O_CREAT, 0o600); os.write(fd, os.urandom(32).hex().encode()); os.close(fd)
     seed = open(seedf).read().strip()
     module = os.path.join(ROOT, b['module']) if not os.path.isabs(b['module']) else b['module']
-    say(f'{now()} Proof 0 of {b["name"]}: prove, succinct, Groth16, one step at a time (logs in {w})')
-    v, t = prove_chain(cfg, w, b['name'], s['reference_fix'], module, s['secret'], seed, int(b.get('fuzz_count', 16)), int(b.get('variants', 32)), int(b.get('po2', 18)), proof0=True)
+    if cfg['prover']['mode'] == 'gpu':
+        # Proof 0 on a RunPod pod (the secret and the salt in the pod's RAM only, wiped; the pod always terminated),
+        # then the Groth16 wrap here, as watch does for attempts.
+        say(f'{now()} Proof 0 of {b["name"]} on a GPU pod: prove and shrink there, Groth16 here (logs in {w})')
+        job = {'bounty_id': b['name'], 'index': 'p0', 'name': b['name'], 'module': module, 'patch': s['reference_fix'], 'secret': s['secret'],
+               'salt': os.path.expanduser(f'~/.kintsugi-salts/{b["name"]}.salt'), 'seed': seed, 'sid': None, 'proof0': True,
+               'fuzz': int(b.get('fuzz_count', 16)), 'variants': int(b.get('variants', 32)), 'image_id': cfg['chain']['image_id'], 'workdir': w}
+        if not os.path.exists(job['salt']): fail(f'no salt for bounty {b["name"]} in ~/.kintsugi-salts/ (skarbnik-host makes it on first use)')
+        with ProverLock():
+            _, t = gpu.prove_on_gpu(cfg, job, lambda m: say(f'{now()} {m}'))
+            os.replace(f'{w}/u_succinct.bin', f'{w}/p0_succinct.bin')
+            v, t['groth16'] = wrap(cfg, w, 'p0')
+    else:
+        say(f'{now()} Proof 0 of {b["name"]}: prove, succinct, Groth16, one step at a time (logs in {w})')
+        v, t = prove_chain(cfg, w, b['name'], s['reference_fix'], module, s['secret'], seed, int(b.get('fuzz_count', 16)), int(b.get('variants', 32)), int(b.get('po2', 18)), proof0=True)
     if journal(v, 'verdict') != 'PASS': fail('Proof 0 did not say PASS')
     json.dump({'times_s': t, 'at': now()}, open(f'{w}/proof0_times.json', 'w'))
     say(f'{now()} Proof 0 ready: VALID, PASS; prove {t["prove"]} s, succinct {t["succinct"]} s, Groth16 {t["groth16"]} s. Next: publish')

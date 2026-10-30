@@ -2,7 +2,7 @@
 # digest, with the dstack guest agent socket (for TDX quotes) and port 8080 behind Phala's gateway.
 services:
   tee:
-    image: ghcr.io/pgreyy/skarbnik-tee@sha256:9a425458da58606807b6bf3028eaa9f26acf830b6a70cd3bd4bf701160fd7261
+    image: ghcr.io/pgreyy/skarbnik-tee@sha256:60f6bcf3862b67e91bb92858831c1279f28e6167131ee5eae94793933fabeb3d
     ports:
       - "8080:8080"
     volumes:

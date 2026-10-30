@@ -1,4 +1,5 @@
-"""GPU proving for skarbnik-vendor's watch: one RunPod pod per revealed attempt.
+"""GPU proving for skarbnik-vendor: one RunPod pod per revealed attempt (watch), per Proof 0 (prove0 in mode gpu), or
+per shrink of a receipt proved elsewhere (shrink_on_gpu: no secret goes to the pod).
 
 For each attempt: check the spend cap, create a Secure Cloud pod (the GPU types and data centers of the config, in
 order), wait for SSH, put the CUDA build of skarbnik-host on it (the VPS's cached copy, or build it there once and
@@ -121,9 +122,10 @@ class Pod:
         pub = open(self.g['ssh_key'] + '.pub').read().strip()
         body = {'name': f'{POD_PREFIX}{self.label}-{int(self.t0)}', 'imageName': self.g['image'], 'cloudType': 'SECURE',
                 'computeType': 'GPU', 'gpuCount': 1, 'gpuTypeIds': list(self.g['gpu_types']), 'gpuTypePriority': 'custom',
-                'dataCenterIds': list(self.g['data_centers']), 'dataCenterPriority': 'custom',
                 'containerDiskInGb': int(self.g['container_disk_gb']), 'volumeInGb': 0, 'ports': ['22/tcp'],
                 'supportPublicIp': True, 'env': {'PUBLIC_KEY': pub}}
+        if self.g['data_centers']:  # an empty list lets RunPod pick any data center
+            body.update(dataCenterIds=list(self.g['data_centers']), dataCenterPriority='custom')
         self.t0 = time.time()
         self.deadline = self.t0 + 60 * float(self.g['cap_minutes'])
         p = self.rp.call('POST', '/pods', body, timeout=120)
@@ -326,7 +328,9 @@ def prove_on_gpu(cfg, job, log):
         pod.scp(job['secret'], pod.remote('/dev/shm/skv/exploit.hex'), 60)
         args = (f'--bounty {shlex.quote(job["name"])} --exploit /dev/shm/skv/exploit.hex --original run/original.wasm '
                 f'--tests run/public_tests.txt --fuzz-count {job["fuzz"]} --variants {job["variants"]} --po2 {g["po2"]} '
-                f'--seed {job["seed"]} --submission-id {job["sid"]}')
+                f'--seed {job["seed"]}' + (f' --submission-id {job["sid"]}' if job.get('sid') else ''))
+        if job.get('proof0'):
+            args = '--proof0 ' + args  # Proof 0 of the vendor's reference fix: no submission id
         t = time.time()
         # No /usr/bin/time here: a pod with the cached binary has no apt step, and this step is timed from the VPS.
         out = pod.ssh('set +e; RISC0_DEV_MODE=0 RISC0_PROVER=local '
@@ -347,3 +351,37 @@ def prove_on_gpu(cfg, job, log):
         pod.terminate()
     times.update(pod_seconds=pod.rec['seconds'], cost_usd=pod.rec['cost_usd'], gpu=pod.rec.get('gpu'), pod=pod.id)
     return os.path.join(w, 'u_succinct.bin'), times
+
+
+def shrink_on_gpu(cfg, receipt, out_path, label, image_id, log):
+    """Shrinks a composite receipt made elsewhere (for example inside a confidential VM) to a succinct receipt on a new
+    pod. The receipt holds no secret, so nothing secret goes to the pod. Always terminates the pod. Returns times."""
+    g = settings(cfg)
+    rp = RunPod(g['api_key_file'])
+    total = spend_total(g)
+    if total >= float(g['budget_usd']):
+        raise BudgetReached(f'GPU spend ${total} has reached the budget of ${g["budget_usd"]}: no new pod without the owner\'s say so')
+    ensure_ssh_key(g)
+    clean_orphans(g, rp, log)
+    pod = Pod(g, rp, log, label)
+    times = {}
+    try:
+        pod.create()
+        pod.wait_ssh()
+        times['pod_ready'] = round(time.time() - pod.t0)
+        times['binary'] = put_binary(pod, g, image_id, log)
+        pod.ssh('mkdir -p run', 60)
+        t = time.time()
+        pod.scp(receipt, pod.remote('run/u.bin'), 900)
+        times['upload'] = round(time.time() - t, 2)
+        pod.ssh('./skarbnik-host verify run/u.bin | grep -q "^VALID"', 300)
+        t = time.time()
+        pod.ssh('RISC0_DEV_MODE=0 RISC0_PROVER=local ./skarbnik-host compress run/u.bin run/u_succinct.bin succinct > run/succinct.log 2>&1', 1800)
+        times['succinct'] = round(time.time() - t, 2)
+        pod.scp(pod.remote('run/u_succinct.bin'), out_path, 300)
+        pod.scp(pod.remote('run/succinct.log'), out_path + '.gpu_succinct.log', 60)
+        log(f'pod {pod.id}: shrank the receipt in {times["succinct"]} s')
+    finally:
+        pod.terminate()
+    times.update(pod_seconds=pod.rec['seconds'], cost_usd=pod.rec['cost_usd'], gpu=pod.rec.get('gpu'), pod=pod.id)
+    return times
