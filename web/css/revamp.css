@@ -187,3 +187,17 @@
 /* the header: six page links fold into the menu button when they no longer fit */
 @container sk (max-width:1240px){.sk .nav-links{display:none}.sk .menu-btn{display:inline-flex}}
 .sk .n-ul.no li svg.i{color:var(--co)}
+/* For vendors: the real commands are longer than the design's, so they get a wider column */
+.sk .r-cmd.r-cmd-w{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px 28px}
+.sk .r-cmd.r-cmd-w dt{overflow-wrap:anywhere}
+@container sk (max-width:760px){.sk .r-cmd.r-cmd-w{grid-template-columns:minmax(0,1fr);gap:4px}}
+@container sk (max-width:900px){.sk :where(.p-vendors) .n-4{grid-template-columns:minmax(0,1fr)!important}}
+/* For agents: the six first answers and the key lists in two columns, the outcomes in three; one column on phones */
+.sk .n-4.a-three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.sk .n-4.a-six,.sk .n-4.a-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sk .n-4 .chip{align-self:flex-start}
+.sk .r-compat .n-tab+.n-tab{margin-top:8px}
+@container sk (max-width:760px){.sk .n-4.a-six,.sk .n-4.a-three,.sk .n-4.a-two{grid-template-columns:minmax(0,1fr)}}
+/* labels inside table cells, shown only when the table stacks into cards on phones */
+.sk .n-tab .tlab{display:none}
+@container sk (max-width:760px){.sk .n-tab .tlab{display:inline;font:600 12px/1.2 var(--fu);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-right:6px}}

@@ -1,4 +1,4 @@
-// Bounties: every bounty on the contract, newest first, read live from testnet. A "Reading the status" key, four
+// Bounties: every bounty on the contract, newest first, read live from testnet. A "How was it paid?" key, four
 // count tiles, a filter per status that is present (with counts; one line that scrolls sideways when it does not fit,
 // arrow keys move between them), and one row per bounty: id, title and kind,
 // reward, attempts, status with a plain line, and its evidence (the payout or creation transaction from
@@ -44,10 +44,10 @@ export async function bounties(viewEl) {
 <div style="display:flex;flex-direction:column;gap:24px;max-width:640px">
 <p class="eyebrow">Bounties on NEAR testnet</p>
 <h1>Bounties</h1>
-<p class="lead">Each row is a record read from the contract. Open bounties accept attempts until they close. Settled ones show how the money moved and link to the transaction.</p>
+<p class="lead">Each row is one repair bounty, read from the contract. Open ones accept attempts until they close. Finished ones show how the money moved. Look at the status to see whether a payment was backed by a proof or paid by timeout.</p>
 </div>
-<div class="card key" role="group" aria-label="How to read the status column">
-<p class="eyebrow" style="color:var(--tx3)">Reading the status</p>
+<div class="card key" role="group" aria-label="How was it paid? Reading the status column">
+<p class="eyebrow" style="color:var(--tx3)">How was it paid?</p>
 ${['Proof verified', 'Timeout settlement', 'Refunded'].map((s) => `<div class="key-row">${chip(STATUS[s].cls, s, STATUS[s].icon)}<p>${esc(STATUS[s].help)}</p></div>`).join('')}
 </div>
 </div>
