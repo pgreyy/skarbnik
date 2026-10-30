@@ -94,6 +94,10 @@ BOUNTY_STEPS = [
     # The confidential proving spike: bounty 33's Proof 0 on a rented GPU, its attempt's prove step inside a Phala TDX VM
     ("docs/evidence/tee_spike/transactions.tsv", "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py",
      {33: ["teespike_bounty_create", "teespike_bounty_open", "teespike_commit", "teespike_reveal", "teespike_submit_groth16"]}),
+    # The testnet cleanup of 2026-10-30: claim_timeout where a revealed attempt waited, expire on the expired bounties
+    ("docs/evidence/cleanup_2026-10-30/transactions.tsv", "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)",
+     {3: ["cleanup_b3_claim"], 26: ["cleanup_b26_claim"], 0: ["cleanup_b0_expire"], 2: ["cleanup_b2_expire"], 10: ["cleanup_b10_expire"],
+      23: ["cleanup_b23_expire"], 25: ["cleanup_b25_expire"]}),
 ]
 # Judge bounties (scripts/judge_bounties.sh): same hashes as bounty 17, created closed, opened by anyone with its Proof 0.
 _jenv = os.path.join(ROOT, "docs/evidence/judge/run.env")

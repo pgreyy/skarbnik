@@ -1,0 +1,45 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet expire json-args '{"bounty_id":"2"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc=2026-10-30T12:54:43Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  expire
+│                       args:         {
+│                                       "bounty_id": "2"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.310 Tgas
+│    Transaction fee: 0.0000309156225445 NEAR
+│    Transaction ID: 8hEp6UuSiZ2aJWGFdrDMVvz6azbGwXJ7HpoCzN28MYDr
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/8hEp6UuSiZ2aJWGFdrDMVvz6azbGwXJ7HpoCzN28MYDr
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"refunded","data":[{"bounty_id":"2","to":"kintsugi-vendor-prnvm.testnet","amount":"100000000000000000000000","caller":"kintsugi-vendor-prnvm.testnet"}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "expire" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet expire json-args '{"bounty_id":"2"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0

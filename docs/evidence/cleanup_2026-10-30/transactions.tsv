@@ -1,0 +1,8 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+cleanup_b3_claim	claim_timeout	kintsugi-vendor-prnvm.testnet	GxEgq98bCbKGQ8rkAKpXJdAzLn6v6nBci9ThrbLcEgNU	-	-	0	-
+cleanup_b26_claim	claim_timeout	kintsugi-vendor-prnvm.testnet	AE6vgA7wr8v3TNJnYpma42K6q3GBsjxzD9nEYBHWru9P	-	-	0	-
+cleanup_b0_expire	expire	kintsugi-vendor-prnvm.testnet	4SX2Q4bCzArxUD5QzXwkPrA7wEcH7hTH2xAHvDdUv9qr	-	-	0	-
+cleanup_b2_expire	expire	kintsugi-vendor-prnvm.testnet	8hEp6UuSiZ2aJWGFdrDMVvz6azbGwXJ7HpoCzN28MYDr	-	-	0	-
+cleanup_b10_expire	expire	kintsugi-vendor-prnvm.testnet	8HQgkXWZWHKYjaL6ESvCrqtZXns95g2vMtahjPwzkLjR	-	-	0	-
+cleanup_b23_expire	expire	kintsugi-vendor-prnvm.testnet	FmktAoGZYua2dXz5xTd15gDnzuRssiscLKttBz7mhWGZ	-	-	0	-
+cleanup_b25_expire	expire	kintsugi-vendor-prnvm.testnet	29poZLcpyMqTKEpDgAmudMeVCTjZ9wk99RBEWKKurrz2	-	-	0	-

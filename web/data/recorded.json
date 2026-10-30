@@ -32,6 +32,16 @@
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "cleanup_b0_expire",
+    "method": "expire",
+    "tx": "4SX2Q4bCzArxUD5QzXwkPrA7wEcH7hTH2xAHvDdUv9qr",
+    "what": "Expired",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/cleanup_2026-10-30/transactions.tsv",
+    "script": "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)"
    }
   ],
   "1": [
@@ -146,6 +156,16 @@
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "cleanup_b2_expire",
+    "method": "expire",
+    "tx": "8hEp6UuSiZ2aJWGFdrDMVvz6azbGwXJ7HpoCzN28MYDr",
+    "what": "Expired",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/cleanup_2026-10-30/transactions.tsv",
+    "script": "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)"
    }
   ],
   "3": [
@@ -188,6 +208,16 @@
     "result": "succeeded",
     "source": "docs/evidence/S6c/transactions.tsv",
     "script": "scripts/s6c_testnet.sh"
+   },
+   {
+    "step": "cleanup_b3_claim",
+    "method": "claim_timeout",
+    "tx": "GxEgq98bCbKGQ8rkAKpXJdAzLn6v6nBci9ThrbLcEgNU",
+    "what": "Timeout claimed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/cleanup_2026-10-30/transactions.tsv",
+    "script": "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)"
    }
   ],
   "4": [
@@ -690,6 +720,16 @@
     "result": "succeeded",
     "source": "docs/evidence/hardening/transactions.tsv",
     "script": "scripts/hardening_testnet.sh"
+   },
+   {
+    "step": "cleanup_b10_expire",
+    "method": "expire",
+    "tx": "8HQgkXWZWHKYjaL6ESvCrqtZXns95g2vMtahjPwzkLjR",
+    "what": "Expired",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/cleanup_2026-10-30/transactions.tsv",
+    "script": "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)"
    }
   ],
   "11": [
@@ -1176,6 +1216,16 @@
     "result": "succeeded",
     "source": "docs/evidence/account_cap/transactions.tsv",
     "script": "scripts/cap_deploy.sh"
+   },
+   {
+    "step": "cleanup_b25_expire",
+    "method": "expire",
+    "tx": "29poZLcpyMqTKEpDgAmudMeVCTjZ9wk99RBEWKKurrz2",
+    "what": "Expired",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/cleanup_2026-10-30/transactions.tsv",
+    "script": "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)"
    }
   ],
   "26": [
@@ -1238,6 +1288,16 @@
     "result": "succeeded",
     "source": "docs/evidence/agent_access/transactions.tsv",
     "script": "scripts/agent_access_test.sh; AGENTS.md followed by hand; tools/skarbnik-mcp"
+   },
+   {
+    "step": "cleanup_b26_claim",
+    "method": "claim_timeout",
+    "tx": "AE6vgA7wr8v3TNJnYpma42K6q3GBsjxzD9nEYBHWru9P",
+    "what": "Timeout claimed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/cleanup_2026-10-30/transactions.tsv",
+    "script": "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)"
    }
   ],
   "32": [
@@ -1406,145 +1466,17 @@
     "script": "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py"
    }
   ],
-  "18": [
-   {
-    "step": "judge_create_1",
-    "method": "create_bounty",
-    "tx": "9uxVRwJ35KmVXCRp2PBhqci8tBUQv3jsKv14SxGTKYyS",
-    "what": "Bounty created",
-    "time": "2026-10-26 10:39 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge/transactions.tsv",
-    "script": "scripts/judge_bounties.sh"
-   },
-   {
-    "step": "judge_open_18",
-    "method": "open_with_groth16",
-    "tx": "GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb",
-    "what": "Opened with its Proof 0",
-    "time": "2026-10-26 10:41 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge/transactions.tsv",
-    "script": "scripts/judge_bounties.sh"
-   },
-   {
-    "step": "judge_open_again_18",
-    "method": "open_with_groth16",
-    "tx": "BVMoi97TTU9bZDqNukW8Loor6dcBocyWHdtVff9Kx1dg",
-    "what": "Opened with its Proof 0",
-    "time": "2026-10-26 10:41 UTC",
-    "result": "refused by the contract",
-    "source": "docs/evidence/judge/transactions.tsv",
-    "script": "scripts/judge_bounties.sh"
-   }
-  ],
-  "19": [
-   {
-    "step": "judge_create_2",
-    "method": "create_bounty",
-    "tx": "ALHkwHuptq5m3qAY4wffBe74mMxMbvg5YPGhJhZJ79WE",
-    "what": "Bounty created",
-    "time": "2026-10-26 10:39 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge/transactions.tsv",
-    "script": "scripts/judge_bounties.sh"
-   }
-  ],
-  "20": [
-   {
-    "step": "judge_create_3",
-    "method": "create_bounty",
-    "tx": "EH2soCJ9SY2XZXGrVaGLF6gtL7TDqScCnmzJKoVuYgAq",
-    "what": "Bounty created",
-    "time": "2026-10-26 10:40 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge/transactions.tsv",
-    "script": "scripts/judge_bounties.sh"
-   }
-  ],
-  "21": [
-   {
-    "step": "judge_create_4",
-    "method": "create_bounty",
-    "tx": "DCtsH68ukAWFDdD3VtWPfVL8qsDiXYDhm8mzZEUz5xpD",
-    "what": "Bounty created",
-    "time": "2026-10-26 10:40 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge/transactions.tsv",
-    "script": "scripts/judge_bounties.sh"
-   }
-  ],
-  "22": [
-   {
-    "step": "judge_create_5",
-    "method": "create_bounty",
-    "tx": "GSbqghysUCSoefGti3kViacqgnZUBf3zZzYZozVMY2jh",
-    "what": "Bounty created",
-    "time": "2026-10-26 10:40 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge/transactions.tsv",
-    "script": "scripts/judge_bounties.sh"
-   },
-   {
-    "step": "judge_refusal_other_seal_22",
-    "method": "open_with_groth16",
-    "tx": "5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj",
-    "what": "Opened with its Proof 0",
-    "time": "2026-10-26 10:41 UTC",
-    "result": "refused by the contract",
-    "source": "docs/evidence/judge/transactions.tsv",
-    "script": "scripts/judge_bounties.sh"
-   }
-  ],
-  "28": [
-   {
-    "step": "judge_create_2",
-    "method": "create_bounty",
-    "tx": "AUJpCpUEST1RuGL9ibeVtDygL8kcK1cJWbLDwocYbRJK",
-    "what": "Bounty created",
-    "time": "2026-10-27 08:33 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge2/transactions.tsv",
-    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
-   }
-  ],
-  "29": [
-   {
-    "step": "judge_create_3",
-    "method": "create_bounty",
-    "tx": "4JJGk3dbjtP9M6GFNLdMBypTKwdkbgAvafLhxopTb8NQ",
-    "what": "Bounty created",
-    "time": "2026-10-27 08:33 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge2/transactions.tsv",
-    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
-   }
-  ],
-  "30": [
-   {
-    "step": "judge_create_4",
-    "method": "create_bounty",
-    "tx": "4WwGk3aH8QdTzqVeMo8PvtfeorBQ32y31yE9usTPvzEf",
-    "what": "Bounty created",
-    "time": "2026-10-27 08:33 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge2/transactions.tsv",
-    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
-   }
-  ],
-  "31": [
-   {
-    "step": "judge_create_5",
-    "method": "create_bounty",
-    "tx": "J2gUsJsLy968sSYJ1uidNKMhu119WYmw9gEsW5drZ2jV",
-    "what": "Bounty created",
-    "time": "2026-10-27 08:33 UTC",
-    "result": "succeeded",
-    "source": "docs/evidence/judge2/transactions.tsv",
-    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
-   }
-  ],
   "23": [
+   {
+    "step": "cleanup_b23_expire",
+    "method": "expire",
+    "tx": "FmktAoGZYua2dXz5xTd15gDnzuRssiscLKttBz7mhWGZ",
+    "what": "Expired",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/cleanup_2026-10-30/transactions.tsv",
+    "script": "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)"
+   },
    {
     "step": "arena_guarded_create",
     "method": "create_bounty",
@@ -1684,6 +1616,144 @@
     "result": "succeeded",
     "source": "docs/evidence/arena_probe/transactions.tsv",
     "script": "scripts/arena_probe.sh"
+   }
+  ],
+  "18": [
+   {
+    "step": "judge_create_1",
+    "method": "create_bounty",
+    "tx": "9uxVRwJ35KmVXCRp2PBhqci8tBUQv3jsKv14SxGTKYyS",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_open_18",
+    "method": "open_with_groth16",
+    "tx": "GhjkpLgkcwUbnWA743FezQEx8WLLXxCtvA7vT9eCfWdb",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 10:41 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_open_again_18",
+    "method": "open_with_groth16",
+    "tx": "BVMoi97TTU9bZDqNukW8Loor6dcBocyWHdtVff9Kx1dg",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 10:41 UTC",
+    "result": "refused by the contract",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "19": [
+   {
+    "step": "judge_create_2",
+    "method": "create_bounty",
+    "tx": "ALHkwHuptq5m3qAY4wffBe74mMxMbvg5YPGhJhZJ79WE",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "20": [
+   {
+    "step": "judge_create_3",
+    "method": "create_bounty",
+    "tx": "EH2soCJ9SY2XZXGrVaGLF6gtL7TDqScCnmzJKoVuYgAq",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:40 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "21": [
+   {
+    "step": "judge_create_4",
+    "method": "create_bounty",
+    "tx": "DCtsH68ukAWFDdD3VtWPfVL8qsDiXYDhm8mzZEUz5xpD",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:40 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "22": [
+   {
+    "step": "judge_create_5",
+    "method": "create_bounty",
+    "tx": "GSbqghysUCSoefGti3kViacqgnZUBf3zZzYZozVMY2jh",
+    "what": "Bounty created",
+    "time": "2026-10-26 10:40 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   },
+   {
+    "step": "judge_refusal_other_seal_22",
+    "method": "open_with_groth16",
+    "tx": "5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj",
+    "what": "Opened with its Proof 0",
+    "time": "2026-10-26 10:41 UTC",
+    "result": "refused by the contract",
+    "source": "docs/evidence/judge/transactions.tsv",
+    "script": "scripts/judge_bounties.sh"
+   }
+  ],
+  "28": [
+   {
+    "step": "judge_create_2",
+    "method": "create_bounty",
+    "tx": "AUJpCpUEST1RuGL9ibeVtDygL8kcK1cJWbLDwocYbRJK",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
+  "29": [
+   {
+    "step": "judge_create_3",
+    "method": "create_bounty",
+    "tx": "4JJGk3dbjtP9M6GFNLdMBypTKwdkbgAvafLhxopTb8NQ",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
+  "30": [
+   {
+    "step": "judge_create_4",
+    "method": "create_bounty",
+    "tx": "4WwGk3aH8QdTzqVeMo8PvtfeorBQ32y31yE9usTPvzEf",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
+   }
+  ],
+  "31": [
+   {
+    "step": "judge_create_5",
+    "method": "create_bounty",
+    "tx": "J2gUsJsLy968sSYJ1uidNKMhu119WYmw9gEsW5drZ2jV",
+    "what": "Bounty created",
+    "time": "2026-10-27 08:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/judge2/transactions.tsv",
+    "script": "JUDGE_ROUND=2 scripts/judge_bounties.sh"
    }
   ],
   "24": [

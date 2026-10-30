@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-10-30: Testnet cleanup: expired bounties closed
+
+- Read every bounty: 0, 2, 3, 10, 23, 25 and 26 were past their expiry and still open. `claim_timeout` on 3
+  (`GxEgq98b…`) and 26 (`AE6vgA7w…`), where revealed attempts were waiting, paid them by the timeout rule; `expire` on 0,
+  2, 10, 23 and 25 refunded 0.1 NEAR each to the vendor and sent the fees of never-revealed commits to the protocol fee
+  pool (0.17 NEAR after). Signed by the vendor account with NEAR CLI; every transaction, its output and where the money
+  went: docs/evidence/cleanup_2026-10-30/. `expire` was not sent on 3 and 26 (nothing left to do after the claim).
+- Not touched: 7, 18 to 22 (expire 2026-12-05) and 28 to 31 (expire 2026-12-06), none expired.
+- The lists of bounties paid by timeout in README.md, docs/CLAIMS.md and docs/TRY_IT.md gain 3 and 26; site data rebuilt
+  (`./scripts/rebuild_site_data.sh`).
+
 ## 2026-10-30: Site Revamp: plain language copy and new structure
 
 - Built the Revamp from the design package (its copy, markup and CSS), on top of the live Panyl theme and fonts.

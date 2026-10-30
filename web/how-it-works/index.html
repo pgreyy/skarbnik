@@ -1,5 +1,6 @@
 <!doctype html>
-<!-- Skarbnik site (testnet), Panyl design, Revamp copy. The page shell: the icon sprite (line icons and the Vinyl mark),
+<!-- Skarbnik site (testnet), Panyl design, Revamp copy. The page shell (its main holds a plain summary for readers
+     without JavaScript; js/app.js draws the live screen over it): the icon sprite (line icons and the Vinyl mark),
      the header (mark, the six page links, the wallet control, the dark and light toggle, the phone menu), the main
      view, the footer, the credit and confirm dialogs, the toast and a live region. js/app.js renders each screen into
      <main> from live testnet data and from the recorded files in data/. Transactions are only ever signed in the
@@ -111,7 +112,7 @@
 </div>
 <nav class="menu-sheet" id="menuSheet" aria-label="Menu" hidden><a href="#/bounties" data-nav="bounties">Bounties</a><a href="#/how-it-works" data-nav="how-it-works">How it works</a><a href="#/vendors" data-nav="vendors">For vendors</a><a href="#/agents" data-nav="agents">For agents</a><a href="#/evidence" data-nav="evidence">Proof &amp; evidence</a><a href="#/judge" data-nav="judge">Judge guide</a><div class="sheet-wallet" id="sheetWallet"></div></nav>
 </header>
-<div class="view" id="view"><p class="small faint" style="padding:16px 24px">A saved copy of <a href="/#/how-it-works">this page</a>, made 2026-10-30 12:47 UTC from the chain and the site's data files. With JavaScript the page shows the live data.</p><main id="main" class="p-how" tabindex="-1">
+<div class="view" id="view"><p class="small faint" style="padding:16px 24px">A saved copy of <a href="/#/how-it-works">this page</a>, made 2026-10-30 13:00 UTC from the chain and the site's data files. With JavaScript the page shows the live data.</p><main id="main" class="p-how" tabindex="-1">
 <section style="background:radial-gradient(900px 400px at 85% 0%,rgba(var(--am-rgb),.06),transparent 70%),var(--bg)">
 <div class="wrap ihd">
 <div style="display:flex;flex-direction:column;gap:22px;max-width:860px">
@@ -181,7 +182,7 @@
 <dialog class="sheet" id="confirmDlg" aria-labelledby="confTitle"></dialog>
 <div class="toast" role="status" id="toast" hidden></div>
 <div class="sr-only" role="status" aria-live="polite" id="live"></div>
-<noscript><p style="padding:24px">You are reading a saved copy. For agents: <a href="/agents.md">agents.md</a>, <a href="/llms.txt">llms.txt</a>, <a href="/feed.json">feed.json</a>.</p></noscript>
+
 <script type="module" src="js/app.js?v=r1"></script>
 </body>
 </html>

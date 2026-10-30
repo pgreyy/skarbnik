@@ -5,6 +5,20 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Testnet cleanup: expired bounties closed by claim_timeout and expire (2026-10-30)
+
+- Question: can every bounty past its expiry be closed with the contract's public methods, with the money going where
+  the rules say?
+- Command: NEAR CLI `call-function as-transaction kintsugi-l2-cihdp.testnet <claim_timeout | expire>`, signed by
+  `kintsugi-vendor-prnvm.testnet`; outputs in [docs/evidence/cleanup_2026-10-30/](evidence/cleanup_2026-10-30/README.md).
+- Result: `claim_timeout` on 3 (`GxEgq98bCbKGQ8rkAKpXJdAzLn6v6nBci9ThrbLcEgNU`) and 26
+  (`AE6vgA7wr8v3TNJnYpma42K6q3GBsjxzD9nEYBHWru9P`) paid the waiting revealed attempts, each with its own fee back;
+  `expire` on 0 (`4SX2Q4bCzArxUD5QzXwkPrA7wEcH7hTH2xAHvDdUv9qr`), 2 (`8hEp6UuSiZ2aJWGFdrDMVvz6azbGwXJ7HpoCzN28MYDr`), 10
+  (`8HQgkXWZWHKYjaL6ESvCrqtZXns95g2vMtahjPwzkLjR`), 23 (`FmktAoGZYua2dXz5xTd15gDnzuRssiscLKttBz7mhWGZ`) and 25
+  (`29poZLcpyMqTKEpDgAmudMeVCTjZ9wk99RBEWKKurrz2`) refunded 0.1 NEAR each to the vendor, the fees of never-revealed
+  commits going to the protocol fee pool (0.17 NEAR after). Views after: 0, 2, 10, 23, 25 Refunded; 3, 26 Paid.
+- Verdict: works as the rules say. Not expired and not touched: 7, 18 to 22 (2026-12-05), 28 to 31 (2026-12-06).
+
 ## Confidential proving spike, part 2: a real attempt's prove step inside a Phala Cloud CVM, paid by proof (2026-10-30)
 
 Question: can the RISC Zero prove step of a revealed attempt run inside an attested confidential VM, with the secret

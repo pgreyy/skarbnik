@@ -16,7 +16,7 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-10-30T12:46:47Z",
+ "generated_at_utc": "2026-10-30T12:59:02Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -137,7 +137,7 @@
  "bounties": [
   {
    "bounty_id": 0,
-   "status": "Demo or test only",
+   "status": "Refunded",
    "kind": "demo",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -227,7 +227,7 @@
   },
   {
    "bounty_id": 2,
-   "status": "Demo or test only",
+   "status": "Refunded",
    "kind": "demo",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -272,7 +272,7 @@
   },
   {
    "bounty_id": 3,
-   "status": "Demo or test only",
+   "status": "Timeout settlement",
    "kind": "demo",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -587,7 +587,7 @@
   },
   {
    "bounty_id": 10,
-   "status": "Demo or test only",
+   "status": "Refunded",
    "kind": "demo",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -601,7 +601,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 4,
    "attempts_used": 1,
-   "slots_in_use": 1,
+   "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
@@ -1172,7 +1172,7 @@
   },
   {
    "bounty_id": 23,
-   "status": "Demo or test only",
+   "status": "Refunded",
    "kind": "test",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -1186,7 +1186,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 3,
-   "slots_in_use": 3,
+   "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
@@ -1262,7 +1262,7 @@
   },
   {
    "bounty_id": 25,
-   "status": "Demo or test only",
+   "status": "Refunded",
    "kind": "test",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -1276,7 +1276,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 2,
-   "slots_in_use": 2,
+   "slots_in_use": 0,
    "max_commits_per_account": 1,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
@@ -1307,7 +1307,7 @@
   },
   {
    "bounty_id": 26,
-   "status": "Demo or test only",
+   "status": "Timeout settlement",
    "kind": "test",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -1668,6 +1668,12 @@
  ],
  "paid_by_timeout": [
   {
+   "bounty_id": 3,
+   "attempt": 0,
+   "outcome": "paid by timeout, not by a proof",
+   "claim_tx": "GxEgq98bCbKGQ8rkAKpXJdAzLn6v6nBci9ThrbLcEgNU"
+  },
+  {
    "bounty_id": 4,
    "attempt": 0,
    "outcome": "paid by timeout, not by a proof",
@@ -1720,6 +1726,12 @@
    "attempt": 0,
    "outcome": "paid by timeout, not by a proof",
    "claim_tx": "BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh"
+  },
+  {
+   "bounty_id": 26,
+   "attempt": 0,
+   "outcome": "paid by timeout, not by a proof",
+   "claim_tx": "AE6vgA7wr8v3TNJnYpma42K6q3GBsjxzD9nEYBHWru9P"
   }
  ],
  "paid_by_timeout_note": "These bounties were paid by the timeout rule (the vendor gave no verdict in time), not by a proof.",

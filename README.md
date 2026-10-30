@@ -141,7 +141,7 @@ Every bounty today, read from the chain:
 | Status | Bounties |
 | --- | --- |
 | Paid by a checked proof | 1, 16, 24, 27, 32, 33 (33: the sealed prove step test) |
-| Paid by the timeout rule | 4, 9, 11, 12, 13, 14, 15, 17 (and 8 on paper only: its transfer failed) |
+| Paid by the timeout rule | 3, 4, 9, 11, 12, 13, 14, 15, 17, 26 (and 8 on paper only: its transfer failed) |
 | Refunded to the vendor | 5, 6 |
 | Demo or test bounties, not settled | 0, 2, 3, 7, 10, 23, 25, 26 |
 | Judge bounties, closed until a judge opens one | 28, 29, 30, 31 (18 to 22 are retired) |
