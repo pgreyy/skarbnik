@@ -128,14 +128,20 @@ const nsUtc = (ns) => new Date(Number(BigInt(ns) / 1000000n)).toISOString().repl
 // ---------- patches: WAT or base64, the interface, the public tests ----------
 let wabtP = null;
 const wabt = () => (wabtP = wabtP || require('wabt')());
+const MAX_WAT = 200000, MAX_PATCH = 16384; // characters of WebAssembly text; bytes of a module (the checker takes 2,048)
 async function patchBytes(a) {
   if (a.wat && a.patch_base64) throw new Fail('give wat or patch_base64, not both');
+  if (a.wat && String(a.wat).length > MAX_WAT) throw new Fail(`the WebAssembly text is longer than ${MAX_WAT.toLocaleString('en-US')} characters`);
+  if (a.patch_base64 && String(a.patch_base64).length > Math.ceil(MAX_PATCH / 3) * 4) throw new Fail(`the module is larger than ${MAX_PATCH.toLocaleString('en-US')} bytes`);
   if (a.patch_base64) { const b = Buffer.from(String(a.patch_base64), 'base64'); if (!b.length) throw new Fail('patch_base64 is empty'); return new Uint8Array(b); }
   if (!a.wat) throw new Fail('give the fixed module as wat (WebAssembly text) or as patch_base64');
   const w = await wabt();
   let mod;
   try { mod = w.parseWat('patch.wat', String(a.wat)); mod.resolveNames(); mod.validate(); } catch (e) { throw new Fail(`the WAT does not assemble: ${String(e.message || e).slice(0, 600)}`); }
-  try { return new Uint8Array(mod.toBinary({}).buffer); } finally { mod.destroy(); }
+  let out;
+  try { out = new Uint8Array(mod.toBinary({}).buffer); } finally { mod.destroy(); }
+  if (out.length > MAX_PATCH) throw new Fail(`the module is larger than ${MAX_PATCH.toLocaleString('en-US')} bytes`);
+  return out;
 }
 // The fix's exports against the public program's: the same names and kinds, the same number of parameters for each
 // function, and no imports. Returns null when they match, else what differs.

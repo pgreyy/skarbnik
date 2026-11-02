@@ -34,10 +34,16 @@ function send(res, status, body, type) {
 }
 const notFound = (res) => send(res, 404, 'Not found\n', 'text/plain; charset=utf-8');
 
+const MAX_BODY = 300000; // bytes; a fix is at most 2,048 bytes, its WebAssembly text far below this
 async function readBody(req) {
-  if (req.body !== undefined && req.body !== null) return typeof req.body === 'string' ? JSON.parse(req.body) : Buffer.isBuffer(req.body) ? JSON.parse(req.body.toString('utf8')) : req.body;
+  if (req.body !== undefined && req.body !== null) {
+    // already parsed by the platform: measure it and refuse anything above the cap
+    const raw = typeof req.body === 'string' ? req.body : Buffer.isBuffer(req.body) ? req.body.toString('utf8') : JSON.stringify(req.body);
+    if (Buffer.byteLength(raw) > MAX_BODY) throw new Error('too large');
+    return typeof req.body === 'object' && !Buffer.isBuffer(req.body) ? req.body : JSON.parse(raw);
+  }
   const chunks = []; let size = 0;
-  for await (const c of req) { size += c.length; if (size > 300000) throw new Error('too large'); chunks.push(c); }
+  for await (const c of req) { size += c.length; if (size > MAX_BODY) throw new Error('too large'); chunks.push(c); }
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || 'null');
 }
 
@@ -55,7 +61,7 @@ module.exports = async function handler(req, res) {
     if (!(await keyAllowed(k))) return notFound(res);
     if (req.method !== 'POST') return send(res, 405, 'Use POST\n', 'text/plain; charset=utf-8');
     let body;
-    try { body = await readBody(req); } catch { return send(res, 400, { jsonrpc: '2.0', id: null, error: { code: -32700, message: 'parse error' } }); }
+    try { body = await readBody(req); } catch (e) { return /too large/.test(String(e && e.message)) ? send(res, 413, { jsonrpc: '2.0', id: null, error: { code: -32600, message: 'the request is larger than 300,000 bytes' } }) : send(res, 400, { jsonrpc: '2.0', id: null, error: { code: -32700, message: 'parse error' } }); }
     const batch = Array.isArray(body);
     const msgs = (batch ? body : [body]).slice(0, 20);
     const out = [];

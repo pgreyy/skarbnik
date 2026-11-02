@@ -24,6 +24,13 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
+## 2026-11-02: Size limits on /api/check and the connector
+
+- A body above 300,000 bytes is refused with 413 also when Vercel has already parsed it (before, the cap held only
+  when the function read the stream itself); WebAssembly text above 200,000 characters and a module above 16,384 bytes
+  are refused before any work. Checked against a local copy: a 400 KB body got 413, 250,000 characters of text and a
+  20 KB module were refused, a missing bounty_id got 400.
+
 ## 2026-11-02: Evidence page in six tabs (local, not live)
 
 - Before: a header, four example cards, the team run notes, "The technical record" with the key numbers, five tabs

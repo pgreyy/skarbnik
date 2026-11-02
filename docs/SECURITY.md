@@ -125,8 +125,13 @@ The Account page shows the link once, right after the wallet adds the key (made 
 sent anywhere by the page); reloading the page loses it. Delete key on the page removes the key with the wallet, which
 turns the link off (EVIDENCE, "The connector link on the Account page").
 
-`/api/check` (web/api/check.js) is keyless: it assembles and checks a fix for anyone (30 a minute per address), signs
-nothing and stores nothing. The local MCP server uses it for fixes written as WebAssembly text; only the fix is sent.
+`/api/check` (web/api/check.js) is keyless: it assembles and checks a fix for anyone, signs nothing and stores nothing.
+The local MCP server uses it for fixes written as WebAssembly text; only the fix is sent. Its limits, and the
+connector's: a request body of at most 300,000 bytes (413 above it, also when the platform has already parsed the
+body), WebAssembly text of at most 200,000 characters, a module of at most 16,384 bytes, 30 requests a minute per
+address on /api/check (60 per link and 120 per address on the connector; instance memory only), the public tests
+stopped at 4 s, outside calls at 20 s, the function at 60 s; no console output, so no request body is logged by this
+code (Vercel's own log keeps the path and the address, not the body).
 
 Known limits: Vercel's own request log records each request's full path, so the link is visible in the project
 owner's Vercel dashboard (accepted by the owner, 2026-11-02: the key is limited, the credit capped, testnet only, and
