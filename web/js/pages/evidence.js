@@ -39,7 +39,7 @@ const LIMITS = (live) => [
   ['coin', '', 'A payout to a missing account is lost', 'Bounty 8 shows it. The site and the agent check the account before a commit, but the contract does not.'],
   ['hash', '', 'One verdict leaks one bit', 'K is the leak budget. A per-account cap (deployed 2026-10-26) limits how many slots one account holds, but one person with many accounts can still fill a bounty’s slots.'],
   ['link', '', 'Level 1 is not built', 'The OutLayer path exists but never answered on testnet. Every current bounty is Level 2 or the older Level 0.'],
-  ['wallet', '', 'Wallets are mostly untested', 'NEAR CLI was clicked through to real transactions. The other wallets were only loaded, not signed in.'],
+  ['wallet', '', 'Wallet apps vary', 'If a wallet refuses a request from these pages, the page shows the NEAR CLI command to run instead.'],
 ];
 
 const GH = 'https://github.com/pgreyy/skarbnik';
@@ -179,7 +179,7 @@ ${EXAMPLES()}
     <div style="max-width:700px"><h2 class="h2s">The contract</h2><p class="body" style="margin-top:12px">It holds the money and the deadlines, checks Groth16 proofs with NEAR’s built in curve functions, and applies the rules. It does not run the private evaluation.</p></div>
     <div class="two">
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px"><h3 class="h3">Deployment, read live</h3><div id="deploy"><p class="small">Reading from testnet…</p></div></div>
-    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><h3 class="h3">What was tested</h3>
+    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><h3 class="h3">Checks that ran</h3>
     <p class="small"><b class="txt">${esc(nums.contract_unit_tests.value)}</b> contract unit tests pass in the repository. ${esc(nums.contract_unit_tests.detail)}</p>
     <p class="small"><b class="txt">${attacks}</b> proof attacks were refused on chain: ${esc((rec.attacks_s6c || []).map((a) => a.what.charAt(0).toLowerCase() + a.what.slice(1)).join(', '))}.</p>
     <p class="small">A proof for the wrong bounty fails cheaply, at ${esc(nums.wrong_bounty_tgas.value)} Tgas. ${tx(rec.wrong_bounty_refused.tx)}</p>
