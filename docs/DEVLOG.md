@@ -24,6 +24,22 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
+## 2026-11-02: For vendors page rebuilt (part B, local)
+
+- `web/js/pages/vendors.js`: "Host a private repair bounty." Tabs Host (5 steps), Setup, Privacy, Compute, Limits, with
+  their own links (#/vendors/<tab>, also #host ...; the old #need, #private and #proving open Setup, Privacy and
+  Compute). Host has two ways, AI (Easiest) and Commands (Advanced), with links #way-ai and #way-cmd. AI: the secret
+  stays on your computer; git clone; the real requirements (Linux or WSL, Docker, x86, a RunPod account for a GPU) with
+  "What do I need for this?"; the setup for Claude Desktop (--setup), Claude Code and Codex with the vendor MCP's real
+  path; the prompt; what the AI does and when it asks you, with the one time confirm code; two closed drop downs.
+  Commands: the five skarbnik-vendor steps with their real arguments, the preflight and the measured cost per proof in
+  drop downs. Setup, Privacy, Compute and Limits in the owner's words. No status chips or lists.
+- llms.txt and docs/VENDOR.md name the same two ways; `scripts/snapshot_pages.mjs` takes ONLY=<pages>; the saved
+  /vendors/ page has the five tabs as headings and every drop down open.
+- Checked with a private script: 12 links land on the right tab and way, tab and way keys, labels, the requirements
+  line, 8 drop downs closed by default; screenshots of each tab and way and with the drop downs open at 1440 and 390,
+  dark and light; no sideways scroll, no script errors.
+
 ## 2026-11-02: The vendor MCP server and one cycle on bounty 35 (part C)
 
 - New `tools/skarbnik-vendor-mcp/` (server.py and README.md): the vendor tool for an AI app on the vendor's computer,

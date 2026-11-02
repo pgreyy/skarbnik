@@ -1,15 +1,23 @@
-// For vendors: how to run a private bounty with tools/skarbnik-vendor, from docs/VENDOR.md. What stays private and the
-// reference fix rule (Proof 0 first), the five step workflow, the real skarbnik-vendor commands, what a vendor
-// provides, how a repair is evaluated, how settlement works, where the prover runs, what the preflight checks, the
-// measured time and cost of one proof (laptop CPU, a rented GPU, the 4 core VPS, from data/numbers.json), and the
-// current limits. Static: no chain reads, no forms, no files and no secrets in the browser; every command runs on the
-// vendor's own machine.
-import { $, esc, icon, table, chip } from '../ui.js';
+// For vendors: a header (host a private repair bounty), then five tabs with their own links (#/vendors/host, setup,
+// privacy, compute, limits; also #host ...). Host: two ways with their own links (#way-ai, #way-cmd). AI: the vendor
+// MCP server (tools/skarbnik-vendor-mcp) on the vendor's own computer, its requirements, the setup for Claude
+// Desktop, Claude Code and Codex, the prompt, what the AI does and when it asks (with the one time confirm code), and
+// two drop downs. Commands: the five skarbnik-vendor steps with their real arguments (docs/VENDOR.md), the preflight
+// and the measured time and cost per proof in drop downs. Setup: what a vendor needs. Privacy: what stays private.
+// Compute: where proving runs. Limits: the current limits. Static: no chain reads, no forms, no secrets in the
+// browser; every command runs on the vendor's own machine.
+import { esc, icon, chip, table, note, block, cmd, collapse, picker, pickPanel, bindPicker, tabbed, tabNav } from '../ui.js';
 import { getNumbers } from '../data.js';
 
-const VENDOR_MD = 'https://github.com/pgreyy/skarbnik/blob/main/docs/VENDOR.md';
-const PROVING_MD = 'https://github.com/pgreyy/skarbnik/blob/main/docs/CONFIDENTIAL_PROVING.md';
+const GH = 'https://github.com/pgreyy/skarbnik';
+const VENDOR_MD = `${GH}/blob/main/docs/VENDOR.md`;
+const MCP_README = `${GH}/blob/main/tools/skarbnik-vendor-mcp/README.md`;
+const SERVER = 'skarbnik/tools/skarbnik-vendor-mcp/server.py';
 const T = 'tools/skarbnik-vendor';
+const PROMPT = 'Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me for each file path you need. Never open, read out or print my secret input file, only use its path. Show me the cost and the time first, and wait for my yes before you publish or spend on a GPU.';
+const WAYS = [{ id: 'ai', label: 'AI', sub: 'Easiest' }, { id: 'cmd', label: 'Commands', sub: 'Advanced' }];
+const li = (items) => `<ol class="ag-ol">${items.map((t) => `<li>${t}</li>`).join('')}</ol>`;
+const forNow = '<span class="chip l-plan">for now</span>';
 
 // One proof, docs/numbers.md: prove, compress to succinct, Groth16 wrap. Laptop: bounty 24's program (data/smooth/).
 // GPU: watch in GPU mode on judge bounty 27 (cached binary), the wrap on the VPS.
@@ -18,25 +26,65 @@ const GPU = { prove: 29.32, shrink: 20.84, wrap: 289.24 };
 const sum = (m) => m.prove + m.shrink + m.wrap;
 const s = (x) => `${x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} s`;
 const hm = (x) => (x >= 3600 ? `about ${(x / 3600).toFixed(1)} h` : `about ${Math.round(x / 60)} min`);
-const head = (id, eyebrow, h, lead) => `<div style="max-width:780px;display:flex;flex-direction:column;gap:16px"><p class="eyebrow">${eyebrow}</p><h2 class="n-h2" id="${id}">${h}</h2>${lead ? `<p class="lead">${lead}</p>` : ''}</div>`;
-const tab = (cols, rows, caption) => `<table class="n-tab">${caption ? `<caption class="sr-only">${caption}</caption>` : ''}${cols ? `<thead><tr>${cols.map((c) => `<th scope="col">${c}</th>`).join('')}</tr></thead>` : ''}<tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 
-const FLOW = [
-  ['', 'Prepare', 'Check that your bug fits', 'A small WebAssembly module with a crash, public tests, a private input and a reference fix. The preflight check shows a cost and time preview.'],
-  ['proof', 'Proof 0', 'Prove your own fix first', 'A proof that your reference fix passes. The bounty cannot open without it.'],
-  ['priv', 'Fund', 'Fund the bounty', 'The reward, the number of attempts, the fees and the deadlines are fixed when you fund it.', 'Testnet only. The deposit is test NEAR.'],
-  ['', 'Prove', 'Prove each revealed patch', 'Run the prover yourself, or let the vendor tool watch the bounty and prove each revealed patch automatically on a machine you pick.'],
-  ['', 'Settle', 'The contract pays by rule', 'A PASS proof pays the agent. A FAIL proof spends the attempt. If no proof arrives in time, the timeout rule pays, and that is never a PASS.'],
+const REQ = 'Needs Linux (on Windows, use WSL), Docker, and an x86 computer. A rented GPU needs a RunPod account.';
+const NEED = collapse('vNeed', 'What do I need for this?', `<ul class="n-ul">${[
+  'Linux, or WSL on Windows',
+  'Docker',
+  'About 8 GB of free memory for the final proof step (or a second machine that does that step, as the project’s own setup does)',
+  'A RunPod account, for a rented GPU',
+  'Test NEAR for the reward',
+].map((t) => `<li>${icon('check')}<span>${t}</span></li>`).join('')}</ul><p class="small mt12">These are for hosting a bounty only. Agents need none of this.</p>`);
+
+const SEE = collapse('vSee', 'What can my AI see, and what can’t it?', `<ul class="n-ul">${[
+  'It uses file paths only. It never opens or reads your secret input or your fix.',
+  'It never shows, prints or logs a secret, a salt, a seed or a key; what comes back from the tool is filtered.',
+  'Publishing, and proving on a rented GPU, each need your yes plus a one time code it shows you first.',
+  'Testnet only.',
+].map((t) => `<li>${icon('check')}<span>${t}</span></li>`).join('')}</ul>`);
+
+const WORKED = collapse('vWorked', 'Then: how do I know it worked?', `${li([
+  'Quit the app fully and open it again. On Windows, closing the Claude Desktop window is not enough: right click its icon near the clock and choose Quit.',
+  'In Claude Desktop, Settings, then Developer, lists skarbnik-vendor as running. The tools icon by the message box lists it too.',
+  `Type:${block('Show me the status of my Skarbnik vendor tool.')}`,
+  'After publishing, your bounty shows as Open for attempts on the Bounties page.',
+])}${collapse('vNothing', 'Nothing shows?', li([
+  'Quit the app fully and open it again. Closing the window is not enough.',
+  'The settings file must be valid: one missing comma or bracket breaks it. Print the settings again and compare.',
+  'The server must be where the settings say, and the vendor tool must run on its own first (docs/VENDOR.md).',
+]))}`);
+
+const ASKS = [
+  ['Set up', 'init', 'Asks you for each file path and detail. Spends nothing.'],
+  ['Check', 'check', 'Nothing to approve: the preflight spends nothing.'],
+  ['Proof 0', 'prove0', 'On your own computer, nothing to approve. On a rented GPU, a clear yes: it shows the cost and a one time code first.'],
+  ['Publish', 'publish', 'A clear yes: it shows the preview, the reward and gas it spends, and a one time code.'],
+  ['Watch', 'watch_start', 'A clear yes: it shows the GPU cost per attempt, the spending cap and a one time code.'],
 ];
-// The real command line of tools/skarbnik-vendor (its argparse: init takes --out and --from; the others --config;
-// publish --yes; watch --once).
+
+const aiWay = `<div class="stack g20">
+  <p class="small">Your secret stays on your computer, so this runs there, not as a link.</p>
+  <div class="stack g12"><p class="ag-sub">1. Get the tool (once)</p>${block('git clone https://github.com/pgreyy/skarbnik.git')}<p class="small">${REQ}</p>${NEED}</div>
+  <div class="stack g12"><p class="ag-sub">2. Add it to your AI app</p>${li([
+    'In Claude Desktop open Settings, then Developer, and press Edit Config.',
+    `Paste this inside it, keeping anything already there. Print it with your own paths, in the folder where you ran git clone:${block(`python3 ${SERVER} --setup claude-desktop`)}`,
+    'Save, then quit Claude fully and open it again.',
+  ])}
+    <p class="ag-sub mt12">Claude Code</p>${block(`claude mcp add --scope user skarbnik-vendor -- python3 "$PWD/${SERVER}"`)}
+    <p class="ag-sub mt12">Codex</p>${block(`codex mcp add skarbnik-vendor -- python3 "$PWD/${SERVER}"`)}
+    <p class="small faint">On Windows the tool runs inside WSL, so Claude Desktop starts it with <span class="mono">wsl</span>: the <a href="${MCP_README}" target="_blank" rel="noopener">README</a> shows the block.</p></div>
+  <div class="stack g12"><p class="ag-sub">3. Ask it to host your bounty</p>${block(PROMPT)}</div>
+  <div class="stack g12"><p class="ag-sub">What your AI does, and when it asks you</p>
+    <table class="n-tab"><caption class="sr-only">What the AI does, and when it asks you</caption><thead><tr><th scope="col">Step</th><th scope="col">When it asks you</th></tr></thead><tbody>
+    ${ASKS.map(([st, tool, when]) => `<tr><td><b>${st}</b> <span class="small faint mono">${tool}</span></td><td>${when}</td></tr>`).join('')}</tbody></table></div>
+  ${SEE}${WORKED}</div>`;
+
 const CMDS = [
-  [`${T} init --out ~/skarbnik-vendor/mybounty.toml`, 'Start a bounty config for your module, tests, input and fix: a few questions, written to a TOML file outside the repository. <span class="mono txt">--from &lt;older file&gt;</span> reuses an older config.'],
-  [`${T} check --config ~/skarbnik-vendor/mybounty.toml`, 'Preflight. Checks the bounty fits and previews the proving cost and time. It refuses with a plain reason if anything fails.'],
-  [`${T} prove0 --config ~/skarbnik-vendor/mybounty.toml`, 'Proves your reference fix passes. This is Proof 0. Its times become the bounty’s measured proof time.'],
-  [`${T} publish --config ~/skarbnik-vendor/mybounty.toml`, 'Funds and opens the bounty on NEAR testnet, after you type <span class="mono txt">publish</span>. It refuses a verdict window too short for the measured proof time.'],
-  [`${T} watch --config ~/skarbnik-vendor/watch.toml`, 'Watches the bounty and proves each revealed patch automatically, then sends <span class="mono txt">submit_groth16</span>. Bounty 32 ran this way. <span class="mono txt">--once</span> does one pass.'],
-  [`${T} status --config ~/skarbnik-vendor/watch.toml`, 'Shows attempts, verdicts and payments for your bounty, and the next action needed.'],
+  ['Prepare your bounty', `${T} init --out ~/skarbnik-vendor/mybounty.toml`, 'A few questions, written to a config outside the repository. <span class="mono txt">--from &lt;older file&gt;</span> reuses an older config.'],
+  ['Check before you spend', `${T} check --config ~/skarbnik-vendor/mybounty.toml`, 'The preflight shows the cost and the time, and refuses if the window is too short for the measured proof time.'],
+  ['Prove your own fix, Proof 0', `${T} prove0 --config ~/skarbnik-vendor/mybounty.toml`, 'The fix must pass the secret test, so every agent knows the bounty can be fixed. Its times become the bounty’s measured proof time.'],
+  ['Publish and fund', `${T} publish --config ~/skarbnik-vendor/mybounty.toml`, 'Creates and opens the bounty after you type <span class="mono txt">publish</span>.<span class="r-tn mt8">' + icon('flask') + '<span>Testnet only. The deposit is test NEAR.</span></span>'],
+  ['Let it prove for you', `${T} watch --config ~/skarbnik-vendor/watch.toml`, 'When an agent reveals a fix, it rents a GPU, makes the proof and submits it: about 17 minutes and a few cents per attempt. <span class="mono txt">--once</span> does one pass; <span class="mono txt">status --config ~/skarbnik-vendor/watch.toml</span> shows each attempt.'],
 ];
 const PREFLIGHT = [
   'The module exists and is within the checker’s limits; the public tests are there. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page (max_patch_bytes).',
@@ -48,105 +96,79 @@ const PREFLIGHT = [
   'The vendor account holds the reward plus 0.2 NEAR for gas and storage.',
   'The verdict window covers K times the measured proof time times 1.5. Attempts are proved one at a time, so K attempts revealed together must all fit. Before Proof 0 there is no measurement: check says so and publish refuses.',
 ];
-const LIMITS = [
-  ['A reference fix is required.', 'A vendor with a crash but no fix is not supported yet.'],
-  ['Small WebAssembly programs only.', 'Not arbitrary software, firmware or every kind of vulnerability.'],
-  ['A correct fix becomes public.', 'If the bug is a one line change, an agent’s fix may equal your reference fix byte for byte, as on bounty 17.'],
-  ['Slow proofs need long windows.', 'Bounty 17 was paid by timeout because the laptop proof finished after the 4 hour window.'],
-  ['A timeout pays whatever was revealed.', 'The contract does not look at the fix, so a poor fix can be paid if you stay silent.'],
-  ['Testnet only, and no external audit.', 'The contract was reviewed in AI review passes. The testnet contract still has a full access key.'],
-];
+const cmdWay = `<div class="stack g20">
+  <p class="small">The same five steps as commands, from a clone of the repository. ${REQ} The vendor tool needs Python 3.11 or later, the project’s programs (skarbnik-host, skarbnik-check) and NEAR CLI (near-cli-rs). The full guide: <a href="${VENDOR_MD}" target="_blank" rel="noopener">docs/VENDOR.md</a>.</p>
+  ${NEED.replace('id="vNeed"', 'id="vNeed2"')}
+  ${li(CMDS.map(([h, c, d]) => `<b>${h}</b>${block(c)}<p class="small">${d}</p>`))}
+  <p class="small faint">Real configs name your secret files, so keep them outside the repository, for example in ~/skarbnik-vendor/ with mode 600. Template: <span class="mono txt">tools/vendor.example.toml</span>.</p>
+  ${collapse('vPre', 'What the preflight checks', `<ol class="ag-ol">${PREFLIGHT.map((p) => `<li>${esc(p)}</li>`).join('')}</ol>`)}
+  ${collapse('vCost', 'Measured time and cost of one proof', '<div id="vcost"><p class="small">Reading the measured numbers…</p></div><p class="small faint mt12">Sources: docs/numbers.md; docs/evidence/vendor_tool/ (GPU mode, bounties 32 and 27), docs/evidence/smooth/ (laptop) and docs/evidence/vps_demo/ (VPS). The first GPU run also built the CUDA binary on its pod (559 s); later pods reuse it.</p>')}
+</div>`;
 
-export async function vendors(viewEl) {
+export async function vendors(viewEl, tab, sub) {
+  const t0 = { need: 'setup', private: 'privacy', proving: 'compute' }[tab] || tab;
+  const way = sub === 'way-cmd' ? 'cmd' : 'ai';
+  const host = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">From your bug to a paid fix</h2><p class="body">Everything runs on NEAR testnet. Two ways, same result.</p></div>
+    <div class="card ag-card"><div class="ag-step" style="grid-template-columns:minmax(0,1fr)"><div class="stack g16">${picker('vway', WAYS, way, 'Ways to host a bounty')}
+    ${WAYS.map((w) => pickPanel('vway', w.id, way, w.id === 'ai' ? aiWay : cmdWay)).join('')}</div></div></div>
+    <div class="n-4 a-three">
+      <div class="card"><p class="n-who">Then</p><h3 class="h4">Agents send sealed fixes</h3><p class="small">First a sealed copy, then the real one, so nobody can copy a fix in between.</p></div>
+      <div class="card"><p class="n-who">Then</p><h3 class="h4">You prove each fix in private</h3><p class="small">The secret test stays on your machine, or the one you rent. A proof records the result.</p></div>
+      <div class="card"><p class="n-who">Then</p><h3 class="h4">The contract pays, or doesn’t</h3><p class="small">It checks the proof itself. A timeout is shown as a timeout, never as a pass.</p></div>
+    </div></div>`;
+  const setup = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">What you need</h2><p class="body">${REQ}</p></div>
+    <table class="n-tab"><caption class="sr-only">What a vendor needs</caption><tbody>
+    <tr><td><b>A small WebAssembly program with a known crash</b></td><td>The buggy program and its public tests. This is what agents receive.</td></tr>
+    <tr><td><b>A fix that works</b></td><td>Your own reference fix. Proof 0 shows it passes before the bounty opens.</td></tr>
+    <tr><td><b>The secret input that triggers the crash</b></td><td>It never goes to agents or to NEAR. Only its fingerprint is stored.</td></tr>
+    <tr><td><b>Test NEAR for the reward</b></td><td>At least 0.1 test NEAR, fixed when you fund the bounty.</td></tr>
+    <tr><td><b>A machine to prove on</b> ${forNow}</td><td>A rented GPU is fast, about 4 cents a proof. Later, proving is planned to be handled by Skarbnik or NEAR.</td></tr>
+    </tbody></table>${NEED.replace('id="vNeed"', 'id="vNeed3"')}</div>`;
+  const privacy = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">What stays private</h2><p class="body">On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p></div>
+    <div class="r-priv">
+      <div class="p"><b class="k">Private</b><b class="h4">The secret test input</b><span class="small">Never sent to agents or to NEAR. Only its fingerprint is stored.</span></div>
+      <div class="p"><b class="k">Private</b><b class="h4">Your reference fix</b><span class="small">Only its hash is public.</span></div>
+      <div><b class="k">Public</b><b class="h4">The program</b><span class="small">The buggy program and its public tests. Agents work from these.</span></div>
+      <div><b class="k">Public</b><b class="h4">An agent’s fix, once revealed</b><span class="small">Public on chain after the reveal.</span></div>
+    </div></div>`;
+  const compute = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Where proving runs</h2><p class="body">You choose. The secret sits wherever you prove.</p></div>
+    <table class="n-tab"><caption class="sr-only">Where proving runs</caption><thead><tr><th scope="col">Where</th><th scope="col">Speed</th><th scope="col">Who can see the secret</th></tr></thead><tbody>
+    <tr><td><b>Your own machine</b></td><td><span class="tlab">Speed </span>Depends on your hardware, faster with a GPU</td><td><span class="tlab">Who can see the secret </span>Only you</td></tr>
+    <tr><td><b>A GPU you rent</b></td><td><span class="tlab">Speed </span>Fast: in our automatic run about 17 minutes from reveal to payment</td><td><span class="tlab">Who can see the secret </span>You and the GPU host for those minutes</td></tr>
+    <tr><td><b>Sealed hardware</b> <span class="chip l-exp">Experimental</span></td><td><span class="tlab">Speed </span>Depends on CPU or GPU: a sealed CPU took about 2 hours (bounty 33); a sealed GPU is not tested yet</td><td><span class="tlab">Who can see the secret </span>The secret is locked so only the sealed machine can open it, checked with its hardware certificate; tested once on testnet</td></tr>
+    </tbody></table></div>`;
+  const limits = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Limits</h2><p class="body">Read these before you plan anything.</p></div>
+    <ul class="n-ul warn" style="max-width:820px">
+    <li>${icon('alert')}<span><b>Testnet only.</b> No mainnet contract exists. The deposit is test NEAR.</span></li>
+    <li>${icon('alert')}<span><b>Small programs only.</b> Crash bugs in small WebAssembly modules, not any software.</span></li>
+    <li>${icon('alert')}<span><b>You need a working fix</b> ${forNow} A crash with no known fix is not supported yet.</span></li>
+    <li>${icon('alert')}<span><b>You prove or time out.</b> If you do not prove a revealed fix in time, the waiting agents are paid by the timeout rule.</span></li>
+    <li>${icon('alert')}<span><b>No external audit.</b> The contract was reviewed in AI review passes, not by an outside auditor.</span></li>
+    </ul>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/evidence">See the evidence ${icon('right')}</a><a class="btn btn-g" href="#/bounties">Browse bounties</a><a class="lnk" href="#/agents">What agents see ${icon('right')}</a></div></div>`;
+
   viewEl.innerHTML = `<main id="main" class="p-gen p-vendors" tabindex="-1">
 <section class="n-ph"><div class="wrap">
 <div style="max-width:820px;display:flex;flex-direction:column;gap:24px">
 <p class="eyebrow">For vendors</p>
-<h1>Outsource the repair. Keep the sensitive test private.</h1>
-<p class="lead">Outside AI agents and developers repair your bug against a private test they never see. A NEAR contract pays them by rules you set, based on the checked result.</p>
+<h1>Host a private repair bounty.</h1>
+<p class="lead">Offer a reward for fixing a sensitive bug, without publishing the test that finds it. Agents see the public code. You keep the secret.</p>
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/vendors/host" data-tablink="host">Host your first bounty ${icon('down')}</a><a class="btn btn-g" href="#/vendors/limits" data-tablink="limits">Read the limits first</a></div>
 <p class="small">NEAR AI’s cybersecurity program, <a class="lnk sm" href="https://near.ai/blog/cybersecurity-models-and-near-ai-red-launch" target="_blank" rel="noopener">NEAR AI Red ${icon('ext')}</a>, gives security teams private, enclave hosted AI for finding vulnerabilities. It pairs well with Skarbnik, the next step: getting a found bug fixed by outside agents without revealing the secret input, and paying by proof. The two are separate projects, with no partnership or integration.</p>
-<div class="card" style="padding:24px;display:flex;flex-direction:column;gap:14px;margin-top:6px">
-<p class="eyebrow">What stays private?</p>
-<div class="r-priv">
-<div class="p"><b class="k">Private</b><b class="h4">Private test input</b><span class="small">Never sent to agents or to NEAR. Only its fingerprint is stored.</span></div>
-<div class="p"><b class="k">Private</b><b class="h4">Private reference fix</b><span class="small">Your own fix. Only its hash is public.</span></div>
-<div><b class="k">Public</b><b class="h4">Public module</b><span class="small">The buggy program and its public tests. Agents work from these.</span></div>
-<div><b class="k">Public after reveal</b><b class="h4">The patch, once revealed</b><span class="small">An agent’s fix is public on chain after the reveal.</span></div>
-</div></div>
-<div class="note">${icon('info')}<p><b style="color:var(--tx)">The reference fix rule.</b> A bounty opens only after a proof shows your own reference fix passes the checker. This is Proof 0. A crash with no fix is not supported yet.</p></div>
-<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#v-flow" data-jump>See the workflow ${icon('down')}</a><a class="btn btn-g" href="#v-limits" data-jump>Read the limits first</a><a class="lnk" href="${VENDOR_MD}" target="_blank" rel="noopener">The full guide: docs/VENDOR.md ${icon('ext')}</a></div>
 </div></div></section>
+<section class="ag-tabs"><div class="wrap" id="vTabs"></div></section></main>`;
 
-<section class="sec n-sec rule" id="v-flow" aria-labelledby="v-flow-h" style="background:var(--bg2)"><div class="wrap">
-${head('v-flow-h', 'Workflow', 'From your bug to a paid fix', 'Five steps. The vendor tool runs each one from your machine.')}
-<div class="n-flow">${FLOW.map(([cls, who, h, p, tn], i) => `<div class="n-st${cls ? ` ${cls}` : ''}"><div class="n-sn" aria-hidden="true">${i + 1}</div><div class="card n-sb"><p class="n-who">${esc(who)}</p><h3 class="h3">${esc(h)}</h3><p class="body">${esc(p)}</p>${tn ? `<p class="r-tn">${icon('alert')}<span>${esc(tn)}</span></p>` : ''}</div></div>`).join('')}</div>
-</div></section>
-
-<section class="sec n-sec rule" id="v-cmds" aria-labelledby="v-cmds-h"><div class="wrap">
-${head('v-cmds-h', 'The vendor tool', 'skarbnik-vendor commands', 'The same steps as commands, run on your machine from a clone of the repository. Python 3.11 or later, no packages; it calls the project’s own programs (skarbnik-host, skarbnik-check) and NEAR CLI (near-cli-rs).')}
-<div class="card" style="padding:26px 28px;margin-top:28px"><dl class="r-cmd r-cmd-w">${CMDS.map(([c, d]) => `<dt>${esc(c)}</dt><dd>${d}</dd>`).join('')}</dl></div>
-<p class="small faint" style="margin-top:16px">Real configs name your secret files, so keep them outside the repository, for example in ~/skarbnik-vendor/ with mode 600. Template: <span class="mono txt">tools/vendor.example.toml</span>.</p>
-</div></section>
-
-<section class="sec n-sec rule" id="v-need" aria-labelledby="v-need-h"><div class="wrap">
-${head('v-need-h', 'What you provide', 'What do I need to provide?', 'Five things. The first four are inputs to the bounty. The last one is a way to produce the proof.')}
-${tab(['You provide', 'What it is for'], [
-    ['The buggy module and public tests', 'A small WebAssembly program, plus tests agents can run locally. This is what agents receive.'],
-    ['A private input that crashes it', 'The secret the fix is checked against. It never goes to agents or to NEAR.'],
-    ['A private reference fix', 'A fix you already trust. The bounty opens only after a proof shows it passes the approved checker. This is called Proof 0.'],
-    ['A reward and the rules', 'At least 0.1 test NEAR, 1 to 16 attempts, the attempt fees and the deadlines. They are fixed when you fund the bounty.'],
-    ['A machine to prove on', `Each revealed patch needs a proof. A rented GPU proves each patch in minutes at very low cost. Sealed proving, where no one can read your secret, has been tested once (bounty 33) and is planned as a managed service.`],
-  ], 'What a vendor provides')}
-</div></section>
-
-<section class="sec n-sec rule" id="v-eval" aria-labelledby="v-eval-h" style="background:var(--bg2)"><div class="wrap">
-${head('v-eval-h', 'How a repair is evaluated', 'How is a repair evaluated?', 'The same approved checker runs every patch. A patch passes only if all of these hold.')}
-${tab(null, [
-    ['It is a valid small module', 'No imports, within the size and memory limits, with the expected entry points. The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.'],
-    ['The private input no longer crashes it', 'The secret input must not crash it or run it out of its work budget.'],
-    ['Public tests still pass', 'On every public test it must give the same answers as the original program.'],
-    ['Hidden fairness inputs pass', 'Inputs chosen from a random seed fixed at the reveal. A fix cannot be tailored to them.'],
-    ['Nearby crash variants pass', 'Inputs that differ from the secret by one or two bytes must not crash where the original did not.'],
-  ], 'What a patch must pass')}
-<p class="small faint" style="margin-top:18px">A PASS means all of this held for that exact patch. It does not mean the program is free of other bugs.</p>
-</div></section>
-
-<section class="sec n-sec rule" id="v-settle" aria-labelledby="v-settle-h"><div class="wrap">
-${head('v-settle-h', 'Settlement', 'How does settlement work?', 'A NEAR contract holds the reward and applies fixed rules. The contract never runs your private test.')}
-${tab(['Outcome', 'What happens'], [
-    [chip('k-proof', 'Paid by proof', 'check'), 'You send a proof that says PASS. The contract checks it and pays the agent the reward, plus the agent’s own fee back.'],
-    [chip('k-fail', 'Failed', 'x'), 'You send a proof that says FAIL. The attempt is spent. The reward stays locked.'],
-    [chip('k-timeout', 'Paid by timeout', 'hourglass'), 'No proof arrived in the verdict window. Anyone can trigger a payment, split equally among revealed attempts still undecided. No proof was checked. Silence is never cheaper than proving.'],
-    [chip('k-refund', 'Refunded', 'undo'), 'The bounty expired with nothing paid. You get the reward back.'],
-  ], 'The four outcomes')}
-</div></section>
-
-<section class="sec n-sec rule" id="v-where" aria-labelledby="v-where-h" style="background:var(--bg2)"><div class="wrap">
-${head('v-where-h', 'Where the proof runs', 'Where do I run the prover?', 'You choose. The secret never goes to agents or to the public, but a proof has to be produced somewhere, and the secret sits wherever it runs.')}
-<div class="n-4" style="grid-template-columns:repeat(3,minmax(0,1fr))">
-<div class="card"><p class="n-who">Strongest privacy</p><h3 class="h3" style="font-size:calc(22px * var(--hs,1))">Your own machine</h3><p class="small">The secret never leaves it. Slow: about ${hm(sum(LAPTOP)).replace('about ', '')} for one proof on a laptop (measured, below), and it needs a lot of memory.</p></div>
-<div class="card"><p class="n-who">Faster</p><h3 class="h3" style="font-size:calc(22px * var(--hs,1))">A machine you rent</h3><p class="small">A GPU you control. Bounty 32 had a proof sent 17 minutes after the reveal this way. The secret is on that machine, in memory only, while it proves; the pod is then terminated.</p></div>
-<div class="card"><p class="n-who">Not offered yet</p><h3 class="h3" style="font-size:calc(22px * var(--hs,1))">Sealed proving by Skarbnik</h3><p class="small">Skarbnik does not prove for you today. Proving inside sealed hardware, where the host cannot read the secret, was tested once on bounty 33 and is planned as a managed service.</p><a class="lnk" href="${PROVING_MD}" target="_blank" rel="noopener" style="align-self:flex-start">The plan, docs/CONFIDENTIAL_PROVING.md ${icon('ext')}</a></div>
-</div>
-</div></section>
-
-<section class="sec n-sec rule" id="v-cost" aria-labelledby="v-cost-h"><div class="wrap">
-${head('v-cost-h', 'Measured, per proof', 'Time and cost of one proof', 'One proof means prove, shrink to a succinct receipt, and wrap to Groth16, the form the contract checks. The GPU row is watch in GPU mode on judge bounty 27 (bounty 17’s program), the laptop row bounty 24’s program, the VPS row the demo program (112 segments): compare by machine, not by program. The wrap always needs an x86 machine with Docker and about 7 GiB of memory.')}
-<div id="vcost" style="margin-top:28px"><p class="small">Reading the measured numbers…</p></div>
-<p class="small faint" style="margin-top:12px">Sources: docs/numbers.md; docs/evidence/vendor_tool/ (GPU mode, bounties 32 and 27), docs/evidence/smooth/ (laptop) and docs/evidence/vps_demo/ (VPS). The first GPU run also built the CUDA binary on its pod (559 s); later pods reuse it.</p>
-<div class="stack g16" style="margin-top:44px"><p class="eyebrow">Before anything is sent</p><h3 class="h3">What the preflight checks</h3>
-<ol class="card pad28 stack g12 vlist">${PREFLIGHT.map((p) => `<li class="small">${esc(p)}</li>`).join('')}</ol></div>
-</div></section>
-
-<section class="sec n-sec rule" id="v-limits" aria-labelledby="v-limits-h" style="background:var(--bg2)"><div class="wrap">
-${head('v-limits-h', 'Limits', 'What are the current limitations?', 'Read these before you plan anything.')}
-<ul class="n-ul warn" style="margin-top:28px;max-width:820px">${LIMITS.map(([b, t]) => `<li>${icon('alert')}<span><b>${esc(b)}</b> ${esc(t)}</span></li>`).join('')}</ul>
-<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:36px"><a class="btn btn-p" href="#/evidence">See the evidence ${icon('right')}</a><a class="btn btn-g" href="#/bounties">Browse bounties</a><a class="lnk" href="#/agents">What agents see ${icon('right')}</a></div>
-</div></section>
-</main>`;
-
-  // the two buttons in the header jump to a section of this page without changing the route
-  viewEl.querySelectorAll('[data-jump]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); const t = $(a.getAttribute('href')); if (t) { t.scrollIntoView(); const h = t.querySelector('h2'); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } } }));
+  const show = tabbed(viewEl.querySelector('#vTabs'), [
+    { id: 'host', label: 'Host', sub: '5 steps', html: host },
+    { id: 'setup', label: 'Setup', html: setup },
+    { id: 'privacy', label: 'Privacy', html: privacy },
+    { id: 'compute', label: 'Compute', html: compute },
+    { id: 'limits', label: 'Limits', html: limits },
+  ], t0, '#/vendors', 'For vendors sections', () => {}, true);
+  if (tab && t0 !== tab) history.replaceState(null, '', `#/vendors/${t0}`);
+  viewEl.querySelectorAll('[data-tablink]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); show(a.dataset.tablink, true); viewEl.querySelector('#vTabs').scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  const pick = bindPicker(viewEl, (id) => { history.replaceState(null, '', `#/vendors/host/way-${id}`); });
+  tabNav.onSub = (sv) => { if (/^way-(ai|cmd)$/.test(sv || '')) pick['Ways to host a bounty'](sv.slice(4)); };
 
   try {
     const nums = await getNumbers(), vps = nums.vps_prove || {};
@@ -157,9 +179,11 @@ ${head('v-limits-h', 'Limits', 'What are the current limitations?', 'Read these 
       ['1 rented NVIDIA L40S (RunPod), watch in GPU mode', s(GPU.prove), s(GPU.shrink), `${s(GPU.wrap)} on the VPS (no Docker on the pod)`, '<b class="txt">about 17 min</b> from reveal to submit', '<b class="txt">about $0.04</b> of GPU a proof ($0.20 the first run, which built the binary)'],
       [`VPS CPU (4 cores, 7.8 GiB, 8 GiB swap)${vps.program ? `<br><span class="small faint">${esc(vps.program)}</span>` : ''}`, vpsCell(vps.prove ? s(vps.prove) : ''), vpsCell(vps.shrink ? s(vps.shrink) : ''), s(vps.wrap || GPU.wrap), vpsCell(vps.total ? `<b class="txt">${hm(vps.total)}</b>` : ''), 'the VPS’s rent'],
     ];
-    $('#vcost').innerHTML = `${table(['Machine', 'Prove', 'Shrink', 'Groth16 wrap', 'One proof', 'Cost'], rows, 'wide', 'Time and cost of one proof')}
+    const el = viewEl.querySelector('#vcost');
+    if (el) el.innerHTML = `${table(['Machine', 'Prove', 'Shrink', 'Groth16 wrap', 'One proof', 'Cost'], rows, 'wide', 'Time and cost of one proof')}
 <p class="small mt12"><b class="txt">The window rule:</b> check and publish refuse a verdict window shorter than K × the measured proof time × 1.5. With the laptop and K = 3: 3 × ${hm(sum(LAPTOP)).replace('about ', '')} × 1.5 is about ${((3 * sum(LAPTOP) * 1.5) / 3600).toFixed(1)} h, so a 24 hour window passes. Bounty 17 had a 4 hour window and a laptop proof, and was paid by timeout.</p>`;
   } catch (e) {
-    if ($('#vcost')) $('#vcost').innerHTML = `<p class="ferr">Could not read the measured numbers: ${esc(e.message)}. They are in docs/numbers.md.</p>`;
+    const el = viewEl.querySelector('#vcost');
+    if (el) el.innerHTML = `<p class="ferr">Could not read the measured numbers: ${esc(e.message)}. They are in docs/numbers.md.</p>`;
   }
 }

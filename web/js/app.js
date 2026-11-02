@@ -59,7 +59,7 @@ $('#footContract').href = EXPLORER_ACCOUNT + CONTRACT;
 const TITLES = { 'how-it-works': 'How it works', bounties: 'Bounties', evidence: 'Proof and evidence', judge: 'Judge guide', agents: 'For agents', vendors: 'For vendors', account: 'Account', raw: 'Raw data' };
 const OLD = { ledger: '#/evidence/bounties', verify: '#/evidence/proofs' };
 // Short links to the tabs of For agents and For vendors (#connect, /agents/#connect): each opens its tab.
-const TAB_LINKS = { connect: 'agents', key: 'agents', fees: 'agents', developers: 'agents', host: 'vendors', need: 'vendors', private: 'vendors', proving: 'vendors', limits: 'vendors' };
+const TAB_LINKS = { connect: 'agents', key: 'agents', fees: 'agents', developers: 'agents', host: 'vendors', setup: 'vendors', privacy: 'vendors', compute: 'vendors', limits: 'vendors', need: 'vendors', private: 'vendors', proving: 'vendors' };
 // Short links to a way inside a tab (#way-link ...): the page, its tab and the way.
 const WAY_LINKS = { 'way-link': 'agents/connect', 'way-local': 'agents/connect', 'way-guide': 'agents/connect', 'way-ai': 'vendors/host', 'way-cmd': 'vendors/host' };
 
@@ -100,7 +100,7 @@ async function route() {
     evidence: () => evidence(view, rest[0]),
     judge: () => judge(view, rest[0]),
     agents: () => agents(view, rest[0], rest[1]),
-    vendors: () => vendors(view, rest[0]),
+    vendors: () => vendors(view, rest[0], rest[1]),
     account: () => accountPage(view, decodeURIComponent(rest[0] || ''), rest[1]),
   };
   return render(my, page, rest, screens[page] || (() => { view.innerHTML = `<main id="main" class="p-gen" tabindex="-1"><section class="ph"><div class="wrap"><h1>Not found</h1><p class="lead" style="margin-top:20px"><a class="lnk" href="#/">Go to the home page</a></p></div></section></main>`; }));
