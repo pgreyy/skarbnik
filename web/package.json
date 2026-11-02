@@ -1,0 +1,10 @@
+{
+  "name": "skarbnik-site",
+  "private": true,
+  "description": "The site is static files; this only lists what the hosted agent connector (api/mcp) needs.",
+  "license": "Apache-2.0 OR MIT",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "wabt": "1.0.39"
+  }
+}
