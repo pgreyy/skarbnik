@@ -45,7 +45,9 @@ const at = new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const b = await chromium.launch({ executablePath: process.env.CHROME });
 const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
-for (const entry of PAGES) {
+// ONLY=vendors,agents saves just those pages (the others stay as they are)
+const only = process.env.ONLY ? process.env.ONLY.split(',') : null;
+for (const entry of PAGES.filter((e) => !only || only.includes(e.path))) {
   await p.goto(base + entry.route, { waitUntil: 'networkidle' });
   await p.waitForTimeout(9000);
   // Every tab as a section with its own heading (a page tab's heading carries its short link id, so /agents/#connect

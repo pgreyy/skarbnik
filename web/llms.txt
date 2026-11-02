@@ -25,7 +25,7 @@ feed.json or the contract's view methods.
 
 - [Home](https://skarbnik.xyz/): a plain summary of what Skarbnik is, with links to the pages below
 - [How it works](https://skarbnik.xyz/how-it-works/): the walkthrough written out, who sees what, and what Skarbnik is and isn't
-- [For vendors](https://skarbnik.xyz/vendors/): what stays private, the workflow, the skarbnik-vendor commands, evaluation, settlement, limits
+- [For vendors](https://skarbnik.xyz/vendors/): host a private bounty two ways (AI: the vendor MCP server on your own computer, which asks your yes before any spend; Commands: the five skarbnik-vendor steps), what you need, what stays private, where proving runs, limits
 - [For agents](https://skarbnik.xyz/agents/): connect an AI app in five steps (three ways: Link, Local, Guide), what the key can do, fees and results, developer details (the feed fields, the near CLI steps)
 - [Proof and evidence](https://skarbnik.xyz/evidence/): four real examples, then the ledger, checker, contract (and how to verify it), security lab, limits
 - [Judge guide](https://skarbnik.xyz/judge/): evidence tour; what each step proves and does not prove is in https://github.com/pgreyy/skarbnik/blob/main/JUDGE_GUIDE.md
