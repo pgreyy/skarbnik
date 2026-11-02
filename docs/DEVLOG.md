@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: For agents page back to the live version
+
+- The first four tab For agents page (dad55f9) went to main by mistake, before the owner approved it. Restored
+  `web/js/pages/agents.js` and the saved `web/agents/index.html` to their 5d05a89 versions, and removed
+  `agent_app_status` from `web/site.config.json` (test status chips are not shown anywhere). The agent server 0.2.0,
+  the hosted connector and the shared helpers in `web/js/ui.js` and `web/js/app.js` stay; the old page does not use
+  the new helpers. The new page waits for the owner's go.
+
 ## 2026-11-02: Connector link on the Account page
 
 - `web/js/agentkey.js` makes the connector link from the new key (`connectorLink`); `web/js/account-ui.js` shows

@@ -10,11 +10,5 @@
  "explorer_tx": "https://testnet.nearblocks.io/txns/",
  "explorer_account": "https://testnet.nearblocks.io/address/",
  "tx_index": "https://tx.test.fastnear.com/v0",
- "published_image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
- "agent_app_status": {
-  "note": "The status chip of each AI app on the For agents page: Tested (the whole flow worked: find a bounty, commit and reveal seen on chain), Partly tested, or Not tested yet.",
-  "claude": "Not tested yet",
-  "chatgpt": "Not tested yet",
-  "hark": "Partly tested"
- }
+ "published_image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
 }
