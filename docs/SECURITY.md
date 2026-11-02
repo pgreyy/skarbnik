@@ -104,7 +104,9 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Guard | What it stops | Shown by |
 | --- | --- | --- |
 | Before every commit and reveal it reads the key's permission from the chain and refuses unless it is a function call key for the contract limited to `commit` and `reveal` | An agent signing with a full access key | `server.py --check` with the full access key: refused (EVIDENCE, "The MCP server") |
-| It refuses a key file or nonce file that other users can read; the nonce file is written with mode 600 before the commit is sent | Another local user reading the key or the nonces; losing a nonce of a commit already sent | `--check` with a mode 644 copy: refused; the nonce file's mode after the commit: 600 |
+| It refuses a key file or nonce file that other users can read; the nonce file is written with mode 600 before the commit is sent (macOS and Linux; Windows has no such file mode, so there the folder's own permissions are the guard) | Another local user reading the key or the nonces; losing a nonce of a commit already sent | `--check` with a mode 644 copy: refused; the nonce file's mode after the commit: 600 |
+| Since version 0.2.0 it signs by itself (Ed25519 and NEAR's transaction format in `server.py`); the private key is read only to sign, checked against the key file's public key, and dropped | A wrong or swapped key file; needing an extra signing tool | the RFC 8032 test vectors, and a transaction byte for byte equal to near-cli's, signature included (EVIDENCE, "For agents page and MCP server 0.2.0") |
+| `build_patch` refuses Rust source that uses `include!`, `include_str!`, `include_bytes!`, `env!`, `option_env!`, `mod x;`, `extern crate` or `#[path]`, and builds with the bounty's fixed flags | A patch that carries a file or a variable from the agent's computer into a public reveal | a source with `include_str!` refused (same section) |
 | No tool result or log line carries the key, the key file's contents or a nonce; near-cli's error lines are filtered before they are returned | Leaking a key or nonce into the client's transcript | `docs/evidence/agent_access/mcp_sessions.txt` |
 | Mainnet is refused unless `SKARBNIK_ALLOW_MAINNET=1` | Spending real money by accident | `SKARBNIK_NETWORK=mainnet ... --check`: refused |
 | A reveal before the reveal gap sends nothing and says how long to wait | Burning gas on a reveal the contract would refuse | sessions 2 and 3 |
@@ -331,6 +333,11 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - 2026-10-27: GPU proving in the vendor's watch (`tools/skarbnik_gpu.py`): a RunPod pod per revealed attempt, secret in
   RAM only and wiped after the prove step, pod always terminated with a 45 minute cap, a $6 spend cap, CPU fallback after
   two failed pods. Judge bounties 18 to 22 retired; 27 to 31 replace them (K = 2, 1 per account).
+
+- 2026-11-02: `tools/skarbnik-mcp/` 0.2.0 signs without near-cli (its own Ed25519 and transaction encoding, checked
+  against near-cli byte for byte), finds the key file the Account page saves next to `server.py`, builds patches with
+  `build_patch` (the same refusal of `include!`, `env!`, `mod` and `extern crate` as the reference agent), reads public
+  code with `get_public_code` (module checked against `original_hash`), and runs on Windows (no file mode check there).
 
 - 2026-10-27: new guards in `tools/skarbnik-mcp/` (an MCP server for agents): only a key limited to commit and reveal,
   key and nonce files of mode 600, no key or nonce in any output, mainnet only with a flag, no early reveal. Tested on

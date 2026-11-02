@@ -48,17 +48,30 @@ const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } }))
 for (const entry of PAGES) {
   await p.goto(base + entry.route, { waitUntil: 'networkidle' });
   await p.waitForTimeout(9000);
-  // Every tab as a section with its own heading; tab buttons and interactive controls do nothing without JavaScript.
+  // Every tab as a section with its own heading (a page tab's heading carries its short link id, so /agents/#connect
+  // lands on it; a picker inside a tab gets a smaller heading); every collapsible panel open, its title kept as text;
+  // tab buttons and interactive controls do nothing without JavaScript.
   const main = await p.evaluate(() => {
     const view = document.querySelector('#view').cloneNode(true);
     for (const list of view.querySelectorAll('[role="tablist"]')) {
-      const labels = Object.fromEntries([...list.querySelectorAll('[role="tab"]')].map((t) => [t.getAttribute('aria-controls'), t.textContent.trim()]));
-      for (const panel of list.parentElement.querySelectorAll(':scope > [role="tabpanel"]')) {
+      const nested = !!list.parentElement.closest('[role="tabpanel"]');
+      for (const t of list.querySelectorAll('[role="tab"]')) {
+        const panel = view.querySelector(`#${CSS.escape(t.getAttribute('aria-controls'))}`);
+        if (!panel) continue;
         panel.removeAttribute('hidden');
-        const h = document.createElement('h2'); h.className = 'h2s'; h.style.margin = '48px 0 16px'; h.textContent = labels[panel.id] || '';
+        const label = [...t.childNodes].filter((n) => n.nodeType === 3 || !n.classList || !(n.classList.contains('chip') || n.classList.contains('tab-sub'))).map((n) => n.textContent).join('').trim();
+        const h = document.createElement(nested ? 'h4' : 'h2');
+        h.className = nested ? 'ag-sub' : 'h2s'; h.style.margin = nested ? '20px 0 10px' : '48px 0 16px'; h.textContent = label;
+        if (!nested && panel.id.startsWith('panel-')) h.id = panel.id.slice(6);
         panel.before(h);
       }
       list.remove();
+    }
+    for (const b of view.querySelectorAll('[aria-expanded][aria-controls]')) {
+      const body = view.querySelector(`#${CSS.escape(b.getAttribute('aria-controls'))}`);
+      if (body) body.removeAttribute('hidden');
+      const chev = b.querySelector('.chev'); if (chev) chev.remove();
+      const span = document.createElement('span'); span.className = b.className; span.innerHTML = b.innerHTML; b.replaceWith(span);
     }
     view.querySelectorAll('button, dialog, [aria-live]:empty').forEach((e) => e.remove());
     return view.innerHTML;

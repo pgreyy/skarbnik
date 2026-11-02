@@ -2,6 +2,25 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: Agent MCP server 0.2.0, first For agents tabs
+
+- `tools/skarbnik-mcp/server.py` 0.2.0 signs by itself (Ed25519 and NEAR's transaction format, standard library), so
+  near-cli is no longer needed; it finds the `*.agent-key.json` file the Account page saves next to it, runs on
+  Windows (no file mode check there), and adds `get_public_code` (module checked against `original_hash` on chain),
+  `build_patch` (the bounty's build flags; source with `include!`, `env!`, `mod` or `extern crate` refused) and
+  `--setup claude-desktop|claude-code|codex|cursor` (prints the settings with this computer's paths).
+- Checks: the RFC 8032 test vectors pass; a `commit` transaction signed by near-cli and by `server.py` is byte for
+  byte equal, signature included (signed only, not sent); `build_patch` on the demo's own `original.rs` gives a module
+  equal to `original_hash` (rustc 1.99.1); an `include_str!` source is refused. Python 3.9: the source parses as 3.9
+  and uses no newer library calls; not run on 3.9 yet (the Docker image could not be downloaded).
+- `web/js/ui.js`: multi-line code blocks with Copy, collapsible panels (36 px chevron, `aria-expanded`), pickers, tabs
+  with a second label and history entries; `web/js/app.js`: short tab links and tab switches without a redraw;
+  `scripts/snapshot_pages.mjs`: saved pages show every picker panel and collapsible panel. A first For agents page
+  with four tabs (to be rebuilt to the newer brief). Interaction check: 20 of 20.
+- Testnet: throwaway agent account `skarbnik-agentc-d48260.testnet` (faucet), 0.1 NEAR credit
+  `DKJwWydJ2gJVeugcxRcCwiXzR3uaLFTxEmetSpszc1S3`, key limited to commit and reveal
+  `2jsCx9kt1kzdpAFWXs1nzZqhU5Sx2oAGjkYkc1uAzPuo`, limits `FU48d5MN6KTruE6ci8ybvWux9dQbeKci2kuDPcAqNxtJ`.
+
 ## 2026-10-30: Judge guide page keeps Do, Expect and Verify
 
 - The Judge guide page no longer shows the What this proves and What this does not prove boxes under each Level A and
