@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Wallet menu labels (local)
+
+- The menu under the connected wallet button now says Account (opens the Account page), Copy name, Credit,
+  Disconnect. `web/css/site.css`: the menu grows to fit its widest label (`width:max-content`, never wider than the
+  screen less 32 px) and each label stays on one line (`white-space:nowrap`).
+- Checked with a private script and a made-up connected account (the real wallet is not signed in for this): the four
+  labels in order, each one line high, the menu inside the screen, at 1440 (header) and 390 (phone menu), dark and
+  light; no script errors.
+
 ## 2026-11-02: For agents page rebuilt (local, not live)
 
 - `web/js/pages/agents.js`: tabs Connect (5 steps), Key, Fees, Developers. Connect: five steps; step 03 says where the

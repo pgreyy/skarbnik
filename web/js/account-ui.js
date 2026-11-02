@@ -33,8 +33,8 @@ function walletHtml(where) {
     return `<button class="credit-chip" type="button" data-w="credit" aria-haspopup="dialog">Credit <b>${credit === null ? '…' : esc(near(credit))}</b></button>
       <div class="acct"><button class="btn btn-g btn-s" type="button" data-w="menu" aria-haspopup="true" aria-expanded="false" aria-controls="acctMenu-${where}" title="${esc(s.account)}">${icon('user')} ${esc(short(s.account))}</button>
       <div class="acct-menu" id="acctMenu-${where}" hidden>
-        <button type="button" data-act="activity">My account and agent setup</button>
-        <button type="button" data-act="copy">Copy account name</button>
+        <button type="button" data-act="activity">Account</button>
+        <button type="button" data-act="copy">Copy name</button>
         <button type="button" data-act="credit">Credit</button>
         <button type="button" data-act="out">Disconnect</button></div></div>`;
   }

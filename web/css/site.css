@@ -32,8 +32,8 @@ body.sk>main{flex:1 0 auto}
 .sk .menu-sheet .sheet-wallet{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--ln)}
 .sk .menu-sheet .sheet-wallet:empty{display:none}
 .sk .acct{position:relative}
-.sk .acct-menu{position:absolute;right:0;top:calc(100% + 8px);min-width:220px;margin:0;padding:6px;background:var(--s1);border:1px solid var(--ln2);border-radius:calc(12px * var(--rs));box-shadow:0 18px 50px rgba(0,0,0,.35);z-index:60}
-.sk .acct-menu button{display:flex;width:100%;min-height:44px;align-items:center;padding:0 12px;background:transparent;border:0;border-radius:calc(8px * var(--rs));font:500 15px/1 var(--fu);color:var(--tx2);cursor:pointer;text-align:left}
+.sk .acct-menu{position:absolute;right:0;top:calc(100% + 8px);min-width:220px;width:max-content;max-width:calc(100vw - 32px);margin:0;padding:6px;background:var(--s1);border:1px solid var(--ln2);border-radius:calc(12px * var(--rs));box-shadow:0 18px 50px rgba(0,0,0,.35);z-index:60}
+.sk .acct-menu button{display:flex;width:100%;min-height:44px;white-space:nowrap;align-items:center;padding:0 12px;background:transparent;border:0;border-radius:calc(8px * var(--rs));font:500 15px/1 var(--fu);color:var(--tx2);cursor:pointer;text-align:left}
 .sk .acct-menu button:hover{background:var(--s2);color:var(--tx)}
 .sk .credit-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:calc(12px * var(--rs));border:1px solid var(--ln);background:transparent;color:var(--tx2);font:500 14px/1 var(--fu);cursor:pointer}
 .sk .credit-chip b{font:500 13px/1 var(--fm);color:var(--tx)}
