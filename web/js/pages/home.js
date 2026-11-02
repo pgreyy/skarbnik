@@ -300,10 +300,10 @@ export async function home(viewEl, sec = 0) {
     $('#rulesAcc').querySelectorAll('[data-acc]').forEach((b) => b.addEventListener('click', () => { const i = Number(b.dataset.acc); drawRules(open === i ? -1 : i); $(`[data-acc="${i}"]`).focus(); }));
   };
   drawRules(0);
-  // the bounties paid by a checked proof so far, read live from the contract
-  try {
-    const ids = await paidByProof();
+  // the bounties paid by a checked proof so far, read live from the contract after the page is shown (not awaited, so
+  // a slow node never holds the page)
+  paidByProof().then((ids) => {
     const el = $('#paidList');
     if (el && ids.length) el.textContent = ` Paid by a checked proof so far, read live from the contract: bounties ${ids.length > 1 ? `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}` : ids[0]}.`;
-  } catch { /* the cards stand on their own */ }
+  }, () => { /* the cards stand on their own */ });
 }

@@ -9,7 +9,9 @@
 // Security Lab: how much repeated attempts can learn, the recorded probe run, and the guarded (real, testnet) vs
 // unguarded (simulated) recording. Limits: what is not claimed, in plain words. Long tables and command lists sit in
 // closed drop downs (details: they open without JavaScript, and the saved page shows them open). Nothing was removed.
-import { CONTRACT, RPCS, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, near, submissions, accessKeys } from '../chain.js';
+// The page is drawn at once; live values say "Loading from the contract" until they arrive, and if the testnet node
+// gives no answer within 4 seconds the saved snapshots are shown, labelled with their time.
+import { CONTRACT, RPCS, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, near, submissions, accessKeys, allBounties } from '../chain.js';
 import { $, esc, icon, copyBtn, chip, tx, acct, hashCell, table, note, cmd, facts, tabbed, seg, bindSeg, collapse } from '../ui.js';
 import { STATUS } from '../status.js';
 import { loadAll, fromFeed, getRecorded, getMeta, getNumbers, txsOf, paidByProof } from '../data.js';
@@ -42,7 +44,7 @@ const LIMITS = (live) => [
   ['hash', '', 'One verdict leaks one bit', 'K is the leak budget. A per-account cap (deployed 2026-10-26) limits how many slots one account holds, but one person with many accounts can still fill a bounty’s slots.'],
   ['link', '', 'Level 1 is not built', 'The OutLayer path exists but never answered on testnet. Every current bounty is Level 2 or the older Level 0.'],
   ['wallet', '', 'Only one wallet has signed here', 'NEAR CLI was clicked through to real transactions. The other wallets were only loaded, not signed in.'],
-  ['user', '', 'Run by the team, not outside customers', 'These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside customers.', '<span id="paidSoFar">Paid by proof so far: reading the contract…</span>'],
+  ['user', '', 'Run by the team, not outside customers', 'These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside customers.', '<span id="paidSoFar">Loading from the contract</span>'],
 ];
 
 const GH = 'https://github.com/pgreyy/skarbnik';
@@ -87,42 +89,47 @@ export async function evidence(viewEl, tab) {
 <p class="lead">Every claim here points to a transaction, a file or a command. Where something is not proven, the label says so. The examples show the outcomes a bounty can have.</p>
 <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/judge">Take the judge tour ${icon('right')}</a><a class="lnk" href="#/evidence/bounties" id="deeperLink">Go to the technical record</a><a class="lnk" href="#/evidence/overview" id="vocabLink">What the status labels mean</a><a class="lnk" href="#/evidence/limits">Read the limits</a></div>
 </div></div></section>
-<section style="padding:0 0 112px"><div class="wrap"><div id="etabs"></div></div></section></main>`;
+<section style="padding:0 0 112px"><div class="wrap"><div id="liveNote" aria-live="polite"></div><div id="etabs"></div></div></section></main>`;
   const overview = `<div class="stack g28">
     <div style="max-width:720px" class="stack g12"><h2 class="h2s" id="deeper">What this page shows</h2><p class="body">The path works on NEAR testnet: bounties were paid by a proof the contract checked, and one was paid by the timeout rule, labelled as such. Each row links to the transaction that decided it.</p></div>
     ${PAID_ROWS()}
     <div class="note">${icon('info')}<p><b style="color:var(--tx)">What these show:</b> the path works on testnet. <b style="color:var(--tx)">What they do not show:</b> that every bug can be handled, that the system is production ready, or that an external audit has happened.</p></div>
     <p class="small" id="ctSum">Reading the contract…</p>
-    <div class="nums" role="list" aria-label="Key numbers" id="nums"><div role="listitem"><b>…</b><span>Reading from testnet</span></div></div>
+    <div class="nums" role="list" aria-label="Key numbers" id="nums"></div>
     ${collapse('vocab', 'What the status labels mean', `<p class="body" style="max-width:640px">Mint is used only for a verified outcome, and always with a word and an icon. A timeout is never styled like a proof. The last two labels are the feed’s states for bounties that are not settled.</p>
     <div class="vocab" style="margin-top:20px">${VOCAB.map((st) => `<div class="card vc">${chip(STATUS[st].cls, st, STATUS[st].icon)}<p class="small">${esc(STATUS[st].help)}</p></div>`).join('')}
     <div class="card vc"><p class="eyebrow" style="color:var(--tx3)">Labels for claims</p><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip l-impl">Implemented</span><span class="chip l-demo">Demonstrated</span><span class="chip l-exp">Experimental</span><span class="chip l-plan">Planned</span></div><p class="small">Used in the judge guide. No audit badge is shown, because there is no audit.</p></div></div>`)}
   </div>`;
 
-  // the bounties paid by a checked proof, read live from the contract (the ledger decides the list)
-  const paidP = paidByProof();
-  const showPaid = () => paidP.then((ids) => { const el = $('#paidSoFar'); if (el) el.textContent = ids.length ? `Paid by proof so far, read live from the contract: bounties ${ids.length > 1 ? `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}` : ids[0]}.` : 'No bounty has been paid by proof yet.'; })
-    .catch(() => { const el = $('#paidSoFar'); if (el) el.textContent = 'The list of bounties paid by proof could not be read just now; the ledger below has it.'; });
-  let all, rec, meta, nums, snapshot = null;
+  let rec, meta, nums;
   try { [rec, meta, nums] = await Promise.all([getRecorded(), getMeta(), getNumbers()]); } catch (e) {
     if ($('#etabs')) $('#etabs').innerHTML = note(`Could not load the site's data: ${esc(e.message)}. Reload to try again.`, 'alert'); return;
   }
-  // Live from the chain; if it cannot be read within 6 seconds, the feed and ledger.json snapshots, labelled with their time.
-  try { all = await Promise.race([loadAll(true), new Promise((_, no) => setTimeout(() => no(new Error('the testnet RPC is slow or busy')), 6000))]); } catch (e) {
-    try { const f = await fromFeed(); all = f.list; snapshot = { at: f.at, err: e.message }; } catch {
-      if ($('#etabs')) $('#etabs').innerHTML = note(`Could not read the contract on testnet: ${esc(e.message)}. Reload to try again.`, 'alert'); return;
-    }
-  }
   if (!$('#etabs')) return;
-  const nProof = all.filter((x) => x.status === 'Proof verified').length, nTime = all.filter((x) => x.status === 'Timeout settlement').length;
-  const attacks = (rec.attacks_s6c || []).filter((a) => /refused/.test(a.result)).length;
-  const numsHtml = [[`${nProof}`, 'Paid by a verified proof'], [`${nTime}`, 'Paid by timeout, never called proven'], [`${nums.contract_unit_tests.value}`, 'Contract unit tests passed'], [`${attacks}`, 'Proof attacks refused on chain'], [`${nums.accepted_proof_tgas.value}<small>Tgas</small>`, `About, per accepted proof (${nums.accepted_proof_tgas.range})`]]
-    .map(([v, t]) => `<div role="listitem"><b>${v}</b><span>${esc(t)}</span></div>`).join('');
-  if (snapshot) $('#etabs').insertAdjacentHTML('beforebegin', `<div style="margin-top:24px">${note(`The contract could not be read just now (${esc(snapshot.err)}). The numbers and the ledger below are the snapshots made at ${esc(snapshot.at)} (feed.json, ledger.json): reload to read them live.`, 'alert')}</div>`);
-  const ctHtml = `The contract on NEAR testnet: <a class="tx" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">${esc(CONTRACT)} ${icon('ext')}</a>. One approved checker id, ${all.length} bounties, and no mainnet contract. Read it on the explorer, not on this page.`;
+  // The page is drawn at once from the site's own files. Live values are read from the contract afterwards and fill
+  // in when they arrive; until then each says so. If the node has not answered within 4 seconds, the saved snapshots
+  // (feed.json, ledger.json) are shown instead, with the time they were made. The node counts as answering once the
+  // bounty list arrives; the full read of every attempt then takes a few seconds more (3 to 8 s measured), up to 30 s.
+  const LOADING = 'Loading from the contract', UNAVAILABLE = 'Live data unavailable, showing the saved list';
+  const within = (p, ms, why) => Promise.race([p, new Promise((_, no) => setTimeout(() => no(new Error(why)), ms))]);
+  const answered = within(allBounties(), 4000, 'the testnet node did not answer within 4 seconds');
+  const full = (p) => answered.then(() => within(p, 30000, 'the full read took longer than 30 seconds'));
+  const savedAt = (at) => `${String(at).replace('T', ' ').replace(/:\d\dZ$/, '').replace(/Z$/, '')} UTC`;
+  const andList = (ids) => (ids.length > 1 ? `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}` : String(ids[0]));
+  let all = null, snapshot = null, settled = [], nProof = 0, nTime = 0;
+  const liveP = full(loadAll(true)).then((l) => { all = l; }, async (e) => { const f = await fromFeed(); all = f.list; snapshot = { at: f.at, err: e.message }; });
 
-  // ---- Ledger: the settled bounties, then the Proof Ledger
-  const settled = all.filter((x) => x.status === 'Proof verified' || x.status === 'Timeout settlement').slice().sort((a, b) => (a.status === b.status ? Number(b.b.id) - Number(a.b.id) : a.status === 'Proof verified' ? -1 : 1));
+  // the bounties paid by a checked proof, read live from the contract (the ledger decides the list)
+  const paidText = full(paidByProof()).then((ids) => (ids.length ? `Paid by proof so far, read live from the contract: bounties ${andList(ids)}.` : 'No bounty has been paid by proof yet.'),
+    async () => { const f = await fromFeed(); const ids = f.list.filter((x) => x.status === 'Proof verified').map((x) => x.b.id); return `${UNAVAILABLE} (saved ${savedAt(f.at)}): paid by proof, bounties ${andList(ids)}.`; })
+    .catch(() => 'The list of bounties paid by proof could not be read just now; the ledger has it.');
+  const showPaid = () => paidText.then((t) => { const el = $('#paidSoFar'); if (el) el.textContent = t; });
+  const attacks = (rec.attacks_s6c || []).filter((a) => /refused/.test(a.result)).length;
+  const drawNums = () => { const el = $('#nums'); if (!el) return; el.innerHTML = [[all ? `${nProof}` : LOADING, 'Paid by a verified proof', !all], [all ? `${nTime}` : LOADING, 'Paid by timeout, never called proven', !all], [`${nums.contract_unit_tests.value}`, 'Contract unit tests passed'], [`${attacks}`, 'Proof attacks refused on chain'], [`${nums.accepted_proof_tgas.value}<small>Tgas</small>`, `About, per accepted proof (${nums.accepted_proof_tgas.range})`]]
+    .map(([v, t, ld]) => `<div role="listitem"><b${ld ? ' class="ld"' : ''}>${v}</b><span>${esc(t)}</span></div>`).join(''); };
+  const ctLine = () => `The contract on NEAR testnet: <a class="tx" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">${esc(CONTRACT)} ${icon('ext')}</a>. ${all ? `One approved checker id, ${all.length} bounties${snapshot ? ` (saved ${esc(savedAt(snapshot.at))})` : ''}, and no mainnet contract.` : `${LOADING}.`} Read it on the explorer, not on this page.`;
+
+  // ---- Ledger: the settled bounties (filled in when the live values arrive), then the Proof Ledger
   const chips = (id, how) => {
     const list = [['commit', 'Commit'], ['reveal', 'Reveal']].flatMap(([m, l]) => txsOf(rec, id, m).slice(0, 2).map((t) => [t.tx, l]));
     const end = how === 'proof' ? txsOf(rec, id, 'submit_groth16').map((t) => [t.tx, 'Proof']) : txsOf(rec, id, 'claim_timeout').map((t) => [t.tx, 'Claim']);
@@ -145,8 +152,8 @@ export async function evidence(viewEl, tab) {
   const exArticles = EXAMPLES().split('<article ').slice(1).map((a) => `<article ${a.replace(/<\/div>\s*$/, '')}`);
   const ledger = `<div class="stack g16"><div style="max-width:700px"><h2 class="h2s">The four examples</h2><p class="body" style="margin-top:12px">The outcomes a bounty can have, each with its deciding transaction.</p></div>
     ${exampleList.map(([id, t], i) => collapse(`ex${id}`, esc(t), `<div class="ev-ex">${exArticles[i]}</div>`)).join('')}</div>
-    <div class="stack g28 mt48">${collapse('ledgerAll', `The settlement ledger: ${settled.length} settled bounties, every transaction`, `<div class="stack g28" id="ledgerTop">${ledgerTop()}</div>`)}</div>
-    <div class="stack g24 mt48" id="proofLedger"><p class="state">Computing the Proof Ledger from the chain…</p></div>`;
+    <div class="stack g28 mt48">${collapse('ledgerAll', 'The settlement ledger: <span id="ledgerN">every settled bounty</span>, every transaction', `<div class="stack g28" id="ledgerTop"><p class="state">${LOADING}</p></div>`)}</div>
+    <div class="stack g24 mt48" id="proofLedger"><p class="state">${LOADING}</p></div>`;
 
   // ---- Checker
   const check = rec.last_image_check && rec.last_image_check.result === 'MATCH' ? rec.last_image_check : null;
@@ -155,7 +162,7 @@ export async function evidence(viewEl, tab) {
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><p class="eyebrow" style="color:var(--tx3)">Image id on the allowlist</p>${check ? chip('l-demo', `MATCH on rebuild, ${check.utc.slice(0, 10)}`, 'check') : ''}</div>
     <div class="cblk"><p class="imgid">${esc(PUBLISHED_IMAGE_ID)}</p>${copyBtn(PUBLISHED_IMAGE_ID)}</div>
-    <p class="small" id="allowLine">Reading the allowlist from testnet…</p>
+    <p class="small" id="allowLine">${LOADING}</p>
     <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">${tx(nums.allowlist_tx.tx, 'allowlisted in')}</div>
     </div>
     <div class="two">
@@ -188,7 +195,7 @@ export async function evidence(viewEl, tab) {
   const contract = `<div class="stack g36">
     <div style="max-width:700px"><h2 class="h2s">The contract</h2><p class="body" style="margin-top:12px">It holds the money and the deadlines, checks Groth16 proofs with NEAR’s built in curve functions, and applies the rules. It does not run the private evaluation.</p></div>
     <div class="two">
-    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px"><h3 class="h3">Deployment, read live</h3><div id="deploy"><p class="small">Reading from testnet…</p></div></div>
+    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px"><h3 class="h3">Deployment, read live</h3><div id="deploy"><p class="small">${LOADING}</p></div></div>
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><h3 class="h3">What was tested</h3>
     <p class="small"><b class="txt">${esc(nums.contract_unit_tests.value)}</b> contract unit tests pass in the repository. ${esc(nums.contract_unit_tests.detail)}</p>
     <p class="small"><b class="txt">${attacks}</b> proof attacks were refused on chain: ${esc((rec.attacks_s6c || []).map((a) => a.what.charAt(0).toLowerCase() + a.what.slice(1)).join(', '))}.</p>
@@ -250,13 +257,12 @@ export async function evidence(viewEl, tab) {
   const html = { overview, bounties: ledger, proofs: checker, contract, lab, limits };
   tabbed($('#etabs'), Object.keys(ids).map((id) => ({ id, label: ids[id], html: html[id] })), t0, '#/evidence', 'Evidence sections', () => {}, true);
   if (tab && t0 !== tab) history.replaceState(null, '', `#/evidence/${t0}`); // an old tab link (ledger, checker) shows its new address
-  $('#nums').innerHTML = numsHtml;
-  $('#ctSum').innerHTML = ctHtml;
+  drawNums();
+  $('#ctSum').innerHTML = ctLine();
   showPaid();
   $('#vocabLink').addEventListener('click', () => { const v = $('#vocab'); if (v) v.open = true; });
   // ledger filter
   const bindLedger = () => bindSeg($('#ledgerTop'), 'data-lf', (f) => { lf = f; $('#lrows').innerHTML = '<div class="lhead" aria-hidden="true"><span>Bounty</span><span>Settlement</span><span>Transactions</span><span>Note</span></div>' + ledgerRows(lf); });
-  bindLedger();
   // security lab stepper
   let probe = 0;
   const T = [`No probes yet. The probe agent knows nothing beyond the size of the secret, ${Number(ar.secret_space).toLocaleString('en-US')} values.`,
@@ -291,6 +297,12 @@ export async function evidence(viewEl, tab) {
         <p class="small">Never run against the contract: ${esc(u.where)}. With the crash variant check on, every probe FAILs and learns 0 bits.</p></div></div>
       <p class="small faint mt8">Recorded in docs/evidence/arena_probe/.</p>`;
   })();
+  // no answer from the node within 4 seconds: say so (the values still fill in if they arrive later)
+  answered.catch(() => {
+    const d = $('#deploy'), al = $('#allowLine'), gone = `Live data unavailable just now. The contract account is on the <a class="lnk sm" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">explorer ${icon('ext')}</a>.`;
+    if (d && d.textContent.trim() === LOADING) d.innerHTML = `<p class="small">${gone}</p>`;
+    if (al && al.textContent.trim() === LOADING) al.innerHTML = gone;
+  });
   (async () => {
     const [ch, owner, pool, allowed, keys] = await Promise.all([codeHash(), view('get_owner').catch(() => null), view('get_protocol_pool').catch(() => null), view('get_allowed_image_ids').catch(() => null), accessKeys(CONTRACT).catch(() => null)]);
     const fullKeys = keys === null ? null : keys.filter((k) => k.access_key.permission === 'FullAccess').length;
@@ -307,40 +319,53 @@ export async function evidence(viewEl, tab) {
   })();
   drawLimits({ fullKeys: null });
 
-  // the Proof Ledger, from every bounty and attempt on chain (js/ledger-core.js)
-  try {
-    const [accounts, provers, costs] = await Promise.all([fetch('data/accounts.json').then((x) => x.json()), fetch('data/provers.json').then((x) => x.json()), fetch('data/operator_costs.json').then((x) => x.json())]);
-    let L, names;
-    if (snapshot) { L = await (await fetch('ledger.json')).json(); names = new Set([...L.paid_accounts.map((a) => a.account), ...L.vendors.map((v) => v.vendor), ...L.earnings.map((x) => x.account)].filter((a) => /\.testnet$/.test(a))); }
-    else {
-      const bs = all.map((x) => x.b), subs = Object.fromEntries(all.map((x) => [String(x.b.id), x.subs]));
-      names = new Set([...bs.map((b) => b.vendor), ...Object.values(subs).flat().flatMap((s) => [s.committer, s.payout])]);
-      const hashes = new Map(await Promise.all([...names].map(async (a) => [a, hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(a))))])));
-      L = buildLedger(bs, subs, rec, accounts, Date.now(), hashes, provers.attempts, costs.costs);
+  // the live values, then the Proof Ledger, from every bounty and attempt on chain (js/ledger-core.js)
+  (async () => {
+    try { await liveP; } catch (e) {
+      for (const id of ['#ledgerTop', '#proofLedger']) { const el = $(id); if (el) el.innerHTML = note(`Could not read the contract or the saved list: ${esc(e.message)}. Reload to try again.`, 'alert'); }
+      return;
     }
-    const c = L.counts;
-    const pl = $('#proofLedger'); if (!pl) return;
-    const howChip = (f) => (f.transfer_failed ? chip('k-fail', 'Paid on paper, transfer failed (audit finding 8)', 'x') : f.how === 'proof' ? chip('k-proof', 'Paid by proof', 'check') : chip('k-timeout', 'Paid by timeout', 'hourglass'));
-    pl.innerHTML = `<div style="max-width:700px"><h2 class="h2s">The Proof Ledger</h2><p class="body" style="margin-top:12px">Every account the contract has paid, how each fix was paid, and each vendor’s on-time record, ${snapshot ? `from the snapshot made at ${esc(L.made_at)} (ledger.json)` : 'computed live from every bounty and attempt on chain'}. No scores, no ranks, no credit for unpaid attempts.</p></div>
-      ${note(`<b>${c.outside_the_team === 0 ? 'Every account below is run by the Skarbnik team or was seeded by its scripts.' : `${c.outside_the_team} account(s) below are not on the team’s list.`}</b> An account missing from the team’s list (data/accounts.json) would show as “not known”.`)}
-      <div class="stat4"><div><b class="num">${c.paid_fixes}</b><span>Paid fixes: ${c.paid_by_proof} by proof, ${c.paid_by_timeout} by timeout${c.paid_on_paper_transfer_failed ? `; ${c.paid_on_paper_transfer_failed} more paid on paper only (transfer failed)` : ''}</span></div><div><b class="num">${c.paid_accounts}</b><span>Paid accounts</span></div><div><b class="num">${c.vendors}</b><span>Vendors</span></div><div><b class="num">${c.distinct_counterparties}</b><span>Distinct counterparties: paid accounts and vendors</span></div></div>
-      ${collapse('plFixes', `Paid fixes: ${c.paid_fixes}`, table(['Bounty', 'Attempt', 'Paid to', 'How', 'Paid', 'Checker', 'Transaction'], L.paid_fixes.map((f) => [
-        `<a class="nw" href="#/bounties/${esc(f.bounty_id)}">Bounty ${esc(f.bounty_id)}</a>`, `#${esc(f.attempt)}`, `${names.has(f.payout_account) ? acct(f.payout_account) : esc(f.payout_account)}<span class="small">${esc(f.kind)}</span>`,
-        `${howChip(f)}<span class="small">${esc(f.how === 'proof' ? 'PASS means: ' : '')}${esc(f.means)}</span>${f.note ? `<span class="small">${esc(f.note)}</span>` : ''}`,
-        f.transfer_failed ? `<span class="mono nw">0 NEAR</span><span class="small">${esc(near(f.on_paper_yocto))} on paper; the transfer failed, no NEAR moved</span>` : `<span class="mono nw">${esc(near(f.paid_yocto))}</span><span class="small">plus its own fee back</span>`,
-        hashCell(f.image_id), tx(f.tx)]), 'xl', 'Paid fixes'))}
-      ${collapse('plAccounts', `Paid accounts: ${c.paid_accounts}`, table(['Account', 'Who runs it', 'Fixes paid', 'By proof', 'By timeout', 'Total paid'], L.paid_accounts.map((a) => [names.has(a.account) ? acct(a.account) : esc(a.account), kindChip(a.kind), esc(a.fixes_paid), esc(a.paid_by_proof), esc(a.paid_by_timeout), `<span class="mono nw">${esc(near(a.total_paid_yocto))}</span>`]), 'wide', 'Paid accounts'))}
-      ${collapse('plEarnings', 'Earnings by account', `<p class="small">Every account that committed or was paid. Fees spent are the attempt fees it paid; fees returned came back with a payout or as credit when a bounty closed. Model and compute costs appear only if the agent’s operator supplies them (data/operator_costs.json).</p>
-      ${table(['Account', 'Who runs it', 'Attempts', 'Gross rewards', 'Fees spent', 'Fees returned', 'Proof-checked passes', 'Timeout payouts', 'Rejected by a FAIL proof', 'Released unrevealed', 'Model and compute cost'], L.earnings.map((x) => [
-        names.has(x.account) ? acct(x.account) : esc(x.account), kindChip(x.kind), esc(x.attempts), `<span class="mono nw">${esc(near(x.gross_rewards_yocto))}</span>`, `<span class="mono nw">${esc(near(x.fees_spent_yocto))}</span>`, `<span class="mono nw">${esc(near(x.fees_returned_yocto))}</span>`,
-        esc(x.proof_checked_passes), esc(x.timeout_payouts), esc(x.rejected_by_a_fail_proof), esc(x.released_unrevealed), x.model_and_compute_cost ? esc(x.model_and_compute_cost) : '<span class="faint">not supplied</span>']), 'xl', 'Earnings')}`)}
-      ${collapse('plNumbers', 'Numbers: settled by proof and by the timeout rule, reveal to settlement', `<p class="small">From the chain only (every decided attempt); the proving machine from data/provers.json.</p>
-      ${table(['Measure', 'Value'], [['Decided attempts', esc(L.metrics.decided_attempts)], ['Settled by a proof', `${esc(L.metrics.settled_by_proof)} (${esc(Math.round((L.metrics.share_settled_by_proof || 0) * 100))}%)`], ['Settled by the timeout rule (timeout rate)', `${esc(L.metrics.settled_by_timeout)} (${esc(Math.round((L.metrics.timeout_rate || 0) * 100))}%)`],
-        ...Object.entries(L.metrics.reveal_to_settlement_seconds).map(([k, v]) => [`Reveal to settlement, ${esc(k)}`, `median ${esc(dur(v.median))}, slowest ${esc(dur(v.slowest))} (${esc(v.attempts)} attempts)`]),
-        ['Distinct outside accounts', `${esc(L.metrics.distinct_outside_accounts)}${L.metrics.distinct_outside_accounts === 0 ? ': every account so far is run or seeded by the team' : ''}`]], '', 'Numbers')}
-      <p class="small">${esc(L.metrics.timing_note)} Machine-readable: <a href="metrics.json">metrics.json</a>.</p>`)}
-      ${collapse('plVendors', 'Vendors: proved in time or not', `<p class="small">For each revealed attempt: decided by a proof before its deadline, or not (then the timeout rule paid it, or it is still waiting past its deadline).</p>
-      ${table(['Vendor', 'Who runs it', 'Bounties', 'Proved in time', 'Not proved in time', 'Waiting past deadline'], L.vendors.map((v) => [names.has(v.vendor) ? acct(v.vendor) : esc(v.vendor), kindChip(v.kind), esc(v.bounties), esc(v.proved_on_time), esc(v.not_proved_in_time), esc(v.waiting_past_deadline)]), 'wide', 'Vendors')}`)}
-      <p class="small">Machine-readable: <a href="ledger.json">ledger.json</a> (a snapshot made by <span class="mono txt">node scripts/gen_ledger.mjs</span> with the same rules). Transaction links come from the files the repository records; amounts and outcomes come from the chain.</p>`;
-  } catch (e) { const pl = $('#proofLedger'); if (pl) pl.innerHTML = note(`Could not compute the Proof Ledger: ${esc(e.message)}`, 'alert'); }
+    if (!$('#etabs')) return;
+    nProof = all.filter((x) => x.status === 'Proof verified').length; nTime = all.filter((x) => x.status === 'Timeout settlement').length;
+    settled = all.filter((x) => x.status === 'Proof verified' || x.status === 'Timeout settlement').slice().sort((a, b) => (a.status === b.status ? Number(b.b.id) - Number(a.b.id) : a.status === 'Proof verified' ? -1 : 1));
+    drawNums(); $('#ctSum').innerHTML = ctLine();
+    const ln = $('#ledgerN'); if (ln) ln.textContent = `${settled.length} settled bounties`;
+    const lt = $('#ledgerTop'); if (lt) { lt.innerHTML = ledgerTop(); bindLedger(); }
+    if (snapshot) $('#liveNote').innerHTML = `<div style="margin-top:24px">${note(`${UNAVAILABLE}. The numbers and the ledgers below are the snapshots saved at ${esc(savedAt(snapshot.at))} (feed.json, ledger.json). Reload to read them live.`, 'alert')}</div>`;
+    try {
+      const [accounts, provers, costs] = await Promise.all([fetch('data/accounts.json').then((x) => x.json()), fetch('data/provers.json').then((x) => x.json()), fetch('data/operator_costs.json').then((x) => x.json())]);
+      let L, names;
+      if (snapshot) { L = await (await fetch('ledger.json')).json(); names = new Set([...L.paid_accounts.map((a) => a.account), ...L.vendors.map((v) => v.vendor), ...L.earnings.map((x) => x.account)].filter((a) => /\.testnet$/.test(a))); }
+      else {
+        const bs = all.map((x) => x.b), subs = Object.fromEntries(all.map((x) => [String(x.b.id), x.subs]));
+        names = new Set([...bs.map((b) => b.vendor), ...Object.values(subs).flat().flatMap((s) => [s.committer, s.payout])]);
+        const hashes = new Map(await Promise.all([...names].map(async (a) => [a, hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(a))))])));
+        L = buildLedger(bs, subs, rec, accounts, Date.now(), hashes, provers.attempts, costs.costs);
+      }
+      const c = L.counts;
+      const pl = $('#proofLedger'); if (!pl) return;
+      const howChip = (f) => (f.transfer_failed ? chip('k-fail', 'Paid on paper, transfer failed (audit finding 8)', 'x') : f.how === 'proof' ? chip('k-proof', 'Paid by proof', 'check') : chip('k-timeout', 'Paid by timeout', 'hourglass'));
+      pl.innerHTML = `<div style="max-width:700px"><h2 class="h2s">The Proof Ledger</h2><p class="body" style="margin-top:12px">Every account the contract has paid, how each fix was paid, and each vendor’s on-time record, ${snapshot ? `from the snapshot made at ${esc(L.made_at)} (ledger.json)` : 'computed live from every bounty and attempt on chain'}. No scores, no ranks, no credit for unpaid attempts.</p></div>
+        ${note(`<b>${c.outside_the_team === 0 ? 'Every account below is run by the Skarbnik team or was seeded by its scripts.' : `${c.outside_the_team} account(s) below are not on the team’s list.`}</b> An account missing from the team’s list (data/accounts.json) would show as “not known”.`)}
+        <div class="stat4"><div><b class="num">${c.paid_fixes}</b><span>Paid fixes: ${c.paid_by_proof} by proof, ${c.paid_by_timeout} by timeout${c.paid_on_paper_transfer_failed ? `; ${c.paid_on_paper_transfer_failed} more paid on paper only (transfer failed)` : ''}</span></div><div><b class="num">${c.paid_accounts}</b><span>Paid accounts</span></div><div><b class="num">${c.vendors}</b><span>Vendors</span></div><div><b class="num">${c.distinct_counterparties}</b><span>Distinct counterparties: paid accounts and vendors</span></div></div>
+        ${collapse('plFixes', `Paid fixes: ${c.paid_fixes}`, table(['Bounty', 'Attempt', 'Paid to', 'How', 'Paid', 'Checker', 'Transaction'], L.paid_fixes.map((f) => [
+          `<a class="nw" href="#/bounties/${esc(f.bounty_id)}">Bounty ${esc(f.bounty_id)}</a>`, `#${esc(f.attempt)}`, `${names.has(f.payout_account) ? acct(f.payout_account) : esc(f.payout_account)}<span class="small">${esc(f.kind)}</span>`,
+          `${howChip(f)}<span class="small">${esc(f.how === 'proof' ? 'PASS means: ' : '')}${esc(f.means)}</span>${f.note ? `<span class="small">${esc(f.note)}</span>` : ''}`,
+          f.transfer_failed ? `<span class="mono nw">0 NEAR</span><span class="small">${esc(near(f.on_paper_yocto))} on paper; the transfer failed, no NEAR moved</span>` : `<span class="mono nw">${esc(near(f.paid_yocto))}</span><span class="small">plus its own fee back</span>`,
+          hashCell(f.image_id), tx(f.tx)]), 'xl', 'Paid fixes'))}
+        ${collapse('plAccounts', `Paid accounts: ${c.paid_accounts}`, table(['Account', 'Who runs it', 'Fixes paid', 'By proof', 'By timeout', 'Total paid'], L.paid_accounts.map((a) => [names.has(a.account) ? acct(a.account) : esc(a.account), kindChip(a.kind), esc(a.fixes_paid), esc(a.paid_by_proof), esc(a.paid_by_timeout), `<span class="mono nw">${esc(near(a.total_paid_yocto))}</span>`]), 'wide', 'Paid accounts'))}
+        ${collapse('plEarnings', 'Earnings by account', `<p class="small">Every account that committed or was paid. Fees spent are the attempt fees it paid; fees returned came back with a payout or as credit when a bounty closed. Model and compute costs appear only if the agent’s operator supplies them (data/operator_costs.json).</p>
+        ${table(['Account', 'Who runs it', 'Attempts', 'Gross rewards', 'Fees spent', 'Fees returned', 'Proof-checked passes', 'Timeout payouts', 'Rejected by a FAIL proof', 'Released unrevealed', 'Model and compute cost'], L.earnings.map((x) => [
+          names.has(x.account) ? acct(x.account) : esc(x.account), kindChip(x.kind), esc(x.attempts), `<span class="mono nw">${esc(near(x.gross_rewards_yocto))}</span>`, `<span class="mono nw">${esc(near(x.fees_spent_yocto))}</span>`, `<span class="mono nw">${esc(near(x.fees_returned_yocto))}</span>`,
+          esc(x.proof_checked_passes), esc(x.timeout_payouts), esc(x.rejected_by_a_fail_proof), esc(x.released_unrevealed), x.model_and_compute_cost ? esc(x.model_and_compute_cost) : '<span class="faint">not supplied</span>']), 'xl', 'Earnings')}`)}
+        ${collapse('plNumbers', 'Numbers: settled by proof and by the timeout rule, reveal to settlement', `<p class="small">From the chain only (every decided attempt); the proving machine from data/provers.json.</p>
+        ${table(['Measure', 'Value'], [['Decided attempts', esc(L.metrics.decided_attempts)], ['Settled by a proof', `${esc(L.metrics.settled_by_proof)} (${esc(Math.round((L.metrics.share_settled_by_proof || 0) * 100))}%)`], ['Settled by the timeout rule (timeout rate)', `${esc(L.metrics.settled_by_timeout)} (${esc(Math.round((L.metrics.timeout_rate || 0) * 100))}%)`],
+          ...Object.entries(L.metrics.reveal_to_settlement_seconds).map(([k, v]) => [`Reveal to settlement, ${esc(k)}`, `median ${esc(dur(v.median))}, slowest ${esc(dur(v.slowest))} (${esc(v.attempts)} attempts)`]),
+          ['Distinct outside accounts', `${esc(L.metrics.distinct_outside_accounts)}${L.metrics.distinct_outside_accounts === 0 ? ': every account so far is run or seeded by the team' : ''}`]], '', 'Numbers')}
+        <p class="small">${esc(L.metrics.timing_note)} Machine-readable: <a href="metrics.json">metrics.json</a>.</p>`)}
+        ${collapse('plVendors', 'Vendors: proved in time or not', `<p class="small">For each revealed attempt: decided by a proof before its deadline, or not (then the timeout rule paid it, or it is still waiting past its deadline).</p>
+        ${table(['Vendor', 'Who runs it', 'Bounties', 'Proved in time', 'Not proved in time', 'Waiting past deadline'], L.vendors.map((v) => [names.has(v.vendor) ? acct(v.vendor) : esc(v.vendor), kindChip(v.kind), esc(v.bounties), esc(v.proved_on_time), esc(v.not_proved_in_time), esc(v.waiting_past_deadline)]), 'wide', 'Vendors')}`)}
+        <p class="small">Machine-readable: <a href="ledger.json">ledger.json</a> (a snapshot made by <span class="mono txt">node scripts/gen_ledger.mjs</span> with the same rules). Transaction links come from the files the repository records; amounts and outcomes come from the chain.</p>`;
+    } catch (e) { const pl = $('#proofLedger'); if (pl) pl.innerHTML = note(`Could not compute the Proof Ledger: ${esc(e.message)}`, 'alert'); }
+  })();
 }

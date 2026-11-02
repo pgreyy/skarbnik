@@ -316,3 +316,4 @@
  .sk .qs-grid>a:not(.qs-card),.sk .qs-grid>a:nth-of-type(n+4){order:4}
  .sk .qs-panel{order:2}
 }
+.sk :where(.p-evidence) .nums b.ld{font:500 15px/1.4 var(--fu);color:var(--tx3);letter-spacing:0}

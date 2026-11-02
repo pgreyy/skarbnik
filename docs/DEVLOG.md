@@ -2,6 +2,38 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Evidence draws at once; live values fill in afterwards (local)
+
+- `web/js/pages/evidence.js`: the page no longer waits for the testnet node before drawing. Tabs, headings, the
+  examples, the static numbers and every drop down appear from the site's own files. The live values (paid by proof
+  and by timeout, the bounty count, the settlement ledger, the Proof Ledger, the paid by proof list on Limits, the
+  deployment and the allowlist) say "Loading from the contract" and fill in when the contract answers. If the node
+  gives no answer within 4 seconds, the saved snapshots (feed.json, ledger.json) are shown with "Live data unavailable,
+  showing the saved list" and the time they were saved; the deployment says the live data is unavailable just now and
+  links the explorer. The node counts as answering once the bounty list arrives: the full read of every attempt then
+  took 3.4 to 7.7 s in three browser runs, so it is allowed up to 30 s instead of being cut at 4.
+- The live parts run after the page is returned to the router, so a slow node no longer holds the router (its scroll
+  to the top and the page announcement). `web/js/pages/home.js`: the same for Home's paid by proof line.
+- Checked the other pages for the same wait: Bounties draws from the saved feed first and replaces it with the live
+  read; For agents, For vendors, How it works and the Judge guide read only the site's own files. No change needed.
+  A single bounty page (#/bounties/N) still waits for that bounty from the node, as it has no saved copy of its
+  attempts; not changed here.
+- Measured with a private script: a fresh browser context per run, time from navigation to the first Evidence tab,
+  three runs each, local server, the node "slow" meaning every request to an RPC host held 30 s.
+
+  | Load | Node | Before (median) | After (median) |
+  | --- | --- | --- | --- |
+  | /evidence/ | answering | 5,005 ms | 281 ms |
+  | #/evidence | answering | 6,415 ms | 164 ms |
+  | /evidence/ | slow | 6,543 ms | 347 ms |
+  | #/evidence | slow | 6,441 ms | 251 ms |
+
+  The live site before (skarbnik.xyz, same script): 8,177, 8,546, 8,448 and 8,510 ms, with one slow run at 35,284 ms.
+- Checked: with the node slow, "Loading from the contract" in each live place at once, and after 4 s the saved
+  values, the date and the unavailable line, at 1440 and 390, dark and light; with the node answering the live values
+  fill in with no unavailable line; the Evidence page script (tabs, old links, 13 limits, drop downs) passes; no
+  script errors. The saved no-JS /evidence/ page is unchanged.
+
 ## 2026-11-03: For vendors, Host: how a repair is checked, how payment works (local)
 
 - The two sections the rebuild had dropped ("How is a repair evaluated?" and "How does settlement work?") are back,
