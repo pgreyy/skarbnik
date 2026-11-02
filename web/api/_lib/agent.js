@@ -137,17 +137,28 @@ async function patchBytes(a) {
   try { mod = w.parseWat('patch.wat', String(a.wat)); mod.resolveNames(); mod.validate(); } catch (e) { throw new Fail(`the WAT does not assemble: ${String(e.message || e).slice(0, 600)}`); }
   try { return new Uint8Array(mod.toBinary({}).buffer); } finally { mod.destroy(); }
 }
-function iface(bytes) {
-  let m;
-  try { m = new WebAssembly.Module(bytes); } catch (e) { return `not a valid WebAssembly module: ${e.message}`; }
-  if (WebAssembly.Module.imports(m).length) return 'the module has imports; it must have none';
-  const ex = Object.fromEntries(WebAssembly.Module.exports(m).map((e) => [e.name, e.kind]));
-  if (ex.input_buf !== 'function' || ex.parse !== 'function' || ex.memory !== 'memory') return 'the module must export memory, input_buf and parse';
+// The fix's exports against the public program's: the same names and kinds, the same number of parameters for each
+// function, and no imports. Returns null when they match, else what differs.
+function exportsOf(bytes) {
+  const m = new WebAssembly.Module(bytes);
+  const inst = WebAssembly.Module.imports(m).length ? null : new WebAssembly.Instance(m, {});
+  return { imports: WebAssembly.Module.imports(m).length, list: WebAssembly.Module.exports(m).map((e) => `${e.name}:${e.kind}${e.kind === 'function' && inst ? `/${inst.exports[e.name].length}` : ''}`).sort() };
+}
+function iface(bytes, original) {
+  let mine;
+  try { mine = exportsOf(bytes); } catch (e) { return `not a valid WebAssembly module: ${String(e.message).slice(0, 200)}`; }
+  if (mine.imports) return 'the module has imports; the public program has none';
+  const want = exportsOf(original).list;
+  if (mine.list.join() !== want.join()) return `the exports differ from the public program's: it exports ${want.join(', ')}; this exports ${mine.list.join(', ') || 'nothing'}`;
   return null;
 }
 function parseTests(text) {
   return text.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')).map((l) => { const [inp, want] = l.split(/\s+/); return { hex: inp === '-' ? '' : inp, want: Number(want) }; });
 }
+// The public demo input (published on purpose, data/demo/README.md): a bounty whose exploit commitment equals the
+// public demo bounty's (bounty 7) uses it, so check_patch can also run it there.
+const DEMO_INPUT_URL = 'https://raw.githubusercontent.com/pgreyy/skarbnik/main/data/demo/exploit.hex';
+const DEMO_BOUNTY = '7';
 const WORKER = `const { parentPort, workerData } = require('node:worker_threads');
 const m = new WebAssembly.Module(workerData.bytes); const out = [];
 for (const t of workerData.tests) {
@@ -167,18 +178,26 @@ function runTests(bytes, tests, ms = 4000) {
 async function checkPatch(bid, bytes, b) {
   const row = await publicCode(bid, b);
   const tests = parseTests(await site(row.public_code.tests));
-  const bad = iface(bytes);
-  const res = bad ? null : await runTests(bytes, tests);
+  const original = await site(row.public_code.module, true);
+  const bad = iface(bytes, original);
+  // On a bounty that uses the public demo input, that input runs too (the last item): the fix must not crash on it.
+  let demo = false;
+  if (!bad) { const d = bid === DEMO_BOUNTY ? b : await bounty(DEMO_BOUNTY).catch(() => null); demo = !!d && d.exploit_commitment === b.exploit_commitment; }
+  const extra = demo ? [{ hex: (await (await fetch(DEMO_INPUT_URL, { signal: AbortSignal.timeout(20000) })).text()).replace(/\s+/g, ''), want: null }] : [];
+  const res = bad ? null : await runTests(bytes, tests.concat(extra));
   const fails = res ? tests.map((t, i) => ({ ...t, ...res[i] })).filter((t) => t.trap || t.got !== t.want) : [];
+  const demoRun = res && demo ? res[tests.length] : null;
   const hash = sha256(bytes);
   return {
     bytes: bytes.length, sha256: hash, max_patch_bytes: b.max_patch_bytes, fits: bytes.length <= b.max_patch_bytes,
     same_as_original: hash === b.original_hash, interface_ok: !bad, interface_problem: bad || undefined,
     public_tests: res ? { passed: tests.length - fails.length, of: tests.length, failures: fails.slice(0, 5).map((f) => ({ input_hex: f.hex.slice(0, 64), expected: f.want, got: f.got, trapped: f.trap })) }
       : bad ? undefined : { passed: 0, of: tests.length, note: 'the tests did not finish within 4 seconds (too slow or an endless loop)' },
+    public_demo_input: demo ? (demoRun ? { crashes: !!demoRun.trap, trap: demoRun.trap } : { crashes: null, note: 'did not finish within 4 seconds' }) : undefined,
+    note: 'This checks the module, its exports and the public tests' + (demo ? ' and the public demo input' : '') + '. It does not show that the fix passes the bounty\'s private test: only the vendor\'s proof decides that.',
   };
 }
-const patchOk = (c) => c.fits && !c.same_as_original && c.interface_ok && c.public_tests && c.public_tests.passed === c.public_tests.of;
+const patchOk = (c) => c.fits && !c.same_as_original && c.interface_ok && c.public_tests && c.public_tests.passed === c.public_tests.of && !(c.public_demo_input && c.public_demo_input.crashes !== false);
 
 // The attempt's nonce, derived so nothing has to be stored: HMAC-SHA256 under the key's seed over the bounty, the
 // payout and the patch's hash. Unknown to anyone without the key; the same patch gives the same nonce at reveal.
@@ -260,7 +279,7 @@ const TOOLS = {
     },
   },
   check_patch: {
-    ro: true, d: 'Assemble a fix (the whole module as WAT, or patch_base64) and check it before spending anything: size against the bounty\'s limit, the interface, and every public test. Sends nothing.',
+    ro: true, d: 'Check a fix before spending anything: turns the WebAssembly text (or patch_base64) into a module, confirms it is valid, that its size fits and that its exports match the public program, and runs the public tests; on a bounty that uses the public demo input it runs that input too. Sends nothing and spends nothing. It does not show that the fix passes the bounty\'s private test: only the vendor\'s proof decides that.',
     p: { bounty_id: { type: 'string' }, wat: { type: 'string', description: 'the whole fixed module as WebAssembly text' }, patch_base64: { type: 'string', description: 'or the fixed .wasm module in base64' } }, r: ['bounty_id'],
     async run(k, a) {
       const bid = String(a.bounty_id); const b = await bounty(bid); const bytes = await patchBytes(a);

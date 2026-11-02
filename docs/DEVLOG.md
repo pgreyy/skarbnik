@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: check_patch compares exports and runs the public demo input
+
+- `web/api/_lib/agent.js`: check_patch now compares the fix's exports with the public program's (names, kinds and
+  parameter counts; no imports) and, on a bounty whose exploit commitment equals the public demo bounty's (bounty 7),
+  also runs the public demo input (`data/demo/exploit.hex`, published on purpose): the fix must not crash on it. Its
+  description and its answer say plainly that it does not show that the fix passes the private test. Nothing is sent
+  or spent.
+- Local run on bounties 34 and 7: the demo fix passes 17 of 17 and does not crash on the demo input; the original
+  module, as WAT or base64, traps with `unreachable` on it, as `skarbnik-check --explain` reports for the same input;
+  a module whose parse takes two parameters is refused (exports differ). Found on the way: the demo input file groups
+  its hex in spaced blocks; whitespace is now removed before it runs.
+
 ## 2026-11-02: Account page link box: icon copy buttons
 
 - `web/js/ui.js` `copyBtn`: an icon only copy button top right inside a code block (44 px, aria-label and tooltip
@@ -11,7 +23,7 @@ One dated entry per work block: what was done, the exact commands, the results, 
   refuses.
 - Checked through the page with the NEAR CLI wallet at 1280 (dark and light) and 390: after a click the button shows
   the check mark, reads "Copied", does not move, and the clipboard holds the link; back after 1.5 s; no sideways
-  scroll. The three test keys added were deleted (`zqheheya…`, `98Wu3nMG…`). No credit used.
+  scroll. The two test keys added were deleted (`zqheheya…`, `98Wu3nMG…`). No credit used.
 
 ## 2026-11-02: For agents page back to the live version
 
