@@ -234,8 +234,8 @@ ${kv([['Verdict window', '4 hours'], ['Proof checked', 'No'], ['Secret input', '
 </div>
 <div class="n-links">
 <a class="vrow" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener"><span class="vico">${icon('cube')}</span><span><b class="h4" style="display:block">The contract on the explorer</b><span class="small">Read the code hash and the bounties on NEAR itself</span></span>${icon('ext')}</a>
-<a class="vrow" href="#/evidence/ledger"><span class="vico">${icon('list')}</span><span><b class="h4" style="display:block">The settlement ledger</b><span class="small">Every paid bounty, by proof or by timeout, with transactions</span></span>${icon('right')}</a>
-<a class="vrow" href="#/evidence/checker"><span class="vico">${icon('cpu')}</span><span><b class="h4" style="display:block">The approved checker</b><span class="small">Rebuild it yourself and compare the fingerprint</span></span>${icon('right')}</a>
+<a class="vrow" href="#/evidence/bounties"><span class="vico">${icon('list')}</span><span><b class="h4" style="display:block">The settlement ledger</b><span class="small">Every paid bounty, by proof or by timeout, with transactions</span></span>${icon('right')}</a>
+<a class="vrow" href="#/evidence/proofs"><span class="vico">${icon('cpu')}</span><span><b class="h4" style="display:block">The approved checker</b><span class="small">Rebuild it yourself and compare the fingerprint</span></span>${icon('right')}</a>
 <a class="vrow" href="#/evidence/limits"><span class="vico">${icon('alert')}</span><span><b class="h4" style="display:block">Known limits</b><span class="small">What is not claimed, in plain words</span></span>${icon('right')}</a>
 <a class="vrow" href="#/judge"><span class="vico">${icon('book')}</span><span><b class="h4" style="display:block">The judge guide</b><span class="small">Do, expect, verify, with what each step proves and does not prove</span></span>${icon('right')}</a>
 </div>

@@ -5,7 +5,8 @@
 // #/how-it-works, #/bounties,
 // #/bounties/<id>[/<tab>], #/raw/<id>, #/evidence[/<tab>], #/judge[/<tab>], #/agents[/<tab>], #/vendors[/<tab>],
 // #/account[/<name>[/<tab>]]. The tabs of For agents and For vendors also open from short links (#connect, #host ...).
-// Old routes: #/ledger, #/arena, #/verify and #/agent redirect to their new place. A saved copy at a real path (/judge/)
+// Old routes: #/ledger, #/arena, #/verify and #/agent redirect to their new place; #/evidence/ledger and
+// #/evidence/checker open the Bounties and Proofs tabs. A saved copy at a real path (/judge/)
 // opens its #/ route (and /agents/#connect its tab). Live screens read the testnet
 // contract with view calls (js/chain.js); recorded parts read data/recorded.json. No sample data.
 import { CONTRACT, EXPLORER_ACCOUNT } from './chain.js';
@@ -56,7 +57,7 @@ $('#footContract').href = EXPLORER_ACCOUNT + CONTRACT;
 
 // ---------- router ----------
 const TITLES = { 'how-it-works': 'How it works', bounties: 'Bounties', evidence: 'Proof and evidence', judge: 'Judge guide', agents: 'For agents', vendors: 'For vendors', account: 'Account', raw: 'Raw data' };
-const OLD = { ledger: '#/evidence/ledger', verify: '#/evidence/checker' };
+const OLD = { ledger: '#/evidence/bounties', verify: '#/evidence/proofs' };
 // Short links to the tabs of For agents and For vendors (#connect, /agents/#connect): each opens its tab.
 const TAB_LINKS = { connect: 'agents', key: 'agents', fees: 'agents', developers: 'agents', host: 'vendors', need: 'vendors', private: 'vendors', proving: 'vendors', limits: 'vendors' };
 // Short links to a way inside a tab (#way-link ...): the page, its tab and the way.

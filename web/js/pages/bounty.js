@@ -176,7 +176,7 @@ ${cmd(`./scripts/check_image_id.sh ${CONTRACT} ${id}`)}
 ${String(id) === '16' ? '<p class="small">Bounty 17 used a new module with a private secret and was paid by timeout, not by a proof.</p><a class="lnk" href="#/bounties/17">Open bounty 17 ' + icon('right') + '</a>'
   : '<p class="small">Bounty 16 used the public demo module and was paid by a verified proof.</p><a class="lnk" href="#/bounties/16">Open bounty 16 ' + icon('right') + '</a>'}
 ${others.length ? `<p class="small">Other new module bounties: ${others.map((o) => `<a href="#/bounties/${esc(o)}">bounty ${esc(o)}</a>`).join(', ')}.</p>` : ''}
-<a class="lnk" href="#/evidence/ledger">See the evidence ledger ${icon('right')}</a>
+<a class="lnk" href="#/evidence/bounties">See the evidence ledger ${icon('right')}</a>
 </div>
 </aside>
 </div>

@@ -290,3 +290,13 @@
  .sk .ag-ill-pop{margin-right:0}
 }
 .sk .ag-where td:first-child{width:22%;color:var(--tx)}
+/* Evidence: the paid bounties as rows on the Overview tab; the four examples inside their drop downs */
+.sk .ev-paid{display:flex;flex-direction:column;border-top:1px solid var(--ln)}
+.sk .ev-row{display:grid;grid-template-columns:110px 170px minmax(0,1fr) auto;gap:8px 18px;align-items:center;padding:14px 0;border-bottom:1px solid var(--ln)}
+.sk .ev-row .lid{font:600 15px/1.2 var(--fu);color:var(--tx);text-decoration:none}
+.sk .ev-row .lid:hover{color:var(--am)}
+.sk .ev-ex .n-ex{margin:0;box-shadow:none}
+@container sk (max-width:760px){
+ .sk .ev-row{grid-template-columns:auto minmax(0,1fr);align-items:start}
+ .sk .ev-row p,.sk .ev-row .tx{grid-column:1/-1}
+}

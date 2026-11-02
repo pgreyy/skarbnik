@@ -24,6 +24,22 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
+## 2026-11-02: Evidence page in six tabs (local, not live)
+
+- Before: a header, four example cards, the team run notes, "The technical record" with the key numbers, five tabs
+  (Ledger, Checker, Contract, Security Lab, Limits) and the status vocabulary below them, all on one long page.
+- Now six tabs with one word labels: Overview (what the page shows, the paid bounties 24, 32, 33 and 17 as rows with
+  their deciding transaction, the team run notes, the key numbers, the status labels in a drop down), Bounties (the four
+  examples, each in a drop down, the settlement ledger, the Proof Ledger with its tables in drop downs), Proofs (the
+  checker; the repository commands in a drop down), Contract (build verification, refused attacks, who may call what,
+  fees, levels and the read only commands in drop downs), Lab (its two tables in drop downs) and Limits (all twelve,
+  visible). Nothing was removed. The tab is kept in the address; #/evidence/ledger and #/evidence/checker (and the old
+  #/ledger and #/verify) open Bounties and Proofs; in-site links now use the new names.
+- Checked with a private script: 12 links land on the right tab (#/evidence, the six tabs, the old ledger and checker,
+  #/ledger, #/verify, /evidence/), arrow keys, the paid rows with explorer links, 20 drop downs closed by default, the 12
+  limits visible; screenshots of each tab and of an open drop down at 1440 and 390, dark and light; no sideways scroll,
+  no script errors. The saved /evidence/ page keeps all content in order with the tab names as headings.
+
 ## 2026-11-02: For agents: key in place, Local in plain view, key file found by itself (local, not live)
 
 - Step 03 has a "Create agent key" button that works in place: it connects the wallet if needed, makes the key with the
