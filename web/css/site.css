@@ -280,3 +280,5 @@ body.sk>main{flex:1 0 auto}
 .sk .cpy .i-ok{visibility:hidden;color:var(--mn)}
 .sk .cpy.done .i-cp{visibility:hidden}
 .sk .cpy.done .i-ok{visibility:visible}
+.sk .cblk>.imgid{padding-right:52px}
+.sk .cpy.inl{position:static;display:inline-grid;vertical-align:middle;margin:-10px -4px}

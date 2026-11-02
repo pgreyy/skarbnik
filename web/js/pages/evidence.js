@@ -8,7 +8,7 @@
 // Security Lab: how much repeated attempts can learn, the recorded probe run, and the guarded (real, testnet) vs
 // unguarded (simulated) recording. Limits: what is not claimed. Then the status vocabulary.
 import { CONTRACT, RPCS, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, near, submissions, accessKeys } from '../chain.js';
-import { $, esc, icon, chip, tx, acct, hashCell, table, note, cmd, facts, tabbed, seg, bindSeg } from '../ui.js';
+import { $, esc, icon, copyBtn, chip, tx, acct, hashCell, table, note, cmd, facts, tabbed, seg, bindSeg } from '../ui.js';
 import { STATUS } from '../status.js';
 import { loadAll, fromFeed, getRecorded, getMeta, getNumbers, txsOf, paidByProof } from '../data.js';
 import { buildLedger } from '../ledger-core.js';
@@ -144,9 +144,9 @@ ${EXAMPLES()}
     <div style="max-width:700px"><h2 class="h2s">The approved checker</h2><p class="body" style="margin-top:12px">A proof counts only for one checker program. Its fingerprint, the image id, is the only id on the contract’s allowlist, and anyone can rebuild the checker and compare.</p></div>
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><p class="eyebrow" style="color:var(--tx3)">Image id on the allowlist</p>${check ? chip('l-demo', `MATCH on rebuild, ${check.utc.slice(0, 10)}`, 'check') : ''}</div>
-    <p class="imgid">${esc(PUBLISHED_IMAGE_ID)}</p>
+    <div class="cblk"><p class="imgid">${esc(PUBLISHED_IMAGE_ID)}</p>${copyBtn(PUBLISHED_IMAGE_ID)}</div>
     <p class="small" id="allowLine">Reading the allowlist from testnet…</p>
-    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><button class="btn btn-g btn-s" type="button" data-copy-text="${esc(PUBLISHED_IMAGE_ID)}">${icon('copy')} Copy image id</button>${tx(nums.allowlist_tx.tx, 'allowlisted in')}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">${tx(nums.allowlist_tx.tx, 'allowlisted in')}</div>
     </div>
     <div class="two">
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px">

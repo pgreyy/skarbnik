@@ -438,7 +438,7 @@ async function drawAccount(name) {
       <div class="mt16">${keys === null ? '<p class="small">Could not read the account’s access keys.</p>'
         : agentKeys.length ? table(['Agent key', 'Scope', 'Spend cap', 'Spent', 'Status', ...(me ? [''] : [])], agentKeys.map((k) => {
           const fc = k.access_key.permission.FunctionCall;
-          return [`<span class="hsh"><code title="${esc(k.public_key)}">${esc(k.public_key.slice(0, 20))}…</code><button class="mini" type="button" data-copy-text="${esc(k.public_key)}">Copy</button></span><span class="small">function call key</span>`,
+          return [`<span class="hsh"><code title="${esc(k.public_key)}">${esc(k.public_key.slice(0, 20))}…</code>${copyBtn(k.public_key).replace('class="cpy"', 'class="cpy inl"')}</span><span class="small">function call key</span>`,
             `${scope(fc.method_names)}<span class="small">gas allowance left ${fc.allowance ? esc(near(fc.allowance)) : 'not limited'}</span>`,
             `<span class="mono nw">${lim.max_fee_per_commit ? esc(near(lim.max_fee_per_commit)) : 'none set'}</span><span class="small">per attempt</span>`,
             `<span class="mono nw">${esc(near(spent.toString()))}</span>`, stopped ? BAD('Stopped') : chip('k-open', 'Active'),

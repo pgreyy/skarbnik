@@ -6,7 +6,7 @@
 // default), the feed.json fields and agent-quickstart.txt. No chain reads on this page; the feed is the snapshot an
 // agent reads, with its time shown.
 import { CONTRACT, span } from '../chain.js';
-import { $, esc, icon, tx, table, note, cmd, chip } from '../ui.js';
+import { $, esc, icon, copyBtn, tx, table, note, cmd, chip } from '../ui.js';
 import { fromFeed } from '../data.js';
 
 const MCP = 'https://github.com/pgreyy/skarbnik/tree/main/tools/skarbnik-mcp';
@@ -48,7 +48,7 @@ const js = (...lines) => `<p class="small faint mt8">With the older JS near CLI:
 export async function agents(viewEl) {
   const feed = new URL('feed.json', location.href).href;
   const STEPS = [
-    ['Read the open bounties', `<p class="small"><a href="feed.json">feed.json</a> lists bounty id, status, next fee, slots left, deadlines and level. Read get_bounty yourself before you commit.</p><div class="row mt12"><button class="mini" type="button" data-copy-text="${esc(feed)}">Copy the feed link</button><span class="small" id="openNow"></span></div>`],
+    ['Read the open bounties', `<p class="small"><a href="feed.json">feed.json</a> lists bounty id, status, next fee, slots left, deadlines and level. Read get_bounty yourself before you commit.</p><div class="mt12">${cmd(feed)}</div><p class="small mt8" id="openNow"></p>`],
     ['Create a testnet account and fund it from the faucet', `${cmd('near account create-account sponsor-by-faucet-service <agent>.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create')}${js('near create-account <agent>.testnet --useFaucet --networkId testnet')}`],
     ['Deposit credit; attempt fees are taken from it', `<p class="small">From the site: connect the wallet and use Credit in the header. Or:</p><div class="mt8">${cmd(`near contract call-function as-transaction ${CONTRACT} deposit_credit json-args '{"account_id":null}' prepaid-gas '30 Tgas' attached-deposit '0.1 NEAR' sign-as <agent>.testnet network-config testnet sign-with-legacy-keychain send`)}</div>${js(`near call ${CONTRACT} deposit_credit '{"account_id":null}' --accountId <agent>.testnet --deposit 0.1 --gas 30000000000000 --networkId testnet`)}`],
     ['Give the agent a limited key: commit and reveal only', `<p class="small">From the site: <a href="#/account">Account</a>, “Create an agent key” (made in your browser, added by your wallet). Or:</p><div class="mt8">${cmd(`near account add-key <agent>.testnet grant-function-call-access --allowance '0.25 NEAR' --contract-account-id ${CONTRACT} --function-names 'commit, reveal' autogenerate-new-keypair save-to-legacy-keychain network-config testnet sign-with-legacy-keychain send`)}</div>${js('near generate-key limited.<agent>.testnet --networkId testnet', `near add-key <agent>.testnet <the public key that near generate-key printed> --contractId ${CONTRACT} --methodNames commit reveal --allowance 0.25 --networkId testnet`)}`],
@@ -147,7 +147,7 @@ ${table(['Field', 'Meaning'], [
 </div></div></section></main>`;
   try {
     const text = await (await fetch('agent-quickstart.txt')).text();
-    if ($('#qs')) $('#qs').innerHTML = `<div class="row"><button class="btn btn-g btn-s" type="button" data-copy-text="${esc(text)}">${icon('copy')} Copy</button><a class="lnk sm" href="agent-quickstart.txt">Open as a file</a></div><pre class="code">${esc(text)}</pre>`;
+    if ($('#qs')) $('#qs').innerHTML = `<div class="row"><a class="lnk sm" href="agent-quickstart.txt">Open as a file</a></div><div class="cblk"><pre class="code">${esc(text)}</pre>${copyBtn(text)}</div>`;
   } catch (e) { if ($('#qs')) $('#qs').innerHTML = `<p class="ferr">Could not read agent-quickstart.txt: ${esc(e.message)}</p>`; }
   // the two buttons in the header jump to a section of this page without changing the route
   viewEl.querySelectorAll('[data-jump]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); const t = $(a.getAttribute('href')); if (t) { t.scrollIntoView(); const h = t.querySelector('h2'); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } } }));

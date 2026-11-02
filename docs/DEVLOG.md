@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: Icon copy buttons everywhere
+
+- Every text "Copy" button is now the icon only `copyBtn` (`web/js/ui.js`): inside the top right of code blocks
+  (`cmd`, `block`, a bounty's raw view, the checker's image id on Evidence, the quickstart and the feed link on For
+  agents) and inline next to hashes (`hashCell`, the agent keys on the Account page). The saved no-JS pages drop all
+  buttons, so their code blocks have none.
+- Checked with a private script on For agents, Judge guide, Evidence (Checker), a raw bounty view, bounty 24 and For
+  vendors at 1440 and 390, dark and light: no text Copy button left; a click shows the check mark and "Copied", the
+  button stays 44 by 44 and does not move, the clipboard holds the value; no sideways scroll, no script errors.
+
 ## 2026-11-02: check_patch compares exports and runs the public demo input
 
 - `web/api/_lib/agent.js`: check_patch now compares the fix's exports with the public program's (names, kinds and

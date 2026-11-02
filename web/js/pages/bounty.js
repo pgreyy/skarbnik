@@ -5,7 +5,7 @@
 // after scripts/check_image_id.sh printed MATCH) and a comparison. Everything except the descriptive words is read from
 // the chain and from data/recorded.json. Also the raw data page (#/raw/<id>).
 import { CONTRACT, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, submissions, near, utc, utcShort, span, left, commitBy } from '../chain.js';
-import { $, esc, icon, chip, tx, acct, hashCell, table, facts, note, cmd, tabbed } from '../ui.js';
+import { $, esc, icon, copyBtn, chip, tx, acct, hashCell, table, facts, note, cmd, tabbed } from '../ui.js';
 import { STATUS, kindOf, kindChips, statusOf, accepting, isJudge, isNewModule } from '../status.js';
 import { getRecorded, getMeta } from '../data.js';
 import { attemptPanel } from '../account-ui.js';
@@ -198,6 +198,6 @@ export async function raw(viewEl, id) {
   try {
     const b = await view('get_bounty', { bounty_id: String(id) }, { fresh: true });
     $('#rawLead').innerHTML = `The live result of <span class="mono txt">get_bounty {"bounty_id":"${esc(id)}"}</span> on ${esc(CONTRACT)}, read ${esc(new Date().toISOString().slice(0, 19).replace('T', ' '))} UTC. Skarbnik was built under the working name Kintsugi; the testnet contract keeps that name.`;
-    $('#raw').innerHTML = `<div class="stack g16"><pre class="code">${esc(JSON.stringify(b, null, 2))}</pre><div><button class="btn btn-g btn-s" type="button" data-copy-text="${esc(JSON.stringify(b))}">${icon('copy')} Copy</button> <a class="lnk sm" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">The contract on the explorer ${icon('ext')}</a></div></div>`;
+    $('#raw').innerHTML = `<div class="stack g16"><div class="cblk"><pre class="code">${esc(JSON.stringify(b, null, 2))}</pre>${copyBtn(JSON.stringify(b))}</div><div><a class="lnk sm" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">The contract on the explorer ${icon('ext')}</a></div></div>`;
   } catch (e) { $('#raw').innerHTML = note(`Could not read: ${esc(e.message)}`, 'alert'); }
 }

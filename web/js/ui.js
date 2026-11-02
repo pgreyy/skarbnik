@@ -20,7 +20,7 @@ export const acct = (a) => `<a class="mono acct-link" style="color:var(--tx)" hr
 
 // A long hash: first 8 and last 4 characters, with Copy and Show full (handled once, in initUi).
 export const hashCell = (h) => `<span class="hsh"><code data-full="${esc(h)}" data-short="${esc(shortId(h))}">${esc(shortId(h))}</code>` +
-  `<button class="mini" type="button" data-copy-text="${esc(h)}" aria-label="Copy the full value">Copy</button>` +
+  copyBtn(h).replace('class="cpy"', 'class="cpy inl"') +
   `<button class="mini" type="button" data-toggle-full aria-expanded="false">Show full</button></span>`;
 
 // An icon only copy button, placed top right inside a code block (.cblk): 44 px tap target, aria-label and tooltip
@@ -29,10 +29,10 @@ export const hashCell = (h) => `<span class="hsh"><code data-full="${esc(h)}" da
 export const copyBtn = (text, label = 'Copy') => `<button class="cpy" type="button" data-copy-text="${esc(text)}" aria-label="${esc(label)}" title="${esc(label)}">${icon('copy', 'i i-cp')}${icon('check', 'i i-ok')}</button>`;
 
 // A command with a Copy button.
-export const cmd = (text) => `<div class="code-row"><p class="code">${esc(text)}</p><button class="mini" type="button" data-copy-text="${esc(text)}" aria-label="Copy the command">Copy</button></div>`;
+export const cmd = (text) => `<div class="cblk"><p class="code">${esc(text)}</p>${copyBtn(text)}</div>`;
 
 // A block of several lines (settings, a prompt, commands) with a Copy button; label names it for screen readers.
-export const block = (text, label = 'Copy') => `<div class="code-row"><pre class="code">${esc(text)}</pre><button class="mini" type="button" data-copy-text="${esc(text)}" aria-label="${esc(label)}">Copy</button></div>`;
+export const block = (text) => `<div class="cblk"><pre class="code">${esc(text)}</pre>${copyBtn(text)}</div>`;
 
 // A collapsible panel, closed by default: the title is a button with aria-expanded; the round chevron turns and goes
 // amber when open (handled once, in initUi). The saved copy for readers without JavaScript shows it open.
