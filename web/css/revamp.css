@@ -302,3 +302,5 @@
 }
 .sk .clp-t{display:flex;flex-direction:column;gap:4px}
 .sk .clp-sub{font:400 13.5px/1.45 var(--fu);color:var(--tx2)}
+.sk .ag-dlg-btns{display:flex;justify-content:flex-end;gap:8px}
+.sk .ag-dlg-btn2{padding:7px 16px;border-radius:8px;border:1px solid var(--ln2);color:var(--tx2)}

@@ -42,6 +42,7 @@ const LIMITS = (live) => [
   ['hash', '', 'One verdict leaks one bit', 'K is the leak budget. A per-account cap (deployed 2026-10-26) limits how many slots one account holds, but one person with many accounts can still fill a bounty’s slots.'],
   ['link', '', 'Level 1 is not built', 'The OutLayer path exists but never answered on testnet. Every current bounty is Level 2 or the older Level 0.'],
   ['wallet', '', 'Only one wallet has signed here', 'NEAR CLI was clicked through to real transactions. The other wallets were only loaded, not signed in.'],
+  ['user', '', 'Run by the team, not outside customers', 'These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside customers.', '<span id="paidSoFar">Paid by proof so far: reading the contract…</span>'],
 ];
 
 const GH = 'https://github.com/pgreyy/skarbnik';
@@ -90,7 +91,6 @@ export async function evidence(viewEl, tab) {
   const overview = `<div class="stack g28">
     <div style="max-width:720px" class="stack g12"><h2 class="h2s" id="deeper">What this page shows</h2><p class="body">The path works on NEAR testnet: bounties were paid by a proof the contract checked, and one was paid by the timeout rule, labelled as such. Each row links to the transaction that decided it.</p></div>
     ${PAID_ROWS()}
-    <div class="note">${icon('info')}<p>These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside customers. <span id="paidSoFar">Paid by proof so far: reading the contract…</span></p></div>
     <div class="note">${icon('info')}<p><b style="color:var(--tx)">What these show:</b> the path works on testnet. <b style="color:var(--tx)">What they do not show:</b> that every bug can be handled, that the system is production ready, or that an external audit has happened.</p></div>
     <p class="small" id="ctSum">Reading the contract…</p>
     <div class="nums" role="list" aria-label="Key numbers" id="nums"><div role="listitem"><b>…</b><span>Reading from testnet</span></div></div>
@@ -244,7 +244,7 @@ export async function evidence(viewEl, tab) {
 
   // ---- Limits
   const limits = `<div class="stack g32"><div style="max-width:700px"><h2 class="h2s">Known limitations, in plain words</h2><p class="body" style="margin-top:12px">These are the points a skeptical reader should check first. None of them is hidden elsewhere.</p></div><div class="lim" id="limList"></div></div>`;
-  const drawLimits = (live) => { const el = $('#limList'); if (el) el.innerHTML = LIMITS(live).map(([i, c, t, d]) => `<div class="card"><span class="ic ${c}">${icon(i)}</span><div><h3 class="h4">${esc(t)}</h3><p class="small" style="margin-top:6px">${esc(d)}</p></div></div>`).join(''); };
+  const drawLimits = (live) => { const el = $('#limList'); if (el) el.innerHTML = LIMITS(live).map(([i, c, t, d, live2]) => `<div class="card"><span class="ic ${c}">${icon(i)}</span><div><h3 class="h4">${esc(t)}</h3><p class="small" style="margin-top:6px">${esc(d)}${live2 ? ` ${live2}` : ''}</p></div></div>`).join(''); showPaid(); };
 
   const ids = { overview: 'Overview', bounties: 'Bounties', proofs: 'Proofs', contract: 'Contract', lab: 'Lab', limits: 'Limits' };
   const html = { overview, bounties: ledger, proofs: checker, contract, lab, limits };

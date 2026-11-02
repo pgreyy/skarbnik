@@ -24,6 +24,21 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
+## 2026-11-03: Evidence team note moved to Limits; For agents step 03 and Link way simplified (local)
+
+- Evidence: the note "These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside
+  customers", with the live list of bounties paid by proof, moved from the Overview tab to a Limits row of its own
+  ("Run by the team, not outside customers"); Limits had no such row before. 13 limits now.
+- For agents, step 03: the Example tag and the sample link box are gone; the button, the dialog, the warning and
+  "Manage or delete keys" are unchanged.
+- For agents, Link way, in plain view: one line, three numbered steps, a two column table (App, Where to find it), the
+  Add custom connector illustration with Cancel and Add, and one closed drop down, "Then: how do I know it worked?",
+  which now holds the per app details that sat in the old table (Continue and No sign in in Claude, the ChatGPT form,
+  turning Skarbnik on in a chat). The "Where do I paste it in my app?" drop down is gone. AGENTS.md and
+  agent-quickstart.txt only say to paste the link where the app adds a custom connector, so they stay as they are.
+- Checked: the For agents script (step 03, the dialog, the Link way layout, Local) and the Evidence script (13 limits,
+  every link and tab) at 1440 and 390, dark and light, no errors; saved /agents/ and /evidence/ regenerated.
+
 ## 2026-11-02: For vendors page rebuilt (part B, local)
 
 - `web/js/pages/vendors.js`: "Host a private repair bounty." Tabs Host (5 steps), Setup, Privacy, Compute, Limits, with
