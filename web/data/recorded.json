@@ -1466,6 +1466,48 @@
     "script": "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py"
    }
   ],
+  "34": [
+   {
+    "step": "hosted_create",
+    "method": "create_bounty",
+    "tx": "Csy4aGw4SauYp98UVMQ1iVgdgT6XB4xSqhMPaef5KneD",
+    "what": "Bounty created",
+    "time": "2026-11-02 20:11 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/hosted_mcp/transactions.tsv",
+    "script": "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)"
+   },
+   {
+    "step": "hosted_open",
+    "method": "open_with_groth16",
+    "tx": "FVJt1sM3ek6ebyiJvqfP9hJs2f5wXhRovYiGoS781CMy",
+    "what": "Opened with its Proof 0",
+    "time": "2026-11-02 20:11 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/hosted_mcp/transactions.tsv",
+    "script": "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)"
+   },
+   {
+    "step": "hosted_local_commit",
+    "method": "commit",
+    "tx": "82pR75AXoQsKLdeocWti2J5HxM3DvSoXFyaQ9z44MPG8",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/hosted_mcp/transactions.tsv",
+    "script": "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)"
+   },
+   {
+    "step": "hosted_local_reveal",
+    "method": "reveal",
+    "tx": "HDRg1odye5Yerx6bNiTk1nhZoWgFV6DoF9cFVXx2tPsX",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/hosted_mcp/transactions.tsv",
+    "script": "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)"
+   }
+  ],
   "23": [
    {
     "step": "cleanup_b23_expire",
@@ -2027,6 +2069,7 @@
   "16": "Test bounty: made for the real run of the model-driven agent (agent/).",
   "25": "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo.",
   "26": "Test bounty: made for the agent access tests (AGENTS.md followed literally, and the MCP server). Not a demo.",
+  "34": "Test bounty: made for the hosted agent connector's tests (commit and reveal through the link). The program is the public demo; nobody proves its attempts, so the timeout rule settles them. Not a demo.",
   "32": "Test bounty: made for the vendor tool's end to end test (tools/skarbnik-vendor watch proves its attempt on a rented GPU with no one's help). Its secret is private, made on the vendor's VPS, but the program is the public demo.",
   "23": "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
  },
