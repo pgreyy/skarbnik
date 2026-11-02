@@ -300,3 +300,5 @@
  .sk .ev-row{grid-template-columns:auto minmax(0,1fr);align-items:start}
  .sk .ev-row p,.sk .ev-row .tx{grid-column:1/-1}
 }
+.sk .clp-t{display:flex;flex-direction:column;gap:4px}
+.sk .clp-sub{font:400 13.5px/1.45 var(--fu);color:var(--tx2)}

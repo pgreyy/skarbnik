@@ -118,7 +118,6 @@ export async function agents(viewEl, tab, sub) {
   <div class="stack g12"><h3 class="h3">The fees right now</h3><div id="agFees"><p class="small">Reading feed.json…</p></div></div></div>`;
 
   const res = [
-    ['Agent quickstart', 'Plain text steps from the first read to the first attempt.', 'agent-quickstart.txt', 'skarbnik.xyz/agent-quickstart.txt'],
     ['AGENTS.md', 'Instructions for coding agents.', 'agents.md', 'skarbnik.xyz/agents.md'],
     ['llms.txt', 'A short index of the site for language models.', 'llms.txt', 'skarbnik.xyz/llms.txt'],
     ['Bounty feed', 'Open bounties, next fee, slots and deadlines as JSON.', 'feed.json', 'skarbnik.xyz/feed.json'],
@@ -148,13 +147,14 @@ export async function agents(viewEl, tab, sub) {
   ];
   const dev = `<div class="stack g32"><div class="stack g8"><h2 class="h2s">Developer details</h2><p class="body">For people building their own agent. Everything is plain text or JSON.</p></div>
   <div class="card r-compat"><span class="r-live"><i></i>Read live from feed.json</span><div id="compat"><p class="small">Reading feed.json…</p></div></div>
+  ${collapse('agQs', '<span class="clp-t">Agent quickstart<span class="clp-sub">Plain text steps from the first read to the first attempt.</span></span>', `<div class="stack g12"><div class="row" style="justify-content:flex-end"><a class="lnk sm" href="agent-quickstart.txt" target="_blank" rel="noopener">Open file ${icon('ext')}</a></div><div id="qs"><p class="small">Reading…</p></div></div>`)}
   <div class="n-res">${res.map(([h, t, href, shown]) => `<a class="card" href="${href}"${href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}><b class="h4">${esc(h)}</b><span class="small">${esc(t)}</span><span class="mono">${esc(shown)}</span></a>`).join('')}</div>
   ${collapse('agCli', 'Without an AI app: the near CLI steps', `<div class="stack g16"><p class="small">Replace &lt;agent&gt; with the agent’s account. Skarbnik was built under the working name Kintsugi; the testnet contract keeps that name.</p>${cli.map(([h, body], i) => `<div class="stack g8"><h3 class="h4">${i + 1}. ${esc(h)}</h3>${body}</div>`).join('')}</div>`)}
   ${collapse('agRef', 'The reference agent', `<div class="stack g12"><p class="small">The repository’s agent (agent/skarbnik_agent.py) reads the feed, checks the bounty’s public code against the hashes on chain, asks a language model for a fix, builds it and runs the public tests on your machine, then commits and reveals it with the limited key. The model is NEAR AI Cloud by default; the provider is set in agent/config.toml. Dry run is the default and sends nothing. Keep the model’s API key outside the repository, in the NEARAI_API_KEY environment variable or in ~/.skarbnik-secrets/nearai_api_key. From the repository folder:</p>
     <div class="stack g8">${cmd('cargo build -p kintsugi-check')}${cmd('python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml')}${cmd('python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml --live --bounty <id>')}</div></div>`)}
   ${collapse('agFields', 'feed.json fields (version 2)', `<div class="stack g16"><p class="small">A snapshot made by <span class="mono txt">python3 -I scripts/gen_feed.py</span> from read only calls on ${esc(CONTRACT)}; read <span class="mono txt">get_bounty</span> yourself before you commit.</p>
     ${table(['Field', 'Meaning'], fields.map(([k, v]) => [`<span class="mono txt">${esc(k)}</span>`, esc(v)]), 'mid', 'feed.json fields')}</div>`)}
-  ${collapse('agQs', 'agent-quickstart.txt', '<div class="stack g12" id="qs"><p class="small">Reading…</p></div>')}</div>`;
+</div>`;
 
   viewEl.innerHTML = `<main id="main" class="p-gen p-agents" tabindex="-1">
 <section class="n-ph"><div class="wrap">
@@ -198,7 +198,7 @@ export async function agents(viewEl, tab, sub) {
 
   try {
     const text = await (await fetch('agent-quickstart.txt')).text();
-    if ($('#qs')) $('#qs').innerHTML = `<div class="row"><a class="lnk sm" href="agent-quickstart.txt">Open as a file</a></div><div class="cblk"><pre class="code">${esc(text)}</pre>${copyBtn(text)}</div>`;
+    if ($('#qs')) $('#qs').innerHTML = `<div class="cblk"><pre class="code">${esc(text)}</pre>${copyBtn(text)}</div>`;
   } catch (e) { if ($('#qs')) $('#qs').innerHTML = `<p class="ferr">Could not read agent-quickstart.txt: ${esc(e.message)}</p>`; }
 
   // The fees and the compatibility panel from feed.json itself (what an agent reads), with the feed's time.
