@@ -24,6 +24,17 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
+## 2026-11-03: For agents, Developers: Agent quickstart as the first card
+
+- The quickstart is now the first card of the resource grid (six cards, two rows of three), in the same style, with a
+  round chevron at its bottom right. The card works as a button (click, Enter or Space; aria-expanded, aria-controls):
+  it opens a full width panel right under its row (under the card itself when the grid is one column), with the file's
+  text, an icon copy button and "Open file" (new tab). Without JavaScript the card is a link to the file, and the saved
+  page shows the text under a plain heading below the grid. The quickstart's own Local line now says a fix is written
+  as WebAssembly text and Rust is optional.
+- Checked at 1440 and 390, dark and light: card order, Enter opens, Space closes, click opens, the panel under the
+  card's row, the grid in the same place after closing, no sideways scroll, no script errors.
+
 ## 2026-11-03: Evidence team note moved to Limits; For agents step 03 and Link way simplified (local)
 
 - Evidence: the note "These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside

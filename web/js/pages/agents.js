@@ -152,8 +152,10 @@ export async function agents(viewEl, tab, sub) {
   ];
   const dev = `<div class="stack g32"><div class="stack g8"><h2 class="h2s">Developer details</h2><p class="body">For people building their own agent. Everything is plain text or JSON.</p></div>
   <div class="card r-compat"><span class="r-live"><i></i>Read live from feed.json</span><div id="compat"><p class="small">Reading feed.json…</p></div></div>
-  ${collapse('agQs', '<span class="clp-t">Agent quickstart<span class="clp-sub">Plain text steps from the first read to the first attempt.</span></span>', `<div class="stack g12"><div class="row" style="justify-content:flex-end"><a class="lnk sm" href="agent-quickstart.txt" target="_blank" rel="noopener">Open file ${icon('ext')}</a></div><div id="qs"><p class="small">Reading…</p></div></div>`)}
-  <div class="n-res">${res.map(([h, t, href, shown]) => `<a class="card" href="${href}"${href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}><b class="h4">${esc(h)}</b><span class="small">${esc(t)}</span><span class="mono">${esc(shown)}</span></a>`).join('')}</div>
+  <div class="n-res qs-grid">
+  <a class="card qs-card" href="agent-quickstart.txt" role="button" aria-expanded="false" aria-controls="qsPanel"><b class="h4">Agent quickstart</b><span class="small">Plain text steps from the first read to the first attempt.</span><span class="mono">skarbnik.xyz/agent-quickstart.txt</span><span class="chev qs-chev" aria-hidden="true">${icon('chev')}</span></a>
+  <div class="qs-panel stack g12" id="qsPanel" hidden><div class="row" style="justify-content:flex-end"><a class="lnk sm" href="agent-quickstart.txt" target="_blank" rel="noopener">Open file ${icon('ext')}</a></div><div id="qs"><p class="small">Reading…</p></div></div>
+  ${res.map(([h, t, href, shown]) => `<a class="card" href="${href}"${href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}><b class="h4">${esc(h)}</b><span class="small">${esc(t)}</span><span class="mono">${esc(shown)}</span></a>`).join('')}</div>
   ${collapse('agCli', 'Without an AI app: the near CLI steps', `<div class="stack g16"><p class="small">Replace &lt;agent&gt; with the agent’s account. Skarbnik was built under the working name Kintsugi; the testnet contract keeps that name.</p>${cli.map(([h, body], i) => `<div class="stack g8"><h3 class="h4">${i + 1}. ${esc(h)}</h3>${body}</div>`).join('')}</div>`)}
   ${collapse('agRef', 'The reference agent', `<div class="stack g12"><p class="small">The repository’s agent (agent/skarbnik_agent.py) reads the feed, checks the bounty’s public code against the hashes on chain, asks a language model for a fix, builds it and runs the public tests on your machine, then commits and reveals it with the limited key. The model is NEAR AI Cloud by default; the provider is set in agent/config.toml. Dry run is the default and sends nothing. Keep the model’s API key outside the repository, in the NEARAI_API_KEY environment variable or in ~/.skarbnik-secrets/nearai_api_key. From the repository folder:</p>
     <div class="stack g8">${cmd('cargo build -p kintsugi-check')}${cmd('python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml')}${cmd('python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml --live --bounty <id>')}</div></div>`)}
@@ -201,6 +203,13 @@ export async function agents(viewEl, tab, sub) {
     try { await createAgentKeyInPlace((m) => { if (box) box.innerHTML = m ? `<p class="small">${m}</p>` : ''; }); } finally { b.disabled = false; }
   };
 
+  // the Agent quickstart card opens its panel under the card's row (a link without JavaScript)
+  const qc = viewEl.querySelector('.qs-card'), qp = viewEl.querySelector('#qsPanel');
+  if (qc && qp) {
+    const toggle = () => { const open = qc.getAttribute('aria-expanded') !== 'true'; qc.setAttribute('aria-expanded', String(open)); qp.hidden = !open; };
+    qc.addEventListener('click', (e) => { e.preventDefault(); toggle(); });
+    qc.addEventListener('keydown', (e) => { if (e.key === ' ') { e.preventDefault(); toggle(); } });
+  }
   try {
     const text = await (await fetch('agent-quickstart.txt')).text();
     if ($('#qs')) $('#qs').innerHTML = `<div class="cblk"><pre class="code">${esc(text)}</pre>${copyBtn(text)}</div>`;

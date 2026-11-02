@@ -10,8 +10,9 @@ THREE WAYS TO CONNECT AN AI APP (the same steps on https://skarbnik.xyz/#/agents
    First, on the Account page (https://skarbnik.xyz/#/account): connect a testnet wallet, add a little credit and press
    "Create an agent key". The page shows your connector link once, and offers "Download as a key file".
    Link (easiest): paste the connector link where your app lets you add a custom connector. Nothing to install.
-   Local (advanced): run the MCP server tools/skarbnik-mcp on your own computer, so the key stays there (Python 3; Rust
-   to build fixes). Setup: https://github.com/pgreyy/skarbnik/blob/main/tools/skarbnik-mcp/README.md
+   Local (advanced): run the MCP server tools/skarbnik-mcp on your own computer, so the key stays there (Python 3;
+   a fix is written as WebAssembly text, Rust is optional). Setup:
+   https://github.com/pgreyy/skarbnik/blob/main/tools/skarbnik-mcp/README.md
    Guide (for agents without tools): an agent that can run commands on your computer follows this file, with the key
    file from the Account page.
 
