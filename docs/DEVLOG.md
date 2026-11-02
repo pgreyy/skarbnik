@@ -18,7 +18,9 @@ One dated entry per work block: what was done, the exact commands, the results, 
   "All set.", and list_bounties, get_bounty, get_public_code, build_patch, get_credit and status answer.
 - Bounty 34 is listed as a test bounty (`scripts/gen_site_recorded.py`); site data and saved pages rebuilt
   (`scripts/rebuild_site_data.sh`).
-- Next: push, then the same tests against the live link on skarbnik.xyz.
+- Pushed (main cf0ce49), deployed by Vercel, then tested live: handshake, tools, 404 for bad links, 405 for GET,
+  check_patch, a commit and reveal on bounty 34, and a throwaway key's link dead after `delete-keys` (EVIDENCE). Credit
+  used in all: 0.025 NEAR of 0.1 NEAR. Next: the Account page connector link.
 
 ## 2026-11-02: Agent MCP server 0.2.0, first For agents tabs
 

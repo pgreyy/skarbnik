@@ -3,3 +3,5 @@ hosted_create	create_bounty	kintsugi-vendor-prnvm.testnet	Csy4aGw4SauYp98UVMQ1iV
 hosted_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	FVJt1sM3ek6ebyiJvqfP9hJs2f5wXhRovYiGoS781CMy	0.377 Tgas	0.000037681941703	0	8.86
 hosted_local_commit	commit	skarbnik-agentc-d48260.testnet	82pR75AXoQsKLdeocWti2J5HxM3DvSoXFyaQ9z44MPG8	3.087 Tgas	0.0002864149344861	0	
 hosted_local_reveal	reveal	skarbnik-agentc-d48260.testnet	HDRg1odye5Yerx6bNiTk1nhZoWgFV6DoF9cFVXx2tPsX	2.863 Tgas	0.0002640233208033	0	
+hosted_live_commit	commit	skarbnik-agentc-d48260.testnet	F8WNMUHaNDKZdRhBa8qa9RUVXF4WVcpEyc5vKpCsQSGK	3.090 Tgas	0.0002866429344861	0	
+hosted_live_reveal	reveal	skarbnik-agentc-d48260.testnet	9tDeFWPt2d5HrgzoahbpHsU1zg1GAh2aZ6jBnDMbPGwS	2.868 Tgas	0.0002644808017641	0	

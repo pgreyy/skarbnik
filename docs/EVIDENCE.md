@@ -206,8 +206,24 @@ reveal, nothing stored by the server, and the link dead once the key is deleted 
   `HDRg1odye5Yerx6bNiTk1nhZoWgFV6DoF9cFVXx2tPsX`. status: attempt 0 Open, revealed, deadline 2026-11-03 00:15 UTC.
 - Rows: `docs/evidence/hosted_mcp/transactions.tsv`.
 
-Verdict: PASS for the local run. The live run on skarbnik.xyz follows below. Nobody proves bounty 34's attempts; they
-will be settled by the timeout rule (a test bounty, not a verdict).
+- Live on skarbnik.xyz (commit cf0ce49 on main, Vercel deploy "success"), same client and the same test account:
+  initialize 200 with no-store and no-referrer, the notification 202, tools/list eight tools; list_bounties (feed of
+  2026-11-02 20:23 UTC), get_public_code 34 (the original as WAT, assembled by wabt on Vercel), get_credit (0.09 NEAR
+  after the local fee). Three bad links (a token of the right shape for no key, a malformed token, no token) each got
+  404 text/plain; GET with the valid link got 405 with Allow: POST, OPTIONS. check_patch 34 with the demo fix: 17 of 17
+  public tests, so the test worker runs on Vercel too.
+- Live commit `F8WNMUHaNDKZdRhBa8qa9RUVXF4WVcpEyc5vKpCsQSGK` (index 1, fee 0.015 NEAR) and, after the gap, reveal
+  `9tDeFWPt2d5HrgzoahbpHsU1zg1GAh2aZ6jBnDMbPGwS`; status: attempts 0 and 1 Open and revealed.
+- Live delete test: a throwaway third key limited to commit and reveal was added
+  (`5w7Qh9PTsZcju47WdtWMtvhYb4m1MJ3Jw7pmwE7vkq8i`); its link answered initialize and tools/list (200). After
+  `near account delete-keys` (`8fpCxXuGeCzwrjLhrXhxH3cpqnmeQ3P1G5vjQNHYfn7d`) the same link got 404 on initialize, the
+  notification and tools/list, while the test account's main link still answered 200.
+- Credit used by these tests: 0.01 NEAR (local commit) plus 0.015 NEAR (live commit) from the test account's 0.1 NEAR,
+  plus gas from its own balance.
+
+Verdict: PASS, locally and live. Not shown: an actual Claude or ChatGPT session through the link (the owner tries those
+in the apps). Nobody proves bounty 34's attempts; they will be settled by the timeout rule (a test bounty, not a
+verdict).
 
 ## The MCP server: list, commit, reveal and status from an MCP client (2026-10-27)
 
