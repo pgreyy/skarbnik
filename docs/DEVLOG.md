@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: For vendors, Host: how a repair is checked, how payment works (local)
+
+- The two sections the rebuild had dropped ("How is a repair evaluated?" and "How does settlement work?") are back,
+  as closed drop downs at the bottom of the Host tab, titled "How is a repair checked?" and "How does payment work?",
+  with their earlier content word for word (the five checks a patch must pass, and the four outcomes). Neither made a
+  tested claim, so nothing was reworded. The saved /vendors/ page has both, open.
+- `web/css/revamp.css`: on narrow screens a table's header row is hidden as a whole, not only its cells, so a table
+  with column titles no longer shows an empty band at the top at 390 (the payment table, and the Link way table on
+  For agents).
+- Checked with a private script: both drop downs closed at first and last in Host, 5 and 4 rows, open with no
+  sideways scroll, at 1440 and 390, dark and light, no script errors; the saved page without JavaScript has both, open.
+
 ## 2026-11-03: Wallet menu labels (local)
 
 - The menu under the connected wallet button now says Account (opens the Account page), Copy name, Credit,

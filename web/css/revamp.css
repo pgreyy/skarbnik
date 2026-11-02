@@ -111,7 +111,7 @@
  .sk .n-solve,.sk .n-part,.sk .n-opt{padding:22px 18px}
  .sk .n-ph{padding:52px 0 40px}
  .sk .n-hero .actions .btn{flex:1 1 100%}
- .sk .n-tab th{display:none}
+ .sk .n-tab th,.sk .n-tab thead{display:none}
  .sk .n-tab tr{display:block;border-bottom:1px solid var(--ln);padding:12px 0}
  .sk .n-tab td{display:block;width:auto!important;border:0;padding:4px 16px}
 }

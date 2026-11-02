@@ -3,9 +3,10 @@
 // MCP server (tools/skarbnik-vendor-mcp) on the vendor's own computer, its requirements, the setup for Claude
 // Desktop, Claude Code and Codex, the prompt, what the AI does and when it asks (with the one time confirm code), and
 // two drop downs. Commands: the five skarbnik-vendor steps with their real arguments (docs/VENDOR.md), the preflight
-// and the measured time and cost per proof in drop downs. Setup: what a vendor needs. Privacy: what stays private.
-// Compute: where proving runs. Limits: the current limits. Static: no chain reads, no forms, no secrets in the
-// browser; every command runs on the vendor's own machine.
+// and the measured time and cost per proof in drop downs. At the bottom of Host, two closed drop downs: how a repair
+// is checked and how payment works. Setup: what a vendor needs. Privacy: what stays private. Compute: where proving
+// runs. Limits: the current limits. Static: no chain reads, no forms, no secrets in the browser; every command runs
+// on the vendor's own machine.
 import { esc, icon, chip, table, note, block, cmd, collapse, picker, pickPanel, bindPicker, tabbed, tabNav } from '../ui.js';
 import { getNumbers } from '../data.js';
 
@@ -105,6 +106,25 @@ const cmdWay = `<div class="stack g20">
   ${collapse('vCost', 'Measured time and cost of one proof', '<div id="vcost"><p class="small">Reading the measured numbers…</p></div><p class="small faint mt12">Sources: docs/numbers.md; docs/evidence/vendor_tool/ (GPU mode, bounties 32 and 27), docs/evidence/smooth/ (laptop) and docs/evidence/vps_demo/ (VPS). The first GPU run also built the CUDA binary on its pod (559 s); later pods reuse it.</p>')}
 </div>`;
 
+// Host, at the bottom: how a repair is checked and how payment works, two closed drop downs
+const ntab = (cols, rows, caption) => `<table class="n-tab"><caption class="sr-only">${caption}</caption>${cols ? `<thead><tr>${cols.map((c) => `<th scope="col">${c}</th>`).join('')}</tr></thead>` : ''}<tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const CHECKED = collapse('vChecked', 'How is a repair checked?', `<p class="small">The same approved checker runs every patch. A patch passes only if all of these hold.</p>
+${ntab(null, [
+    ['<b>It is a valid small module</b>', 'No imports, within the size and memory limits, with the expected entry points. The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.'],
+    ['<b>The private input no longer crashes it</b>', 'The secret input must not crash it or run it out of its work budget.'],
+    ['<b>Public tests still pass</b>', 'On every public test it must give the same answers as the original program.'],
+    ['<b>Hidden fairness inputs pass</b>', 'Inputs chosen from a random seed fixed at the reveal. A fix cannot be tailored to them.'],
+    ['<b>Nearby crash variants pass</b>', 'Inputs that differ from the secret by one or two bytes must not crash where the original did not.'],
+  ], 'What a patch must pass')}
+<p class="small faint mt12">A PASS means all of this held for that exact patch. It does not mean the program is free of other bugs.</p>`);
+const PAYMENT = collapse('vPayment', 'How does payment work?', `<p class="small">A NEAR contract holds the reward and applies fixed rules. The contract never runs your private test.</p>
+${ntab(['Outcome', 'What happens'], [
+    [chip('k-proof', 'Paid by proof', 'check'), 'You send a proof that says PASS. The contract checks it and pays the agent the reward, plus the agent’s own fee back.'],
+    [chip('k-fail', 'Failed', 'x'), 'You send a proof that says FAIL. The attempt is spent. The reward stays locked.'],
+    [chip('k-timeout', 'Paid by timeout', 'hourglass'), 'No proof arrived in the verdict window. Anyone can trigger a payment, split equally among revealed attempts still undecided. No proof was checked. Silence is never cheaper than proving.'],
+    [chip('k-refund', 'Refunded', 'undo'), 'The bounty expired with nothing paid. You get the reward back.'],
+  ], 'The four outcomes')}`);
+
 export async function vendors(viewEl, tab, sub) {
   const t0 = { need: 'setup', private: 'privacy', proving: 'compute' }[tab] || tab;
   const way = sub === 'way-cmd' ? 'cmd' : 'ai';
@@ -115,7 +135,8 @@ export async function vendors(viewEl, tab, sub) {
       <div class="card"><p class="n-who">Then</p><h3 class="h4">Agents send sealed fixes</h3><p class="small">First a sealed copy, then the real one, so nobody can copy a fix in between.</p></div>
       <div class="card"><p class="n-who">Then</p><h3 class="h4">You prove each fix in private</h3><p class="small">The secret test stays on your machine, or the one you rent. A proof records the result.</p></div>
       <div class="card"><p class="n-who">Then</p><h3 class="h4">The contract pays, or doesn’t</h3><p class="small">It checks the proof itself. A timeout is shown as a timeout, never as a pass.</p></div>
-    </div></div>`;
+    </div>
+    <div class="stack g12">${CHECKED}${PAYMENT}</div></div>`;
   const setup = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">What you need</h2><p class="body">${REQ}</p></div>
     <table class="n-tab"><caption class="sr-only">What a vendor needs</caption><tbody>
     <tr><td><b>A small WebAssembly program with a known crash</b></td><td>The buggy program and its public tests. This is what agents receive.</td></tr>
