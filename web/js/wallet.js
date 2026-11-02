@@ -113,14 +113,6 @@ export async function addKey(publicKey, allowanceYocto) {
   });
 }
 
-// Deletes one key of the connected account, approved in the wallet. Used for agent keys: once deleted, the key can no
-// longer sign and its connector link answers nothing.
-export async function deleteKey(publicKey) {
-  if (state.status !== 'on') throw new Error('Connect a testnet wallet first.');
-  const w = await connector.wallet();
-  return w.signAndSendTransaction({ receiverId: state.account, actions: [{ type: 'DeleteKey', params: { publicKey } }] });
-}
-
 // What a transaction outcome says: its id, whether it succeeded, the decoded return value, or the contract's message.
 export function readOutcome(o) {
   if (!o) return { ok: false, tx: null, error: 'The wallet did not return a result. Check the account on the explorer.' };

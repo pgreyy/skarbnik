@@ -2,6 +2,13 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: Account page connector link taken back out of the live site
+
+- The Account page link (2b59ba4) went to main before the owner approved it. Restored `web/js/account-ui.js`,
+  `web/js/agentkey.js`, `web/js/wallet.js` and `web/css/site.css` to their versions before it; the security and
+  architecture notes for it are removed until it goes live. Its test (EVIDENCE, "The connector link on the Account
+  page") stays, marked as run from a local copy. The change is kept on a local branch for the owner's go.
+
 ## 2026-11-02: For agents page back to the live version
 
 - The first four tab For agents page (dad55f9) went to main by mistake, before the owner approved it. Restored

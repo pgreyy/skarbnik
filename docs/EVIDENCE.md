@@ -194,8 +194,10 @@ key from the page turn that link off?
   test helper's token for the same key, without printing either). The link and the key appear in no file in the
   repository and no log; the screenshot taken during the run was deleted.
 
-Verdict: PASS. Stop (set_agent_limits with a fee cap of 0) refuses every later commit, also through a link, but the
-link still answers reads; only deleting the key turns it off, and the page says so.
+Verdict: PASS for that page code, run from a local copy. The page change is not on the live site: it went to main
+before the owner approved it and was taken back out (DEVLOG, 2026-11-02); it waits for the owner's go. Stop
+(set_agent_limits with a fee cap of 0) refuses every later commit, also through a link, but the link still answers
+reads; only deleting the key turns it off.
 
 ## The hosted agent connector: one link, commit and reveal on test bounty 34 (2026-11-02)
 

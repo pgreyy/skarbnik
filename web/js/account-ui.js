@@ -2,14 +2,13 @@
 // dialog (deposit_credit, withdraw_credit), the attempt panel on a bounty page (commit, reveal, then waiting for the
 // vendor's proof), and the Account page: balances, agent keys, the agent limits form and the stop button
 // (set_agent_limits), "Create an agent key" (made in this browser, shown once, added by the wallet as a key limited to
-// commit and reveal; once added, its connector link for the hosted agent connector is shown once too), Delete key on
-// each agent key (the wallet removes it, which also turns its connector link off), and an audit log. Every payment goes through a confirm step and then the wallet; the page shows
+// commit and reveal), and an audit log. Every payment goes through a confirm step and then the wallet; the page shows
 // only what the chain says. Attempt fees are taken from credit deposited in the contract first.
 import { CONTRACT, EXPLORER_ACCOUNT, view, near, utc, span, commitBy, nsToDate, allBounties, submissions, accessKeys } from './chain.js';
 import { TX_INDEX } from './config.js';
 import * as W from './wallet.js';
 import { fingerprint, newNonce, hex, b64, sha256, putAttempt, attemptsFor, dropAttempt, downloadRecord, toYocto } from './attempt.js';
-import { newAgentKey, connectorLink } from './agentkey.js';
+import { newAgentKey } from './agentkey.js';
 import { $, esc, icon, chip, tx, acct, toast, table, facts, bothTimes, cmd, note } from './ui.js';
 
 let credit = null; // the connected account's contract credit, yoctoNEAR string
@@ -436,15 +435,13 @@ async function drawAccount(name) {
       ${me ? setupHtml(name, lim, stopped, agentKeys.length) : `<div class="mt32">${note(W.state.status === 'on' ? `You are connected as ${esc(W.state.account)}. Only the owner of ${esc(name)} can set its agent limits or add its keys.` : 'Connect this account’s wallet to set agent limits, stop its agents or add an agent key.', 'info')}</div>`}
       <h2 class="h2s mt48">Agent keys</h2>
       <div class="mt16">${keys === null ? '<p class="small">Could not read the account’s access keys.</p>'
-        : agentKeys.length ? table(['Agent key', 'Scope', 'Spend cap', 'Spent', 'Status', ...(me ? [''] : [])], agentKeys.map((k) => {
+        : agentKeys.length ? table(['Agent key', 'Scope', 'Spend cap', 'Spent', 'Status'], agentKeys.map((k) => {
           const fc = k.access_key.permission.FunctionCall;
           return [`<span class="hsh"><code title="${esc(k.public_key)}">${esc(k.public_key.slice(0, 20))}…</code><button class="mini" type="button" data-copy-text="${esc(k.public_key)}">Copy</button></span><span class="small">function call key</span>`,
             `${scope(fc.method_names)}<span class="small">gas allowance left ${fc.allowance ? esc(near(fc.allowance)) : 'not limited'}</span>`,
             `<span class="mono nw">${lim.max_fee_per_commit ? esc(near(lim.max_fee_per_commit)) : 'none set'}</span><span class="small">per attempt</span>`,
-            `<span class="mono nw">${esc(near(spent.toString()))}</span>`, stopped ? BAD('Stopped') : chip('k-open', 'Active'),
-            ...(me ? [`<button class="mini" type="button" data-delkey="${esc(k.public_key)}" aria-label="Delete key ${esc(k.public_key.slice(-4))}">Delete key</button>`] : [])];
+            `<span class="mono nw">${esc(near(spent.toString()))}</span>`, stopped ? BAD('Stopped') : chip('k-open', 'Active')];
         }), 'wide') : '<p class="small">No key of this account is limited to this contract.</p>'}
-      ${me && agentKeys.length ? '<p class="small mt12">Delete key removes the key from your account with your wallet: it can no longer send in fixes, and its connector link stops working at once.</p><div id="delBox"></div>' : ''}
       <p class="small mt12">${keys === null ? '' : `Spend cap: the most one attempt may cost (set_agent_limits). Spent: attempt fees not paid back. ${fullKeys} full access ${fullKeys === 1 ? 'key' : 'keys'} (the owner’s wallet keys) not listed.`}${lim.fixed_payout ? ` Fixed payout: ${acct(lim.fixed_payout)}.` : ''}${stopped ? ' Stopped: the max fee per attempt is 0, so every commit by this account is refused.' : ''}</p></div>
       <h2 class="h2s mt48">History</h2>
       <div class="mt16">${history.length ? table(['What', 'State', 'Transaction'], history.map((h) => h.row)) : '<p class="small">No attempts or deposits yet.</p>'}</div>
@@ -477,7 +474,6 @@ function setupHtml(name, lim, stopped, nKeys) {
         <p class="hint" id="limHint">set_agent_limits, with 1 yoctoNEAR attached, so only your wallet can call it, never an agent key. A commit by this account above the fee, or naming another payout, is refused by the contract.</p>
         <p class="ferr" id="limErr" role="alert" hidden></p></div>
       <div class="row"><button class="btn btn-p" type="submit">Save limits in wallet</button>${!stopped && nKeys ? `<button class="btn btn-g" type="button" id="stopBtn">${icon('stop')} Stop ${nKeys > 1 ? 'agents' : 'agent'}</button>` : ''}</div>
-      ${!stopped && nKeys ? '<p class="small">Stop refuses every later commit, also through a connector link. To turn a link off completely, delete its key in the table above.</p>' : ''}
     </form>
     <div id="limBox"></div>
   </div>
@@ -489,13 +485,7 @@ function setupHtml(name, lim, stopped, nKeys) {
       <div><p class="small faint">Public key</p><code>${esc(k.publicKey)}</code></div>
       <div><p class="small faint">Private key</p><code id="privKey">${esc(k.privateKey)}</code></div>
       <div class="row"><button class="btn btn-g btn-s" type="button" id="keyFile">${icon('download')} Download as a key file</button><button class="mini" type="button" data-copy-text="${esc(k.privateKey)}">Copy private key</button></div>
-      ${k.added ? `<div class="msg ok" role="status">${OK('Added')} This key may call only commit and reveal on ${esc(CONTRACT)}. ${tx(k.added)}</div>
-      <div class="linkbox stack g12" role="region" aria-label="Your connector link"><h4 class="h4">Your connector link</h4>
-        <p class="small">Paste it into your AI app as a custom connector (<a href="#/agents/connect">For agents, step 04</a>). Treat it like a password.</p>
-        <div class="code-row"><code class="code" id="connLink">${esc(connectorLink(name, k.privateKey))}</code><button class="mini" type="button" data-copy-text="${esc(connectorLink(name, k.privateKey))}" aria-label="Copy the connector link">Copy</button></div>
-        <p class="small">Anyone with this link can use your agent key. It can only send in fixes and spend your small test credit. Delete the key to cancel the link.</p>
-        <p class="small faint">Shown once: reloading this page loses it. The key file below is for running Skarbnik on your own computer.</p></div>
-      <div class="row"><button class="btn btn-g btn-s" type="button" id="keyForget">I saved it, hide the key</button></div>`
+      ${k.added ? `<div class="msg ok" role="status">${OK('Added')} This key may call only commit and reveal on ${esc(CONTRACT)}. ${tx(k.added)}</div><div class="row"><button class="btn btn-g btn-s" type="button" id="keyForget">I saved it, hide the key</button></div>`
       : `<div class="field"><label for="keyAllow">Gas allowance for this key (NEAR)</label><input id="keyAllow" inputmode="decimal" value="0.25" aria-describedby="allowHint"><p class="hint" id="allowHint">The most this key may spend on gas. Attempt fees come from credit, not from this allowance.</p></div>
       <div class="row"><button class="btn btn-p" type="button" id="keyAdd">Add this key with my wallet</button><button class="btn btn-g btn-s" type="button" id="keyForget">Forget this key</button></div>`}
       <div id="keyBox"></div></div>`
@@ -534,7 +524,7 @@ function bindSetup(name, lim) {
     await send(limBox, { max_fee_per_commit: fee, fixed_payout: pay }, `Saved: max fee ${esc(near(fee))} per attempt, payout ${esc(pay)}.`);
   };
   const stop = $('#stopBtn');
-  if (stop) stop.onclick = () => send(limBox, { max_fee_per_commit: '0', fixed_payout: lim.fixed_payout || null }, 'Stopped. The max fee per attempt is now 0, so every commit by this account is refused, whichever key or connector link signs it. Reveals of attempts already made still work. To turn a connector link off completely, delete its key.');
+  if (stop) stop.onclick = () => send(limBox, { max_fee_per_commit: '0', fixed_payout: lim.fixed_payout || null }, 'Stopped. The max fee per attempt is now 0, so every commit by this account is refused, whichever key signs it. Reveals of attempts already made still work.');
   const nk = $('#keyNew');
   if (nk) nk.onclick = async () => {
     try { pendingKey = await newAgentKey(); } catch { pendingKey = null; toast('This browser cannot make an Ed25519 key. Use the CLI command on the For agents page.'); return; }
@@ -547,19 +537,6 @@ function bindSetup(name, lim) {
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
   const fg = $('#keyForget'); if (fg) fg.onclick = () => { pendingKey = null; drawAccount(name); };
-  document.querySelectorAll('[data-delkey]').forEach((b) => (b.onclick = () => {
-    const pub = b.dataset.delkey, box = $('#delBox');
-    box.innerHTML = `<div class="msg" role="status">Delete the key ending in <span class="mono">${esc(pub.slice(-4))}</span>? It stops signing at once, and its connector link stops working. <div class="row mt12"><button class="btn btn-p btn-s" type="button" id="delYes">Delete with my wallet</button><button class="btn btn-g btn-s" type="button" id="delNo">Cancel</button></div></div>`;
-    $('#delNo').onclick = () => { box.innerHTML = ''; };
-    $('#delYes').onclick = async () => {
-      say(box, '', 'Waiting for the wallet. Approve or reject the DeleteKey request in the wallet window.');
-      try {
-        const o = W.readOutcome(await W.deleteKey(pub));
-        if (o.ok) { say(box, 'ok', `Deleted. That key and its connector link no longer work. ${tx(o.tx)}`); setTimeout(() => drawAccount(name), 3000); }
-        else say(box, 'bad', `Not deleted: ${esc(o.error)} ${o.tx ? tx(o.tx) : ''}`);
-      } catch (e) { say(box, 'bad', `Not deleted: ${esc(W.plainError(e))}`); }
-    };
-  }));
   const ka = $('#keyAdd');
   if (ka) ka.onclick = async () => {
     const box = $('#keyBox'), allowText = $('#keyAllow').value.trim(), allow = toYocto(allowText);
