@@ -26,7 +26,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 NETWORKS = {
     "testnet": {"contract": "kintsugi-l2-cihdp.testnet", "rpc": ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"],
                 "feed": "https://skarbnik.xyz/feed.json"},

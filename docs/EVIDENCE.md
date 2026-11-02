@@ -175,6 +175,19 @@ opentest` (output `docs/evidence/judge2/`).
 - Round 1 stays on chain. 18 was opened by our test; 19 to 22 were never opened. After their expiry anyone can call
   `expire`, which refunds the vendor; nothing happens to them by itself.
 
+## The two MCP servers started from Windows through WSL (2026-11-03)
+
+Question: do the README's WSL lines start the servers from the Windows side, and is WSLENV needed for the key file?
+
+- From Windows (`cmd.exe`) on this laptop, reading the files in place in WSL: `wsl python3 -I .../skarbnik-mcp/server.py
+  --check` with `SKARBNIK_KEY_FILE` set and named in `WSLENV` (`SKARBNIK_KEY_FILE/u`) ended "All set."; the same
+  without WSLENV said it found no key file. An MCP client script started both servers this way (`cmd.exe /c wsl
+  python3 ...`): initialize and tools/list answered (nine agent tools, ten vendor tools), and the agent server's
+  get_credit read the test account through the key named in WSLENV.
+
+Verdict: the WSL lines in tools/skarbnik-mcp/README.md and tools/skarbnik-vendor-mcp/README.md start the servers.
+Not run: Claude Desktop itself, native Windows Python, macOS.
+
 ## The vendor MCP server: one cycle on bounty 35, Proof 0 and the attempt on rented GPUs (2026-11-02)
 
 Question: can an AI app host a bounty end to end through `tools/skarbnik-vendor-mcp`, with the vendor's yes before
