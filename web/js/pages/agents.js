@@ -22,32 +22,37 @@ const FIRST_MSG = 'List the open Skarbnik bounties.';
 const GUIDE = 'Open skarbnik.xyz/agent-quickstart.txt and follow it. Use my agent key file at <path to your key file>. Find an open bounty, try to fix it, and tell me the fee first.';
 const WAYS = [{ id: 'link', label: 'Link', sub: 'Easiest' }, { id: 'local', label: 'Local', sub: 'Advanced' }, { id: 'guide', label: 'Guide', sub: 'For agents without tools' }];
 const li = (items) => `<ol class="ag-ol">${items.map((t) => `<li>${t}</li>`).join('')}</ol>`;
-const exampleBox = `<div class="ag-ex"><span class="ag-ex-l">Example</span><code class="code">${esc(EXAMPLE_LINK)}</code></div>`;
-
-// Where to paste the link, in one closed drop down: the table, then the illustration (a made-up, shortened value).
+// The Link way, in plain view: three steps, a short table of where the settings are, and an illustration (a made-up,
+// shortened value). Only "Then: how do I know it worked?" is a drop down.
 const WHERE_ROWS = [
-  ['Claude', 'Open Customize, then Connectors. Press <b>+ Add</b>, then <b>Add custom connector</b>. Enter a name, paste the link and press Continue. Under Authentication choose <b>No sign in</b>, then press Add. In a chat, press <b>+</b> at the lower left, open Connectors and turn Skarbnik on.'],
-  ['ChatGPT', 'Open <span class="mono txt">chatgpt.com/plugins</span>. Press <b>+</b>, then <b>Add custom MCP server</b>. Enter a name and a short description, choose a public endpoint and paste the link, choose no authentication, confirm “I understand and want to continue”, then <b>Create as a plugin</b>. In a new chat, type <b>@</b> and pick Skarbnik.'],
-  ['Other apps', 'Where the app adds a remote MCP server by its address: paste the link as the address, with no sign in.'],
+  ['Claude (Desktop, website, phone)', 'Customize, then Connectors, press +, then Add custom connector'],
+  ['ChatGPT', 'chatgpt.com/plugins, press +, then Add custom MCP server, then Create as a plugin'],
+  ['Other apps', 'Look for custom connector or MCP server in the app’s settings, and use no sign in.'],
 ];
-const WHERE = collapse('agWhere', 'Where do I paste it in my app?', `<table class="n-tab ag-where"><caption class="sr-only">Where to paste the link</caption><thead><tr><th scope="col">App</th><th scope="col">Where</th></tr></thead><tbody>${WHERE_ROWS.map(([a, w]) => `<tr><td><b>${a}</b></td><td>${w}</td></tr>`).join('')}</tbody></table>
-<figure class="ag-dlg" aria-label="Illustration of an Add custom connector form">
-  <div class="ag-dlg-box" aria-hidden="true"><b>Add custom connector</b>
-    <span class="ag-dlg-f"><i>Name</i><span>Skarbnik</span></span>
-    <span class="ag-dlg-f"><i>Remote MCP server URL</i><span class="mono">${esc(EXAMPLE_LINK)}</span></span>
-    <span class="ag-dlg-f"><i>Authentication</i><span>No sign in</span></span>
-    <span class="ag-dlg-btn">Add</span></div>
-  <figcaption class="small faint">Illustration. Your app may look a little different.</figcaption></figure>`);
-
-const LINK_WORKED = collapse('agLinkWorked', 'Then: how do I know it worked?', `${li([
-  'Skarbnik shows in your app’s list of connectors or plugins.',
-  'Start a new chat and turn Skarbnik on for it: in Claude, press + and open Connectors; in ChatGPT, type @ and pick it.',
-  `Ask:${block(FIRST_MSG)}It answers with the open bounties, each with its reward and fee.`,
-])}${collapse('agLinkNothing', 'Nothing shows?', li([
-  'Check that you pasted the whole link. It is long.',
-  'Check that the key still exists on your Account page. Deleting the key turns the link off.',
-  'Start a new chat and turn Skarbnik on again.',
-]))}`);
+const LINK_WAY = `<div class="stack g16">
+  <p class="small">Best for most people. Nothing to install. Works in Claude, ChatGPT and any app that can add a custom connector or MCP server.</p>
+  ${li([
+    'Open your AI app’s connector settings. Where to find them is in the table below.',
+    'Choose Add custom connector (or Add MCP server).',
+    'Paste the connector link from step 03, name it Skarbnik, set sign in to none, and press Add.',
+  ])}
+  <table class="n-tab ag-where"><caption class="sr-only">Where to find the connector settings</caption><thead><tr><th scope="col">App</th><th scope="col">Where to find it</th></tr></thead><tbody>${WHERE_ROWS.map(([a, w]) => `<tr><td><b>${a}</b></td><td>${w}</td></tr>`).join('')}</tbody></table>
+  <figure class="ag-dlg" aria-label="Illustration of an Add custom connector form">
+    <div class="ag-dlg-box" aria-hidden="true"><b>Add custom connector</b>
+      <span class="ag-dlg-f"><i>Name</i><span>Skarbnik</span></span>
+      <span class="ag-dlg-f"><i>Remote MCP server URL</i><span class="mono">${esc(EXAMPLE_LINK)}</span></span>
+      <span class="ag-dlg-f"><i>Authentication</i><span>No sign in</span></span>
+      <span class="ag-dlg-btns"><span class="ag-dlg-btn2">Cancel</span><span class="ag-dlg-btn">Add</span></span></div>
+    <figcaption class="small faint">Illustration. Your app may look a little different.</figcaption></figure>
+  ${collapse('agLinkWorked', 'Then: how do I know it worked?', `${li([
+    'Skarbnik shows in your app’s list of connectors or plugins. In Claude, after pasting the link press Continue, then choose No sign in under Authentication. In ChatGPT the form also asks for a short description; choose a public endpoint, and confirm “I understand and want to continue” before Create as a plugin.',
+    'Start a new chat and turn Skarbnik on for it. In Claude, press + at the lower left, open Connectors and turn Skarbnik on. In ChatGPT, type @ and pick Skarbnik.',
+    `Ask:${block(FIRST_MSG)}It answers with the open bounties, each with its reward and fee.`,
+  ])}<p class="ag-sub mt12">Nothing shows?</p>${li([
+    'Check that you pasted the whole link. It is long.',
+    'Check that the key still exists on your Account page. Deleting the key turns the link off.',
+    'Start a new chat and turn Skarbnik on again.',
+  ])}`)}</div>`;
 
 const LOCAL_WORKED = collapse('agLocalWorked', 'Then: how do I know it worked?', `${li([
   'Quit the app fully and open it again. It only reads its settings when it starts. On Windows, closing the Claude Desktop window is not enough: right click its icon near the clock and choose Quit.',
@@ -81,7 +86,7 @@ export async function agents(viewEl, tab, sub) {
   const way = WAYS.some((w) => `way-${w.id}` === sub) ? sub.slice(4) : 'link';
   const step = (n, h, body) => `<div class="ag-step"><span class="ag-n">${String(n).padStart(2, '0')}</span><div class="stack g12"><h3 class="h3">${h}</h3>${body}</div></div>`;
   const ways = {
-    link: `<div class="stack g16"><p class="small">The easiest way: nothing to install. Your AI app talks to Skarbnik’s hosted connector through your link. Use the link from step 03, and paste it where your app lets you add a custom connector.</p>${WHERE}${LINK_WORKED}</div>`,
+    link: LINK_WAY,
     local: `<div class="stack g16"><p class="small">For people who want the key to stay on their own computer: Skarbnik’s MCP server runs there and signs there.</p>
       ${picker('los', OS, 'win', 'Your computer')}${OS.map((o) => pickPanel('los', o.id, 'win', localSteps(o.id))).join('')}${LOCAL_PY}${LOCAL_WSL}${LOCAL_WORKED}</div>`,
     guide: `<div class="stack g16"><p class="small">Agents that can’t add tools, like Hark Pro, follow the written guide instead. They need to be able to run commands on your computer.</p>${block(GUIDE)}</div>`,
@@ -91,7 +96,7 @@ export async function agents(viewEl, tab, sub) {
   <div class="card ag-card">
     ${step(1, 'Connect your wallet', `<p class="small">Any NEAR testnet wallet. The money is test money, nothing real.</p><div class="row" id="agWallet"></div>`)}
     ${step(2, 'Add a little credit', `<p class="small">Deposit some test NEAR. Each attempt takes its small fee from this credit.</p><div class="row"><button class="btn btn-g btn-s" type="button" id="agCredit">${icon('coin')} Add credit</button><a class="lnk sm" href="${accountHref}">Open Account</a></div>`)}
-    ${step(3, 'Get your connector link', `<p class="small">Create an agent key and approve it in your wallet. Your connector link is then shown once: copy it and keep it like a password. For the Local and Guide ways, also download the key file there. The key can only send in fixes; it can’t move your money.</p><div class="row"><button class="btn btn-p btn-s" type="button" id="agKeyNew">${icon('key')} Create agent key</button></div><p class="small"><a class="lnk sm" href="${accountHref}">Manage or delete keys</a></p><div id="agKeyBox" role="status"></div>${exampleBox}`)}
+    ${step(3, 'Get your connector link', `<p class="small">Create an agent key and approve it in your wallet. Your connector link is then shown once: copy it and keep it like a password. For the Local and Guide ways, also download the key file there. The key can only send in fixes; it can’t move your money.</p><div class="row"><button class="btn btn-p btn-s" type="button" id="agKeyNew">${icon('key')} Create agent key</button></div><p class="small"><a class="lnk sm" href="${accountHref}">Manage or delete keys</a></p><div id="agKeyBox" role="status"></div>`)}
     ${step(4, 'Add Skarbnik to your AI app', `<p class="small">Pick one way.</p>${picker('way', WAYS, way, 'Ways to add Skarbnik')}${WAYS.map((w) => pickPanel('way', w.id, way, ways[w.id])).join('')}`)}
     ${step(5, 'Ask it to try a bounty', `<p class="small">In a new chat, paste:</p>${block(PROMPT)}<p class="r-tn">${icon('flask')}<span><b>Testnet only.</b> Attempts spend test NEAR from your credit.</span></p>`)}
   </div>
