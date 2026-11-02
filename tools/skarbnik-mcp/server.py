@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # skarbnik-mcp: an MCP server (stdio, JSON-RPC 2.0, one message per line) that lets an AI agent work on Skarbnik
-# bounties with a key limited to commit and reveal. Tools: list_bounties, get_bounty, get_public_code, build_patch,
-# get_credit, commit, reveal, status. It reads the feed and the contract (view calls over RPC), builds a patch from
-# Rust source with the local rustc and the bounty's build flags, builds the commit fingerprint exactly as the
+# bounties with a key limited to commit and reveal. Tools: list_bounties, get_bounty, get_public_code, check_patch, build_patch,
+# get_credit, commit, reveal, status. It reads the feed and the contract (view calls over RPC), checks a fix written as
+# WebAssembly text with the site's keyless check (web/api/check.js, only the fix is sent), or builds one from Rust
+# source with the local rustc and the bounty's build flags, builds the commit fingerprint exactly as the
 # contract's commit_fingerprint, keeps each attempt's nonce in a file next to the key, and signs each transaction
 # itself (Ed25519 and NEAR's transaction format, below) with the key file: SKARBNIK_KEY_FILE, or the one
-# *.agent-key.json file in this script's folder (the file the site's Account page saves). It refuses any key that is
+# *.agent-key.json file in this script's folder or in Downloads (the file the site's Account page saves). It refuses any key that is
 # not a function call key limited to commit and reveal on the contract. It never returns or logs the key or the nonce
 # file's contents. `--setup <app>` prints the exact settings for Claude Desktop, Claude Code, Codex or Cursor, with
 # this computer's paths (`--key <file>` adds the key file). Testnet by default; mainnet only with SKARBNIK_ALLOW_MAINNET=1. Python 3.9 or later,
@@ -22,6 +23,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.error
 import urllib.request
 
 VERSION = "0.2.0"
@@ -87,20 +89,26 @@ def feed(cfg):
     return json.loads(fetch(cfg["feed"]))
 
 
+KEY_DIRS = [HERE, os.path.join(os.path.expanduser("~"), "Downloads")]
+
+
 def find_key_file(cfg):
-    """SKARBNIK_KEY_FILE, or else the one *.agent-key.json file next to this script."""
+    """SKARBNIK_KEY_FILE, or else the one *.agent-key.json file (the file the Account page saves) next to this script,
+    or else in the Downloads folder."""
     if cfg["key_file"]:
         path = os.path.abspath(os.path.expanduser(cfg["key_file"]))
         if not os.path.isfile(path):
-            raise Fail(f"SKARBNIK_KEY_FILE names a file that does not exist: {path}")
+            raise Fail(f"the key file named in the settings does not exist: {path}")
         return path
-    found = sorted(glob.glob(os.path.join(HERE, "*.agent-key.json")))
-    if len(found) == 1:
-        return found[0]
-    if not found:
-        raise Fail(f"no key file: put the agent key file you downloaded from the Account page (it ends in .agent-key.json) in {HERE}, "
-                   "or set SKARBNIK_KEY_FILE to its full path")
-    raise Fail(f"more than one .agent-key.json file in {HERE}: keep one, or set SKARBNIK_KEY_FILE")
+    for folder in KEY_DIRS:
+        found = sorted(glob.glob(os.path.join(folder, "*.agent-key.json")))
+        if len(found) == 1:
+            return found[0]
+        if len(found) > 1:
+            raise Fail(f"found more than one key file (.agent-key.json) in {folder}: keep one there, or name yours with --key "
+                       "when you print the settings (or SKARBNIK_KEY_FILE)")
+    raise Fail("found no key file: download it on the Account page (\"Download as a key file\"; its name ends in .agent-key.json) "
+               f"into {KEY_DIRS[1]} or {KEY_DIRS[0]}, or name it with --key when you print the settings (or SKARBNIK_KEY_FILE)")
 
 
 def key_info(cfg):
@@ -434,12 +442,62 @@ def t_get_public_code(cfg, a):
     if hashlib.sha256(module).hexdigest() != b["original_hash"]:
         raise Fail(f"the public module of bounty {bid} does not match original_hash on chain; do not use it")
     tests = fetch(base + pc["tests"]).decode()
+    try:
+        wat = remote_check({"bounty_id": bid, "want": "original_wat"}).get("original_wat")
+    except (Fail, OSError, ValueError):
+        wat = None
     return {"bounty_id": bid, "program": pc.get("program"), "description": pc.get("description"), "target": row.get("target"),
             "max_patch_bytes": b["max_patch_bytes"], "original_module_bytes": len(module),
             "module_matches_chain": True, "source_file": base + pc["source"], "source": fetch(base + pc["source"]).decode(),
-            "build": fetch(base + pc["build"]).decode(), "public_tests": tests,
-            "next": "write the complete fixed Rust file, then call build_patch with it; the interface (input_buf and parse) "
-                    "must stay the same and every public test must still give the same value"}
+            "build": fetch(base + pc["build"]).decode(), "public_tests": tests, "original_wat": wat,
+            "next": "change original_wat (the same program as WebAssembly text) to fix the bug the Rust source describes, then call "
+                    "check_patch with the whole module as wat; keep the exports and every public test's answer. With Rust installed "
+                    "you may write the fixed Rust file and call build_patch instead"}
+
+
+CHECK_URL = os.environ.get("SKARBNIK_CHECK_URL", "https://skarbnik.xyz/api/check")
+
+
+def remote_check(body):
+    """The site's keyless check (web/api/check.js): assembles WebAssembly text and runs the public checks. Only the
+    fix is sent, never the key."""
+    req = urllib.request.Request(CHECK_URL, json.dumps(body).encode(), {"Content-Type": "application/json", "User-Agent": f"skarbnik-mcp/{VERSION}"})
+    try:
+        with urllib.request.urlopen(req, timeout=90) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        try:
+            msg = json.load(e).get("error")
+        except ValueError:
+            msg = None
+        raise Fail(msg or f"the check service answered {e.code}")
+
+
+def t_check_patch(cfg, a):
+    """Checks a fix (WebAssembly text, or a .wasm file) with the site's check and saves the module next to the key."""
+    bid = str(a["bounty_id"])
+    if a.get("wat"):
+        body = {"bounty_id": bid, "wat": a["wat"]}
+    elif a.get("patch_path"):
+        with open(os.path.expanduser(a["patch_path"]), "rb") as f:
+            body = {"bounty_id": bid, "patch_base64": base64.b64encode(f.read()).decode()}
+    else:
+        raise Fail("give the whole fixed module as wat (WebAssembly text), or patch_path")
+    r = remote_check(body)
+    mod = base64.b64decode(r.pop("patch_base64"))
+    try:
+        folder = os.path.dirname(find_key_file(cfg))
+    except Fail:
+        folder = HERE
+    work = os.path.join(folder, "work", f"bounty-{bid}")
+    os.makedirs(work, exist_ok=True)
+    path = os.path.join(work, f"patch-{hashlib.sha256(mod).hexdigest()[:10]}.wasm")
+    with open(path, "wb") as f:
+        f.write(mod)
+    r["patch_path"] = path
+    r["next"] = (f"tell the user the fee (get_bounty) and wait for a yes, then commit with patch_path {path}" if r.get("ready_to_commit")
+                 else "fix the problems above and check again")
+    return r
 
 
 def rustc_path():
@@ -597,6 +655,8 @@ TOOLS = {
                    {"bounty_id": {"type": "string", "description": "the bounty id"}}, ["bounty_id"]),
     "get_public_code": (t_get_public_code, "The public code of a bounty: the Rust source with its known bug, the build flags, the public tests (input as hex and the value the original returns) and what a fix must do. The module is checked against the hash on chain.",
                         {"bounty_id": {"type": "string"}}, ["bounty_id"]),
+    "check_patch": (t_check_patch, "Check a fix before spending anything: the whole fixed module as WebAssembly text (wat), or a .wasm file (patch_path). The site's check turns the text into a module, confirms it is valid, fits, and has the same exports as the public program, and runs the public tests (and the public demo input on demo bounties). The module is saved next to the key file for commit. Only the fix is sent, never the key. It does not show that the fix passes the private test.",
+                    {"bounty_id": {"type": "string"}, "wat": {"type": "string"}, "patch_path": {"type": "string"}}, ["bounty_id"]),
     "build_patch": (t_build_patch, "Build a patch from the complete fixed Rust source file, with the bounty's exact build flags (needs rustc with the wasm32-unknown-unknown target on this computer). Returns the .wasm path to commit, its size and whether it fits the bounty's limit. Source that uses include!, env!, mod or extern crate is refused.",
                     {"bounty_id": {"type": "string"}, "rust_source": {"type": "string", "description": "the complete fixed .rs file"}}, ["bounty_id", "rust_source"]),
     "get_credit": (t_get_credit, "Credit in the contract and agent limits of an account (default: the key's account).",
@@ -617,7 +677,7 @@ def handle(msg):
         return {"protocolVersion": (msg.get("params") or {}).get("protocolVersion", "2025-06-18"),
                 "capabilities": {"tools": {}}, "serverInfo": {"name": "skarbnik", "version": VERSION},
                 "instructions": "Skarbnik bounties on NEAR (testnet by default). Read AGENTS.md at https://skarbnik.xyz/agents.md. "
-                                "Work order: list_bounties, get_public_code, build_patch, get_bounty (tell the user the fee and "
+                                "Work order: list_bounties, get_public_code, check_patch (WebAssembly text; or build_patch from Rust), get_bounty (tell the user the fee and "
                                 "wait for a yes), commit, then reveal after the reveal gap, then status."}
     if method == "ping":
         return {}
@@ -661,15 +721,14 @@ def setup_text(app, key=None):
     """The settings for one app, with this computer's Python and this script's path (and the key file, if given)."""
     py, me = sys.executable, os.path.abspath(__file__)
     env = {}
+    note = ""
     if key:
         env["SKARBNIK_KEY_FILE"] = os.path.abspath(os.path.expanduser(key))
     else:
         try:
-            kf = find_key_file(settings())
-            if os.path.dirname(kf) != HERE:
-                env["SKARBNIK_KEY_FILE"] = kf
-        except Fail:
-            pass
+            note = f"Key file found: {find_key_file(settings())} (the server finds it by itself each time it starts).\n\n"
+        except Fail as e:
+            note = f"Note: {e}\n\n"
     entry = {"command": py, "args": ["-I", me]}
     if env:
         entry["env"] = env
@@ -677,17 +736,17 @@ def setup_text(app, key=None):
     if app in ("claude-desktop", "cursor"):
         where = ("Claude Desktop: Settings, Developer, Edit Config. That opens claude_desktop_config.json."
                  if app == "claude-desktop" else "Cursor: the file .cursor/mcp.json in your home folder.")
-        return (f"{where}\nIf the file is empty or holds only {{}}, replace everything in it with this:\n\n{block}\n\n"
+        return (f"{note}{where}\nIf the file is empty or holds only {{}}, replace everything in it with this:\n\n{block}\n\n"
                 "If it already has \"mcpServers\", add only the \"skarbnik\": {...} part inside it, with a comma between it "
                 "and the entry before it. Save the file, then quit the app fully and open it again.")
     if app == "claude-code":
         envs = "".join(f' --env {k}="{v}"' for k, v in env.items())
-        return f'Run this once in a terminal:\n\nclaude mcp add --scope user{envs} skarbnik -- "{py}" -I "{me}"\n\nThen start claude; /mcp lists skarbnik.'
+        return f'{note}Run this once in a terminal:\n\nclaude mcp add --scope user{envs} skarbnik -- "{py}" -I "{me}"\n\nThen start claude; /mcp lists skarbnik.'
     if app == "codex":
         lines = ["[mcp_servers.skarbnik]", f"command = '{py}'", f"args = ['-I', '{me}']"]
         if env:
             lines.append("env = { " + ", ".join(f"{k} = '{v}'" for k, v in env.items()) + " }")
-        return ("Add this to the file .codex/config.toml in your home folder (make the file if it does not exist), "
+        return (note + "Add this to the file .codex/config.toml in your home folder (make the file if it does not exist), "
                 "then start Codex again:\n\n" + "\n".join(lines))
     raise Fail("--setup takes one of: claude-desktop, claude-code, codex, cursor")
 

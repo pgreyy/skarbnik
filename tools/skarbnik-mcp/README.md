@@ -4,13 +4,16 @@ An MCP server that lets an AI app work on Skarbnik bounties: find one, read its 
 and reveal it, then follow the outcome. It signs on your computer with a key limited to `commit` and `reveal` and
 refuses any other key. One file, `server.py`, Python 3.9 or later, standard library only, on Windows, macOS and Linux.
 It signs transactions itself (Ed25519 and NEAR's transaction format, in the file), so no NEAR command line tool is
-needed. Building a fix needs Rust with the `wasm32-unknown-unknown` target.
+needed. A fix can be written as WebAssembly text and checked with the site's keyless check (`check_patch`; only the fix
+is sent, never the key), so Rust is optional: with Rust and its `wasm32-unknown-unknown` target, `build_patch` builds
+a fix from Rust source instead.
 
 | Tool | What it does |
 | --- | --- |
 | `list_bounties` | Bounties from https://skarbnik.xyz/feed.json (a snapshot): terms, next fee, slots, windows, public code links |
 | `get_bounty` | One bounty read live from the contract, with the checks of [AGENTS.md](../../AGENTS.md) section 2 for your account |
-| `get_public_code` | The bounty's Rust source, build flags and public tests from the site; the module is checked against `original_hash` on chain |
+| `get_public_code` | The bounty's Rust source, build flags and public tests from the site, and the original module as WebAssembly text; the module is checked against `original_hash` on chain |
+| `check_patch` | Checks a fix written as WebAssembly text (or a `.wasm` file) with https://skarbnik.xyz/api/check: valid, fits, the same exports as the public program, the public tests, and the public demo input on demo bounties; saves the module next to the key file for `commit`. It does not show that the private test passes |
 | `build_patch` | Builds the complete fixed Rust file with the bounty's exact flags into `work/bounty-<id>/` next to the key file; returns the `.wasm` path, its size and whether it fits; refuses source that uses `include!`, `env!`, `mod` or `extern crate` |
 | `get_credit` | Your credit in the contract and your agent limits |
 | `commit` | Checks the bounty and the key, makes a nonce, builds the fingerprint, saves the nonce, sends `commit`; refuses a patch above the bounty's `max_patch_bytes` (the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page) |
@@ -21,8 +24,8 @@ needed. Building a fix needs Rust with the `wasm32-unknown-unknown` target.
 
 - It never returns or logs the key file or the nonces. The private key is read from the file only to sign, checked
   against the file's public key, and dropped.
-- The key file is `SKARBNIK_KEY_FILE`, or else the one `*.agent-key.json` file in the folder of `server.py` (the file
-  the site's Account page saves when you press "Create an agent key").
+- The key file is `SKARBNIK_KEY_FILE`, or else the one `*.agent-key.json` file (the file the site's Account page
+  saves) next to `server.py`, or else in your Downloads folder. If it finds none, or more than one, it says so.
 - It refuses a key that is not a function call key for the contract limited to `commit` and `reveal` (it reads the
   key's permission from the chain before each commit and reveal). On macOS and Linux it also refuses a key file other
   users can read (`chmod 600`).

@@ -460,6 +460,49 @@ async function drawAccount(name) {
   } catch (e) { out.innerHTML = note(`Could not read: ${esc(e.message)}`, 'alert'); }
 }
 
+// ---------- agent keys: shared by the Account page and the For agents page ----------
+// Adds a key made in this browser as a key limited to commit and reveal, with the wallet's approval.
+export async function addAgentKey(publicKey, allowanceYocto) { return W.readOutcome(await W.addKey(publicKey, allowanceYocto)); }
+// Offers the key as a file (the format the MCP server and near-cli read).
+function downloadKeyFile(account, k) {
+  const blob = new Blob([JSON.stringify({ account_id: account, public_key: k.publicKey, private_key: k.privateKey }, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${account}.agent-key.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+// The connector link, shown once in a dialog: copy, download as a key file, the warning. Closing it empties the dialog,
+// so the link and the key leave the page; nothing is logged or stored.
+export function openKeyDialog(account, k, txHash) {
+  const d = $('#keyDlg'); let key = k;
+  const link = connectorLink(account, key.privateKey);
+  d.innerHTML = `<div class="dhead"><h2 class="h3" id="keyTitle">Your connector link</h2><button class="btn btn-g btn-s" type="button" data-close>Close</button></div>
+    <p class="small faint">Shown once. Copy it now: it is gone when this closes.</p>
+    <div class="stack g16 mt16"><div class="cblk"><code class="code" id="dlgLink">${esc(link)}</code>${copyBtn(link)}</div>
+    <div class="row"><button class="btn btn-g btn-s" type="button" id="dlgKeyFile">${icon('download')} Download as key file</button><span class="small faint">For the Local and Guide ways.</span></div>
+    ${note('Anyone with this link can use your agent key. It can only send in fixes and spend your small test credit. Delete the key on your Account page to switch the link off.', 'alert')}
+    ${txHash ? `<p class="small">Key added by your wallet: ${tx(txHash)}</p>` : ''}</div>`;
+  $('#dlgKeyFile', d).onclick = () => { if (key) downloadKeyFile(account, key); };
+  d.querySelectorAll('[data-close]').forEach((b) => (b.onclick = () => d.close()));
+  d.addEventListener('close', () => { d.innerHTML = ''; key = null; }, { once: true });
+  d.showModal();
+  $('[data-close]', d).focus();
+}
+// "Create agent key" in place (For agents, step 03): connects the wallet first if needed, makes the key in this browser,
+// asks the wallet to add it (gas allowance 0.25 NEAR, as on the Account page), then shows the link once.
+export async function createAgentKeyInPlace(say) {
+  if (W.state.status !== 'on') { say('Connect a testnet wallet first.'); await W.connect(); }
+  if (W.state.status !== 'on') { say('The wallet did not connect, so no key was made.'); return; }
+  const account = W.state.account;
+  let k;
+  try { k = await newAgentKey(); } catch { say('This browser cannot make an Ed25519 key. Use the Account page in another browser.'); return; }
+  say('Waiting for the wallet. Approve or reject the AddKey request in the wallet window.');
+  try {
+    const o = await addAgentKey(k.publicKey, toYocto('0.25'));
+    if (!o.ok) { say(`The wallet sent the request but it failed: ${esc(o.error)}`); return; }
+    say('');
+    openKeyDialog(account, k, o.tx);
+  } catch (e) { say(`The wallet did not add the key: ${esc(W.plainError(e))}`); } finally { k = null; }
+}
+
 // ---------- agent setup (connected owner only) ----------
 const CLI = (account, pub, allowance) => `near account add-key ${account} grant-function-call-access --allowance '${allowance} NEAR' --contract-account-id ${CONTRACT} --function-names 'commit, reveal' use-manually-provided-public-key ${pub} network-config testnet sign-with-legacy-keychain send`;
 
@@ -541,11 +584,7 @@ function bindSetup(name, lim) {
     await drawAccount(name); const p = $('#privKey'); if (p) p.scrollIntoView({ block: 'center' });
   };
   const kf = $('#keyFile');
-  if (kf) kf.onclick = () => {
-    const blob = new Blob([JSON.stringify({ account_id: name, public_key: pendingKey.publicKey, private_key: pendingKey.privateKey }, null, 1)], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${name}.agent-key.json`;
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  };
+  if (kf) kf.onclick = () => downloadKeyFile(name, pendingKey);
   const fg = $('#keyForget'); if (fg) fg.onclick = () => { pendingKey = null; drawAccount(name); };
   document.querySelectorAll('[data-delkey]').forEach((b) => (b.onclick = () => {
     const pub = b.dataset.delkey, box = $('#delBox');
@@ -567,7 +606,7 @@ function bindSetup(name, lim) {
     say(box, '', 'Waiting for the wallet. Approve or reject the AddKey request in the wallet window.');
     const fallback = `<p class="small mt12">If your wallet cannot add the key, run this in a terminal with the NEAR CLI (near-cli-rs), signed with your full key:</p>${cmd(CLI(name, pendingKey.publicKey, allowText))}`;
     try {
-      const o = W.readOutcome(await W.addKey(pendingKey.publicKey, allow));
+      const o = await addAgentKey(pendingKey.publicKey, allow);
       if (o.ok) { pendingKey.added = o.tx; say(box, 'ok', `The key was added: it may call only commit and reveal on ${esc(CONTRACT)}. ${tx(o.tx)}`); setTimeout(() => drawAccount(name), 3000); }
       else box.innerHTML = `<div class="msg bad" role="alert">The wallet sent the request but it failed: ${esc(o.error)} ${o.tx ? tx(o.tx) : ''}</div>${fallback}`;
     } catch (e) { box.innerHTML = `<div class="msg bad" role="alert">The wallet did not add the key: ${esc(W.plainError(e))}</div>${fallback}`; }

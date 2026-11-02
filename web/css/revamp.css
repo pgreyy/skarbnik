@@ -257,8 +257,8 @@
 .sk .clp[open]>.clp-btn .chev{transform:rotate(180deg);border-color:var(--am);color:var(--am)}
 .sk .clp-b{padding:2px 18px 20px}
 .sk .clp .clp{margin-top:18px}
-.sk .ag-ex{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
-.sk .ag-ex .code{flex:1 1 260px;margin:0;color:var(--tx2);border-style:dashed}
+.sk .ag-ex{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.sk .ag-ex .code{align-self:stretch;margin:0;color:var(--tx2);border-style:dashed}
 .sk .ag-ex-l{font:600 11.5px/1 var(--fu);letter-spacing:.1em;text-transform:uppercase;color:var(--am)}
 .sk .ag-dlg{margin:18px 0 0;display:flex;flex-direction:column;gap:8px;max-width:460px}
 .sk .ag-dlg-box{display:flex;flex-direction:column;gap:10px;padding:18px;border:1px solid var(--ln2);border-radius:14px;background:var(--bg2);font-size:14px;color:var(--tx)}

@@ -374,4 +374,4 @@ async function handleMessage(k, msg) {
   return { jsonrpc: '2.0', id, error: { code: -32601, message: 'method not found' } };
 }
 
-module.exports = { decodeToken, keyAllowed, handleMessage, VERSION, TOOLS, b58encode, b58decode, functionCallTx, fingerprint };
+module.exports = { decodeToken, keyAllowed, handleMessage, VERSION, TOOLS, b58encode, b58decode, functionCallTx, fingerprint, checkPatch, patchBytes, patchOk, bounty, Fail };

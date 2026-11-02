@@ -125,6 +125,9 @@ The Account page shows the link once, right after the wallet adds the key (made 
 sent anywhere by the page); reloading the page loses it. Delete key on the page removes the key with the wallet, which
 turns the link off (EVIDENCE, "The connector link on the Account page").
 
+`/api/check` (web/api/check.js) is keyless: it assembles and checks a fix for anyone (30 a minute per address), signs
+nothing and stores nothing. The local MCP server uses it for fixes written as WebAssembly text; only the fix is sent.
+
 Known limits: Vercel's own request log records each request's full path, so the link is visible in the project
 owner's Vercel dashboard (accepted by the owner, 2026-11-02: the key is limited, the credit capped, testnet only, and
 the key can be deleted). Anyone who has the link can commit and reveal as that account, spending its credit up to its

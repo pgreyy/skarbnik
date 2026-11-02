@@ -24,6 +24,25 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
+## 2026-11-02: For agents: key in place, Local in plain view, key file found by itself (local, not live)
+
+- Step 03 has a "Create agent key" button that works in place: it connects the wallet if needed, makes the key with the
+  same code as the Account page (`createAgentKeyInPlace`, `addAgentKey` in web/js/account-ui.js), and after the wallet's
+  approval opens a dialog that shows the connector link once, with an icon copy button, "Download as key file" and the
+  warning to delete the key on the Account page to switch the link off. Closing it (Esc or Close) empties the dialog.
+  "Manage or delete keys" links to the Account page. One example link, tagged "Example", only in step 03; the Link way
+  says to use the link from step 03.
+- The Local way shows its steps: get the server (one file, a Windows and a Mac or Linux switch), add it to the app
+  (Claude Desktop with --setup, Claude Code and Codex commands), ask it to try a bounty. Only "Need Python first?",
+  "Windows with WSL" and "Then: how do I know it worked?" are closed. No placeholders in its copy boxes.
+- `tools/skarbnik-mcp/server.py`: finds the key file next to itself or in Downloads (--key only when it finds none or
+  several, and it says which); `check_patch` checks a fix written as WebAssembly text with the new keyless
+  `/api/check` (web/api/check.js), so Rust is optional; `get_public_code` returns the original as WebAssembly text.
+- Checked with a private script: the button, the dialog (focus stays inside, Esc closes, the dialog is emptied and no
+  link stays in the page), the Link way, the Local steps and drop downs, at 1440 and 390, dark and light, no errors;
+  check_patch through the local server against a local copy of /api/check: 17 of 17 public tests, no crash on the demo
+  input, the module saved next to the key file.
+
 ## 2026-11-02: No tested wording on the pages, limits kept
 
 - Only lines that claimed an app, OS or step is tested were reworded: How it works "Checked against the public tests

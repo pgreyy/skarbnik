@@ -11,7 +11,7 @@ import { CONTRACT, span } from '../chain.js';
 import { $, esc, icon, copyBtn, note, cmd, chip, block, table, collapse, picker, pickPanel, bindPicker, tabbed, tabNav } from '../ui.js';
 import { fromFeed } from '../data.js';
 import * as W from '../wallet.js';
-import { openCredit } from '../account-ui.js';
+import { openCredit, createAgentKeyInPlace } from '../account-ui.js';
 
 const REPO = 'https://github.com/pgreyy/skarbnik';
 const MCP = `${REPO}/tree/main/tools/skarbnik-mcp`;
@@ -22,7 +22,7 @@ const FIRST_MSG = 'List the open Skarbnik bounties.';
 const GUIDE = 'Open skarbnik.xyz/agent-quickstart.txt and follow it. Use my agent key file at <path to your key file>. Find an open bounty, try to fix it, and tell me the fee first.';
 const WAYS = [{ id: 'link', label: 'Link', sub: 'Easiest' }, { id: 'local', label: 'Local', sub: 'Advanced' }, { id: 'guide', label: 'Guide', sub: 'For agents without tools' }];
 const li = (items) => `<ol class="ag-ol">${items.map((t) => `<li>${t}</li>`).join('')}</ol>`;
-const exampleBox = `<div class="ag-ex"><code class="code">${esc(EXAMPLE_LINK)}</code><span class="ag-ex-l">Example, yours is different</span></div>`;
+const exampleBox = `<div class="ag-ex"><span class="ag-ex-l">Example</span><code class="code">${esc(EXAMPLE_LINK)}</code></div>`;
 
 // Where to paste the link, in one closed drop down: the table, then the illustration (a made-up, shortened value).
 const WHERE_ROWS = [
@@ -49,18 +49,6 @@ const LINK_WORKED = collapse('agLinkWorked', 'Then: how do I know it worked?', `
   'Start a new chat and turn Skarbnik on again.',
 ]))}`);
 
-const LOCAL_SETUP = collapse('agLocalSetup', 'What you need, and the setup', `<div class="stack g20">
-  <p class="small">Needs Python 3 and Git. To build fixes it also uses Rust (<a href="https://rustup.rs" target="_blank" rel="noopener">rustup.rs</a>) with its WebAssembly target. Use the key file from step 03.</p>
-  <div class="stack g8"><p class="ag-sub">1. Get the server</p>${block('git clone https://github.com/pgreyy/skarbnik.git\nrustup target add wasm32-unknown-unknown')}</div>
-  <div class="stack g8"><p class="ag-sub">2. Claude Desktop (Windows or Mac)</p>${li([
-    'In Claude Desktop, open Settings, then Developer, and press Edit Config. A settings file opens.',
-    `Paste this inside it. Keep anything that is already there. Print it with your own paths, in the folder where you ran git clone (on Windows, use <span class="mono txt">py</span> for <span class="mono txt">python3</span> and backslashes):${cmd('python3 skarbnik/tools/skarbnik-mcp/server.py --setup claude-desktop --key "<path to your key file>"')}`,
-    'Save the file, then quit Claude fully and open it again.',
-  ])}</div>
-  <div class="stack g8"><p class="ag-sub">3. Claude Code</p><p class="small">In the folder where you ran git clone:</p>${cmd('claude mcp add --scope user skarbnik --env SKARBNIK_KEY_FILE="<path to your key file>" -- python3 "$PWD/skarbnik/tools/skarbnik-mcp/server.py"')}</div>
-  <div class="stack g8"><p class="ag-sub">4. Codex</p><p class="small">Print the lines for <span class="mono txt">.codex/config.toml</span> in your home folder, and add them to it:</p>${cmd('python3 skarbnik/tools/skarbnik-mcp/server.py --setup codex --key "<path to your key file>"')}</div>
-  <p class="small faint">On Windows with the server inside WSL, see the <a href="${README}" target="_blank" rel="noopener">README</a>: the command is wsl, and the key variable must also be named in WSLENV.</p></div>`);
-
 const LOCAL_WORKED = collapse('agLocalWorked', 'Then: how do I know it worked?', `${li([
   'Quit the app fully and open it again. It only reads its settings when it starts. On Windows, closing the Claude Desktop window is not enough: right click its icon near the clock and choose Quit.',
   'In Claude Desktop, Settings, then Developer, lists skarbnik as running. In Claude Code, /mcp lists it; in Codex, codex mcp list.',
@@ -68,8 +56,24 @@ const LOCAL_WORKED = collapse('agLocalWorked', 'Then: how do I know it worked?',
 ])}${collapse('agLocalNothing', 'Nothing shows?', li([
   'Quit the app fully and open it again. Closing the window is not enough.',
   'The settings file must be valid: one missing comma or bracket breaks it. Print the settings again and compare.',
-  'The folder and the key file must exist where the settings say.',
+  'The server must be where the settings say, and the key file in Downloads or next to the server (or named with --key).',
 ]))}`);
+
+const RAW = 'https://raw.githubusercontent.com/pgreyy/skarbnik/main/tools/skarbnik-mcp/server.py';
+const OS = [{ id: 'win', label: 'Windows' }, { id: 'mac', label: 'Mac or Linux' }];
+const LOCAL_CMDS = {
+  win: { get: `mkdir -Force "$HOME\\skarbnik"\ncurl.exe -L -o "$HOME\\skarbnik\\server.py" ${RAW}`, run: 'py "$HOME\\skarbnik\\server.py"', code: 'claude mcp add --scope user skarbnik -- py "$HOME\\skarbnik\\server.py"', codex: 'codex mcp add skarbnik -- py "$HOME\\skarbnik\\server.py"' },
+  mac: { get: `mkdir -p ~/skarbnik\ncurl -L -o ~/skarbnik/server.py ${RAW}\nchmod 600 ~/Downloads/*.agent-key.json`, run: 'python3 ~/skarbnik/server.py', code: 'claude mcp add --scope user skarbnik -- python3 ~/skarbnik/server.py', codex: 'codex mcp add skarbnik -- python3 ~/skarbnik/server.py' },
+};
+const localSteps = (os) => { const c = LOCAL_CMDS[os]; return li([
+  `<b>Get the server.</b> One small file, standard Python only:${block(c.get)}`,
+  `<b>Add it to your AI app.</b> Claude Desktop: open Settings, then Developer, then Edit Config. Paste what the setup command prints inside the file. Save, then quit Claude fully and open it again.${block(`${c.run} --setup claude-desktop`)}
+    <p class="ag-sub mt12">Claude Code</p>${block(c.code)}<p class="ag-sub mt12">Codex</p>${block(c.codex)}
+    <p class="small mt12">The server finds your key file by itself. If it can’t, it tells you.</p><p class="small faint">Keep the key file somewhere else? Add <span class="mono">--key "&lt;path&gt;"</span> to the setup command, or <span class="mono">--env SKARBNIK_KEY_FILE="&lt;path&gt;"</span> to the claude and codex commands.</p>`,
+  `<b>Ask it to try a bounty.</b>${block(PROMPT)}`,
+]); };
+const LOCAL_PY = collapse('agPy', 'Need Python first?', `<p class="small">Install Python 3 from <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org/downloads</a>. On Windows, tick “Add python.exe to PATH” in the installer. On a Mac, then open the Python folder in Applications and double click “Install Certificates.command”.</p><p class="small faint mt8">Optional: with Rust (rustup.rs) and its WebAssembly target, the server can also build a fix from Rust source.</p>`);
+const LOCAL_WSL = collapse('agWsl', 'Windows with WSL', `<p class="small">To keep the server inside WSL instead, Claude Desktop starts it with the command <span class="mono">wsl</span>; a setting such as SKARBNIK_KEY_FILE reaches Linux only when it is also named in WSLENV. The <a href="${README}" target="_blank" rel="noopener">README</a> shows the exact block.</p>`);
 
 export async function agents(viewEl, tab, sub) {
   const me = W.state.status === 'on' ? W.state.account : null;
@@ -77,9 +81,9 @@ export async function agents(viewEl, tab, sub) {
   const way = WAYS.some((w) => `way-${w.id}` === sub) ? sub.slice(4) : 'link';
   const step = (n, h, body) => `<div class="ag-step"><span class="ag-n">${String(n).padStart(2, '0')}</span><div class="stack g12"><h3 class="h3">${h}</h3>${body}</div></div>`;
   const ways = {
-    link: `<div class="stack g16"><p class="small">The easiest way: nothing to install. Your AI app talks to Skarbnik’s hosted connector through your link.</p>
-      ${exampleBox}<p class="small">Paste this link where your app lets you add a custom connector.</p>${WHERE}${LINK_WORKED}</div>`,
-    local: `<div class="stack g16"><p class="small">For developers who want the key to stay on their own computer: Skarbnik’s MCP server runs there and signs there.</p>${LOCAL_SETUP}${LOCAL_WORKED}</div>`,
+    link: `<div class="stack g16"><p class="small">The easiest way: nothing to install. Your AI app talks to Skarbnik’s hosted connector through your link. Use the link from step 03, and paste it where your app lets you add a custom connector.</p>${WHERE}${LINK_WORKED}</div>`,
+    local: `<div class="stack g16"><p class="small">For people who want the key to stay on their own computer: Skarbnik’s MCP server runs there and signs there.</p>
+      ${picker('los', OS, 'win', 'Your computer')}${OS.map((o) => pickPanel('los', o.id, 'win', localSteps(o.id))).join('')}${LOCAL_PY}${LOCAL_WSL}${LOCAL_WORKED}</div>`,
     guide: `<div class="stack g16"><p class="small">Agents that can’t add tools, like Hark Pro, follow the written guide instead. They need to be able to run commands on your computer.</p>${block(GUIDE)}</div>`,
   };
 
@@ -87,7 +91,7 @@ export async function agents(viewEl, tab, sub) {
   <div class="card ag-card">
     ${step(1, 'Connect your wallet', `<p class="small">Any NEAR testnet wallet. The money is test money, nothing real.</p><div class="row" id="agWallet"></div>`)}
     ${step(2, 'Add a little credit', `<p class="small">Deposit some test NEAR. Each attempt takes its small fee from this credit.</p><div class="row"><button class="btn btn-g btn-s" type="button" id="agCredit">${icon('coin')} Add credit</button><a class="lnk sm" href="${accountHref}">Open Account</a></div>`)}
-    ${step(3, 'Get your connector link', `<p class="small">On your Account page, press “Create an agent key” and approve it in your wallet. The page then shows your connector link once: copy it and keep it like a password. For the Local and Guide ways, also press “Download as a key file”. The key can only send in fixes; it can’t move your money.</p>${exampleBox}<div class="row"><a class="btn btn-g btn-s" href="${accountHref}">Open Account</a></div>`)}
+    ${step(3, 'Get your connector link', `<p class="small">Create an agent key and approve it in your wallet. Your connector link is then shown once: copy it and keep it like a password. For the Local and Guide ways, also download the key file there. The key can only send in fixes; it can’t move your money.</p><div class="row"><button class="btn btn-p btn-s" type="button" id="agKeyNew">${icon('key')} Create agent key</button></div><p class="small"><a class="lnk sm" href="${accountHref}">Manage or delete keys</a></p><div id="agKeyBox" role="status"></div>${exampleBox}`)}
     ${step(4, 'Add Skarbnik to your AI app', `<p class="small">Pick one way.</p>${picker('way', WAYS, way, 'Ways to add Skarbnik')}${WAYS.map((w) => pickPanel('way', w.id, way, ways[w.id])).join('')}`)}
     ${step(5, 'Ask it to try a bounty', `<p class="small">In a new chat, paste:</p>${block(PROMPT)}<p class="r-tn">${icon('flask')}<span><b>Testnet only.</b> Attempts spend test NEAR from your credit.</span></p>`)}
   </div>
@@ -185,6 +189,12 @@ export async function agents(viewEl, tab, sub) {
   drawWallet();
   const off = W.onChange(() => { if (!$('#agWallet')) { off(); return; } drawWallet(); });
   $('#agCredit').onclick = () => (W.state.status === 'on' ? openCredit('deposit') : W.connect());
+  // step 03 in place: the same code as the Account page; the link only ever appears in the dialog
+  $('#agKeyNew').onclick = async () => {
+    const box = $('#agKeyBox'), b = $('#agKeyNew');
+    b.disabled = true;
+    try { await createAgentKeyInPlace((m) => { if (box) box.innerHTML = m ? `<p class="small">${m}</p>` : ''; }); } finally { b.disabled = false; }
+  };
 
   try {
     const text = await (await fetch('agent-quickstart.txt')).text();

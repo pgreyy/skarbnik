@@ -45,6 +45,10 @@
     "api/mcp/[token].js": {
       "maxDuration": 60,
       "memory": 1024
+    },
+    "api/check.js": {
+      "maxDuration": 60,
+      "memory": 1024
     }
   }
 }
