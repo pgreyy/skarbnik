@@ -24,6 +24,15 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
+## 2026-11-03: Tool READMEs (Windows and Mac first, WSL as a footnote)
+
+- tools/skarbnik-mcp/README.md: the setup now matches the For agents page's Local way: one file, Python from
+  python.org, the key file found in Downloads, Claude Desktop through `--setup`, the `claude mcp add` and `codex mcp add`
+  lines for Windows and for Mac or Linux, and a WSL footnote with the exact block (`wsl`, `WSLENV`). Server 0.3.0
+  (check_patch, key file discovery, `--key`).
+- tools/skarbnik-vendor-mcp/README.md keeps WSL as the Windows route: the vendor tool needs Linux and Docker.
+- Ran from Windows through WSL (EVIDENCE, "The two MCP servers started from Windows through WSL").
+
 ## 2026-11-03: For agents, Developers: Agent quickstart as the first card
 
 - The quickstart is now the first card of the resource grid (six cards, two rows of three), in the same style, with a

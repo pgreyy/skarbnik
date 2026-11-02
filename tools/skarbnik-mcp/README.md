@@ -35,36 +35,61 @@ a fix from Rust source instead.
 
 ## Setup
 
-The same steps are on the site, with copy buttons: https://skarbnik.xyz/#/agents/connect
+The same steps are on the site, with copy buttons: https://skarbnik.xyz/#/agents/connect (the Local way). Without
+installing anything, the Link way gives an AI app the same tools through one link.
 
-1. On the site's Account page, connect a testnet wallet, add a little credit and press "Create an agent key". Save the
-   key file.
-2. Install Python 3.9 or later and Rust (https://rustup.rs), then `rustup target add wasm32-unknown-unknown`.
-3. Put `server.py` and the key file in one folder. On Windows (PowerShell):
+1. On the site's Account page, connect a testnet wallet, add a little credit, press "Create agent key" and download
+   the key file. The server finds it in your Downloads folder by itself.
+2. Get the server, one file, with Python 3.9 or later. On Windows (PowerShell), with Python from python.org ("Add
+   python.exe to PATH" ticked):
 
-       mkdir "$HOME\skarbnik"
+       mkdir -Force "$HOME\skarbnik"
        curl.exe -L -o "$HOME\skarbnik\server.py" https://raw.githubusercontent.com/pgreyy/skarbnik/main/tools/skarbnik-mcp/server.py
-       move "$HOME\Downloads\*.agent-key.json" "$HOME\skarbnik\"
-       py "$HOME\skarbnik\server.py" --check
 
-   On macOS or Linux:
+   On a Mac or Linux:
 
        mkdir -p ~/skarbnik
        curl -L -o ~/skarbnik/server.py https://raw.githubusercontent.com/pgreyy/skarbnik/main/tools/skarbnik-mcp/server.py
-       mv ~/Downloads/*.agent-key.json ~/skarbnik/
-       chmod 600 ~/skarbnik/*.agent-key.json
-       python3 ~/skarbnik/server.py --check
+       chmod 600 ~/Downloads/*.agent-key.json
 
-   `--check` tests Python, the key (on chain) and Rust, and ends with "All set."
-4. Print the settings for your app, with this computer's paths filled in, and follow what it prints:
-   `python3 ~/skarbnik/server.py --setup claude-desktop` (or `claude-code`, `codex`, `cursor`; on Windows
-   `py "$HOME\skarbnik\server.py" --setup ...`).
+   `py "$HOME\skarbnik\server.py" --check` (Windows) or `python3 ~/skarbnik/server.py --check` (Mac or Linux) tests
+   Python and the key on chain, and ends with "All set."
+3. Add it to your AI app.
 
-   - Claude Desktop: Settings, Developer, Edit Config opens `claude_desktop_config.json`; paste what was printed,
-     save, then quit Claude Desktop fully (on Windows also from the system tray) and open it again.
-   - Claude Code: run the printed `claude mcp add --scope user ...` line; `/mcp` lists skarbnik.
-   - Codex: add the printed lines to `~/.codex/config.toml`; `codex mcp list` lists skarbnik.
-   - Cursor: the same `mcpServers` block as Claude Desktop, in `~/.cursor/mcp.json`.
+   - Claude Desktop (Windows or Mac): open Settings, then Developer, and press Edit Config. Paste what this prints
+     inside the file, keeping anything already there; save, then quit Claude fully and open it again (on Windows also
+     from the system tray):
+
+         py "$HOME\skarbnik\server.py" --setup claude-desktop        (Windows)
+         python3 ~/skarbnik/server.py --setup claude-desktop          (Mac)
+
+   - Claude Code:
+
+         claude mcp add --scope user skarbnik -- py "$HOME\skarbnik\server.py"      (Windows)
+         claude mcp add --scope user skarbnik -- python3 ~/skarbnik/server.py        (Mac or Linux)
+
+   - Codex (writes `~/.codex/config.toml`):
+
+         codex mcp add skarbnik -- py "$HOME\skarbnik\server.py"                    (Windows)
+         codex mcp add skarbnik -- python3 ~/skarbnik/server.py                      (Mac or Linux)
+
+   - Cursor: the same `mcpServers` block as Claude Desktop (`--setup cursor`), in `~/.cursor/mcp.json`.
+
+   The server finds the key file by itself (next to `server.py`, or in Downloads) and says so in plain words when it
+   finds none or more than one. Keeping it somewhere else: add `--key "<path>"` to `--setup`, or
+   `--env SKARBNIK_KEY_FILE="<path>"` to the `claude` and `codex` commands.
+4. Ask it: "Find an open Skarbnik bounty, read its public code and try to fix it. Tell me the fee before you spend
+   anything." Fixes are written as WebAssembly text and checked with `check_patch`; Rust is optional (`build_patch`).
+
+On Windows with the server inside WSL instead, Claude Desktop starts it with `wsl`, and a setting such as
+`SKARBNIK_KEY_FILE` reaches Linux only when it is also named in `WSLENV`; without it the server starts but finds no
+key file:
+
+    "skarbnik": {
+      "command": "wsl",
+      "args": ["python3", "/home/<you>/skarbnik/server.py"],
+      "env": { "SKARBNIK_KEY_FILE": "/home/<you>/skarbnik/<account>.agent-key.json", "WSLENV": "SKARBNIK_KEY_FILE/u" }
+    }
 
 Other settings (environment variables): `SKARBNIK_KEY_FILE`, `SKARBNIK_ACCOUNT` (default: from the key file or its
 folder), `SKARBNIK_NETWORK` (default `testnet`), `SKARBNIK_ALLOW_MAINNET`, `SKARBNIK_CONTRACT`, `SKARBNIK_RPC`,
@@ -74,6 +99,6 @@ from near-cli's keychain works either way).
 ## A session
 
 Ask the agent, for example: "Find an open Skarbnik bounty, read its public code and try to fix it. Tell me the fee
-before you spend anything." It calls list_bounties, get_public_code, build_patch and get_bounty, tells you the fee,
-then commits after your yes and reveals after the bounty's reveal gap. Earlier test with an MCP client (Claude Code) on
-test bounty 26, version 0.1.0 signing through near-cli: [docs/EVIDENCE.md](../../docs/EVIDENCE.md), "The MCP server".
+before you spend anything." It calls list_bounties, get_public_code, check_patch and get_bounty, tells you the fee,
+then commits after your yes and reveals after the bounty's reveal gap. Runs with an MCP client script are in
+[docs/EVIDENCE.md](../../docs/EVIDENCE.md), "The MCP server" and "The vendor MCP server".
