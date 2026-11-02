@@ -10,7 +10,7 @@ import { TX_INDEX } from './config.js';
 import * as W from './wallet.js';
 import { fingerprint, newNonce, hex, b64, sha256, putAttempt, attemptsFor, dropAttempt, downloadRecord, toYocto } from './attempt.js';
 import { newAgentKey, connectorLink } from './agentkey.js';
-import { $, esc, icon, chip, tx, acct, toast, table, facts, bothTimes, cmd, note } from './ui.js';
+import { $, esc, icon, copyBtn, chip, tx, acct, toast, table, facts, bothTimes, cmd, note } from './ui.js';
 
 let credit = null; // the connected account's contract credit, yoctoNEAR string
 const short = (a) => (a.length > 22 ? `${a.slice(0, 12)}…${a.slice(-8)}` : a);
@@ -487,20 +487,20 @@ function setupHtml(name, lim, stopped, nKeys) {
     ${k ? `<div class="keybox" role="region" aria-label="Your new agent key">
       ${note('<b>Save this private key now.</b> It is shown only once and this site does not keep it. Anyone holding it can commit and reveal as this account, spending its credit up to your limits. It cannot withdraw.', 'alert')}
       <div><p class="small faint">Public key</p><code>${esc(k.publicKey)}</code></div>
-      <div><p class="small faint">Private key</p><code id="privKey">${esc(k.privateKey)}</code></div>
-      <div class="row"><button class="btn btn-g btn-s" type="button" id="keyFile">${icon('download')} Download as a key file</button><button class="mini" type="button" data-copy-text="${esc(k.privateKey)}">Copy private key</button></div>
+      <div><p class="small faint">Private key</p><div class="cblk"><code class="code" id="privKey">${esc(k.privateKey)}</code>${copyBtn(k.privateKey)}</div></div>
+      <div class="row"><button class="btn btn-g btn-s" type="button" id="keyFile">${icon('download')} Download as a key file</button></div>
       ${k.added ? `<div class="msg ok" role="status">${OK('Added')} This key may call only commit and reveal on ${esc(CONTRACT)}. ${tx(k.added)}</div>
       <div class="linkbox stack g12" role="region" aria-label="Your connector link"><h4 class="h4">Your connector link</h4>
-        <p class="small">Paste it into your AI app as a custom connector (<a href="#/agents/connect">For agents, step 04</a>). Treat it like a password.</p>
-        <div class="code-row"><code class="code" id="connLink">${esc(connectorLink(name, k.privateKey))}</code><button class="mini" type="button" data-copy-text="${esc(connectorLink(name, k.privateKey))}" aria-label="Copy the connector link">Copy</button></div>
+        <p class="small">Paste it into your AI app where it lets you add a custom connector. Treat it like a password.</p>
+        <div class="cblk"><code class="code" id="connLink">${esc(connectorLink(name, k.privateKey))}</code>${copyBtn(connectorLink(name, k.privateKey))}</div>
         <p class="small">Anyone with this link can use your agent key. It can only send in fixes and spend your small test credit. Delete the key to cancel the link.</p>
-        <p class="small faint">Shown once: reloading this page loses it. The key file below is for running Skarbnik on your own computer.</p></div>
+        <p class="small faint">Shown once: reloading this page loses it. The key file (Download as a key file, above) is for running Skarbnik on your own computer.</p></div>
       <div class="row"><button class="btn btn-g btn-s" type="button" id="keyForget">I saved it, hide the key</button></div>`
       : `<div class="field"><label for="keyAllow">Gas allowance for this key (NEAR)</label><input id="keyAllow" inputmode="decimal" value="0.25" aria-describedby="allowHint"><p class="hint" id="allowHint">The most this key may spend on gas. Attempt fees come from credit, not from this allowance.</p></div>
       <div class="row"><button class="btn btn-p" type="button" id="keyAdd">Add this key with my wallet</button><button class="btn btn-g btn-s" type="button" id="keyForget">Forget this key</button></div>`}
       <div id="keyBox"></div></div>`
     : `<div class="row"><button class="btn btn-p" type="button" id="keyNew">${icon('key')} Create an agent key</button></div>`}
-    <p class="small faint">Wallets tested for adding a key from this page: NEAR CLI (docs/EVIDENCE.md, "Agent setup from the site"). Other wallets were not tried; if one refuses, the exact CLI command is shown here instead.</p>
+    <p class="small faint">If your wallet refuses to add the key, the page shows the exact NEAR CLI command to run instead.</p>
   </div>
   </div>
   <div class="card pad28 stack g16 mt24">

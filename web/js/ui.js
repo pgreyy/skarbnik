@@ -23,6 +23,11 @@ export const hashCell = (h) => `<span class="hsh"><code data-full="${esc(h)}" da
   `<button class="mini" type="button" data-copy-text="${esc(h)}" aria-label="Copy the full value">Copy</button>` +
   `<button class="mini" type="button" data-toggle-full aria-expanded="false">Show full</button></span>`;
 
+// An icon only copy button, placed top right inside a code block (.cblk): 44 px tap target, aria-label and tooltip
+// "Copy"; after a click the icon turns into a check mark for 1.5 s (handled once, in initUi). Without JavaScript the
+// saved pages drop it, so a code block never shows a dead button.
+export const copyBtn = (text, label = 'Copy') => `<button class="cpy" type="button" data-copy-text="${esc(text)}" aria-label="${esc(label)}" title="${esc(label)}">${icon('copy', 'i i-cp')}${icon('check', 'i i-ok')}</button>`;
+
 // A command with a Copy button.
 export const cmd = (text) => `<div class="code-row"><p class="code">${esc(text)}</p><button class="mini" type="button" data-copy-text="${esc(text)}" aria-label="Copy the command">Copy</button></div>`;
 
@@ -80,6 +85,12 @@ export function initUi() {
   document.addEventListener('click', async (e) => {
     const c = e.target.closest('[data-copy-text]');
     if (c) {
+      if (c.classList.contains('cpy')) {
+        try { await navigator.clipboard.writeText(c.dataset.copyText); c.classList.add('done'); c.setAttribute('aria-label', 'Copied'); $('#live').textContent = 'Copied'; }
+        catch { c.setAttribute('aria-label', 'Copy failed: select the text instead'); $('#live').textContent = 'Copy failed: select the text instead'; }
+        setTimeout(() => { c.classList.remove('done'); c.setAttribute('aria-label', c.title || 'Copy'); }, 1500);
+        return;
+      }
       const was = c.textContent;
       try { await navigator.clipboard.writeText(c.dataset.copyText); c.textContent = 'Copied'; } catch { c.textContent = 'Select it'; }
       setTimeout(() => (c.textContent = was), 1400);

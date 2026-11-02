@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: Account page link box: icon copy buttons
+
+- `web/js/ui.js` `copyBtn`: an icon only copy button top right inside a code block (44 px, aria-label and tooltip
+  "Copy", a check mark for 1.5 s after a click, no layout shift); `web/css/site.css` `.cblk` and `.cpy`. Used on the
+  Account page for the private key and the connector link (no "Copy" text buttons there now). The box no longer points
+  to a For agents step that is not live; the line about which wallets were tried is replaced by what to do if a wallet
+  refuses.
+- Checked through the page with the NEAR CLI wallet at 1280 (dark and light) and 390: after a click the button shows
+  the check mark, reads "Copied", does not move, and the clipboard holds the link; back after 1.5 s; no sideways
+  scroll. The three test keys added were deleted (`zqheheya…`, `98Wu3nMG…`). No credit used.
+
 ## 2026-11-02: For agents page back to the live version
 
 - The first four tab For agents page (dad55f9) went to main by mistake, before the owner approved it. Restored

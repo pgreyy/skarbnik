@@ -270,3 +270,13 @@ body.sk>main{flex:1 0 auto}
 .sk :where(.p-bounties) .bar .seg button{flex:0 0 auto;min-height:44px;padding:0 12px;white-space:nowrap}
 .sk :where(.p-bounties) .bar .seg[data-more]{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
 @container sk (max-width:700px){.sk :where(.p-bounties) .bar .seg{width:100%}}
+/* Code blocks with an icon only copy button top right inside them (ui.js copyBtn) */
+.sk .cblk{position:relative}
+.sk .cblk>.code{display:block;margin:0;padding-right:52px;overflow-wrap:anywhere;word-break:break-word}
+.sk .cblk>pre.code{white-space:pre-wrap}
+.sk .cpy{position:absolute;top:0;right:0;width:44px;height:44px;display:grid;place-items:center;padding:0;border:0;border-radius:calc(10px * var(--rs));background:transparent;color:var(--tx3);cursor:pointer;transition:color .2s}
+.sk .cpy:hover{color:var(--tx)}
+.sk .cpy svg.i{width:18px;height:18px;grid-area:1/1}
+.sk .cpy .i-ok{visibility:hidden;color:var(--mn)}
+.sk .cpy.done .i-cp{visibility:hidden}
+.sk .cpy.done .i-ok{visibility:visible}
