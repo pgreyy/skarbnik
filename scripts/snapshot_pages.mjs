@@ -68,6 +68,13 @@ for (const entry of PAGES) {
       list.remove();
     }
     view.querySelectorAll('details').forEach((d) => d.setAttribute('open', ''));
+    // the Agent quickstart card: a plain link to the file; its text under a plain heading below the grid
+    for (const c of view.querySelectorAll('.qs-card')) {
+      const panel = view.querySelector(`#${CSS.escape(c.getAttribute('aria-controls'))}`);
+      c.removeAttribute('role'); c.removeAttribute('aria-expanded'); c.removeAttribute('aria-controls');
+      const chev = c.querySelector('.chev'); if (chev) chev.remove();
+      if (panel) { panel.removeAttribute('hidden'); const h = document.createElement('h3'); h.className = 'h3'; h.style.marginTop = '24px'; h.textContent = 'Agent quickstart'; c.closest('.qs-grid').after(h); h.after(panel); }
+    }
     for (const b of view.querySelectorAll('[aria-expanded][aria-controls]')) {
       const body = view.querySelector(`#${CSS.escape(b.getAttribute('aria-controls'))}`);
       if (body) body.removeAttribute('hidden');
