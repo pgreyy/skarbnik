@@ -171,6 +171,8 @@ body.sk>main{flex:1 0 auto}
 /* the agent key, shown once */
 .sk .keybox{display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:calc(14px * var(--rs));border:1.5px dashed rgba(var(--am-rgb),.75);background:rgba(var(--am-rgb),.05)}
 .sk .keybox code{font:400 13px/1.5 var(--fm);color:var(--tx);overflow-wrap:anywhere}
+.sk .linkbox{padding:16px;border-radius:calc(12px * var(--rs));border:1px solid var(--ln2);background:var(--bg)}
+.sk .linkbox .code{overflow-wrap:anywhere;word-break:break-all}
 
 /* details used for longer reference blocks */
 .sk details.more{border:1px solid var(--ln);border-radius:calc(20px * var(--rs));background:var(--s1)}

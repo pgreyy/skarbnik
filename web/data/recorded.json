@@ -1506,6 +1506,26 @@
     "result": "succeeded",
     "source": "docs/evidence/hosted_mcp/transactions.tsv",
     "script": "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)"
+   },
+   {
+    "step": "hosted_live_commit",
+    "method": "commit",
+    "tx": "F8WNMUHaNDKZdRhBa8qa9RUVXF4WVcpEyc5vKpCsQSGK",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/hosted_mcp/transactions.tsv",
+    "script": "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)"
+   },
+   {
+    "step": "hosted_live_reveal",
+    "method": "reveal",
+    "tx": "9tDeFWPt2d5HrgzoahbpHsU1zg1GAh2aZ6jBnDMbPGwS",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/hosted_mcp/transactions.tsv",
+    "script": "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)"
    }
   ],
   "23": [

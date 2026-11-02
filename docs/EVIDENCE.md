@@ -175,6 +175,28 @@ opentest` (output `docs/evidence/judge2/`).
 - Round 1 stays on chain. 18 was opened by our test; 19 to 22 were never opened. After their expiry anyone can call
   `expire`, which refunds the vendor; nothing happens to them by itself.
 
+## The connector link on the Account page, made and cancelled from the page (2026-11-02)
+
+Question: does the Account page give a working connector link when "Create an agent key" runs, and does deleting the
+key from the page turn that link off?
+
+- Run through the real page (local copy of `web/` at commit time, live testnet, live connector on skarbnik.xyz) with
+  the NEAR CLI wallet, driven by a private browser script, account `skarbnik-agentc-d48260.testnet`:
+  "Create an agent key" made the key in the browser; "Add this key with my wallet" gave the wallet's command, run with
+  near-cli: `GSTPDScSzNu2EoEzdbzrGEm7ct8yEvFcR27tKY3qr6qp`. The page then showed "Your connector link" once, with a
+  Copy button and the note "Anyone with this link can use your agent key. It can only send in fixes and spend your
+  small test credit. Delete the key to cancel the link."
+- That link, used with the HTTP client: initialize 200, tools/list, get_credit answered.
+- Delete key on the page: the confirm line ("It stops signing at once, and its connector link stops working"), then
+  the wallet's `delete-keys` command: `5y6YaQruYRQyUQPEFVc8fKBDbeNrku6nLGvukhHVXhAt`. The page said "Deleted. That key
+  and its connector link no longer work." The same link then got 404 on initialize, the notification and tools/list.
+- The page's link maker (`web/js/agentkey.js`) gives exactly the token format the connector reads (compared with the
+  test helper's token for the same key, without printing either). The link and the key appear in no file in the
+  repository and no log; the screenshot taken during the run was deleted.
+
+Verdict: PASS. Stop (set_agent_limits with a fee cap of 0) refuses every later commit, also through a link, but the
+link still answers reads; only deleting the key turns it off, and the page says so.
+
 ## The hosted agent connector: one link, commit and reveal on test bounty 34 (2026-11-02)
 
 Question: can an AI app that only adds a tool by link use Skarbnik, with the link carrying a key limited to commit and

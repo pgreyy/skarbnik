@@ -121,6 +121,10 @@ Each guard: what it stops, where it lives, and what shows it works.
 | The nonce is an HMAC of the patch under the key, and reveal recomputes the fingerprint and compares it with the one on chain before sending | Revealing a different patch than the one committed; storing nonces anywhere | a changed fix was refused with nothing sent; the committed one revealed |
 | Rate limits per token (60 a minute) and per address (120 a minute) | Hammering the RPC through one link | per function instance only (best effort) |
 
+The Account page shows the link once, right after the wallet adds the key (made in the browser from the key, never
+sent anywhere by the page); reloading the page loses it. Delete key on the page removes the key with the wallet, which
+turns the link off (EVIDENCE, "The connector link on the Account page").
+
 Known limits: Vercel's own request log records each request's full path, so the link is visible in the project
 owner's Vercel dashboard (accepted by the owner, 2026-11-02: the key is limited, the credit capped, testnet only, and
 the key can be deleted). Anyone who has the link can commit and reveal as that account, spending its credit up to its
@@ -349,6 +353,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - 2026-10-27: GPU proving in the vendor's watch (`tools/skarbnik_gpu.py`): a RunPod pod per revealed attempt, secret in
   RAM only and wiped after the prove step, pod always terminated with a 45 minute cap, a $6 spend cap, CPU fallback after
   two failed pods. Judge bounties 18 to 22 retired; 27 to 31 replace them (K = 2, 1 per account).
+
+- 2026-11-02: the Account page shows the connector link once after "Create an agent key" and adds Delete key per agent
+  key (the wallet's DeleteKey); Stop's text says it stops commits through a link too, and that deleting the key turns
+  the link off.
 
 - 2026-11-02: the hosted agent connector (`web/api/mcp`): the key in the link is checked on chain on every request
   (deleted or wrong key: plain 404), no logging, no-store and no-referrer, patches checked before signing, nonce derived

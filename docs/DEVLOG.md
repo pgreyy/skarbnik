@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: Connector link on the Account page
+
+- `web/js/agentkey.js` makes the connector link from the new key (`connectorLink`); `web/js/account-ui.js` shows
+  "Your connector link" once after the wallet adds the key, with Copy and the note that anyone with it can use the key,
+  that it can only send in fixes and spend the small test credit, and that deleting the key cancels it; a Delete key
+  button on each agent key (`W.deleteKey`, a DeleteKey action in the wallet) with a confirm line; Stop's text now says
+  it also stops commits through a link and that deleting the key turns a link off. The wallet flow, limits form and
+  test mode note are unchanged.
+- Checked through the real page with the NEAR CLI wallet: key added, link answered live, key deleted from the page,
+  link 404 (EVIDENCE, "The connector link on the Account page"). No credit used (gas only).
+
 ## 2026-11-02: The hosted agent connector (part D)
 
 - Built `web/api/mcp/[token].js` and `web/api/_lib/agent.js`: a Vercel function next to the site at
