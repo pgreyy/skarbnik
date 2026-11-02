@@ -192,7 +192,7 @@ Details: [docs/numbers.md](docs/numbers.md).
   mainnet contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades
   behind a multisig or DAO with a delay). The deployed code is a reproducible build, and every deploy and the current
   code hash are listed in docs/EVIDENCE.md, so a silent change shows.
-- **Narrow tasks, testnet only, no external audit.** Skarbnik takes only small deterministic WebAssembly repairs. The
+- **Narrow tasks, testnet only, no external audit.** Only small deterministic WebAssembly repairs are supported. The
   contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)).
 
 Every limit: [docs/LIMITS.md](docs/LIMITS.md). Who can do what: [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md).
@@ -239,7 +239,7 @@ also cap how many attempts one account holds (the per-account cap, live since 20
 
 1. **Managed confidential proving** (planned): one shared sealed prover for many vendors, so no host can read the
    secret. A CPU spike ran on testnet: bounty 33's prove step ran inside an attested Phala TDX VM and was paid by
-   proof; a GPU TEE has not been run yet ([docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md)).
+   proof; a GPU TEE is not tested ([docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md)).
 2. **Bounties with no reference fix:** Proof 0 proves only that the original crashes on the secret.
 3. **A vendor liveness bond and a fallback evaluator,** to make silence costly and timeouts rare.
 4. **Agent earnings after costs** on the Proof Ledger.

@@ -215,7 +215,7 @@ export function attemptPanel(el, b, subs, verifiers) {
     el.hidden = closed && !mine.length; // a closed bounty with nothing of yours to follow needs no attempt panel
     if (el.hidden) return;
     el.innerHTML = `<div class="stack g16"><h2 class="h3" id="sendT">Send an attempt</h2>${stepper}
-      <p class="small">Commit locks a sealed fingerprint of your fix. Reveal sends the fix itself so it can be checked. Reveal within ${esc(span(b.reveal_window_ns))} of your commit. After you reveal, the vendor has ${esc(span(b.verdict_window_ns))} to prove the result.</p>
+      <p class="small">Commit locks a sealed fingerprint of your fix. Reveal sends the fix itself so it can be tested. Reveal within ${esc(span(b.reveal_window_ns))} of your commit. After you reveal, the vendor has ${esc(span(b.verdict_window_ns))} to prove the result.</p>
       ${msg ? `<div class="msg ${msgKind}" role="${msgKind === 'bad' ? 'alert' : 'status'}">${msg}</div>` : ''}
       ${mine.length ? `<ul>${mineHtml}</ul>` : ''}${body}</div>`;
     const cs = $('#connSubmit', el); if (cs) cs.onclick = () => W.connect();

@@ -24,12 +24,14 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
-## 2026-11-02: No tested wording on the pages
+## 2026-11-02: No tested wording on the pages, limits kept
 
-- Reworded: Evidence "What was tested" is now "Checks that ran"; the wallet limit is now "Wallet apps vary" (what the
-  page does when a wallet refuses); How it works "Checked against the public tests only"; the attempt panel "so it can
-  be checked"; README: "takes only small deterministic WebAssembly repairs", "a GPU TEE has not been run yet", "Built
-  on Ubuntu 26.04 under WSL2". The For vendors page keeps the owner's own wording until its rebuild.
+- Only lines that claimed an app, OS or step is tested were reworded: How it works "Checked against the public tests
+  only", README "Built on Ubuntu 26.04 under WSL2". The wallet limit stays a limit, with a plainer title ("Only one
+  wallet has signed here"; NEAR CLI signed real transactions, the other wallets were only loaded). A first pass also
+  reworded honest limits and a heading; those are back as they were: Evidence "What was tested", the attempt panel
+  "so it can be tested", README "Only small deterministic WebAssembly repairs are supported" and "a GPU TEE is not
+  tested". The For vendors page keeps "tested once on testnet" for sealed proving: a fact about bounty 33.
 
 ## 2026-11-02: Icon copy buttons everywhere
 
