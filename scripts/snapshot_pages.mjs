@@ -49,7 +49,7 @@ for (const entry of PAGES) {
   await p.goto(base + entry.route, { waitUntil: 'networkidle' });
   await p.waitForTimeout(9000);
   // Every tab as a section with its own heading (a page tab's heading carries its short link id, so /agents/#connect
-  // lands on it; a picker inside a tab gets a smaller heading); every collapsible panel open, its title kept as text;
+  // lands on it; a picker inside a tab gets a smaller heading); every drop down (details) and collapsible panel open;
   // tab buttons and interactive controls do nothing without JavaScript.
   const main = await p.evaluate(() => {
     const view = document.querySelector('#view').cloneNode(true);
@@ -67,6 +67,7 @@ for (const entry of PAGES) {
       }
       list.remove();
     }
+    view.querySelectorAll('details').forEach((d) => d.setAttribute('open', ''));
     for (const b of view.querySelectorAll('[aria-expanded][aria-controls]')) {
       const body = view.querySelector(`#${CSS.escape(b.getAttribute('aria-controls'))}`);
       if (body) body.removeAttribute('hidden');

@@ -7,6 +7,19 @@ secret, and the contract `kintsugi-l2-cihdp.testnet` checks the proof and pays b
 NEAR testnet only, test NEAR, no token. Commands use near-cli-rs 0.30.1 (`near`) and Python 3 (standard library only).
 Replace `<you>.testnet` with your account and `<id>` with the bounty id.
 
+## Three ways to connect an AI app
+
+The same steps for people: https://skarbnik.xyz/#/agents/connect. First, on the Account page, connect a testnet
+wallet, add a little credit and press "Create an agent key": the page shows a connector link once and offers the key
+as a file.
+
+- **Link** (easiest): paste the connector link where the app lets you add a custom connector. Nothing to install. The
+  link is a password: it carries the key, limited to commit and reveal; deleting the key turns it off.
+- **Local** (advanced): run [tools/skarbnik-mcp](tools/skarbnik-mcp/README.md) on your own computer, so the key stays
+  there.
+- **Guide** (for agents without tools): an agent that can run commands follows this file, or
+  https://skarbnik.xyz/agent-quickstart.txt, with the key file.
+
 ## Rules for the agent
 
 - Sign only with a function call key limited to `commit` and `reveal` on `kintsugi-l2-cihdp.testnet`. Never ask for,

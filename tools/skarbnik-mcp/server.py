@@ -8,7 +8,7 @@
 # *.agent-key.json file in this script's folder (the file the site's Account page saves). It refuses any key that is
 # not a function call key limited to commit and reveal on the contract. It never returns or logs the key or the nonce
 # file's contents. `--setup <app>` prints the exact settings for Claude Desktop, Claude Code, Codex or Cursor, with
-# this computer's paths. Testnet by default; mainnet only with SKARBNIK_ALLOW_MAINNET=1. Python 3.9 or later,
+# this computer's paths (`--key <file>` adds the key file). Testnet by default; mainnet only with SKARBNIK_ALLOW_MAINNET=1. Python 3.9 or later,
 # standard library only; Windows, macOS and Linux.
 import base64
 import glob
@@ -657,16 +657,19 @@ def rust_ready():
     return True, f"{ver} with the wasm32-unknown-unknown target"
 
 
-def setup_text(app):
-    """The settings for one app, with this computer's Python and this script's path."""
+def setup_text(app, key=None):
+    """The settings for one app, with this computer's Python and this script's path (and the key file, if given)."""
     py, me = sys.executable, os.path.abspath(__file__)
     env = {}
-    try:
-        kf = find_key_file(settings())
-        if os.path.dirname(kf) != HERE:
-            env["SKARBNIK_KEY_FILE"] = kf
-    except Fail:
-        pass
+    if key:
+        env["SKARBNIK_KEY_FILE"] = os.path.abspath(os.path.expanduser(key))
+    else:
+        try:
+            kf = find_key_file(settings())
+            if os.path.dirname(kf) != HERE:
+                env["SKARBNIK_KEY_FILE"] = kf
+        except Fail:
+            pass
     entry = {"command": py, "args": ["-I", me]}
     if env:
         entry["env"] = env
@@ -691,7 +694,9 @@ def setup_text(app):
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == "--setup":
-        print(setup_text(sys.argv[2] if len(sys.argv) > 2 else ""))
+        rest = sys.argv[2:]
+        key = rest[rest.index("--key") + 1] if "--key" in rest and rest.index("--key") + 1 < len(rest) else None
+        print(setup_text(rest[0] if rest and rest[0] != "--key" else "", key))
         return
     if len(sys.argv) > 1 and sys.argv[1] == "--check":
         ok = True

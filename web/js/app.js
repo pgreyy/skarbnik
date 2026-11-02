@@ -59,6 +59,8 @@ const TITLES = { 'how-it-works': 'How it works', bounties: 'Bounties', evidence:
 const OLD = { ledger: '#/evidence/ledger', verify: '#/evidence/checker' };
 // Short links to the tabs of For agents and For vendors (#connect, /agents/#connect): each opens its tab.
 const TAB_LINKS = { connect: 'agents', key: 'agents', fees: 'agents', developers: 'agents', host: 'vendors', need: 'vendors', private: 'vendors', proving: 'vendors', limits: 'vendors' };
+// Short links to a way inside a tab (#way-link ...): the page, its tab and the way.
+const WAY_LINKS = { 'way-link': 'agents/connect', 'way-local': 'agents/connect', 'way-guide': 'agents/connect', 'way-ai': 'vendors/host', 'way-cmd': 'vendors/host' };
 
 let routeGen = 0;
 let onHome = false;
@@ -69,6 +71,7 @@ async function route() {
   const sec = hash.replace(/^#/, '');
   if (OLD_IDS[sec]) { location.replace(`#${OLD_IDS[sec]}`); return null; }
   if (TAB_LINKS[sec]) { location.replace(`#/${TAB_LINKS[sec]}/${sec}`); return null; }
+  if (WAY_LINKS[sec]) { location.replace(`#/${WAY_LINKS[sec]}/${sec}`); return null; }
   if (!hash || hash === '#' || hash === '#/' || HOME_IDS.includes(sec)) {
     const i = Math.max(0, HOME_IDS.indexOf(sec));
     if (onHome && $('main.home')) { showSection(i, true); return null; }
@@ -83,7 +86,11 @@ async function route() {
   if (page === 'bounties' && /^\d+$/.test(rest[0] || '') && rest[1] === 'attempts') { location.replace(`#/bounties/${rest[0]}/overview`); return null; }
   if (page === 'bounties' && /^\d+$/.test(rest[0] || '') && rest[1] === 'proof') { location.replace(`#/bounties/${rest[0]}/privacy`); return null; }
   // another tab of the page on screen (the back button, or a tab link): show it without drawing the page again
-  if (tabNav.base === `#/${page}` && tabNav.ids.includes(rest[0]) && tabNav.el && tabNav.el.isConnected) { tabNav.show(rest[0], false, true); return null; }
+  if (tabNav.base === `#/${page}` && tabNav.ids.includes(rest[0]) && tabNav.el && tabNav.el.isConnected) {
+    tabNav.show(rest[0], false, true);
+    if (rest[1] && tabNav.onSub) tabNav.onSub(rest[1]);
+    return null;
+  }
   const view = $('#view');
   const screens = {
     'how-it-works': () => how(view),
@@ -91,7 +98,7 @@ async function route() {
     raw: () => raw(view, rest[0]),
     evidence: () => evidence(view, rest[0]),
     judge: () => judge(view, rest[0]),
-    agents: () => agents(view, rest[0]),
+    agents: () => agents(view, rest[0], rest[1]),
     vendors: () => vendors(view, rest[0]),
     account: () => accountPage(view, decodeURIComponent(rest[0] || ''), rest[1]),
   };
@@ -120,8 +127,9 @@ async function render(my, page, rest, draw) {
 // A saved copy of a page (scripts/snapshot_pages.mjs) lives at a real path such as /judge/ or /bounties/24/: with
 // JavaScript, that path becomes its #/ route and the live page is drawn over the copy.
 const savedPath = location.pathname.replace(/^\/+|\/+$/g, '');
-if (savedPath && savedPath !== 'index.html' && (!location.hash || TAB_LINKS[location.hash.slice(1)] === savedPath)) {
-  history.replaceState(null, '', `/#/${savedPath}${location.hash ? `/${location.hash.slice(1)}` : ''}`);
+const savedHash = location.hash.slice(1);
+if (savedPath && savedPath !== 'index.html' && (!savedHash || TAB_LINKS[savedHash] === savedPath || (WAY_LINKS[savedHash] || '').startsWith(`${savedPath}/`))) {
+  history.replaceState(null, '', `/#/${WAY_LINKS[savedHash] && WAY_LINKS[savedHash].startsWith(`${savedPath}/`) ? WAY_LINKS[savedHash] : savedPath}${savedHash && !TAB_LINKS[savedHash] && !WAY_LINKS[savedHash] ? '' : savedHash ? `/${savedHash}` : ''}`);
 }
 window.addEventListener('hashchange', async () => { const h1 = await route(); if (h1) { h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true }); } });
 initUi();

@@ -2,6 +2,35 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: For agents page rebuilt (local, not live)
+
+- `web/js/pages/agents.js`: tabs Connect (5 steps), Key, Fees, Developers. Connect: five steps; step 03 says where the
+  connector link comes from (the Account page) and shows only a made-up, shortened example; step 04 has three ways,
+  Link (Easiest), Local (Advanced), Guide (For agents without tools), each with its own link (#way-link, #way-local,
+  #way-guide, kept as #/agents/connect/way-<id>). Link: the example box, one line, "Where do I paste it in my app?"
+  (the table for Claude, ChatGPT and other apps, then an illustration of an Add custom connector form with the example
+  value) and "Then: how do I know it worked?", both closed. Local: Python, Git and Rust only inside a closed drop down,
+  with the real commands (`git clone`, `server.py --setup claude-desktop --key`, `claude mcp add`, `--setup codex`) and
+  the WSL note pointing to the README. Guide: one line and the prompt. No status chips, no app picker, no lists of
+  apps. Jargon (feed fields, compatibility, near CLI steps, reference agent) sits in the Developers tab.
+- `web/js/ui.js`: drop downs are details elements (work without JavaScript; Enter and Space); pickers carry a second
+  label; `web/js/app.js` routes the way links; `scripts/snapshot_pages.mjs` opens every drop down in the saved pages.
+  `tools/skarbnik-mcp/server.py --setup <app> --key <file>` puts the key file into the printed settings.
+- In step with the page: AGENTS.md (and web/agents.md), agent-quickstart.txt, llms.txt and the README table name the
+  same three ways.
+- Checked with a private script: tab and way keys, back and forward, the short links (#connect, #way-local,
+  /agents/#way-local, /agents/#fees), the drop downs (closed at first, Enter opens, Space closes, the 36 px chevron
+  turns), copy buttons, no status or tested wording, no real link or key in the page; screenshots of each way at 1440
+  and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
+  paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
+
+## 2026-11-02: No tested wording on the pages
+
+- Reworded: Evidence "What was tested" is now "Checks that ran"; the wallet limit is now "Wallet apps vary" (what the
+  page does when a wallet refuses); How it works "Checked against the public tests only"; the attempt panel "so it can
+  be checked"; README: "takes only small deterministic WebAssembly repairs", "a GPU TEE has not been run yet", "Built
+  on Ubuntu 26.04 under WSL2". The For vendors page keeps the owner's own wording until its rebuild.
+
 ## 2026-11-02: Icon copy buttons everywhere
 
 - Every text "Copy" button is now the icon only `copyBtn` (`web/js/ui.js`): inside the top right of code blocks

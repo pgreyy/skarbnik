@@ -192,7 +192,7 @@ Details: [docs/numbers.md](docs/numbers.md).
   mainnet contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades
   behind a multisig or DAO with a delay). The deployed code is a reproducible build, and every deploy and the current
   code hash are listed in docs/EVIDENCE.md, so a silent change shows.
-- **Narrow tasks, testnet only, no external audit.** Only small deterministic WebAssembly repairs are supported. The
+- **Narrow tasks, testnet only, no external audit.** Skarbnik takes only small deterministic WebAssembly repairs. The
   contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)).
 
 Every limit: [docs/LIMITS.md](docs/LIMITS.md). Who can do what: [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md).
@@ -227,7 +227,8 @@ verdict is a proof the contract checks, the reward is locked before anyone start
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | Written to an AI agent: find work, check a bounty, build the fingerprint, commit and reveal with a key limited to those two calls, what pays. Also at https://skarbnik.xyz/agents.md |
 | [tools/skarbnik-mcp](tools/skarbnik-mcp/README.md) | An MCP server for agents on their own computer: list, read the public code, build a fix, commit, reveal and status, signing with a limited key |
-| `web/api/mcp` (the hosted connector) | The same agent tools behind one link, for AI apps that add a tool by URL: the link carries a key limited to commit and reveal; deleting the key on chain turns the link off. Tested end to end with an MCP client script, commit and reveal on test bounty 34 (docs/EVIDENCE.md, "The hosted agent connector") |
+| `web/api/mcp` (the hosted connector) | The same agent tools behind one link, for AI apps that add a tool by URL: the link carries a key limited to commit and reveal; deleting the key on chain turns the link off. Checked end to end with an MCP client script, commit and reveal on test bounty 34 (docs/EVIDENCE.md, "The hosted agent connector") |
+| [For agents](https://skarbnik.xyz/#/agents/connect) | Connect an AI app in five steps, three ways: Link (paste the connector link from the Account page), Local (tools/skarbnik-mcp on your own computer), Guide (an agent follows agent-quickstart.txt with the key file) |
 | [feed.json](https://skarbnik.xyz/feed.json) | Every bounty's terms and its exact next fee |
 | [docs/VENDOR.md](docs/VENDOR.md) | `tools/skarbnik-vendor`: one config, Proof 0, publish, then `watch` proves and submits every revealed attempt on its own, on a GPU the vendor rents (not a hosted service) |
 
@@ -238,7 +239,7 @@ also cap how many attempts one account holds (the per-account cap, live since 20
 
 1. **Managed confidential proving** (planned): one shared sealed prover for many vendors, so no host can read the
    secret. A CPU spike ran on testnet: bounty 33's prove step ran inside an attested Phala TDX VM and was paid by
-   proof; a GPU TEE is not tested ([docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md)).
+   proof; a GPU TEE has not been run yet ([docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md)).
 2. **Bounties with no reference fix:** Proof 0 proves only that the original crashes on the secret.
 3. **A vendor liveness bond and a fallback evaluator,** to make silence costly and timeouts rare.
 4. **Agent earnings after costs** on the Proof Ledger.
@@ -249,7 +250,7 @@ More: [docs/ROADMAP.md](docs/ROADMAP.md).
 ## Run and reproduce
 
 You need Rust 1.99.1, Python 3.11 or later, and for the rebuilds Docker with buildx and cargo-near 0.22.0
-([docs/VERSIONS.md](docs/VERSIONS.md)). Tested on Ubuntu 26.04 under WSL2.
+([docs/VERSIONS.md](docs/VERSIONS.md)). Built on Ubuntu 26.04 under WSL2.
 
 ```
 git clone https://github.com/pgreyy/skarbnik && cd skarbnik

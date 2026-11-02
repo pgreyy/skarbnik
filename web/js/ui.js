@@ -34,23 +34,27 @@ export const cmd = (text) => `<div class="cblk"><p class="code">${esc(text)}</p>
 // A block of several lines (settings, a prompt, commands) with a Copy button; label names it for screen readers.
 export const block = (text) => `<div class="cblk"><pre class="code">${esc(text)}</pre>${copyBtn(text)}</div>`;
 
-// A collapsible panel, closed by default: the title is a button with aria-expanded; the round chevron turns and goes
-// amber when open (handled once, in initUi). The saved copy for readers without JavaScript shows it open.
-export const collapse = (id, title, body, open = false) => `<div class="clp${open ? ' open' : ''}"><h4 class="clp-h"><button class="clp-btn" type="button" aria-expanded="${open}" aria-controls="${esc(id)}" data-clp><span>${title}</span><span class="chev${open ? ' rot' : ''}">${icon('chev')}</span></button></h4><div class="clp-b" id="${esc(id)}"${open ? '' : ' hidden'}>${body}</div></div>`;
+// A drop down panel, closed by default: a details element (works without JavaScript; Enter and Space open and close
+// it), its title a summary with the round chevron that turns and goes amber when open. The saved copy for readers
+// without JavaScript shows it open.
+export const collapse = (id, title, body, open = false) => `<details class="clp" id="${esc(id)}"${open ? ' open' : ''}><summary class="clp-btn"><span>${title}</span><span class="chev" aria-hidden="true">${icon('chev')}</span></summary><div class="clp-b">${body}</div></details>`;
 
 // A picker: a small tab group (role tablist) whose panels may sit anywhere, each with id <group>-<item id>.
-// items: [{ id, label (HTML) }]. bindPicker wires clicks, the arrow keys, Home and End.
+// items: [{ id, label (one word), sub (a small second label, optional) }]. bindPicker wires clicks, the arrow keys,
+// Home and End; onPick(id) runs after a change.
 export const picker = (group, items, cur, label) => `<div class="apk" role="tablist" aria-label="${esc(label)}">${items.map((t) =>
-  `<button class="apk-b" role="tab" type="button" id="${group}-t-${t.id}" aria-controls="${group}-${t.id}" aria-selected="${t.id === cur}" tabindex="${t.id === cur ? 0 : -1}" data-pick="${t.id}">${t.label}</button>`).join('')}</div>`;
+  `<button class="apk-b" role="tab" type="button" id="${group}-t-${t.id}" aria-controls="${group}-${t.id}" aria-selected="${t.id === cur}" tabindex="${t.id === cur ? 0 : -1}" data-pick="${t.id}"><span class="apk-l">${t.label}</span>${t.sub ? `<span class="apk-s">${esc(t.sub)}</span>` : ''}</button>`).join('')}</div>`;
 export const pickPanel = (group, id, cur, html) => `<div role="tabpanel" id="${group}-${id}" aria-labelledby="${group}-t-${id}"${id === cur ? '' : ' hidden'}>${html}</div>`;
 export function bindPicker(root, onPick = () => {}) {
+  const pickers = {};
   root.querySelectorAll('.apk').forEach((list) => {
     const btns = [...list.querySelectorAll('[data-pick]')];
     const show = (b, focus) => {
       btns.forEach((x) => { const on = x === b; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; const pn = document.getElementById(x.getAttribute('aria-controls')); if (pn) pn.hidden = !on; });
       if (focus) b.focus();
-      onPick(b.dataset.pick);
+      onPick(b.dataset.pick, list);
     };
+    pickers[list.getAttribute('aria-label')] = (id) => { const b = btns.find((x) => x.dataset.pick === id); if (b) show(b, false); };
     btns.forEach((b, i) => {
       b.addEventListener('click', () => show(b, false));
       b.addEventListener('keydown', (e) => {
@@ -59,6 +63,7 @@ export function bindPicker(root, onPick = () => {}) {
       });
     });
   });
+  return pickers;
 }
 
 // A table inside a card. cols: headings; rows: lists of HTML cells. cls adds a minimum width (wide, mid).
@@ -94,13 +99,6 @@ export function initUi() {
       const was = c.textContent;
       try { await navigator.clipboard.writeText(c.dataset.copyText); c.textContent = 'Copied'; } catch { c.textContent = 'Select it'; }
       setTimeout(() => (c.textContent = was), 1400);
-      return;
-    }
-    const k = e.target.closest('[data-clp]');
-    if (k) {
-      const open = k.getAttribute('aria-expanded') !== 'true', body = document.getElementById(k.getAttribute('aria-controls'));
-      k.setAttribute('aria-expanded', open); k.querySelector('.chev').classList.toggle('rot', open); k.closest('.clp').classList.toggle('open', open);
-      if (body) body.hidden = !open;
       return;
     }
     const t = e.target.closest('[data-toggle-full]');
@@ -141,7 +139,7 @@ export function tabbed(el, items, current, base, label, onShow = () => {}, push 
       if (n !== null) { e.preventDefault(); show(btns[n].dataset.tab, true); }
     });
   });
-  if (base) Object.assign(tabNav, { base, ids: items.map((t) => t.id), show, el });
+  if (base) Object.assign(tabNav, { base, ids: items.map((t) => t.id), show, el, onSub: null });
   onShow(cur);
   return show;
 }
