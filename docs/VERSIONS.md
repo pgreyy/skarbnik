@@ -134,6 +134,8 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | Tool | Version | Command |
 | --- | --- | --- |
 | Node | v22.23.4 | `node --version` |
+| wabt (npm, the hosted connector's WebAssembly text tools) | 1.0.39 | `web/package.json`, `web/package-lock.json` |
+| Python 3.9 (compatibility run of tools/skarbnik-mcp) | 3.9.25, installed with uv 0.13.6 into a private folder | `python3.9 --version` |
 | npm | 10.9.9 | `npm --version` |
 | Docker | 29.1.3, build 29.1.3-0ubuntu4.1 | `docker --version` |
 | git | 2.53.0 | `git --version` |

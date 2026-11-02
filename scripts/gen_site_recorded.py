@@ -94,6 +94,10 @@ BOUNTY_STEPS = [
     # The confidential proving spike: bounty 33's Proof 0 on a rented GPU, its attempt's prove step inside a Phala TDX VM
     ("docs/evidence/tee_spike/transactions.tsv", "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py",
      {33: ["teespike_bounty_create", "teespike_bounty_open", "teespike_commit", "teespike_reveal", "teespike_submit_groth16"]}),
+    # The hosted agent connector (web/api/mcp): test bounty 34, commits and reveals sent through the connector's link,
+    # first from a local copy of the function, then from the live site
+    ("docs/evidence/hosted_mcp/transactions.tsv", "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)",
+     {34: ["hosted_create", "hosted_open", "hosted_local_commit", "hosted_local_reveal", "hosted_live_commit", "hosted_live_reveal"]}),
     # The testnet cleanup of 2026-10-30: claim_timeout where a revealed attempt waited, expire on the expired bounties
     ("docs/evidence/cleanup_2026-10-30/transactions.tsv", "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)",
      {3: ["cleanup_b3_claim"], 26: ["cleanup_b26_claim"], 0: ["cleanup_b0_expire"], 2: ["cleanup_b2_expire"], 10: ["cleanup_b10_expire"],
@@ -267,6 +271,7 @@ if "ABOUNTY" in agentenv:
 
 out["test_bounties"]["25"] = "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo."
 out["test_bounties"]["26"] = "Test bounty: made for the agent access tests (AGENTS.md followed literally, and the MCP server). Not a demo."
+out["test_bounties"]["34"] = "Test bounty: made for the hosted agent connector's tests (commit and reveal through the link). The program is the public demo; nobody proves its attempts, so the timeout rule settles them. Not a demo."
 out["test_bounties"]["32"] = "Test bounty: made for the vendor tool's end to end test (tools/skarbnik-vendor watch proves its attempt on a rented GPU with no one's help). Its secret is private, made on the vendor's VPS, but the program is the public demo."
 if ARENA_BOUNTY:
     out["test_bounties"][ARENA_BOUNTY] = "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."

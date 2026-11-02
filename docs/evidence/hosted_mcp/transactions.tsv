@@ -1,0 +1,5 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+hosted_create	create_bounty	kintsugi-vendor-prnvm.testnet	Csy4aGw4SauYp98UVMQ1iVgdgT6XB4xSqhMPaef5KneD	0.353 Tgas	0.0000352739140955	0	8.97
+hosted_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	FVJt1sM3ek6ebyiJvqfP9hJs2f5wXhRovYiGoS781CMy	0.377 Tgas	0.000037681941703	0	8.86
+hosted_local_commit	commit	skarbnik-agentc-d48260.testnet	82pR75AXoQsKLdeocWti2J5HxM3DvSoXFyaQ9z44MPG8	3.087 Tgas	0.0002864149344861	0	
+hosted_local_reveal	reveal	skarbnik-agentc-d48260.testnet	HDRg1odye5Yerx6bNiTk1nhZoWgFV6DoF9cFVXx2tPsX	2.863 Tgas	0.0002640233208033	0	

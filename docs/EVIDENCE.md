@@ -175,6 +175,40 @@ opentest` (output `docs/evidence/judge2/`).
 - Round 1 stays on chain. 18 was opened by our test; 19 to 22 were never opened. After their expiry anyone can call
   `expire`, which refunds the vendor; nothing happens to them by itself.
 
+## The hosted agent connector: one link, commit and reveal on test bounty 34 (2026-11-02)
+
+Question: can an AI app that only adds a tool by link use Skarbnik, with the link carrying a key limited to commit and
+reveal, nothing stored by the server, and the link dead once the key is deleted on chain?
+
+- What was built: `web/api/mcp/[token].js` and `web/api/_lib/agent.js` (Vercel function, MCP Streamable HTTP,
+  stateless, JSON answers). The link is `https://skarbnik.xyz/api/mcp/sk1_<token>`; the token holds the account and
+  the key's 32 byte seed. Fixes are sent as WebAssembly text (WAT) and assembled with wabt 1.0.39.
+- Local run (the function served by a small Node wrapper on this machine, against the real testnet), client
+  `notes/tools/mcp_http.py` (private): initialize 200 with Cache-Control no-store and Referrer-Policy no-referrer; the
+  initialized notification 202; tools/list returns eight tools; list_bounties, get_bounty 7, get_public_code 7 (module
+  equal to `original_hash`, the original as 258 lines of WAT) and get_credit answer.
+- check_patch on bounty 7: the demo's public fix (`data/demo/fixed.wasm` turned into WAT) assembles to 544 bytes and
+  passes 17 of 17 public tests; broken WAT is refused with the assembler's message; an endless loop stops at the 4 s
+  limit (0 of 17); a module without memory and input_buf fails the interface check; the original module is flagged as
+  the original.
+- Refusals: a malformed token, a token of the right shape for no key, and a missing token each got a plain 404; GET with
+  a valid link got 405 (Allow: POST, OPTIONS).
+- Deleting the key kills the link: a second key limited to commit and reveal was added to
+  `skarbnik-agentc-d48260.testnet` (`5RoNdtn68qCfwQWGzSku3E42AsnitzZeUW8NJKY8xkqk`); its link answered initialize and
+  tools/list (200). The key was deleted (`Aa6Nja9ooL1TwyF1bZh1zF4nusQvPAkt61rxU8eF8iyj`); the next initialize,
+  notification and tools/list through the same link each got 404.
+- Test bounty 34 (`./scripts/hosted_mcp_test.sh bounty`): demo program, K = 6, no per-account cap, 0.1 NEAR, reveal gap
+  60 s, verdict window 4 h, expiry 3 days, opened with the demo's stored Groth16 Proof 0: create
+  `Csy4aGw4SauYp98UVMQ1iVgdgT6XB4xSqhMPaef5KneD`, open `FVJt1sM3ek6ebyiJvqfP9hJs2f5wXhRovYiGoS781CMy`.
+- Commit through the link (local): `82pR75AXoQsKLdeocWti2J5HxM3DvSoXFyaQ9z44MPG8`, index 0, fee 0.01 NEAR from the
+  test account's credit. A reveal 3 s later sent nothing ("wait 57 seconds"). After the gap, a reveal with a changed fix
+  was refused before sending (fingerprint differs); the committed fix revealed:
+  `HDRg1odye5Yerx6bNiTk1nhZoWgFV6DoF9cFVXx2tPsX`. status: attempt 0 Open, revealed, deadline 2026-11-03 00:15 UTC.
+- Rows: `docs/evidence/hosted_mcp/transactions.tsv`.
+
+Verdict: PASS for the local run. The live run on skarbnik.xyz follows below. Nobody proves bounty 34's attempts; they
+will be settled by the timeout rule (a test bounty, not a verdict).
+
 ## The MCP server: list, commit, reveal and status from an MCP client (2026-10-27)
 
 Question: can an agent work a bounty through `tools/skarbnik-mcp`, signing only with a key limited to commit and

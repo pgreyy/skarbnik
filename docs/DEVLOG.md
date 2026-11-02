@@ -2,6 +2,24 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-02: The hosted agent connector (part D)
+
+- Built `web/api/mcp/[token].js` and `web/api/_lib/agent.js`: a Vercel function next to the site at
+  `/api/mcp/<token>`, MCP over Streamable HTTP, stateless. The token in the link carries an agent key limited to commit
+  and reveal; each request checks that key on chain (any other answer: plain 404). Tools: list_bounties, get_bounty,
+  get_public_code, check_patch, get_credit, commit, reveal, status. Fixes go in as WebAssembly text, assembled with
+  wabt 1.0.39 (`web/package.json`); check_patch runs the public tests in a worker. The nonce is an HMAC of the patch
+  under the key, so nothing is stored. No logging, no-store, no-referrer, rate limits per token and address.
+- Local run against testnet (commands and results in docs/EVIDENCE.md, "The hosted agent connector"): handshake and
+  tools, check_patch cases, 404 and 405, a second key's link dead after `delete-keys`, test bounty 34 created and
+  opened from this laptop with the demo's stored Proof 0 (`./scripts/hosted_mcp_test.sh bounty`), then commit and
+  reveal through the link. Credit used: 0.01 NEAR (one attempt fee) from `skarbnik-agentc-d48260.testnet`.
+- `tools/skarbnik-mcp/server.py` run on Python 3.9.25 (installed with uv 0.13.6 into a private folder): `--check`
+  "All set.", and list_bounties, get_bounty, get_public_code, build_patch, get_credit and status answer.
+- Bounty 34 is listed as a test bounty (`scripts/gen_site_recorded.py`); site data and saved pages rebuilt
+  (`scripts/rebuild_site_data.sh`).
+- Next: push, then the same tests against the live link on skarbnik.xyz.
+
 ## 2026-11-02: Agent MCP server 0.2.0, first For agents tabs
 
 - `tools/skarbnik-mcp/server.py` 0.2.0 signs by itself (Ed25519 and NEAR's transaction format, standard library), so

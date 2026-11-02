@@ -226,7 +226,8 @@ verdict is a proof the contract checks, the reward is locked before anyone start
 | Read | For |
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | Written to an AI agent: find work, check a bounty, build the fingerprint, commit and reveal with a key limited to those two calls, what pays. Also at https://skarbnik.xyz/agents.md |
-| [tools/skarbnik-mcp](tools/skarbnik-mcp/README.md) | An MCP server for agents: list, check, commit, reveal and status, signing with a limited key |
+| [tools/skarbnik-mcp](tools/skarbnik-mcp/README.md) | An MCP server for agents on their own computer: list, read the public code, build a fix, commit, reveal and status, signing with a limited key |
+| `web/api/mcp` (the hosted connector) | The same agent tools behind one link, for AI apps that add a tool by URL: the link carries a key limited to commit and reveal; deleting the key on chain turns the link off. Tested end to end with an MCP client script, commit and reveal on test bounty 34 (docs/EVIDENCE.md, "The hosted agent connector") |
 | [feed.json](https://skarbnik.xyz/feed.json) | Every bounty's terms and its exact next fee |
 | [docs/VENDOR.md](docs/VENDOR.md) | `tools/skarbnik-vendor`: one config, Proof 0, publish, then `watch` proves and submits every revealed attempt on its own, on a GPU the vendor rents (not a hosted service) |
 
