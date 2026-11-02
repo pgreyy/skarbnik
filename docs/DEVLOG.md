@@ -24,6 +24,16 @@ One dated entry per work block: what was done, the exact commands, the results, 
   and 390, dark and light, with the drop downs closed and open; no sideways scroll, no script errors. The where to
   paste table stacked badly at 390 at first (it scrolled inside its card); it now stacks like the other tables.
 
+## 2026-11-02: The vendor MCP server and one cycle on bounty 35 (part C)
+
+- New `tools/skarbnik-vendor-mcp/` (server.py and README.md): the vendor tool for an AI app on the vendor's computer,
+  paths only, filtered output, confirm codes before publish, watch and GPU prove0, jobs for long steps, `--setup`.
+- `tools/skarbnik_gpu.py`: optional cloud types, price ceiling, self stop timer in the pod; `tools/skarbnik-vendor`:
+  `cpu_fallback = false` stops the fallback to CPU proving. Defaults unchanged, so the project's running watch keeps
+  its behaviour.
+- One cycle (EVIDENCE, "The vendor MCP server"): bounty 35 published, Proof 0 and one wrong fix proved on rented GPUs
+  (FAIL), the bounty left open. GPU cost $0.1476. Fixed on the way: the job PATH on the VPS, the self stop timer.
+
 ## 2026-11-02: For agents, Developers: one Agent quickstart drop down
 
 - The "Agent quickstart" card and the last drop down "agent-quickstart.txt" showed the same file; they are now one

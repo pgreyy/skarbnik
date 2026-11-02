@@ -1,0 +1,6 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+vmcp_create	create_bounty	kintsugi-vendor-prnvm.testnet	D9CrF95UhzfiD931tdW3Wr5nuhh5SWfvUJPsQmxYPcW5	2.911 Tgas	0.0002687361318516	0	
+vmcp_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	2AhKBEEwnbCiX7pFJrPmr4ab5TDy9G9TsasqB4ZbABge	35.252 Tgas	0.003502929423487	0	
+vmcp_commit	commit	skarbnik-agentc-d48260.testnet	2ssbkXYMqWXR3GdacQ9uewx43Y6p7VaPZDm8xzLNTWng	3.087 Tgas	0.0002864127953205	0	
+vmcp_reveal	reveal	skarbnik-agentc-d48260.testnet	BrpKfpaSpdy1YF7hdZ4wZBo3wm8mYJT8YLnyJQe42qn5	2.867 Tgas	0.0002643490562517	0	
+vmcp_watch_submit_groth16	submit_groth16	skarbnik-prover-bb2d00.testnet	FPE1uRi4HE1p7iRNRfcC3qRDLCt3JbkENRELdG5b8nKp	35.674 Tgas	0.0035451034113775	0	

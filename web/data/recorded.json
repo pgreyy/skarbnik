@@ -1466,6 +1466,58 @@
     "script": "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py"
    }
   ],
+  "35": [
+   {
+    "step": "vmcp_create",
+    "method": "create_bounty",
+    "tx": "D9CrF95UhzfiD931tdW3Wr5nuhh5SWfvUJPsQmxYPcW5",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_mcp/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (publish, watch); tools/skarbnik-mcp (commit, reveal)"
+   },
+   {
+    "step": "vmcp_open",
+    "method": "open_with_groth16",
+    "tx": "2AhKBEEwnbCiX7pFJrPmr4ab5TDy9G9TsasqB4ZbABge",
+    "what": "Opened with its Proof 0",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_mcp/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (publish, watch); tools/skarbnik-mcp (commit, reveal)"
+   },
+   {
+    "step": "vmcp_commit",
+    "method": "commit",
+    "tx": "2ssbkXYMqWXR3GdacQ9uewx43Y6p7VaPZDm8xzLNTWng",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_mcp/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (publish, watch); tools/skarbnik-mcp (commit, reveal)"
+   },
+   {
+    "step": "vmcp_reveal",
+    "method": "reveal",
+    "tx": "BrpKfpaSpdy1YF7hdZ4wZBo3wm8mYJT8YLnyJQe42qn5",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_mcp/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (publish, watch); tools/skarbnik-mcp (commit, reveal)"
+   },
+   {
+    "step": "vmcp_watch_submit_groth16",
+    "method": "submit_groth16",
+    "tx": "FPE1uRi4HE1p7iRNRfcC3qRDLCt3JbkENRELdG5b8nKp",
+    "what": "Proof of an attempt sent",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/vendor_mcp/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (publish, watch); tools/skarbnik-mcp (commit, reveal)"
+   }
+  ],
   "34": [
    {
     "step": "hosted_create",
@@ -2089,6 +2141,7 @@
   "16": "Test bounty: made for the real run of the model-driven agent (agent/).",
   "25": "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo.",
   "26": "Test bounty: made for the agent access tests (AGENTS.md followed literally, and the MCP server). Not a demo.",
+  "35": "Test bounty: made by the vendor MCP server's end to end run. The public demo program and the public demo input, with a private salt; its first attempt was a wrong fix on purpose (FAIL), and it stays open for a recorded walkthrough. Not a demo.",
   "34": "Test bounty: made for the hosted agent connector's tests (commit and reveal through the link). The program is the public demo; nobody proves its attempts, so the timeout rule settles them. Not a demo.",
   "32": "Test bounty: made for the vendor tool's end to end test (tools/skarbnik-vendor watch proves its attempt on a rented GPU with no one's help). Its secret is private, made on the vendor's VPS, but the program is the public demo.",
   "23": "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."

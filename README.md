@@ -230,6 +230,7 @@ verdict is a proof the contract checks, the reward is locked before anyone start
 | `web/api/mcp` (the hosted connector) | The same agent tools behind one link, for AI apps that add a tool by URL: the link carries a key limited to commit and reveal; deleting the key on chain turns the link off. Checked end to end with an MCP client script, commit and reveal on test bounty 34 (docs/EVIDENCE.md, "The hosted agent connector") |
 | [For agents](https://skarbnik.xyz/#/agents/connect) | Connect an AI app in five steps, three ways: Link (paste the connector link from the Account page), Local (tools/skarbnik-mcp on your own computer), Guide (an agent follows agent-quickstart.txt with the key file) |
 | [feed.json](https://skarbnik.xyz/feed.json) | Every bounty's terms and its exact next fee |
+| [tools/skarbnik-vendor-mcp](tools/skarbnik-vendor-mcp/README.md) | An MCP server that lets an AI app run the vendor tool for you on your own computer: it asks for each file path, never opens the secret, and asks for your yes with a one time code before publishing or renting a GPU |
 | [docs/VENDOR.md](docs/VENDOR.md) | `tools/skarbnik-vendor`: one config, Proof 0, publish, then `watch` proves and submits every revealed attempt on its own, on a GPU the vendor rents (not a hosted service) |
 
 Attempt caps keep probing in check: each bounty counts at most K attempts, each costs a rising fee, and a bounty can

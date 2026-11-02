@@ -88,14 +88,29 @@ With `mode = "gpu"` in a watch config, `watch` proves each revealed attempt on a
    is left. The pod's cost (hourly price times its life) goes to the log and to `gpu_spend.json`.
 6. It wraps to Groth16, verifies, checks the verdict, the submission id and the secret commitment, and submits.
 
-After two failed pods for one attempt, or at the spend cap, it proves on its own CPU and writes a WARNING line. Once a
+After two failed pods for one attempt, or at the spend cap, it proves on its own CPU and writes a WARNING line, unless
+`cpu_fallback = false` is set in `[gpu]`: then nothing is proved on this machine and the next scan tries again. Once a
 proof exists, a failed submit is only sent again (up to 10 times); no new pod starts for that attempt. One proof cost
 $0.04 on an L40S with the cached binary (docs/numbers.md). Set `network = "testnet-fastnear"` in the watch config's
 `[chain]`: near-cli then signs against the regular RPC rather than the archival one, whose old block hash once made a
 submit expire. The
 `[gpu]` section: `api_key_file` (mode 600; never printed, logged or copied), `gpu_types`, `data_centers`, `cap_minutes`
 (45), `budget_usd` (6), and optionally `image`, `spend_file`, `ssh_key`, `binary_cache`, `src_tarball`, `guests_dir`,
-`po2` (19).
+`po2` (19), `cloud_types` (default `["SECURE"]`; add `"COMMUNITY"` to rent from both), `max_usd_per_hr` (a price
+ceiling: a pod priced above it is terminated at once and the next choice tried), `self_stop_minutes` (a timer inside the
+pod removes it after this many minutes even if this machine stops watching it) and `cpu_fallback`. An empty
+`data_centers` lets RunPod pick any data center.
+
+## With an AI app: `tools/skarbnik-vendor-mcp`
+
+An MCP server that runs these commands for an AI app (Claude Desktop, Claude Code, Codex), on the computer that holds
+the secret. It asks for each file path and never opens the secret or the fix; `publish`, `watch_start` and `prove0` on a
+rented GPU first return the cost and time with a one time confirm code, and run only when called again with it.
+Setup: [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README.md). The project's own cycle split
+the work across two machines: init, check, publish and status on the laptop that holds the vendor key; Proof 0 and
+watch on the VPS that holds the RunPod key (the public Proof 0 files were copied to the laptop for publish; no key
+moved). The laptop's check refuses on memory for the Groth16 wrap, which runs on the VPS; the server's publish accepts
+that one refusal once Proof 0 exists.
 
 ## The site's CSS
 

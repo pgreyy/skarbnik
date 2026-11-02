@@ -30,6 +30,10 @@ DEFAULTS = {
     'ssh_key': '~/.skarbnik-vendor/pod_ed25519', 'binary_cache': '~/skarbnik/gpu/skarbnik-host-cuda',
     'src_tarball': '~/skarbnik/gpu/src.tar.gz', 'guests_dir': '~/skarbnik/gpu/prebuilt-guests', 'po2': 19,
     'rust': '1.99.1', 'risc0': '3.0.6',
+    # optional: the clouds to try in order (SECURE, COMMUNITY), a price ceiling per pod hour (a pod priced above it is
+    # terminated at once and the next choice tried), and a timer inside the pod that removes it after this many minutes
+    # even if this machine stops watching it
+    'cloud_types': ['SECURE'], 'max_usd_per_hr': None, 'self_stop_minutes': None,
 }
 
 
@@ -119,9 +123,34 @@ class Pod:
         return self.deadline - time.time()
 
     def create(self):
+        """A pod of the first GPU type and cloud that has one free, within the price ceiling if one is set."""
+        types, last = list(self.g['gpu_types']), None
+        ceiling = float(self.g['max_usd_per_hr']) if self.g.get('max_usd_per_hr') else None
+        for cloud in list(self.g.get('cloud_types') or ['SECURE']):
+            while types:
+                try:
+                    p = self._create(cloud, types)
+                except GpuError as e:
+                    last = e
+                    if 'no instances' in str(e).lower() or 'not available' in str(e).lower():
+                        self.log(f'no free GPU of {len(types)} types on the {cloud.lower()} cloud')
+                        break
+                    raise
+                price = float(self.rec.get('cost_per_hr') or 0)
+                if ceiling is not None and price > ceiling:
+                    self.log(f'pod {self.id}: {self.rec.get("gpu")} at ${price}/h is above the ${ceiling}/h ceiling; terminating it')
+                    gpu_name = self.rec.get('gpu')
+                    self.terminate()
+                    types = [t for t in types if t != gpu_name and not (gpu_name and gpu_name in t)] if gpu_name else types[1:]
+                    self.id = None
+                    continue
+                return
+        raise GpuError(f'no GPU could be rented within the limits ({last})' if last else 'no GPU could be rented within the limits')
+
+    def _create(self, cloud, types):
         pub = open(self.g['ssh_key'] + '.pub').read().strip()
-        body = {'name': f'{POD_PREFIX}{self.label}-{int(self.t0)}', 'imageName': self.g['image'], 'cloudType': 'SECURE',
-                'computeType': 'GPU', 'gpuCount': 1, 'gpuTypeIds': list(self.g['gpu_types']), 'gpuTypePriority': 'custom',
+        body = {'name': f'{POD_PREFIX}{self.label}-{int(time.time())}', 'imageName': self.g['image'], 'cloudType': cloud,
+                'computeType': 'GPU', 'gpuCount': 1, 'gpuTypeIds': list(types), 'gpuTypePriority': 'custom',
                 'containerDiskInGb': int(self.g['container_disk_gb']), 'volumeInGb': 0, 'ports': ['22/tcp'],
                 'supportPublicIp': True, 'env': {'PUBLIC_KEY': pub}}
         if self.g['data_centers']:  # an empty list lets RunPod pick any data center
@@ -153,11 +182,13 @@ class Pod:
                         self.rec['gpu'] = name
                         spend_record(self.g, self.rec)
                     self.log(f'pod {self.id}: ssh ready after {round(time.time() - self.t0)} s, GPU {self.rec["gpu"]}')
-                    return
+                    break
                 except GpuError:
                     pass
             time.sleep(10)
-        raise GpuError('the pod did not come up within the hard cap')
+        else:
+            raise GpuError('the pod did not come up within the hard cap')
+        self.arm_self_stop()  # outside the loop: if it cannot be armed, the step fails and the pod is terminated
 
     def _ssh_base(self):
         kh = os.path.join(os.path.dirname(self.g['ssh_key']), f'pod_known_hosts_{self.id}')
@@ -191,13 +222,30 @@ class Pod:
     def remote(self, path):
         return f'root@{self.host}:{path}'
 
+    def arm_self_stop(self):
+        """A timer inside the pod that removes it after self_stop_minutes from its start, whatever happens here."""
+        mins = self.g.get('self_stop_minutes')
+        if not mins:
+            return
+        secs = max(60, int(float(mins) * 60 - (time.time() - self.t0)))
+        # The pod's id and its own key are in the container's first process, not in an ssh session. The timer runs in
+        # its own session with stdin, stdout and stderr detached, so this ssh call returns at once. Without runpodctl
+        # it stops the container instead (the GPU stops billing; the next start removes the stopped pod).
+        out = self.ssh('E=$(tr "\\0" "\\n" < /proc/1/environ); P=$(echo "$E" | sed -n "s/^RUNPOD_POD_ID=//p"); '
+                       'K=$(echo "$E" | sed -n "s/^RUNPOD_API_KEY=//p"); '
+                       f'if command -v runpodctl >/dev/null 2>&1 && [ -n "$P" ] && [ -n "$K" ]; then '
+                       f'RUNPOD_API_KEY="$K" setsid nohup sh -c "sleep {secs}; runpodctl remove pod $P || kill -9 1" </dev/null >/dev/null 2>&1 & echo ARMED; '
+                       f'else setsid nohup sh -c "sleep {secs}; kill -9 1" </dev/null >/dev/null 2>&1 & echo ARMED_KILL; fi', 30)
+        self.log(f'pod {self.id}: self stop armed for {round(secs / 60)} min ({"runpodctl" if "ARMED_KILL" not in out else "container stop"})')
+
     def terminate(self):
         if not self.id:
             return
-        try:
-            self.ssh(WIPE, 30)
-        except GpuError:
-            pass
+        if self.host:  # a pod refused for its price never got a secret or an address
+            try:
+                self.ssh(WIPE, 30)
+            except GpuError:
+                pass
         err = None
         for _ in range(5):
             try:

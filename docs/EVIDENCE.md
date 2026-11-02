@@ -175,6 +175,44 @@ opentest` (output `docs/evidence/judge2/`).
 - Round 1 stays on chain. 18 was opened by our test; 19 to 22 were never opened. After their expiry anyone can call
   `expire`, which refunds the vendor; nothing happens to them by itself.
 
+## The vendor MCP server: one cycle on bounty 35, Proof 0 and the attempt on rented GPUs (2026-11-02)
+
+Question: can an AI app host a bounty end to end through `tools/skarbnik-vendor-mcp`, with the vendor's yes before
+each spend, file paths only, and the GPU steps within a price ceiling and a spend cap?
+
+- Driven by an MCP client script, stdio (laptop) and stdio over ssh (VPS). Bounty name mcpdemo: the public demo program
+  and the public demo input and fix, copied into `~/.skarbnik-vendor/mcpdemo/` (mode 600) on both machines; the salt
+  was made on the VPS by `skarbnik-host` and never opened. Split as the owner set it: init, check, publish and status on
+  the laptop (vendor key); prove0 and watch on the VPS (RunPod key, prover key); no key moved.
+- Laptop: `init` wrote the config; `check` passed every point but memory (4,417 MiB available plus swap, the Groth16
+  wrap needs about 7,600 MiB). VPS: `init` (with the VPS's program paths) and `check` passed.
+- `prove0`, GPU: the first run's pod (NVIDIA L40S, EU-NL-1, $1.09/h, 138 s, $0.0418) proved, but the Groth16 wrap failed:
+  the server's job did not have the VPS's `bin` folder on its PATH (fixed: `job_env`). Then RunPod had no free L40S,
+  RTX 6000 Ada or RTX A6000 in the five listed data centers on six tries 5 minutes apart (no pod, no cost).
+- With the owner's yes the choice was widened: nine NVIDIA types with 24 GB or more, any data center, secure and
+  community clouds, a ceiling of $1.00 an hour, a 60 minute cap and a self stop timer. Two pods ended early on a bug in
+  arming that timer (RTX 4090 EU-RO-1, 153 s, $0.0378, stopped by hand by its process id and terminated; RTX 4090
+  EUR-IS-2, 39 s, $0.0096, terminated by the tool), fixed. Then an L40S at $1.09/h was refused by the ceiling (3 s,
+  $0.0009) and an RTX 6000 Ada in US-WA-1 at $0.99/h proved Proof 0: VALID, PASS; prove 29.4 s, succinct 22.6 s on the
+  pod (145 s, $0.0399), Groth16 453.9 s on the VPS.
+- Publish (laptop, `publish` with its confirm code; the server let the memory refusal pass because Proof 0 existed):
+  bounty 35, create `D9CrF95UhzfiD931tdW3Wr5nuhh5SWfvUJPsQmxYPcW5`, open `2AhKBEEwnbCiX7pFJrPmr4ab5TDy9G9TsasqB4ZbABge`.
+  0.1 NEAR reward, K = 4, verdict window 24 h, expiry 14 days.
+- Watch (VPS, `watch_init` then `watch_start` with its confirm code). An agent attempt through `tools/skarbnik-mcp`
+  with `skarbnik-agentc-d48260.testnet`: a wrong fix on purpose (it limits the list count but keeps the off by one
+  check; public tests pass, the demo input still crashes), so the bounty stays open; commit
+  `2ssbkXYMqWXR3GdacQ9uewx43Y6p7VaPZDm8xzLNTWng` (fee 0.01 NEAR), reveal `BrpKfpaSpdy1YF7hdZ4wZBo3wm8mYJT8YLnyJQe42qn5`.
+  The watch found no free GPU on its first pass and did not prove on the CPU (`cpu_fallback = false`); its next pass
+  got an RTX 4090 in EUR-IS-2 at $0.89/h (71 s, $0.0176): verdict FAIL, Groth16 384.0 s, `submit_groth16`
+  `FPE1uRi4HE1p7iRNRfcC3qRDLCt3JbkENRELdG5b8nKp`, outcome Failed. From reveal to submit: 8 min 6 s. `watch_stop`
+  stopped it; no pod is left.
+- GPU cost of this cycle: $0.1476 over six pods; the VPS's spend file shows $0.543 in all, under the $6 cap. Rows:
+  `docs/evidence/vendor_mcp/transactions.tsv`.
+
+Verdict: PASS, after two fixes made on the way (the job PATH and the self stop timer). Bounty 35 stays open for the
+owner's walkthrough (3 of 4 slots). Not shown: an AI app driving this server (an MCP client script did); the laptop
+cannot run the Groth16 wrap.
+
 ## The connector link on the Account page, made and cancelled from the page (2026-11-02)
 
 Question: does the Account page give a working connector link when "Create an agent key" runs, and does deleting the

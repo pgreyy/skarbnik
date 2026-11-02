@@ -16,6 +16,7 @@ A vendor should not have to be a cryptography operator. Commands:
            mode cpu proves on this machine; mode gpu proves and shrinks on a RunPod pod per attempt
            (tools/skarbnik_gpu.py: secret in the pod's RAM only, pod always terminated, 45 minute cap, spend cap),
            then wraps to Groth16 here; after two failed pods, or at the spend cap, it falls back to cpu and warns
+           (unless gpu.cpu_fallback = false: then nothing is proved here and the next scan tries again)
   status   each watched bounty and attempt, its state and the next action needed
 
 Secrets (the secret input, the salt, the reference fix) stay on the machine that proves, in files of mode 600 outside
@@ -406,9 +407,13 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
                         v, t['groth16'] = wrap(wcfg, w, 'u')
                     break
                 except gpu.BudgetReached as ex:
+                    if not gpu.settings(wcfg).get('cpu_fallback', True):
+                        raise RuntimeError(f'{ex}; gpu.cpu_fallback is false: no CPU proving here') from None
                     log_line(wcfg, f'WARNING bounty {bid} attempt {i}: {ex}; proving on this machine (cpu) instead'); break
                 except Exception as ex:  # noqa: BLE001
                     log_line(wcfg, f'bounty {bid} attempt {i}: GPU try {n} of 2 failed ({ex})')
+            if v is None and not gpu.settings(wcfg).get('cpu_fallback', True):
+                raise RuntimeError('the GPU path did not give a proof, and gpu.cpu_fallback is false: no CPU proving here; the next scan tries again')
             if v is None:
                 log_line(wcfg, f'WARNING bounty {bid} attempt {i}: the GPU path did not give a proof; falling back to cpu on this machine (about 10 h here)')
         if v is None:

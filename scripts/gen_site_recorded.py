@@ -94,6 +94,10 @@ BOUNTY_STEPS = [
     # The confidential proving spike: bounty 33's Proof 0 on a rented GPU, its attempt's prove step inside a Phala TDX VM
     ("docs/evidence/tee_spike/transactions.tsv", "tools/skarbnik-vendor publish; tools/skarbnik-mcp; tools/tee-spike/attempt_in_tee.py",
      {33: ["teespike_bounty_create", "teespike_bounty_open", "teespike_commit", "teespike_reveal", "teespike_submit_groth16"]}),
+    # The vendor MCP server's end to end run (tools/skarbnik-vendor-mcp): bounty 35, published from the laptop, Proof 0
+    # and the attempt proved on rented GPUs from the VPS, the attempt sent through tools/skarbnik-mcp (a wrong fix: FAIL)
+    ("docs/evidence/vendor_mcp/transactions.tsv", "tools/skarbnik-vendor-mcp (publish, watch); tools/skarbnik-mcp (commit, reveal)",
+     {35: ["vmcp_create", "vmcp_open", "vmcp_commit", "vmcp_reveal", "vmcp_watch_submit_groth16"]}),
     # The hosted agent connector (web/api/mcp): test bounty 34, commits and reveals sent through the connector's link,
     # first from a local copy of the function, then from the live site
     ("docs/evidence/hosted_mcp/transactions.tsv", "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)",
@@ -271,6 +275,7 @@ if "ABOUNTY" in agentenv:
 
 out["test_bounties"]["25"] = "Test bounty: made for the live test of the per-account cap (max_commits_per_account 1). Not a demo."
 out["test_bounties"]["26"] = "Test bounty: made for the agent access tests (AGENTS.md followed literally, and the MCP server). Not a demo."
+out["test_bounties"]["35"] = "Test bounty: made by the vendor MCP server's end to end run. The public demo program and the public demo input, with a private salt; its first attempt was a wrong fix on purpose (FAIL), and it stays open for a recorded walkthrough. Not a demo."
 out["test_bounties"]["34"] = "Test bounty: made for the hosted agent connector's tests (commit and reveal through the link). The program is the public demo; nobody proves its attempts, so the timeout rule settles them. Not a demo."
 out["test_bounties"]["32"] = "Test bounty: made for the vendor tool's end to end test (tools/skarbnik-vendor watch proves its attempt on a rented GPU with no one's help). Its secret is private, made on the vendor's VPS, but the program is the public demo."
 if ARENA_BOUNTY:

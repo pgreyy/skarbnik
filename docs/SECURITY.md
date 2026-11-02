@@ -139,6 +139,16 @@ the key can be deleted). Anyone who has the link can commit and reveal as that a
 limits; deleting the key on chain ends that. The fix's text passes through the function to be assembled; nothing is
 kept.
 
+### The vendor MCP server (`tools/skarbnik-vendor-mcp`) and GPU limits
+
+| Guard | What it stops | Shown by |
+| --- | --- | --- |
+| Tools take file paths only; the server never opens the secret, the fix, a salt or a key, and filters lines about keys, secrets, seeds and signatures from what it returns | The secret or a key reaching the AI app's transcript | the bounty 35 cycle's sessions (EVIDENCE, "The vendor MCP server") |
+| publish, watch_start and prove0 on a rented GPU return the cost and a confirm code that works once, for that step and config, for 15 minutes | Spending without the vendor's yes | each spending step in the cycle |
+| `max_usd_per_hr`: a pod priced above the ceiling is terminated at once | Paying above the vendor's price | an L40S at $1.09/h refused in 3 s ($0.0009) |
+| `self_stop_minutes`: a timer inside the pod removes it after the limit, even if the vendor machine stops watching | A forgotten pod billing for hours | armed on each later pod ("self stop armed for 60 min"); when it cannot be armed, the step fails and the pod is terminated (pod nz7c118p60bspv, 39 s) |
+| `cpu_fallback = false`: no CPU proving on the vendor machine when no GPU is free | A 10 hour CPU proof on a small server | the watch for bounty 35 refused to fall back when RunPod had no GPU, and tried again |
+
 ### Keys
 
 | Guard | What it stops | Shown by |
@@ -365,6 +375,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - 2026-11-02: the Account page shows the connector link once after "Create an agent key" and adds Delete key per agent
   key (the wallet's DeleteKey); Stop's text says it stops commits through a link too, and that deleting the key turns
   the link off.
+
+- 2026-11-02: the vendor MCP server (paths only, filtered output, one time confirm codes before spending) and new GPU
+  limits in `tools/skarbnik_gpu.py` and `tools/skarbnik-vendor` (cloud types, a price ceiling, a self stop timer inside
+  the pod, no CPU fallback when set). Defaults unchanged.
 
 - 2026-11-02: the hosted agent connector (`web/api/mcp`): the key in the link is checked on chain on every request
   (deleted or wrong key: plain 404), no logging, no-store and no-referrer, patches checked before signing, nonce derived
