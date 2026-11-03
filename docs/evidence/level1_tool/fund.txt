@@ -1,0 +1,31 @@
+2026-11-03T13:11:50Z
+$ near tokens kintsugi-res1-prnvm.testnet send-near kintsugi-vendor-prnvm.testnet 3 NEAR network-config testnet sign-with-legacy-keychain send
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res1-prnvm.testnet
+│    receiver_id:  kintsugi-vendor-prnvm.testnet
+│    actions:
+│       -- transfer deposit:    3 NEAR
+│     [0m
+├  Your transaction was signed successfully.
+│    Public key: ed25519:4nab7LQVFF5XAGQdk3SACm2PQCmbBJXGcWqL37PiyNxy
+│     [0m
+├  Transaction Execution Info:
+│    Gas burned: 0.224 Tgas
+│    Transaction fee: 0.00002231825625 NEAR
+│    Transaction ID: Fp4pKERQcDksPZg6XUq8MuNxHwe95TTTrfNy3sjDeXXP
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/Fp4pKERQcDksPZg6XUq8MuNxHwe95TTTrfNy3sjDeXXP
+│     [0m
+
+
+<kintsugi-res1-prnvm.testnet> has transferred 3 NEAR to <kintsugi-vendor-prnvm.testnet> successfully.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    [33mnear tokens kintsugi-res1-prnvm.testnet send-near kintsugi-vendor-prnvm.testnet '3 NEAR' network-config testnet sign-with-legacy-keychain send[39m
+
+exit=0
+kintsugi-vendor-prnvm.testnet 4.3321216498492662
+kintsugi-res1-prnvm.testnet 8.532815348732344999999997

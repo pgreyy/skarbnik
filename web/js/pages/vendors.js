@@ -179,6 +179,7 @@ export async function vendors(viewEl, tab, sub) {
     <li>${icon('alert')}<span><b>No external audit.</b> The contract was reviewed in AI review passes, not by an outside auditor.</span></li>
     <li>${icon('alert')}<span><b>Level 1 depends on OutLayer.</b> The contract trusts OutLayer running the pinned verifier program, and OutLayer must be able to download that file from GitHub or still hold it in its cache. If it cannot, a check gets no answer and the timeout rule decides.</span></li>
     <li>${icon('alert')}<span><b>Level 1 costs.</b> About 0.011 NEAR a check, and about 2.67 NEAR held while OutLayer works and returned after.</span></li>
+    <li>${icon('alert')}<span><b>Level 1 in the vendor tool.</b> The vendor tool’s Level 1 mode has not been run end to end yet.</span></li>
     <li>${icon('alert')}<span><b>Level 0 is run by the project.</b> Both registered verifiers belong to the project today.</span></li>
     </ul>
     <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/evidence">See the evidence ${icon('right')}</a><a class="btn btn-g" href="#/bounties">Browse bounties</a><a class="lnk" href="#/agents">What agents see ${icon('right')}</a></div></div>`;

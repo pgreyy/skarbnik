@@ -2,6 +2,23 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Vendor tool Level 1 fix; 40 px under the tab strips
+
+- `tools/skarbnik-vendor`: the journal lookup (`journal_bytes`) required exactly one copy of the 780 byte journal in a
+  succinct receipt, and every real receipt holds two identical copies, so Level 1 `publish` and `watch` would have
+  stopped before `open_with_outlayer` and `check_with_outlayer`. It now accepts identical copies. Checked against the
+  three real proofs of bounty 36: the old code failed on all three, the new code finds each journal with the hash
+  recorded on chain (`docs/evidence/level1/vendor_tool_journal_fix.txt`).
+- `publish` built the opening call after `create_bounty`; a failure there would have left a created, unopened bounty
+  with its reward locked. It now builds the opening call and, at Level 1, checks that the vendor account holds the
+  reward plus OutLayer's deposit before anything is sent. `prove0` at Level 1 checks the journal can be found.
+- Until a full cycle runs through the vendor tool, the Limits on Evidence and For vendors, docs/VENDOR.md, the vendor
+  MCP server's README and the tool's help say "The vendor tool's Level 1 mode has not been run end to end yet."
+- The gap from a tab strip to the first heading under it is 40 px (32 at phone widths); 80 px (56) stays above every
+  later section heading. Checked at 1440, 1024, 980, 768 and 390, dark and light.
+- 3 test NEAR moved from `kintsugi-res1-prnvm.testnet` to `kintsugi-vendor-prnvm.testnet` for the cycle (tx
+  `Fp4pKERQcDksPZg6XUq8MuNxHwe95TTTrfNy3sjDeXXP`, `docs/evidence/level1_tool/fund.txt`).
+
 ## 2026-11-03: For vendors: a short level choice; one spacing rhythm for section headings
 
 - For vendors, Host: "How should the bounty be verified?" with three cards (the level and one line each, Level 2 marked

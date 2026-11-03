@@ -1,0 +1,6 @@
+Journal lookup in tools/skarbnik-vendor (journal_bytes), checked 2026-11-03T12:59Z against the three real succinct proofs of bounty 36
+(target/level1/p0_succinct.bin, a0_succinct.bin, a1_succinct.bin; each holds its 780 byte journal twice, identical).
+Old code (before the fix): p0, a0, a1: 'could not find the journal in the receipt' (it required exactly one copy).
+Fixed code: p0, a0, a1: journal found, 780 bytes, sha256 equal to skarbnik-host verify's 'journal sha256', and to the
+journal hashes on chain (create_bounty proof0_journal_hash e9c75e40...; attempts 0 and 1 journal_hash 518396f0..., c65b2dc3...);
+outlayer_args builds the open_with_outlayer and check_with_outlayer arguments from them.

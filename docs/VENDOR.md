@@ -27,7 +27,7 @@ https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520
 (rebuilt to the same hash by `scripts/build_verifier_wasm.sh`). At Level 1 `prove0` and `watch` stop at the succinct
 proof; `publish` opens with `open_with_outlayer` and `watch` sends each proof with `check_with_outlayer`, both from an
 account that can attach a deposit (an agent's limited key cannot). At every level a timeout is a timeout: no verdict
-in time means the waiting attempts are paid by rule.
+in time means the waiting attempts are paid by rule. The vendor tool's Level 1 mode has not been run end to end yet.
 
 ## Commands
 

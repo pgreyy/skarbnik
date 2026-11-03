@@ -375,12 +375,13 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 @container sk (max-width:700px){.sk .v-levels{grid-template-columns:minmax(0,1fr)}}
 /* One rhythm for section headings on For vendors, For agents, How it works and the Evidence tabs: about 80 px above a
    section heading (56 on a phone), 12 px from a heading to its intro line, 24 px from the intro to the content, 32 px
-   between card rows. .sub is a later section inside a tab panel's 24 px stack. */
+   between card rows; 40 px (32 on a phone) from a tab strip to the first heading under it. .sub is a later section
+   inside a tab panel's 24 px stack. */
 .sk :is(.p-vendors,.p-agents,.p-evidence) .panel .stack>.n-tab,.sk :is(.p-vendors,.p-agents,.p-evidence) .panel .stack>.n-4{margin-top:0}
 .sk :is(.p-vendors,.p-agents,.p-evidence) .panel .sub{margin-top:56px}
-.sk :is(.p-vendors,.p-agents,.p-evidence) .panel>:first-child{margin-top:36px}
+.sk :is(.p-vendors,.p-agents,.p-evidence) .panel{padding-top:40px}
 .sk :is(.p-vendors,.p-agents,.p-evidence) .panel .sub+.n-4{margin-top:8px}
-@container sk (max-width:700px){.sk :is(.p-vendors,.p-agents,.p-evidence) .panel .sub{margin-top:32px}.sk :is(.p-vendors,.p-agents,.p-evidence) .panel>:first-child{margin-top:24px}}
+@container sk (max-width:700px){.sk :is(.p-vendors,.p-agents,.p-evidence) .panel .sub{margin-top:32px}.sk :is(.p-vendors,.p-agents,.p-evidence) .panel{padding-top:32px}}
 /* How it works: the same rhythm; a section's content ends about 80 px (56 on a phone) above the next section's eyebrow */
 .sk .p-how .sec{padding:40px 0}
 .sk .p-how .h-story{padding-bottom:40px}

@@ -6,6 +6,7 @@ before anything is spent. It runs on your own computer, because the secret input
 hosted link. One file, `server.py`, Python 3.9 or later, standard library only. The vendor tool it runs needs Python
 3.11 or later, the project's programs (`skarbnik-host`, `skarbnik-check`), NEAR CLI with your vendor account, and for
 the Groth16 wrap (Level 2, the default) an x86 computer with Docker and about 7.6 GiB of memory plus swap (docs/VENDOR.md).
+The vendor tool's Level 1 mode has not been run end to end yet.
 
 ## Tools
 

@@ -3,7 +3,7 @@
 
 Each bounty has a level (bounty.level, default 2): 2 = the contract checks a Groth16 proof itself; 1 = the contract
 trusts OutLayer running the pinned verifier program on the succinct proof (no Groth16 step, so no Docker and no 7.6 GiB
-here); 0 = two registered verifiers decide (today both are run by the project).
+here); 0 = two registered verifiers decide (today both are run by the project). The vendor tool's Level 1 mode has not been run end to end yet.
 
 A vendor should not have to be a cryptography operator. Commands:
   init     ask a few questions (or copy an older config with --from) and write a bounty config (TOML), outside the repo
@@ -204,11 +204,11 @@ def verify_succinct(cfg, w, tag):
 
 def journal_bytes(receipt, v):
     """The proof's 780 byte journal, found in the receipt after its length prefix and checked against the journal sha256
-    that `skarbnik-host verify` printed."""
+    that `skarbnik-host verify` printed. A succinct receipt holds the journal twice (identical copies); any copy will do."""
     rb = open(receipt, 'rb').read(); want = re.search(r'^journal sha256: (\S+)', v, re.M).group(1); prefix = (780).to_bytes(8, 'little')
-    found = [rb[i + 8:i + 788] for i in range(len(rb) - 788) if rb[i:i + 8] == prefix and hashlib.sha256(rb[i + 8:i + 788]).hexdigest() == want]
+    found = {rb[i + 8:i + 788] for i in range(len(rb) - 788) if rb[i:i + 8] == prefix and hashlib.sha256(rb[i + 8:i + 788]).hexdigest() == want}
     if len(found) != 1: raise RuntimeError('could not find the journal in the receipt')
-    return found[0]
+    return found.pop()
 
 def outlayer_args(w, tag, extra):
     """The arguments of open_with_outlayer and check_with_outlayer: the succinct receipt, its sha256 and its journal."""
@@ -391,6 +391,9 @@ def cmd_prove0(a):
         say(f'{now()} Proof 0 of {b["name"]}: prove, succinct{", Groth16" if level_of(cfg) == 2 else ""}, one step at a time (logs in {w})')
         v, t = prove_chain(cfg, w, b['name'], s['reference_fix'], module, s['secret'], seed, int(b.get('fuzz_count', 16)), int(b.get('variants', 32)), int(b.get('po2', 18)), proof0=True, groth16=level_of(cfg) == 2)
     if journal(v, 'verdict') != 'PASS': fail('Proof 0 did not say PASS')
+    if level_of(cfg) == 1:  # the arguments of open_with_outlayer need the journal from the receipt: find it now, not at publish
+        try: journal_bytes(f'{w}/p0_succinct.bin', v)
+        except RuntimeError as e: fail(f'Proof 0: {e}')
     json.dump({'times_s': t, 'at': now()}, open(f'{w}/proof0_times.json', 'w'))
     say(f'{now()} Proof 0 ready: VALID, PASS; prove {t["prove"]} s, succinct {t["succinct"]} s' + (f', Groth16 {t["groth16"]} s' if 'groth16' in t else '') + '. Next: publish')
 
@@ -413,16 +416,25 @@ def cmd_publish(a):
               'fuzz_count': int(b.get('fuzz_count', 16)), 'variant_count': int(b.get('variants', 32)), 'level': level_of(cfg)}
     json.dump(create, open(f'{w}/create_call.json', 'w'))
     bid = str(view(cfg, 'get_next_bounty_id'))
+    lv = level_of(cfg)
+    # Build the opening call and check its money before create_bounty, so a failure here can never leave a created bounty
+    # that cannot be opened, with its reward locked.
+    try:
+        if lv == 2: open_args = proof_args(w, 'p0', {'bounty_id': bid})
+        elif lv == 1: open_args = outlayer_args(w, 'p0', {'bounty_id': bid})
+    except (RuntimeError, OSError, KeyError, ValueError) as e: fail(f'the opening call could not be built, so nothing was sent: {e}')
+    if lv == 1:
+        min_dep = int(view(cfg, 'get_outlayer')['min_deposit']); dep = near_amount(min_dep).replace(' NEAR', '')
+        have, need = balance(cfg, cfg['chain']['vendor_account']), yocto(b['reward_near']) + min_dep + yocto('0.05')
+        if have is None or have < need: fail(f'the vendor account needs about {near_amount(need)} (the reward, OutLayer\'s deposit {dep} NEAR held while it works, and gas); it has {near_amount(have or 0)}; nothing was sent')
     tx1, ok1, why = send(cfg, cfg['chain']['vendor_account'], 'create_bounty', f'{w}/create_call.json', f'{b["reward_near"]} NEAR', log=f'{w}/run.log')
     say(f'create_bounty: {tx1} {"ok" if ok1 else "FAILED: " + why}')
     if not ok1: sys.exit(1)
-    lv = level_of(cfg)
     if lv == 2:
-        tx2, ok2, why = send(cfg, cfg['chain']['vendor_account'], 'open_with_groth16', proof_args(w, 'p0', {'bounty_id': bid}), log=f'{w}/run.log')
+        tx2, ok2, why = send(cfg, cfg['chain']['vendor_account'], 'open_with_groth16', open_args, log=f'{w}/run.log')
         say(f'open_with_groth16: {tx2} {"ok" if ok2 else "FAILED: " + why}')
     elif lv == 1:
-        dep = near_amount(view(cfg, 'get_outlayer')['min_deposit']).replace(' NEAR', '')
-        tx2, ok2, why = send(cfg, cfg['chain']['vendor_account'], 'open_with_outlayer', outlayer_args(w, 'p0', {'bounty_id': bid}), f'{dep} NEAR', log=f'{w}/run.log')
+        tx2, ok2, why = send(cfg, cfg['chain']['vendor_account'], 'open_with_outlayer', open_args, f'{dep} NEAR', log=f'{w}/run.log')
         say(f'open_with_outlayer: {tx2} {"ok" if ok2 else "FAILED: " + why}; {dep} NEAR held while OutLayer works, then returned (less its fee)')
     else:
         tx2 = None
