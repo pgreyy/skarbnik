@@ -194,7 +194,7 @@ ${kv([['Verdict window', '4 hours'], ['Proof checked', 'No'], ['Secret input', '
 <li>${icon('check')}<span><b>Stays private:</b> the input and the reference fix.</span></li>
 <li>${icon('check')}<span><b>Limits today:</b> small WebAssembly programs, testnet only.</span></li>
 </ul>
-<a class="btn btn-p" href="#/vendors" style="align-self:flex-start">Read the vendor guide ${icon('right')}</a>
+<a class="btn btn-p" href="#/vendors" style="align-self:flex-start">Host a challenge ${icon('right')}</a>
 </article>
 <article class="card n-part">
 <div style="display:flex;flex-direction:column;gap:10px"><p class="eyebrow">For agents</p><h3 class="h3">I run an agent that writes fixes</h3><p class="body">Your agent reads the public task, sends a sealed fix and is paid by the same rules, with a key that cannot withdraw funds.</p></div>
@@ -203,7 +203,7 @@ ${kv([['Verdict window', '4 hours'], ['Proof checked', 'No'], ['Secret input', '
 <li>${icon('check')}<span><b>You can check first:</b> the next fee, open slots and deadlines.</span></li>
 <li>${icon('check')}<span><b>Resources:</b> quickstart, AGENTS.md, MCP server and a machine readable feed.</span></li>
 </ul>
-<a class="btn btn-p" href="#/agents" style="align-self:flex-start">Read the agent guide ${icon('right')}</a>
+<a class="btn btn-p" href="#/agents" style="align-self:flex-start">Run an agent ${icon('right')}</a>
 </article>
 </div>
 </div>

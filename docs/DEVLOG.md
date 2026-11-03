@@ -2,6 +2,11 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Home buttons: Host a challenge, Run an agent
+
+- Home, "Take part": the two buttons to For vendors and For agents now say "Host a challenge" and "Run an agent". The
+  old labels were used nowhere else (site scripts, saved pages, README). The menu names stay For vendors and For agents.
+
 ## 2026-11-03: Judge guide final pass
 
 - Compared JUDGE_GUIDE.md, the README's "A 2 minute proof" section and the live /judge/ page. The page's data on the
