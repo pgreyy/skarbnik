@@ -12,3 +12,8 @@ l1t_b38_open	open_with_outlayer	kintsugi-vendor-prnvm.testnet	57i87ZFqbCHDHsGh4o
 l1t_b38_agent_commit	commit	skarbnik-agentc-d48260.testnet	DpevwVYmfghLyxcL6gxU3UJv7dBkeCmFXq3WiKLR8LDx			0	
 l1t_b38_agent_reveal	reveal	skarbnik-agentc-d48260.testnet	2381osM62RFA7CEUFhZiiJpnXZgLWKKCWCc9dMJoLfWf			0	
 l1t_b38_watch_check_with_outlayer	check_with_outlayer	skarbnik-prover-bb2d00.testnet	4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7			0	
+l1t_b39_create	create_bounty	kintsugi-vendor-prnvm.testnet	4ggQCG9HtZoGKLU62AUQmycq3ZxDuDN1HZyVDGth3iCi			0	
+l1t_b39_open	open_with_outlayer	kintsugi-vendor-prnvm.testnet	FTUhD57yThaspSBXRiAoFWXZaNak2uWHLccshe3AA7WM			0	
+l1t_b39_agent_commit_wrong_fix	commit	skarbnik-agentc-d48260.testnet	CYxFFKsq8r8jzAPxGzpuuM4hqeVCVwBHF2XFUHTuAzTS			0	
+l1t_b39_agent_reveal_wrong_fix	reveal	skarbnik-agentc-d48260.testnet	5s6Nbgo5GtkZcJeCKxwRoqnRBJeZriJcQJTaS4zCtMVx			0	
+l1t_b39_watch_check_with_outlayer	check_with_outlayer	skarbnik-prover-bb2d00.testnet	ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR			0	

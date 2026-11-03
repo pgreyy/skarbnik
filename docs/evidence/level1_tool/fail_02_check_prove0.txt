@@ -1,0 +1,27 @@
+== check 
+{
+ "job": "check-20261103-163454-9da0",
+ "running": false,
+ "minutes": 0.0,
+ "output": "Preflight for l1fail (/home/skarbnik/skarbnik-vendor/l1fail.toml)\n  ok   module /home/skarbnik/.skarbnik-vendor/l1fail/original.wasm, 556 bytes; 17 public tests\n  ok   the original crashes on the secret input\n  ok   the reference fix passes the full check on 4 random seeds\n  ok   memory: 7282 MiB available, 8038 MiB swap; proving needs about 2600 MiB at --po2 18\n  ok   Level 1: OutLayer is set (outlayer.testnet, program sha256 e60647ec50f76f59..., min_deposit 2.8 NEAR)\n  ok   checker image id dd6c5f42c117ce3a... is on the contract's allowlist\n  ok   vendor balance 4.099315 NEAR\n  note no measured proof time yet for this mode and module: prove0 measures it; publish refuses until it is measured\n\nPreview\n  reward: 0.1 NEAR, locked in the contract when the bounty is created\n  level 1: the contract trusts OutLayer running the pinned verifier program on the succinct proof\n       level 2 costs: per proof about 36 Tgas of gas (about 0.004 NEAR); the Groth16 step needs Docker, an x86 computer and about 7.6 GiB\n    -> level 1 costs: per check about 0.011 NEAR (OutLayer's fee about 0.0011 NEAR plus about 97 Tgas of gas, mostly for the 300 KB proof sent as an argument), and min_deposit (about 2.8 NEAR) held while OutLayer works and returned; no Groth16 step\n       level 0 costs: no proof on chain; the verifiers must attest Proof 0 and each verdict before the windows close\n  attempts: up to 1; fees, taken from each researcher's credit: #1 0.01 NEAR\n  windows: reveal 1 min to 1 h after a commit; your proof within 24 h of each reveal; the bounty expires after 96 h\n  on timeout: if you do not prove a revealed attempt within its verdict window, anyone can call claim_timeout and the\n    reward is split equally among the revealed attempts still waiting. The contract does not look at the fix: it pays\n    whatever was revealed. That protects researchers from a silent vendor; it is not a verdict.\n\nPreflight passed.",
+ "exit": 0,
+ "ok": true
+}
+== prove0 
+{
+ "needs_yes": true,
+ "what": "Proof 0 of bounty l1fail spends GPU rental: one rented GPU for this step: about 1 to 11 minutes (11 when the GPU build of the prover is made for the first time), about $0.04 to $0.20; no Groth16 step at this level: the succinct proof goes to OutLayer (Level 1) or to the verifiers (Level 0)",
+ "gpu_budget_usd": 1.53,
+ "confirm_code": "(code held)",
+ "next": "ask the vendor; after a clear yes, call prove0 again with this confirm_code"
+}
+== prove0 
+{
+ "job": "prove0-20261103-163457-d430",
+ "running": false,
+ "minutes": 2.0,
+ "output": "2026-11-03T15:34:57Z Proof 0 of l1fail on a GPU pod: prove and shrink there (logs in /home/skarbnik/skarbnik-vendor/l1fail-work)\n2026-11-03T15:34:59Z pod zmmq4sa31ftitr created: NVIDIA L40S in US-TX-4, $1.09/h, hard cap 60 min\n2026-11-03T15:35:24Z pod zmmq4sa31ftitr: ssh ready after 27 s, GPU NVIDIA L40S\n2026-11-03T15:35:26Z pod zmmq4sa31ftitr: self stop armed for 60 min (runpodctl)\n2026-11-03T15:35:49Z pod zmmq4sa31ftitr: cached GPU binary in place (sha256 d71c9469f749d05d...)\n2026-11-03T15:36:28Z pod zmmq4sa31ftitr: proved in 17.2 s, secret wiped; segments: 12 journal.verdict: PASS\n2026-11-03T15:36:58Z pod zmmq4sa31ftitr terminated: 120 s, $0.0363 ($1.09/h); GPU spend so far $0.7548\n2026-11-03T15:36:58Z Proof 0 ready: VALID, PASS; prove 17.2 s, succinct 12.94 s. Next: publish",
+ "exit": 0,
+ "ok": true,
+ "salt": "made for this bounty in ~/.kintsugi-salts (never read or shown here)"
+}

@@ -1,0 +1,28 @@
+== watch_init 
+{
+ "watch_config": "/home/skarbnik/skarbnik-vendor/l1fail-watch.toml",
+ "bounty_id": "39",
+ "next": "call watch_start with config_path /home/skarbnik/skarbnik-vendor/l1fail-watch.toml"
+}
+== watch_start 
+{
+ "needs_yes": true,
+ "watches_bounties": [
+  "39"
+ ],
+ "prover_mode": "gpu",
+ "spends": "for each revealed attempt, one rented GPU for this step: about 1 to 11 minutes (11 when the GPU build of the prover is made for the first time), about $0.04 to $0.20; then, for a Level 2 bounty only, the Groth16 wrap on this computer, about 5 minutes; a Level 1 bounty's succinct proof goes to OutLayer. Spend cap: $1.53 in all; spent so far $0.7548. At the cap no new GPU starts. On a Level 1 bounty each check also holds the contract's min_deposit (about 2.8 NEAR) from the submit account while OutLayer works, returned less about 0.011 NEAR",
+ "time": "from a reveal to the submitted proof, about 17 minutes in the measured GPU run (bounty 32)",
+ "confirm_code": "(code held)",
+ "next": "ask the vendor; after a clear yes, call watch_start again with this confirm_code"
+}
+== watch_start 
+{
+ "running": true,
+ "pid": 728177,
+ "watches_bounties": [
+  "39"
+ ],
+ "log": "/home/skarbnik/skarbnik-vendor/l1fail-watch.log",
+ "next": "watch proves each revealed attempt and submits the proof; follow it with watch_status, stop it with watch_stop"
+}

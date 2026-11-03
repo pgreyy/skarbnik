@@ -1,0 +1,11 @@
+2026-11-03T15:38:26Z watch started (mode gpu, bounties 39, one job at a time)
+2026-11-03T15:38:26Z GPU mode: rented GPU NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA L4, NVIDIA GeForce RTX 4090, NVIDIA L40 in , cap 60 min per pod, spend so far $0.7548 of a $1.53 budget
+2026-11-03T15:40:27Z bounty 39 attempt 0: proving (patch sha256 79fde4285378fb5c..., seed c706a9aab48cb830..., deadline 2026-11-04 15:39 UTC)
+2026-11-03T15:40:29Z bounty 39 attempt 0: pod 96l5pxarlxfc0u created: NVIDIA RTX 6000 Ada Generation in US-WA-1, $0.99/h, hard cap 60 min
+2026-11-03T15:40:53Z bounty 39 attempt 0: pod 96l5pxarlxfc0u: ssh ready after 25 s, GPU NVIDIA RTX 6000 Ada Generation
+2026-11-03T15:40:56Z bounty 39 attempt 0: pod 96l5pxarlxfc0u: self stop armed for 60 min (runpodctl)
+2026-11-03T15:41:24Z bounty 39 attempt 0: pod 96l5pxarlxfc0u: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-11-03T15:41:53Z bounty 39 attempt 0: pod 96l5pxarlxfc0u: proved in 7.08 s, secret wiped; segments: 4 journal.verdict: FAIL
+2026-11-03T15:42:26Z bounty 39 attempt 0: pod 96l5pxarlxfc0u terminated: 117 s, $0.0322 ($0.99/h); GPU spend so far $0.787
+2026-11-03T15:42:26Z bounty 39 attempt 0: proof ready, verdict FAIL; prove 7.08 s, succinct 5.63 s; on NVIDIA RTX 6000 Ada Generation, pod 117 s, $0.0322
+2026-11-03T15:42:41Z bounty 39 attempt 0: check_with_outlayer ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR ok; outcome on chain Failed

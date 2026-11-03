@@ -1,0 +1,6 @@
+== init 
+{
+ "config": "/home/skarbnik/skarbnik-vendor/l1fail.toml",
+ "output": "wrote /home/skarbnik/skarbnik-vendor/l1fail.toml. Next: tools/skarbnik-vendor check --config /home/skarbnik/skarbnik-vendor/l1fail.toml",
+ "next": "call check with config_path /home/skarbnik/skarbnik-vendor/l1fail.toml"
+}
