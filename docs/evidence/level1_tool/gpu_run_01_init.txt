@@ -1,0 +1,6 @@
+== init 
+{
+ "config": "/home/skarbnik/skarbnik-vendor/l1gpu.toml",
+ "output": "wrote /home/skarbnik/skarbnik-vendor/l1gpu.toml. Next: tools/skarbnik-vendor check --config /home/skarbnik/skarbnik-vendor/l1gpu.toml",
+ "next": "call check with config_path /home/skarbnik/skarbnik-vendor/l1gpu.toml"
+}

@@ -27,7 +27,7 @@ https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520
 (rebuilt to the same hash by `scripts/build_verifier_wasm.sh`). At Level 1 `prove0` and `watch` stop at the succinct
 proof; `publish` opens with `open_with_outlayer` and `watch` sends each proof with `check_with_outlayer`, both from an
 account that can attach a deposit (an agent's limited key cannot). At every level a timeout is a timeout: no verdict
-in time means the waiting attempts are paid by rule. The vendor tool's Level 1 mode has not been run end to end yet.
+in time means the waiting attempts are paid by rule.
 
 ## Commands
 
@@ -102,7 +102,7 @@ With `mode = "gpu"` in a watch config, `watch` proves each revealed attempt on a
 1. It refuses to start a pod once the logged GPU spend reaches the budget, and terminates pods it left behind.
 2. It creates a Secure Cloud pod: the GPU types in order (L40S, RTX 6000 Ada, L4, RTX 4090, L40), the data centers in
    order, the image `runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404` (PyTorch 2.8.0, CUDA 12.8.1, Ubuntu 24.04).
-   Which GPUs work: the prover build runs on NVIDIA Ada generation cards only. Shown working: L40S, RTX 6000 Ada, L4 and RTX 4090. Shown failing, with CUDA's "named symbol not found": RTX A6000, RTX 3090 and A40 (older Ampere cards; docs/evidence/level1_tool/gpu_diag_ampere.txt). The L40 is the same generation as the L40S and was not run. The tool skips other types.
+   The prover build runs only on NVIDIA Ada generation GPUs (shown working: L40S, RTX 6000 Ada, L4, RTX 4090; shown failing: RTX A6000, RTX 3090, A40), so the tool skips other types.
 3. It puts the CUDA build of `skarbnik-host` on the pod: the cached copy, or a build on the first pod (Rust, RISC Zero,
    the committed source and the reproducible guest files; the build must embed the published checker id), kept for the
    next pods.

@@ -1,14 +1,14 @@
 {
- "made_at": "2026-11-03T10:42:29Z",
+ "made_at": "2026-11-03T14:52:21Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Computed from the chain only (every bounty and attempt), with the proving machine from web/data/provers.json. Same rules as the Ledger page.",
- "decided_attempts": 27,
+ "decided_attempts": 29,
  "settled_by_proof": 9,
- "settled_by_outlayer": 2,
+ "settled_by_outlayer": 4,
  "settled_by_timeout": 16,
- "share_settled_by_proof": 0.3333333333333333,
- "timeout_rate": 0.5925925925925926,
+ "share_settled_by_proof": 0.3103448275862069,
+ "timeout_rate": 0.5517241379310345,
  "reveal_to_settlement_seconds": {
   "proof, laptop": {
    "attempts": 4,
@@ -31,12 +31,12 @@
    "slowest": 7828.404930129
   },
   "outlayer, not recorded": {
-   "attempts": 2,
-   "median": 2159.4462715025,
+   "attempts": 4,
+   "median": 1872.0897755135002,
    "slowest": 3218.03281503
   }
  },
  "timing_note": "by proof: from the reveal to the proof accepted on chain; by outlayer: from the reveal to OutLayer's answer accepted on chain (Level 1); by timeout: from the reveal to the verdict deadline (the claim came later).",
- "distinct_outside_accounts": 1,
+ "distinct_outside_accounts": 0,
  "outside_note": "accounts not on the team list (web/data/accounts.json) among vendors, committers and payout accounts"
 }

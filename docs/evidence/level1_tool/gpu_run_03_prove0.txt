@@ -1,0 +1,17 @@
+== prove0 
+{
+ "needs_yes": true,
+ "what": "Proof 0 of bounty l1gpu spends GPU rental: one rented GPU for this step: about 1 to 11 minutes (11 when the GPU build of the prover is made for the first time), about $0.04 to $0.20; no Groth16 step at this level: the succinct proof goes to OutLayer (Level 1) or to the verifiers (Level 0)",
+ "gpu_budget_usd": 1.6,
+ "confirm_code": "(code held)",
+ "next": "ask the vendor; after a clear yes, call prove0 again with this confirm_code"
+}
+== prove0 
+{
+ "job": "prove0-20261103-153441-f2bb",
+ "running": false,
+ "minutes": 2.6,
+ "output": "2026-11-03T14:34:41Z Proof 0 of l1gpu on a GPU pod: prove and shrink there (logs in /home/skarbnik/skarbnik-vendor/l1gpu-work)\n2026-11-03T14:34:44Z pod 8pgria1to9p22a created: NVIDIA L4 in US-MO-2, $0.59/h, hard cap 60 min\n2026-11-03T14:35:30Z pod 8pgria1to9p22a: ssh ready after 48 s, GPU NVIDIA L4\n2026-11-03T14:35:33Z pod 8pgria1to9p22a: self stop armed for 59 min (runpodctl)\n2026-11-03T14:35:59Z pod 8pgria1to9p22a: cached GPU binary in place (sha256 d71c9469f749d05d...)\n2026-11-03T14:36:44Z pod 8pgria1to9p22a: proved in 24.41 s, secret wiped; segments: 12 journal.verdict: PASS\n2026-11-03T14:37:18Z pod 8pgria1to9p22a terminated: 156 s, $0.0256 ($0.59/h); GPU spend so far $0.6613\n2026-11-03T14:37:19Z Proof 0 ready: VALID, PASS; prove 24.41 s, succinct 14.53 s. Next: publish",
+ "exit": 0,
+ "ok": true
+}

@@ -5,6 +5,71 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Level 1 through the vendor tool: bounties 37 and 38 (2026-11-03)
+
+**Question.** Can a vendor host a Level 1 bounty end to end with the vendor tool, driven through its MCP server
+(`tools/skarbnik-vendor-mcp`), and have each attempt proved and checked through OutLayer with no one's help?
+
+**Verdict: PASS, for the PASS direction only.** One full cycle (bounty 37), in which the real fix was sent through
+the hosted connector link, and one run of the watch in GPU mode (bounty 38), both settled on OutLayer's PASS. No FAIL
+went through the tool: bounty 37's wrong fix was still undecided when the PASS closed the bounty, so its fee was
+refunded. A FAIL through OutLayer was shown on bounty 36, by `scripts/level1_testnet.py` ("Level 1 through OutLayer").
+Every transaction: `docs/evidence/level1_tool/transactions.tsv`; every MCP call: `docs/evidence/level1_tool/`
+(driven by an MCP client script over stdio, on the laptop and over ssh on the VPS; confirm codes were passed on,
+never printed).
+
+**Fixed first** (`cae5a9d`, on main before the cycle): the tool's journal lookup required exactly one copy of the
+journal and every real succinct receipt holds two identical copies, so Level 1 `publish` and `watch` would have stopped
+before reaching OutLayer (`docs/evidence/level1/vendor_tool_journal_fix.txt`); `publish` now builds the opening call
+and checks the vendor's funds before `create_bounty`. 3 test NEAR moved to the vendor account
+(`Fp4pKERQcDksPZg6XUq8MuNxHwe95TTTrfNy3sjDeXXP`).
+
+**Bounty 37: the full cycle.** Level 1, the public demo program, input and fix, check size 1 and 1, K = 2, fee 0.01
+NEAR rising by 0.005, reward 0.1 NEAR.
+
+| Step | Where | Result | Transaction |
+| --- | --- | --- | --- |
+| `init`, `check` | VPS, MCP server | config written; preflight passed (OutLayer set, checker on the allowlist) | |
+| `prove0`, GPU mode | VPS, MCP server | rented NVIDIA L4: prove 18.5 s, shrink 11.1 s, PASS; pod 88 s, $0.0144 | |
+| `init`, `check`, `publish` | laptop, MCP server | created and opened through OutLayer (PASS, 2.8 NEAR held and returned) | [`7QKA1m1F...`](https://testnet.nearblocks.io/txns/7QKA1m1Fw8GDanqc8xMjiaiZBeiENVevhmYLZaR1RTV3), [`9fw7pzS7...`](https://testnet.nearblocks.io/txns/9fw7pzS7Vt2y4AwqCg5en3c8hHsHmpC8e2N1xBZ8FmeS) |
+| `watch_init`, `watch_start`, GPU mode | VPS, MCP server | watch running, $2.543 cap in all | |
+| attempt 0: the real fix, through the hosted connector link | `kintt.testnet` (the owner's account) | commit, reveal | [`7zrdLaRD...`](https://testnet.nearblocks.io/txns/7zrdLaRDi1r9FHxpSPdenwcYVaVWcSKfY99UrArecBz2), [`3MhPkqPm...`](https://testnet.nearblocks.io/txns/3MhPkqPmqqXUgFCTGJPDZV84Z76xvZdCScJH7n8YqbfZ) |
+| attempt 1: a wrong fix (`data/attacks/wrong_fix.wasm`), through `tools/skarbnik-mcp` | `skarbnik-agentc-d48260.testnet` (its key limited to commit and reveal; the owner chose it after a key for `kintsugi-res2-prnvm` could not be added) | commit, reveal | [`tQMCUJw7...`](https://testnet.nearblocks.io/txns/tQMCUJw7eAssQ2MPVbZL5BXvrkbavJX1Ps9HPcZTYRe), [`CuZmnu1s...`](https://testnet.nearblocks.io/txns/CuZmnu1scD8cTvd3TaoTh8hX5d6n1iod69BP68PqKb9M) |
+| watch, attempt 0 on GPUs | VPS | **failed twice**: RTX A6000 and RTX 3090 aborted (exit 134); a third pod, RTX 6000 Ada, was stopped before it proved; $0.011, $0.0042, $0.0228 | |
+| watch, attempt 0 on the laptop CPU | laptop, MCP server (`watch_init`, `watch_start`, mode cpu) | 24 segments, prove 1,299 s, shrink 934 s, PASS; `check_with_outlayer`: OutLayer verified PASS, 0.1 NEAR paid to `kintt.testnet`; attempt 1's fee refunded (undecided when the bounty closed) | [`6nKhWdEu...`](https://testnet.nearblocks.io/txns/6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS) |
+
+The laptop proof needed the bounty's salt, made on the VPS by `prove0`: it was copied once from the VPS to the laptop
+(mode 600, never opened or shown).
+
+**Why the GPUs failed, and the fix.** The pods' error output was not kept; the tool now keeps it (`gpu_errors/` next
+to the spend file) and returns the end of the prover's log. Two prove only diagnostic pods with attempt 0's patch,
+nothing sent to the chain: an RTX 4090 proved it (10.3 s, PASS, $0.0274, `gpu_diag_ada.txt`); an A40 aborted with
+CUDA's "named symbol not found" ($0.0129, `gpu_diag_ampere.txt`). The cached CUDA build of the prover runs on NVIDIA Ada
+generation cards only (shown working: L40S, RTX 6000 Ada, L4, RTX 4090; shown failing: RTX A6000, RTX 3090, A40); the
+tool now skips other types (`tools/skarbnik_gpu.py`, `WORKS_ON`).
+
+**Bounty 38: the watch in GPU mode.** Level 1, the same demo files, K = 1, check size 1 and 1, Ada cards only.
+
+| Step | Where | Result | Transaction |
+| --- | --- | --- | --- |
+| `init`, `check`, `prove0`, GPU mode | VPS, MCP server | first try: no free Ada card (no pod, no cost); then NVIDIA L4: prove 24.4 s, shrink 14.5 s, PASS; $0.0256 | |
+| `init`, `check`, `publish` | laptop, MCP server | created and opened through OutLayer | [`BebHULiV...`](https://testnet.nearblocks.io/txns/BebHULiVojuNKsQNwGW312psofewBiACX7mbLJxFKY3v), [`57i87ZFq...`](https://testnet.nearblocks.io/txns/57i87ZFqbCHDHsGh4oahNe4ySSteVZtArFTGbEfoepw9) |
+| attempt 0: the real fix, through `tools/skarbnik-mcp` | `skarbnik-agentc-d48260.testnet` | commit, reveal | [`DpevwVYm...`](https://testnet.nearblocks.io/txns/DpevwVYmfghLyxcL6gxU3UJv7dBkeCmFXq3WiKLR8LDx), [`2381osM6...`](https://testnet.nearblocks.io/txns/2381osM62RFA7CEUFhZiiJpnXZgLWKKCWCc9dMJoLfWf) |
+| watch in GPU mode, attempt 0 | VPS | NVIDIA L40S: prove 10.2 s, shrink 7.7 s, PASS; pod 189 s, $0.0572; `check_with_outlayer`: OutLayer verified PASS, 0.1 NEAR paid | [`4heRP1d6...`](https://testnet.nearblocks.io/txns/4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7) |
+
+From reveal (14:41:00 UTC) to payment (14:44:32 UTC): 3 min 32 s.
+
+**GPU cost:** $0.1755 in all for both bounties and the diagnostics, eight pods (the cap was $2 for the cycle and $1
+more for the GPU work). No pod is left.
+
+**Fixed on the way** (branch `level1-tool`): the MCP server's `init` takes the check size (`fuzz_count`, `variants`);
+`prove0` fails with a plain message when no GPU can be rented; Level 1 texts no longer mention a Groth16 step (prove0,
+the watch log, `watch_start`'s cost and time, the preview's source of the proof time).
+
+**Not shown.** A FAIL through the tool; the vendor tool on a machine other than the project's laptop and VPS; OutLayer
+downloading the pinned file afresh (every answer said "Cached WASM from 2026-10-26"); an AI app driving the MCP server
+(an MCP client script did).
+
 ## Level 1 through OutLayer: built, deployed and settled on testnet (2026-11-03)
 
 **Verdict: PASS.** Bounty 36 was opened and settled through OutLayer on testnet: a wrong fix FAIL, the real fix PASS

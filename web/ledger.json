@@ -1,5 +1,5 @@
 {
- "made_at": "2026-11-03T10:42:29Z",
+ "made_at": "2026-11-03T14:52:21Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Every account in this ledger is run by the Skarbnik team or was seeded by its scripts (accounts.kinds). No scores, no ranks, no credit for unpaid attempts. Amounts in yoctoNEAR; a paid fix also got its own attempt fee back.",
@@ -383,6 +383,38 @@
    "fee_refunded_yocto": "15000000000000000000000",
    "tx": "3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u",
    "note": null
+  },
+  {
+   "bounty_id": "37",
+   "attempt": 0,
+   "payout_account": "the owner's personal testnet account",
+   "kind": "team-run",
+   "how": "outlayer",
+   "status": "verified by OutLayer (Level 1): paid on OutLayer's answer, the contract did not check the proof",
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "means": "OutLayer reported that the pinned verifier program accepted a PASS proof of this checker for this patch; the contract trusted that answer and did not check the proof itself.",
+   "transfer_failed": false,
+   "paid_yocto": "100000000000000000000000",
+   "on_paper_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS",
+   "note": null
+  },
+  {
+   "bounty_id": "38",
+   "attempt": 0,
+   "payout_account": "skarbnik-agentc-d48260.testnet",
+   "kind": "team-run",
+   "how": "outlayer",
+   "status": "verified by OutLayer (Level 1): paid on OutLayer's answer, the contract did not check the proof",
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "means": "OutLayer reported that the pinned verifier program accepted a PASS proof of this checker for this patch; the contract trusted that answer and did not check the proof itself.",
+   "transfer_failed": false,
+   "paid_yocto": "100000000000000000000000",
+   "on_paper_yocto": "100000000000000000000000",
+   "fee_refunded_yocto": "10000000000000000000000",
+   "tx": "4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7",
+   "note": null
   }
  ],
  "paid_accounts": [
@@ -407,11 +439,11 @@
   {
    "account": "the owner's personal testnet account",
    "kind": "team-run",
-   "fixes_paid": 2,
+   "fixes_paid": 3,
    "paid_by_proof": 0,
-   "paid_by_outlayer": 0,
+   "paid_by_outlayer": 1,
    "paid_by_timeout": 2,
-   "total_paid_yocto": "533333333333333333333334"
+   "total_paid_yocto": "633333333333333333333334"
   },
   {
    "account": "kintsugi-web-1e80c1.testnet",
@@ -457,6 +489,15 @@
    "paid_by_outlayer": 0,
    "paid_by_timeout": 1,
    "total_paid_yocto": "150000000000000000000000"
+  },
+  {
+   "account": "skarbnik-agentc-d48260.testnet",
+   "kind": "team-run",
+   "fixes_paid": 1,
+   "paid_by_proof": 0,
+   "paid_by_outlayer": 1,
+   "paid_by_timeout": 0,
+   "total_paid_yocto": "100000000000000000000000"
   }
  ],
  "earnings": [
@@ -508,12 +549,12 @@
   {
    "account": "the owner's personal testnet account",
    "kind": "team-run",
-   "attempts": 3,
-   "fees_spent_yocto": "30000000000000000000000",
-   "fees_returned_yocto": "20000000000000000000000",
-   "gross_rewards_yocto": "533333333333333333333334",
+   "attempts": 4,
+   "fees_spent_yocto": "40000000000000000000000",
+   "fees_returned_yocto": "30000000000000000000000",
+   "gross_rewards_yocto": "633333333333333333333334",
    "proof_checked_passes": 0,
-   "outlayer_passes": 0,
+   "outlayer_passes": 1,
    "timeout_payouts": 2,
    "rejected_by_a_fail_proof": 0,
    "released_unrevealed": 0,
@@ -612,13 +653,13 @@
   },
   {
    "account": "skarbnik-agentc-d48260.testnet",
-   "kind": "not known",
-   "attempts": 3,
-   "fees_spent_yocto": "35000000000000000000000",
-   "fees_returned_yocto": "0",
-   "gross_rewards_yocto": "0",
+   "kind": "team-run",
+   "attempts": 5,
+   "fees_spent_yocto": "60000000000000000000000",
+   "fees_returned_yocto": "25000000000000000000000",
+   "gross_rewards_yocto": "100000000000000000000000",
    "proof_checked_passes": 0,
-   "outlayer_passes": 0,
+   "outlayer_passes": 1,
    "timeout_payouts": 0,
    "rejected_by_a_fail_proof": 1,
    "released_unrevealed": 0,
@@ -630,19 +671,19 @@
   {
    "vendor": "kintsugi-vendor-prnvm.testnet",
    "kind": "team-run",
-   "bounties": 37,
-   "proved_on_time": 11,
+   "bounties": 39,
+   "proved_on_time": 13,
    "not_proved_in_time": 16,
    "waiting_past_deadline": 2
   }
  ],
  "metrics": {
-  "decided_attempts": 27,
+  "decided_attempts": 29,
   "settled_by_proof": 9,
-  "settled_by_outlayer": 2,
+  "settled_by_outlayer": 4,
   "settled_by_timeout": 16,
-  "share_settled_by_proof": 0.3333333333333333,
-  "timeout_rate": 0.5925925925925926,
+  "share_settled_by_proof": 0.3103448275862069,
+  "timeout_rate": 0.5517241379310345,
   "reveal_to_settlement_seconds": {
    "proof, laptop": {
     "attempts": 4,
@@ -665,24 +706,24 @@
     "slowest": 7828.404930129
    },
    "outlayer, not recorded": {
-    "attempts": 2,
-    "median": 2159.4462715025,
+    "attempts": 4,
+    "median": 1872.0897755135002,
     "slowest": 3218.03281503
    }
   },
   "timing_note": "by proof: from the reveal to the proof accepted on chain; by outlayer: from the reveal to OutLayer's answer accepted on chain (Level 1); by timeout: from the reveal to the verdict deadline (the claim came later).",
-  "distinct_outside_accounts": 1,
+  "distinct_outside_accounts": 0,
   "outside_note": "accounts not on the team list (web/data/accounts.json) among vendors, committers and payout accounts"
  },
  "counts": {
-  "paid_fixes": 22,
+  "paid_fixes": 24,
   "paid_by_proof": 6,
-  "paid_by_outlayer": 1,
+  "paid_by_outlayer": 3,
   "paid_by_timeout": 15,
   "paid_on_paper_transfer_failed": 1,
-  "paid_accounts": 8,
+  "paid_accounts": 9,
   "vendors": 1,
-  "distinct_counterparties": 9,
+  "distinct_counterparties": 10,
   "outside_the_team": 0
  }
 }

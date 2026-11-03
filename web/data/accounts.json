@@ -22,7 +22,8 @@
   "skarbnik-partd-461f99.testnet": "seeded",
   "skarbnik-prover-bb2d00.testnet": "team-run",
   "skarbnik-agentsmd-960210.testnet": "seeded",
-  "skarbnik-mcp-2fe414.testnet": "seeded"
+  "skarbnik-mcp-2fe414.testnet": "seeded",
+  "skarbnik-agentc-d48260.testnet": "team-run"
  },
  "source": "docs/EVIDENCE.md and the scripts that made each account (docs/evidence/*/run.env, accounts.env)",
  "hashed_accounts": {

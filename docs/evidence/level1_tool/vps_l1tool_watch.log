@@ -1,0 +1,29 @@
+2026-11-03T13:35:42Z watch started (mode gpu, bounties 37, one job at a time)
+2026-11-03T13:35:42Z GPU mode: rented GPU NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA L40, NVIDIA L4, NVIDIA GeForce RTX 4090, NVIDIA RTX A6000, NVIDIA RTX A5000, NVIDIA A40, NVIDIA GeForce RTX 3090 in , cap 60 min per pod, spend so far $0.5574 of a $2.543 budget
+2026-11-03T13:44:44Z bounty 37 attempt 0: proving (patch sha256 e2aa5a8c09d055bd..., seed cf58c836d3717391..., deadline 2026-11-04 13:44 UTC)
+2026-11-03T13:44:46Z bounty 37 attempt 0: pod sn22k4fgloeq4j created: NVIDIA RTX A6000 in EU-SE-1, $0.59/h, hard cap 60 min
+2026-11-03T13:45:21Z bounty 37 attempt 0: pod sn22k4fgloeq4j: ssh ready after 37 s, GPU NVIDIA RTX A6000
+2026-11-03T13:45:23Z bounty 37 attempt 0: pod sn22k4fgloeq4j: self stop armed for 59 min (runpodctl)
+2026-11-03T13:45:36Z bounty 37 attempt 0: pod sn22k4fgloeq4j: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-11-03T13:45:51Z bounty 37 attempt 0: pod sn22k4fgloeq4j terminated: 67 s, $0.011 ($0.59/h); GPU spend so far $0.5684
+2026-11-03T13:45:51Z bounty 37 attempt 0: GPU try 1 of 2 failed (pod step failed (exit 134): skv/exploit.hex --original run/original.wasm --tests run/public_tests.txt --fuzz-count 1 --variants 1 --po2 19 --seed cf58c836d371739195d4d8145d31ae1300943000188b909e85221fefcc3bad98 --submission-id b20eff5691389a03cf27aec992a6aa692bf235e583da6e132b04ef3413cbd80f --out run/u.bin > run/prove.log 2>&1)
+2026-11-03T13:45:53Z bounty 37 attempt 0: no free GPU of 9 types on the secure cloud
+2026-11-03T13:45:55Z bounty 37 attempt 0: no free GPU of 9 types on the community cloud
+2026-11-03T13:45:55Z bounty 37 attempt 0: GPU try 2 of 2 failed (no GPU could be rented within the limits (RunPod POST /pods: HTTP 500 {"error":"create pod: There are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no i))
+2026-11-03T13:45:55Z bounty 37 attempt 0: FAILED (the GPU path did not give a proof, and gpu.cpu_fallback is false: no CPU proving here; the next scan tries again); try 1 of 2
+2026-11-03T13:45:56Z bounty 37 attempt 0: proving (patch sha256 e2aa5a8c09d055bd..., seed cf58c836d3717391..., deadline 2026-11-04 13:44 UTC)
+2026-11-03T13:45:58Z bounty 37 attempt 0: no free GPU of 9 types on the secure cloud
+2026-11-03T13:46:01Z bounty 37 attempt 0: pod rmezp9ydarecr5 created: NVIDIA GeForce RTX 3090 in None, $0.22/h, hard cap 60 min
+2026-11-03T13:46:35Z bounty 37 attempt 0: pod rmezp9ydarecr5: ssh ready after 37 s, GPU NVIDIA GeForce RTX 3090
+2026-11-03T13:46:36Z bounty 37 attempt 0: pod rmezp9ydarecr5: self stop armed for 59 min (runpodctl)
+2026-11-03T13:46:54Z bounty 37 attempt 0: pod rmezp9ydarecr5: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-11-03T13:47:07Z bounty 37 attempt 0: pod rmezp9ydarecr5 terminated: 68 s, $0.0042 ($0.22/h); GPU spend so far $0.5726
+2026-11-03T13:47:07Z bounty 37 attempt 0: GPU try 1 of 2 failed (pod step failed (exit 134): skv/exploit.hex --original run/original.wasm --tests run/public_tests.txt --fuzz-count 1 --variants 1 --po2 19 --seed cf58c836d371739195d4d8145d31ae1300943000188b909e85221fefcc3bad98 --submission-id b20eff5691389a03cf27aec992a6aa692bf235e583da6e132b04ef3413cbd80f --out run/u.bin > run/prove.log 2>&1)
+2026-11-03T13:47:09Z bounty 37 attempt 0: no free GPU of 9 types on the secure cloud
+2026-11-03T13:47:11Z bounty 37 attempt 0: no free GPU of 9 types on the community cloud
+2026-11-03T13:47:11Z bounty 37 attempt 0: GPU try 2 of 2 failed (no GPU could be rented within the limits (RunPod POST /pods: HTTP 500 {"error":"create pod: There are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no i))
+2026-11-03T13:47:11Z bounty 37 attempt 0: FAILED (the GPU path did not give a proof, and gpu.cpu_fallback is false: no CPU proving here; the next scan tries again); try 1 of 2
+2026-11-03T13:47:12Z bounty 37 attempt 0: proving (patch sha256 e2aa5a8c09d055bd..., seed cf58c836d3717391..., deadline 2026-11-04 13:44 UTC)
+2026-11-03T13:47:14Z bounty 37 attempt 0: pod jpglkpq24luz9o created: NVIDIA RTX 6000 Ada Generation in US-WA-1, $0.99/h, hard cap 60 min
+2026-11-03T13:47:38Z bounty 37 attempt 0: pod jpglkpq24luz9o: ssh ready after 26 s, GPU NVIDIA RTX 6000 Ada Generation
+2026-11-03T13:47:41Z bounty 37 attempt 0: pod jpglkpq24luz9o: self stop armed for 60 min (runpodctl)

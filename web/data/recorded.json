@@ -1662,6 +1662,130 @@
     "script": "scripts/level1_testnet.py"
    }
   ],
+  "37": [
+   {
+    "step": "l1t_b37_create",
+    "method": "create_bounty",
+    "tx": "7QKA1m1Fw8GDanqc8xMjiaiZBeiENVevhmYLZaR1RTV3",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b37_open",
+    "method": "open_with_outlayer",
+    "tx": "9fw7pzS7Vt2y4AwqCg5en3c8hHsHmpC8e2N1xBZ8FmeS",
+    "what": "Opened with its Proof 0, checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b37_hosted_commit",
+    "method": "commit",
+    "tx": "7zrdLaRDi1r9FHxpSPdenwcYVaVWcSKfY99UrArecBz2",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b37_hosted_reveal",
+    "method": "reveal",
+    "tx": "3MhPkqPmqqXUgFCTGJPDZV84Z76xvZdCScJH7n8YqbfZ",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b37_agent_commit_wrong_fix",
+    "method": "commit",
+    "tx": "tQMCUJw7eAssQ2MPVbZL5BXvrkbavJX1Ps9HPcZTYRe",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b37_agent_reveal_wrong_fix",
+    "method": "reveal",
+    "tx": "CuZmnu1scD8cTvd3TaoTh8hX5d6n1iod69BP68PqKb9M",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b37_watch_check_with_outlayer",
+    "method": "check_with_outlayer",
+    "tx": "6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS",
+    "what": "Proof of an attempt checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   }
+  ],
+  "38": [
+   {
+    "step": "l1t_b38_create",
+    "method": "create_bounty",
+    "tx": "BebHULiVojuNKsQNwGW312psofewBiACX7mbLJxFKY3v",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b38_open",
+    "method": "open_with_outlayer",
+    "tx": "57i87ZFqbCHDHsGh4oahNe4ySSteVZtArFTGbEfoepw9",
+    "what": "Opened with its Proof 0, checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b38_agent_commit",
+    "method": "commit",
+    "tx": "DpevwVYmfghLyxcL6gxU3UJv7dBkeCmFXq3WiKLR8LDx",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b38_agent_reveal",
+    "method": "reveal",
+    "tx": "2381osM62RFA7CEUFhZiiJpnXZgLWKKCWCc9dMJoLfWf",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b38_watch_check_with_outlayer",
+    "method": "check_with_outlayer",
+    "tx": "4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7",
+    "what": "Proof of an attempt checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   }
+  ],
   "23": [
    {
     "step": "cleanup_b23_expire",

@@ -2,6 +2,24 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Level 1 through the vendor tool: bounties 37 and 38
+
+- One full cycle through `tools/skarbnik-vendor-mcp` (bounty 37): `init`, `check` and `prove0` on the VPS (Proof 0 on a
+  rented L4), `init`, `check` and `publish` on the laptop, the watch on the VPS in GPU mode. The real fix came through
+  the hosted connector link (`kintt.testnet`); a wrong fix through `tools/skarbnik-mcp` from
+  `skarbnik-agentc-d48260.testnet` (adding a limited key to `kintsugi-res2-prnvm` was not allowed in this session; the
+  owner chose that account). The watch's GPU proof of attempt 0 failed twice (RTX A6000, RTX 3090: exit 134); the watch
+  then ran on the laptop CPU and settled it: OutLayer PASS, 0.1 NEAR to `kintt.testnet`
+  (`6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS`); the wrong fix's fee was refunded when the PASS closed the bounty.
+- Diagnosis: prove only pods with attempt 0's patch; an RTX 4090 proved it, an A40 aborted with CUDA's "named symbol
+  not found": the cached prover build runs on Ada generation cards only. `tools/skarbnik_gpu.py` now skips other types,
+  keeps a failed step's whole output (`gpu_errors/`) and returns the end of the prover's log.
+- Bounty 38: the watch in GPU mode on an L40S, OutLayer PASS, paid (`4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7`),
+  3 min 32 s from reveal to payment.
+- Fixed in the tools: the MCP server's `init` takes the check size; `prove0` fails plainly when no GPU is free; Level 1
+  texts no longer mention a Groth16 step. The "not run end to end yet" lines are removed.
+- GPU cost: $0.1755 over eight pods. Not shown: a FAIL through the tool.
+
 ## 2026-11-03: Vendor tool Level 1 fix; 40 px under the tab strips
 
 - `tools/skarbnik-vendor`: the journal lookup (`journal_bytes`) required exactly one copy of the 780 byte journal in a

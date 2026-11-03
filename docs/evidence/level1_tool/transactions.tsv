@@ -1,0 +1,14 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+l1t_fund	send_near	kintsugi-res1-prnvm.testnet	Fp4pKERQcDksPZg6XUq8MuNxHwe95TTTrfNy3sjDeXXP			0	
+l1t_b37_create	create_bounty	kintsugi-vendor-prnvm.testnet	7QKA1m1Fw8GDanqc8xMjiaiZBeiENVevhmYLZaR1RTV3			0	
+l1t_b37_open	open_with_outlayer	kintsugi-vendor-prnvm.testnet	9fw7pzS7Vt2y4AwqCg5en3c8hHsHmpC8e2N1xBZ8FmeS			0	
+l1t_b37_hosted_commit	commit	kintt.testnet	7zrdLaRDi1r9FHxpSPdenwcYVaVWcSKfY99UrArecBz2			0	
+l1t_b37_hosted_reveal	reveal	kintt.testnet	3MhPkqPmqqXUgFCTGJPDZV84Z76xvZdCScJH7n8YqbfZ			0	
+l1t_b37_agent_commit_wrong_fix	commit	skarbnik-agentc-d48260.testnet	tQMCUJw7eAssQ2MPVbZL5BXvrkbavJX1Ps9HPcZTYRe			0	
+l1t_b37_agent_reveal_wrong_fix	reveal	skarbnik-agentc-d48260.testnet	CuZmnu1scD8cTvd3TaoTh8hX5d6n1iod69BP68PqKb9M			0	
+l1t_b37_watch_check_with_outlayer	check_with_outlayer	kintsugi-vendor-prnvm.testnet	6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS			0	
+l1t_b38_create	create_bounty	kintsugi-vendor-prnvm.testnet	BebHULiVojuNKsQNwGW312psofewBiACX7mbLJxFKY3v			0	
+l1t_b38_open	open_with_outlayer	kintsugi-vendor-prnvm.testnet	57i87ZFqbCHDHsGh4oahNe4ySSteVZtArFTGbEfoepw9			0	
+l1t_b38_agent_commit	commit	skarbnik-agentc-d48260.testnet	DpevwVYmfghLyxcL6gxU3UJv7dBkeCmFXq3WiKLR8LDx			0	
+l1t_b38_agent_reveal	reveal	skarbnik-agentc-d48260.testnet	2381osM62RFA7CEUFhZiiJpnXZgLWKKCWCc9dMJoLfWf			0	
+l1t_b38_watch_check_with_outlayer	check_with_outlayer	skarbnik-prover-bb2d00.testnet	4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7			0	

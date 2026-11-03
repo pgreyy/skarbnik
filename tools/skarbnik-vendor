@@ -3,7 +3,7 @@
 
 Each bounty has a level (bounty.level, default 2): 2 = the contract checks a Groth16 proof itself; 1 = the contract
 trusts OutLayer running the pinned verifier program on the succinct proof (no Groth16 step, so no Docker and no 7.6 GiB
-here); 0 = two registered verifiers decide (today both are run by the project). The vendor tool's Level 1 mode has not been run end to end yet.
+here); 0 = two registered verifiers decide (today both are run by the project).
 
 A vendor should not have to be a cryptography operator. Commands:
   init     ask a few questions (or copy an older config with --from) and write a bounty config (TOML), outside the repo
@@ -385,7 +385,8 @@ def cmd_prove0(a):
                'fuzz': int(b.get('fuzz_count', 16)), 'variants': int(b.get('variants', 32)), 'image_id': cfg['chain']['image_id'], 'workdir': w}
         if not os.path.exists(job['salt']): fail(f'no salt for bounty {b["name"]} in ~/.kintsugi-salts/ (skarbnik-host makes it on first use)')
         with ProverLock():
-            _, t = gpu.prove_on_gpu(cfg, job, lambda m: say(f'{now()} {m}'))
+            try: _, t = gpu.prove_on_gpu(cfg, job, lambda m: say(f'{now()} {m}'))
+            except gpu.GpuError as e: fail(f'Proof 0 on a GPU did not finish: {e}; nothing was sent; run prove0 again later')
             os.replace(f'{w}/u_succinct.bin', f'{w}/p0_succinct.bin')
             if level_of(cfg) == 2: v, t['groth16'] = wrap(cfg, w, 'p0')
             else: v = verify_succinct(cfg, w, 'p0')
