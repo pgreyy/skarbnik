@@ -28,7 +28,20 @@
       ]
     },
     {
-      "source": "/api/(.*)",
+      "source": "/api/mcp/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
+      ]
+    },
+    {
+      "source": "/api/check",
       "headers": [
         {
           "key": "Cache-Control",
@@ -49,6 +62,10 @@
     "api/check.js": {
       "maxDuration": 60,
       "memory": 1024
+    },
+    "api/feed.js": {
+      "maxDuration": 15,
+      "memory": 512
     }
   }
 }

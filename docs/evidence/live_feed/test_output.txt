@@ -1,0 +1,38 @@
+===== every RPC call fails (network error): 2 RPC calls, 3 ms
+    source: saved; updated_at_utc: 2026-11-03T23:43:09Z; Cache-Control: public, max-age=0, s-maxage=15
+    live_note: The live read failed (get_next_bounty_id: network error from every RPC); this is the saved feed of generated_at_utc. Read get_bounty before you commit.
+    bounty 40: Open for attempts, 1 of 8 used, accepts true; bounty 41: Open for attempts, 1 of 8 used, accepts true
+    ok   falls back to the saved feed, reason "network error from every RPC"
+    ok   the rows are the saved rows, unchanged
+    ok   the saved answer is cached 15 s only
+===== every RPC answers HTTP 429: 2 RPC calls, 28 ms
+    source: saved; updated_at_utc: 2026-11-03T23:43:09Z; Cache-Control: public, max-age=0, s-maxage=15
+    live_note: The live read failed (get_next_bounty_id: HTTP 429 from every RPC); this is the saved feed of generated_at_utc. Read get_bounty before you commit.
+    bounty 40: Open for attempts, 1 of 8 used, accepts true; bounty 41: Open for attempts, 1 of 8 used, accepts true
+    ok   falls back to the saved feed, reason "HTTP 429 from every RPC"
+    ok   the rows are the saved rows, unchanged
+    ok   the saved answer is cached 15 s only
+===== every RPC times out: 2 RPC calls, 8002 ms
+    source: saved; updated_at_utc: 2026-11-03T23:43:09Z; Cache-Control: public, max-age=0, s-maxage=15
+    live_note: The live read failed (get_next_bounty_id: timeout from every RPC); this is the saved feed of generated_at_utc. Read get_bounty before you commit.
+    bounty 40: Open for attempts, 1 of 8 used, accepts true; bounty 41: Open for attempts, 1 of 8 used, accepts true
+    ok   falls back to the saved feed, reason "timeout"
+    ok   the rows are the saved rows, unchanged
+    ok   the saved answer is cached 15 s only
+===== a faked chain: 20 RPC calls (saved feed: 42 bounties, 6 open)
+    source: live; updated_at_utc: 2026-11-03T23:46:49Z; Cache-Control: public, max-age=0, s-maxage=60
+    live_note: Read from the chain at updated_at_utc: bounties 7, 18, 34, 35, 40, 41, 42 (the ones the saved feed lists as open, and any newer ones), 20 view calls; every other row is the saved feed of generated_at_utc. Cached about 60 seconds. Read get_bounty before you commit.
+    bounty 39: Failed by OutLayer, 1 of 1 used, accepts false
+    bounty 40: Open for attempts, 3 of 8 used, accepts true
+    bounty 41: Proof rejected, 8 of 8 used, accepts false
+    bounty 42: Open for attempts, 0 of 8 used, accepts true
+    ok   a live answer, cached 60 s
+    ok   bounty 40: 3 attempts used, one failed, still Open for attempts
+    ok   bounty 41: every slot used and failed, Level 2: Proof rejected
+    ok   bounty 42 (newer than the saved feed): listed, with the public code of its known program
+    ok   bounty 39 (not open in the saved feed): the saved row, not read
+    ok   open_bounties: the saved open ones less 41, plus 42
+    ok   bounty 40 open row: 5 slots left
+    ok   view calls: 20, fewer than one per saved bounty (42): only the open and newer bounties are read
+    ok   a second request within 60 s: from the cache, no RPC calls
+ALL PASS

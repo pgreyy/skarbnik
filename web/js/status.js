@@ -5,7 +5,7 @@
 // OutLayer (the contract trusted OutLayer's answer), a Level 0 payment Verifiers attested; Timeout settlement and
 // Refunded are neutral; Failed, Proof rejected (Level 2: a FAIL proof the contract checked) and Failed by OutLayer
 // (Level 1: OutLayer answered FAIL) are coral, always with a word.
-import { commitBy, nsToDate } from './chain.js';
+import { commitBy, nsToDate } from './rules.js';
 
 export const STATUS = {
   'Proof verified': { cls: 'k-proof', icon: 'check', help: 'The contract checked a proof for the paid attempt (Level 2).' },
