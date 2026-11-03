@@ -9,7 +9,7 @@ Measured numbers only, each with the file it comes from. A number that was not m
 | --- | --- | --- |
 | Laptop CPU | 13th Gen Intel Core i7-1360P, 16 logical CPUs | `lscpu` |
 | Memory for Linux (WSL2) | 10 GiB visible (11 GB configured), 8 GB swap | `free -h`; docs/EVIDENCE.md (header) |
-| GPU | none on the laptop. Rented on RunPod (Secure Cloud, PyTorch 2.8.0 / CUDA 12.8.1 / Ubuntu 24.04 template, 60 GB container disk, no volume): 1x NVIDIA L40S, 46,068 MiB, driver 595.91.07, nvcc 12.8.93, 128 CPUs | docs/evidence/smooth/gpu/01_check.log |
+| GPU | none on the laptop. A rented GPU (secure cloud, PyTorch 2.8.0 / CUDA 12.8.1 / Ubuntu 24.04 template, 60 GB container disk, no volume): 1x NVIDIA L40S, 46,068 MiB, driver 595.91.07, nvcc 12.8.93, 128 CPUs | docs/evidence/smooth/gpu/01_check.log |
 
 ## Proving on the laptop CPU (RISC Zero 3.0.6, check size: 16 fresh inputs, 32 variants, `--po2 19`)
 
@@ -36,13 +36,13 @@ The agent's fix for bounty 24 is byte for byte the vendor's reference fix, so Pr
 (GPU) check the same patch of the same program under the same checker image id `dd6c5f42...` (the attempt proof uses
 the seed recorded at reveal and the attempt's submission id; Proof 0 uses Proof 0 mode and its own seed).
 
-| Step | Laptop CPU (i7-1360P, `--po2 18`) | NVIDIA L40S on RunPod (`--po2 19`, `cuda-prove-only`) | Source |
+| Step | Laptop CPU (i7-1360P, `--po2 18`) | rented NVIDIA L40S (`--po2 19`, `cuda-prove-only`) | Source |
 | --- | --- | --- | --- |
 | Prove | 8,679.49 s (141 segments), peak 2,418 MiB | **29.82 s** (33 segments), peak GPU memory 9,275 MiB, host 514,528 KB | docs/evidence/smooth/prove_proof0.log; docs/evidence/smooth/gpu/prove_u0.log, 03_prove.log |
 | Compress to succinct ("shrink") | 5,591.59 s, peak 1,564 MiB | **21.71 s**, host 294,940 KB | compress_proof0.log; gpu/compress_succinct.log |
 | Groth16 wrap | 252.93 s (Proof 0), container peak 6,201 MiB | not on the pod (no Docker there); the attempt was wrapped on a separate Docker machine: 337.73 s on a 4 core x86_64 VPS with 7.8 GiB RAM, container peak 6.82 GiB, lowest available memory 184 MiB, 371 MiB of swap used | groth16_p0.log; docs/evidence/smooth/vps/groth16.log, mem.log |
 | Whole pod use, first check to fetch | | 706 s: setup 554 s (Rust and RISC Zero install 86 s, code 38 s, build 425 s, image id check), secret in 48 s, prove and wipe, verify, shrink, fetch | docs/evidence/smooth/gpu/*.log |
-| Cost | electricity and time | **$0.60**: RunPod balance $9.46 to $8.86, reported by the owner (it may include a first pod that stayed on "Initializing" and was terminated) | owner |
+| Cost | electricity and time | **$0.60**: GPU rental balance $9.46 to $8.86, reported by the owner (it may include a first pod that stayed on "Initializing" and was terminated) | owner |
 
 ## One CPU proof on the project's VPS (4 cores, `data/demo/`, `--po2 18`)
 
@@ -62,7 +62,7 @@ slower than the laptop (198 s against 62 s per segment at `--po2 18`, bounty 24'
 time `tools/proof_times.json` holds for `cpu@contabo-vps-4core:demo`. Bounty 17's program (`data/unpack/`) was not
 proved on the VPS; its attempt took 102 segments at `--po2 18` on the laptop, fewer than this run's 112.
 
-## One proof by the vendor's watch in GPU mode (RunPod, NVIDIA L40S, 2026-10-27)
+## One proof by the vendor's watch in GPU mode (a rented NVIDIA L40S, 2026-10-27)
 
 In short: **about 17 minutes from reveal to `submit_groth16`** (bounty 32: 17 min 9 s, measured end to end, including
 the one-time 559 s build of the CUDA binary), and **about $0.04 of GPU per proof** with the cached binary ($0.0372;
@@ -100,11 +100,11 @@ Bounty 33 (`data/demo/`, `--po2 18`), the prove step inside an Intel TDX VM with
 | --- | --- | --- |
 | Prove (101 segments, peak 3,288 MiB used in the VM) | 6,226.5 s | inside the CVM (sealed status, `prove_run/prove_status.json`) |
 | CVM life, create to delete | 6,491 s; $0.826278 | Phala balance before and after |
-| Shrink | 58.63 s; pod 170 s, $0.0515 | RunPod L40S (`prove_run/gpu_shrink.json`) |
+| Shrink | 58.63 s; pod 170 s, $0.0515 | rented L40S (`prove_run/gpu_shrink.json`) |
 | Groth16 | 379.81 s | the VPS, Docker (`prove_run/groth16_u.log`) |
 | Reveal to `submit_groth16` | 2 h 10 min 34 s | 23:44:17 to 01:54:51 UTC |
 
-Proof 0 of the same bounty on a RunPod L40S: prove 30.21 s (32 segments, `--po2 19`), shrink 21.85 s, pod 135 s,
+Proof 0 of the same bounty on a rented L40S: prove 30.21 s (32 segments, `--po2 19`), shrink 21.85 s, pod 135 s,
 $0.0409; Groth16 on the VPS 387.44 s (`proof0_gpu/`).
 
 ## Gas on NEAR testnet

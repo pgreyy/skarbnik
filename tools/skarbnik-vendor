@@ -7,13 +7,13 @@ A vendor should not have to be a cryptography operator. Commands:
            seeds, memory for the prover mode, the checker id on the allowlist, the vendor's balance, and the verdict
            window against K times the measured proof time; prints a preview and refuses with a plain reason
   prove0   Proof 0 of the reference fix: prove, shrink to succinct, Groth16, verify, the contract arguments (mode gpu:
-           prove and shrink on a RunPod pod, Groth16 here); one job at a
+           prove and shrink on a rented GPU pod, Groth16 here); one job at a
            time, memory watched (scripts/s2_measure.sh)
   publish  shows the preview, asks for confirmation, creates and opens the bounty, prints the transactions
   watch    the auto prover: polls the chain for revealed attempts on the bounties in the watch config, proves each one
            (oldest first) with the attempt's seed and submission id, checks the verdict and the secret commitment, and
            submits the Groth16 proof (submit_groth16, which anyone may send); warns when a window is at risk. Prover
-           mode cpu proves on this machine; mode gpu proves and shrinks on a RunPod pod per attempt
+           mode cpu proves on this machine; mode gpu proves and shrinks on a rented GPU pod per attempt
            (tools/skarbnik_gpu.py: secret in the pod's RAM only, pod always terminated, 45 minute cap, spend cap),
            then wraps to Groth16 here; after two failed pods, or at the spend cap, it falls back to cpu and warns
            (unless gpu.cpu_fallback = false: then nothing is proved here and the next scan tries again)
@@ -214,7 +214,7 @@ QUESTIONS = [
     ('bounty', 'po2', 'proof segment size (18 needs about 2.5 GiB, 19 about 5 GiB)', '18'),
     ('secrets', 'secret', 'path of the secret crashing input (hex), outside the repository', '~/.skarbnik-vendor/mybounty/exploit.hex'),
     ('secrets', 'reference_fix', 'path of your reference fix (.wasm), outside the repository', '~/.skarbnik-vendor/mybounty/fixed.wasm'),
-    ('prover', 'mode', 'where proving runs: gpu (a RunPod pod per proof) or cpu (this machine)', 'gpu'),
+    ('prover', 'mode', 'where proving runs: gpu (a rented GPU pod per proof) or cpu (this machine)', 'gpu'),
     ('prover', 'workdir', 'folder for receipts and logs, outside the repository', '~/skarbnik-vendor/mybounty'),
     ('chain', 'vendor_account', 'your vendor account (signs create and open)', 'you.testnet'),
 ]
@@ -319,7 +319,7 @@ def cmd_prove0(a):
     seed = open(seedf).read().strip()
     module = os.path.join(ROOT, b['module']) if not os.path.isabs(b['module']) else b['module']
     if cfg['prover']['mode'] == 'gpu':
-        # Proof 0 on a RunPod pod (the secret and the salt in the pod's RAM only, wiped; the pod always terminated),
+        # Proof 0 on a rented GPU pod (the secret and the salt in the pod's RAM only, wiped; the pod always terminated),
         # then the Groth16 wrap here, as watch does for attempts.
         say(f'{now()} Proof 0 of {b["name"]} on a GPU pod: prove and shrink there, Groth16 here (logs in {w})')
         job = {'bounty_id': b['name'], 'index': 'p0', 'name': b['name'], 'module': module, 'patch': s['reference_fix'], 'secret': s['secret'],
@@ -453,7 +453,7 @@ def cmd_watch(a):
     log_line(wcfg, f'watch started (mode {wcfg["prover"]["mode"]}, bounties {", ".join(b for b, _ in watched(wcfg))}, one job at a time)')
     if wcfg['prover']['mode'] == 'gpu':
         g = gpu.settings(wcfg)
-        log_line(wcfg, f'GPU mode: RunPod {", ".join(g["gpu_types"])} in {", ".join(g["data_centers"])}, cap {g["cap_minutes"]} min per pod, '
+        log_line(wcfg, f'GPU mode: rented GPU {", ".join(g["gpu_types"])} in {", ".join(g["data_centers"])}, cap {g["cap_minutes"]} min per pod, '
                        f'spend so far ${gpu.spend_total(g)} of a ${g["budget_usd"]} budget')
     while True:
         jobs = scan(wcfg, st)

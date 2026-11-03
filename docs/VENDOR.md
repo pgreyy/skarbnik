@@ -4,7 +4,7 @@ A vendor should not have to be a cryptography operator. `tools/skarbnik-vendor` 
 takes a private Level 2 bounty from a config file to an open bounty, and then proves every revealed attempt by itself.
 The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors, in two ways: AI (an AI app runs these
 commands through tools/skarbnik-vendor-mcp and asks your yes before any spend) and Commands (the five steps below).
-It needs Linux (on Windows, WSL), Docker, an x86 computer, and a RunPod account for a rented GPU.
+It needs Linux (on Windows, WSL), Docker, an x86 computer, and a GPU rental account for a rented GPU.
 It calls the project's own programs (`skarbnik-host`, `skarbnik-check`), `scripts/s2_measure.sh` for timing and the
 memory guard, and NEAR CLI (near-cli-rs) for transactions. Testnet only.
 
@@ -75,7 +75,7 @@ The Groth16 wrap needs an x86 machine with Docker and about 7 GiB of memory, whi
 
 ## GPU mode
 
-With `mode = "gpu"` in a watch config, `watch` proves each revealed attempt on a RunPod pod
+With `mode = "gpu"` in a watch config, `watch` proves each revealed attempt on a rented GPU pod
 (`tools/skarbnik_gpu.py`) and wraps it to Groth16 on its own machine:
 
 1. It refuses to start a pod once the logged GPU spend reaches the budget, and terminates pods it left behind.
@@ -101,7 +101,7 @@ submit expire. The
 `po2` (19), `cloud_types` (default `["SECURE"]`; add `"COMMUNITY"` to rent from both), `max_usd_per_hr` (a price
 ceiling: a pod priced above it is terminated at once and the next choice tried), `self_stop_minutes` (a timer inside the
 pod removes it after this many minutes even if this machine stops watching it) and `cpu_fallback`. An empty
-`data_centers` lets RunPod pick any data center.
+`data_centers` lets the GPU rental pick any data center.
 
 ## With an AI app: `tools/skarbnik-vendor-mcp`
 
@@ -110,7 +110,7 @@ the secret. It asks for each file path and never opens the secret or the fix; `p
 rented GPU first return the cost and time with a one time confirm code, and run only when called again with it.
 Setup: [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README.md). The project's own cycle split
 the work across two machines: init, check, publish and status on the laptop that holds the vendor key; Proof 0 and
-watch on the VPS that holds the RunPod key (the public Proof 0 files were copied to the laptop for publish; no key
+watch on the VPS that holds the GPU rental key (the public Proof 0 files were copied to the laptop for publish; no key
 moved). The laptop's check refuses on memory for the Groth16 wrap, which runs on the VPS; the server's publish accepts
 that one refusal once Proof 0 exists.
 

@@ -55,13 +55,13 @@ time and failed try is [docs/evidence/tee_spike/README.md](evidence/tee_spike/RE
 - **The checker, sealed.** In a `tdx.small` CVM: PASS for the public demo secret with the demo fix, FAIL for a fresh
   private secret with a wrong fix; each answer sealed to its request, so only the attested program could have written
   it (`checker_run/`). Cost $0.002725.
-- **The prove step, sealed, paid on chain.** Test bounty 33: Proof 0 on a normal rented GPU (RunPod L40S, $0.0409);
+- **The prove step, sealed, paid on chain.** Test bounty 33: Proof 0 on a normal rented GPU (an L40S, $0.0409);
   one researcher attempt; its RISC Zero prove step inside a `tdx.xlarge` CVM (8 vCPU, 16 GB): 6,226.5 s, 101 segments,
   PASS, the secret erased; the receipt (no secret) out, its hash equal to the sealed status; the CVM deleted at once;
-  the shrink on a RunPod GPU ($0.0515), Groth16 on the VPS, and `submit_groth16`
+  the shrink on a rented GPU ($0.0515), Groth16 on the VPS, and `submit_groth16`
   `Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS`: Passed, bounty 33 Paid. Reveal to payout 2 h 10 min 34 s. The
   contract was not changed.
-- **Cost.** Phala $0.838183 in all (the cap was $4), RunPod $0.0924.
+- **Cost.** Phala $0.838183 in all (the cap was $4), the rented GPU $0.0924.
 
 What it did not show, and what is still open:
 

@@ -233,7 +233,7 @@ def t_check(a):
 
 
 def gpu_note():
-    return ("one rented GPU (RunPod) for this step: about 1 to 11 minutes (11 when the GPU build of the prover is made "
+    return ("one rented GPU for this step: about 1 to 11 minutes (11 when the GPU build of the prover is made "
             "for the first time), about $0.04 to $0.20; then the Groth16 wrap on this computer, about 5 minutes")
 
 

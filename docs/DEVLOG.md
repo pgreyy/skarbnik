@@ -2,6 +2,19 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: The GPU provider's name taken out of what people read
+
+- The For vendors page and its saved copy say "A GPU rental account, for a rented GPU", "A rented GPU needs a GPU
+  rental account" and "1 rented NVIDIA L40S"; docs/VENDOR.md, docs/CLAIMS.md, docs/CONFIDENTIAL_PROVING.md,
+  docs/SECURITY.md and docs/numbers.md say "a rented GPU" or "the GPU rental"; the vendor tool's help and log line,
+  its header comments, the vendor MCP's cost line and the sealed hardware spike's comments too.
+- Kept, because the tools need them: the GPU module `tools/skarbnik_gpu.py` (its API address, the `RunPod` class, the
+  pod's own environment variable names, the default key file name, its error messages that point to the provider's
+  console), the container image name, the example config's key file setting, and the evidence logs, docs/EVIDENCE.md,
+  this log and git history.
+- Checked with a private script: every tab and way of Home, For vendors, For agents, Evidence, Judge guide and How it
+  works at 1440 and 390, dark and light: the name does not appear, no sideways scroll, no script errors.
+
 ## 2026-11-03: Evidence hero link removed; no vertical scrollbar on tab strips
 
 - Evidence: the hero link "What the status labels mean" (its only job was to jump back to Overview and open that drop

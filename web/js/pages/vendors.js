@@ -28,12 +28,12 @@ const sum = (m) => m.prove + m.shrink + m.wrap;
 const s = (x) => `${x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} s`;
 const hm = (x) => (x >= 3600 ? `about ${(x / 3600).toFixed(1)} h` : `about ${Math.round(x / 60)} min`);
 
-const REQ = 'Needs Linux (on Windows, use WSL), Docker, and an x86 computer. A rented GPU needs a RunPod account.';
+const REQ = 'Needs Linux (on Windows, use WSL), Docker, and an x86 computer. A rented GPU needs a GPU rental account.';
 const NEED = collapse('vNeed', 'What do I need for this?', `<ul class="n-ul">${[
   'Linux, or WSL on Windows',
   'Docker',
   'About 8 GB of free memory for the final proof step (or a second machine that does that step, as the project’s own setup does)',
-  'A RunPod account, for a rented GPU',
+  'A GPU rental account, for a rented GPU',
   'Test NEAR for the reward',
 ].map((t) => `<li>${icon('check')}<span>${t}</span></li>`).join('')}</ul><p class="small mt12">These are for hosting a bounty only. Agents need none of this.</p>`);
 
@@ -197,7 +197,7 @@ export async function vendors(viewEl, tab, sub) {
     const vpsCell = (x) => (measuring ? chip('k-test', 'Measuring', 'hourglass') : x);
     const rows = [
       ['Laptop CPU (i7-1360P, 16 threads)', s(LAPTOP.prove), s(LAPTOP.shrink), s(LAPTOP.wrap), `<b class="txt">${hm(sum(LAPTOP))}</b>`, 'electricity'],
-      ['1 rented NVIDIA L40S (RunPod), watch in GPU mode', s(GPU.prove), s(GPU.shrink), `${s(GPU.wrap)} on the VPS (no Docker on the pod)`, '<b class="txt">about 17 min</b> from reveal to submit', '<b class="txt">about $0.04</b> of GPU a proof ($0.20 the first run, which built the binary)'],
+      ['1 rented NVIDIA L40S, watch in GPU mode', s(GPU.prove), s(GPU.shrink), `${s(GPU.wrap)} on the VPS (no Docker on the pod)`, '<b class="txt">about 17 min</b> from reveal to submit', '<b class="txt">about $0.04</b> of GPU a proof ($0.20 the first run, which built the binary)'],
       [`VPS CPU (4 cores, 7.8 GiB, 8 GiB swap)${vps.program ? `<br><span class="small faint">${esc(vps.program)}</span>` : ''}`, vpsCell(vps.prove ? s(vps.prove) : ''), vpsCell(vps.shrink ? s(vps.shrink) : ''), s(vps.wrap || GPU.wrap), vpsCell(vps.total ? `<b class="txt">${hm(vps.total)}</b>` : ''), 'the VPS’s rent'],
     ];
     const el = viewEl.querySelector('#vcost');

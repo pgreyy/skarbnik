@@ -83,7 +83,7 @@ Development laptop: 13th Gen Intel Core i7-1360P, 16 logical CPUs, 10 GiB visibl
 The same kind of proof on the laptop and on a rented GPU (bounty 24, `data/smooth/`; the agent's fix is the reference fix
 byte for byte, so both proofs check the same patch under the same checker image id):
 
-| Step | Laptop CPU (i7-1360P, `--po2 18`) | 1x NVIDIA L40S on RunPod (`--po2 19`) | Source |
+| Step | Laptop CPU (i7-1360P, `--po2 18`) | 1x rented NVIDIA L40S (`--po2 19`) | Source |
 | --- | --- | --- | --- |
 | Prove | 8,679.49 s (141 segments), peak 2,418 MiB | **29.82 s** (33 segments), peak GPU memory 9,275 MiB | `docs/evidence/smooth/prove_proof0.log`; `docs/evidence/smooth/gpu/prove_u0.log` |
 | Compress to succinct | 5,591.59 s | **21.71 s** | `docs/evidence/smooth/compress_proof0.log`; `docs/evidence/smooth/gpu/compress_succinct.log` |

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Part 2 of the confidential proving spike: prove one revealed attempt of a test bounty with the RISC Zero prove step
-running inside a Phala Cloud TDX CVM, shrink it on a RunPod GPU, then wrap to Groth16 and submit it from the vendor
+running inside a Phala Cloud TDX CVM, shrink it on a rented GPU, then wrap to Groth16 and submit it from the vendor
 machine (the VPS).
 
 Steps, each logged to <out>/run.log with its time:
@@ -13,7 +13,7 @@ Steps, each logged to <out>/run.log with its time:
   4. vendor.py prove: the secret input and the bounty's salt, sealed to the attested key, plus the public job
   5. every 2 minutes: the sealed job status and the Phala balance; the CVM is deleted at once when the receipt is out,
      when the job fails, when the balance reaches the floor (the owner's cap), or on any error (always, in `finally`)
-  6. shrink to succinct on a RunPod GPU pod (no secret goes there); then on the VPS: Groth16 wrap, verify, check the
+  6. shrink to succinct on a rented GPU pod (no secret goes there); then on the VPS: Groth16 wrap, verify, check the
      journal (the bounty's secret commitment, the attempt's submission id), and submit_groth16 from the submit account
 Usage: attempt_in_tee.py <config.toml> <bounty id> <attempt index> <out dir> [instance type]
 The secret and the salt are passed to the vendor tools container as read only files; they are never printed.
@@ -120,7 +120,7 @@ def main(cfg_path, bid, idx, out, itype='tdx.xlarge'):
     w = out
     times = json.load(open(f'{out}/prove_status.json'))
     t0 = time.time()
-    # the shrink runs on a RunPod GPU (the receipt holds no secret); the VPS proves nothing on its CPU
+    # the shrink runs on a rented GPU (the receipt holds no secret); the VPS proves nothing on its CPU
     gt = skv.gpu.shrink_on_gpu(cfg, f'{w}/u.bin', f'{w}/u_succinct.bin', f'b{bid}a{idx}shrink', b['image_id'], log)
     secs = gt['succinct']; json.dump(gt, open(f'{w}/gpu_shrink.json', 'w'), indent=1)
     log(f'succinct on a GPU pod: {secs} s ({gt["gpu"]}, pod {gt["pod_seconds"]} s, ${gt["cost_usd"]})')
