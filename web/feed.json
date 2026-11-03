@@ -19,7 +19,7 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-11-03T22:04:26Z",
+ "generated_at_utc": "2026-11-03T22:20:40Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -285,6 +285,56 @@
    "slots_left": 7,
    "commit_deadline_utc": "2026-12-31T20:20:33Z",
    "expires_at_utc": "2027-01-02T21:20:33Z",
+   "bounty_amount": "0.1 NEAR",
+   "test_bounty": false
+  },
+  {
+   "bounty_id": 41,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "grid",
+   "module_description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug",
+   "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2026-12-31T21:19:34Z",
+    "expires_at_utc": "2027-01-02T22:19:34Z"
+   },
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "image_id_allowed": true,
+   "original_hash": "52f3b28a273de0752a52a48e611ebc9a4907cccb22a234e2a27343a9435d259d",
+   "corpus_hash": "f5522fff32de251f4606e8e998cca30329d384b619783bb7df8921db3edf979d",
+   "public_code": {
+    "source": "code/grid/original.rs",
+    "module": "code/grid/original.wasm",
+    "tests": "code/grid/public_tests.txt",
+    "build": "code/grid/BUILD.txt",
+    "program": "grid",
+    "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug"
+   },
+   "slots_left": 8,
+   "commit_deadline_utc": "2026-12-31T21:19:34Z",
+   "expires_at_utc": "2027-01-02T22:19:34Z",
    "bounty_amount": "0.1 NEAR",
    "test_bounty": false
   }
@@ -2133,6 +2183,51 @@
     "build": "code/ringlog2/BUILD.txt",
     "program": "ringlog2",
     "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"
+   }
+  },
+  {
+   "bounty_id": 41,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "grid",
+   "module_description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug",
+   "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2026-12-31T21:19:34Z",
+    "expires_at_utc": "2027-01-02T22:19:34Z"
+   },
+   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+   "image_id_allowed": true,
+   "original_hash": "52f3b28a273de0752a52a48e611ebc9a4907cccb22a234e2a27343a9435d259d",
+   "corpus_hash": "f5522fff32de251f4606e8e998cca30329d384b619783bb7df8921db3edf979d",
+   "public_code": {
+    "source": "code/grid/original.rs",
+    "module": "code/grid/original.wasm",
+    "tests": "code/grid/public_tests.txt",
+    "build": "code/grid/BUILD.txt",
+    "program": "grid",
+    "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug"
    }
   }
  ],

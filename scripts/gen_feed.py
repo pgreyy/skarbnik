@@ -55,7 +55,9 @@ PACKAGES = {"demo": {"dir": "data/demo", "source": "original.rs", "module": "ori
             "smooth": {"dir": "data/smooth", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
                        "description": "a smoothing filter for a stream of sensor samples; no hint at its bug"},
             "ringlog2": {"dir": "data/ringlog2", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
-                         "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"}}
+                         "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"},
+            "grid": {"dir": "data/grid", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
+                     "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug"}}
 # What every fix must do, for every program (the checker's rules: harness/checker/src/lib.rs).
 TARGET = ("Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies "
           "of it where the original crashes, while giving the original's answers on every public test and on fresh inputs "

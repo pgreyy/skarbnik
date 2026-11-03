@@ -1,0 +1,19 @@
+# Public tests for the paint grid (grid.rs).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+# The expected values were produced by running the original module:
+#   target/debug/skarbnik-check run --module original.wasm --input <hex>
+# Proof 0 (`skarbnik-check proof0`) re-checks that the original returns every one of them.
+-                                        292984781    # no operations
+0002a3                                   1802771812   # plot (2,3) to 5
+0002a30102a3                             1546939410   # plot (2,3), get it back
+03                                       615415118    # sum of row 0, all clear
+0000800001c003                           1706455822   # plot two cells of row 0, sum row 0
+002320010301                             1473198398   # column 35 of row 0 is column 3 of row 1
+001fff01ff1e                             2125202149   # plot the last cell, get column 255 of row 30
+00004102010000                           1317054038   # plot row 1, scroll 1, get row 0
+122603                                   950621724    # scroll 5, scroll 10, sum row 0
+0000607a010000                           950415388    # plot row 0, scroll 31, get row 0
+03070b0f                                 1735237113   # four row sums
+0002                                     -1           # plot cut short
+01                                       -1           # get cut short
+000a6a2b0227                             1424308255   # plot row 10, sum row 10, scroll 1, sum row 9
