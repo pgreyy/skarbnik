@@ -27,7 +27,8 @@ WHAT = {"create_bounty": "Bounty created", "open_with_groth16": "Opened with its
         "commit": "Attempt committed", "reveal": "Attempt revealed", "submit_groth16": "Proof of an attempt sent",
         "post_verdict": "Vendor posted a verdict", "attest": "Verifier attested a verdict", "claim_timeout": "Timeout claimed",
         "expire": "Expired", "release_unrevealed": "Unrevealed slot released", "deposit_credit": "Credit deposited",
-        "withdraw_credit": "Credit withdrawn", "set_agent_limits": "Agent limits set", "create-account": "Test account created"}
+        "withdraw_credit": "Credit withdrawn", "set_agent_limits": "Agent limits set", "create-account": "Test account created",
+        "open_with_outlayer": "Opened with its Proof 0, checked by OutLayer (Level 1)", "check_with_outlayer": "Proof of an attempt checked by OutLayer (Level 1)"}
 WHAT_CLI = {"cli_deposit_credit": "Credit deposited through the site (NEAR CLI wallet)", "cli_commit": "Attempt committed through the site (NEAR CLI wallet)",
             "cli_reveal": "Attempt revealed through the site (NEAR CLI wallet)", "cli_withdraw_credit": "Credit withdrawn through the site (NEAR CLI wallet)",
             "agentkey_commit_other_payout": "Limited agent key: commit naming another payout", "agentkey_commit": "Limited agent key: attempt committed",

@@ -1,13 +1,33 @@
 # Running a bounty as a vendor: `skarbnik-vendor`
 
 A vendor should not have to be a cryptography operator. `tools/skarbnik-vendor` (Python 3.11 or later, no packages)
-takes a private Level 2 bounty from a config file to an open bounty, and then proves every revealed attempt by itself.
+takes a private bounty from a config file to an open bounty, and then proves every revealed attempt by itself. A
+bounty is Level 2 by default; Levels 1 and 0 are explained below.
 The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors, in two ways: AI (an AI app runs these
 commands through tools/skarbnik-vendor-mcp, shows the cost first and asks for a one time confirm code before any
 spend) and Commands (the five steps below).
-It needs Linux (on Windows, WSL), Docker, an x86 computer, and a GPU rental account for a rented GPU.
+It needs Linux (on Windows, WSL), Docker and an x86 computer for the Groth16 step (Level 2), and a GPU rental account
+for a rented GPU.
 It calls the project's own programs (`skarbnik-host`, `skarbnik-check`), `scripts/s2_measure.sh` for timing and the
 memory guard, and NEAR CLI (near-cli-rs) for transactions. Testnet only.
+
+## Levels
+
+`level` in the config's `[bounty]` section (0, 1 or 2, default 2) is fixed when the bounty is created.
+
+| Level | Who decides | What you need | Trust |
+| --- | --- | --- | --- |
+| 2 (default) | The contract checks a Groth16 proof of each fix itself (`open_with_groth16`, `submit_groth16`) | The Groth16 step: Docker, an x86 computer, about 7.6 GiB; about 36 Tgas of gas a proof | The published checker and the contract. The only level called paid by proof |
+| 1 | OutLayer runs the verifier program pinned on chain (`get_outlayer`) on the succinct proof, and the contract trusts its answer (`open_with_outlayer`, `check_with_outlayer`) | No Groth16 step. Each check: about 0.006 NEAR (OutLayer's fee about 0.0011 NEAR plus about 50 Tgas of gas), and the contract's `min_deposit` (2.8 NEAR) attached, of which about 2.67 NEAR is held while OutLayer works and returned | OutLayer and its operator, and that OutLayer can download the pinned program from GitHub or still holds it in its cache |
+| 0 | Two registered verifiers sign Proof 0 and each verdict (`attest_proof0`, `post_verdict`, `attest`) | Nothing proved on chain; the verifiers must sign in time | The verifiers, today both run by the project |
+
+The pinned Level 1 program is the build of `verifier/outlayer` committed in this repository: sha256
+`e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8`, at
+https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm
+(rebuilt to the same hash by `scripts/build_verifier_wasm.sh`). At Level 1 `prove0` and `watch` stop at the succinct
+proof; `publish` opens with `open_with_outlayer` and `watch` sends each proof with `check_with_outlayer`, both from an
+account that can attach a deposit (an agent's limited key cannot). At every level a timeout is a timeout: no verdict
+in time means the waiting attempts are paid by rule.
 
 ## Commands
 

@@ -14,10 +14,12 @@ import { attemptPanel } from '../account-ui.js';
 const STEP = {
   create_bounty: ['coin', 'Bounty created and funded', 'The vendor locked the reward. Every hash, the windows, K and the check size were fixed on chain. The bounty starts closed.'],
   open_with_groth16: ['seal', 'Opened by Proof 0', 'The vendor proved its own reference fix passes the full check. The contract verified that Groth16 proof itself, so the bounty could open.'],
+  open_with_outlayer: ['seal', 'Opened by Proof 0, checked by OutLayer', 'Level 1: OutLayer ran the pinned verifier program on the vendor’s Proof 0 and the contract opened the bounty on its answer. The contract did not check the proof itself.'],
   attest_proof0: ['seal', 'Proof 0 attested', 'A registered verifier signed that the vendor’s Proof 0 passes (Level 0).'],
   commit: ['hash', 'An attempt commits a fingerprint', 'Only a fingerprint of the patch goes on chain, with the attempt fee from credit.'],
   reveal: ['eye', 'The attempt reveals its patch', 'The patch became public on chain. The block seed chose the hidden fairness inputs, and the verdict window started.'],
   submit_groth16: ['seal', 'A proof of the attempt was accepted', 'The contract checked the Groth16 proof itself and applied its verdict.'],
+  check_with_outlayer: ['seal', 'OutLayer checked the proof of the attempt', 'Level 1: OutLayer ran the pinned verifier program on the proof and the contract applied the verdict on its answer. The contract did not check the proof itself.'],
   attest: ['seal', 'A verifier attested the verdict', 'Level 0: a registered verifier signed the verdict.'],
   claim_timeout: ['hourglass', 'Anyone claimed the timeout', 'The verdict window ended with no accepted proof. claim_timeout paid the revealed attempts still undecided. The contract did not look at the fix.'],
   release_unrevealed: ['undo', 'An unrevealed slot was released', 'A commit that was never revealed in time gave its slot back; its fee went to the protocol pool.'],
@@ -25,8 +27,8 @@ const STEP = {
 };
 
 function subState(b, s) {
-  if (s.outcome === 'Passed') return ['k-proof', 'Proof verified', 'check'];
-  if (s.outcome === 'Failed') return ['k-fail', 'Failed by a proof', 'x'];
+  if (s.outcome === 'Passed') return b.level === 1 ? ['k-await', 'Verified by OutLayer', 'seal'] : b.level === 0 ? ['k-await', 'Verifiers attested', 'seal'] : ['k-proof', 'Proof verified', 'check'];
+  if (s.outcome === 'Failed') return b.level === 1 ? ['k-fail', 'Failed: OutLayer said FAIL', 'x'] : ['k-fail', 'Failed by a proof', 'x'];
   if (s.outcome === 'TimedOut') return ['k-timeout', 'Timeout settlement', 'hourglass'];
   if (s.outcome === 'Released') return ['k-refund', 'Released', 'undo'];
   if (s.revealed_at_ns) return b.state !== 'Open' ? ['k-refund', 'Undecided, refunded as credit', 'undo'] : ['k-await', 'Awaiting evaluation', 'hourglass'];
@@ -103,6 +105,7 @@ function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at
   const check = rec.last_image_check && rec.last_image_check.result === 'MATCH' ? rec.last_image_check : null;
   const program = isNewModule(b, rec) ? (rec.new_module_programs || {})[String(id)] : demo ? 'data/demo/ (public demo module)' : isJudge(b, rec) ? 'data/unpack/ (same as bounty 17)' : null;
   const lead = story.lead || (status === 'Proof verified' ? 'A revealed attempt was proven PASS and the contract paid on that proof.'
+    : status === 'Verified by OutLayer' ? 'Level 1: OutLayer ran the pinned verifier program on the proof of a revealed attempt and said PASS, and the contract paid on that answer. The contract did not check the proof itself.'
     : status === 'Timeout settlement' ? 'No proof was accepted inside the verdict window, so the contract paid by its timeout rule. That is a liveness rule, not a verdict.'
     : status === 'Refunded' ? 'Nothing was paid out. The vendor got the reward back.'
     : acc ? 'Open now: it accepts commits until the time below. Fix the public program and commit from the panel below, or run an agent.'
@@ -111,6 +114,10 @@ function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at
     : status === 'Failed' ? 'Past its expiry and not settled. Anyone can call expire to refund the vendor.'
     : mode === 'live' ? 'Read live from the contract.' : 'From the saved snapshot below.');
 
+  const level1Box = b.level === 1 ? `<div class="why" role="note"><span class="vico">${icon('info')}</span><div>
+    <h2 class="h3">Level 1: the contract trusts OutLayer’s answer</h2>
+    <p class="body" style="margin-top:8px;max-width:760px">For this bounty the contract does not check proofs itself. It sends each proof to OutLayer, which runs the verifier program the owner pinned (its address and sha256 are on chain, <span class="mono">get_outlayer</span>), and it accepts the answer only if it matches this bounty and this attempt. A payment here is never called “Proof verified”.</p>
+    </div></div>` : '';
   const timeoutBox = status === 'Timeout settlement' ? `<div class="why" role="note"><span class="vico">${icon('info')}</span><div>
     <h2 class="h3">Why this is not “Proof verified”</h2>
     <p class="body" style="margin-top:8px;max-width:760px">The contract never checked a proof for the paid attempt. It paid because the verdict window ended. We say so on every page that shows this bounty.</p>
@@ -194,6 +201,7 @@ function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at
 </div>
 </div>
 ${timeoutBox}
+${level1Box}
 ${recNote ? `<div style="margin-top:24px">${note(`${esc(recNote.text)} ${tx(recNote.tx)}`, 'alert')}</div>` : ''}
 <div id="liveNote">${liveNote(mode, at)}</div>
 </div></section>
@@ -208,7 +216,7 @@ ${program ? `<dt>Module</dt><dd class="mono" style="font-size:13px">${esc(progra
 <dt>Reward</dt><dd>${esc(near(b.amount))}</dd>
 <dt>Attempts</dt><dd>Up to ${esc(b.max_commits)}</dd>
 <dt>Verdict window</dt><dd>${esc(span(b.verdict_window_ns))}</dd>
-<dt>Level</dt><dd>${b.level === 2 ? '2, the contract checks the proof' : '0, two verifiers sign'}</dd>
+<dt>Level</dt><dd>${b.level === 2 ? '2, the contract checks the proof' : b.level === 1 ? '1, the contract trusts OutLayer’s answer' : '0, two verifiers sign'}</dd>
 <dt>Vendor</dt><dd>${acct(b.vendor)}</dd>
 ${b.winner !== null && b.winner !== undefined && subs[b.winner] ? `<dt>Paid to</dt><dd>${acct(subs[b.winner].payout)}</dd>` : ''}
 <dt>Network</dt><dd>NEAR testnet</dd>

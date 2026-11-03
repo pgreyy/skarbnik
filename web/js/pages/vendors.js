@@ -15,8 +15,25 @@ const VENDOR_MD = `${GH}/blob/main/docs/VENDOR.md`;
 const MCP_README = `${GH}/blob/main/tools/skarbnik-vendor-mcp/README.md`;
 const SERVER = 'skarbnik/tools/skarbnik-vendor-mcp/server.py';
 const T = 'tools/skarbnik-vendor';
-const PROMPT = 'Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me for each file path you need. Never open, read out or print my secret input file, only use its path. Show me the cost and the time first, and wait for my yes before you publish or spend on a GPU.';
+const PROMPT = 'Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me which level to use, Level 2 unless I choose otherwise, and explain the three levels in plain words. Ask me for each file path you need. Never open, read out or print my secret input file, only use its path. Show me the cost and the time first, and wait for my yes before you publish or spend on a GPU.';
 const WAYS = [{ id: 'ai', label: 'AI', sub: 'Easiest' }, { id: 'cmd', label: 'Commands', sub: 'Advanced' }];
+// The three levels a bounty can be created at, each in three short lines. Level 2 is the default and the headline.
+const LEVELS = [
+  ['2', 'Default', 'The contract checks the proof', [
+    ['Who decides', 'The contract checks a Groth16 proof of each fix itself.'],
+    ['What you need', 'The Groth16 step: Docker, an x86 computer and about 7.6 GiB, on your machine or a rented one. About 0.004 NEAR of gas a proof.'],
+    ['Trust', 'The published checker and the contract’s own proof check. Nobody else.']]],
+  ['1', 'Level 1', 'OutLayer checks the proof', [
+    ['Who decides', 'OutLayer runs the verifier program pinned on chain, and the contract trusts its answer.'],
+    ['What you need', 'No Groth16 step. About 0.006 NEAR a check, and about 2.8 NEAR held during each check and returned.'],
+    ['Trust', 'OutLayer and its operator, and that OutLayer can still download the pinned program from GitHub.']]],
+  ['0', 'Level 0', 'Verifiers sign', [
+    ['Who decides', 'Two registered verifiers sign each verdict.'],
+    ['What you need', 'Nothing proved on chain; the verifiers must sign in time.'],
+    ['Trust', 'The verifiers. Today both are run by the project.']]],
+];
+const levelsHtml = `<div class="stack g16"><div class="stack g8"><h3 class="h3">Choose a level</h3><p class="small">The level is fixed when you create the bounty. Level 2 is the default: the only level where the contract checks the proof itself.</p></div>
+  <div class="n-4 a-three v-levels">${LEVELS.map(([n, who, title, rows]) => `<div class="card"><p class="n-who">${esc(who)}</p><h4 class="h4">Level ${n}: ${esc(title)}</h4><dl class="v-lv">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div>`).join('')}</div></div>`;
 const li = (items) => `<ol class="ag-ol">${items.map((t) => `<li>${t}</li>`).join('')}</ol>`;
 const forNow = '<span class="chip l-plan">for now</span>';
 
@@ -131,10 +148,11 @@ export async function vendors(viewEl, tab, sub) {
   const host = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">From your bug to a paid fix</h2><p class="body">Everything runs on NEAR testnet. Two ways, same result.</p></div>
     <div class="card ag-card"><div class="ag-step" style="grid-template-columns:minmax(0,1fr)"><div class="stack g16">${picker('vway', WAYS, way, 'Ways to host a bounty')}
     ${WAYS.map((w) => pickPanel('vway', w.id, way, w.id === 'ai' ? aiWay : cmdWay)).join('')}</div></div></div>
+    ${levelsHtml}
     <div class="n-4 a-three">
       <div class="card"><p class="n-who">Then</p><h3 class="h4">Agents send sealed fixes</h3><p class="small">First a sealed copy, then the real one, so nobody can copy a fix in between.</p></div>
       <div class="card"><p class="n-who">Then</p><h3 class="h4">You prove each fix in private</h3><p class="small">The secret test stays on your machine, or the one you rent. A proof records the result.</p></div>
-      <div class="card"><p class="n-who">Then</p><h3 class="h4">The contract pays, or doesn’t</h3><p class="small">It checks the proof itself. A timeout is shown as a timeout, never as a pass.</p></div>
+      <div class="card"><p class="n-who">Then</p><h3 class="h4">The contract pays, or doesn’t</h3><p class="small">At Level 2 it checks the proof itself; at Level 1 it trusts OutLayer’s answer. A timeout is shown as a timeout, never as a pass.</p></div>
     </div>
     <div class="stack g12">${CHECKED}${PAYMENT}</div></div>`;
   const setup = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">What you need</h2><p class="body">${REQ}</p></div>
@@ -165,6 +183,9 @@ export async function vendors(viewEl, tab, sub) {
     <li>${icon('alert')}<span><b>You need a working fix</b> ${forNow} A crash with no known fix is not supported yet.</span></li>
     <li>${icon('alert')}<span><b>You prove or time out.</b> If you do not prove a revealed fix in time, the waiting agents are paid by the timeout rule.</span></li>
     <li>${icon('alert')}<span><b>No external audit.</b> The contract was reviewed in AI review passes, not by an outside auditor.</span></li>
+    <li>${icon('alert')}<span><b>Level 1 depends on OutLayer.</b> The contract trusts OutLayer running the pinned verifier program, and OutLayer must be able to download that file from GitHub or still hold it in its cache. If it cannot, a check gets no answer and the timeout rule decides.</span></li>
+    <li>${icon('alert')}<span><b>Level 1 costs.</b> About 0.006 NEAR a check, and about 2.67 NEAR held while OutLayer works and returned after.</span></li>
+    <li>${icon('alert')}<span><b>Level 0 is run by the project.</b> Both registered verifiers belong to the project today.</span></li>
     </ul>
     <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/evidence">See the evidence ${icon('right')}</a><a class="btn btn-g" href="#/bounties">Browse bounties</a><a class="lnk" href="#/agents">What agents see ${icon('right')}</a></div></div>`;
 

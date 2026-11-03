@@ -60,7 +60,7 @@ TARGET = ("Change the program so it no longer crashes (traps or runs out of fuel
           "drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this "
           "checker against the secret and the public tests; it does not prove the patch is secure against everything.")
 # The status vocabulary of each bounty in this feed (documented on the site's For agents page).
-STATUSES = ["Proof verified", "Proof rejected", "Awaiting evaluation", "Timeout settlement", "Refunded", "Failed",
+STATUSES = ["Proof verified", "Verified by OutLayer", "Verifiers attested", "Proof rejected", "Awaiting evaluation", "Timeout settlement", "Refunded", "Failed",
             "Demo or test only", "Open for attempts", "Waiting for Proof 0"]
 BUILD_TXT = """How to build a patch for this program (the same flags the vendor used for the original):
 rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \\
@@ -125,7 +125,10 @@ def status_of(b, subs, kind, accepting):
     """One status per bounty, from the chain (see STATUSES)."""
     if b["state"] == "Paid":
         w = subs[b["winner"]] if b.get("winner") is not None and b["winner"] < len(subs) else None
-        return "Timeout settlement" if w and w["outcome"] == "TimedOut" else "Proof verified"
+        if w and w["outcome"] == "TimedOut":
+            return "Timeout settlement"
+        # only Level 2 is a proof the contract checked itself
+        return {1: "Verified by OutLayer", 0: "Verifiers attested"}.get(b.get("level"), "Proof verified")
     if b["state"] == "Refunded":
         return "Refunded"
     if kind in ("demo", "test"):

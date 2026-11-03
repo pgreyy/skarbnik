@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
-"""skarbnik-vendor: the vendor's command line tool for private Level 2 bounties on the Skarbnik contract (NEAR testnet).
+"""skarbnik-vendor: the vendor's command line tool for private bounties on the Skarbnik contract (NEAR testnet).
+
+Each bounty has a level (bounty.level, default 2): 2 = the contract checks a Groth16 proof itself; 1 = the contract
+trusts OutLayer running the pinned verifier program on the succinct proof (no Groth16 step, so no Docker and no 7.6 GiB
+here); 0 = two registered verifiers decide (today both are run by the project).
 
 A vendor should not have to be a cryptography operator. Commands:
   init     ask a few questions (or copy an older config with --from) and write a bounty config (TOML), outside the repo
   check    the preflight: module, public tests, the secret crashes the original, the reference fix passes on several
            seeds, memory for the prover mode, the checker id on the allowlist, the vendor's balance, and the verdict
            window against K times the measured proof time; prints a preview and refuses with a plain reason
-  prove0   Proof 0 of the reference fix: prove, shrink to succinct, Groth16, verify, the contract arguments (mode gpu:
-           prove and shrink on a rented GPU pod, Groth16 here); one job at a
+  prove0   Proof 0 of the reference fix: prove, shrink to succinct, then (Level 2 only) Groth16, verify, the contract
+           arguments (mode gpu: prove and shrink on a rented GPU pod, Groth16 here); one job at a
            time, memory watched (scripts/s2_measure.sh)
-  publish  shows the preview, asks for confirmation, creates and opens the bounty, prints the transactions
+  publish  shows the preview, asks for confirmation, creates and opens the bounty (Level 2: open_with_groth16; Level 1:
+           open_with_outlayer, attaching the contract's min_deposit; Level 0: opens when two verifiers attest), prints the
+           transactions
   watch    the auto prover: polls the chain for revealed attempts on the bounties in the watch config, proves each one
            (oldest first) with the attempt's seed and submission id, checks the verdict and the secret commitment, and
-           submits the Groth16 proof (submit_groth16, which anyone may send); warns when a window is at risk. Prover
+           settles it by the bounty's level: Level 2 submits the Groth16 proof (submit_groth16), Level 1 sends the
+           succinct proof to OutLayer (check_with_outlayer, attaching min_deposit, held and returned), Level 0 posts the
+           verdict for the verifiers (post_verdict); warns when a window is at risk. Prover
            mode cpu proves on this machine; mode gpu proves and shrinks on a rented GPU pod per attempt
            (tools/skarbnik_gpu.py: secret in the pod's RAM only, pod always terminated, 45 minute cap, spend cap),
            then wraps to Groth16 here; after two failed pods, or at the spend cap, it falls back to cpu and warns
@@ -35,6 +43,16 @@ YOCTO = 10**24
 MARGIN = 1.5            # the verdict window must cover K x the measured proof time x this margin
 GROTH16_NEED_MIB = 7600  # memory plus free swap the Groth16 wrap needs (container peak 6.8 to 7.3 GiB measured)
 PROVE_NEED_MIB = {18: 2600, 19: 5000, 20: 9000}  # prover peak by segment size (docs/numbers.md), with a little room
+# What each level means and costs, as the preview prints it (docs/VENDOR.md, "Levels"; numbers from docs/evidence/).
+LEVELS = {
+    2: ('the contract checks a Groth16 proof itself',
+        'per proof about 36 Tgas of gas (about 0.004 NEAR); the Groth16 step needs Docker, an x86 computer and about 7.6 GiB'),
+    1: ('the contract trusts OutLayer running the pinned verifier program on the succinct proof',
+        'per check about 0.006 NEAR (OutLayer\'s fee about 0.0011 NEAR plus about 50 Tgas of gas), and min_deposit (about 2.8 NEAR) held while OutLayer works and returned; no Groth16 step'),
+    0: ('two registered verifiers decide; today both are run by the project, so you trust the project',
+        'no proof on chain; the verifiers must attest Proof 0 and each verdict before the windows close'),
+}
+def level_of(cfg): return int(cfg['bounty'].get('level', 2))
 
 def now(): return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 def say(*a): print(*a, flush=True)
@@ -161,8 +179,8 @@ class ProverLock:
 def prove_chain(cfg, *a, **k):
     with ProverLock(): return _prove_chain(cfg, *a, **k)
 
-def _prove_chain(cfg, w, name, candidate, module, secret, seed, fuzz, variants, po2, proof0=False, sid=None):
-    """prove -> succinct -> Groth16 -> verify -> contract arguments, in workdir w. Returns the verify text and times."""
+def _prove_chain(cfg, w, name, candidate, module, secret, seed, fuzz, variants, po2, proof0=False, sid=None, groth16=True):
+    """prove -> succinct -> (Level 2: Groth16) -> verify -> contract arguments, in workdir w. Returns the verify text and times."""
     host = binpath(cfg, 'host'); log = f'{w}/run.log'; times = {}
     argv = [host, 'prove', candidate, '--bounty', name, '--exploit', secret, '--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt',
             '--fuzz-count', str(fuzz), '--variants', str(variants), '--po2', str(po2), '--seed', seed, '--out', f'{w}/{"p0" if proof0 else "u"}.bin']
@@ -173,8 +191,30 @@ def _prove_chain(cfg, w, name, candidate, module, secret, seed, fuzz, variants, 
     times['prove'] = measured(cfg, f'{w}/prove_{tag}.log', argv, cfg['prover'].get('prove_max_s', 43200), cfg['prover'].get('min_avail_mib', 300))
     times['succinct'] = measured(cfg, f'{w}/succinct_{tag}.log', [host, 'compress', f'{w}/{tag}.bin', f'{w}/{tag}_succinct.bin', 'succinct'], cfg['prover'].get('succinct_max_s', 43200), cfg['prover'].get('min_avail_mib', 300))
     os.remove(f'{w}/{tag}.bin')  # the composite receipt is large and no longer needed
-    v, times['groth16'] = wrap(cfg, w, tag)
+    if groth16: v, times['groth16'] = wrap(cfg, w, tag)
+    else: v = verify_succinct(cfg, w, tag)
     return v, times
+
+def verify_succinct(cfg, w, tag):
+    """Levels 0 and 1: verify the succinct receipt here and keep the verify text (no Groth16 step)."""
+    v = subprocess.run([binpath(cfg, 'host'), 'verify', f'{w}/{tag}_succinct.bin'], capture_output=True, text=True).stdout
+    open(f'{w}/verify_{tag}.txt', 'w').write(v)
+    if not re.search(r'^VALID', v, re.M): raise RuntimeError('the succinct receipt does not verify')
+    return v
+
+def journal_bytes(receipt, v):
+    """The proof's 780 byte journal, found in the receipt after its length prefix and checked against the journal sha256
+    that `skarbnik-host verify` printed."""
+    rb = open(receipt, 'rb').read(); want = re.search(r'^journal sha256: (\S+)', v, re.M).group(1); prefix = (780).to_bytes(8, 'little')
+    found = [rb[i + 8:i + 788] for i in range(len(rb) - 788) if rb[i:i + 8] == prefix and hashlib.sha256(rb[i + 8:i + 788]).hexdigest() == want]
+    if len(found) != 1: raise RuntimeError('could not find the journal in the receipt')
+    return found[0]
+
+def outlayer_args(w, tag, extra):
+    """The arguments of open_with_outlayer and check_with_outlayer: the succinct receipt, its sha256 and its journal."""
+    rec = f'{w}/{tag}_succinct.bin'; v = open(f'{w}/verify_{tag}.txt').read(); rb = open(rec, 'rb').read()
+    args = dict(extra, receipt_b64=base64.b64encode(rb).decode(), receipt_sha256=hashlib.sha256(rb).hexdigest(), journal=base64.b64encode(journal_bytes(rec, v)).decode())
+    p = f'{w}/{tag}_outlayer_call.json'; json.dump(args, open(p, 'w')); return p
 
 def wrap(cfg, w, tag):
     """Groth16 wrap of {tag}_succinct.bin -> verify -> contract arguments, in workdir w. Returns the verify text and seconds."""
@@ -205,6 +245,7 @@ QUESTIONS = [
     ('bounty', 'module', 'the folder with original.wasm and public_tests.txt', 'data/demo'),
     ('bounty', 'reward_near', 'reward in NEAR', '0.1'),
     ('bounty', 'k', 'attempts allowed, K (1 to 16)', '1'),
+    ('bounty', 'level', 'level: 2 = the contract checks a Groth16 proof itself (default); 1 = the contract trusts OutLayer running the pinned verifier; 0 = registered verifiers run by the project', '2'),
     ('bounty', 'attempt_fee_near', 'fee of the first attempt, in NEAR', '0.01'),
     ('bounty', 'fee_step_near', 'added to the fee for each earlier attempt, in NEAR', '0.005'),
     ('bounty', 'reveal_gap_s', 'seconds between a commit and its earliest reveal', '60'),
@@ -235,7 +276,7 @@ def cmd_init(a):
         if sec.startswith('_') or not isinstance(vals, dict): continue
         lines.append(f'[{sec}]')
         for k, v in vals.items():
-            num = isinstance(v, (int, float)) or (isinstance(v, str) and re.fullmatch(r'\d+', v) and k in ('k', 'reveal_gap_s', 'reveal_window_s', 'verdict_window_h', 'expiry_h', 'po2', 'max_patch_bytes', 'fuzz_count', 'variants'))
+            num = isinstance(v, (int, float)) or (isinstance(v, str) and re.fullmatch(r'\d+', v) and k in ('k', 'level', 'reveal_gap_s', 'reveal_window_s', 'verdict_window_h', 'expiry_h', 'po2', 'max_patch_bytes', 'fuzz_count', 'variants'))
             lines.append(f'{k} = {json.dumps(v) if not num else int(v) if isinstance(v, str) else v}')
         lines.append('')
     os.makedirs(os.path.dirname(out), exist_ok=True)
@@ -248,6 +289,10 @@ def preview(cfg, est):
     b = cfg['bounty']; k = int(b['k']); fee = yocto(b['attempt_fee_near']); step = yocto(b['fee_step_near'])
     say('\nPreview')
     say(f'  reward: {b["reward_near"]} NEAR, locked in the contract when the bounty is created')
+    lv = level_of(cfg)
+    say(f'  level {lv}: {LEVELS[lv][0]}')
+    for n in (2, 1, 0):
+        say(f'    {"->" if n == lv else "  "} level {n} costs: {LEVELS[n][1]}')
     say(f'  attempts: up to {k}; fees, taken from each researcher\'s credit: ' + ', '.join(f'#{i + 1} {near_amount(fee + i * step)}' for i in range(k)))
     say(f'  windows: reveal {span(b["reveal_gap_s"])} to {span(b["reveal_window_s"])} after a commit; your proof within {b["verdict_window_h"]} h of each reveal; the bounty expires after {b["expiry_h"]} h')
     say('  on timeout: if you do not prove a revealed attempt within its verdict window, anyone can call claim_timeout and the')
@@ -287,10 +332,21 @@ def cmd_check(a):
         passes += r.returncode == 0 and 'proof0: PASS' in r.stdout
     if passes != 4: problems.append(f'the reference fix passed the full check on {passes} of 4 seeds')
     else: ok('the reference fix passes the full check on 4 random seeds')
-    po2 = int(b.get('po2', 18)); avail, swap = mem_mib()
-    need = max(PROVE_NEED_MIB.get(po2, 5000), GROTH16_NEED_MIB)
-    if avail + min(swap, 2048) < need: problems.append(f'not enough memory here for {pr["mode"]} proving: {avail} MiB available + {swap} MiB swap, needs about {need} MiB (the Groth16 wrap)')
-    else: ok(f'memory: {avail} MiB available, {swap} MiB swap; proving needs about {PROVE_NEED_MIB.get(po2)} MiB at --po2 {po2}, the Groth16 wrap about {GROTH16_NEED_MIB} MiB')
+    po2 = int(b.get('po2', 18)); avail, swap = mem_mib(); lv = level_of(cfg)
+    if lv not in LEVELS: problems.append(f'bounty.level {lv} is not 0, 1 or 2')
+    need = max(PROVE_NEED_MIB.get(po2, 5000), GROTH16_NEED_MIB) if lv == 2 else PROVE_NEED_MIB.get(po2, 5000)
+    what = 'the Groth16 wrap' if lv == 2 else 'proving (no Groth16 step at this level)'
+    if avail + min(swap, 2048) < need: problems.append(f'not enough memory here for {pr["mode"]} proving: {avail} MiB available + {swap} MiB swap, needs about {need} MiB ({what})')
+    else: ok(f'memory: {avail} MiB available, {swap} MiB swap; proving needs about {PROVE_NEED_MIB.get(po2)} MiB at --po2 {po2}' + (f', the Groth16 wrap about {GROTH16_NEED_MIB} MiB' if lv == 2 else ''))
+    if lv == 1:
+        try:
+            ol = view(cfg, 'get_outlayer')
+            if ol: ok(f'Level 1: OutLayer is set ({ol["account_id"]}, program sha256 {ol["wasm_sha256"][:16]}..., min_deposit {near_amount(ol["min_deposit"])})')
+            else: problems.append('Level 1: the contract has no OutLayer settings yet (the owner sets them)')
+        except Exception as e: problems.append(f'could not read the OutLayer settings: {e}')  # noqa: BLE001
+    if lv == 0:
+        try: ok(f'Level 0: {len(view(cfg, "get_verifiers"))} registered verifiers (run by the project); they must attest Proof 0 before the bounty opens')
+        except Exception as e: problems.append(f'could not read the verifiers: {e}')  # noqa: BLE001
     if pr['mode'] not in ('cpu', 'gpu'): problems.append(f'prover mode {pr["mode"]} is not known; use gpu or cpu')
     try:
         allowed = view(cfg, 'get_allowed_image_ids')
@@ -329,13 +385,14 @@ def cmd_prove0(a):
         with ProverLock():
             _, t = gpu.prove_on_gpu(cfg, job, lambda m: say(f'{now()} {m}'))
             os.replace(f'{w}/u_succinct.bin', f'{w}/p0_succinct.bin')
-            v, t['groth16'] = wrap(cfg, w, 'p0')
+            if level_of(cfg) == 2: v, t['groth16'] = wrap(cfg, w, 'p0')
+            else: v = verify_succinct(cfg, w, 'p0')
     else:
-        say(f'{now()} Proof 0 of {b["name"]}: prove, succinct, Groth16, one step at a time (logs in {w})')
-        v, t = prove_chain(cfg, w, b['name'], s['reference_fix'], module, s['secret'], seed, int(b.get('fuzz_count', 16)), int(b.get('variants', 32)), int(b.get('po2', 18)), proof0=True)
+        say(f'{now()} Proof 0 of {b["name"]}: prove, succinct{", Groth16" if level_of(cfg) == 2 else ""}, one step at a time (logs in {w})')
+        v, t = prove_chain(cfg, w, b['name'], s['reference_fix'], module, s['secret'], seed, int(b.get('fuzz_count', 16)), int(b.get('variants', 32)), int(b.get('po2', 18)), proof0=True, groth16=level_of(cfg) == 2)
     if journal(v, 'verdict') != 'PASS': fail('Proof 0 did not say PASS')
     json.dump({'times_s': t, 'at': now()}, open(f'{w}/proof0_times.json', 'w'))
-    say(f'{now()} Proof 0 ready: VALID, PASS; prove {t["prove"]} s, succinct {t["succinct"]} s, Groth16 {t["groth16"]} s. Next: publish')
+    say(f'{now()} Proof 0 ready: VALID, PASS; prove {t["prove"]} s, succinct {t["succinct"]} s' + (f', Groth16 {t["groth16"]} s' if 'groth16' in t else '') + '. Next: publish')
 
 def cmd_publish(a):
     cfg = load(a.config); b = cfg['bounty']; w = os.path.expanduser(cfg['prover']['workdir'])
@@ -353,14 +410,23 @@ def cmd_publish(a):
               'max_patch_bytes': int(b.get('max_patch_bytes', 1024)), 'reveal_gap_ns': str(int(b['reveal_gap_s']) * SEC), 'verdict_window_ns': str(int(b['verdict_window_h']) * 3600 * SEC),
               'attest_window_ns': str(3600 * SEC), 'expiry_ns': str(int(b['expiry_h']) * 3600 * SEC), 'attempt_fee': str(yocto(b['attempt_fee_near'])), 'fee_step': str(yocto(b['fee_step_near'])),
               'reference_fix_hash': ref, 'proof0_journal_hash': re.search(r'^journal sha256: (\S+)', v, re.M).group(1), 'reveal_window_ns': str(int(b['reveal_window_s']) * SEC),
-              'fuzz_count': int(b.get('fuzz_count', 16)), 'variant_count': int(b.get('variants', 32)), 'level': 2}
+              'fuzz_count': int(b.get('fuzz_count', 16)), 'variant_count': int(b.get('variants', 32)), 'level': level_of(cfg)}
     json.dump(create, open(f'{w}/create_call.json', 'w'))
     bid = str(view(cfg, 'get_next_bounty_id'))
     tx1, ok1, why = send(cfg, cfg['chain']['vendor_account'], 'create_bounty', f'{w}/create_call.json', f'{b["reward_near"]} NEAR', log=f'{w}/run.log')
     say(f'create_bounty: {tx1} {"ok" if ok1 else "FAILED: " + why}')
     if not ok1: sys.exit(1)
-    tx2, ok2, why = send(cfg, cfg['chain']['vendor_account'], 'open_with_groth16', proof_args(w, 'p0', {'bounty_id': bid}), log=f'{w}/run.log')
-    say(f'open_with_groth16: {tx2} {"ok" if ok2 else "FAILED: " + why}')
+    lv = level_of(cfg)
+    if lv == 2:
+        tx2, ok2, why = send(cfg, cfg['chain']['vendor_account'], 'open_with_groth16', proof_args(w, 'p0', {'bounty_id': bid}), log=f'{w}/run.log')
+        say(f'open_with_groth16: {tx2} {"ok" if ok2 else "FAILED: " + why}')
+    elif lv == 1:
+        dep = near_amount(view(cfg, 'get_outlayer')['min_deposit']).replace(' NEAR', '')
+        tx2, ok2, why = send(cfg, cfg['chain']['vendor_account'], 'open_with_outlayer', outlayer_args(w, 'p0', {'bounty_id': bid}), f'{dep} NEAR', log=f'{w}/run.log')
+        say(f'open_with_outlayer: {tx2} {"ok" if ok2 else "FAILED: " + why}; {dep} NEAR held while OutLayer works, then returned (less its fee)')
+    else:
+        tx2 = None
+        say('Level 0: the bounty opens when two registered verifiers attest its Proof 0 (journal and receipt sha256 above, in create_call.json)')
     json.dump({'bounty_id': bid, 'create_tx': tx1, 'open_tx': tx2, 'at': now()}, open(f'{w}/published.json', 'w'))
     bb = view(cfg, 'get_bounty', {'bounty_id': bid})
     say(f'bounty {bid}: state {bb["state"]}, opened {bb["opened"]}, image id allowed {bb["image_id_allowed"]}. Add it to the watch config.')
@@ -384,13 +450,15 @@ def log_line(wcfg, msg):
 
 def prove_attempt(wcfg, bid, e, b, i, s, st):
     key = f'{bid}:{i}'; w = os.path.expanduser(f'{wcfg["watch"]["workdir"]}/b{bid}_a{i}'); os.makedirs(w, mode=0o700, exist_ok=True)
+    level = int(b.get('level', 2))  # 2: Groth16 to the contract; 1: the succinct proof to OutLayer; 0: a posted verdict
     patch = f'{w}/patch.wasm'; open(patch, 'wb').write(base64.b64decode(s['patch']))
     sid = view(wcfg, 'get_submission_id', {'bounty_id': bid, 'index': i})
     module = os.path.join(ROOT, e['module']) if not os.path.isabs(e['module']) else e['module']
     log_line(wcfg, f'bounty {bid} attempt {i}: proving (patch sha256 {sha_file(patch)[:16]}..., seed {s["seed"][:16]}..., deadline {datetime.fromtimestamp(int(s["deadline_ns"]) / 1e9, timezone.utc):%Y-%m-%d %H:%M} UTC)')
     prev = st.get(key, {})
     v = t = None
-    if prev.get('state') in ('proof ready', 'submit failed') and os.path.exists(f'{w}/u_args.json') and os.path.exists(f'{w}/verify_u.txt'):
+    ready = os.path.exists(f'{w}/u_args.json') if level == 2 else os.path.exists(f'{w}/u_succinct.bin')
+    if prev.get('state') in ('proof ready', 'submit failed') and ready and os.path.exists(f'{w}/verify_u.txt'):
         # The proof exists: only the submit is tried again; no new pod and no new proving for this attempt.
         v, t = open(f'{w}/verify_u.txt').read(), prev.get('times_s', {})
         log_line(wcfg, f'bounty {bid} attempt {i}: the proof is already made; submitting it again (try {prev.get("submit_failures", 0) + 1})')
@@ -404,7 +472,8 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
                 try:
                     with ProverLock():
                         _, t = gpu.prove_on_gpu(wcfg, job, lambda m: log_line(wcfg, f'bounty {bid} attempt {i}: {m}'))
-                        v, t['groth16'] = wrap(wcfg, w, 'u')
+                        if level == 2: v, t['groth16'] = wrap(wcfg, w, 'u')
+                        else: v = verify_succinct(wcfg, w, 'u')
                     break
                 except gpu.BudgetReached as ex:
                     if not gpu.settings(wcfg).get('cpu_fallback', True):
@@ -417,7 +486,7 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
             if v is None:
                 log_line(wcfg, f'WARNING bounty {bid} attempt {i}: the GPU path did not give a proof; falling back to cpu on this machine (about 10 h here)')
         if v is None:
-            v, t = prove_chain(wcfg, w, e['name'], patch, module, os.path.expanduser(e['secret']), s['seed'], b['fuzz_count'], b['variant_count'], int(e.get('po2', 18)), sid=sid)
+            v, t = prove_chain(wcfg, w, e['name'], patch, module, os.path.expanduser(e['secret']), s['seed'], b['fuzz_count'], b['variant_count'], int(e.get('po2', 18)), sid=sid, groth16=level == 2)
     if journal(v, 'exploit_commitment') != b['exploit_commitment']: raise RuntimeError('the proof\'s secret commitment is not the bounty\'s (wrong secret or salt); not submitting')
     if journal(v, 'submission_id') != sid: raise RuntimeError('the proof is for another submission id; not submitting')
     verdict = journal(v, 'verdict')
@@ -426,9 +495,20 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
     st[key] = {'state': 'proof ready', 'verdict': verdict, 'times_s': t, 'submit_failures': prev.get('submit_failures', 0)}; state_save(wcfg, st)
     fresh = view(wcfg, 'get_submission', {'bounty_id': bid, 'index': i})
     if fresh['outcome'] != 'Open': log_line(wcfg, f'bounty {bid} attempt {i}: already decided on chain ({fresh["outcome"]}); not submitting'); st[key] = {'state': 'decided elsewhere', 'outcome': fresh['outcome']}; return
-    tx, ok, why = send(wcfg, wcfg['chain']['submit_account'], 'submit_groth16', proof_args(w, 'u', {'bounty_id': bid, 'index': i}), log=f'{w}/run.log')
+    if level == 2:
+        method = 'submit_groth16'
+        tx, ok, why = send(wcfg, wcfg['chain']['submit_account'], method, proof_args(w, 'u', {'bounty_id': bid, 'index': i}), log=f'{w}/run.log')
+    elif level == 1:
+        method = 'check_with_outlayer'; dep = near_amount(view(wcfg, 'get_outlayer')['min_deposit']).replace(' NEAR', '')
+        tx, ok, why = send(wcfg, wcfg['chain']['submit_account'], method, outlayer_args(w, 'u', {'bounty_id': bid, 'index': i}), f'{dep} NEAR', log=f'{w}/run.log')
+    else:
+        method = 'post_verdict'; rb = open(f'{w}/u_succinct.bin', 'rb').read(); p = f'{w}/u_post_call.json'
+        json.dump({'bounty_id': bid, 'index': i, 'verdict': 'Pass' if verdict == 'PASS' else 'Fail', 'journal_hash': re.search(r'^journal sha256: (\S+)', v, re.M).group(1),
+                   'receipt_hash': hashlib.sha256(rb).hexdigest()}, open(p, 'w'))
+        tx, ok, why = send(wcfg, wcfg['chain'].get('vendor_account', wcfg['chain']['submit_account']), method, p, log=f'{w}/run.log')
+        log_line(wcfg, f'bounty {bid} attempt {i}: Level 0: the verdict is posted; two registered verifiers must attest it before the attestation window closes')
     after = view(wcfg, 'get_submission', {'bounty_id': bid, 'index': i})
-    log_line(wcfg, f'bounty {bid} attempt {i}: submit_groth16 {tx} {"ok" if ok else "FAILED: " + why}; outcome on chain {after["outcome"]}')
+    log_line(wcfg, f'bounty {bid} attempt {i}: {method} {tx} {"ok" if ok else "FAILED: " + why}; outcome on chain {after["outcome"]}')
     st[key] = {'state': 'submitted' if ok else 'submit failed', 'tx': tx, 'verdict': verdict, 'outcome': after['outcome'], 'times_s': t, 'done': now(),
                'submit_failures': prev.get('submit_failures', 0) + (0 if ok else 1)}
     if not ok: return

@@ -194,8 +194,11 @@ def t_init(a):
     mode = a.get("prover_mode", "gpu")
     if mode not in ("gpu", "cpu"):
         raise Fail("prover_mode is gpu or cpu")
+    level = int(a.get("level", 2))
+    if level not in (0, 1, 2):
+        raise Fail("level is 0, 1 or 2 (default 2)")
     cfg = {
-        "bounty": {"name": a["name"], "module": a.get("module", "data/demo"), "reward_near": str(a["reward_near"]), "k": int(a.get("k", 1)),
+        "bounty": {"name": a["name"], "module": a.get("module", "data/demo"), "reward_near": str(a["reward_near"]), "k": int(a.get("k", 1)), "level": level,
                    "attempt_fee_near": str(a.get("attempt_fee_near", "0.01")), "fee_step_near": str(a.get("fee_step_near", "0.005")),
                    "reveal_gap_s": int(a.get("reveal_gap_s", 60)), "reveal_window_s": int(a.get("reveal_window_s", 3600)),
                    "verdict_window_h": int(a.get("verdict_window_h", 24)), "expiry_h": int(a.get("expiry_h", 96)),
@@ -232,9 +235,11 @@ def t_check(a):
     return job_result(start_job(["check", "--config", config_path(a["config_path"])], "check"), wait=float(a.get("wait_seconds", 40)))
 
 
-def gpu_note():
+def gpu_note(level=2):
+    tail = ("then the Groth16 wrap on this computer, about 5 minutes" if level == 2 else
+            "no Groth16 step at this level: the succinct proof goes to OutLayer (Level 1) or to the verifiers (Level 0)")
     return ("one rented GPU for this step: about 1 to 11 minutes (11 when the GPU build of the prover is made "
-            "for the first time), about $0.04 to $0.20; then the Groth16 wrap on this computer, about 5 minutes")
+            "for the first time), about $0.04 to $0.20; " + tail)
 
 
 def t_prove0(a):
@@ -243,7 +248,7 @@ def t_prove0(a):
     mode = cfg.get("prover", {}).get("mode", "cpu")
     if mode == "gpu":
         if not a.get("confirm_code"):
-            return {"needs_yes": True, "what": f"Proof 0 of bounty {cfg['bounty']['name']} spends GPU rental: {gpu_note()}",
+            return {"needs_yes": True, "what": f"Proof 0 of bounty {cfg['bounty']['name']} spends GPU rental: {gpu_note(int(cfg['bounty'].get('level', 2)))}",
                     "gpu_budget_usd": cfg.get("gpu", {}).get("budget_usd", 6.0),
                     "confirm_code": new_code("prove0", path),
                     "next": "ask the vendor; after a clear yes, call prove0 again with this confirm_code"}
@@ -284,7 +289,8 @@ def t_publish(a):
         cfg = read_toml(path)
         b = cfg.get("bounty", {})
         out = {"needs_yes": True, "preview": r["output"],
-               "spends": f"the reward ({b.get('reward_near')} NEAR, locked in the contract) plus a little gas, from {cfg.get('chain', {}).get('vendor_account')}; testnet only",
+               "spends": f"the reward ({b.get('reward_near')} NEAR, locked in the contract) plus a little gas, from {cfg.get('chain', {}).get('vendor_account')}; testnet only"
+                         + ("; Level 1 also holds the contract's min_deposit (about 2.8 NEAR) while OutLayer checks Proof 0, returned less OutLayer's fee (about 0.0011 NEAR)" if int(b.get("level", 2)) == 1 else ""),
                "time": "two transactions, under a minute"}
         refusals = [l.strip()[2:] for l in r.get("output", "").split("REFUSED:", 1)[-1].splitlines() if l.strip().startswith("- ")] if "REFUSED:" in r.get("output", "") else []
         work = os.path.expanduser(cfg.get("prover", {}).get("workdir", ""))
@@ -355,7 +361,8 @@ def t_watch_start(a):
         mode = w.get("prover", {}).get("mode", "cpu")
         return {"needs_yes": True, "watches_bounties": ids, "prover_mode": mode,
                 "spends": (f"for each revealed attempt, {gpu_note()}. Spend cap: ${g.get('budget_usd', 6.0)} in all; spent so far ${spent}. "
-                           "At the cap no new GPU starts." if mode == "gpu" else "this computer's time; no rental"),
+                           "At the cap no new GPU starts." if mode == "gpu" else "this computer's time; no rental")
+                          + ". On a Level 1 bounty each check also holds the contract's min_deposit (about 2.8 NEAR) from the submit account while OutLayer works, returned less about 0.006 NEAR",
                 "time": "from a reveal to the submitted proof, about 17 minutes in the measured GPU run (bounty 32)",
                 "confirm_code": new_code("watch_start", path),
                 "next": "ask the vendor; after a clear yes, call watch_start again with this confirm_code"}
@@ -421,6 +428,7 @@ TOOLS = {
               "module": {"type": "string", "description": "folder with original.wasm and public_tests.txt (default data/demo)"}, "secret_input_path": S, "reference_fix_path": S,
               "vendor_account": S, "reward_near": S, "k": {"type": "integer"}, "attempt_fee_near": S, "fee_step_near": S, "reveal_gap_s": {"type": "integer"},
               "reveal_window_s": {"type": "integer"}, "verdict_window_h": {"type": "integer"}, "expiry_h": {"type": "integer"}, "prover_mode": {"type": "string", "description": "gpu or cpu"},
+              "level": {"type": "integer", "description": "2 (default): the contract checks a Groth16 proof itself; 1: the contract trusts OutLayer running the pinned verifier program, no Groth16 step, about 0.006 NEAR per check and about 2.8 NEAR held and returned; 0: registered verifiers, run by the project"},
               "machine": S, "workdir": S, "gpu_budget_usd": {"type": "number"}, "path_host": S, "path_check": S, "path_near": S},
              ["out_path", "name", "secret_input_path", "reference_fix_path", "vendor_account", "reward_near"]),
     "check": (t_check, "The preflight (skarbnik-vendor check): module, tests, that the original crashes on the secret, that the fix passes, memory, the checker id, the balance and the window rule, then a preview of fees, windows and time. Spends nothing.",

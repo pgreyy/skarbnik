@@ -3,7 +3,7 @@
 // previous, next, replay, the step tabs (arrow keys, Home and End), a "Try it" control per step, the technical detail
 // toggle, and a proof path and a timeout path at step 4 (the timeout path says "This is not a proof"). An illustrative
 // walkthrough, not connected to the contract; the same story is written out in plain text below it, then the "who
-// sees what" matrix and "What Skarbnik is, and isn't" (the scope, in two lists).
+// sees what" matrix, the three levels (who decides a verdict) and "What Skarbnik is, and isn't" (the scope, in two lists).
 import { $, esc, icon, note, chip } from '../ui.js';
 import { matrix } from './matrix.js';
 import { PUBLISHED_IMAGE_ID } from '../chain.js';
@@ -46,6 +46,15 @@ ${STEPS(true).map((s, i) => `<div><h3 class="h4" style="margin-top:8px">${i + 1}
 <section class="sec rule" aria-labelledby="who-h" style="background:var(--bg2)"><div class="wrap">
 <div style="max-width:720px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Who knows what</p><h2 class="h2" id="who-h">What can each party see?</h2><p class="lead">The same story as a table. The contract enforces rules and checks the proof. It does not run the private evaluation.</p></div>
 <div id="howMatrix"></div></div></section>
+<section class="sec rule" id="levels" aria-labelledby="levels-h"><div class="wrap">
+<div style="max-width:760px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Levels</p><h2 class="h2" id="levels-h">Who decides a verdict?</h2><p class="lead">The vendor picks one of three levels when it creates a bounty. The story above is Level 2, the default.</p></div>
+<table class="n-tab" style="max-width:980px"><caption class="sr-only">The three levels</caption><thead><tr><th scope="col">Level</th><th scope="col">Who decides</th><th scope="col">Trust</th></tr></thead><tbody>
+<tr><td><b>Level 2</b></td><td><span class="tlab">Who decides </span>The contract checks a Groth16 proof of each fix itself.</td><td><span class="tlab">Trust </span>The published checker and the contract. The only level called paid by proof.</td></tr>
+<tr><td><b>Level 1</b></td><td><span class="tlab">Who decides </span>OutLayer runs the verifier program pinned on chain on the proof, and the contract trusts its answer.</td><td><span class="tlab">Trust </span>OutLayer and its operator, and that it can still download the pinned program from GitHub.</td></tr>
+<tr><td><b>Level 0</b></td><td><span class="tlab">Who decides </span>Two registered verifiers sign each verdict.</td><td><span class="tlab">Trust </span>The verifiers, today both run by the project.</td></tr>
+</tbody></table>
+<p class="small" style="margin-top:16px;max-width:760px">At every level a timeout is a timeout: if no verdict arrives in time, the waiting attempts are paid by rule, and it is never shown as a pass.</p>
+</div></section>
 <section class="sec rule" id="scope" aria-labelledby="isnt-h"><div class="wrap">
 <div style="max-width:720px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Scope</p><h2 class="h2" id="isnt-h">What Skarbnik is, and isn’t</h2></div>
 <div class="r-isnt">

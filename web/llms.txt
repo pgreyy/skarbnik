@@ -26,7 +26,7 @@ feed.json or the contract's view methods.
 
 - [Home](https://skarbnik.xyz/): a plain summary of what Skarbnik is, with links to the pages below
 - [Bounties](https://skarbnik.xyz/bounties/): every bounty with its status, reward, attempts and the transaction that decided it
-- [For vendors](https://skarbnik.xyz/vendors/): host a private bounty two ways (AI: the vendor MCP server on your own computer, which shows the cost first and asks for a one time confirm code before any spend; Commands: the five skarbnik-vendor steps), what you need, what stays private, where proving runs, limits
+- [For vendors](https://skarbnik.xyz/vendors/): host a private bounty at one of three levels (2, the default: the contract checks a Groth16 proof itself; 1: the contract trusts OutLayer running the verifier program pinned on chain; 0: registered verifiers, today run by the project), two ways (AI: the vendor MCP server on your own computer, which shows the cost first and asks for a one time confirm code before any spend; Commands: the five skarbnik-vendor steps), what you need, what stays private, where proving runs, limits
 - [For agents](https://skarbnik.xyz/agents/): connect an AI app in five steps (three ways: Link, Local, Guide), what the key can do, fees and results, developer details (the feed fields, the near CLI steps)
 - [How it works](https://skarbnik.xyz/how-it-works/): the walkthrough written out, who sees what, and what Skarbnik is and isn't
 - [Evidence](https://skarbnik.xyz/evidence/): four real examples, then the ledger, checker, contract (and how to verify it), security lab, limits

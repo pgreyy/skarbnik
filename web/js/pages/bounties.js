@@ -16,9 +16,10 @@ function subLine(x, meta, rec) {
   if (x.snap) return x.snap.accepts_commits ? `Accepting commits until ${x.snap.windows.commit_deadline_utc.replace('T', ' ').replace(':00Z', '').replace('Z', '')} UTC (snapshot).` : (meta.notes || {})[id] || '';
   const recNote = rec.bounty_notes && rec.bounty_notes[id];
   if (recNote) return recNote.text;
-  if (meta.notes && meta.notes[id] && (status === 'Proof verified' || status === 'Timeout settlement' || status === 'Refunded')) return meta.notes[id];
+  if (meta.notes && meta.notes[id] && (status === 'Proof verified' || status === 'Verified by OutLayer' || status === 'Timeout settlement' || status === 'Refunded')) return meta.notes[id];
   const waiting = subs.filter((s) => s && s.outcome === 'Open' && s.revealed_at_ns).length;
   if (status === 'Proof verified') return 'A PASS proof was accepted by the contract.';
+  if (status === 'Verified by OutLayer') return 'Level 1: OutLayer said PASS for a proof and the contract paid on its answer; the contract did not check the proof itself.';
   if (status === 'Timeout settlement') return 'No proof arrived in the window. Paid by the timeout rule.';
   if (status === 'Refunded') return 'Refunded to the vendor.';
   if (status === 'Failed') return 'Past its expiry and not settled. Anyone can call expire to refund the vendor.';
@@ -32,6 +33,7 @@ function subLine(x, meta, rec) {
 function evidenceOf(x, rec) {
   const id = String(x.b.id);
   if (x.status === 'Proof verified') return ['Proof transaction', lastTx(rec, id, 'submit_groth16') || lastTx(rec, id, 'attest')];
+  if (x.status === 'Verified by OutLayer') return ['OutLayer check', lastTx(rec, id, 'check_with_outlayer')];
   if (x.status === 'Timeout settlement') return ['Claim transaction', lastTx(rec, id, 'claim_timeout')];
   if (x.status === 'Refunded') return ['Expire transaction', lastTx(rec, id, 'expire')] ;
   return ['Created transaction', firstTx(rec, id, 'create_bounty')];

@@ -33,8 +33,8 @@ as a file.
 `https://skarbnik.xyz/feed.json` (a snapshot; `generated_at_utc` says when). The fields you need:
 
 - `open_bounties`: the bounties that accepted commits when the feed was made.
-- `bounties[]`: every bounty, with `bounty_id`, `status`, `accepts_commits`, `level` (2: the contract checks the proof
-  itself), `target` (what PASS needs), `max_patch_bytes`, `reward_yocto`, `max_commits` (K), `attempts_used`,
+- `bounties[]`: every bounty, with `bounty_id`, `status`, `accepts_commits`, `level` (2, 1 or 0; what each
+  means is in section 2), `target` (what PASS needs), `max_patch_bytes`, `reward_yocto`, `max_commits` (K), `attempts_used`,
   `slots_in_use`, `max_commits_per_account` (null: no cap), `fee_schedule`, `next_fee_yocto`, `windows`
   (`reveal_gap_ns`, `reveal_window_ns`, `verdict_window_ns`, `commit_deadline_utc`, `expires_at_utc`), `image_id`,
   `image_id_allowed`, `original_hash`, `corpus_hash`, and `public_code` (paths relative to feed.json: `source`,
@@ -49,8 +49,16 @@ Read the live state; the feed may be old:
 
 Commit only if all of these hold:
 
-- `state` is `"Open"`, `opened` is `true`, `level` is `2`, `image_id_allowed` is `true`, and `image_id` is
+- `state` is `"Open"`, `opened` is `true`, `image_id_allowed` is `true`, and `image_id` is
   `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc` (the published checker).
+- `level` is `2` or `1`. Take a Level `0` bounty only if your user explicitly asked for one. What each level means, in
+  the words to use with your user:
+  - Level 2: the contract checks the proof itself.
+  - Level 1: the contract trusts an answer from OutLayer running our pinned verifier program; the vendor's watch asks
+    for the check; if no check arrives, the timeout rule applies.
+  - Level 0: registered verifiers decide, run by the project today.
+- Before you commit, tell your user in one message the fee (`next_fee`) and the bounty's level with its meaning from
+  the list above, and wait for their yes.
 - sha256 of the public module equals `original_hash`. The tests hash: for each line of the tests file (`<input hex or
   -> <expected i32>`, `#` starts a comment), append u32 little endian length of the input bytes, the input bytes, and
   the expected value as i32 little endian; sha256 of the whole equals `corpus_hash`.

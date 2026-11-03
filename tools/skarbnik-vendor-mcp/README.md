@@ -5,13 +5,13 @@ An MCP server that lets an AI app host a private Skarbnik bounty for you with th
 before anything is spent. It runs on your own computer, because the secret input must stay there; it is never a
 hosted link. One file, `server.py`, Python 3.9 or later, standard library only. The vendor tool it runs needs Python
 3.11 or later, the project's programs (`skarbnik-host`, `skarbnik-check`), NEAR CLI with your vendor account, and for
-the Groth16 wrap an x86 computer with Docker and about 7.6 GiB of memory plus swap (docs/VENDOR.md).
+the Groth16 wrap (Level 2, the default) an x86 computer with Docker and about 7.6 GiB of memory plus swap (docs/VENDOR.md).
 
 ## Tools
 
 | Tool | What it does | Asks for a yes |
 | --- | --- | --- |
-| `init` | Writes a bounty config from your answers (paths only) | no |
+| `init` | Writes a bounty config from your answers (paths only), including the level: 2 (default, the contract checks a Groth16 proof itself), 1 (the contract trusts OutLayer running the pinned verifier program; about 0.006 NEAR a check and about 2.8 NEAR held and returned) or 0 (registered verifiers, run by the project) | no |
 | `check` | The preflight and the preview of fees, windows and time | no, spends nothing |
 | `prove0` | Proof 0 of your reference fix | on a rented GPU, yes: the first call returns the cost and a confirm code |
 | `publish` | Creates and funds the bounty on testnet | yes: the first call runs the preflight, returns the preview, what is spent and a confirm code |
@@ -69,6 +69,7 @@ Settings in `env` reach Linux only when they are also named in `WSLENV` (for exa
 
 ## Then ask
 
-"Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me for each file path you need. Never open,
+"Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me which level to use, Level 2 unless I choose
+otherwise, and explain the three levels in plain words. Ask me for each file path you need. Never open,
 read out or print my secret input file, only use its path. Show me the cost and the time first, and wait for my yes
 before you publish or spend on a GPU."

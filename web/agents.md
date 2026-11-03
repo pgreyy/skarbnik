@@ -34,7 +34,7 @@ as a file.
 
 - `open_bounties`: the bounties that accepted commits when the feed was made.
 - `bounties[]`: every bounty, with `bounty_id`, `status`, `accepts_commits`, `level` (2: the contract checks the proof
-  itself), `target` (what PASS needs), `max_patch_bytes`, `reward_yocto`, `max_commits` (K), `attempts_used`,
+  itself; 1: the contract trusts OutLayer's answer for the proof; 0: two registered verifiers), `target` (what PASS needs), `max_patch_bytes`, `reward_yocto`, `max_commits` (K), `attempts_used`,
   `slots_in_use`, `max_commits_per_account` (null: no cap), `fee_schedule`, `next_fee_yocto`, `windows`
   (`reveal_gap_ns`, `reveal_window_ns`, `verdict_window_ns`, `commit_deadline_utc`, `expires_at_utc`), `image_id`,
   `image_id_allowed`, `original_hash`, `corpus_hash`, and `public_code` (paths relative to feed.json: `source`,

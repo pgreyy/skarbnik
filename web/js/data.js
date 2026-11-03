@@ -40,9 +40,10 @@ export async function loadAll(full = false) {
   cache = { t: Date.now(), v, full };
   return v;
 }
-// The ids of the bounties paid by a proof: every bounty, and the winning attempt of each paid one.
+// The ids of the bounties paid by a proof the contract checked: every bounty, and the winning attempt of each paid one.
+// Only Level 2 counts: the one level where the contract checked the proof itself.
 export async function paidByProof() {
-  const bs = (await allBounties()).filter((b) => b && b.state === 'Paid' && b.winner !== null && b.winner !== undefined);
+  const bs = (await allBounties()).filter((b) => b && b.level === 2 && b.state === 'Paid' && b.winner !== null && b.winner !== undefined);
   const w = await Promise.all(bs.map((b) => view('get_submission', { bounty_id: String(b.id), index: b.winner })));
   return bs.filter((b, i) => w[i] && w[i].outcome === 'Passed').map((b) => b.id);
 }

@@ -126,13 +126,13 @@ Rebuild the deployed contract from its commit and compare it with the code on ch
 the build image `sourcescan/cargo-near:0.22.0-rust-1.99.1` is about 0.5 GB
 ([docs/TRY_IT.md](docs/TRY_IT.md), step 11).
 
-    git checkout c74bd5c820c1ce684f81e3f794a8e3e804b3d2b5
+    git checkout c86db11bd2c7ac461c4d915b6fd8e125eeb31b9e
     (cd contract && cargo near build reproducible-wasm)
     sha256sum target/near/kintsugi_contract/kintsugi_contract.wasm
 
-Expect sha256 `ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e`, whose base58 form
-`Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u` equals the contract's code hash on chain. This shows the code running on
-chain is built from the published commit `c74bd5c`. It does not show that the source is free of bugs, or that the owner
+Expect sha256 `630ed90923bda105cfe2f50c4ded6191808425f6710aa773210a7bb6063150bb`, whose base58 form
+`7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC` equals the contract's code hash on chain. This shows the code running on
+chain is built from the published commit `c86db11`. It does not show that the source is free of bugs, or that the owner
 will not deploy other code later (the testnet contract keeps its full access key on purpose; every deploy is listed in
 [docs/EVIDENCE.md](docs/EVIDENCE.md)).
 
@@ -168,7 +168,7 @@ in [docs/EVIDENCE.md](docs/EVIDENCE.md). No step needs real money or a mainnet w
 #### More browser checks
 
 - **Find the contract.** Open https://testnet.nearblocks.io/address/kintsugi-l2-cihdp.testnet : a testnet account
-  with a deployed contract and the code hash `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u`, the same as on the site's
+  with a deployed contract and the code hash `7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC`, the same as on the site's
   Evidence page, Contract tab (https://skarbnik.xyz/#/evidence/contract), read live. Shows: the contract is real,
   deployed on NEAR testnet, and the site reads it. Does not show: that the code has no bugs; it has not been externally
   audited.
@@ -223,7 +223,7 @@ never shown as done.
 | An agent can be set up from the site: limits, a key made in the browser and added by the wallet | Demonstrated | [`docs/evidence/web/partd_transactions.tsv`](docs/evidence/web/partd_transactions.tsv); EVIDENCE, "Site in the final design" |
 | The attempt cap K limits what repeated probes learn | Demonstrated | bounty 23 (3 of 12 probe commits counted); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Arena: guarded and unguarded" |
 | The checker rebuilds to the image id on chain | Demonstrated | MATCH from a fresh clone: [`docs/evidence/judge/fresh_clone_2026-10-26b.txt`](docs/evidence/judge/fresh_clone_2026-10-26b.txt); B5 |
-| The contract on chain is a reproducible build of a published commit | Demonstrated | code hash `Gx1JfW7G…` = the base58 sha256 of `cargo near build reproducible-wasm` at commit `c74bd5c` (two builds, the same hash); deploy tx [`83biMoi8…`](https://testnet.nearblocks.io/txns/83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy, and the reproducible build"; B8 |
+| The contract on chain is a reproducible build of a published commit | Demonstrated | code hash `7fgVdHPV…` = the base58 sha256 of `cargo near build reproducible-wasm` at commit `c86db11`; deploy tx [`YxMNwuWZ…`](https://testnet.nearblocks.io/txns/YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy, and the reproducible build"; B8 |
 | 135 contract unit tests pass | Implemented | `cargo test -p kintsugi-contract`; [`docs/evidence/account_cap/contract_unit_tests.txt`](docs/evidence/account_cap/contract_unit_tests.txt) |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | Implemented | `cargo test -p kintsugi-check`; [docs/EVIDENCE.md](docs/EVIDENCE.md), S1 |
 | A per-account cap on attempt slots | Demonstrated | deployed 2026-10-26 (tx [`DVv7N9o1…`](https://testnet.nearblocks.io/txns/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7)); bounty 25: a second commit by one account refused ([`docs/evidence/account_cap/deploy_summary.txt`](docs/evidence/account_cap/deploy_summary.txt)) |

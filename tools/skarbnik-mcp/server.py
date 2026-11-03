@@ -26,7 +26,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 NETWORKS = {
     "testnet": {"contract": "kintsugi-l2-cihdp.testnet", "rpc": ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"],
                 "feed": "https://skarbnik.xyz/feed.json"},
@@ -379,12 +379,35 @@ def ns_utc(ns):
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(int(ns) / 1e9))
 
 
-def bounty_checks(cfg, b, acct=None):
-    """The checks of AGENTS.md section 2 that can be read from the chain; each says ok or why not."""
+# What each level means, in the words an agent uses with its user (AGENTS.md section 2).
+LEVEL_MEANING = {
+    2: "the contract checks the proof itself.",
+    1: ("the contract trusts an answer from OutLayer running our pinned verifier program; the vendor's watch asks for "
+        "the check; if no check arrives, the timeout rule applies."),
+    0: "registered verifiers decide, run by the project today.",
+}
+
+
+def near(yocto):
+    """yoctoNEAR (a decimal string) as NEAR, for messages: "0.015 NEAR"."""
+    whole, frac = divmod(int(yocto), 10 ** 24)
+    frac = str(frac).rjust(24, "0").rstrip("0")[:6]
+    return f"{whole}{'.' + frac if frac else ''} NEAR"
+
+
+def level_line(b):
+    """The sentence to tell the user before a commit: the fee and the level with its meaning."""
+    lv = b.get("level")
+    return f"Fee {near(b['next_fee'])}. Level {lv}: {LEVEL_MEANING.get(lv, 'unknown level')}"
+
+
+def bounty_checks(cfg, b, acct=None, level_0_ok=False):
+    """The checks of AGENTS.md section 2 that can be read from the chain; each says ok or why not. Levels 2 and 1 are
+    allowed; Level 0 only when the user explicitly asked for it (level_0_ok)."""
     now = time.time_ns()
     out = {
         "open": b["state"] == "Open" and b["opened"],
-        "level_2": b["level"] == 2,
+        "level_allowed": b["level"] in (1, 2) or (b["level"] == 0 and bool(level_0_ok)),
         "published_checker": b["image_id_allowed"] and b["image_id"] == PUBLISHED_IMAGE_ID,
         "free_slot": b["active"] < b["max_commits"],
         "time_left": now + int(b["reveal_window_ns"]) + int(b["verdict_window_ns"]) <= int(b["expires_at_ns"]),
@@ -406,8 +429,9 @@ def t_list_bounties(cfg, a):
     f = feed(cfg)
     rows = [b for b in f["bounties"] if b.get("accepts_commits") or not a.get("only_open", True)]
     return {"feed": cfg["feed"], "generated_at_utc": f.get("generated_at_utc"),
-            "note": "A snapshot; get_bounty reads the live state before you commit.",
-            "bounties": [{"bounty_id": b["bounty_id"], "status": b["status"], "kind": b.get("kind"), "accepts_commits": b.get("accepts_commits"),
+            "note": "A snapshot; get_bounty reads the live state before you commit. Tell your user each bounty's level and its meaning with the fee.",
+            "bounties": [{"bounty_id": b["bounty_id"], "level": b.get("level"), "level_meaning": LEVEL_MEANING.get(b.get("level")),
+                          "status": b["status"], "kind": b.get("kind"), "accepts_commits": b.get("accepts_commits"),
                           "reward": b.get("reward"), "next_fee": b.get("next_fee"), "max_commits": b.get("max_commits"),
                           "slots_in_use": b.get("slots_in_use"), "max_commits_per_account": b.get("max_commits_per_account"),
                           "max_patch_bytes": b.get("max_patch_bytes"), "windows": b.get("windows"), "target": b.get("target"),
@@ -426,6 +450,8 @@ def t_get_bounty(cfg, a):
             "next_fee", "max_patch_bytes", "reveal_gap_ns", "reveal_window_ns", "verdict_window_ns", "expires_at_ns",
             "image_id", "image_id_allowed", "original_hash", "corpus_hash", "winner")
     return {"bounty": {k: b.get(k) for k in keep}, "expires_at_utc": ns_utc(b["expires_at_ns"]),
+            "level_meaning": LEVEL_MEANING.get(b.get("level")),
+            "tell_the_user": level_line(b) + " Wait for their yes before commit.",
             "checks": bounty_checks(cfg, b, acct), "checks_for_account": acct}
 
 
@@ -495,7 +521,7 @@ def t_check_patch(cfg, a):
     with open(path, "wb") as f:
         f.write(mod)
     r["patch_path"] = path
-    r["next"] = (f"tell the user the fee (get_bounty) and wait for a yes, then commit with patch_path {path}" if r.get("ready_to_commit")
+    r["next"] = (f"tell the user in one message the fee and the bounty's level with its meaning (get_bounty's tell_the_user) and wait for a yes, then commit with patch_path {path}" if r.get("ready_to_commit")
                  else "fix the problems above and check again")
     return r
 
@@ -569,7 +595,7 @@ def t_commit(cfg, a):
         raise Fail(f"no bounty {bid}")
     if not patch or len(patch) > b["max_patch_bytes"]:
         raise Fail(f"the patch is {len(patch)} bytes; this bounty takes 1 to {b['max_patch_bytes']}")
-    checks = bounty_checks(cfg, b, acct)
+    checks = bounty_checks(cfg, b, acct, level_0_ok=a.get("level_0_ok", False))
     if not checks["ok_to_commit"]:
         raise Fail("refused before sending: " + ", ".join(k for k, v in checks.items() if not v and k != "ok_to_commit"))
     payout = a.get("payout") or acct
@@ -649,9 +675,9 @@ def t_status(cfg, a):
 
 
 TOOLS = {
-    "list_bounties": (t_list_bounties, "Bounties from the Skarbnik feed (a snapshot): terms, next fee, slots, windows and the public code links.",
+    "list_bounties": (t_list_bounties, "Bounties from the Skarbnik feed (a snapshot): each bounty's level and what it means, terms, next fee, slots, windows and the public code links.",
                       {"only_open": {"type": "boolean", "description": "only bounties accepting commits (default true)"}}, []),
-    "get_bounty": (t_get_bounty, "The live state of one bounty from the contract, and the checks to pass before committing (for the key's account when a key is set).",
+    "get_bounty": (t_get_bounty, "The live state of one bounty from the contract, its level and what that means, the sentence to tell your user (the fee and the level with its meaning, in one message), and the checks to pass before committing (for the key's account when a key is set).",
                    {"bounty_id": {"type": "string", "description": "the bounty id"}}, ["bounty_id"]),
     "get_public_code": (t_get_public_code, "The public code of a bounty: the Rust source with its known bug, the build flags, the public tests (input as hex and the value the original returns) and what a fix must do. The module is checked against the hash on chain.",
                         {"bounty_id": {"type": "string"}}, ["bounty_id"]),
@@ -661,8 +687,9 @@ TOOLS = {
                     {"bounty_id": {"type": "string"}, "rust_source": {"type": "string", "description": "the complete fixed .rs file"}}, ["bounty_id", "rust_source"]),
     "get_credit": (t_get_credit, "Credit in the contract and agent limits of an account (default: the key's account).",
                    {"account_id": {"type": "string"}}, []),
-    "commit": (t_commit, "Commit a patch (a .wasm file) to a bounty: checks the bounty and the key, makes a nonce, builds the fingerprint, saves the nonce next to the key (mode 600), then sends commit with the limited key. Takes the attempt fee from credit.",
+    "commit": (t_commit, "Commit a patch (a .wasm file) to a bounty: checks the bounty and the key, makes a nonce, builds the fingerprint, saves the nonce next to the key (mode 600), then sends commit with the limited key. Takes the attempt fee from credit. Before calling it, tell your user in one message the fee and the bounty's level with its meaning (get_bounty's tell_the_user), and wait for their yes. Levels 2 and 1 are taken; Level 0 only if your user explicitly asked for it (level_0_ok).",
                {"bounty_id": {"type": "string"}, "patch_path": {"type": "string", "description": "path of the patched .wasm module"},
+                "level_0_ok": {"type": "boolean", "description": "true only if your user explicitly asked for a Level 0 bounty"},
                 "payout": {"type": "string", "description": "payout account (default: the key's account)"}}, ["bounty_id", "patch_path"]),
     "reveal": (t_reveal, "Reveal a committed patch (after the bounty's reveal gap, within its reveal window). The patch becomes public.",
                {"bounty_id": {"type": "string"}, "index": {"type": "integer", "description": "the attempt index commit returned"}}, ["bounty_id", "index"]),
@@ -677,8 +704,8 @@ def handle(msg):
         return {"protocolVersion": (msg.get("params") or {}).get("protocolVersion", "2025-06-18"),
                 "capabilities": {"tools": {}}, "serverInfo": {"name": "skarbnik", "version": VERSION},
                 "instructions": "Skarbnik bounties on NEAR (testnet by default). Read AGENTS.md at https://skarbnik.xyz/agents.md. "
-                                "Work order: list_bounties, get_public_code, check_patch (WebAssembly text; or build_patch from Rust), get_bounty (tell the user the fee and "
-                                "wait for a yes), commit, then reveal after the reveal gap, then status."}
+                                "Work order: list_bounties, get_public_code, check_patch (WebAssembly text; or build_patch from Rust), get_bounty (tell the user in one message the fee and "
+                                "the bounty's level with its meaning, and wait for a yes), commit, then reveal after the reveal gap, then status."}
     if method == "ping":
         return {}
     if method == "tools/list":

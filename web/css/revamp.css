@@ -365,3 +365,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* Evidence Lab: a little room between a label and its large number */
 .sk :where(.p-evidence) b.big{display:block;margin-top:6px}
 .sk .jg-time{margin-left:8px;font:500 14px/1.4 var(--fu);color:var(--tx3);white-space:nowrap}
+/* For vendors, Host: the three levels, three short lines each */
+.sk .v-lv{margin:12px 0 0;display:flex;flex-direction:column;gap:10px}
+.sk .v-lv dt{font:600 12px/1.4 var(--fu);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+.sk .v-lv dd{margin:2px 0 0;font-size:14.5px;line-height:1.5;color:var(--tx2)}

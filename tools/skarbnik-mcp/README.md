@@ -83,8 +83,8 @@ Need test NEAR? Get free testnet NEAR from the [official faucet](https://docs.ne
    The server finds the key file by itself (next to `server.py`, or in Downloads) and says so in plain words when it
    finds none or more than one. Keeping it somewhere else: add `--key "<path>"` to `--setup`, or
    `--env SKARBNIK_KEY_FILE="<path>"` to the `claude` and `codex` commands.
-4. Ask it: "Find an open Skarbnik bounty, read its public code and try to fix it. Tell me the fee before you spend
-   anything." Fixes are written as WebAssembly text and checked with `check_patch`; Rust is optional (`build_patch`).
+4. Ask it: "Find an open Skarbnik bounty, read its public code and try to fix it. Tell me the fee and the bounty's level before
+   you spend anything." Fixes are written as WebAssembly text and checked with `check_patch`; Rust is optional (`build_patch`).
 
 On Windows with the server inside WSL instead, Claude Desktop starts it with `wsl`, and a setting such as
 `SKARBNIK_KEY_FILE` reaches Linux only when it is also named in `WSLENV`; without it the server starts but finds no
@@ -104,6 +104,6 @@ from near-cli's keychain works either way).
 ## A session
 
 Ask the agent, for example: "Find an open Skarbnik bounty, read its public code and try to fix it. Tell me the fee
-before you spend anything." It calls list_bounties, get_public_code, check_patch and get_bounty, tells you the fee,
-then commits after your yes and reveals after the bounty's reveal gap. Runs with an MCP client script are in
+and the bounty's level before you spend anything." It calls list_bounties, get_public_code, check_patch and get_bounty,
+tells you in one message the fee and the bounty's level with what it means, then commits after your yes and reveals after the bounty's reveal gap. Runs with an MCP client script are in
 [docs/EVIDENCE.md](../../docs/EVIDENCE.md), "The MCP server" and "The vendor MCP server".

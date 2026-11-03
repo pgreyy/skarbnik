@@ -12,7 +12,7 @@ const crypto = require('node:crypto');
 const { Worker } = require('node:worker_threads');
 const SITE = require('../../site.config.json');
 
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const BASE = 'https://skarbnik.xyz/';
 const CONTRACT = SITE.contract;
 const RPCS = SITE.rpc_urls;
@@ -213,10 +213,17 @@ function fingerprint(bytes, payout, nonce) {
   return sha256(Buffer.concat([Buffer.from('kintsugi-commit-v1'), a, Buffer.from(bytes), c, p, nonce]));
 }
 
-async function checks(b, account) {
+// What each level means, in the words an agent uses with its user (AGENTS.md section 2).
+const LEVEL_MEANING = {
+  2: 'the contract checks the proof itself.',
+  1: 'the contract trusts an answer from OutLayer running our pinned verifier program; the vendor\'s watch asks for the check; if no check arrives, the timeout rule applies.',
+  0: 'registered verifiers decide, run by the project today.',
+};
+// Levels 2 and 1 are taken; Level 0 only when the user explicitly asked for it.
+async function checks(b, account, level0ok = false) {
   const now = BigInt(Date.now()) * 1000000n;
   const out = {
-    open: b.state === 'Open' && b.opened, level_2: b.level === 2, published_checker: b.image_id_allowed && b.image_id === IMAGE_ID,
+    open: b.state === 'Open' && b.opened, level_allowed: b.level === 2 || b.level === 1 || (b.level === 0 && level0ok === true), published_checker: b.image_id_allowed && b.image_id === IMAGE_ID,
     free_slot: b.active < b.max_commits, time_left: now + BigInt(b.reveal_window_ns) + BigInt(b.verdict_window_ns) <= BigInt(b.expires_at_ns),
   };
   const [credit, limits] = await Promise.all([view('get_credit', { account_id: account }), view('get_agent_limits', { account_id: account })]);
@@ -232,7 +239,7 @@ async function bounty(bid) { const b = await view('get_bounty', { bounty_id: bid
 // ---------- tools ----------
 const TOOLS = {
   list_bounties: {
-    ro: true, d: 'Open Skarbnik bounties from the feed (a snapshot): reward, next attempt fee, slots, windows. Call get_bounty for the live state.',
+    ro: true, d: 'Open Skarbnik bounties from the feed (a snapshot): each bounty\'s level and what it means, reward, next attempt fee, slots, windows. Call get_bounty for the live state.',
     p: { only_open: { type: 'boolean', description: 'only bounties accepting attempts (default true)' } }, r: [],
     async run(k, a) {
       const f = await feed();
@@ -244,23 +251,25 @@ const TOOLS = {
         const b = await view('get_bounty', { bounty_id: String(id) }).catch(() => null);
         if (!b || b.state !== 'Open' || !b.opened || b.active >= b.max_commits) continue;
         const same = f.bounties.find((x) => x.original_hash === b.original_hash && x.public_code);
-        rows.push({ bounty_id: id, status: 'Open for attempts (newer than the feed)', kind: same ? same.kind : undefined, program: same && same.program, module_description: same && same.module_description,
+        rows.push({ bounty_id: id, level: b.level, status: 'Open for attempts (newer than the feed)', kind: same ? same.kind : undefined, program: same && same.program, module_description: same && same.module_description,
           reward: near(b.amount), next_fee: near(b.next_fee), slots_left: b.max_commits - b.active, max_commits: b.max_commits, max_commits_per_account: b.max_commits_per_account,
           max_patch_bytes: b.max_patch_bytes, commit_deadline_utc: nsUtc(BigInt(b.expires_at_ns) - BigInt(b.reveal_window_ns) - BigInt(b.verdict_window_ns)) });
       }
-      return { generated_at_utc: f.generated_at_utc, network: 'testnet', bounties: rows.map((b) => ({ bounty_id: String(b.bounty_id), status: b.status, kind: b.kind, test_bounty: b.test_bounty || undefined,
+      return { generated_at_utc: f.generated_at_utc, network: 'testnet', bounties: rows.map((b) => ({ bounty_id: String(b.bounty_id), level: b.level, level_meaning: LEVEL_MEANING[b.level], status: b.status, kind: b.kind, test_bounty: b.test_bounty || undefined,
         program: b.program, description: b.module_description, reward: b.reward, next_fee: b.next_fee, slots_left: b.slots_left, max_commits: b.max_commits,
         max_commits_per_account: b.max_commits_per_account, max_patch_bytes: b.max_patch_bytes, commit_deadline_utc: b.commit_deadline_utc })),
         next: 'pick one, call get_public_code, then check_patch with your fix' };
     },
   },
   get_bounty: {
-    ro: true, d: 'One bounty read live from the contract, with the checks to pass before committing for this link\'s account (credit, fee limit, slots, time).',
+    ro: true, d: 'One bounty read live from the contract: its level and what it means, the sentence to tell the user (the fee and the level with its meaning, in one message), and the checks to pass before committing for this link\'s account (credit, fee limit, slots, time).',
     p: { bounty_id: { type: 'string' } }, r: ['bounty_id'],
     async run(k, a) {
       const b = await bounty(String(a.bounty_id));
       const c = await checks(b, k.account);
-      return { bounty_id: String(b.id), state: b.state, opened: b.opened, reward: near(b.amount), next_fee: near(b.next_fee), next_fee_yocto: b.next_fee,
+      return { bounty_id: String(b.id), level: b.level, level_meaning: LEVEL_MEANING[b.level],
+        tell_the_user: `Fee ${near(b.next_fee)}. Level ${b.level}: ${LEVEL_MEANING[b.level] || 'unknown level'} Wait for their yes before commit.`,
+        state: b.state, opened: b.opened, reward: near(b.amount), next_fee: near(b.next_fee), next_fee_yocto: b.next_fee,
         slots_in_use: b.active, max_commits: b.max_commits, max_patch_bytes: b.max_patch_bytes, reveal_gap_seconds: Number(BigInt(b.reveal_gap_ns) / 1000000000n),
         reveal_window_seconds: Number(BigInt(b.reveal_window_ns) / 1000000000n), verdict_window_hours: Number(BigInt(b.verdict_window_ns) / 3600000000000n),
         expires_at_utc: nsUtc(b.expires_at_ns), account: k.account, credit: near(c.credit_yocto), checks: c.checks };
@@ -290,7 +299,7 @@ const TOOLS = {
     async run(k, a) {
       const bid = String(a.bounty_id); const b = await bounty(bid); const bytes = await patchBytes(a);
       const c = await checkPatch(bid, bytes, b);
-      return { ...c, ready_to_commit: patchOk(c), fee: near(b.next_fee), next: patchOk(c) ? `tell the user the fee (${near(b.next_fee)}) and wait for a yes, then call commit with the same wat` : 'fix the problems above and check again' };
+      return { ...c, ready_to_commit: patchOk(c), fee: near(b.next_fee), level: b.level, next: patchOk(c) ? `tell the user in one message the fee (${near(b.next_fee)}) and the level: Level ${b.level}: ${LEVEL_MEANING[b.level] || 'unknown level'} Wait for a yes, then call commit with the same wat` : 'fix the problems above and check again' };
     },
   },
   get_credit: {
@@ -298,13 +307,14 @@ const TOOLS = {
     async run(k) { const [c, l] = await Promise.all([view('get_credit', { account_id: k.account }), view('get_agent_limits', { account_id: k.account })]); return { account: k.account, credit: near(c), credit_yocto: String(c), limits: l }; },
   },
   commit: {
-    ro: false, d: 'Commit a fix to a bounty: sends a sealed fingerprint of it and takes the attempt fee from credit. Only after the user said yes to the fee. The fix must pass check_patch. Keep the same wat: reveal needs it.',
-    p: { bounty_id: { type: 'string' }, wat: { type: 'string' }, patch_base64: { type: 'string' }, payout: { type: 'string', description: 'payout account (default: the account\'s fixed payout, else the account)' } }, r: ['bounty_id'],
+    ro: false, d: 'Commit a fix to a bounty: sends a sealed fingerprint of it and takes the attempt fee from credit. Only after you told the user in one message the fee and the bounty\'s level with its meaning (get_bounty\'s tell_the_user) and they said yes. Levels 2 and 1 are taken; Level 0 only if the user explicitly asked for it (level_0_ok). The fix must pass check_patch. Keep the same wat: reveal needs it.',
+    p: { bounty_id: { type: 'string' }, wat: { type: 'string' }, patch_base64: { type: 'string' }, payout: { type: 'string', description: 'payout account (default: the account\'s fixed payout, else the account)' },
+      level_0_ok: { type: 'boolean', description: 'true only if the user explicitly asked for a Level 0 bounty' } }, r: ['bounty_id'],
     async run(k, a) {
       const bid = String(a.bounty_id); const b = await bounty(bid); const bytes = await patchBytes(a);
       const c = await checkPatch(bid, bytes, b);
       if (!patchOk(c)) throw new Fail(`refused before sending: the fix does not pass check_patch (${JSON.stringify({ fits: c.fits, same_as_original: c.same_as_original, interface: c.interface_problem, public_tests: c.public_tests && `${c.public_tests.passed} of ${c.public_tests.of}` })})`);
-      const ch = await checks(b, k.account);
+      const ch = await checks(b, k.account, a.level_0_ok === true);
       if (!ch.checks.ok_to_commit) throw new Fail('refused before sending: ' + Object.entries(ch.checks).filter(([n, v]) => !v && n !== 'ok_to_commit').map(([n]) => n).join(', '));
       const payout = a.payout || ch.limits.fixed_payout || k.account;
       const fp = fingerprint(bytes, payout, nonceFor(k, bid, payout, bytes));
@@ -357,7 +367,7 @@ async function handleMessage(k, msg) {
   if (method === 'initialize') {
     const want = msg.params && msg.params.protocolVersion;
     return ok({ protocolVersion: SUPPORTED.includes(want) ? want : SUPPORTED[1], capabilities: { tools: { listChanged: false } }, serverInfo: { name: 'skarbnik', title: 'Skarbnik (testnet)', version: VERSION },
-      instructions: 'Skarbnik repair bounties on NEAR testnet, with a key that can only commit and reveal. Order: list_bounties, get_public_code, check_patch until it is ready, get_bounty, tell the user the fee and wait for a yes, commit, then reveal after the gap with the same wat, then status.' });
+      instructions: 'Skarbnik repair bounties on NEAR testnet, with a key that can only commit and reveal. Order: list_bounties, get_public_code, check_patch until it is ready, get_bounty, tell the user the fee and the bounty\'s level with its meaning in one message and wait for a yes, commit, then reveal after the gap with the same wat, then status.' });
   }
   if (id === undefined || id === null) return null; // notifications (initialized, cancelled) need no answer
   if (method === 'ping') return ok({});

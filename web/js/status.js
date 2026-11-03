@@ -1,11 +1,15 @@
 // One status per bounty, with the same rules as the agent feed (scripts/gen_feed.py, status_of), so the site and
 // feed.json never disagree; the kind of a bounty (private, demo or test, and whether it is a judge bounty or a new
 // module); whether it accepts a commit now; and the chip each status is shown with. Mint is used only for Proof
-// verified; Timeout settlement and Refunded are neutral; Failed and Proof rejected are coral, always with a word.
+// verified, the one status where the contract checked the proof itself (Level 2); a Level 1 payment is Verified by
+// OutLayer (the contract trusted OutLayer's answer), a Level 0 payment Verifiers attested; Timeout settlement and
+// Refunded are neutral; Failed and Proof rejected are coral, always with a word.
 import { commitBy, nsToDate } from './chain.js';
 
 export const STATUS = {
-  'Proof verified': { cls: 'k-proof', icon: 'check', help: 'The contract checked a proof for the paid attempt.' },
+  'Proof verified': { cls: 'k-proof', icon: 'check', help: 'The contract checked a proof for the paid attempt (Level 2).' },
+  'Verified by OutLayer': { cls: 'k-await', icon: 'seal', help: 'OutLayer ran the pinned verifier program on the proof and the contract paid on its answer. The contract did not check the proof itself (Level 1).' },
+  'Verifiers attested': { cls: 'k-await', icon: 'seal', help: 'Two registered verifiers attested the verdict and the contract paid on their word (Level 0).' },
   'Proof rejected': { cls: 'k-reject', icon: 'x', help: 'A valid proof said FAIL for an attempt. The bounty is still open.' },
   'Awaiting evaluation': { cls: 'k-await', icon: 'hourglass', help: 'A patch was revealed and no verdict has arrived yet.' },
   'Timeout settlement': { cls: 'k-timeout', icon: 'hourglass', help: 'No proof arrived in the window. The contract paid by rule. This is not a proof.' },
@@ -32,7 +36,8 @@ export const accepting = (b, now = Date.now()) => b.state === 'Open' && b.opened
 export function statusOf(b, subs, kind, now = Date.now()) {
   if (b.state === 'Paid') {
     const w = b.winner !== null && b.winner !== undefined ? subs[b.winner] : null;
-    return w && w.outcome === 'TimedOut' ? 'Timeout settlement' : 'Proof verified';
+    if (w && w.outcome === 'TimedOut') return 'Timeout settlement';
+    return b.level === 1 ? 'Verified by OutLayer' : b.level === 0 ? 'Verifiers attested' : 'Proof verified';
   }
   if (b.state === 'Refunded') return 'Refunded';
   if (kind === 'demo' || kind === 'test') return 'Demo or test only';

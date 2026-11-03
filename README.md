@@ -109,8 +109,8 @@ One verdict also tells the agent one bit about the secret, so each bounty caps i
   testnet NEAR from the [official faucet](https://docs.near.org/getting-started/faucet) or
   [near-faucet.io](https://near-faucet.io/). A faucet can run out; if it does, ask in the
   [NEAR dev Telegram](https://t.me/neardev). The near-cli-rs command in TRY_IT step 5 makes a funded account too.
-- **Verify the contract yourself:** rebuild it with `cargo near build reproducible-wasm` at commit `c74bd5c` and get the
-  code hash on chain, `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u` ([docs/TRY_IT.md](docs/TRY_IT.md), step 11).
+- **Verify the contract yourself:** rebuild it with `cargo near build reproducible-wasm` at commit `c86db11` and get the
+  code hash on chain, `7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC` ([docs/TRY_IT.md](docs/TRY_IT.md), step 11).
 - **The full tour:** [JUDGE_GUIDE.md](JUDGE_GUIDE.md): three steps in the browser, about 5 minutes (Quick), an optional
   fourth where you run it yourself, about 2 more minutes, then an optional check on your own machine (Verify), the
   claims with what each does not prove, and the limits.
@@ -263,8 +263,8 @@ You need Rust 1.99.1, Python 3.11 or later, and for the rebuilds Docker with bui
 git clone https://github.com/pgreyy/skarbnik && cd skarbnik
 cargo test -p kintsugi-contract                           # 135 passed
 ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 17  # rebuilds the checker: MATCH
-git checkout c74bd5c && (cd contract && cargo near build reproducible-wasm) && git checkout -
-sha256sum target/near/kintsugi_contract/kintsugi_contract.wasm   # ecf697be...421e, the code on chain
+git checkout c86db11 && (cd contract && cargo near build reproducible-wasm) && git checkout -
+sha256sum target/near/kintsugi_contract/kintsugi_contract.wasm   # 630ed909...50bb, the code on chain
 python3 -m http.server 8000 --directory web               # the site at http://localhost:8000/
 ```
 
