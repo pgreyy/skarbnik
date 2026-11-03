@@ -3,7 +3,8 @@
 // previous, next, replay, the step tabs (arrow keys, Home and End), a "Try it" control per step, the technical detail
 // toggle, and a proof path and a timeout path at step 4 (the timeout path says "This is not a proof"). An illustrative
 // walkthrough, not connected to the contract; the same story is written out in plain text below it, then the "who
-// sees what" matrix, the three levels (who decides a verdict) and "What Skarbnik is, and isn't" (the scope, in two lists).
+// sees what" matrix, the three levels (who decides, what the vendor
+// needs, trust; #/how-it-works/levels opens the page there) and "What Skarbnik is, and isn't" (the scope, in two lists).
 import { $, esc, icon, note, chip } from '../ui.js';
 import { matrix } from './matrix.js';
 import { PUBLISHED_IMAGE_ID } from '../chain.js';
@@ -26,7 +27,7 @@ const STEPS = (proof) => [
 ];
 const SEQ = [{ step: 0, lens: 'agent' }, { step: 0, lens: 'eval' }, { step: 1, phase: 'commit' }, { step: 1, phase: 'reveal' }, { step: 2, tech: false }, { step: 2, tech: true }, { step: 3, path: 'proof' }, { step: 3, path: 'timeout' }];
 
-export async function how(viewEl) {
+export async function how(viewEl, part) {
   const st = { step: 0, lens: 'agent', phase: 'commit', path: 'proof', tech: false, playing: false };
   let timer = null, tick = 0;
   viewEl.innerHTML = `<main id="main" class="p-how" tabindex="-1">
@@ -38,25 +39,25 @@ export async function how(viewEl) {
 <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><button class="btn btn-p" type="button" data-play></button><a class="lnk" href="#/bounties">Skip this, browse open bounties ${icon('right')}</a></div>
 <p class="small faint">An illustrative walkthrough. It is not connected to the contract. Real bounties are on the <a class="lnk" href="#/bounties">Bounties</a> page.</p>
 </div></div></section>
-<section style="padding-bottom:96px"><div class="wrap"><div class="card story" id="story"></div></div></section>
-<section class="sec rule" aria-labelledby="plain-h"><div class="wrap"><div style="max-width:760px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">The same story in plain text</p><h2 class="h2" id="plain-h">Four steps, written out</h2>
-${STEPS(true).map((s, i) => `<div><h3 class="h4" style="margin-top:8px">${i + 1}. ${esc(s.title)}</h3><p class="body" style="margin-top:6px">${esc(s.p1)} ${esc(s.p2)}</p></div>`).join('')}
-<div><h3 class="h4" style="margin-top:8px">4b. If the vendor goes silent</h3><p class="body" style="margin-top:6px">${esc(STEPS(false)[3].p1)} ${esc(STEPS(false)[3].p2)} This is not a proof: a timeout payment shows only that the vendor did not answer in time.</p></div>
+<section class="h-story"><div class="wrap"><div class="card story" id="story"></div></div></section>
+<section class="sec rule" aria-labelledby="plain-h"><div class="wrap"><div style="max-width:760px;display:flex;flex-direction:column;gap:24px"><div class="stack g12"><p class="eyebrow">The same story in plain text</p><h2 class="h2" id="plain-h">Four steps, written out</h2></div>
+${STEPS(true).map((s, i) => `<div><h3 class="h4">${i + 1}. ${esc(s.title)}</h3><p class="body" style="margin-top:6px">${esc(s.p1)} ${esc(s.p2)}</p></div>`).join('')}
+<div><h3 class="h4">4b. If the vendor goes silent</h3><p class="body" style="margin-top:6px">${esc(STEPS(false)[3].p1)} ${esc(STEPS(false)[3].p2)} This is not a proof: a timeout payment shows only that the vendor did not answer in time.</p></div>
 </div></div></section>
 <section class="sec rule" aria-labelledby="who-h" style="background:var(--bg2)"><div class="wrap">
-<div style="max-width:720px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Who knows what</p><h2 class="h2" id="who-h">What can each party see?</h2><p class="lead">The same story as a table. The contract enforces rules and checks the proof. It does not run the private evaluation.</p></div>
+<div style="max-width:720px;display:flex;flex-direction:column;gap:12px"><p class="eyebrow">Who knows what</p><h2 class="h2" id="who-h">What can each party see?</h2><p class="lead">The same story as a table. The contract enforces rules and checks the proof. It does not run the private evaluation.</p></div>
 <div id="howMatrix"></div></div></section>
 <section class="sec rule" id="levels" aria-labelledby="levels-h"><div class="wrap">
-<div style="max-width:760px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Levels</p><h2 class="h2" id="levels-h">Who decides a verdict?</h2><p class="lead">The vendor picks one of three levels when it creates a bounty. The story above is Level 2, the default.</p></div>
-<table class="n-tab" style="max-width:980px"><caption class="sr-only">The three levels</caption><thead><tr><th scope="col">Level</th><th scope="col">Who decides</th><th scope="col">Trust</th></tr></thead><tbody>
-<tr><td><b>Level 2</b></td><td><span class="tlab">Who decides </span>The contract checks a Groth16 proof of each fix itself.</td><td><span class="tlab">Trust </span>The published checker and the contract. The only level called paid by proof.</td></tr>
-<tr><td><b>Level 1</b></td><td><span class="tlab">Who decides </span>OutLayer runs the verifier program pinned on chain on the proof, and the contract trusts its answer.</td><td><span class="tlab">Trust </span>OutLayer and its operator, and that it can still download the pinned program from GitHub.</td></tr>
-<tr><td><b>Level 0</b></td><td><span class="tlab">Who decides </span>Two registered verifiers sign each verdict.</td><td><span class="tlab">Trust </span>The verifiers, today both run by the project.</td></tr>
+<div style="max-width:760px;display:flex;flex-direction:column;gap:12px"><p class="eyebrow">Levels</p><h2 class="h2" id="levels-h">Who decides a verdict?</h2><p class="lead">The vendor picks one of three levels when it creates a bounty. The story above is Level 2, the default.</p></div>
+<table class="n-tab" style="max-width:1080px"><caption class="sr-only">The three levels</caption><thead><tr><th scope="col">Level</th><th scope="col">Who decides</th><th scope="col">What the vendor needs</th><th scope="col">Trust</th></tr></thead><tbody>
+<tr><td><b>Level 2</b></td><td><span class="tlab">Who decides </span>The contract checks a Groth16 proof of each fix itself.</td><td><span class="tlab">What the vendor needs </span>The Groth16 step: Docker, an x86 computer and about 7.6 GiB, on its machine or a rented one. About 0.004 NEAR of gas a proof.</td><td><span class="tlab">Trust </span>The published checker and the contract. The only level called paid by proof.</td></tr>
+<tr><td><b>Level 1</b></td><td><span class="tlab">Who decides </span>OutLayer runs the verifier program pinned on chain on the proof, and the contract trusts its answer.</td><td><span class="tlab">What the vendor needs </span>No Groth16 step. About 0.011 NEAR a check, and about 2.8 NEAR held during each check and returned.</td><td><span class="tlab">Trust </span>OutLayer and its operator, and that it can still download the pinned program from GitHub.</td></tr>
+<tr><td><b>Level 0</b></td><td><span class="tlab">Who decides </span>Two registered verifiers sign each verdict.</td><td><span class="tlab">What the vendor needs </span>Nothing proved on chain; the verifiers must sign in time.</td><td><span class="tlab">Trust </span>The verifiers, today both run by the project.</td></tr>
 </tbody></table>
 <p class="small" style="margin-top:16px;max-width:760px">At every level a timeout is a timeout: if no verdict arrives in time, the waiting attempts are paid by rule, and it is never shown as a pass.</p>
 </div></section>
 <section class="sec rule" id="scope" aria-labelledby="isnt-h"><div class="wrap">
-<div style="max-width:720px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Scope</p><h2 class="h2" id="isnt-h">What Skarbnik is, and isn’t</h2></div>
+<div style="max-width:720px;display:flex;flex-direction:column;gap:12px"><p class="eyebrow">Scope</p><h2 class="h2" id="isnt-h">What Skarbnik is, and isn’t</h2></div>
 <div class="r-isnt">
 <div class="card"><p class="eyebrow" style="color:var(--mn)">It is</p><ul class="n-ul"><li>${icon('check')}<span>A private repair bounty system on NEAR testnet</span></li><li>${icon('check')}<span>For small WebAssembly programs with a known crash and a reference fix</span></li><li>${icon('check')}<span>A way to check a fix against a hidden test, with a proof of that one check</span></li><li>${icon('check')}<span>A NEAR contract that holds the reward and pays by fixed rules</span></li><li>${icon('check')}<span>Open to AI agents and to independent developers</span></li></ul></div>
 <div class="card"><p class="eyebrow" style="color:var(--co)">It isn’t</p><ul class="n-ul no"><li>${icon('x')}<span>A security audit, or proof that a program is safe against everything</span></li><li>${icon('x')}<span>A tool for any kind of software, firmware or vulnerability</span></li><li>${icon('x')}<span>Production ready, or live on mainnet</span></li><li>${icon('x')}<span>A place where the secret goes on chain. Only its fingerprint does</span></li><li>${icon('x')}<span>A proof when a bounty is paid by timeout. A timeout is never a PASS</span></li></ul></div>
@@ -128,4 +129,6 @@ ${STEPS(true).map((s, i) => `<div><h3 class="h4" style="margin-top:8px">${i + 1}
     if (e.target.closest('[data-tech]')) { stop(); st.tech = !st.tech; draw(); const t = story.querySelector('[data-tech]'); if (t) t.focus(); }
   });
   draw();
+  // #/how-it-works/levels (the "Compare the levels" link on For vendors): the comparison, after the router's scroll to top
+  if (part === 'levels') setTimeout(() => { const el = viewEl.querySelector('#levels'); if (el) el.scrollIntoView(); }, 0);
 }

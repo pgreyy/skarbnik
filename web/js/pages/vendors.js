@@ -17,23 +17,17 @@ const SERVER = 'skarbnik/tools/skarbnik-vendor-mcp/server.py';
 const T = 'tools/skarbnik-vendor';
 const PROMPT = 'Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me which level to use, Level 2 unless I choose otherwise, and explain the three levels in plain words. Ask me for each file path you need. Never open, read out or print my secret input file, only use its path. Show me the cost and the time first, and wait for my yes before you publish or spend on a GPU.';
 const WAYS = [{ id: 'ai', label: 'AI', sub: 'Easiest' }, { id: 'cmd', label: 'Commands', sub: 'Advanced' }];
-// The three levels a bounty can be created at, each in three short lines. Level 2 is the default and the headline.
+// The level choice: three short cards, Level 2 recommended; a tap shows what that level needs. The full comparison (who
+// decides, what you need, trust) is on How it works (#/how-it-works/levels).
 const LEVELS = [
-  ['2', 'Default', 'The contract checks the proof', [
-    ['Who decides', 'The contract checks a Groth16 proof of each fix itself.'],
-    ['What you need', 'The Groth16 step: Docker, an x86 computer and about 7.6 GiB, on your machine or a rented one. About 0.004 NEAR of gas a proof.'],
-    ['Trust', 'The published checker and the contract’s own proof check. Nobody else.']]],
-  ['1', 'Level 1', 'OutLayer checks the proof', [
-    ['Who decides', 'OutLayer runs the verifier program pinned on chain, and the contract trusts its answer.'],
-    ['What you need', 'No Groth16 step. About 0.011 NEAR a check, and about 2.8 NEAR held during each check and returned.'],
-    ['Trust', 'OutLayer and its operator, and that OutLayer can still download the pinned program from GitHub.']]],
-  ['0', 'Level 0', 'Verifiers sign', [
-    ['Who decides', 'Two registered verifiers sign each verdict.'],
-    ['What you need', 'Nothing proved on chain; the verifiers must sign in time.'],
-    ['Trust', 'The verifiers. Today both are run by the project.']]],
+  ['2', 'The contract checks the proof itself.', 'Docker, an x86 computer and about 7.6 GiB for the Groth16 step.'],
+  ['1', 'OutLayer checks it; the contract trusts the answer.', 'No Groth16 step; about 2.8 NEAR held during each check, then returned.'],
+  ['0', 'Registered verifiers decide, run by the project today.', 'Nothing proved on chain; the verifiers must sign in time.'],
 ];
-const levelsHtml = `<div class="stack g16"><div class="stack g8"><h3 class="h3">Choose a level</h3><p class="small">The level is fixed when you create the bounty. Level 2 is the default: the only level where the contract checks the proof itself.</p></div>
-  <div class="n-4 a-three v-levels">${LEVELS.map(([n, who, title, rows]) => `<div class="card"><p class="n-who">${esc(who)}</p><h4 class="h4">Level ${n}: ${esc(title)}</h4><dl class="v-lv">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div>`).join('')}</div></div>`;
+const levelsHtml = `<div class="stack g24 sub" id="vLevels"><h3 class="h3">How should the bounty be verified?</h3>
+  <div class="v-levels" role="group" aria-label="Verification level">${LEVELS.map(([n, line]) => `<button type="button" class="card v-lvc" data-lv="${n}" aria-pressed="${n === '2'}"><span class="v-lvn">Level ${n}${n === '2' ? '<span class="v-rec">Recommended</span>' : ''}</span><span class="small">${esc(line)}</span></button>`).join('')}</div>
+  <div class="stack g8"><p class="small" id="vLvNeed" aria-live="polite"><b>You need:</b> ${esc(LEVELS[0][2])}</p>
+  <p class="small">Not sure? Pick Level 2. <a class="lnk sm" href="#/how-it-works/levels">Compare the levels</a></p></div></div>`;
 const li = (items) => `<ol class="ag-ol">${items.map((t) => `<li>${t}</li>`).join('')}</ol>`;
 const forNow = '<span class="chip l-plan">for now</span>';
 
@@ -145,7 +139,7 @@ ${ntab(['Outcome', 'What happens'], [
 export async function vendors(viewEl, tab, sub) {
   const t0 = { need: 'setup', private: 'privacy', proving: 'compute' }[tab] || tab;
   const way = sub === 'way-cmd' ? 'cmd' : 'ai';
-  const host = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">From your bug to a paid fix</h2><p class="body">Everything runs on NEAR testnet. Two ways, same result.</p></div>
+  const host = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">From your bug to a paid fix</h2><p class="body">Everything runs on NEAR testnet. Two ways, same result.</p></div>
     <div class="card ag-card"><div class="ag-step" style="grid-template-columns:minmax(0,1fr)"><div class="stack g16">${picker('vway', WAYS, way, 'Ways to host a bounty')}
     ${WAYS.map((w) => pickPanel('vway', w.id, way, w.id === 'ai' ? aiWay : cmdWay)).join('')}</div></div></div>
     ${levelsHtml}
@@ -155,7 +149,7 @@ export async function vendors(viewEl, tab, sub) {
       <div class="card"><p class="n-who">Then</p><h3 class="h4">The contract pays, or doesn’t</h3><p class="small">At Level 2 it checks the proof itself; at Level 1 it trusts OutLayer’s answer. A timeout is shown as a timeout, never as a pass.</p></div>
     </div>
     <div class="stack g12">${CHECKED}${PAYMENT}</div></div>`;
-  const setup = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">What you need</h2><p class="body">${REQ}</p></div>
+  const setup = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">What you need</h2><p class="body">${REQ}</p></div>
     <table class="n-tab"><caption class="sr-only">What a vendor needs</caption><tbody>
     <tr><td><b>A small WebAssembly program with a known crash</b></td><td>The buggy program and its public tests. This is what agents receive.</td></tr>
     <tr><td><b>A fix that works</b></td><td>Your own reference fix. Proof 0 shows it passes before the bounty opens.</td></tr>
@@ -163,20 +157,20 @@ export async function vendors(viewEl, tab, sub) {
     <tr><td><b>Test NEAR for the reward</b></td><td>At least 0.1 test NEAR, fixed when you fund the bounty.</td></tr>
     <tr><td><b>A machine to prove on</b> ${forNow}</td><td>A rented GPU is fast, about 4 cents a proof. Later, proving is planned to be handled by Skarbnik or NEAR.</td></tr>
     </tbody></table>${NEED.replace('id="vNeed"', 'id="vNeed3"')}</div>`;
-  const privacy = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">What stays private</h2><p class="body">On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p></div>
+  const privacy = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">What stays private</h2><p class="body">On private bounties, researchers and the public never see the secret input. Demo bounties use a public input so anyone can check them.</p></div>
     <div class="r-priv">
       <div class="p"><b class="k">Private</b><b class="h4">The secret test input</b><span class="small">Never sent to agents or to NEAR. Only its fingerprint is stored.</span></div>
       <div class="p"><b class="k">Private</b><b class="h4">Your reference fix</b><span class="small">Only its hash is public.</span></div>
       <div><b class="k">Public</b><b class="h4">The program</b><span class="small">The buggy program and its public tests. Agents work from these.</span></div>
       <div><b class="k">Public</b><b class="h4">An agent’s fix, once revealed</b><span class="small">Public on chain after the reveal.</span></div>
     </div></div>`;
-  const compute = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Where proving runs</h2><p class="body">You choose. The secret sits wherever you prove.</p></div>
+  const compute = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">Where proving runs</h2><p class="body">You choose. The secret sits wherever you prove.</p></div>
     <table class="n-tab"><caption class="sr-only">Where proving runs</caption><thead><tr><th scope="col">Where</th><th scope="col">Speed</th><th scope="col">Who can see the secret</th></tr></thead><tbody>
     <tr><td><b>Your own machine</b></td><td><span class="tlab">Speed </span>Depends on your hardware, faster with a GPU</td><td><span class="tlab">Who can see the secret </span>Only you</td></tr>
     <tr><td><b>A GPU you rent</b></td><td><span class="tlab">Speed </span>Fast: in our automatic run about 17 minutes from reveal to payment</td><td><span class="tlab">Who can see the secret </span>You and the GPU host for those minutes</td></tr>
     <tr><td><b>Sealed hardware</b> <span class="chip l-exp">Experimental</span></td><td><span class="tlab">Speed </span>Depends on CPU or GPU: a sealed CPU took about 2 hours (bounty 33); a sealed GPU is planned, not built</td><td><span class="tlab">Who can see the secret </span>The secret is locked so only the sealed machine can open it, checked with its hardware certificate; run once on testnet</td></tr>
     </tbody></table></div>`;
-  const limits = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Limits</h2><p class="body">Read these before you plan anything.</p></div>
+  const limits = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">Limits</h2><p class="body">Read these before you plan anything.</p></div>
     <ul class="n-ul warn" style="max-width:820px">
     <li>${icon('alert')}<span><b>Testnet only.</b> No mainnet contract exists. The deposit is test NEAR.</span></li>
     <li>${icon('alert')}<span><b>Small programs only.</b> Crash bugs in small WebAssembly modules, not any software.</span></li>
@@ -210,6 +204,13 @@ export async function vendors(viewEl, tab, sub) {
   if (tab && t0 !== tab) history.replaceState(null, '', `#/vendors/${t0}`);
   viewEl.querySelectorAll('[data-tablink]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); show(a.dataset.tablink, true); viewEl.querySelector('#vTabs').scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
   const pick = bindPicker(viewEl, (id) => { history.replaceState(null, '', `#/vendors/host/way-${id}`); });
+  // the level cards: a tap marks one and shows what it needs
+  viewEl.addEventListener('click', (e) => {
+    const c = e.target.closest('[data-lv]'); if (!c) return;
+    viewEl.querySelectorAll('[data-lv]').forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+    const need = viewEl.querySelector('#vLvNeed'); const row = LEVELS.find(([n]) => n === c.dataset.lv);
+    if (need && row) need.innerHTML = `<b>You need:</b> ${esc(row[2])}`;
+  });
   tabNav.onSub = (sv) => { if (/^way-(ai|cmd)$/.test(sv || '')) pick['Ways to host a bounty'](sv.slice(4)); };
 
   try {

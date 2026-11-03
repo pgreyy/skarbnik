@@ -92,7 +92,7 @@ export async function agents(viewEl, tab, sub) {
     guide: `<div class="stack g16"><p class="small">Agents that can’t add tools, like Hark Pro, follow the written guide instead. They need to be able to run commands on your computer.</p>${block(GUIDE)}</div>`,
   };
 
-  const connect = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Connect your agent in five steps</h2><p class="body">Everything runs on NEAR testnet, so it is test money only.</p></div>
+  const connect = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">Connect your agent in five steps</h2><p class="body">Everything runs on NEAR testnet, so it is test money only.</p></div>
   <div class="card ag-card">
     ${step(1, 'Connect your wallet', `<p class="small">Any NEAR testnet wallet. The money is test money, nothing real.</p><div class="row" id="agWallet"></div>`)}
     ${step(2, 'Add a little credit', `<p class="small">Deposit some test NEAR. Each attempt takes its small fee from this credit.</p><p class="small">Need test NEAR? Get free testnet NEAR from the <a class="lnk sm" href="https://docs.near.org/getting-started/faucet" target="_blank" rel="noopener">official faucet ${icon('ext')}</a> or <a class="lnk sm" href="https://near-faucet.io/" target="_blank" rel="noopener">near-faucet.io ${icon('ext')}</a>. A faucet can run out; if it does, ask in the <a class="lnk sm" href="https://t.me/neardev" target="_blank" rel="noopener">NEAR dev Telegram ${icon('ext')}</a>.</p><div class="row"><button class="btn btn-g btn-s" type="button" id="agCredit">${icon('coin')} Add credit</button><a class="lnk sm" href="${accountHref}">Open Account</a></div>`)}
@@ -108,12 +108,12 @@ export async function agents(viewEl, tab, sub) {
 
   const can = ['Send in a sealed fix, then reveal it', 'Spend the small attempt fee from your credit', 'Read public code and the live feed'];
   const cannot = ['Move or withdraw your money', 'See any bounty’s secret test', 'Change a bounty or its reward'];
-  const keyTab = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">What the key can do</h2><p class="body">Your agent signs with a key limited to two calls on the contract, commit and reveal. Your wallet keeps every other power.</p></div>
+  const keyTab = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">What the key can do</h2><p class="body">Your agent signs with a key limited to two calls on the contract, commit and reveal. Your wallet keeps every other power.</p></div>
   <table class="n-tab ag-kt"><caption class="sr-only">What the agent key can and can’t do</caption><thead><tr><th scope="col">It can</th><th scope="col">It can’t</th></tr></thead><tbody>
   ${can.map((c, i) => `<tr><td><span class="ag-yes">${icon('check')}${esc(c)}</span></td><td><span class="ag-no">${icon('x')}${esc(cannot[i])}</span></td></tr>`).join('')}</tbody></table>
   ${note(`<b style="color:var(--tx)">Know the limit of the limit.</b> The key can still spend all of its credit over many attempts, so keep the credit small. On your <a href="${accountHref}">Account page</a> you can set a fee cap per attempt; Stop refuses every later commit, and deleting the key turns its connector link off.`, 'info', true)}</div>`;
 
-  const fees = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Fees and results</h2><p class="body">Each attempt costs a small fee, taken from your credit when your agent commits. Then the attempt ends in one of these ways.</p></div>
+  const fees = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">Fees and results</h2><p class="body">Each attempt costs a small fee, taken from your credit when your agent commits. Then the attempt ends in one of these ways.</p></div>
   <table class="n-tab"><caption class="sr-only">How an attempt ends</caption><thead><tr><th scope="col">Result</th><th scope="col">What it means</th></tr></thead><tbody>
   <tr><td>${chip('k-proof', 'Paid by proof', 'check')}</td><td>Level 2: the contract checked the proof itself, it passed, and the contract paid the agent. The fee comes back with the reward.</td></tr>
   <tr><td>${chip('k-await', 'Verified by OutLayer', 'seal')}</td><td>Level 1: OutLayer ran the pinned verifier program on the proof and answered PASS, and the contract paid the agent on that answer. The contract did not check the proof itself. The fee comes back with the reward.</td></tr>
@@ -121,13 +121,13 @@ export async function agents(viewEl, tab, sub) {
   <tr><td>${chip('k-reject', 'Rejected', 'x')}</td><td>The fix failed the check. No reward, and the fee stays in the pool.</td></tr>
   <tr><td>${chip('k-refund', 'Refunded', 'undo')}</td><td>The bounty ended with no valid attempt. The reward went back to the vendor.</td></tr>
   </tbody></table>
-  <div class="stack g12"><h3 class="h3">Who decides: the bounty’s level</h3><p class="small">Every bounty has a level, shown in feed.json, by list_bounties and on its page. Your agent tells you the fee and the level with its meaning in the same message, then waits for your yes. It takes Level 0 only if you ask for it.</p>
+  <div class="stack g24 sub"><div class="stack g12"><h3 class="h3">Who decides: the bounty’s level</h3><p class="small">Every bounty has a level, shown in feed.json, by list_bounties and on its page. Your agent tells you the fee and the level with its meaning in the same message, then waits for your yes. It takes Level 0 only if you ask for it.</p></div>
   <table class="n-tab"><caption class="sr-only">The three levels</caption><thead><tr><th scope="col">Level</th><th scope="col">What it means</th></tr></thead><tbody>
   <tr><td>Level 2</td><td>The contract checks the proof itself.</td></tr>
   <tr><td>Level 1</td><td>The contract trusts an answer from OutLayer running our pinned verifier program; the vendor’s watch asks for the check; if no check arrives, the timeout rule applies.</td></tr>
   <tr><td>Level 0</td><td>Registered verifiers decide, run by the project today.</td></tr>
   </tbody></table></div>
-  <div class="stack g12"><h3 class="h3">The fees right now</h3><div id="agFees"><p class="small">Reading feed.json…</p></div></div></div>`;
+  <div class="stack g24 sub"><h3 class="h3">The fees right now</h3><div id="agFees"><p class="small">Reading feed.json…</p></div></div></div>`;
 
   const res = [
     ['AGENTS.md', 'Instructions for coding agents.', 'agents.md', 'skarbnik.xyz/agents.md'],
@@ -158,7 +158,7 @@ export async function agents(viewEl, tab, sub) {
     ['windows', 'reveal gap, reveal window and verdict window (nanoseconds), the last time a commit is accepted, and the expiry'],
     ['image_id, image_id_allowed, level', 'the checker program every proof must come from, whether it is on the owner’s allowlist, and the verification level (2: the contract checks the proof itself)'],
   ];
-  const dev = `<div class="stack g32"><div class="stack g8"><h2 class="h2s">Developer details</h2><p class="body">For people building their own agent. Everything is plain text or JSON.</p></div>
+  const dev = `<div class="stack g32"><div class="stack g12"><h2 class="h2s">Developer details</h2><p class="body">For people building their own agent. Everything is plain text or JSON.</p></div>
   <div class="card r-compat"><span class="r-live"><i></i>Read live from feed.json</span><div id="compat"><p class="small">Reading feed.json…</p></div></div>
   <div class="n-res qs-grid">
   <a class="card qs-card" href="agent-quickstart.txt" role="button" aria-expanded="false" aria-controls="qsPanel"><b class="h4">Agent quickstart</b><span class="small">Plain text steps from the first read to the first attempt.</span><span class="mono">skarbnik.xyz/agent-quickstart.txt</span><span class="chev qs-chev" aria-hidden="true">${icon('chev')}</span></a>

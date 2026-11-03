@@ -365,7 +365,25 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* Evidence Lab: a little room between a label and its large number */
 .sk :where(.p-evidence) b.big{display:block;margin-top:6px}
 .sk .jg-time{margin-left:8px;font:500 14px/1.4 var(--fu);color:var(--tx3);white-space:nowrap}
-/* For vendors, Host: the three levels, three short lines each */
-.sk .v-lv{margin:12px 0 0;display:flex;flex-direction:column;gap:10px}
-.sk .v-lv dt{font:600 12px/1.4 var(--fu);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
-.sk .v-lv dd{margin:2px 0 0;font-size:14.5px;line-height:1.5;color:var(--tx2)}
+/* For vendors, Host: the level choice, three short cards; the pressed one is marked like a picked way */
+.sk .v-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.sk .v-lvc{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px 20px;text-align:left;font:inherit;color:var(--tx2);cursor:pointer;transition:border-color .2s,background .2s}
+.sk .v-lvc:hover{border-color:var(--ln2)}
+.sk .v-lvc[aria-pressed=true]{border-color:var(--am);background:rgba(var(--am-rgb),.08)}
+.sk .v-lvn{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:600 17px/1.3 var(--fu);color:var(--tx)}
+.sk .v-rec{font:600 12px/1.4 var(--fu);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+@container sk (max-width:700px){.sk .v-levels{grid-template-columns:minmax(0,1fr)}}
+/* One rhythm for section headings on For vendors, For agents, How it works and the Evidence tabs: about 80 px above a
+   section heading (56 on a phone), 12 px from a heading to its intro line, 24 px from the intro to the content, 32 px
+   between card rows. .sub is a later section inside a tab panel's 24 px stack. */
+.sk :is(.p-vendors,.p-agents,.p-evidence) .panel .stack>.n-tab,.sk :is(.p-vendors,.p-agents,.p-evidence) .panel .stack>.n-4{margin-top:0}
+.sk :is(.p-vendors,.p-agents,.p-evidence) .panel .sub{margin-top:56px}
+.sk :is(.p-vendors,.p-agents,.p-evidence) .panel>:first-child{margin-top:36px}
+.sk :is(.p-vendors,.p-agents,.p-evidence) .panel .sub+.n-4{margin-top:8px}
+@container sk (max-width:700px){.sk :is(.p-vendors,.p-agents,.p-evidence) .panel .sub{margin-top:32px}.sk :is(.p-vendors,.p-agents,.p-evidence) .panel>:first-child{margin-top:24px}}
+/* How it works: the same rhythm; a section's content ends about 80 px (56 on a phone) above the next section's eyebrow */
+.sk .p-how .sec{padding:40px 0}
+.sk .p-how .h-story{padding-bottom:40px}
+.sk .p-how .sec .wrap>*+*{margin-top:24px}
+.sk .p-how #howMatrix>:first-child{margin-top:0}
+@container sk (max-width:700px){.sk .p-how .sec{padding:28px 0}.sk .p-how .h-story{padding-bottom:28px}}

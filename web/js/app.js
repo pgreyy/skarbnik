@@ -95,7 +95,7 @@ async function route() {
   }
   const view = $('#view');
   const screens = {
-    'how-it-works': () => how(view),
+    'how-it-works': () => how(view, rest[0]),
     bounties: () => (/^\d+$/.test(rest[0] || '') ? bounty(view, rest[0], rest[1]) : bounties(view)),
     raw: () => raw(view, rest[0]),
     evidence: () => evidence(view, rest[0]),

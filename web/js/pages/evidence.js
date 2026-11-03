@@ -163,7 +163,7 @@ export async function evidence(viewEl, tab) {
 
   // ---- Checker
   const check = rec.last_image_check && rec.last_image_check.result === 'MATCH' ? rec.last_image_check : null;
-  const checker = `<div class="stack g36">
+  const checker = `<div class="stack g24">
     <div style="max-width:700px"><h2 class="h2s">The approved checker</h2><p class="body" style="margin-top:12px">A proof counts only for one checker program. Its fingerprint, the image id, is the only id on the contract’s allowlist, and anyone can rebuild the checker and compare.</p></div>
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><p class="eyebrow" style="color:var(--tx3)">Image id on the allowlist</p>${check ? chip('l-demo', `MATCH on rebuild, ${check.utc.slice(0, 10)}`, 'check') : ''}</div>
@@ -183,8 +183,8 @@ export async function evidence(viewEl, tab) {
     <p class="small"><b class="txt">It does.</b> The id on chain is the id of the public checker source, built the reproducible way.</p>
     <p class="small"><b class="txt">It does not.</b> It does not show that the checker is complete, or that a passing fix is secure against everything. A proof says one patch passed or failed this defined check.</p>
     </div></div>
-    <div><h3 class="h3">What the checker runs on every patch</h3>
-    <div class="card" style="padding:8px 28px;margin-top:16px"><div class="steps">
+    <div class="sub"><h3 class="h3">What the checker runs on every patch</h3>
+    <div class="card" style="padding:8px 28px;margin-top:24px"><div class="steps">
     ${[['Validate the module', 'No imports, at most 2 memory pages, checked exports. The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.'], ['Run the secret input', 'It must not crash or run out of fuel, 50,000 units per input, in a fresh interpreter each time.'], ['Run the public tests', 'Every answer must match the original program’s.'], ['Run fairness inputs', 'Drawn from the reveal seed, so a patch cannot be tailored to them. They must match the original.'], ['Run crash variants', 'One or two byte changes of the secret must not crash where the original crashes.']]
       .map(([h, p], i) => `<div class="st"><span class="n">${i + 1}</span><div><b class="h4">${esc(h)}</b><p class="small" style="margin-top:4px">${esc(p)}</p></div></div>`).join('')}
     </div></div></div>
@@ -198,7 +198,7 @@ export async function evidence(viewEl, tab) {
     </div>`)}</div>`;
 
   // ---- Contract
-  const contract = `<div class="stack g36">
+  const contract = `<div class="stack g24">
     <div style="max-width:700px"><h2 class="h2s">The contract</h2><p class="body" style="margin-top:12px">It holds the money and the deadlines, checks Groth16 proofs with NEAR’s built in curve functions, and applies the rules. It does not run the private evaluation.</p></div>
     <div class="two">
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px"><h3 class="h3">Deployment, read live</h3><div id="deploy"><p class="small">${LOADING}</p></div></div>
@@ -235,7 +235,7 @@ export async function evidence(viewEl, tab) {
 
   // ---- Security Lab
   const ar = rec.arena, A = ar.attempts, K = A[0].budget, bitsTotal = Math.log2(ar.secret_space);
-  const lab = `<div class="stack g32">
+  const lab = `<div class="stack g24">
     <div style="max-width:700px"><div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px"><span class="chip l-demo">Demonstrated</span>${chip('k-test', 'Recorded, replayed here', 'flask')}</div><h2 class="h2s">Security Lab: how much can probing learn?</h2><p class="body" style="margin-top:12px">One verdict leaks at most one bit about the secret, so the attempt limit K is the leak budget. A probe agent tried to learn a ${Number(ar.secret_space).toLocaleString('en-US')} value secret one bit at a time. Step through what was recorded.</p><p class="small" style="margin-top:12px"><b class="txt">What this lab covers:</b> one attack only, learning the secret through many yes or no attempts. It does not cover other attacks: forged and replayed proofs are on the <a href="#/evidence/contract">Contract tab</a>, and timing and other side channels are not measured (<a href="#/evidence/limits">Limits</a>).</p></div>
     <div class="two" style="align-items:stretch">
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:22px">
@@ -250,7 +250,7 @@ export async function evidence(viewEl, tab) {
     <p class="small faint">A ${Number(ar.secret_space).toLocaleString('en-US')} value secret holds ${bitsTotal} bits. ${K} attempts reveal at most ${K}, which leaves ${(ar.secret_space / 2 ** K).toLocaleString('en-US')} candidates. Verdicts came from ${esc(ar.verdicts_from)}.</p>
     <div style="margin-top:auto">${tx((ar.chain.steps.find((s) => /ignored|fourth|4/i.test(s.what)) || ar.chain.steps[ar.chain.steps.length - 1]).tx)}<p class="small faint" style="margin-top:8px">The recorded run on an earlier testnet contract (${esc(ar.chain.contract)}), where the commit after the cap was ignored.</p></div>
     </div></div>
-    <div id="gu"><p class="small">Reading the guarded and unguarded runs…</p></div>
+    <div id="gu" class="sub"><p class="small">Reading the guarded and unguarded runs…</p></div>
     ${collapse('variantsOn', 'Crash variant check on', `<p class="small">With the check of ${esc(ar.control_variants)} variants of the secret input switched on, the same probes all FAIL whatever the secret, so the probe agent learns 0 bits.</p><div class="mt16">${table(['Probe', 'Verdict'], ar.control_variant_check_on.map((c) => [`<span class="mono">${esc(c.probe)}</span>`, c.verdict === 'PASS' ? chip('k-proof', 'PASS', 'check') : chip('k-fail', 'FAIL', 'x')]), '', 'Control')}</div>`)}
     ${collapse('capChain', 'The same cap on testnet', `<div>${table(['What happened', 'Result', 'Transaction', 'Time'], ar.chain.steps.map((t) => [esc(t.what), /refused/.test(t.result) ? chip('k-reject', 'Refused', 'x') : chip('k-refund', 'Succeeded', 'check'), tx(t.tx), t.time ? esc(t.time) : '<span class="faint">not recorded</span>']), 'wide', 'On testnet')}</div><p class="small faint mt8">Recorded in ${esc(ar.chain.source)} and ${esc(ar.source)}.</p>`)}
     </div>`;
@@ -294,7 +294,7 @@ export async function evidence(viewEl, tab) {
     if (!gu) { el.innerHTML = note('The guarded and unguarded runs are not recorded yet.'); return; }
     const pct = (x) => `${Math.round(x * 100)}%`, bar = (x) => `<span class="sharebar" role="img" aria-label="${pct(x)} of the secret"><i style="width:${Math.round(x * 100)}%"></i></span>`;
     const g = gu.guarded, u = gu.unguarded, bid = (g.where.match(/bounty (\d+)/) || [])[1];
-    el.innerHTML = `<h3 class="h3">Guarded vs unguarded</h3><p class="body" style="margin-top:8px;max-width:760px">The same probe agent asks one yes or no question per attempt about one bit of a ${esc(gu.secret_bits)} bit secret. Without a cap it learns the whole secret; on the contract the cap stops it after ${esc(g.attempts_counted)} counted attempts, so it can learn at most ${esc(g.bits_at_most)} of ${esc(gu.secret_bits)} bits.</p>
+    el.innerHTML = `<h3 class="h3">Guarded vs unguarded</h3><p class="body" style="margin-top:12px;max-width:760px">The same probe agent asks one yes or no question per attempt about one bit of a ${esc(gu.secret_bits)} bit secret. Without a cap it learns the whole secret; on the contract the cap stops it after ${esc(g.attempts_counted)} counted attempts, so it can learn at most ${esc(g.bits_at_most)} of ${esc(gu.secret_bits)} bits.</p>
       <div class="two mt24">
       <div class="card pad28 stack g16"><div class="row" style="justify-content:space-between"><b class="h4">Guarded</b><span class="chip l-demo">Real, testnet</span></div>${table(['Measure', 'Value'], [['Attempts sent', `<span class="mono">${esc(g.attempts_sent)}</span>`], ['Attempts counted', `<span class="mono">${esc(g.attempts_counted)}</span><span class="small">cap K = ${esc(g.cap_K)}; the rest ignored at no cost</span>`], ['NEAR spent', `<span class="mono">${esc(g.fees_near)} NEAR in fees + ${esc(Number(g.gas_near).toFixed(4))} NEAR gas</span>`], ['Bits learned', `<span class="mono">at most ${esc(g.bits_at_most)}</span><span class="small">0 in this run: the probes were not revealed, so no verdict was asked for</span>`], ['Share of the secret exposed', `${bar(g.share_exposed_at_most)}<span class="mono">at most ${pct(g.share_exposed_at_most)}</span>`]], '', 'Guarded run')}
         <p class="small">${bid ? `<a href="#/bounties/${esc(bid)}">${esc(g.where)}</a>` : esc(g.where)}, probe account ${acct(g.account)}, ${esc(g.account_kind)} by the project. First commit ${tx(g.txs[0])}, first ignored commit ${tx(g.txs[g.attempts_counted])}.</p></div>

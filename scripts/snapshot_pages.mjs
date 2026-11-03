@@ -92,6 +92,8 @@ for (const entry of PAGES.filter((e) => !only || only.includes(e.path))) {
       const chev = b.querySelector('.chev'); if (chev) chev.remove();
       const span = document.createElement('span'); span.className = b.className; span.innerHTML = b.innerHTML; b.replaceWith(span);
     }
+    // the level cards on For vendors are buttons that also carry text a reader needs: kept as plain blocks
+    view.querySelectorAll('button.v-lvc').forEach((e) => { const d = document.createElement('div'); d.className = e.className; d.innerHTML = e.innerHTML; e.replaceWith(d); });
     view.querySelectorAll('button, dialog, [aria-live]:empty').forEach((e) => e.remove());
     return view.innerHTML;
   });

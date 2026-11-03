@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: For vendors: a short level choice; one spacing rhythm for section headings
+
+- For vendors, Host: "How should the bounty be verified?" with three cards (the level and one line each, Level 2 marked
+  Recommended), one "You need:" line that changes when a card is tapped, "Not sure? Pick Level 2." and "Compare the
+  levels", a link to `#/how-it-works/levels`. The block is 57 words. The who decides, what the vendor needs and trust
+  detail moved into the comparison table on How it works, which gained a "What the vendor needs" column.
+- One rhythm on For vendors, For agents, How it works and the Evidence tabs: 80 px above a section heading (56 px at
+  phone widths), 12 px from a heading to its intro line, 24 px from the intro to the content, 32 px between card rows.
+  How it works' sections were 112 px apart on each side (about 224 px from one section's content to the next heading).
+- Measured with a private browser script at 1440, 1024, 980, 768 and 390, dark and light: every section heading on the
+  four pages on the rule.
+
 ## 2026-11-03: Level 1 through OutLayer, built, deployed and settled on testnet
 
 - GitHub download test (part A): four OutLayer testnet jobs naming a file by its commit pinned raw.githubusercontent.com
