@@ -1,0 +1,6 @@
+utc_start=2026-11-03T22:33:40Z
+step=b41_watch_submit_groth16
+method=submit_groth16
+signer=skarbnik-prover-bb2d00.testnet
+tx_hash=393Ub7PNLB2EYaRMeJvqkTnZc3JFcDrD6se66ais17np
+source=the transaction's block time and status, read with EXPERIMENTAL_tx_status and block

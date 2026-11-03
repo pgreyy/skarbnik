@@ -1,11 +1,11 @@
-bounty	step	account	transaction	result
-40	create_bounty	kintsugi-vendor-prnvm.testnet	CPQG1TNNn6RFGNYpSv9k6sfbDeCKtiXhRPwZrWv1FnPm	created, 0.1 NEAR reward held
-40	open_with_outlayer	kintsugi-vendor-prnvm.testnet	33KaXU68dqxRm4uAhgjtL14B2Q4QNFZQc3Pt9c1eLXpp	opened through OutLayer's check of Proof 0 (2.8 NEAR held, then returned less its fee)
-40	commit (attempt 0, a wrong fix)	skarbnik-agentc-d48260.testnet	4uLAeX7bPT8JGPbcLs8FWbV7ohxnzeeFFrtxqUhw9R3o	committed, fee 0.01 NEAR
-40	reveal (attempt 0)	skarbnik-agentc-d48260.testnet	2ayf4bzjqRuRCjW72PzHtSrrDVF7zBuK6ECnYY88bNHK	revealed 21:42:55 UTC
-40	check_with_outlayer (attempt 0)	skarbnik-prover-bb2d00.testnet	DvNgEFhAJ6wo9Qp82GHdBssPYZCJ1rJXUoaRduik5JME	OutLayer's answer: the attempt is Failed on chain; nobody paid
-41	create_bounty	kintsugi-vendor-prnvm.testnet	FXmh32zyiuscUC16Z2joEzu5nvgSxYgVtLJfihYo6tbW	created, 0.1 NEAR reward held
-41	open_with_groth16	kintsugi-vendor-prnvm.testnet	8M9t7sQzKR5v7KVfyneNGDwY51daSHA8XDbitoX2fDyq	opened: the contract checked the Proof 0 Groth16 proof
-41	commit (attempt 0, a wrong fix)	skarbnik-agentc-d48260.testnet	G7ZqFZ4gX5cjR2pBYiyXizviGLUrSsCedd7HwGq5eZ1x	committed, fee 0.01 NEAR
-41	reveal (attempt 0)	skarbnik-agentc-d48260.testnet	7eT7mgu144tnR8rvHDPGLMdAzKeMWveSSUkJh4Br1Pgt	revealed 22:24:35 UTC
-41	submit_groth16 (attempt 0)	skarbnik-prover-bb2d00.testnet	393Ub7PNLB2EYaRMeJvqkTnZc3JFcDrD6se66ais17np	the contract checked a FAIL proof; attempt Failed; nobody paid
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+b40_create	create_bounty	kintsugi-vendor-prnvm.testnet	CPQG1TNNn6RFGNYpSv9k6sfbDeCKtiXhRPwZrWv1FnPm	3133875544306		rpc:ok	
+b40_open	open_with_outlayer	kintsugi-vendor-prnvm.testnet	33KaXU68dqxRm4uAhgjtL14B2Q4QNFZQc3Pt9c1eLXpp	96980944505830		rpc:ok	
+b40_agent_commit_wrong_fix	commit	skarbnik-agentc-d48260.testnet	4uLAeX7bPT8JGPbcLs8FWbV7ohxnzeeFFrtxqUhw9R3o	3363722055123		rpc:ok	
+b40_agent_reveal_wrong_fix	reveal	skarbnik-agentc-d48260.testnet	2ayf4bzjqRuRCjW72PzHtSrrDVF7zBuK6ECnYY88bNHK	2856966202989		rpc:ok	
+b40_watch_check_with_outlayer	check_with_outlayer	skarbnik-prover-bb2d00.testnet	DvNgEFhAJ6wo9Qp82GHdBssPYZCJ1rJXUoaRduik5JME	97407824553526		rpc:ok	
+b41_create	create_bounty	kintsugi-vendor-prnvm.testnet	FXmh32zyiuscUC16Z2joEzu5nvgSxYgVtLJfihYo6tbW	3057948852447		rpc:ok	
+b41_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	8M9t7sQzKR5v7KVfyneNGDwY51daSHA8XDbitoX2fDyq	35268746216050		rpc:ok	
+b41_agent_commit_wrong_fix	commit	skarbnik-agentc-d48260.testnet	G7ZqFZ4gX5cjR2pBYiyXizviGLUrSsCedd7HwGq5eZ1x	3368260663467		rpc:ok	
+b41_agent_reveal_wrong_fix	reveal	skarbnik-agentc-d48260.testnet	7eT7mgu144tnR8rvHDPGLMdAzKeMWveSSUkJh4Br1Pgt	2859272469657		rpc:ok	
+b41_watch_submit_groth16	submit_groth16	skarbnik-prover-bb2d00.testnet	393Ub7PNLB2EYaRMeJvqkTnZc3JFcDrD6se66ais17np	35683906071649		rpc:ok	

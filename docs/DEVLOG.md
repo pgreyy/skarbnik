@@ -61,7 +61,11 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - Mistakes: my first syntax check of the changed page scripts did not catch an unescaped apostrophe, and the saved
   pages were made from a broken page; found by loading the pages, fixed and regenerated before the push. I sent bounty
   41's commit without waiting for `check_patch`, which had said not ready.
-- Next: the Bounties list says "No transaction recorded" for 40 and 41 until `scripts/gen_site_recorded.py` maps them.
+- `scripts/gen_site_recorded.py` maps bounties 40 and 41 to `docs/evidence/bounties_40_41/transactions.tsv` (each
+  row's signer, method and status, and its block time in `steps/`, read from the chain); the bounty pages list all five
+  transactions of each, the Bounties list its created transaction. A first rebuild hit HTTP 429 from both testnet RPC
+  nodes in `scripts/gen_feed.py`; the feed and the ledger do not use this mapping and were left as they were; the
+  saved pages were made again once the RPC answered.
 
 ## 2026-11-03: The vendor watch waits for a GPU instead of giving up
 

@@ -1,0 +1,6 @@
+utc_start=2026-11-03T21:47:09Z
+step=b40_watch_check_with_outlayer
+method=check_with_outlayer
+signer=skarbnik-prover-bb2d00.testnet
+tx_hash=DvNgEFhAJ6wo9Qp82GHdBssPYZCJ1rJXUoaRduik5JME
+source=the transaction's block time and status, read with EXPERIMENTAL_tx_status and block

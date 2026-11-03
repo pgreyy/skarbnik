@@ -1,0 +1,6 @@
+utc_start=2026-11-03T21:20:46Z
+step=b40_open
+method=open_with_outlayer
+signer=kintsugi-vendor-prnvm.testnet
+tx_hash=33KaXU68dqxRm4uAhgjtL14B2Q4QNFZQc3Pt9c1eLXpp
+source=the transaction's block time and status, read with EXPERIMENTAL_tx_status and block

@@ -1,0 +1,6 @@
+utc_start=2026-11-03T21:41:23Z
+step=b40_agent_commit_wrong_fix
+method=commit
+signer=skarbnik-agentc-d48260.testnet
+tx_hash=4uLAeX7bPT8JGPbcLs8FWbV7ohxnzeeFFrtxqUhw9R3o
+source=the transaction's block time and status, read with EXPERIMENTAL_tx_status and block

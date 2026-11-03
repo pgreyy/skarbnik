@@ -1838,6 +1838,110 @@
     "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
    }
   ],
+  "40": [
+   {
+    "step": "b40_create",
+    "method": "create_bounty",
+    "tx": "CPQG1TNNn6RFGNYpSv9k6sfbDeCKtiXhRPwZrWv1FnPm",
+    "what": "Bounty created",
+    "time": "2026-11-03 21:20 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   },
+   {
+    "step": "b40_open",
+    "method": "open_with_outlayer",
+    "tx": "33KaXU68dqxRm4uAhgjtL14B2Q4QNFZQc3Pt9c1eLXpp",
+    "what": "Opened with its Proof 0, checked by OutLayer (Level 1)",
+    "time": "2026-11-03 21:20 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   },
+   {
+    "step": "b40_agent_commit_wrong_fix",
+    "method": "commit",
+    "tx": "4uLAeX7bPT8JGPbcLs8FWbV7ohxnzeeFFrtxqUhw9R3o",
+    "what": "Attempt committed",
+    "time": "2026-11-03 21:41 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   },
+   {
+    "step": "b40_agent_reveal_wrong_fix",
+    "method": "reveal",
+    "tx": "2ayf4bzjqRuRCjW72PzHtSrrDVF7zBuK6ECnYY88bNHK",
+    "what": "Attempt revealed",
+    "time": "2026-11-03 21:42 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   },
+   {
+    "step": "b40_watch_check_with_outlayer",
+    "method": "check_with_outlayer",
+    "tx": "DvNgEFhAJ6wo9Qp82GHdBssPYZCJ1rJXUoaRduik5JME",
+    "what": "Proof of an attempt checked by OutLayer (Level 1)",
+    "time": "2026-11-03 21:47 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   }
+  ],
+  "41": [
+   {
+    "step": "b41_create",
+    "method": "create_bounty",
+    "tx": "FXmh32zyiuscUC16Z2joEzu5nvgSxYgVtLJfihYo6tbW",
+    "what": "Bounty created",
+    "time": "2026-11-03 22:19 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   },
+   {
+    "step": "b41_open",
+    "method": "open_with_groth16",
+    "tx": "8M9t7sQzKR5v7KVfyneNGDwY51daSHA8XDbitoX2fDyq",
+    "what": "Opened with its Proof 0",
+    "time": "2026-11-03 22:19 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   },
+   {
+    "step": "b41_agent_commit_wrong_fix",
+    "method": "commit",
+    "tx": "G7ZqFZ4gX5cjR2pBYiyXizviGLUrSsCedd7HwGq5eZ1x",
+    "what": "Attempt committed",
+    "time": "2026-11-03 22:23 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   },
+   {
+    "step": "b41_agent_reveal_wrong_fix",
+    "method": "reveal",
+    "tx": "7eT7mgu144tnR8rvHDPGLMdAzKeMWveSSUkJh4Br1Pgt",
+    "what": "Attempt revealed",
+    "time": "2026-11-03 22:24 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   },
+   {
+    "step": "b41_watch_submit_groth16",
+    "method": "submit_groth16",
+    "tx": "393Ub7PNLB2EYaRMeJvqkTnZc3JFcDrD6se66ais17np",
+    "what": "Proof of an attempt sent",
+    "time": "2026-11-03 22:33 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/bounties_40_41/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
+   }
+  ],
   "23": [
    {
     "step": "cleanup_b23_expire",

@@ -1,0 +1,6 @@
+utc_start=2026-11-03T22:24:34Z
+step=b41_agent_reveal_wrong_fix
+method=reveal
+signer=skarbnik-agentc-d48260.testnet
+tx_hash=7eT7mgu144tnR8rvHDPGLMdAzKeMWveSSUkJh4Br1Pgt
+source=the transaction's block time and status, read with EXPERIMENTAL_tx_status and block

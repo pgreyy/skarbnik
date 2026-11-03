@@ -1,0 +1,6 @@
+utc_start=2026-11-03T22:19:34Z
+step=b41_create
+method=create_bounty
+signer=kintsugi-vendor-prnvm.testnet
+tx_hash=FXmh32zyiuscUC16Z2joEzu5nvgSxYgVtLJfihYo6tbW
+source=the transaction's block time and status, read with EXPERIMENTAL_tx_status and block

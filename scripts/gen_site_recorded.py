@@ -112,6 +112,10 @@ BOUNTY_STEPS = [
     # 39 (watch in GPU mode, a wrong fix: FAIL)
     ("docs/evidence/level1_tool/transactions.tsv", "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp",
      {37: ["l1t_b37_"], 38: ["l1t_b38_"], 39: ["l1t_b39_"]}),
+    # Bounties 40 (Level 1, ringlog2) and 41 (Level 2, grid): K 8 with a cap of 2 per account, published from the laptop
+    # without the secret, Proof 0 and the watches on the VPS, one wrong fix each through tools/skarbnik-mcp (FAIL)
+    ("docs/evidence/bounties_40_41/transactions.tsv", "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp",
+     {40: ["b40_"], 41: ["b41_"]}),
     # The testnet cleanup of 2026-10-30: claim_timeout where a revealed attempt waited, expire on the expired bounties
     ("docs/evidence/cleanup_2026-10-30/transactions.tsv", "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)",
      {3: ["cleanup_b3_claim"], 26: ["cleanup_b26_claim"], 0: ["cleanup_b0_expire"], 2: ["cleanup_b2_expire"], 10: ["cleanup_b10_expire"],

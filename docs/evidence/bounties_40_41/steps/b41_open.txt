@@ -1,0 +1,6 @@
+utc_start=2026-11-03T22:19:40Z
+step=b41_open
+method=open_with_groth16
+signer=kintsugi-vendor-prnvm.testnet
+tx_hash=8M9t7sQzKR5v7KVfyneNGDwY51daSHA8XDbitoX2fDyq
+source=the transaction's block time and status, read with EXPERIMENTAL_tx_status and block
