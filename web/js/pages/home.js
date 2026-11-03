@@ -230,7 +230,7 @@ ${kv([['Verdict window', '4 hours'], ['Proof checked', 'No'], ['Secret input', '
 <p class="eyebrow">Check it yourself</p>
 <h2 class="h2 n-h2" id="fin-h">Check the transactions.</h2>
 <p class="lead">Every claim here points to a transaction, a file or a command. Where something is not proven, the label says so.</p>
-<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/judge">Take the 10 minute judge tour ${icon('right')}</a><a class="btn btn-g" href="#/bounties">Browse open bounties</a></div>
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/judge">Take the 5 minute judge tour ${icon('right')}</a><a class="btn btn-g" href="#/bounties">Browse open bounties</a></div>
 </div>
 <div class="n-links">
 <a class="vrow" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener"><span class="vico">${icon('cube')}</span><span><b class="h4" style="display:block">The contract on the explorer</b><span class="small">Read the code hash and the bounties on NEAR itself</span></span>${icon('ext')}</a>

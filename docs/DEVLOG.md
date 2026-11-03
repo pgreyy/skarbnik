@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: The judge tour is a 5 minute tour
+
+- Home's "Take the 10 minute judge tour" is now "Take the 5 minute judge tour", and docs/TRY_IT.md says "The 5 minute
+  tour" (and names the guide's Verify tab, not Level B). No other "10 minute", "ten minute" or "10 min" was about the
+  tour (the rest are measured times such as 6 h 10 min).
+- Timed with a private script on the Quick tab: words at 200 a minute plus 10 s for each link or button. Intro 50 words,
+  0 links, 15 s; step 1 122 words, 2 links, 57 s; step 2 85 words, 2 links, 46 s; step 3 89 words, 2 links, 47 s;
+  step 4 230 words (with its two commands), 4 links, 109 s. Total 274 s, 4.6 min. Not in this count: running step 4's
+  commands, which its note puts at about 2 minutes.
+
 ## 2026-11-03: Home buttons: Host a challenge, Run an agent
 
 - Home, "Take part": the two buttons to For vendors and For agents now say "Host a challenge" and "Run an agent". The

@@ -1,7 +1,7 @@
 # Try it: eleven steps from a fresh clone
 
-Every step names the command and what it prints, with the run that produced it. The 5 to 10 minute tour with no
-install is [JUDGE_GUIDE.md](../JUDGE_GUIDE.md); this is its hands-on part (Level B).
+Every step names the command and what it prints, with the run that produced it. The 5 minute tour with no
+install is [JUDGE_GUIDE.md](../JUDGE_GUIDE.md); this is its hands-on part (its Verify tab, steps B1 to B8).
 
 The facts the steps use:
 
