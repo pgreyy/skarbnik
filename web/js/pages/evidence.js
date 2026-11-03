@@ -89,7 +89,7 @@ export async function evidence(viewEl, tab) {
 <p class="eyebrow">Proof &amp; evidence</p>
 <h1>Read the real examples first. Then check the record.</h1>
 <p class="lead">Every claim here points to a transaction, a file or a command. Where something is not proven, the label says so. The examples show the outcomes a bounty can have.</p>
-<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/judge">Take the judge tour ${icon('right')}</a><a class="lnk" href="#/evidence/bounties" id="deeperLink">Go to the technical record</a><a class="lnk" href="#/evidence/overview" id="vocabLink">What the status labels mean</a><a class="lnk" href="#/evidence/limits">Read the limits</a></div>
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/judge">Take the judge tour ${icon('right')}</a><a class="lnk" href="#/evidence/bounties" id="deeperLink">Go to the technical record</a><a class="lnk" href="#/evidence/limits">Read the limits</a></div>
 </div></div></section>
 <section style="padding:0 0 112px"><div class="wrap"><div id="liveNote" aria-live="polite"></div><div id="etabs"></div></div></section></main>`;
   const overview = `<div class="stack g28">
@@ -263,7 +263,6 @@ export async function evidence(viewEl, tab) {
   drawNums();
   $('#ctSum').innerHTML = ctLine();
   showPaid();
-  $('#vocabLink').addEventListener('click', () => { const v = $('#vocab'); if (v) v.open = true; });
   // ledger filter
   const bindLedger = () => bindSeg($('#ledgerTop'), 'data-lf', (f) => { lf = f; $('#lrows').innerHTML = '<div class="lhead" aria-hidden="true"><span>Bounty</span><span>Settlement</span><span>Transactions</span><span>Note</span></div>' + ledgerRows(lf); });
   // security lab stepper

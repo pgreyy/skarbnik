@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Evidence hero link removed; no vertical scrollbar on tab strips
+
+- Evidence: the hero link "What the status labels mean" (its only job was to jump back to Overview and open that drop
+  down) is gone, on the page and the saved /evidence/ page; the drop down stays where it is.
+- Every tab strip (For agents, For vendors, Evidence, Judge guide, bounty pages): the strip's line is now drawn inside
+  it and the tabs no longer reach 1 px below it, so the strip has nothing to scroll up and down; overflow-y is hidden
+  and the scrollbar is not drawn. Tabs still scroll sideways when they do not fit.
+- Checked with a private script on the five pages at 1440, 1024, 768 and 390, dark and light: no vertical scroll, no
+  scrollbar, the last tab reachable, sideways scrolling at 390, no page sideways scroll, no script errors.
+
 ## 2026-11-03: Judge guide rebuilt: Quick, Verify, Claims, Limits
 
 - `JUDGE_GUIDE.md` is rewritten in the new shape and stays the source of the page: "Check Skarbnik in five minutes.",
