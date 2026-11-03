@@ -19,7 +19,7 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-11-03T21:37:29Z",
+ "generated_at_utc": "2026-11-03T22:04:26Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -240,29 +240,29 @@
   },
   {
    "bounty_id": 40,
-   "status": "Open for attempts",
+   "status": "Failed by OutLayer",
    "kind": "private",
    "judge_bounty": false,
    "retired_judge_bounty": false,
    "accepts_commits": true,
    "level": 1,
-   "program": null,
-   "module_description": null,
+   "program": "ringlog2",
+   "module_description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 2048,
    "reward_yocto": "100000000000000000000000",
    "reward": "0.1 NEAR",
    "max_commits": 8,
-   "attempts_used": 0,
-   "slots_in_use": 0,
+   "attempts_used": 1,
+   "slots_in_use": 1,
    "max_commits_per_account": 2,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
     "step_yocto": "5000000000000000000000",
     "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
    },
-   "next_fee_yocto": "10000000000000000000000",
-   "next_fee": "0.01 NEAR",
+   "next_fee_yocto": "15000000000000000000000",
+   "next_fee": "0.015 NEAR",
    "windows": {
     "reveal_gap_ns": "60000000000",
     "reveal_window_ns": "3600000000000",
@@ -274,8 +274,15 @@
    "image_id_allowed": true,
    "original_hash": "c4fa58a2bafe3d2595c57f9049a765c12c90329dd45977a2840c41a2012cfe5c",
    "corpus_hash": "da79b27dc8cc91e251d6d3bae0228a8b3615746d7dedc1ace69c6cab1186a5cb",
-   "public_code": null,
-   "slots_left": 8,
+   "public_code": {
+    "source": "code/ringlog2/original.rs",
+    "module": "code/ringlog2/original.wasm",
+    "tests": "code/ringlog2/public_tests.txt",
+    "build": "code/ringlog2/BUILD.txt",
+    "program": "ringlog2",
+    "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"
+   },
+   "slots_left": 7,
    "commit_deadline_utc": "2026-12-31T20:20:33Z",
    "expires_at_utc": "2027-01-02T21:20:33Z",
    "bounty_amount": "0.1 NEAR",
@@ -2085,29 +2092,29 @@
   },
   {
    "bounty_id": 40,
-   "status": "Open for attempts",
+   "status": "Failed by OutLayer",
    "kind": "private",
    "judge_bounty": false,
    "retired_judge_bounty": false,
    "accepts_commits": true,
    "level": 1,
-   "program": null,
-   "module_description": null,
+   "program": "ringlog2",
+   "module_description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 2048,
    "reward_yocto": "100000000000000000000000",
    "reward": "0.1 NEAR",
    "max_commits": 8,
-   "attempts_used": 0,
-   "slots_in_use": 0,
+   "attempts_used": 1,
+   "slots_in_use": 1,
    "max_commits_per_account": 2,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
     "step_yocto": "5000000000000000000000",
     "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
    },
-   "next_fee_yocto": "10000000000000000000000",
-   "next_fee": "0.01 NEAR",
+   "next_fee_yocto": "15000000000000000000000",
+   "next_fee": "0.015 NEAR",
    "windows": {
     "reveal_gap_ns": "60000000000",
     "reveal_window_ns": "3600000000000",
@@ -2119,7 +2126,14 @@
    "image_id_allowed": true,
    "original_hash": "c4fa58a2bafe3d2595c57f9049a765c12c90329dd45977a2840c41a2012cfe5c",
    "corpus_hash": "da79b27dc8cc91e251d6d3bae0228a8b3615746d7dedc1ace69c6cab1186a5cb",
-   "public_code": null
+   "public_code": {
+    "source": "code/ringlog2/original.rs",
+    "module": "code/ringlog2/original.wasm",
+    "tests": "code/ringlog2/public_tests.txt",
+    "build": "code/ringlog2/BUILD.txt",
+    "program": "ringlog2",
+    "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"
+   }
   }
  ],
  "paid_by_timeout": [

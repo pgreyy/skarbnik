@@ -1,0 +1,19 @@
+# Public tests for the event log (ringlog.rs).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+# The expected values were produced by running the original module:
+#   target/debug/skarbnik-check run --module original.wasm --input <hex>
+# Proof 0 (`skarbnik-check proof0`) re-checks that the original returns every one of them.
+-                                        292984781    # no operations
+05                                       1819549431   # append 5
+050681                                   1489684427   # append 5 and 6, read the last 2
+42                                       1853104669   # skip 3 slots
+0740088081                               153168033    # append, skip 1, append, read 1, read 2
+0102030405060708090a0b0c0d0e0f108f       1214434198   # 16 appends (the ring is full), read all 16
+0102030405060708090a0b0c0d0e0f10118f     1343934826   # 17 appends (the first slot is written again), read 16
+0102030405060708090a0b0c0d420580         1901535075   # 13 appends, skip 3 (back to the first slot), append, read 1
+c8c8c8c8c8c8c8c8c8c889                   828440114    # 10 appends of 72, read 10
+3fff81                                   1073978188   # append 63 and 127, read 2
+80                                       615415118    # read 1 of an empty ring
+090807400682                             1886648301   # three appends, skip 1, append, read 3
+414141418f                               77891346     # four skips of 2, read 16
+1415161718191a1b1c1d1e1f2021408f         396416667    # 14 appends, skip 1, read 16

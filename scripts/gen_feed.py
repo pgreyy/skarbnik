@@ -53,7 +53,9 @@ PACKAGES = {"demo": {"dir": "data/demo", "source": "original.rs", "module": "ori
             "unpack": {"dir": "data/unpack", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
                        "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"},
             "smooth": {"dir": "data/smooth", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
-                       "description": "a smoothing filter for a stream of sensor samples; no hint at its bug"}}
+                       "description": "a smoothing filter for a stream of sensor samples; no hint at its bug"},
+            "ringlog2": {"dir": "data/ringlog2", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
+                         "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"}}
 # What every fix must do, for every program (the checker's rules: harness/checker/src/lib.rs).
 TARGET = ("Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies "
           "of it where the original crashes, while giving the original's answers on every public test and on fresh inputs "
@@ -66,7 +68,7 @@ BUILD_TXT = """How to build a patch for this program (the same flags the vendor 
 rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \\
   -C codegen-units=1 -C target-cpu=mvp -C link-arg=-zstack-size=8192 -C link-arg=--initial-memory=131072 \\
   -C link-arg=--max-memory=131072 -o patch.wasm patch.rs
-Keep the interface: input_buf() -> i32 and parse(len: i32) -> i32. The patch must be at most the bounty's max_patch_bytes: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.
+Keep the interface: input_buf() -> i32 and parse(len: i32) -> i32. The patch must be at most the bounty's max_patch_bytes: the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page.
 Public tests: one per line, <input as hex, or - for empty> <value the original returns>. corpus_hash is sha256 over, for
 each test in order: input length (u32 little endian), input bytes, expected value (i32 little endian).
 """
