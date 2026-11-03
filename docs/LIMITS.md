@@ -2,7 +2,25 @@
 
 Every known limit in one list, one line each. The detail, with the code, the tests and the decisions behind each one,
 is in [SECURITY.md, section 3](SECURITY.md#3-known-limits); the review findings are in [AUDIT.md](AUDIT.md). Who can do
-what: [THREAT_MODEL.md](THREAT_MODEL.md). The site shows the same list: https://skarbnik.xyz/#/evidence/limits
+what: [THREAT_MODEL.md](THREAT_MODEL.md). The site shows the short version: https://skarbnik.xyz/#/evidence/limits
+
+## The five that matter most
+
+1. **Testnet only.** No mainnet contract exists; every transaction is on NEAR testnet with test NEAR, and every bounty
+   so far was set up and run by the Skarbnik team, not by outside customers.
+2. **Small programs only.** Crash bugs in small WebAssembly modules, patches up to 2,048 bytes; a bounty needs a working
+   reference fix before it opens.
+3. **Level 1 depends on OutLayer.** The contract trusts OutLayer and its operator and does not check the proof itself;
+   OutLayer must be up and able to download the pinned verifier file from GitHub (or still hold it in its cache), or no
+   check arrives and the timeout rule applies.
+4. **A timeout pays whatever was revealed.** The contract does not look at the fix, so a timeout payment is not a pass;
+   under a silent vendor an honest fix may get as little as 1/K of the reward.
+5. **What is not shown yet.** An external audit (the contract had AI review passes only), outside customers, a wallet
+   other than NEAR CLI signing a transaction, OutLayer downloading the pinned file afresh when the contract asks, and
+   sealed hardware for OutLayer's workers (never claimed).
+
+<details>
+<summary>More limits</summary>
 
 ## Scope
 
@@ -32,8 +50,8 @@ what: [THREAT_MODEL.md](THREAT_MODEL.md). The site shows the same list: https://
   (https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm,
   sha256 `e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8`) or holding it in its cache; when it cannot,
   no check arrives and the timeout rule applies. The owner sets that program for every Level 1 bounty and can change it.
-  Each check costs about 0.011 NEAR and holds 2.8 NEAR while OutLayer works (returned). Settled once on testnet
-  (bounty 36).
+  Each check costs about 0.011 NEAR and holds 2.8 NEAR while OutLayer works (returned). Run on testnet on
+  bounties 36 to 39 (36 by a script; 37, 38 and 39 through the vendor tool).
 
 ## The vendor and the secret
 
@@ -52,7 +70,7 @@ what: [THREAT_MODEL.md](THREAT_MODEL.md). The site shows the same list: https://
   still waiting; in the worst case an honest fix gets 1/K, and a copied fix gets an equal share.
 - A payout to an account that does not exist is lost; the site and `scripts/agent_preflight.sh` refuse such an
   account.
-- The protocol fee pool (fees of commits never revealed, and Level 2 fees of decided attempts) has no way out, by
+- The protocol fee pool (fees of commits never revealed, and Level 1 and Level 2 fees of decided attempts) has no way out, by
   design.
 - Storage is not charged to anyone; the contract's own balance covers it.
 
@@ -78,3 +96,5 @@ what: [THREAT_MODEL.md](THREAT_MODEL.md). The site shows the same list: https://
 - Older bounties (before the reproducible checker) use image ids nobody can rebuild; only bounties with the
   reproducible
   id `dd6c5f42...` can be checked with `./scripts/check_image_id.sh`.
+
+</details>

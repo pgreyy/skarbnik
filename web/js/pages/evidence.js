@@ -31,15 +31,16 @@ async function codeHash() {
   return null;
 }
 
+// The first five are the limits a judge needs first; the rest sit under "More limits".
 const LIMITS = (live) => [
   ['alert', 'am', 'Testnet only', 'No mainnet contract exists. Every transaction on this site is a testnet transaction, and every bounty so far was set up and run by the Skarbnik team, not by outside customers.', '<span id="paidSoFar">Loading from the contract</span>'],
   ['cube', '', 'Small programs only', 'Crash bugs in small WebAssembly modules. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. A vendor needs a working fix before posting; a crash with no known fix cannot be posted.'],
   ['link', 'am', 'Level 1 depends on OutLayer', 'At Level 1 the contract does not check the proof itself: it trusts OutLayer, and its operator, running the verifier program pinned on chain (get_outlayer). OutLayer must be up and able to download the pinned file from GitHub, or still hold it in its cache, which it can drop; if no check arrives, the timeout rule applies. A check costs about 0.011 NEAR and holds about 2.8 NEAR while OutLayer works, returned after. Only Level 2 is checked by the contract itself.'],
   ['hourglass', '', 'A timeout pays whatever was revealed', 'If no verdict arrives in time, the timeout rule splits the reward among the attempts still waiting. The contract does not read the fix, so this is not a pass; under a silent vendor an honest fix may get as little as 1/K of the bounty.'],
+  ['check', '', 'What is not shown yet', 'The path works on NEAR testnet and nothing wider. Not shown: an external audit (the contract had AI review passes only), outside customers, a wallet other than NEAR CLI signing a transaction, OutLayer downloading the pinned file afresh when the contract asks, and sealed hardware for OutLayer’s workers (never claimed).'],
   ['clock', '', 'Proving is slow without a GPU', 'On a laptop CPU one attempt takes about 1.5 to 2.5 hours to prove, plus the shrink step, so it can miss a 4 hour window; then the timeout rule applies. On a rented GPU the vendor’s watch took about 17 minutes from reveal to submit (bounty 32), about $0.04 of GPU a proof, with the secret in that machine’s RAM during the proof.'],
   ['key', 'am', live.fullKeys === 0 ? 'No full access key' : 'Full access key kept on purpose (testnet)', live.fullKeys === 0 ? 'Read live: the contract account has no full access key, so its code cannot be replaced.' : `The testnet contract’s account keeps a full access key, so its owner can replace the code under live bounties. This is deliberate: it’s an experimental testnet contract that will keep changing. The mainnet contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay). ${live.fullKeys === null ? 'The keys could not be read just now.' : `Read live: ${live.fullKeys} full access ${live.fullKeys === 1 ? 'key' : 'keys'}.`} To check that the code has not changed silently, compare the live code hash on the Contract tab with the last deploy in docs/EVIDENCE.md, “Contract code and every deploy”, which lists every deploy transaction.`],
   ['eye', '', 'Attempts are public and limited', 'After the reveal a patch is on chain for anyone to read. Each verdict tells a researcher at most one bit about the secret, so the attempt cap K is the leak budget; one person with many accounts can still fill a bounty’s slots.'],
-  ['check', '', 'What is not shown yet', 'The path works on NEAR testnet and nothing wider. Not shown: an external audit (the contract had AI review passes only), outside customers, a wallet other than NEAR CLI signing a transaction, OutLayer downloading the pinned file afresh when the contract asks, and sealed hardware for OutLayer’s workers (never claimed).'],
 ];
 
 const GH = 'https://github.com/pgreyy/skarbnik';
@@ -253,8 +254,14 @@ export async function evidence(viewEl, tab) {
     </div>`;
 
   // ---- Limits
-  const limits = `<div class="stack g32"><div style="max-width:700px"><h2 class="h2s">Known limitations, in plain words</h2><p class="body" style="margin-top:12px">These are the points a skeptical reader should check first. None of them is hidden elsewhere.</p></div><div class="lim" id="limList"></div></div>`;
-  const drawLimits = (live) => { const el = $('#limList'); if (el) el.innerHTML = LIMITS(live).map(([i, c, t, d, live2]) => `<div class="card"><span class="ic ${c}">${icon(i)}</span><div><h3 class="h4">${esc(t)}</h3><p class="small" style="margin-top:6px">${esc(d)}${live2 ? ` ${live2}` : ''}</p></div></div>`).join(''); showPaid(); };
+  const limits = `<div class="stack g32"><div style="max-width:700px"><h2 class="h2s">Known limitations, in plain words</h2><p class="body" style="margin-top:12px">These are the points a skeptical reader should check first. None of them is hidden elsewhere.</p></div><div class="lim" id="limList"></div>${collapse('limMore', 'More limits', '<div class="lim" id="limMoreList"></div>')}</div>`;
+  const limCard = ([i, c, t, d, live2]) => `<div class="card"><span class="ic ${c}">${icon(i)}</span><div><h3 class="h4">${esc(t)}</h3><p class="small" style="margin-top:6px">${esc(d)}${live2 ? ` ${live2}` : ''}</p></div></div>`;
+  const drawLimits = (live) => {
+    const cards = LIMITS(live), el = $('#limList'), more = $('#limMoreList');
+    if (el) el.innerHTML = cards.slice(0, 5).map(limCard).join('');
+    if (more) more.innerHTML = cards.slice(5).map(limCard).join('');
+    showPaid();
+  };
 
   const ids = { overview: 'Overview', bounties: 'Bounties', proofs: 'Proofs', contract: 'Contract', lab: 'Lab', limits: 'Limits' };
   const html = { overview, bounties: ledger, proofs: checker, contract, lab, limits };

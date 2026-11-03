@@ -338,7 +338,7 @@
         [
          "A Level 1 bounty settled on OutLayer's answer (the contract trusts OutLayer and does not check the proof)",
          "Demonstrated",
-         "bounty 36 (<a href=\"#/bounties/36\">https://skarbnik.xyz/#/bounties/36</a>): wrong fix FAIL <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">8HYqqjPy…</span></a>, real fix PASS and paid <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">3ZpV6zsg…</span></a>; through the vendor tool, bounties 37 and 38 paid on a PASS only; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/EVIDENCE.md\" target=\"_blank\" rel=\"noopener\">docs/EVIDENCE.md</a>, \"Level 1 through OutLayer\""
+         "bounty 36 (<a href=\"#/bounties/36\">https://skarbnik.xyz/#/bounties/36</a>): wrong fix FAIL <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">8HYqqjPy…</span></a>, real fix PASS and paid <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">3ZpV6zsg…</span></a>; through the vendor tool, bounties 37 and 38 paid on a PASS and bounty 39 FAIL <a class=\"tx\" href=\"https://testnet.nearblocks.io/txns/ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR\" target=\"_blank\" rel=\"noopener\"><span class=\"mono\">ogTyBybL…</span></a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/EVIDENCE.md\" target=\"_blank\" rel=\"noopener\">docs/EVIDENCE.md</a>, \"Level 1 through OutLayer\""
         ],
         [
          "No upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay)",
@@ -361,7 +361,12 @@
          "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/CONFIDENTIAL_PROVING.md\" target=\"_blank\" rel=\"noopener\">docs/CONFIDENTIAL_PROVING.md</a>; <a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>, item 1"
         ],
         [
-         "Vendor liveness bond and fallback evaluator",
+         "A vendor bond slashed on silence, and timeout rewards only for attempts that pass the public tests",
+         "Planned",
+         "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>"
+        ],
+        [
+         "Simpler levels: Level 2 as the product, Level 0 retired or kept for the project's own use",
          "Planned",
          "<a href=\"https://github.com/pgreyy/skarbnik/blob/main/docs/ROADMAP.md\" target=\"_blank\" rel=\"noopener\">docs/ROADMAP.md</a>"
         ],

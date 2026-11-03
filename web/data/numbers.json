@@ -1,10 +1,10 @@
 {
  "note": "Measured numbers the site shows that the chain cannot give. Each names the file that measured it.",
  "contract_unit_tests": {
-  "value": 135,
+  "value": 155,
   "text": "contract unit tests pass in the repository",
-  "source": "docs/evidence/account_cap/contract_unit_tests.txt",
-  "detail": "135 with the per-account cap, deployed 2026-10-26 (docs/evidence/account_cap/); the code before it passed 119 (docs/evidence/judge/clean_clone.txt)."
+  "source": "docs/evidence/level1/contract_unit_tests.txt",
+  "detail": "155 with Level 1 (29 of them Level 1 tests), deployed 2026-11-03 (docs/evidence/level1/); 135 with the per-account cap (docs/evidence/account_cap/), 119 before it (docs/evidence/judge/clean_clone.txt)."
  },
  "accepted_proof_tgas": {
   "value": "35",

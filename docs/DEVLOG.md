@@ -2,6 +2,24 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Docs audit: disagreeing statements fixed; five limits first; roadmap plans
+
+- Fixed to the true value: `web/data/numbers.json` said 135 contract unit tests (the Evidence page read it); it is 155
+  (`docs/evidence/level1/contract_unit_tests.txt`). The README's Level 1 row and the Judge guide's Level 1 row now cover
+  bounties 36 to 39 (36 by a script, PASS and FAIL; 37 and 38 PASS and 39 FAIL through the vendor tool). docs/ROADMAP.md
+  no longer says the vendor tool's Level 1 GPU mode was not run (it ran on bounties 38 and 39). docs/LIMITS.md: Level 1
+  ran on bounties 36 to 39, not once; Level 1 fees of decided attempts also go to the fee pool. docs/CLAIMS.md lists
+  bounties 36, 37 and 38 as paid on OutLayer's PASS, apart from the proof-paid ones.
+- Checked and left as they are: bounty 24's GPU cost is $0.60 for its hand-run pod session (docs/numbers.md) and $0.04
+  is per proof with the cached binary (bounties 27 and 32); no statement mixes them. The 119 and 135 test counts left
+  are dated history entries.
+- docs/LIMITS.md and the Evidence page: the five that matter most first (Testnet only; Small programs only; Level 1
+  depends on OutLayer; A timeout pays whatever was revealed; What is not shown yet), the rest under a closed "More
+  limits".
+- Roadmap (docs/ROADMAP.md, README, Judge guide): below managed confidential proving, three planned items: a vendor bond
+  slashed on silence with timeout rewards only for attempts that pass the public tests; bounties with no reference
+  fix; simpler levels (Level 2 the product, Level 0 retired or kept for the project's own use). No contract change.
+
 ## 2026-11-03: Evidence limits cut to 8; "not production ready" wording removed; a calm line for the saved record
 
 - Evidence, Limits: 17 cards became 8 (Testnet only; Small programs only; Level 1 depends on OutLayer; A timeout pays

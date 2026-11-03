@@ -70,7 +70,7 @@ show it.
 | Level | Who decides | Shown by |
 | --- | --- | --- |
 | 2 (the default) | The contract checks the Groth16 proof itself, as in step 4 | every proof-paid bounty above; EVIDENCE, S6c |
-| 1 | OutLayer runs our pinned verifier program on the proof and the contract trusts its answer: no Groth16 step for the vendor, but OutLayer and its operator are trusted | bounty 36, opened ([`4GdNLf15…`](https://testnet.nearblocks.io/txns/4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ)) and paid by OutLayer's PASS ([`3ZpV6zsg…`](https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u)), and a wrong fix FAIL ([`8HYqqjPy…`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY)); through the vendor tool, bounties 37 and 38, each paid on OutLayer's PASS ([`6nKhWdEu…`](https://testnet.nearblocks.io/txns/6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS), [`4heRP1d6…`](https://testnet.nearblocks.io/txns/4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7)); EVIDENCE, "Level 1 through OutLayer" |
+| 1 | OutLayer runs our pinned verifier program on the proof and the contract trusts its answer: no Groth16 step for the vendor, but OutLayer and its operator are trusted | bounty 36, opened ([`4GdNLf15…`](https://testnet.nearblocks.io/txns/4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ)) and paid by OutLayer's PASS ([`3ZpV6zsg…`](https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u)), and a wrong fix FAIL ([`8HYqqjPy…`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY)); through the vendor tool, bounties 37 and 38, each paid on OutLayer's PASS ([`6nKhWdEu…`](https://testnet.nearblocks.io/txns/6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS), [`4heRP1d6…`](https://testnet.nearblocks.io/txns/4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7)); EVIDENCE, "Level 1 through OutLayer" | | bounties 36 to 39 on testnet: bounty 36 paid by OutLayer's PASS ([`3ZpV6zsg…`](https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u)) and a wrong fix FAIL ([`8HYqqjPy…`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY)), sent by a script; through the vendor tool, bounties 37 and 38 paid on OutLayer's PASS ([`6nKhWdEu…`](https://testnet.nearblocks.io/txns/6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS), [`4heRP1d6…`](https://testnet.nearblocks.io/txns/4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7)) and bounty 39's wrong fix FAIL ([`ogTyBybL…`](https://testnet.nearblocks.io/txns/ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR)); EVIDENCE, "Level 1 through OutLayer" and "Level 1 through the vendor tool" |
 | 0 | Registered verifiers attest; today all of them are run by the project | EVIDENCE, S4 |
 
 ## What the checker tests, and what it can't
@@ -260,10 +260,12 @@ also cap how many attempts one account holds (the per-account cap, live since 20
 1. **Managed confidential proving** (planned): one shared sealed prover for many vendors, so no host can read the
    secret. A CPU spike ran on testnet: bounty 33's prove step ran inside an attested Phala TDX VM and was paid by
    proof; a GPU TEE is planned, not built ([docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md)).
-2. **Bounties with no reference fix:** Proof 0 proves only that the original crashes on the secret.
-3. **A vendor liveness bond and a fallback evaluator,** to make silence costly and timeouts rare.
-4. **Agent earnings after costs** on the Proof Ledger.
-5. **Mainnet** (skarbnik.near), without a lone upgrade key.
+2. **A vendor bond and fairer timeouts** (planned): a bond slashed when the vendor stays silent, and timeout rewards only
+   for attempts that pass the public tests.
+3. **Bounties with no reference fix** (planned): Proof 0 proves only that the original crashes on the secret.
+4. **Simpler levels** (planned): Level 2 is the product; Level 0 is retired or kept only for the project's own use.
+5. **Agent earnings after costs** on the Proof Ledger.
+6. **Mainnet** (skarbnik.near), without a lone upgrade key.
 
 More: [docs/ROADMAP.md](docs/ROADMAP.md).
 
