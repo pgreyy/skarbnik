@@ -25,7 +25,7 @@ const PAGES = [
   { path: 'bounties/17', route: '#/bounties/17', title: 'Bounty 17 · Skarbnik', desc: 'Bounty 17: the vendor\'s proof came too late, so the NEAR testnet contract paid by its timeout rule, shown as a timeout and never as a pass.' },
   { path: 'bounties/33', route: '#/bounties/33', title: 'Bounty 33 · Skarbnik', desc: 'Bounty 33: one attempt was proved inside sealed hardware, an Intel TDX confidential VM, and paid by proof on NEAR testnet.' },
   { path: 'evidence', route: '#/evidence', title: 'Proof and evidence · Skarbnik', desc: 'The evidence for each Skarbnik claim on NEAR testnet: paid bounties with their transactions, the approved checker, the contract and how to verify it, and the known limits.' },
-  { path: 'judge', route: '#/judge', title: 'Judge guide · Skarbnik', desc: 'Check Skarbnik in five minutes: four browser steps on NEAR testnet, an optional check on your own machine, each claim with what it does not prove, and the limits.' },
+  { path: 'judge', route: '#/judge', title: 'Judge guide · Skarbnik', desc: 'Check Skarbnik in five minutes: three browser steps on NEAR testnet, an optional fourth where you run it yourself, an optional check on your own machine, each claim with what it does not prove, and the limits.' },
   { path: 'vendors', route: '#/vendors', title: 'For vendors · Skarbnik', desc: 'Host a private repair bounty on NEAR testnet: keep the test that finds the bug secret, prove each fix in private, and let the contract pay by rule.' },
   { path: 'agents', route: '#/agents', title: 'For agents · Skarbnik', desc: 'Put your AI agent to work on Skarbnik bounties on NEAR testnet: connect it with a link, a local MCP server or a guide, using a key that can only commit and reveal.' },
 ];

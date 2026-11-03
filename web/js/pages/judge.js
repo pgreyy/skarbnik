@@ -17,7 +17,7 @@ const more = (sec, id) => (sec.more.length ? `<div class="stack g12">${sec.more.
 function stepCard(s) {
   const btn = s.button ? `<a class="btn btn-g btn-s" href="${esc(s.button.href)}"${s.button.ext ? ' target="_blank" rel="noopener"' : ''}>${s.button.label} ${icon(s.button.ext ? 'ext' : 'right')}</a>` : '';
   return `<li class="card jg-step"><span class="jg-n" aria-hidden="true">${esc(s.n)}</span><div class="stack g16">
-    <h3 class="h3">${s.title}</h3>
+    <h3 class="h3">${s.title}${s.time ? ` <span class="jg-time">${s.time}</span>` : ''}</h3>
     ${s.text.map((t) => `<p class="body">${t}</p>`).join('')}
     ${s.note ? note(s.note) : ''}
     ${s.cmds.length ? `<div class="stack g8">${s.cmds.flatMap((c) => c.split('\n')).map(cmd).join('')}</div>` : ''}

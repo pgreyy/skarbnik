@@ -106,7 +106,10 @@ def step(title, body):
     m = re.fullmatch(r'(\d+)\. (.+)', title)
     if not m:
         sys.exit(f'{SRC}: a step title must be "N. Title", not "{title}"')
-    s = {'n': m.group(1), 'title': inline(m.group(2)), 'text': [], 'cmds': [], 'button': None, 'note': None}
+    # a time in brackets at the end of a title ("Optional: run it yourself (about 2 more minutes)") is shown beside it
+    t = re.fullmatch(r'(.+?) \(([^()]+)\)', m.group(2))
+    s = {'n': m.group(1), 'title': inline(t.group(1) if t else m.group(2)), 'time': inline(t.group(2)) if t else None,
+         'text': [], 'cmds': [], 'button': None, 'note': None}
     for kind, lines in chunks(body):
         if kind == 'p':
             s['text'].append(inline(lines[0]))

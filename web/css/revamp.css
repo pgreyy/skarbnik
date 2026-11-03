@@ -364,3 +364,4 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .sk :where(.p-bounties) .bar .seg[data-more]{-webkit-mask-image:none;mask-image:none}
 /* Evidence Lab: a little room between a label and its large number */
 .sk :where(.p-evidence) b.big{display:block;margin-top:6px}
+.sk .jg-time{margin-left:8px;font:500 14px/1.4 var(--fu);color:var(--tx3);white-space:nowrap}

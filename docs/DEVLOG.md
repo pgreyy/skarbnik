@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: The tour's last step is optional
+
+- Judge guide, Quick: step 4 is now "Optional: run it yourself", with "about 2 more minutes" beside the heading, and the
+  intro says three steps in a browser take about 5 minutes and the fourth is optional. The same line in the README,
+  docs/README.md, llms.txt and the saved /judge/ page's description. `scripts/gen_judge_data.py` shows a time given in
+  brackets after a step's title next to its heading.
+- Checked with the Judge guide script at 1440 and 390, dark and light: 19 checks pass, no script errors.
+
 ## 2026-11-03: For vendors: "A GPU rental account is needed for a rented GPU."
 
 - The requirements line on For vendors (both ways, and the saved page) now reads "A GPU rental account is needed for a

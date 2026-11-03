@@ -10,8 +10,9 @@ anyone can check them.
 
 ## Quick (5 min)
 
-Four steps. Steps 1 to 3 need only a browser; step 4 needs a testnet wallet. Each step says what you should see, what it
-shows and what it does not show, and links the chain, so you check it there and not on this page.
+Three steps in a browser, about 5 minutes. A fourth step is optional: run it yourself with a testnet wallet, about 2
+more minutes. Each step says what you should see, what it shows and what it does not show, and links the chain, so you
+check it there and not on this page.
 
 ### 1. Open a bounty paid by proof
 
@@ -48,7 +49,7 @@ Open bounty 17: the same kind of task, but the vendor's proof finished after the
 - This shows: a silent vendor cannot block payment, and a timeout is shown as a timeout, never as a pass.
 - Does not show: that bounty 17's patch passed. No proof was checked for that attempt.
 
-### 4. Try a judge bounty yourself
+### 4. Optional: run it yourself (about 2 more minutes)
 
 Judge bounties 28 to 31 have the same hashes as bounty 17 and were created closed, so anyone can open one with a real
 proof. Each can be opened once: send bounty 17's stored Proof 0 to one that is still closed (28; use 29, 30 or 31 if 28
