@@ -4,6 +4,9 @@
 # should read get_bounty itself before committing. No key is used and nothing is sent.
 # It also publishes the public code of each known program in web/code/<name>/ (copied from data/), and names it in the
 # feed for every bounty whose original_hash and corpus_hash match those files, so an agent can download and check it.
+# It also writes web/data/bounty_snapshots.json in the same run, with the same time: the raw get_bounty and every
+# get_submission of the bounties the site points people to, and get_verifiers, so a bounty page can show them at once
+# (labelled as a saved snapshot with its time) while it reads the contract live.
 # Usage, from the repo root: python3 -I scripts/gen_feed.py   (RPC=... to use another testnet RPC)
 import base64
 import datetime
@@ -138,11 +141,17 @@ def status_of(b, subs, kind, accepting):
     return "Open for attempts" if accepting else "Awaiting evaluation"
 
 
+# the bounties the site points people to: the examples, the newest demo and the judge bounties
+SNAPSHOT_IDS = ["7", "17", "24", "32", "33", "35", "28", "29", "30", "31"]
+snapshots = {}
+
 for i in range(n):
     b = view("get_bounty", {"bounty_id": str(i)})
     if not b:
         continue
     subs = [view("get_submission", {"bounty_id": str(i), "index": k}) for k in range(b["commits"])]
+    if str(i) in SNAPSHOT_IDS:
+        snapshots[str(i)] = {"bounty": b, "submissions": subs}
     kind = "test" if str(i) in test_ids else "demo" if b["exploit_commitment"] == demo_commitment else "private"
     cb = int(b["expires_at_ns"]) - int(b["reveal_window_ns"]) - int(b["verdict_window_ns"])
     accepting = b["state"] == "Open" and b["opened"] and now_ns < cb and b["max_commits"] - b["active"] > 0
@@ -218,6 +227,17 @@ feed = {
     "quickstart": "agent-quickstart.txt",
     "quickstart_url": f"{SITE_URL}/agent-quickstart.txt",
 }
+missing = [x for x in SNAPSHOT_IDS if x not in snapshots]
+if missing:
+    sys.exit(f"bounty snapshots: no bounty {', '.join(missing)} on {CONTRACT}")
+snap = {"generated_at_utc": utc(now_ns), "contract": CONTRACT,
+        "note": "A saved snapshot of the contract, not live. Made by scripts/gen_feed.py together with feed.json.",
+        "verifiers": [v["account_id"] for v in view("get_verifiers", {})], "bounties": snapshots}
+with open(os.path.join(ROOT, "web/data/bounty_snapshots.json"), "w") as f:
+    json.dump(snap, f, indent=1)
+    f.write("\n")
+print(f"wrote web/data/bounty_snapshots.json: bounties {', '.join(SNAPSHOT_IDS)}", file=sys.stderr)
+
 dst = os.path.join(ROOT, "web/feed.json")
 with open(dst, "w") as f:
     json.dump(feed, f, indent=1)

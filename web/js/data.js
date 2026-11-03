@@ -12,6 +12,8 @@ export const getRecorded = once(() => json('data/recorded.json'));
 export const getMeta = once(() => json('data/bounty_meta.json'));
 export const getNumbers = once(() => json('data/numbers.json'));
 export const getConfig = once(() => json('site.config.json'));
+// saved snapshots of the bounties the site points people to (scripts/gen_feed.py), shown until the chain answers
+export const getBountySnapshots = once(() => json('data/bounty_snapshots.json'));
 
 // The attempts a bounty's status needs: none for a refunded bounty, the winning attempt for a paid one (whether it was
 // paid by proof or by timeout), every attempt for an open one. full: every attempt of every bounty (the ledger).

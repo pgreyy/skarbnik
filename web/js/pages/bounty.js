@@ -3,11 +3,12 @@
 // panel for commit and reveal, the story of the bounty from its recorded transactions, its attempts), Transactions,
 // Rules and timing, and Privacy and evidence. The aside holds the terms, the check-the-checker command (shown only
 // after scripts/check_image_id.sh printed MATCH) and a comparison. Everything except the descriptive words is read from
-// the chain and from data/recorded.json. Also the raw data page (#/raw/<id>).
+// the chain and from data/recorded.json; until the chain answers, a saved snapshot for the bounties the site points
+// people to (data/bounty_snapshots.json). Also the raw data page (#/raw/<id>).
 import { CONTRACT, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, submissions, near, utc, utcShort, span, left, commitBy } from '../chain.js';
 import { $, esc, icon, copyBtn, chip, tx, acct, hashCell, table, facts, note, cmd, tabbed } from '../ui.js';
 import { STATUS, kindOf, kindChips, statusOf, accepting, isJudge, isNewModule } from '../status.js';
-import { getRecorded, getMeta } from '../data.js';
+import { getRecorded, getMeta, getBountySnapshots } from '../data.js';
 import { attemptPanel } from '../account-ui.js';
 
 const STEP = {
@@ -38,15 +39,63 @@ function windowLeft(b, s) {
   return `${s.revealed_at_ns ? 'proof due' : 'reveal by'} <span class="mono nw">${esc(utcShort(ns))} UTC</span><span class="small">${l ? esc(l) : 'passed'}</span>`;
 }
 
+const LOADING = 'Loading from the contract';
+const savedAt = (at) => `${String(at).replace('T', ' ').replace(/:\d\dZ$/, '').replace(/Z$/, '')} UTC`;
+// the line under the page header while the page shows the saved snapshot; empty once it shows live data
+const liveNote = (mode, at) => (mode === 'live' ? '' : `<div style="margin-top:24px">${mode === 'loading'
+  ? note(`${LOADING}. Until it answers, this page shows the saved snapshot from ${esc(savedAt(at))}.`, 'clock')
+  : note(`Live data unavailable, showing the saved snapshot from ${esc(savedAt(at))}. Reload to read it live.`, 'alert')}</div>`);
+
+// The page is drawn at once. For the bounties the site points people to (web/data/bounty_snapshots.json, written by
+// scripts/gen_feed.py), the saved snapshot is shown, labelled with its time, until the contract answers; then the page
+// is drawn again from live data. For other bounties the header shows "Loading from the contract" until then. If the node
+// gives no first answer within 4 seconds, the page says so.
 export async function bounty(viewEl, id, tab) {
-  viewEl.innerHTML = `<main id="main" class="p-bounty" tabindex="-1"><section class="ph"><div class="wrap"><nav class="crumb" aria-label="Breadcrumb"><a href="#/bounties">Bounties</a><span aria-hidden="true">/</span><span style="color:var(--tx)" aria-current="page">Bounty ${esc(id)}</span></nav><h1>Bounty ${esc(id)}</h1><p class="state">Reading bounty ${esc(id)} from testnet…</p></div></section></main>`;
-  let b, subs, rec, meta, verifiers;
-  try {
-    [rec, meta, b] = await Promise.all([getRecorded(), getMeta(), view('get_bounty', { bounty_id: String(id) })]);
-    if (!b) { viewEl.querySelector('.state').textContent = `There is no bounty ${id} on ${CONTRACT}.`; return; }
-    [subs, verifiers] = await Promise.all([submissions(b), view('get_verifiers').then((v) => v.map((x) => x.account_id))]);
-  } catch (e) { const st = viewEl.querySelector('.state'); if (st) st.innerHTML = `Could not read the contract on testnet: ${esc(e.message)}. Check your connection and reload.`; return; }
-  if (!document.querySelector('main.p-bounty')) return;
+  viewEl.innerHTML = `<main id="main" class="p-bounty" tabindex="-1" data-bid="${esc(id)}"><section class="ph"><div class="wrap"><nav class="crumb" aria-label="Breadcrumb"><a href="#/bounties">Bounties</a><span aria-hidden="true">/</span><span style="color:var(--tx)" aria-current="page">Bounty ${esc(id)}</span></nav><h1>Bounty ${esc(id)}</h1><p class="state" role="status">${LOADING}</p></div></section></main>`;
+  // still this bounty's page (the reader may have moved on)
+  const here = () => { const m = document.querySelector('main.p-bounty'); return m && m.dataset.bid === String(id) ? m : null; };
+  const bP = view('get_bounty', { bounty_id: String(id) });
+  const liveP = bP.then(async (b) => {
+    if (!b) return null;
+    const [subs, verifiers] = await Promise.all([submissions(b), view('get_verifiers').then((v) => v.map((x) => x.account_id))]);
+    return { b, subs, verifiers };
+  });
+  liveP.catch(() => {});
+  let rec, meta;
+  try { [rec, meta] = await Promise.all([getRecorded(), getMeta()]); } catch (e) {
+    const st = viewEl.querySelector('.state'); if (st) st.textContent = `Could not load the site's data: ${e.message}. Reload to try again.`; return;
+  }
+  const snaps = await getBountySnapshots().catch(() => null);
+  const s0 = snaps && snaps.bounties && snaps.bounties[String(id)];
+  const saved = s0 ? { b: s0.bounty, subs: s0.submissions, verifiers: snaps.verifiers } : null;
+  let live = false;
+  const tabNow = () => (location.hash.match(/^#\/bounties\/\d+\/([a-z]+)/) || [])[1] || tab;
+  if (saved && here()) drawBounty(viewEl, id, tabNow(), rec, meta, saved, 'loading', snaps.generated_at_utc);
+  // no first answer from the node within 4 seconds: say so (the live data still fills in if it arrives later)
+  const quiet = setTimeout(() => {
+    if (live || !here()) return;
+    if (saved) { const n = $('#liveNote'); if (n) n.innerHTML = liveNote('unavailable', snaps.generated_at_utc); }
+    else { const st = viewEl.querySelector('.state'); if (st) st.textContent = `${LOADING}. The testnet node has not answered yet; still trying.`; }
+  }, 4000);
+  bP.then(() => clearTimeout(quiet), () => {});
+  liveP.then((L) => {
+    if (!here()) return;
+    if (!L) { const st = viewEl.querySelector('.state'); if (st) st.textContent = `There is no bounty ${id} on ${CONTRACT}.`; else { const n = $('#liveNote'); if (n) n.innerHTML = note(`The contract has no bounty ${esc(id)}.`, 'alert'); } return; }
+    live = true;
+    // drawn again from live data: keep the reader's tab, scroll position and focused tab
+    const y = window.scrollY, focusId = document.activeElement && document.activeElement.closest('#btabs') ? document.activeElement.id : null;
+    drawBounty(viewEl, id, tabNow(), rec, meta, L, 'live', null);
+    window.scrollTo(0, y); if (focusId && document.getElementById(focusId)) document.getElementById(focusId).focus({ preventScroll: true });
+  }, (e) => {
+    if (!here() || live) return;
+    if (saved) { const n = $('#liveNote'); if (n) n.innerHTML = liveNote('unavailable', snaps.generated_at_utc); }
+    else { const st = viewEl.querySelector('.state'); if (st) st.textContent = `Could not read the contract on testnet: ${e.message}. Check your connection and reload.`; }
+  });
+}
+
+// One bounty page from { b, subs, verifiers }: live data (mode 'live') or the saved snapshot ('loading' or
+// 'unavailable', labelled with its time `at`).
+function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at) {
   const kind = kindOf(b, rec), status = statusOf(b, subs, kind), st = STATUS[status], acc = accepting(b);
   const title = (meta.titles || {})[id] || `Bounty ${id}`, story = (meta.story || {})[id] || {};
   const txs = (rec.bounties && rec.bounties[String(id)]) || [], recNote = rec.bounty_notes && rec.bounty_notes[String(id)];
@@ -60,7 +109,7 @@ export async function bounty(viewEl, id, tab) {
     : status === 'Awaiting evaluation' ? 'A revealed attempt is waiting for the vendor’s proof. If none arrives before its deadline, anyone can claim the timeout.'
     : status === 'Waiting for Proof 0' ? 'Created and funded, not opened yet. It opens when its Proof 0 is accepted on chain.'
     : status === 'Failed' ? 'Past its expiry and not settled. Anyone can call expire to refund the vendor.'
-    : 'Read live from the contract.');
+    : mode === 'live' ? 'Read live from the contract.' : 'From the saved snapshot below.');
 
   const timeoutBox = status === 'Timeout settlement' ? `<div class="why" role="note"><span class="vico">${icon('info')}</span><div>
     <h2 class="h3">Why this is not “Proof verified”</h2>
@@ -129,7 +178,7 @@ export async function bounty(viewEl, id, tab) {
     ${story.caveat ? note(esc(story.caveat), 'alert') : ''}
     <p class="small"><a class="lnk sm" href="#/raw/${esc(id)}">Raw get_bounty data, read live</a></p></div>`;
   const others = (rec.new_module_bounties ? Object.keys(rec.new_module_bounties) : []).filter((x) => x !== String(id));
-  viewEl.innerHTML = `<main id="main" class="p-bounty" tabindex="-1">
+  viewEl.innerHTML = `<main id="main" class="p-bounty" tabindex="-1" data-bid="${esc(id)}">
 <section class="ph"><div class="wrap">
 <nav class="crumb" aria-label="Breadcrumb"><a href="#/bounties">Bounties</a><span aria-hidden="true">/</span><span style="color:var(--tx)" aria-current="page">Bounty ${esc(id)}</span></nav>
 <div class="ph-grid">
@@ -146,6 +195,7 @@ export async function bounty(viewEl, id, tab) {
 </div>
 ${timeoutBox}
 ${recNote ? `<div style="margin-top:24px">${note(`${esc(recNote.text)} ${tx(recNote.tx)}`, 'alert')}</div>` : ''}
+<div id="liveNote">${liveNote(mode, at)}</div>
 </div></section>
 <section style="padding:0 0 112px"><div class="wrap">
 <div class="main-grid" style="margin-top:0">
@@ -188,7 +238,9 @@ ${others.length ? `<p class="small">Other new module bounties: ${others.map((o) 
     { id: 'rules', label: 'Rules and timing', html: rules },
     { id: 'privacy', label: 'Privacy and evidence', html: privacy },
   ], tab, `#/bounties/${id}`, `Bounty ${id} sections`);
-  attemptPanel($('#sendPanel'), b, subs, verifiers);
+  // committing and revealing need the live contract: the panel waits for it
+  if (mode === 'live') attemptPanel($('#sendPanel'), b, subs, verifiers);
+  else $('#sendPanel').innerHTML = `<p class="eyebrow">Send an attempt</p><p class="small mt8">${mode === 'loading' ? `${LOADING}. Committing and revealing use the live contract, not the saved snapshot.` : 'Live data unavailable just now. Committing and revealing need the live contract: reload to try again.'}</p>`;
 }
 
 export async function raw(viewEl, id) {
