@@ -143,10 +143,13 @@ def status_of(b, subs, kind, accepting):
         return "Failed"  # past expiry and not settled: nothing will be decided any more until someone calls expire
     if not b["opened"]:
         return "Waiting for Proof 0"
+    if accepting:
+        return "Open for attempts"  # a free slot and time left, even after failed attempts (see "attempts")
     if any(s["outcome"] == "Failed" for s in subs):
-        # an attempt was rejected: by a FAIL proof the contract checked (Level 2), or by OutLayer's FAIL answer (Level 1)
+        # no free slot or no time left, nobody paid, and an attempt was rejected: by a FAIL proof the contract checked
+        # (Level 2), or by OutLayer's FAIL answer (Level 1)
         return "Failed by OutLayer" if b.get("level") == 1 else "Proof rejected"
-    return "Open for attempts" if accepting else "Awaiting evaluation"
+    return "Awaiting evaluation"
 
 
 # the bounties the site points people to: the examples, the newest demo and the judge bounties
@@ -170,7 +173,7 @@ for i in range(n):
         "program": pc["program"] if pc else None, "module_description": pc["description"] if pc else None,
         "target": TARGET, "max_patch_bytes": b["max_patch_bytes"],
         "reward_yocto": b["amount"], "reward": near(b["amount"]),
-        "max_commits": b["max_commits"], "attempts_used": b["commits"], "slots_in_use": b["active"],
+        "max_commits": b["max_commits"], "attempts_used": b["commits"], "attempts": f"{b['commits']} of {b['max_commits']} used", "slots_in_use": b["active"],
         "max_commits_per_account": b.get("max_commits_per_account"),
         "fee_schedule": {"base_yocto": b["attempt_fee"], "step_yocto": b["fee_step"],
                          "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"},

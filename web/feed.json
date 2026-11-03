@@ -19,7 +19,7 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-11-03T22:20:40Z",
+ "generated_at_utc": "2026-11-03T22:55:26Z",
  "note": "Snapshot made by scripts/gen_feed.py. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
@@ -54,6 +54,7 @@
    "reward": "0.5 NEAR",
    "max_commits": 3,
    "attempts_used": 0,
+   "attempts": "0 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -104,6 +105,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -154,6 +156,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 6,
    "attempts_used": 2,
+   "attempts": "2 of 6 used",
    "slots_in_use": 2,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -204,6 +207,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 4,
    "attempts_used": 1,
+   "attempts": "1 of 4 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -240,7 +244,7 @@
   },
   {
    "bounty_id": 40,
-   "status": "Failed by OutLayer",
+   "status": "Open for attempts",
    "kind": "private",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -254,6 +258,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 8,
    "attempts_used": 1,
+   "attempts": "1 of 8 used",
    "slots_in_use": 1,
    "max_commits_per_account": 2,
    "fee_schedule": {
@@ -303,16 +308,17 @@
    "reward_yocto": "100000000000000000000000",
    "reward": "0.1 NEAR",
    "max_commits": 8,
-   "attempts_used": 0,
-   "slots_in_use": 0,
+   "attempts_used": 1,
+   "attempts": "1 of 8 used",
+   "slots_in_use": 1,
    "max_commits_per_account": 2,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
     "step_yocto": "5000000000000000000000",
     "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
    },
-   "next_fee_yocto": "10000000000000000000000",
-   "next_fee": "0.01 NEAR",
+   "next_fee_yocto": "15000000000000000000000",
+   "next_fee": "0.015 NEAR",
    "windows": {
     "reveal_gap_ns": "60000000000",
     "reveal_window_ns": "3600000000000",
@@ -332,7 +338,7 @@
     "program": "grid",
     "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug"
    },
-   "slots_left": 8,
+   "slots_left": 7,
    "commit_deadline_utc": "2026-12-31T21:19:34Z",
    "expires_at_utc": "2027-01-02T22:19:34Z",
    "bounty_amount": "0.1 NEAR",
@@ -356,6 +362,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 0,
+   "attempts": "0 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -401,6 +408,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 2,
+   "attempts": "2 of 3 used",
    "slots_in_use": 2,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -446,6 +454,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 0,
+   "attempts": "0 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -491,6 +500,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -536,6 +546,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -581,6 +592,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -626,6 +638,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 3,
+   "attempts": "3 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -671,6 +684,7 @@
    "reward": "0.5 NEAR",
    "max_commits": 3,
    "attempts_used": 0,
+   "attempts": "0 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -716,6 +730,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -761,6 +776,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 4,
    "attempts_used": 4,
+   "attempts": "4 of 4 used",
    "slots_in_use": 3,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -806,6 +822,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 4,
    "attempts_used": 1,
+   "attempts": "1 of 4 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -851,6 +868,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 4,
    "attempts_used": 2,
+   "attempts": "2 of 4 used",
    "slots_in_use": 2,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -896,6 +914,7 @@
    "reward": "0.5 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -941,6 +960,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 1,
    "attempts_used": 1,
+   "attempts": "1 of 1 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -986,6 +1006,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 3,
+   "attempts": "3 of 3 used",
    "slots_in_use": 3,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1031,6 +1052,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 2,
+   "attempts": "2 of 2 used",
    "slots_in_use": 2,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1076,6 +1098,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 1,
+   "attempts": "1 of 2 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1121,6 +1144,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1166,6 +1190,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1211,6 +1236,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 0,
+   "attempts": "0 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1256,6 +1282,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 0,
+   "attempts": "0 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1301,6 +1328,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 0,
+   "attempts": "0 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1346,6 +1374,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 0,
+   "attempts": "0 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1391,6 +1420,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 3,
+   "attempts": "3 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1436,6 +1466,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 1,
+   "attempts": "1 of 3 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1481,6 +1512,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 3,
    "attempts_used": 2,
+   "attempts": "2 of 3 used",
    "slots_in_use": 0,
    "max_commits_per_account": 1,
    "fee_schedule": {
@@ -1526,6 +1558,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 4,
    "attempts_used": 2,
+   "attempts": "2 of 4 used",
    "slots_in_use": 2,
    "max_commits_per_account": 1,
    "fee_schedule": {
@@ -1571,6 +1604,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 1,
+   "attempts": "1 of 2 used",
    "slots_in_use": 1,
    "max_commits_per_account": 1,
    "fee_schedule": {
@@ -1616,6 +1650,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 0,
+   "attempts": "0 of 2 used",
    "slots_in_use": 0,
    "max_commits_per_account": 1,
    "fee_schedule": {
@@ -1661,6 +1696,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 0,
+   "attempts": "0 of 2 used",
    "slots_in_use": 0,
    "max_commits_per_account": 1,
    "fee_schedule": {
@@ -1706,6 +1742,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 0,
+   "attempts": "0 of 2 used",
    "slots_in_use": 0,
    "max_commits_per_account": 1,
    "fee_schedule": {
@@ -1751,6 +1788,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 0,
+   "attempts": "0 of 2 used",
    "slots_in_use": 0,
    "max_commits_per_account": 1,
    "fee_schedule": {
@@ -1796,6 +1834,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 1,
    "attempts_used": 1,
+   "attempts": "1 of 1 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1841,6 +1880,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 1,
    "attempts_used": 1,
+   "attempts": "1 of 1 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1886,6 +1926,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 6,
    "attempts_used": 2,
+   "attempts": "2 of 6 used",
    "slots_in_use": 2,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1931,6 +1972,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 4,
    "attempts_used": 1,
+   "attempts": "1 of 4 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -1976,6 +2018,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 2,
+   "attempts": "2 of 2 used",
    "slots_in_use": 2,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -2021,6 +2064,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 2,
    "attempts_used": 2,
+   "attempts": "2 of 2 used",
    "slots_in_use": 2,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -2066,6 +2110,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 1,
    "attempts_used": 1,
+   "attempts": "1 of 1 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -2111,6 +2156,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 1,
    "attempts_used": 1,
+   "attempts": "1 of 1 used",
    "slots_in_use": 1,
    "max_commits_per_account": null,
    "fee_schedule": {
@@ -2142,7 +2188,7 @@
   },
   {
    "bounty_id": 40,
-   "status": "Failed by OutLayer",
+   "status": "Open for attempts",
    "kind": "private",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -2156,6 +2202,7 @@
    "reward": "0.1 NEAR",
    "max_commits": 8,
    "attempts_used": 1,
+   "attempts": "1 of 8 used",
    "slots_in_use": 1,
    "max_commits_per_account": 2,
    "fee_schedule": {
@@ -2200,16 +2247,17 @@
    "reward_yocto": "100000000000000000000000",
    "reward": "0.1 NEAR",
    "max_commits": 8,
-   "attempts_used": 0,
-   "slots_in_use": 0,
+   "attempts_used": 1,
+   "attempts": "1 of 8 used",
+   "slots_in_use": 1,
    "max_commits_per_account": 2,
    "fee_schedule": {
     "base_yocto": "10000000000000000000000",
     "step_yocto": "5000000000000000000000",
     "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
    },
-   "next_fee_yocto": "10000000000000000000000",
-   "next_fee": "0.01 NEAR",
+   "next_fee_yocto": "15000000000000000000000",
+   "next_fee": "0.015 NEAR",
    "windows": {
     "reveal_gap_ns": "60000000000",
     "reveal_window_ns": "3600000000000",

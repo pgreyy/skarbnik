@@ -11,14 +11,14 @@ export const STATUS = {
   'Proof verified': { cls: 'k-proof', icon: 'check', help: 'The contract checked a proof for the paid attempt (Level 2).' },
   'Verified by OutLayer': { cls: 'k-await', icon: 'seal', help: 'OutLayer ran the pinned verifier program on the proof and the contract paid on its answer. The contract did not check the proof itself (Level 1).' },
   'Verifiers attested': { cls: 'k-await', icon: 'seal', help: 'Two registered verifiers attested the verdict and the contract paid on their word (Level 0).' },
-  'Proof rejected': { cls: 'k-reject', icon: 'x', help: 'A valid proof said FAIL for an attempt. The bounty is still open.' },
-  'Failed by OutLayer': { cls: 'k-reject', icon: 'x', help: 'OutLayer ran the pinned verifier program on the proof of an attempt and answered FAIL; the attempt is spent. The contract did not check the proof itself (Level 1). The bounty is still open.' },
+  'Proof rejected': { cls: 'k-reject', icon: 'x', help: 'No attempt slot or commit time is left and nobody was paid; a valid proof said FAIL for an attempt (Level 2).' },
+  'Failed by OutLayer': { cls: 'k-reject', icon: 'x', help: 'OutLayer ran the pinned verifier program on the proof of an attempt and answered FAIL, no attempt slot or commit time is left and nobody was paid. The contract did not check the proof itself (Level 1).' },
   'Awaiting evaluation': { cls: 'k-await', icon: 'hourglass', help: 'A patch was revealed and no verdict has arrived yet.' },
   'Timeout settlement': { cls: 'k-timeout', icon: 'hourglass', help: 'No proof arrived in the window. The contract paid by rule. This is not a proof.' },
   'Refunded': { cls: 'k-refund', icon: 'undo', help: 'Nothing was paid out. The vendor got the reward back.' },
   'Failed': { cls: 'k-fail', icon: 'x', help: 'Past its expiry and not settled. Anyone can call expire to refund the vendor.' },
   'Demo or test only': { cls: 'k-test', icon: 'flask', help: 'A demo or test bounty, not settled yet. It uses a public input or a test setup.' },
-  'Open for attempts': { cls: 'k-open', icon: 'clock', help: 'Opened by its Proof 0 and accepting commits now.' },
+  'Open for attempts': { cls: 'k-open', icon: 'clock', help: 'Opened by its Proof 0 and accepting commits now. Earlier attempts may have failed; the attempts used are shown with it.' },
   'Waiting for Proof 0': { cls: 'k-open', icon: 'clock', help: 'Created, not opened yet. It opens when its Proof 0 is accepted.' },
 };
 
@@ -46,8 +46,10 @@ export function statusOf(b, subs, kind, now = Date.now()) {
   if (subs.some((s) => s && s.outcome === 'Open' && s.revealed_at_ns)) return 'Awaiting evaluation';
   if (BigInt(now) * 1000000n >= BigInt(b.expires_at_ns)) return 'Failed';
   if (!b.opened) return 'Waiting for Proof 0';
+  // a free slot and time left: open, even after failed attempts (the attempts used are shown with it)
+  if (accepting(b, now)) return 'Open for attempts';
   if (subs.some((s) => s && s.outcome === 'Failed')) return b.level === 1 ? 'Failed by OutLayer' : 'Proof rejected';
-  return accepting(b, now) ? 'Open for attempts' : 'Awaiting evaluation';
+  return 'Awaiting evaluation';
 }
 
 // The kind chips of a bounty: what its input is, and whether it is a judge or new module bounty.

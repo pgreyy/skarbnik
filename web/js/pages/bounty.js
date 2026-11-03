@@ -28,7 +28,7 @@ const STEP = {
 
 function subState(b, s) {
   if (s.outcome === 'Passed') return b.level === 1 ? ['k-await', 'Verified by OutLayer', 'seal'] : b.level === 0 ? ['k-await', 'Verifiers attested', 'seal'] : ['k-proof', 'Proof verified', 'check'];
-  if (s.outcome === 'Failed') return b.level === 1 ? ['k-fail', 'Failed by OutLayer', 'x'] : ['k-fail', 'Failed by a proof', 'x'];
+  if (s.outcome === 'Failed') return b.level === 1 ? ['k-fail', 'Failed by OutLayer', 'x'] : ['k-fail', 'Proof rejected', 'x'];
   if (s.outcome === 'TimedOut') return ['k-timeout', 'Timeout settlement', 'hourglass'];
   if (s.outcome === 'Released') return ['k-refund', 'Released', 'undo'];
   if (s.revealed_at_ns) return b.state !== 'Open' ? ['k-refund', 'Undecided, refunded as credit', 'undo'] : ['k-await', 'Awaiting evaluation', 'hourglass'];
