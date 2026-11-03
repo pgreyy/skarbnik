@@ -53,4 +53,4 @@ writeFileSync('web/ledger.json', JSON.stringify(out, null, 1) + '\n');
 writeFileSync('web/metrics.json', JSON.stringify({ made_at: out.made_at, network: cfg.network, contract: cfg.contract,
   note: 'Computed from the chain only (every bounty and attempt), with the proving machine from web/data/provers.json. Same rules as the Ledger page.',
   ...L.metrics }, null, 1) + '\n');
-console.error(`wrote web/ledger.json: ${L.counts.paid_fixes} paid fixes (${L.counts.paid_by_proof} by proof, ${L.counts.paid_by_timeout} by timeout), ${L.counts.paid_accounts} paid accounts, ${L.counts.vendors} vendors, ${L.counts.distinct_counterparties} distinct counterparties, ${L.counts.outside_the_team} outside the team`);
+console.error(`wrote web/ledger.json: ${L.counts.paid_fixes} paid fixes (${L.counts.paid_by_proof} by proof, ${L.counts.paid_by_outlayer} on OutLayer's answer, ${L.counts.paid_by_timeout} by timeout), ${L.counts.paid_accounts} paid accounts, ${L.counts.vendors} vendors, ${L.counts.distinct_counterparties} distinct counterparties, ${L.counts.outside_the_team} outside the team`);

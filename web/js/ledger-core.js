@@ -7,17 +7,22 @@
 // counterparties, and a few numbers. No scores, no ranks, no credit for unpaid attempts.
 
 // How the winning payout of a bounty was made: 'proof' (a verdict that became final: a Groth16 PASS, or two verifier
-// attestations at Level 0) or 'timeout' (the deadline passed with no final verdict; claim_timeout paid).
-const howOf = (s) => (s.outcome === 'Passed' ? 'proof' : s.outcome === 'TimedOut' ? 'timeout' : null);
+// attestations at Level 0), 'outlayer' (Level 1: OutLayer's answer that the pinned verifier program accepted a PASS
+// proof; the contract did not check the proof itself) or 'timeout' (the deadline passed with no final verdict;
+// claim_timeout paid).
+const howOf = (s, b) => (s.outcome === 'Passed' ? (b.level === 1 ? 'outlayer' : 'proof') : s.outcome === 'TimedOut' ? 'timeout' : null);
+const STATUS = { proof: 'paid by proof', outlayer: 'verified by OutLayer (Level 1): paid on OutLayer\'s answer, the contract did not check the proof', timeout: 'paid by timeout' };
 
 export const PASS_MEANS = 'passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.';
+export const OUTLAYER_MEANS = 'OutLayer reported that the pinned verifier program accepted a PASS proof of this checker for this patch; the contract trusted that answer and did not check the proof itself.';
 export const TIMEOUT_MEANS = 'paid by the timeout rule: a liveness rule, not a verdict; no proof checked this fix.';
 
 // The recorded transaction that made a bounty's payout: the one successful claim_timeout for a timeout; for a proof, the
 // last successful submit_groth16 (a PASS closes the bounty, so no later proof can succeed) or Level 0 attestation.
 function payoutTx(recorded, bid, how) {
   const rows = ((recorded && recorded.bounties && recorded.bounties[String(bid)]) || []).filter((r) => r.result === 'succeeded');
-  const pick = how === 'timeout' ? rows.filter((r) => r.method === 'claim_timeout') : rows.filter((r) => r.method === 'submit_groth16' || r.method === 'attest');
+  const pick = how === 'timeout' ? rows.filter((r) => r.method === 'claim_timeout')
+    : how === 'outlayer' ? rows.filter((r) => r.method === 'check_with_outlayer') : rows.filter((r) => r.method === 'submit_groth16' || r.method === 'attest');
   return pick.length ? pick[pick.length - 1].tx : null;
 }
 
@@ -32,7 +37,7 @@ export function buildLedger(bounties, subsByBounty, recorded, accounts, nowMs = 
   const vendors = new Map();
   const earn = new Map();
   const e = (a) => earn.get(a) || earn.set(a, { account: shown(a), kind: kind(a), attempts: 0, fees_spent_yocto: 0n, fees_returned_yocto: 0n,
-    gross_rewards_yocto: 0n, proof_checked_passes: 0, timeout_payouts: 0, rejected_by_a_fail_proof: 0, released_unrevealed: 0, waiting: 0,
+    gross_rewards_yocto: 0n, proof_checked_passes: 0, outlayer_passes: 0, timeout_payouts: 0, rejected_by_a_fail_proof: 0, released_unrevealed: 0, waiting: 0,
     model_and_compute_cost: (costs && costs[a]) || null }).get(a);
   const times = [];
   const paidRaw = new Set();
@@ -55,7 +60,7 @@ export function buildLedger(bounties, subsByBounty, recorded, accounts, nowMs = 
       const c = e(s.committer);
       c.attempts += 1; c.fees_spent_yocto += fee;
       const closed = b.state !== 'Open';
-      if (s.outcome === 'Passed') { c.proof_checked_passes += 1; if (!failed) c.fees_returned_yocto += fee; }
+      if (s.outcome === 'Passed') { if (b.level === 1) c.outlayer_passes += 1; else c.proof_checked_passes += 1; if (!failed) c.fees_returned_yocto += fee; }
       else if (s.outcome === 'TimedOut') { c.timeout_payouts += 1; if (!failed) c.fees_returned_yocto += fee; }
       else if (s.outcome === 'Failed') c.rejected_by_a_fail_proof += 1;
       else if (s.outcome === 'Released') c.released_unrevealed += 1;
@@ -65,16 +70,16 @@ export function buildLedger(bounties, subsByBounty, recorded, accounts, nowMs = 
       else if (s.outcome === 'TimedOut') v.not_proved_in_time += 1;
       else if (s.outcome === 'Open' && s.revealed_at_ns && s.deadline_ns && BigInt(s.deadline_ns) / 1000000n < BigInt(nowMs) && b.state === 'Open') v.waiting_past_deadline += 1;
       if ((s.outcome === 'Passed' || s.outcome === 'Failed') && s.verdict_posted_at_ns && s.revealed_at_ns)
-        times.push({ by: 'proof', machine: provers[`${b.id}:${i}`] || 'not recorded', seconds: Number(BigInt(s.verdict_posted_at_ns) - BigInt(s.revealed_at_ns)) / 1e9 });
+        times.push({ by: b.level === 1 ? 'outlayer' : 'proof', machine: provers[`${b.id}:${i}`] || 'not recorded', seconds: Number(BigInt(s.verdict_posted_at_ns) - BigInt(s.revealed_at_ns)) / 1e9 });
       else if (s.outcome === 'TimedOut' && s.deadline_ns && s.revealed_at_ns)
         times.push({ by: 'timeout', machine: 'none (no proof)', seconds: Number(BigInt(s.deadline_ns) - BigInt(s.revealed_at_ns)) / 1e9 });
-      const how = howOf(s);
+      const how = howOf(s, b);
       if (!how) return;
-      const paid = how === 'proof' ? amount : (b.winner === i ? amount - share * (n - 1n) : share);
+      const paid = how !== 'timeout' ? amount : (b.winner === i ? amount - share * (n - 1n) : share);
       if (!failed) { e(s.payout).gross_rewards_yocto += paid; paidRaw.add(s.payout); }
       fixes.push({ bounty_id: String(b.id), attempt: i, payout_account: shown(s.payout), kind: kind(s.payout), how,
-        status: failed ? 'paid on paper, transfer failed (audit finding 8)' : how === 'proof' ? 'paid by proof' : 'paid by timeout',
-        image_id: b.image_id, means: how === 'proof' ? PASS_MEANS : TIMEOUT_MEANS,
+        status: failed ? 'paid on paper, transfer failed (audit finding 8)' : STATUS[how],
+        image_id: b.image_id, means: how === 'proof' ? PASS_MEANS : how === 'outlayer' ? OUTLAYER_MEANS : TIMEOUT_MEANS,
         transfer_failed: failed, paid_yocto: failed ? '0' : paid.toString(), on_paper_yocto: paid.toString(),
         fee_refunded_yocto: failed ? '0' : fee.toString(), tx: payoutTx(recorded, b.id, how), note: (note && note.text) || null });
     });
@@ -82,9 +87,9 @@ export function buildLedger(bounties, subsByBounty, recorded, accounts, nowMs = 
   }
   const acc = new Map();
   for (const f of fixes.filter((x) => !x.transfer_failed)) {
-    const a = acc.get(f.payout_account) || { account: f.payout_account, kind: f.kind, fixes_paid: 0, paid_by_proof: 0, paid_by_timeout: 0, total_paid_yocto: '0' };
+    const a = acc.get(f.payout_account) || { account: f.payout_account, kind: f.kind, fixes_paid: 0, paid_by_proof: 0, paid_by_outlayer: 0, paid_by_timeout: 0, total_paid_yocto: '0' };
     a.fixes_paid += 1;
-    if (f.how === 'proof') a.paid_by_proof += 1; else a.paid_by_timeout += 1;
+    if (f.how === 'proof') a.paid_by_proof += 1; else if (f.how === 'outlayer') a.paid_by_outlayer += 1; else a.paid_by_timeout += 1;
     a.total_paid_yocto = (BigInt(a.total_paid_yocto) + BigInt(f.paid_yocto)).toString();
     acc.set(f.payout_account, a);
   }
@@ -93,14 +98,14 @@ export function buildLedger(bounties, subsByBounty, recorded, accounts, nowMs = 
   const vend = [...vendors.values()];
   const counterparties = new Set([...paidRaw, ...vendors.keys()]);
   const everyone = new Set([...earn.keys(), ...bounties.map((b) => b.vendor)]);
-  const decided = times.length, byProof = times.filter((t) => t.by === 'proof').length;
+  const decided = times.length, byProof = times.filter((t) => t.by === 'proof').length, byOutlayer = times.filter((t) => t.by === 'outlayer').length;
   const groups = {};
   for (const t of times) (groups[`${t.by}, ${t.machine}`] = groups[`${t.by}, ${t.machine}`] || []).push(t.seconds);
   const metrics = {
-    decided_attempts: decided, settled_by_proof: byProof, settled_by_timeout: decided - byProof,
-    share_settled_by_proof: decided ? byProof / decided : null, timeout_rate: decided ? (decided - byProof) / decided : null,
+    decided_attempts: decided, settled_by_proof: byProof, settled_by_outlayer: byOutlayer, settled_by_timeout: decided - byProof - byOutlayer,
+    share_settled_by_proof: decided ? byProof / decided : null, timeout_rate: decided ? (decided - byProof - byOutlayer) / decided : null,
     reveal_to_settlement_seconds: Object.fromEntries(Object.entries(groups).map(([k, xs]) => [k, { attempts: xs.length, median: median(xs), slowest: Math.max(...xs) }])),
-    timing_note: 'by proof: from the reveal to the proof accepted on chain; by timeout: from the reveal to the verdict deadline (the claim came later).',
+    timing_note: 'by proof: from the reveal to the proof accepted on chain; by outlayer: from the reveal to OutLayer\'s answer accepted on chain (Level 1); by timeout: from the reveal to the verdict deadline (the claim came later).',
     distinct_outside_accounts: [...everyone].filter((a) => kind(a) === 'not known').length,
     outside_note: 'accounts not on the team list (web/data/accounts.json) among vendors, committers and payout accounts',
   };
@@ -111,6 +116,7 @@ export function buildLedger(bounties, subsByBounty, recorded, accounts, nowMs = 
     vendors: vend,
     metrics,
     counts: { paid_fixes: fixes.filter((f) => !f.transfer_failed).length, paid_by_proof: fixes.filter((f) => f.how === 'proof' && !f.transfer_failed).length,
+      paid_by_outlayer: fixes.filter((f) => f.how === 'outlayer' && !f.transfer_failed).length,
       paid_by_timeout: fixes.filter((f) => f.how === 'timeout' && !f.transfer_failed).length, paid_on_paper_transfer_failed: fixes.filter((f) => f.transfer_failed).length,
       paid_accounts: acc.size, vendors: vend.length, distinct_counterparties: counterparties.size,
       outside_the_team: [...counterparties].filter((a) => kind(a) === 'not known').length },

@@ -18,7 +18,8 @@ Planned work, most important first. Nothing here is built yet; what is built is 
 
 Later:
 
-- OutLayer as a Level 1 verifier, once its testnet answers.
+- Level 1 with a check that OutLayer ran inside an enclave (its attestation), and the GPU mode of the vendor tool for
+  Level 1 bounties (built in the tool, not run).
 - On the site: create a bounty.
 - A "crash proven only" mode, for a vendor who can prove the crash but has no fix yet.
 - Mainnet, with a network switch in the header.

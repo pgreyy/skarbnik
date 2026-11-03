@@ -1,0 +1,96 @@
+OutLayer request_execution arguments, compared field by field, read from the chain (EXPERIMENTAL_tx_status on
+https://test.rpc.fastnear.com): the call to outlayer.testnet in each transaction, and the execution_requested event
+OutLayer logged. Input values are shown by length and sha256 prefix only. Made 2026-11-03.
+
+caller (predecessor): differs
+    contract open (4GdNLf15): "kintsugi-l2-cihdp.testnet"
+    probe 7Pr3stqn: "kintsugi-res2-prnvm.testnet"
+    probe E5TmYhW5: "kintsugi-res2-prnvm.testnet"
+    probe 2KxPD7fB: "kintsugi-res2-prnvm.testnet"
+deposit: differs
+    contract open (4GdNLf15): "2800000000000000000000000"
+    probe 7Pr3stqn: "100000000000000000000000"
+    probe E5TmYhW5: "2800000000000000000000000"
+    probe 2KxPD7fB: "100000000000000000000000"
+gas: differs
+    contract open (4GdNLf15): 150000000000000
+    probe 7Pr3stqn: 300000000000000
+    probe E5TmYhW5: 300000000000000
+    probe 2KxPD7fB: 300000000000000
+arg keys: differs
+    contract open (4GdNLf15): ["input_data", "payer_account_id", "resource_limits", "response_format", "source"]
+    probe 7Pr3stqn: ["input_data", "resource_limits", "response_format", "source"]
+    probe E5TmYhW5: ["input_data", "resource_limits", "response_format", "source"]
+    probe 2KxPD7fB: ["input_data", "resource_limits", "response_format", "source"]
+arg source: differs
+    contract open (4GdNLf15): {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm", "hash": "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8", "build_target": "wasm32-wasip1"
+    probe 7Pr3stqn: {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/skarbnik-ol-probe/895678520ca9c0de5e0840fbe790b838ea600e60/farbox-verifier-spike.wasm", "hash": "60e04ada562d3f58b91a5a7c328a0cd366d2bdb12221e52a290f214a16f1dd43", "build_target": "wasm32-wasip1"}}
+    probe E5TmYhW5: {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/skarbnik-ol-probe/895678520ca9c0de5e0840fbe790b838ea600e60/farbox-verifier-spike.wasm", "hash": "60e04ada562d3f58b91a5a7c328a0cd366d2bdb12221e52a290f214a16f1dd43", "build_target": "wasm32-wasip1"}}
+    probe 2KxPD7fB: {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/skarbnik-ol-probe/e348cf68c64be4bf38108d2c6684f598cc9942dc/farbox-verifier-spike2.wasm", "hash": "7c19a694268ddfdbbcb4301756ea1acec4b250c5451919bd5f1d8644937499d2", "build_target": "wasm32-wasip1"}}
+arg resource_limits: differs
+    contract open (4GdNLf15): {"max_instructions": 2000000000, "max_memory_mb": 64, "max_execution_seconds": 20}
+    probe 7Pr3stqn: {"max_instructions": 10000000, "max_memory_mb": 128, "max_execution_seconds": 60}
+    probe E5TmYhW5: {"max_instructions": 2000000000, "max_memory_mb": 64, "max_execution_seconds": 20}
+    probe 2KxPD7fB: {"max_instructions": 10000000, "max_memory_mb": 128, "max_execution_seconds": 60}
+arg response_format: same in all four
+    contract open (4GdNLf15): "Json"
+    probe 7Pr3stqn: "Json"
+    probe E5TmYhW5: "Json"
+    probe 2KxPD7fB: "Json"
+arg payer_account_id: differs
+    contract open (4GdNLf15): "kintsugi-res2-prnvm.testnet"
+    probe 7Pr3stqn: "(absent)"
+    probe E5TmYhW5: "(absent)"
+    probe 2KxPD7fB: "(absent)"
+input length: differs
+    contract open (4GdNLf15): 299979
+    probe 7Pr3stqn: 2
+    probe E5TmYhW5: 299979
+    probe 2KxPD7fB: 2
+input keys: differs
+    contract open (4GdNLf15): ["image_id", "receipt_b64", "receipt_sha256", "submission_id"]
+    probe 7Pr3stqn: []
+    probe E5TmYhW5: ["image_id", "receipt_b64", "receipt_sha256", "submission_id"]
+    probe 2KxPD7fB: []
+input sha256: differs
+    contract open (4GdNLf15): "2fba09d3ef852f5c"
+    probe 7Pr3stqn: "44136fa355b3678a"
+    probe E5TmYhW5: "4ba1b847f5c70435"
+    probe 2KxPD7fB: "44136fa355b3678a"
+event request_data keys: same in all four
+    contract open (4GdNLf15): ["attached_usd", "code_source", "compile_only", "force_rebuild", "input_data", "input_data_in_state", "payment", "predecessor_id", "project_id", "project_uuid", "request_id", "resource_limits", "response_format", "secrets_ref", "sender_id", "store_on_fastfs", 
+    probe 7Pr3stqn: ["attached_usd", "code_source", "compile_only", "force_rebuild", "input_data", "input_data_in_state", "payment", "predecessor_id", "project_id", "project_uuid", "request_id", "resource_limits", "response_format", "secrets_ref", "sender_id", "store_on_fastfs", 
+    probe E5TmYhW5: ["attached_usd", "code_source", "compile_only", "force_rebuild", "input_data", "input_data_in_state", "payment", "predecessor_id", "project_id", "project_uuid", "request_id", "resource_limits", "response_format", "secrets_ref", "sender_id", "store_on_fastfs", 
+    probe 2KxPD7fB: ["attached_usd", "code_source", "compile_only", "force_rebuild", "input_data", "input_data_in_state", "payment", "predecessor_id", "project_id", "project_uuid", "request_id", "resource_limits", "response_format", "secrets_ref", "sender_id", "store_on_fastfs", 
+event code_source: differs
+    contract open (4GdNLf15): {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm", "hash": "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8", "build_target": "wasm32-wasip1"
+    probe 7Pr3stqn: {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/skarbnik-ol-probe/895678520ca9c0de5e0840fbe790b838ea600e60/farbox-verifier-spike.wasm", "hash": "60e04ada562d3f58b91a5a7c328a0cd366d2bdb12221e52a290f214a16f1dd43", "build_target": "wasm32-wasip1"}}
+    probe E5TmYhW5: {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/skarbnik-ol-probe/895678520ca9c0de5e0840fbe790b838ea600e60/farbox-verifier-spike.wasm", "hash": "60e04ada562d3f58b91a5a7c328a0cd366d2bdb12221e52a290f214a16f1dd43", "build_target": "wasm32-wasip1"}}
+    probe 2KxPD7fB: {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/skarbnik-ol-probe/e348cf68c64be4bf38108d2c6684f598cc9942dc/farbox-verifier-spike2.wasm", "hash": "7c19a694268ddfdbbcb4301756ea1acec4b250c5451919bd5f1d8644937499d2", "build_target": "wasm32-wasip1"}}
+event resource_limits: differs
+    contract open (4GdNLf15): {"max_instructions": 2000000000, "max_memory_mb": 64, "max_execution_seconds": 20}
+    probe 7Pr3stqn: {"max_instructions": 10000000, "max_memory_mb": 128, "max_execution_seconds": 60}
+    probe E5TmYhW5: {"max_instructions": 2000000000, "max_memory_mb": 64, "max_execution_seconds": 20}
+    probe 2KxPD7fB: {"max_instructions": 10000000, "max_memory_mb": 128, "max_execution_seconds": 60}
+event response_format: same in all four
+    contract open (4GdNLf15): "Json"
+    probe 7Pr3stqn: "Json"
+    probe E5TmYhW5: "Json"
+    probe 2KxPD7fB: "Json"
+event sender_id: same in all four
+    contract open (4GdNLf15): "kintsugi-res2-prnvm.testnet"
+    probe 7Pr3stqn: "kintsugi-res2-prnvm.testnet"
+    probe E5TmYhW5: "kintsugi-res2-prnvm.testnet"
+    probe 2KxPD7fB: "kintsugi-res2-prnvm.testnet"
+event predecessor_id: differs
+    contract open (4GdNLf15): "kintsugi-l2-cihdp.testnet"
+    probe 7Pr3stqn: "kintsugi-res2-prnvm.testnet"
+    probe E5TmYhW5: "kintsugi-res2-prnvm.testnet"
+    probe 2KxPD7fB: "kintsugi-res2-prnvm.testnet"
+
+compilation_note in each answer: contract open 4GdNLf15 "Cached WASM from 2026-10-26T05:34:41"; probe 7Pr3stqn
+"Freshly compiled"; probe E5TmYhW5 "Cached WASM from 2026-11-03T08:21:43"; probe 2KxPD7fB "Freshly compiled".
+
+Probe built the contract way (docs/evidence/OL-diag/probeB_contract_way_fresh.txt): the arguments of 4GdNLf15 with only
+the source changed to a file OutLayer did not hold, at the same path depth; sent with 150 Tgas and 2.8 NEAR by
+kintsugi-res2-prnvm.testnet directly: tx 8yxJZoEYb3x2N6kNoXioK4nPJCusztJbjMyMTaVyxYbD, "Freshly compiled", ok true, PASS, 19 s.

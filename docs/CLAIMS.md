@@ -103,6 +103,7 @@ Each claim names the file and the command that show it. Full results, failures i
 | A bounty opens only after the vendor's own reference fix passes the full check (Proof 0) | works on testnet | `scripts/s13_attacks.sh`, `scripts/s18_live_bounty.sh` (EVIDENCE, S13, S18) |
 | Anyone can rebuild the checker and get the published image id | MATCH | TRY_IT.md, step 9 |
 | The contract on chain is a reproducible build of a published commit | Demonstrated: code hash `7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC` = base58 of sha256 `630ed909...50bb` | `cd contract && cargo near build reproducible-wasm` at commit `c86db11` (TRY_IT.md, step 11); deploy tx `YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE` (EVIDENCE.md, "Level 1 through OutLayer") |
+| Level 1: OutLayer runs the pinned verifier program on a succinct proof and the contract settles on its answer, with the same journal checks and settlement as Level 2 | works on testnet, once: bounty 36 opened through OutLayer (tx `4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ`), a wrong fix FAIL (tx `8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY`), the real fix PASS and paid (tx `3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u`); a flipped seal answered not ok and recorded nothing; the contract trusts OutLayer and does not check the proof (Known limits) | `python3 scripts/level1_testnet.py`, `cargo test -p kintsugi-contract` (EVIDENCE, "Level 1 through OutLayer") |
 | Level 0: two registered verifiers check a receipt and attest | works on testnet; all verifier accounts are run by the project | `scripts/s4_testnet.sh` (EVIDENCE, S4) |
 | An agent's limited key cannot withdraw, change limits or exceed its fee limit; the Account page's stop button stops it | works on testnet | `./scripts/web_testnet.sh agentkey`; docs/SECURITY.md, "The site"; the stop button: EVIDENCE, "Site in the final design" |
 | Agent setup from the site: the limits form, an agent key made in the browser (shown once, never sent) and added by the wallet as a key limited to commit and reveal | works on testnet with the NEAR CLI wallet: the agent then committed and revealed with that key | EVIDENCE, "Site in the final design"; `docs/evidence/web/partd_transactions.tsv` |
@@ -114,8 +115,6 @@ Each claim names the file and the command that show it. Full results, failures i
 
 ## What is not built
 
-- **Level 1 is not built as a working path.** The contract has entry points for an OutLayer verifier, but OutLayer never
-  answered our jobs on testnet (8 of 8 timed out), so no Level 1 verdict exists (EVIDENCE, "OutLayer (Level 1) on testnet").
 - On the site: creating a bounty.
 - A mainnet contract.
 - Managed confidential proving (one sealed prover for many vendors) and proving in a GPU TEE

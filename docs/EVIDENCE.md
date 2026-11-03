@@ -7,6 +7,9 @@ by `<repo>` and `~`.
 
 ## Level 1 through OutLayer: built, deployed and settled on testnet (2026-11-03)
 
+**Verdict: PASS.** Bounty 36 was opened and settled through OutLayer on testnet: a wrong fix FAIL, the real fix PASS
+and paid. Balances before and after: `docs/evidence/level1/balances.txt`.
+
 **Question.** Can a bounty be decided by OutLayer running our pinned verifier program, with the contract trusting
 OutLayer's answer, and can OutLayer fetch that program from GitHub?
 
@@ -73,12 +76,34 @@ by 0.005, reward 0.1 NEAR. Every proof was made on the laptop CPU with `--po2 18
 | Proof of attempt 0 | vendor | FAIL, 8 segments, 696 s (`run/prove_a0.txt`) | |
 | Attacks (SECURITY.md, section 2) | asker, a stranger | private callback refused; Proof 0 as attempt 0 refused; low deposit refused; flipped seal: OutLayer answered not ok, nothing recorded | [`BmRtsAg7...`](https://testnet.nearblocks.io/txns/BmRtsAg7T6d72G91AyppvUP5S1e4wygPHxsXt8LtsYKt) (flipped seal) |
 | `check_with_outlayer` attempt 0 | asker | OutLayer verified FAIL; the attempt is spent ("Failed"), nothing paid | [`8HYqqjPy...`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY) |
-| Proof and `check_with_outlayer` of attempt 1, the real fix | vendor, asker | pending |  |
+| Proof of attempt 1 | vendor | PASS, 24 segments, 2,185 s (`run/prove_a1.txt`) | |
+| `check_with_outlayer` attempt 1 | asker | OutLayer verified PASS; the contract returned "final_pass" and paid `kintsugi-res1-prnvm` 0.1 NEAR (reason `outlayer_pass`) with its 0.015 NEAR fee back; bounty 36 is Paid | [`3ZpV6zsg...`](https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u) |
 
 **Cost of a check, measured** (`docs/evidence/level1/check_costs.txt`): about 0.0107 NEAR each time: 97 Tgas of gas
 (0.0096 NEAR, most of it for the 300 KB proof sent as an argument) plus OutLayer's charge of 0.0011 NEAR. The 2.8 NEAR
 attached is held while OutLayer works and refunded in the same transaction. Before this run the docs said about
 0.006 NEAR; that was an estimate, and it was wrong.
+
+**6. Does the contract ask OutLayer the same way as the probe jobs that were downloaded?** The request the contract sent
+in `4GdNLf15` was compared field by field with the probe jobs `7Pr3stqn`, `E5TmYhW5` and `2KxPD7fB`, all read from the
+chain (`docs/evidence/level1/request_comparison.txt`). The same in all four: the source type (`WasmUrl`) and its three
+fields (url, hash, build_target), `wasm32-wasip1`, the host raw.githubusercontent.com, the response format, and the
+signer OutLayer records. Different: the caller (the contract, not an account), `payer_account_id` (only the contract
+sends it), 150 Tgas instead of 300, a deeper path in another repository, and, against the two jobs that were freshly
+downloaded, a 300 KB input kept in OutLayer's state and tighter limits (2,000,000,000 instructions, 64 MB, 20 s
+instead of 10,000,000, 128 MB, 60 s with an empty input). So one more job was sent built the contract's way: the
+contract's own arguments from `4GdNLf15`, with only the source changed to a new file OutLayer could not hold (the pinned
+build plus a 43 byte version string, sha256 `b2d5f2014a9f266c7bc7bc64ab05fe4fad7a7ecf4a99854640b2cb277c592b79`, at
+`verifier/outlayer/farbox-verifier.wasm` in the probe repository, commit `8f93dde`), 150 Tgas and 2.8 NEAR, signed by
+`kintsugi-res2-prnvm.testnet`. OutLayer answered in 19 s: "Freshly compiled", `ok: true`, PASS, charge 0.0012171 NEAR
+(tx [`8yxJZoEYb3x2N6kNoXioK4nPJCusztJbjMyMTaVyxYbD`](https://testnet.nearblocks.io/txns/8yxJZoEYb3x2N6kNoXioK4nPJCusztJbjMyMTaVyxYbD),
+`docs/evidence/OL-diag/probeB_contract_way_fresh.txt`).
+
+What this proves: with the contract's exact limits, input, payer and gas, OutLayer on testnet downloaded a program it
+did not hold from a commit pinned GitHub address at the same path depth, compiled it and answered, on 2026-11-03. What
+it does not prove: that a fresh download works when the caller is the contract (no job here had both; the contract's
+jobs used OutLayer's cache, and the fresh jobs were sent by an account), that the pinned file itself
+(`e60647ec...`) would be downloaded again if OutLayer dropped it from its cache, or that it will work on another day.
 
 **What this run did not show.** OutLayer's answers in this run all say "Cached WASM from 2026-10-26": OutLayer already held
 this build (same sha256) in its cache since 2026-10-26 05:34 UTC, the time of our earlier tries. So this run shows OutLayer

@@ -12,3 +12,4 @@ l1_attack_flipped_seal	check_with_outlayer	kintsugi-res2-prnvm.testnet	BmRtsAg7T
 l1_attack_low_deposit	check_with_outlayer	kintsugi-res2-prnvm.testnet				1	9
 l1_attack_private_callback_2	on_outlayer_check	kintsugi-res2-prnvm.testnet				1	6
 l1_check_wrong_fix	check_with_outlayer	kintsugi-res2-prnvm.testnet	8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY	14.7 Tgas		0	17
+l1_check_real_fix	check_with_outlayer	kintsugi-res2-prnvm.testnet	3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u	14.7 Tgas		0	16

@@ -7,6 +7,7 @@ tx                                            what                              
 4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ  open_with_outlayer (Proof 0, PASS)     97.0 Tgas  0.009585   0.0011308      0.010716
 BmRtsAg7T6d72G91AyppvUP5S1e4wygPHxsXt8LtsYKt  check_with_outlayer (flipped seal)     96.9 Tgas  0.009578   0.0010954      0.010674
 8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY  check_with_outlayer (wrong fix, FAIL)  97.4 Tgas  0.009625   0.0011002      0.010725
+3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u  check_with_outlayer (real fix, PASS, paid)  98.5 Tgas  0.009716   0.0011006      0.010817
 
 Most of the gas pays for the 300 KB argument (the succinct proof in base64). OutLayer's input deposit for that size:
 estimate_execution_cost returned 2.6751102 NEAR (docs/evidence/OL-diag/probeA_github_raw_good.txt).

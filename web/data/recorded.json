@@ -1580,6 +1580,88 @@
     "script": "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)"
    }
   ],
+  "36": [
+   {
+    "step": "l1_create",
+    "method": "create_bounty",
+    "tx": "FdB4oi1eqKksLk6jeweWPKNve4txW2K6kBz6WsREjzqf",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1/transactions.tsv",
+    "script": "scripts/level1_testnet.py"
+   },
+   {
+    "step": "l1_open",
+    "method": "open_with_outlayer",
+    "tx": "4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ",
+    "what": "Opened with its Proof 0, checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1/transactions.tsv",
+    "script": "scripts/level1_testnet.py"
+   },
+   {
+    "step": "l1_commit_wrong_fix",
+    "method": "commit",
+    "tx": "ra9nBCZeK26wPCS7wJtxYe92K2kJPbqQ6wUUjmnyhkh",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1/transactions.tsv",
+    "script": "scripts/level1_testnet.py"
+   },
+   {
+    "step": "l1_commit_real_fix",
+    "method": "commit",
+    "tx": "FWwFmRrpDoJYMgYrWaLm2fo8CSfDHoupK1TUhFAmhxZ8",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1/transactions.tsv",
+    "script": "scripts/level1_testnet.py"
+   },
+   {
+    "step": "l1_reveal_wrong_fix",
+    "method": "reveal",
+    "tx": "FsbQF2y44QEX6oWWBqLzbHu5f4Bem4aUHhUXFvWo5tfS",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1/transactions.tsv",
+    "script": "scripts/level1_testnet.py"
+   },
+   {
+    "step": "l1_reveal_real_fix",
+    "method": "reveal",
+    "tx": "3ZKrK5NoBBZoSwYwJWkrSzo84PdfvZY1Zf3hAKnbTMBZ",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1/transactions.tsv",
+    "script": "scripts/level1_testnet.py"
+   },
+   {
+    "step": "l1_check_wrong_fix",
+    "method": "check_with_outlayer",
+    "tx": "8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY",
+    "what": "Proof of an attempt checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1/transactions.tsv",
+    "script": "scripts/level1_testnet.py"
+   },
+   {
+    "step": "l1_check_real_fix",
+    "method": "check_with_outlayer",
+    "tx": "3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u",
+    "what": "Proof of an attempt checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1/transactions.tsv",
+    "script": "scripts/level1_testnet.py"
+   }
+  ],
   "23": [
    {
     "step": "cleanup_b23_expire",

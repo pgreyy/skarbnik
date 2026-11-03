@@ -70,7 +70,7 @@ show it.
 | Level | Who decides | Shown by |
 | --- | --- | --- |
 | 2 (the default) | The contract checks the Groth16 proof itself, as in step 4 | every proof-paid bounty above; EVIDENCE, S6c |
-| 1 | OutLayer runs our pinned verifier program on the proof and the contract trusts its answer: no Groth16 step for the vendor, but OutLayer and its operator are trusted | bounty 36, opened ([`4GdNLf15…`](https://testnet.nearblocks.io/txns/4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ)) and its real fix's check through OutLayer is pending; EVIDENCE, "Level 1 through OutLayer" |
+| 1 | OutLayer runs our pinned verifier program on the proof and the contract trusts its answer: no Groth16 step for the vendor, but OutLayer and its operator are trusted | bounty 36, opened ([`4GdNLf15…`](https://testnet.nearblocks.io/txns/4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ)) and paid by OutLayer's PASS ([`3ZpV6zsg…`](https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u)), and a wrong fix FAIL ([`8HYqqjPy…`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY)); EVIDENCE, "Level 1 through OutLayer" |
 | 0 | Registered verifiers attest; today all of them are run by the project | EVIDENCE, S4 |
 
 ## What the checker tests, and what it can't

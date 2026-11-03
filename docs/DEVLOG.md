@@ -15,8 +15,9 @@ One dated entry per work block: what was done, the exact commands, the results, 
   `docs/evidence/level1/deploy/`), tx `YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE`, 40 of 40 saved views unchanged;
   `set_outlayer` tx `9sXDRkHu4NbGpK3Gsd6jS4R9CWmoGwhLzuzEg3vYZqmr`.
 - Bounty 36 (`python3 scripts/level1_testnet.py create|open|commit|reveal|ids|attacks|private_callback|check`): opened
-  through OutLayer, a wrong fix decided FAIL through OutLayer, four attacks refused; the real fix's proof and check are pending. Proofs on the laptop CPU:
-  Proof 0 3,548 s, the wrong fix 696 s.
+  through OutLayer, a wrong fix decided FAIL through OutLayer, four attacks refused, the real fix verified PASS through OutLayer and paid 0.1 NEAR (tx
+  `3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u`). Proofs on the laptop CPU:
+  Proof 0 3,548 s, the wrong fix 696 s, the real fix 2,185 s.
 - Measured: a check costs about 0.0107 NEAR (97 Tgas plus OutLayer's 0.0011 NEAR); the docs' earlier 0.006 NEAR was an
   estimate and is corrected everywhere.
 - Mistakes: the open step was run twice by mistake (the second call refused, gas only; its first log rebuilt from the
@@ -28,6 +29,11 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - Agents (owner's decision D15): Levels 2 and 1, Level 0 only when the user asks; the level and its meaning are said in
   the same message as the fee (AGENTS.md, agents.md, agent-quickstart.txt, tools/skarbnik-mcp 0.4.0, the hosted
   connector 1.1.0, For agents).
+- The contract's OutLayer request compared field by field with the probe jobs (docs/evidence/level1/request_comparison.txt);
+  one more job built the contract's way with a file OutLayer did not hold was freshly compiled and answered PASS in 19 s
+  (tx `8yxJZoEYb3x2N6kNoXioK4nPJCusztJbjMyMTaVyxYbD`). Not shown: a fresh download when the caller is the contract.
+- GPU for the real fix: approved by the owner, not used: the wrong fix had already finished on the laptop and the real
+  fix's laptop proof had started, so a rented GPU would not have finished sooner. Nothing was rented or spent.
 - Not run: the vendor tool's GPU mode for a Level 1 bounty; a fresh GitHub download of the pinned build itself (OutLayer
   had it cached).
 

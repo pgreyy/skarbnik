@@ -1,0 +1,14 @@
+Native balances (near account view-account-summary ... network-config testnet now) and contract credit (get_credit).
+Before the Level 1 run (2026-11-03, before create_bounty):
+kintsugi-vendor-prnvm.testnet balance 1.4323999404054494 credit "0"
+kintsugi-res1-prnvm.testnet balance 11.418414176849130799999997 credit "130000000000000000000000"
+kintsugi-res2-prnvm.testnet balance 9.775221617594730999999999 credit "160000000000000000000000"
+After bounty 36 was paid (2026-11-03, about 10:37 UTC):
+kintsugi-vendor-prnvm.testnet balance 1.3321216498492662
+kintsugi-res1-prnvm.testnet balance 11.532859985244844999999997 credit "115000000000000000000000"
+kintsugi-res2-prnvm.testnet balance 9.719280633414726999999999 credit "150000000000000000000000"
+res1 (the real fix): +0.115 NEAR received in the payout transaction (0.1 reward + its 0.015 attempt fee back); its credit
+fell by the 0.015 fee at commit. res2 (the wrong fix, and the asker of every check): its 0.01 fee stays in the contract
+(to the protocol fee pool at expiry); its native balance paid the gas of every check, the four attacks, the extra
+contract way probe job (docs/evidence/OL-diag/probeB_contract_way_fresh.txt) and OutLayer's charges; every 2.8 NEAR
+deposit came back. vendor: the 0.1 NEAR reward plus gas.

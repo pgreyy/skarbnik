@@ -114,7 +114,7 @@
 </div>
 <nav class="menu-sheet" id="menuSheet" aria-label="Menu" hidden><a href="#/bounties" data-nav="bounties">Bounties</a><a href="#/vendors" data-nav="vendors">For vendors</a><a href="#/agents" data-nav="agents">For agents</a><a href="#/how-it-works" data-nav="how-it-works">How it works</a><a href="#/evidence" data-nav="evidence">Evidence</a><a href="#/judge" data-nav="judge">Judge guide</a><div class="sheet-wallet" id="sheetWallet"></div></nav>
 </header>
-<div class="view" id="view"><p class="small faint" style="padding:16px 24px">A saved copy of <a href="/#/how-it-works">this page</a>, made 2026-11-03 06:28 UTC from the chain and the site's data files. With JavaScript the page shows the live data.</p><main id="main" class="p-how" tabindex="-1">
+<div class="view" id="view"><p class="small faint" style="padding:16px 24px">A saved copy of <a href="/#/how-it-works">this page</a>, made 2026-11-03 10:43 UTC from the chain and the site's data files. With JavaScript the page shows the live data.</p><main id="main" class="p-how" tabindex="-1">
 <section class="n-ph"><div class="wrap">
 <div style="max-width:820px;display:flex;flex-direction:column;gap:24px">
 <p class="eyebrow">How it works</p>
@@ -159,6 +159,15 @@
 </div>
 </div>
 </div></div></div></section>
+<section class="sec rule" id="levels" aria-labelledby="levels-h"><div class="wrap">
+<div style="max-width:760px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Levels</p><h2 class="h2" id="levels-h">Who decides a verdict?</h2><p class="lead">The vendor picks one of three levels when it creates a bounty. The story above is Level 2, the default.</p></div>
+<table class="n-tab" style="max-width:980px"><caption class="sr-only">The three levels</caption><thead><tr><th scope="col">Level</th><th scope="col">Who decides</th><th scope="col">Trust</th></tr></thead><tbody>
+<tr><td><b>Level 2</b></td><td><span class="tlab">Who decides </span>The contract checks a Groth16 proof of each fix itself.</td><td><span class="tlab">Trust </span>The published checker and the contract. The only level called paid by proof.</td></tr>
+<tr><td><b>Level 1</b></td><td><span class="tlab">Who decides </span>OutLayer runs the verifier program pinned on chain on the proof, and the contract trusts its answer.</td><td><span class="tlab">Trust </span>OutLayer and its operator, and that it can still download the pinned program from GitHub.</td></tr>
+<tr><td><b>Level 0</b></td><td><span class="tlab">Who decides </span>Two registered verifiers sign each verdict.</td><td><span class="tlab">Trust </span>The verifiers, today both run by the project.</td></tr>
+</tbody></table>
+<p class="small" style="margin-top:16px;max-width:760px">At every level a timeout is a timeout: if no verdict arrives in time, the waiting attempts are paid by rule, and it is never shown as a pass.</p>
+</div></section>
 <section class="sec rule" id="scope" aria-labelledby="isnt-h"><div class="wrap">
 <div style="max-width:720px;display:flex;flex-direction:column;gap:18px"><p class="eyebrow">Scope</p><h2 class="h2" id="isnt-h">What Skarbnik is, and isn’t</h2></div>
 <div class="r-isnt">

@@ -121,7 +121,7 @@ export async function evidence(viewEl, tab) {
   const full = (p) => { p.catch(() => {}); return answered.then(() => within(p, 30000, 'the full read took longer than 30 seconds')); };
   const savedAt = (at) => `${String(at).replace('T', ' ').replace(/:\d\dZ$/, '').replace(/Z$/, '')} UTC`;
   const andList = (ids) => (ids.length > 1 ? `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}` : String(ids[0]));
-  let all = null, snapshot = null, settled = [], nProof = 0, nTime = 0;
+  let all = null, snapshot = null, settled = [], nProof = 0, nOl = 0, nTime = 0;
   const liveP = full(loadAll(true)).then((l) => { all = l; }, async (e) => { const f = await fromFeed(); all = f.list; snapshot = { at: f.at, err: e.message }; });
 
   // the bounties paid by a checked proof, read live from the contract (the ledger decides the list)
@@ -137,20 +137,21 @@ export async function evidence(viewEl, tab) {
   // ---- Ledger: the settled bounties (filled in when the live values arrive), then the Proof Ledger
   const chips = (id, how) => {
     const list = [['commit', 'Commit'], ['reveal', 'Reveal']].flatMap(([m, l]) => txsOf(rec, id, m).slice(0, 2).map((t) => [t.tx, l]));
-    const end = how === 'proof' ? txsOf(rec, id, 'submit_groth16').map((t) => [t.tx, 'Proof']) : txsOf(rec, id, 'claim_timeout').map((t) => [t.tx, 'Claim']);
+    const end = how === 'proof' ? txsOf(rec, id, 'submit_groth16').map((t) => [t.tx, 'Proof'])
+      : how === 'outlayer' ? txsOf(rec, id, 'check_with_outlayer').map((t) => [t.tx, 'OutLayer check']) : txsOf(rec, id, 'claim_timeout').map((t) => [t.tx, 'Claim']);
     return [...list, ...end].map(([t, l]) => tx(t, l)).join('');
   };
   const ledgerRows = (f) => settled.filter((x) => f === 'all' || x.status === f).map((x) => {
     const id = String(x.b.id), st = STATUS[x.status], n8 = rec.bounty_notes && rec.bounty_notes[id];
     return `<div class="lrow" role="listitem"><div><a class="lid" style="color:var(--tx);text-decoration:none" href="#/bounties/${esc(id)}">#${esc(id)}</a><p class="small" style="margin-top:4px">${esc((meta.titles || {})[id] || '')}</p></div>
       <div>${chip(st.cls, x.status, st.icon)}${n8 && n8.transfer_failed ? `<div class="mt8">${chip('k-fail', 'Paid on paper, transfer failed', 'x')}</div>` : ''}</div>
-      <div class="txs">${chips(id, x.status === 'Proof verified' ? 'proof' : 'timeout') || '<span class="small faint">no transactions recorded</span>'}</div>
+      <div class="txs">${chips(id, x.status === 'Proof verified' ? 'proof' : x.status === 'Verified by OutLayer' ? 'outlayer' : 'timeout') || '<span class="small faint">no transactions recorded</span>'}</div>
       <p class="small">${esc(n8 ? n8.text : (meta.notes || {})[id] || '')}</p></div>`;
   }).join('');
   let lf = 'all';
   const ledgerTop = () => `<div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:end">
-    <div style="max-width:640px"><h2 class="h2s">The settlement ledger</h2><p class="body" style="margin-top:12px">Every paid bounty on the contract, with the transactions that show how it was decided. Paid by proof and paid by timeout are kept apart on purpose.</p></div>
-    ${seg([['all', 'All', settled.length], ['Proof verified', 'Proof verified', nProof], ['Timeout settlement', 'Timeout settlement', nTime]].map(([id, l, c]) => ({ id, label: `${esc(l)} <span style="color:var(--tx3)">${c}</span>` })), lf, 'Filter the ledger', 'data-lf')}</div>
+    <div style="max-width:640px"><h2 class="h2s">The settlement ledger</h2><p class="body" style="margin-top:12px">Every paid bounty on the contract, with the transactions that show how it was decided. Paid by proof, paid on OutLayer’s answer (Level 1) and paid by timeout are kept apart on purpose.</p></div>
+    ${seg([['all', 'All', settled.length], ['Proof verified', 'Proof verified', nProof], ...(nOl ? [['Verified by OutLayer', 'Verified by OutLayer', nOl]] : []), ['Timeout settlement', 'Timeout settlement', nTime]].map(([id, l, c]) => ({ id, label: `${esc(l)} <span style="color:var(--tx3)">${c}</span>` })), lf, 'Filter the ledger', 'data-lf')}</div>
     <div class="blist" role="list" aria-label="Ledger" id="lrows"><div class="lhead" aria-hidden="true"><span>Bounty</span><span>Settlement</span><span>Transactions</span><span>Note</span></div>${ledgerRows(lf)}</div>
     ${note('Bounty 17 is paid by timeout, not by a proof. Its evidence proof says PASS, but it finished after the window and was never submitted.')}`;
   const exampleList = [['24', 'Bounty 24: private repair, paid by proof'], ['32', 'Bounty 32: automatic vendor proving, paid by proof'], ['17', 'Bounty 17: timeout settlement, not a PASS'], ['33', 'Bounty 33: proved inside sealed hardware, paid by proof']];
@@ -330,8 +331,9 @@ export async function evidence(viewEl, tab) {
       return;
     }
     if (!$('#etabs')) return;
-    nProof = all.filter((x) => x.status === 'Proof verified').length; nTime = all.filter((x) => x.status === 'Timeout settlement').length;
-    settled = all.filter((x) => x.status === 'Proof verified' || x.status === 'Timeout settlement').slice().sort((a, b) => (a.status === b.status ? Number(b.b.id) - Number(a.b.id) : a.status === 'Proof verified' ? -1 : 1));
+    nProof = all.filter((x) => x.status === 'Proof verified').length; nOl = all.filter((x) => x.status === 'Verified by OutLayer').length; nTime = all.filter((x) => x.status === 'Timeout settlement').length;
+    const ORDER = ['Proof verified', 'Verified by OutLayer', 'Timeout settlement'];
+    settled = all.filter((x) => ORDER.includes(x.status)).slice().sort((a, b) => (a.status === b.status ? Number(b.b.id) - Number(a.b.id) : ORDER.indexOf(a.status) - ORDER.indexOf(b.status)));
     drawNums(); $('#ctSum').innerHTML = ctLine();
     const ln = $('#ledgerN'); if (ln) ln.textContent = `${settled.length} settled bounties`;
     const lt = $('#ledgerTop'); if (lt) { lt.innerHTML = ledgerTop(); bindLedger(); }
@@ -348,22 +350,22 @@ export async function evidence(viewEl, tab) {
       }
       const c = L.counts;
       const pl = $('#proofLedger'); if (!pl) return;
-      const howChip = (f) => (f.transfer_failed ? chip('k-fail', 'Paid on paper, transfer failed (audit finding 8)', 'x') : f.how === 'proof' ? chip('k-proof', 'Paid by proof', 'check') : chip('k-timeout', 'Paid by timeout', 'hourglass'));
+      const howChip = (f) => (f.transfer_failed ? chip('k-fail', 'Paid on paper, transfer failed (audit finding 8)', 'x') : f.how === 'proof' ? chip('k-proof', 'Paid by proof', 'check') : f.how === 'outlayer' ? chip('k-await', 'Verified by OutLayer', 'seal') : chip('k-timeout', 'Paid by timeout', 'hourglass'));
       pl.innerHTML = `<div style="max-width:700px"><h2 class="h2s">The Proof Ledger</h2><p class="body" style="margin-top:12px">Every account the contract has paid, how each fix was paid, and each vendor’s on-time record, ${snapshot ? `from the snapshot made at ${esc(L.made_at)} (ledger.json)` : 'computed live from every bounty and attempt on chain'}. No scores, no ranks, no credit for unpaid attempts.</p></div>
         ${note(`<b>${c.outside_the_team === 0 ? 'Every account below is run by the Skarbnik team or was seeded by its scripts.' : `${c.outside_the_team} account(s) below are not on the team’s list.`}</b> An account missing from the team’s list (data/accounts.json) would show as “not known”.`)}
-        <div class="stat4"><div><b class="num">${c.paid_fixes}</b><span>Paid fixes: ${c.paid_by_proof} by proof, ${c.paid_by_timeout} by timeout${c.paid_on_paper_transfer_failed ? `; ${c.paid_on_paper_transfer_failed} more paid on paper only (transfer failed)` : ''}</span></div><div><b class="num">${c.paid_accounts}</b><span>Paid accounts</span></div><div><b class="num">${c.vendors}</b><span>Vendors</span></div><div><b class="num">${c.distinct_counterparties}</b><span>Distinct counterparties: paid accounts and vendors</span></div></div>
+        <div class="stat4"><div><b class="num">${c.paid_fixes}</b><span>Paid fixes: ${c.paid_by_proof} by proof, ${c.paid_by_outlayer ? `${c.paid_by_outlayer} on OutLayer’s answer (Level 1), ` : ''}${c.paid_by_timeout} by timeout${c.paid_on_paper_transfer_failed ? `; ${c.paid_on_paper_transfer_failed} more paid on paper only (transfer failed)` : ''}</span></div><div><b class="num">${c.paid_accounts}</b><span>Paid accounts</span></div><div><b class="num">${c.vendors}</b><span>Vendors</span></div><div><b class="num">${c.distinct_counterparties}</b><span>Distinct counterparties: paid accounts and vendors</span></div></div>
         ${collapse('plFixes', `Paid fixes: ${c.paid_fixes}`, table(['Bounty', 'Attempt', 'Paid to', 'How', 'Paid', 'Checker', 'Transaction'], L.paid_fixes.map((f) => [
           `<a class="nw" href="#/bounties/${esc(f.bounty_id)}">Bounty ${esc(f.bounty_id)}</a>`, `#${esc(f.attempt)}`, `${names.has(f.payout_account) ? acct(f.payout_account) : esc(f.payout_account)}<span class="small">${esc(f.kind)}</span>`,
           `${howChip(f)}<span class="small">${esc(f.how === 'proof' ? 'PASS means: ' : '')}${esc(f.means)}</span>${f.note ? `<span class="small">${esc(f.note)}</span>` : ''}`,
           f.transfer_failed ? `<span class="mono nw">0 NEAR</span><span class="small">${esc(near(f.on_paper_yocto))} on paper; the transfer failed, no NEAR moved</span>` : `<span class="mono nw">${esc(near(f.paid_yocto))}</span><span class="small">plus its own fee back</span>`,
           hashCell(f.image_id), tx(f.tx)]), 'xl', 'Paid fixes'))}
-        ${collapse('plAccounts', `Paid accounts: ${c.paid_accounts}`, table(['Account', 'Who runs it', 'Fixes paid', 'By proof', 'By timeout', 'Total paid'], L.paid_accounts.map((a) => [names.has(a.account) ? acct(a.account) : esc(a.account), kindChip(a.kind), esc(a.fixes_paid), esc(a.paid_by_proof), esc(a.paid_by_timeout), `<span class="mono nw">${esc(near(a.total_paid_yocto))}</span>`]), 'wide', 'Paid accounts'))}
+        ${collapse('plAccounts', `Paid accounts: ${c.paid_accounts}`, table(['Account', 'Who runs it', 'Fixes paid', 'By proof', 'On OutLayer’s answer', 'By timeout', 'Total paid'], L.paid_accounts.map((a) => [names.has(a.account) ? acct(a.account) : esc(a.account), kindChip(a.kind), esc(a.fixes_paid), esc(a.paid_by_proof), esc(a.paid_by_outlayer || 0), esc(a.paid_by_timeout), `<span class="mono nw">${esc(near(a.total_paid_yocto))}</span>`]), 'wide', 'Paid accounts'))}
         ${collapse('plEarnings', 'Earnings by account', `<p class="small">Every account that committed or was paid. Fees spent are the attempt fees it paid; fees returned came back with a payout or as credit when a bounty closed. Model and compute costs appear only if the agent’s operator supplies them (data/operator_costs.json).</p>
-        ${table(['Account', 'Who runs it', 'Attempts', 'Gross rewards', 'Fees spent', 'Fees returned', 'Proof-checked passes', 'Timeout payouts', 'Rejected by a FAIL proof', 'Released unrevealed', 'Model and compute cost'], L.earnings.map((x) => [
+        ${table(['Account', 'Who runs it', 'Attempts', 'Gross rewards', 'Fees spent', 'Fees returned', 'Proof-checked passes', 'Passes on OutLayer’s answer', 'Timeout payouts', 'Rejected by a FAIL proof', 'Released unrevealed', 'Model and compute cost'], L.earnings.map((x) => [
           names.has(x.account) ? acct(x.account) : esc(x.account), kindChip(x.kind), esc(x.attempts), `<span class="mono nw">${esc(near(x.gross_rewards_yocto))}</span>`, `<span class="mono nw">${esc(near(x.fees_spent_yocto))}</span>`, `<span class="mono nw">${esc(near(x.fees_returned_yocto))}</span>`,
-          esc(x.proof_checked_passes), esc(x.timeout_payouts), esc(x.rejected_by_a_fail_proof), esc(x.released_unrevealed), x.model_and_compute_cost ? esc(x.model_and_compute_cost) : '<span class="faint">not supplied</span>']), 'xl', 'Earnings')}`)}
+          esc(x.proof_checked_passes), esc(x.outlayer_passes || 0), esc(x.timeout_payouts), esc(x.rejected_by_a_fail_proof), esc(x.released_unrevealed), x.model_and_compute_cost ? esc(x.model_and_compute_cost) : '<span class="faint">not supplied</span>']), 'xl', 'Earnings')}`)}
         ${collapse('plNumbers', 'Numbers: settled by proof and by the timeout rule, reveal to settlement', `<p class="small">From the chain only (every decided attempt); the proving machine from data/provers.json.</p>
-        ${table(['Measure', 'Value'], [['Decided attempts', esc(L.metrics.decided_attempts)], ['Settled by a proof', `${esc(L.metrics.settled_by_proof)} (${esc(Math.round((L.metrics.share_settled_by_proof || 0) * 100))}%)`], ['Settled by the timeout rule (timeout rate)', `${esc(L.metrics.settled_by_timeout)} (${esc(Math.round((L.metrics.timeout_rate || 0) * 100))}%)`],
+        ${table(['Measure', 'Value'], [['Decided attempts', esc(L.metrics.decided_attempts)], ['Settled by a proof', `${esc(L.metrics.settled_by_proof)} (${esc(Math.round((L.metrics.share_settled_by_proof || 0) * 100))}%)`], ['Settled on OutLayer’s answer (Level 1)', esc(L.metrics.settled_by_outlayer || 0)], ['Settled by the timeout rule (timeout rate)', `${esc(L.metrics.settled_by_timeout)} (${esc(Math.round((L.metrics.timeout_rate || 0) * 100))}%)`],
           ...Object.entries(L.metrics.reveal_to_settlement_seconds).map(([k, v]) => [`Reveal to settlement, ${esc(k)}`, `median ${esc(dur(v.median))}, slowest ${esc(dur(v.slowest))} (${esc(v.attempts)} attempts)`]),
           ['Distinct outside accounts', `${esc(L.metrics.distinct_outside_accounts)}${L.metrics.distinct_outside_accounts === 0 ? ': every account so far is run or seeded by the team' : ''}`]], '', 'Numbers')}
         <p class="small">${esc(L.metrics.timing_note)} Machine-readable: <a href="metrics.json">metrics.json</a>.</p>`)}

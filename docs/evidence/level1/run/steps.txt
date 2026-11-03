@@ -11,3 +11,4 @@
 2026-11-03T10:00:36Z l1_attack_low_deposit: a real attempt proof with less than min_deposit attached; tx ; exit 1; return 
 2026-11-03T10:01:16Z l1_attack_private_callback_2: a stranger calls the private callback (repeat with the full refusal text); tx ; exit 1; return 
 2026-11-03T10:01:32Z l1_check_wrong_fix: check the wrong fix through OutLayer; tx 8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY; exit 0; return "final_fail"
+2026-11-03T10:36:55Z l1_check_real_fix: check the real fix through OutLayer; tx 3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u; exit 0; return "final_pass"

@@ -25,7 +25,15 @@ what: [THREAT_MODEL.md](THREAT_MODEL.md). The site shows the same list: https://
 - Level 2 trusts the BN254 curve (below 100-bit security by recent estimates, not quantum safe), RISC Zero's Groth16
   trusted setup, and two RISC Zero constants fixed in the contract for version 3.0.6.
 - RISC Zero states its zero knowledge property is not formally proven.
-- Level 0 trusts its verifiers, and on testnet all of them are run by the project. Level 1 (OutLayer) never answered.
+- Level 0 trusts its verifiers, and on testnet all of them are run by the project.
+- Level 1 trusts OutLayer, its operator and its signing keys: the contract settles on OutLayer's answer without checking
+  the proof itself, and the answer does not prove which program ran. It depends on OutLayer downloading the pinned
+  verifier file from GitHub
+  (https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm,
+  sha256 `e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8`) or holding it in its cache; when it cannot,
+  no check arrives and the timeout rule applies. The owner sets that program for every Level 1 bounty and can change it.
+  Each check costs about 0.011 NEAR and holds 2.8 NEAR while OutLayer works (returned). Settled once on testnet
+  (bounty 36).
 
 ## The vendor and the secret
 
