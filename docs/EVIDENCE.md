@@ -5,15 +5,17 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
-## Level 1 through the vendor tool: bounties 37 and 38 (2026-11-03)
+## Level 1 through the vendor tool: bounties 37, 38 and 39 (2026-11-03)
 
 **Question.** Can a vendor host a Level 1 bounty end to end with the vendor tool, driven through its MCP server
 (`tools/skarbnik-vendor-mcp`), and have each attempt proved and checked through OutLayer with no one's help?
 
-**Verdict: PASS, for the PASS direction only.** One full cycle (bounty 37), in which the real fix was sent through
-the hosted connector link, and one run of the watch in GPU mode (bounty 38), both settled on OutLayer's PASS. No FAIL
-went through the tool: bounty 37's wrong fix was still undecided when the PASS closed the bounty, so its fee was
-refunded. A FAIL through OutLayer was shown on bounty 36, by `scripts/level1_testnet.py` ("Level 1 through OutLayer").
+**Verdict: PASS, both directions.** One full cycle (bounty 37), in which the real fix was sent through the hosted
+connector link, and one run of the watch in GPU mode (bounty 38), both settled on OutLayer's PASS; and one FAIL
+(bounty 39): a wrong fix proved on a rented GPU, OutLayer verified FAIL, the attempt spent, nobody paid (tx
+[`ogTyBybL...`](https://testnet.nearblocks.io/txns/ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR)). Bounty 37's wrong fix
+was still undecided when the PASS closed the bounty, so its fee was refunded. Bounty 36's FAIL through OutLayer was sent
+by `scripts/level1_testnet.py`, not by the tool ("Level 1 through OutLayer").
 Every transaction: `docs/evidence/level1_tool/transactions.tsv`; every MCP call: `docs/evidence/level1_tool/`
 (driven by an MCP client script over stdio, on the laptop and over ssh on the VPS; confirm codes were passed on,
 never printed).
@@ -59,16 +61,28 @@ tool now skips other types (`tools/skarbnik_gpu.py`, `WORKS_ON`).
 
 From reveal (14:41:00 UTC) to payment (14:44:32 UTC): 3 min 32 s.
 
-**GPU cost:** $0.1755 in all for both bounties and the diagnostics, eight pods (the cap was $2 for the cycle and $1
+**Bounty 39: a FAIL through the watch in GPU mode.** Level 1, the same demo files, one slot (K = 1), check size 1 and 1.
+
+| Step | Where | Result | Transaction |
+| --- | --- | --- | --- |
+| `init`, `check`, `prove0`, GPU mode | VPS, MCP server | NVIDIA L40S: prove 17.2 s, shrink 12.9 s, PASS; pod 120 s, $0.0363 | |
+| `init`, `check`, `publish` | laptop, MCP server | created and opened through OutLayer | [`4ggQCG9H...`](https://testnet.nearblocks.io/txns/4ggQCG9HtZoGKLU62AUQmycq3ZxDuDN1HZyVDGth3iCi), [`FTUhD57y...`](https://testnet.nearblocks.io/txns/FTUhD57yThaspSBXRiAoFWXZaNak2uWHLccshe3AA7WM) |
+| attempt 0: a wrong fix (`data/attacks/wrong_fix.wasm`; `check_patch`: 17 of 17 public tests), through `tools/skarbnik-mcp` | `skarbnik-agentc-d48260.testnet` | commit, reveal | [`CYxFFKsq...`](https://testnet.nearblocks.io/txns/CYxFFKsq8r8jzAPxGzpuuM4hqeVCVwBHF2XFUHTuAzTS), [`5s6Nbgo5...`](https://testnet.nearblocks.io/txns/5s6Nbgo5GtkZcJeCKxwRoqnRBJeZriJcQJTaS4zCtMVx) |
+| watch in GPU mode, attempt 0 | VPS | NVIDIA RTX 6000 Ada: prove 7.1 s (4 segments), FAIL; pod 117 s, $0.0322; `check_with_outlayer`: events `outlayer_verified` FAIL and `attempt_spent`, the contract returned `final_fail`, outcome Failed | [`ogTyBybL...`](https://testnet.nearblocks.io/txns/ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR) |
+
+Afterwards (`get_bounty 39`, `get_submission 39 0`): the bounty is still Open with no winner, its 0.1 NEAR reward is still
+held in the contract, its one slot is used, and the attempt's 0.01 NEAR fee is still held.
+
+**GPU cost:** $0.2440 in all for the three bounties and the diagnostics, ten pods (the cap was $2 for the cycle and $1
 more for the GPU work). No pod is left.
 
 **Fixed on the way** (branch `level1-tool`): the MCP server's `init` takes the check size (`fuzz_count`, `variants`);
 `prove0` fails with a plain message when no GPU can be rented; Level 1 texts no longer mention a Groth16 step (prove0,
 the watch log, `watch_start`'s cost and time, the preview's source of the proof time).
 
-**Not shown.** A FAIL through the tool; the vendor tool on a machine other than the project's laptop and VPS; OutLayer
-downloading the pinned file afresh (every answer said "Cached WASM from 2026-10-26"); an AI app driving the MCP server
-(an MCP client script did).
+**Not shown.** OutLayer downloading the pinned program afresh when the contract is the caller (every answer here said
+"Cached WASM from 2026-10-26"); what happens to bounty 39's reward and fee at its expiry (about 2026-11-07 15:37 UTC);
+sealed hardware for OutLayer's workers (never claimed; `docs/evidence/level1_tool/outlayer_sealed_hardware.txt`).
 
 ## Level 1 through OutLayer: built, deployed and settled on testnet (2026-11-03)
 

@@ -108,9 +108,10 @@ BOUNTY_STEPS = [
     ("docs/evidence/level1/transactions.tsv", "scripts/level1_testnet.py",
      {36: ["l1_create", "l1_open", "l1_commit_", "l1_reveal_", "l1_check_"]}),
     # The vendor tool's Level 1 runs: bounty 37 (the vendor MCP server; the real fix sent through the hosted connector,
-    # proved on the laptop CPU after the GPU path failed on older GPUs) and bounty 38 (watch in GPU mode)
+    # proved on the laptop CPU after the GPU path failed on older GPUs), bounty 38 (watch in GPU mode, PASS) and bounty
+    # 39 (watch in GPU mode, a wrong fix: FAIL)
     ("docs/evidence/level1_tool/transactions.tsv", "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp",
-     {37: ["l1t_b37_"], 38: ["l1t_b38_"]}),
+     {37: ["l1t_b37_"], 38: ["l1t_b38_"], 39: ["l1t_b39_"]}),
     # The testnet cleanup of 2026-10-30: claim_timeout where a revealed attempt waited, expire on the expired bounties
     ("docs/evidence/cleanup_2026-10-30/transactions.tsv", "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)",
      {3: ["cleanup_b3_claim"], 26: ["cleanup_b26_claim"], 0: ["cleanup_b0_expire"], 2: ["cleanup_b2_expire"], 10: ["cleanup_b10_expire"],

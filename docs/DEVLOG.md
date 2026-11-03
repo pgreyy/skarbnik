@@ -2,6 +2,20 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Level 1 through the vendor tool: a FAIL on bounty 39
+
+- Bounty 39 (Level 1, one slot), through `tools/skarbnik-vendor-mcp`: Proof 0 on a rented L40S; created and opened
+  through OutLayer (`4ggQCG9HtZoGKLU62AUQmycq3ZxDuDN1HZyVDGth3iCi`, `FTUhD57yThaspSBXRiAoFWXZaNak2uWHLccshe3AA7WM`); a
+  wrong fix from `skarbnik-agentc-d48260.testnet` through `tools/skarbnik-mcp` (commit
+  `CYxFFKsq8r8jzAPxGzpuuM4hqeVCVwBHF2XFUHTuAzTS`, reveal `5s6Nbgo5GtkZcJeCKxwRoqnRBJeZriJcQJTaS4zCtMVx`); the watch in GPU
+  mode proved it FAIL on an RTX 6000 Ada and sent `check_with_outlayer`
+  (`ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR`): OutLayer verified FAIL, the attempt spent, nobody paid. The bounty
+  stays Open with its reward held; the fee is held. GPU cost $0.0685. Bounty 36's FAIL was sent by
+  `scripts/level1_testnet.py`, not by the tool.
+- `scripts/gen_site_recorded.py` maps bounty 39; site data regenerated.
+- Not shown: OutLayer downloading the pinned program afresh when the contract is the caller; bounty 39's reward and fee
+  at its expiry (about 2026-11-07); sealed hardware for OutLayer (never claimed).
+
 ## 2026-11-03: Level 1 through the vendor tool: bounties 37 and 38
 
 - One full cycle through `tools/skarbnik-vendor-mcp` (bounty 37): `init`, `check` and `prove0` on the VPS (Proof 0 on a
@@ -18,7 +32,7 @@ One dated entry per work block: what was done, the exact commands, the results, 
   3 min 32 s from reveal to payment.
 - Fixed in the tools: the MCP server's `init` takes the check size; `prove0` fails plainly when no GPU is free; Level 1
   texts no longer mention a Groth16 step. The "not run end to end yet" lines are removed.
-- GPU cost: $0.1755 over eight pods. Not shown: a FAIL through the tool.
+- GPU cost: $0.1755 over eight pods. A FAIL through the tool followed on bounty 39 (entry above).
 
 ## 2026-11-03: Vendor tool Level 1 fix; 40 px under the tab strips
 

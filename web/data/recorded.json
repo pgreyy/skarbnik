@@ -1786,6 +1786,58 @@
     "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
    }
   ],
+  "39": [
+   {
+    "step": "l1t_b39_create",
+    "method": "create_bounty",
+    "tx": "4ggQCG9HtZoGKLU62AUQmycq3ZxDuDN1HZyVDGth3iCi",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b39_open",
+    "method": "open_with_outlayer",
+    "tx": "FTUhD57yThaspSBXRiAoFWXZaNak2uWHLccshe3AA7WM",
+    "what": "Opened with its Proof 0, checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b39_agent_commit_wrong_fix",
+    "method": "commit",
+    "tx": "CYxFFKsq8r8jzAPxGzpuuM4hqeVCVwBHF2XFUHTuAzTS",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b39_agent_reveal_wrong_fix",
+    "method": "reveal",
+    "tx": "5s6Nbgo5GtkZcJeCKxwRoqnRBJeZriJcQJTaS4zCtMVx",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   },
+   {
+    "step": "l1t_b39_watch_check_with_outlayer",
+    "method": "check_with_outlayer",
+    "tx": "ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR",
+    "what": "Proof of an attempt checked by OutLayer (Level 1)",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/level1_tool/transactions.tsv",
+    "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp; web/api/mcp"
+   }
+  ],
   "23": [
    {
     "step": "cleanup_b23_expire",
