@@ -46,22 +46,25 @@ const savedAt = (at) => `${String(at).replace('T', ' ').replace(/:\d\dZ$/, '').r
 // the line under the page header while the page shows the saved snapshot; empty once it shows live data
 const liveNote = (mode, at) => (mode === 'live' ? '' : `<div style="margin-top:24px">${mode === 'loading'
   ? note(`${LOADING}. Until it answers, this page shows the saved snapshot from ${esc(savedAt(at))}.`, 'clock')
-  : note(`Live data unavailable, showing the saved snapshot from ${esc(savedAt(at))}. Reload to read it live.`, 'alert')}</div>`);
+  : note(`Showing the saved record of ${esc(savedAt(at))}. Live reading is paused; reload to read it live.`, 'info')}</div>`);
 
 // The page is drawn at once. For the bounties the site points people to (web/data/bounty_snapshots.json, written by
 // scripts/gen_feed.py), the saved snapshot is shown, labelled with its time, until the contract answers; then the page
 // is drawn again from live data. For other bounties the header shows "Loading from the contract" until then. If the node
-// gives no first answer within 4 seconds, the page says so.
+// gives no first answer within 4 seconds, the page says so; the live read is tried twice before the page gives up. While
+// a saved snapshot is shown, that is one calm line, not a warning; only a bounty with no snapshot gets a real warning.
 export async function bounty(viewEl, id, tab) {
   viewEl.innerHTML = `<main id="main" class="p-bounty" tabindex="-1" data-bid="${esc(id)}"><section class="ph"><div class="wrap"><nav class="crumb" aria-label="Breadcrumb"><a href="#/bounties">Bounties</a><span aria-hidden="true">/</span><span style="color:var(--tx)" aria-current="page">Bounty ${esc(id)}</span></nav><h1>Bounty ${esc(id)}</h1><p class="state" role="status">${LOADING}</p></div></section></main>`;
   // still this bounty's page (the reader may have moved on)
   const here = () => { const m = document.querySelector('main.p-bounty'); return m && m.dataset.bid === String(id) ? m : null; };
   const bP = view('get_bounty', { bounty_id: String(id) });
-  const liveP = bP.then(async (b) => {
+  const rest = async (b) => {
     if (!b) return null;
     const [subs, verifiers] = await Promise.all([submissions(b), view('get_verifiers').then((v) => v.map((x) => x.account_id))]);
     return { b, subs, verifiers };
-  });
+  };
+  // the live read, tried a second time if the first one fails
+  const liveP = bP.then(rest).catch(() => view('get_bounty', { bounty_id: String(id) }).then(rest));
   liveP.catch(() => {});
   let rec, meta;
   try { [rec, meta] = await Promise.all([getRecorded(), getMeta()]); } catch (e) {
@@ -248,7 +251,7 @@ ${others.length ? `<p class="small">Other new module bounties: ${others.map((o) 
   ], tab, `#/bounties/${id}`, `Bounty ${id} sections`);
   // committing and revealing need the live contract: the panel waits for it
   if (mode === 'live') attemptPanel($('#sendPanel'), b, subs, verifiers);
-  else $('#sendPanel').innerHTML = `<p class="eyebrow">Send an attempt</p><p class="small mt8">${mode === 'loading' ? `${LOADING}. Committing and revealing use the live contract, not the saved snapshot.` : 'Live data unavailable just now. Committing and revealing need the live contract: reload to try again.'}</p>`;
+  else $('#sendPanel').innerHTML = `<p class="eyebrow">Send an attempt</p><p class="small mt8">${mode === 'loading' ? `${LOADING}. Committing and revealing use the live contract, not the saved snapshot.` : 'Live reading is paused. Committing and revealing need the live contract: reload to try again.'}</p>`;
 }
 
 export async function raw(viewEl, id) {

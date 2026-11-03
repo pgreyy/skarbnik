@@ -174,7 +174,7 @@ ${kv([['Verdict window', '4 hours'], ['Proof checked', 'No'], ['Secret input', '
 <a class="lnk" href="#/bounties/17">Read the full account ${icon('right')}</a>
 </article>
 </div>
-<div class="note" style="margin-top:28px">${icon('info')}<p><b style="color:var(--tx)">What these show:</b> the whole path works on testnet. <b style="color:var(--tx)">What they do not show:</b> that every bug can be handled, that the system is production ready, or that it has had an external audit. It has not.<span id="paidList"></span></p></div>
+<div class="note" style="margin-top:28px">${icon('info')}<p><b style="color:var(--tx)">What these show:</b> the whole path works on testnet. <b style="color:var(--tx)">What they do not show:</b> that every bug can be handled, or that it has had an external audit. It has not.<span id="paidList"></span></p></div>
 <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:28px"><a class="btn btn-g" href="#/evidence">See all proof and evidence</a><a class="lnk" href="#/judge">Follow the judge guide ${icon('right')}</a></div>
 </div>
 </section>

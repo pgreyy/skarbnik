@@ -2,6 +2,21 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Evidence limits cut to 8; "not production ready" wording removed; a calm line for the saved record
+
+- Evidence, Limits: 17 cards became 8 (Testnet only; Small programs only; Level 1 depends on OutLayer; A timeout pays
+  whatever was revealed; Proving is slow without a GPU; the full access key card; Attempts are public and limited; What
+  is not shown yet). Merged: run by the team into Testnet only; the three Level 1 cards into one; laptop and GPU
+  proving into one; no external audit, only one wallet signed and what the evidence shows into What is not shown yet;
+  revealed fixes and one bit per verdict into one. Dropped: Not production ready, and A payout to a missing account
+  is lost. docs/LIMITS.md and the other docs keep their full lists; JUDGE_GUIDE's count says eight.
+- "Production ready" wording removed from the Evidence card, Home ("What they do not show") and How it works ("It
+  isn't": now "Live on mainnet"); none is left outside the DEVLOG and the evidence logs.
+- Live data: Evidence and the bounty page try the live read twice before falling back. When the saved record loaded,
+  they show one calm line ("Showing the saved record of <time>. Live reading is paused; reload to read it live.");
+  a warning appears only if the saved record could not be loaded either. Checked in a browser with the testnet node
+  blocked, and with the node and the saved files blocked. Snapshots and saved pages regenerated (19:32 UTC).
+
 ## 2026-11-03: Level 1 through the vendor tool: a FAIL on bounty 39
 
 - Bounty 39 (Level 1, one slot), through `tools/skarbnik-vendor-mcp`: Proof 0 on a rented L40S; created and opened

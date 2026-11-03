@@ -32,23 +32,14 @@ async function codeHash() {
 }
 
 const LIMITS = (live) => [
-  ['check', '', 'What the evidence shows', 'The path works on NEAR testnet: bounties were paid by a proof the contract checked, and one was paid by the timeout rule. It shows that path, nothing wider.'],
-  ['alert', 'am', 'Testnet only', 'No mainnet contract exists. Every transaction on this site is a testnet transaction.'],
-  ['shield', '', 'No external audit', 'The contract was reviewed in AI review passes, with every finding reproduced before it was fixed. The checker, scripts, site and agent were outside that review.'],
-  ['gauge', '', 'Not production ready', 'Skarbnik is an experimental testnet project. It is not ready for production use or for real funds.'],
+  ['alert', 'am', 'Testnet only', 'No mainnet contract exists. Every transaction on this site is a testnet transaction, and every bounty so far was set up and run by the Skarbnik team, not by outside customers.', '<span id="paidSoFar">Loading from the contract</span>'],
+  ['cube', '', 'Small programs only', 'Crash bugs in small WebAssembly modules. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. A vendor needs a working fix before posting; a crash with no known fix cannot be posted.'],
+  ['link', 'am', 'Level 1 depends on OutLayer', 'At Level 1 the contract does not check the proof itself: it trusts OutLayer, and its operator, running the verifier program pinned on chain (get_outlayer). OutLayer must be up and able to download the pinned file from GitHub, or still hold it in its cache, which it can drop; if no check arrives, the timeout rule applies. A check costs about 0.011 NEAR and holds about 2.8 NEAR while OutLayer works, returned after. Only Level 2 is checked by the contract itself.'],
+  ['hourglass', '', 'A timeout pays whatever was revealed', 'If no verdict arrives in time, the timeout rule splits the reward among the attempts still waiting. The contract does not read the fix, so this is not a pass; under a silent vendor an honest fix may get as little as 1/K of the bounty.'],
+  ['clock', '', 'Proving is slow without a GPU', 'On a laptop CPU one attempt takes about 1.5 to 2.5 hours to prove, plus the shrink step, so it can miss a 4 hour window; then the timeout rule applies. On a rented GPU the vendor’s watch took about 17 minutes from reveal to submit (bounty 32), about $0.04 of GPU a proof, with the secret in that machine’s RAM during the proof.'],
   ['key', 'am', live.fullKeys === 0 ? 'No full access key' : 'Full access key kept on purpose (testnet)', live.fullKeys === 0 ? 'Read live: the contract account has no full access key, so its code cannot be replaced.' : `The testnet contract’s account keeps a full access key, so its owner can replace the code under live bounties. This is deliberate: it’s an experimental testnet contract that will keep changing. The mainnet contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay). ${live.fullKeys === null ? 'The keys could not be read just now.' : `Read live: ${live.fullKeys} full access ${live.fullKeys === 1 ? 'key' : 'keys'}.`} To check that the code has not changed silently, compare the live code hash on the Contract tab with the last deploy in docs/EVIDENCE.md, “Contract code and every deploy”, which lists every deploy transaction.`],
-  ['clock', '', 'Vendor proofs are slow on a laptop', 'One attempt takes about 1.5 to 2.5 hours to prove on a laptop CPU, plus the shrink step, so it can miss a 4 hour window. Then the timeout rule applies.'],
-  ['cpu', '', 'GPU proving rents a machine', 'The vendor’s watch proves each attempt on a rented GPU (bounties 32 and 27): about 17 minutes from reveal to submit, about $0.04 of GPU a proof. The secret sits in that machine’s RAM during the proof, then is wiped. The Groth16 wrap needs Docker on an x86 machine.'],
-  ['hourglass', '', 'A timeout pays whatever was revealed', 'The contract does not read the fix. Under a silent vendor, an honest fix may get as little as 1/K of the bounty.'],
-  ['eye', '', 'Revealed fixes are public', 'After the reveal a patch is on chain. A one line fix is often the reference fix byte for byte, so a secret reference fix protects little.'],
-  ['cube', '', 'Narrow scope', 'Crash bugs in small WebAssembly modules. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. A vendor with a crash but no fix is not supported.'],
-  ['coin', '', 'A payout to a missing account is lost', 'Bounty 8 shows it. The site and the agent check the account before a commit, but the contract does not.'],
-  ['hash', '', 'One verdict leaks one bit', 'K is the leak budget. A per-account cap (deployed 2026-10-26) limits how many slots one account holds, but one person with many accounts can still fill a bounty’s slots.'],
-  ['link', '', 'Level 1 trusts OutLayer', 'At Level 1 the contract does not check the proof itself: it trusts OutLayer running the verifier program pinned on chain (get_outlayer), and the operator of OutLayer. Only Level 2 is checked by the contract itself, and only Level 2 is called paid by proof.'],
-  ['link', 'am', 'Level 1 depends on a download from GitHub', 'OutLayer must be able to download the pinned program from its commit pinned address on raw.githubusercontent.com, or still hold it in its cache, which it can drop. If it cannot, a check gets no answer and the attempt goes to the timeout rule.'],
-  ['coin', '', 'Level 1 costs', 'About 0.011 NEAR a check (OutLayer’s fee about 0.0011 NEAR plus about 97 Tgas of gas, most of it for the 300 KB proof sent as an argument), and about 2.67 NEAR held while OutLayer works and returned after.'],
-  ['wallet', '', 'Only one wallet has signed here', 'NEAR CLI was clicked through to real transactions. The other wallets were only loaded, not signed in.'],
-  ['user', '', 'Run by the team, not outside customers', 'These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside customers.', '<span id="paidSoFar">Loading from the contract</span>'],
+  ['eye', '', 'Attempts are public and limited', 'After the reveal a patch is on chain for anyone to read. Each verdict tells a researcher at most one bit about the secret, so the attempt cap K is the leak budget; one person with many accounts can still fill a bounty’s slots.'],
+  ['check', '', 'What is not shown yet', 'The path works on NEAR testnet and nothing wider. Not shown: an external audit (the contract had AI review passes only), outside customers, a wallet other than NEAR CLI signing a transaction, OutLayer downloading the pinned file afresh when the contract asks, and sealed hardware for OutLayer’s workers (never claimed).'],
 ];
 
 const GH = 'https://github.com/pgreyy/skarbnik';
@@ -110,23 +101,29 @@ export async function evidence(viewEl, tab) {
   }
   if (!$('#etabs')) return;
   // The page is drawn at once from the site's own files. Live values are read from the contract afterwards and fill
-  // in when they arrive; until then each says so. If the node has not answered within 4 seconds, the saved snapshots
-  // (feed.json, ledger.json) are shown instead, with the time they were made. The node counts as answering once the
+  // in when they arrive; until then each says so. If the node has not answered within 4 seconds (tried twice), the saved
+  // snapshots (feed.json, ledger.json) are shown instead, with one calm line giving the time they were made; a warning
+  // appears only if the saved snapshots could not be loaded either. The node counts as answering once the
   // bounty list arrives; the full read of every attempt then takes a few seconds more (3 to 8 s measured), up to 30 s.
-  const LOADING = 'Loading from the contract', UNAVAILABLE = 'Live data unavailable, showing the saved list';
+  const LOADING = 'Loading from the contract';
   const within = (p, ms, why) => Promise.race([p, new Promise((_, no) => setTimeout(() => no(new Error(why)), ms))]);
-  const answered = within(allBounties(), 4000, 'the testnet node did not answer within 4 seconds');
-  answered.catch(() => {});
-  // p is caught here too: when the node never answered, its later failure is expected, not an error to report
-  const full = (p) => { p.catch(() => {}); return answered.then(() => within(p, 30000, 'the full read took longer than 30 seconds')); };
+  // One live read: the node must give its first answer (the bounty list) within 4 s, then the full read within 30 s.
+  // load() is caught here too: when the node never answered, its later failure is expected, not an error to report.
+  const tryLive = (load) => {
+    const answered = within(allBounties(), 4000, 'the testnet node did not answer within 4 seconds'); answered.catch(() => {});
+    const p = load(); p.catch(() => {});
+    return answered.then(() => within(p, 30000, 'the full read took longer than 30 seconds'));
+  };
+  // the live read is tried twice before the page falls back to the saved record
+  const full = (load) => tryLive(load).catch(() => tryLive(load));
   const savedAt = (at) => `${String(at).replace('T', ' ').replace(/:\d\dZ$/, '').replace(/Z$/, '')} UTC`;
   const andList = (ids) => (ids.length > 1 ? `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}` : String(ids[0]));
   let all = null, snapshot = null, settled = [], nProof = 0, nOl = 0, nTime = 0;
-  const liveP = full(loadAll(true)).then((l) => { all = l; }, async (e) => { const f = await fromFeed(); all = f.list; snapshot = { at: f.at, err: e.message }; });
+  const liveP = full(() => loadAll(true)).then((l) => { all = l; }, async (e) => { const f = await fromFeed(); all = f.list; snapshot = { at: f.at, err: e.message }; });
 
   // the bounties paid by a checked proof, read live from the contract (the ledger decides the list)
-  const paidText = full(paidByProof()).then((ids) => (ids.length ? `Paid by proof so far, read live from the contract: bounties ${andList(ids)}.` : 'No bounty has been paid by proof yet.'),
-    async () => { const f = await fromFeed(); const ids = f.list.filter((x) => x.status === 'Proof verified').map((x) => x.b.id); return `${UNAVAILABLE} (saved ${savedAt(f.at)}): paid by proof, bounties ${andList(ids)}.`; })
+  const paidText = full(() => paidByProof()).then((ids) => (ids.length ? `Paid by proof so far, read live from the contract: bounties ${andList(ids)}.` : 'No bounty has been paid by proof yet.'),
+    async () => { const f = await fromFeed(); const ids = f.list.filter((x) => x.status === 'Proof verified').map((x) => x.b.id); return `From the saved record of ${savedAt(f.at)}: paid by proof, bounties ${andList(ids)}.`; })
     .catch(() => 'The list of bounties paid by proof could not be read just now; the ledger has it.');
   const showPaid = () => paidText.then((t) => { const el = $('#paidSoFar'); if (el) el.textContent = t; });
   const attacks = (rec.attacks_s6c || []).filter((a) => /refused/.test(a.result)).length;
@@ -302,9 +299,10 @@ export async function evidence(viewEl, tab) {
         <p class="small">Never run against the contract: ${esc(u.where)}. With the crash variant check on, every probe FAILs and learns 0 bits.</p></div></div>
       <p class="small faint mt8">Recorded in docs/evidence/arena_probe/.</p>`;
   })();
-  // no answer from the node within 4 seconds: say so (the values still fill in if they arrive later)
-  answered.catch(() => {
-    const d = $('#deploy'), al = $('#allowLine'), gone = `Live data unavailable just now. The contract account is on the <a class="lnk sm" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">explorer ${icon('ext')}</a>.`;
+  // no live answer after both tries: say so (the values still fill in if they arrive later)
+  liveP.catch(() => {}).then(() => {
+    if (all && !snapshot) return;
+    const d = $('#deploy'), al = $('#allowLine'), gone = `Live reading is paused just now. The contract account is on the <a class="lnk sm" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">explorer ${icon('ext')}</a>.`;
     if (d && d.textContent.trim() === LOADING) d.innerHTML = `<p class="small">${gone}</p>`;
     if (al && al.textContent.trim() === LOADING) al.innerHTML = gone;
   });
@@ -337,7 +335,8 @@ export async function evidence(viewEl, tab) {
     drawNums(); $('#ctSum').innerHTML = ctLine();
     const ln = $('#ledgerN'); if (ln) ln.textContent = `${settled.length} settled bounties`;
     const lt = $('#ledgerTop'); if (lt) { lt.innerHTML = ledgerTop(); bindLedger(); }
-    if (snapshot) $('#liveNote').innerHTML = `<div style="margin-top:24px">${note(`${UNAVAILABLE}. The numbers and the ledgers below are the snapshots saved at ${esc(savedAt(snapshot.at))} (feed.json, ledger.json). Reload to read them live.`, 'alert')}</div>`;
+    // the saved record loaded: one calm line, not a warning (a real warning appears only if the saved record failed too)
+    if (snapshot) $('#liveNote').innerHTML = `<div style="margin-top:24px">${note(`Showing the saved record of ${esc(savedAt(snapshot.at))} (feed.json, ledger.json). Live reading is paused; reload to read it live.`, 'info')}</div>`;
     try {
       const [accounts, provers, costs] = await Promise.all([fetch('data/accounts.json').then((x) => x.json()), fetch('data/provers.json').then((x) => x.json()), fetch('data/operator_costs.json').then((x) => x.json())]);
       let L, names;

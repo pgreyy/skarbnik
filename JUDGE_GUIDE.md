@@ -187,7 +187,7 @@ in [docs/EVIDENCE.md](docs/EVIDENCE.md). No step needs real money or a mainnet w
   decided by it. Does not show: that the id is built from this source (Verify step 2 shows that) or that the checker is
   free of bugs.
 - **Read what is not claimed.** https://skarbnik.xyz/#/evidence/limits or the README's "Trust assumptions" (every limit:
-  [docs/CLAIMS.md](docs/CLAIMS.md), "Known limits"): seventeen limits in plain words on the site, among them no external
+  [docs/CLAIMS.md](docs/CLAIMS.md), "Known limits"): eight limits in plain words on the site, among them no external
   audit (only AI review passes), a full access key kept on purpose on the testnet contract, and testnet only. Check the
   access key with a `view_access_key_list` call on `kintsugi-l2-cihdp.testnet`, and the live code hash against the last
   deploy in [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy". Does not show: that no other limits
