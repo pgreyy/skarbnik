@@ -112,8 +112,13 @@ With `mode = "gpu"` in a watch config, `watch` proves each revealed attempt on a
    is left. The pod's cost (hourly price times its life) goes to the log and to `gpu_spend.json`.
 6. It wraps to Groth16, verifies, checks the verdict, the submission id and the secret commitment, and submits.
 
-After two failed pods for one attempt, or at the spend cap, it proves on its own CPU and writes a WARNING line, unless
-`cpu_fallback = false` is set in `[gpu]`: then nothing is proved on this machine and the next scan tries again. Once a
+With `cpu_fallback = false` in `[gpu]` (the project's setting), nothing is proved on the vendor machine's CPU. When no
+GPU of the allowed types is free, the watch waits 5 minutes, then 10 between tries, as long as at least 2 hours of the
+attempt's verdict window are left, with a "WAITING for a GPU" line each round; any other failure gets two rounds of two
+pods. When it stops, it writes a loud ALERT line to the watch log and keeps it in its state, where `status` shows it;
+the attempt then goes to the timeout rule unless the vendor proves it another way. The state survives a restart. With
+`cpu_fallback = true`, a round that gives no proof (or the spend cap) proves on the vendor machine's CPU instead and
+writes a WARNING line. Once a
 proof exists, a failed submit is only sent again (up to 10 times); no new pod starts for that attempt. One proof cost
 $0.04 on an L40S with the cached binary (docs/numbers.md). Set `network = "testnet-fastnear"` in the watch config's
 `[chain]`: near-cli then signs against the regular RPC rather than the archival one, whose old block hash once made a

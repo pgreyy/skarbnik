@@ -49,6 +49,11 @@ class GpuError(Exception):
 WORKS_ON = {'NVIDIA L40S', 'NVIDIA L40', 'NVIDIA L4', 'NVIDIA RTX 6000 Ada Generation', 'NVIDIA GeForce RTX 4090'}
 
 
+class NoGpuFree(GpuError):
+    """No GPU of the allowed types could be rented just now (none free in any listed data center or cloud, or all above
+    the price ceiling): a reason to wait and try again, not a failed proof."""
+
+
 class BudgetReached(GpuError):
     """The spend cap is reached: no new pod starts without the owner's say so."""
 
@@ -156,7 +161,7 @@ class Pod:
                     self.id = None
                     continue
                 return
-        raise GpuError(f'no GPU could be rented within the limits ({last})' if last else 'no GPU could be rented within the limits')
+        raise NoGpuFree(f'no GPU could be rented within the limits ({last})' if last else 'no GPU could be rented within the limits')
 
     def _create(self, cloud, types):
         pub = open(self.g['ssh_key'] + '.pub').read().strip()

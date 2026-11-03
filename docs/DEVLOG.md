@@ -2,6 +2,19 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: The vendor watch waits for a GPU instead of giving up
+
+- Found while answering how the watch handles a busy GPU market: each round reset the attempt's saved state, so the
+  failure count never passed 1 and the watch retried at once, without end (bounty 37's log shows "try 1 of 2" twice).
+- `tools/skarbnik_gpu.py`: "no GPU could be rented" is its own error (`NoGpuFree`).
+- `tools/skarbnik-vendor` watch, with `cpu_fallback = false`: when no GPU is free it waits 5 minutes, then 10 between
+  tries, while at least 2 hours of the verdict window are left, with a "WAITING for a GPU, try N, next try at ..., verdict
+  window ends ..." line each round; other failures get two rounds, then stop. Both ends write a loud ALERT line to the
+  watch log and keep it in the state file, which `status` prints first. The waiting state survives a restart. With
+  `cpu_fallback = true` it still proves on the CPU instead.
+- `python3 -I scripts/test_watch_retry.py` (fake GPU, chain and clock; no rental): no GPU free twice then free, no GPU
+  ever free, a card that crashes every round, a restart while waiting: ALL PASS. Not deployed to the VPS yet.
+
 ## 2026-11-03: Evidence limits: all eight cards shown; Level 1 proving times
 
 - The "More limits" fold on the Evidence page is gone: all eight cards are shown, the five that matter most first.

@@ -23,8 +23,10 @@ A vendor should not have to be a cryptography operator. Commands:
            verdict for the verifiers (post_verdict); warns when a window is at risk. Prover
            mode cpu proves on this machine; mode gpu proves and shrinks on a rented GPU pod per attempt
            (tools/skarbnik_gpu.py: secret in the pod's RAM only, pod always terminated, 45 minute cap, spend cap),
-           then wraps to Groth16 here; after two failed pods, or at the spend cap, it falls back to cpu and warns
-           (unless gpu.cpu_fallback = false: then nothing is proved here and the next scan tries again)
+           then wraps to Groth16 here (Level 2). When no GPU is free it waits 5 minutes, then 10 between tries, while
+           at least 2 hours of the verdict window are left; any other failure gets two rounds of two pods. At the end
+           it writes a loud ALERT line, kept in the state for `status`, and never gives up silently. With
+           gpu.cpu_fallback = true it proves on this machine's CPU instead of waiting or stopping
   status   each watched bounty and attempt, its state and the next action needed
 
 Secrets (the secret input, the salt, the reference fix) stay on the machine that proves, in files of mode 600 outside
@@ -478,11 +480,12 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
         v, t = open(f'{w}/verify_u.txt').read(), prev.get('times_s', {})
         log_line(wcfg, f'bounty {bid} attempt {i}: the proof is already made; submitting it again (try {prev.get("submit_failures", 0) + 1})')
     else:
-        st[key] = {'state': 'proving', 'started': now()}; state_save(wcfg, st)
+        st[key] = {**{k: prev[k] for k in ('failures', 'gpu_wait') if k in prev}, 'state': 'proving', 'started': now()}; state_save(wcfg, st)
         if wcfg['prover']['mode'] == 'gpu':
             job = {'bounty_id': bid, 'index': i, 'name': e['name'], 'module': module, 'patch': patch, 'secret': os.path.expanduser(e['secret']),
                    'salt': os.path.expanduser(f'~/.kintsugi-salts/{e["name"]}.salt'), 'seed': s['seed'], 'sid': sid, 'fuzz': b['fuzz_count'],
                    'variants': b['variant_count'], 'image_id': b['image_id'], 'workdir': w}
+            last = None
             for n in (1, 2):
                 try:
                     with ProverLock():
@@ -490,14 +493,18 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
                         if level == 2: v, t['groth16'] = wrap(wcfg, w, 'u')
                         else: v = verify_succinct(wcfg, w, 'u')
                     break
+                except gpu.NoGpuFree as ex:
+                    if not gpu.settings(wcfg).get('cpu_fallback', True):
+                        raise  # nothing to rent right now: the watch waits and tries again (failed_round)
+                    log_line(wcfg, f'WARNING bounty {bid} attempt {i}: {ex}; proving on this machine (cpu) instead'); break
                 except gpu.BudgetReached as ex:
                     if not gpu.settings(wcfg).get('cpu_fallback', True):
                         raise RuntimeError(f'{ex}; gpu.cpu_fallback is false: no CPU proving here') from None
                     log_line(wcfg, f'WARNING bounty {bid} attempt {i}: {ex}; proving on this machine (cpu) instead'); break
                 except Exception as ex:  # noqa: BLE001
-                    log_line(wcfg, f'bounty {bid} attempt {i}: GPU try {n} of 2 failed ({ex})')
+                    last = ex; log_line(wcfg, f'bounty {bid} attempt {i}: GPU try {n} of 2 failed ({ex})')
             if v is None and not gpu.settings(wcfg).get('cpu_fallback', True):
-                raise RuntimeError('the GPU path did not give a proof, and gpu.cpu_fallback is false: no CPU proving here; the next scan tries again')
+                raise RuntimeError(f'the GPU path gave no proof ({str(last)[:160]}); gpu.cpu_fallback is false, so nothing is proved on this machine')
             if v is None:
                 log_line(wcfg, f'WARNING bounty {bid} attempt {i}: the GPU path did not give a proof; falling back to cpu on this machine (about 10 h here)')
         if v is None:
@@ -530,6 +537,40 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
     for f in ('u_succinct.bin',):
         if os.path.exists(f'{w}/{f}'): os.remove(f'{w}/{f}')
 
+GPU_WAIT_FIRST_S, GPU_WAIT_NEXT_S, GPU_WAIT_MIN_LEFT_S = 300, 600, 7200  # 5 min, then every 10 min, while 2 h are left
+
+def utc_at(t): return f'{datetime.fromtimestamp(t, timezone.utc):%Y-%m-%d %H:%M} UTC'
+
+def alert(wcfg, rec, msg):
+    """A loud line in the watch log, kept in the state so `status` shows it: the watch never gives up silently."""
+    rec.update(state='gave up', alert=f'{now()} {msg}'); log_line(wcfg, f'ALERT {msg}')
+
+def failed_round(wcfg, st, bid, i, s, ex, t=None):
+    """After a proving round that gave no proof. No GPU free: wait 5 minutes, then 10 between tries, as long as at least
+    2 hours of the attempt's verdict window are left after the next try. Any other failure (a card the prover build does
+    not run on, a bad proof): two rounds in all. Either way the end is a loud ALERT line, never a silent stop."""
+    t = time.time() if t is None else t
+    key = f'{bid}:{i}'; rec = st.get(key, {}); end = int(s['deadline_ns']) / SEC
+    if isinstance(ex, gpu.NoGpuFree):
+        n = rec.get('gpu_wait', {}).get('tries', 0) + 1
+        nxt = t + (GPU_WAIT_FIRST_S if n == 1 else GPU_WAIT_NEXT_S)
+        if end - nxt < GPU_WAIT_MIN_LEFT_S:
+            alert(wcfg, rec, f'bounty {bid} attempt {i}: GAVE UP: no GPU was free in {n} tries, and a next try at {utc_at(nxt)} would leave less '
+                             f'than 2 h of the verdict window (it ends {utc_at(end)}). Nothing more is proved here; the timeout rule decides this '
+                             'attempt unless the vendor proves it another way.')
+        else:
+            rec.update(state='waiting for a GPU', gpu_wait={'tries': n, 'next_at': nxt, 'last': str(ex)[:200]})
+            log_line(wcfg, f'bounty {bid} attempt {i}: WAITING for a GPU, try {n}, next try at {utc_at(nxt)}, verdict window ends {utc_at(end)}')
+    else:
+        rec.update(failures=rec.get('failures', 0) + 1, error=str(ex)[:300])
+        if rec['failures'] >= 2:
+            alert(wcfg, rec, f'bounty {bid} attempt {i}: STOPPED after 2 failed rounds ({str(ex)[:200]}). Nothing more is proved here; the timeout '
+                             f'rule decides this attempt at {utc_at(end)} unless the vendor acts.')
+        else:
+            rec['state'] = 'failed'
+            log_line(wcfg, f'bounty {bid} attempt {i}: FAILED ({ex}); try 1 of 2')
+    st[key] = rec
+
 def scan(wcfg, st):
     jobs = []
     for bid, e in watched(wcfg):
@@ -539,7 +580,8 @@ def scan(wcfg, st):
         for i, s in enumerate(subs):
             if s['outcome'] != 'Open' or not s.get('revealed_at_ns'): continue
             done = st.get(f'{bid}:{i}', {})
-            if done.get('state') in ('submitted', 'decided elsewhere', 'deadline passed') or done.get('failures', 0) >= 2 or done.get('submit_failures', 0) >= 10: continue
+            if done.get('state') in ('submitted', 'decided elsewhere', 'deadline passed', 'gave up') or done.get('failures', 0) >= 2 or done.get('submit_failures', 0) >= 10: continue
+            if done.get('gpu_wait', {}).get('next_at', 0) > time.time(): continue  # waiting for a GPU: not before its next try
             jobs.append((int(s['revealed_at_ns']), bid, e, b, i, s))
     return sorted(jobs, key=lambda j: j[0])
 
@@ -563,8 +605,7 @@ def cmd_watch(a):
             _, bid, e, b, i, s = jobs[0]
             try: prove_attempt(wcfg, bid, e, b, i, s, st)
             except Exception as ex:  # noqa: BLE001
-                rec = st.get(f'{bid}:{i}', {}); rec.update(state='failed', failures=rec.get('failures', 0) + 1, error=str(ex)[:300]); st[f'{bid}:{i}'] = rec
-                log_line(wcfg, f'bounty {bid} attempt {i}: FAILED ({ex}); try {rec["failures"]} of 2')
+                failed_round(wcfg, st, bid, i, s, ex)
             state_save(wcfg, st)
             continue
         if a.once: log_line(wcfg, 'nothing to prove'); return
@@ -572,6 +613,8 @@ def cmd_watch(a):
 
 def cmd_status(a):
     wcfg = load(a.config); st = state_load(wcfg); nowns = time.time() * SEC
+    for k, rec in st.items():
+        if rec.get('alert'): say(f'ALERT {rec["alert"]}')
     for bid, e in watched(wcfg):
         try: b, subs = attempts(wcfg, bid)
         except Exception as ex: say(f'bounty {bid}: could not read ({ex})'); continue  # noqa: BLE001
