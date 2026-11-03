@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Evidence limits: all eight cards shown; Level 1 proving times
+
+- The "More limits" fold on the Evidence page is gone: all eight cards are shown, the five that matter most first.
+- "Proving is slow without a GPU" now says its figures are Level 2 ones (16 and 32, then the Groth16 step) and adds
+  Level 1's: about 12 to 37 minutes per attempt on the laptop CPU (bounty 36: 696 s and 2,185 s; bounty 37: 1,299 s
+  plus a 934 s shrink) and about 7 to 10 seconds to prove on a rented Ada GPU (bounty 39: 7.08 s; bounty 38: 10.21 s).
+- The Level 1 card's "about 2.8 NEAR held" stays: 2.8 NEAR is the contract's min_deposit, attached and forwarded to
+  OutLayer, which returns all but its fee; 2.6751 NEAR was OutLayer's own estimate of its input deposit.
+
 ## 2026-11-03: Docs audit: disagreeing statements fixed; five limits first; roadmap plans
 
 - Fixed to the true value: `web/data/numbers.json` said 135 contract unit tests (the Evidence page read it); it is 155
