@@ -101,8 +101,9 @@ One verdict also tells the agent one bit about the secret, so each bounty caps i
 - **A cheat refused:** bounty 17's real journal with another real proof's seal, sent to judge bounty 22, refused by the
   pairing check itself: tx [`5uKLepww…`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj).
   [9 more attacks](https://skarbnik.xyz/#/evidence/contract) were refused on chain.
-- **An honest timeout:** [bounty 17](https://skarbnik.xyz/bounties/17/). The fix was right, but a laptop proof was too
-  slow for the 4 hour window, so the timeout rule paid it, labelled as a timeout, not a proof.
+- **An honest timeout:** [bounty 17](https://skarbnik.xyz/bounties/17/). The vendor's laptop proof said PASS but
+  finished after the 4 hour window and was never sent, so the timeout rule paid it, labelled as a timeout, not a proof:
+  tx [`BLcWs7dp…`](https://testnet.nearblocks.io/txns/BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh).
 - **Open a judge bounty yourself:** judge bounties 28 to 31 are closed; send bounty 17's stored proof from any testnet
   account and the contract checks it and opens one ([docs/TRY_IT.md](docs/TRY_IT.md), step 5). Need test NEAR? Get free
   testnet NEAR from the [official faucet](https://docs.near.org/getting-started/faucet) or

@@ -56,8 +56,8 @@ is already open). Each judge bounty takes K = 2 attempts, at most 1 per account,
 
 Need test NEAR? Get free testnet NEAR from the [official faucet](https://docs.near.org/getting-started/faucet) or
 [near-faucet.io](https://near-faucet.io/). A faucet can run out; if it does, ask in the
-[NEAR dev Telegram](https://t.me/neardev). Or make a testnet account funded by the faucet with near-cli-rs 0.30.1, then, from a clone of
-the repository:
+[NEAR dev Telegram](https://t.me/neardev). Or make a testnet account funded by the faucet with near-cli-rs 0.30.1.
+Then, from a clone of the repository:
 
     near account create-account sponsor-by-faucet-service <you>.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
     near contract call-function as-transaction kintsugi-l2-cihdp.testnet open_with_groth16 file-args docs/evidence/receipts/judge_open_28.json prepaid-gas '300 Tgas' attached-deposit '0 NEAR' sign-as <you>.testnet network-config testnet sign-with-legacy-keychain send

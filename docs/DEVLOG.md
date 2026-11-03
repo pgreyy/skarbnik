@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Judge guide final pass
+
+- Compared JUDGE_GUIDE.md, the README's "A 2 minute proof" section and the live /judge/ page. The page's data on the
+  live site is byte for byte what `scripts/gen_judge_data.py` builds from JUDGE_GUIDE.md. Every link was checked: the
+  16 transaction ids all exist (FastNEAR transaction index), the 22 links to repository files and their anchors exist,
+  and the web links answer 200, except the NEAR explorer, which shows a bot check to scripts (its transactions were
+  checked through the index instead).
+- Fixed in the README: bounty 17 said "The fix was right"; the guide says no proof was checked for it. It now says the
+  vendor's laptop proof said PASS but finished after the 4 hour window and was never sent, with the claim transaction.
+  The README's "9 more attacks" matches the 9 refused attacks recorded; its amounts, times and ids match the guide.
+
 ## 2026-11-03: Saved pages for readers without scripts: titles, descriptions, Open Graph, /bounties/
 
 - `scripts/snapshot_pages.mjs`: each saved page now gets its own one sentence description and its own Open Graph
