@@ -2,6 +2,12 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: For vendors: "A GPU rental account is needed for a rented GPU."
+
+- The requirements line on For vendors (both ways, and the saved page) now reads "A GPU rental account is needed for a
+  rented GPU." The live page, its script and the saved page had no provider name since 44b1eeb (checked again with curl
+  and in a browser with every tab open); a view showing the old strings was most likely a copy from before that push.
+
 ## 2026-11-03: Docs in step with the site
 
 - AGENTS.md (and web/agents.md), agent-quickstart.txt, llms.txt, the README and tools/skarbnik-mcp/README.md describe

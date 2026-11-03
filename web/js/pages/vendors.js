@@ -28,7 +28,7 @@ const sum = (m) => m.prove + m.shrink + m.wrap;
 const s = (x) => `${x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} s`;
 const hm = (x) => (x >= 3600 ? `about ${(x / 3600).toFixed(1)} h` : `about ${Math.round(x / 60)} min`);
 
-const REQ = 'Needs Linux (on Windows, use WSL), Docker, and an x86 computer. A rented GPU needs a GPU rental account.';
+const REQ = 'Needs Linux (on Windows, use WSL), Docker, and an x86 computer. A GPU rental account is needed for a rented GPU.';
 const NEED = collapse('vNeed', 'What do I need for this?', `<ul class="n-ul">${[
   'Linux, or WSL on Windows',
   'Docker',
