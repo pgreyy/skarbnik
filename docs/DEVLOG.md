@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Evidence: the "What these show" box removed, two limits added
+
+- The note "What these show: the path works on testnet. What they do not show: ..." is gone from the Evidence page
+  and from the saved /evidence/ page. Before removing it, the Limits tab was checked for each point: no external audit
+  was there ("No external audit"); that not every bug can be handled is the "Narrow scope" row (crash bugs in small
+  WebAssembly modules only). Missing, so added as rows: "What the evidence shows" (the path works on NEAR testnet, and
+  nothing wider) and "Not production ready". Limits now has 15 rows. Home keeps its own copy of the box.
+- Fixed: when the node gave no answer within 4 seconds, the Evidence page's background reads could later fail with
+  nothing listening, which showed as a script error. They are now caught. Checked with every RPC request failing:
+  Evidence, bounty 24, bounty 5, Home and Bounties show their saved or loading state with no script errors.
+
 ## 2026-11-03: Menu order and the Evidence label
 
 - The top menu, the phone menu and the footer now read Bounties, For vendors, For agents, How it works, Evidence,

@@ -32,8 +32,10 @@ async function codeHash() {
 }
 
 const LIMITS = (live) => [
+  ['check', '', 'What the evidence shows', 'The path works on NEAR testnet: bounties were paid by a proof the contract checked, and one was paid by the timeout rule. It shows that path, nothing wider.'],
   ['alert', 'am', 'Testnet only', 'No mainnet contract exists. Every transaction on this site is a testnet transaction.'],
   ['shield', '', 'No external audit', 'The contract was reviewed in AI review passes, with every finding reproduced before it was fixed. The checker, scripts, site and agent were outside that review.'],
+  ['gauge', '', 'Not production ready', 'Skarbnik is an experimental testnet project. It is not ready for production use or for real funds.'],
   ['key', 'am', live.fullKeys === 0 ? 'No full access key' : 'Full access key kept on purpose (testnet)', live.fullKeys === 0 ? 'Read live: the contract account has no full access key, so its code cannot be replaced.' : `The testnet contract’s account keeps a full access key, so its owner can replace the code under live bounties. This is deliberate: it’s an experimental testnet contract that will keep changing. The mainnet contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay). ${live.fullKeys === null ? 'The keys could not be read just now.' : `Read live: ${live.fullKeys} full access ${live.fullKeys === 1 ? 'key' : 'keys'}.`} To check that the code has not changed silently, compare the live code hash on the Contract tab with the last deploy in docs/EVIDENCE.md, “Contract code and every deploy”, which lists every deploy transaction.`],
   ['clock', '', 'Vendor proofs are slow on a laptop', 'One attempt takes about 1.5 to 2.5 hours to prove on a laptop CPU, plus the shrink step, so it can miss a 4 hour window. Then the timeout rule applies.'],
   ['cpu', '', 'GPU proving rents a machine', 'The vendor’s watch proves each attempt on a rented GPU (bounties 32 and 27): about 17 minutes from reveal to submit, about $0.04 of GPU a proof. The secret sits in that machine’s RAM during the proof, then is wiped. The Groth16 wrap needs Docker on an x86 machine.'],
@@ -93,7 +95,6 @@ export async function evidence(viewEl, tab) {
   const overview = `<div class="stack g28">
     <div style="max-width:720px" class="stack g12"><h2 class="h2s" id="deeper">What this page shows</h2><p class="body">The path works on NEAR testnet: bounties were paid by a proof the contract checked, and one was paid by the timeout rule, labelled as such. Each row links to the transaction that decided it.</p></div>
     ${PAID_ROWS()}
-    <div class="note">${icon('info')}<p><b style="color:var(--tx)">What these show:</b> the path works on testnet. <b style="color:var(--tx)">What they do not show:</b> that every bug can be handled, that the system is production ready, or that an external audit has happened.</p></div>
     <p class="small" id="ctSum">Reading the contract…</p>
     <div class="nums" role="list" aria-label="Key numbers" id="nums"></div>
     ${collapse('vocab', 'What the status labels mean', `<p class="body" style="max-width:640px">Mint is used only for a verified outcome, and always with a word and an icon. A timeout is never styled like a proof. The last two labels are the feed’s states for bounties that are not settled.</p>
@@ -113,7 +114,9 @@ export async function evidence(viewEl, tab) {
   const LOADING = 'Loading from the contract', UNAVAILABLE = 'Live data unavailable, showing the saved list';
   const within = (p, ms, why) => Promise.race([p, new Promise((_, no) => setTimeout(() => no(new Error(why)), ms))]);
   const answered = within(allBounties(), 4000, 'the testnet node did not answer within 4 seconds');
-  const full = (p) => answered.then(() => within(p, 30000, 'the full read took longer than 30 seconds'));
+  answered.catch(() => {});
+  // p is caught here too: when the node never answered, its later failure is expected, not an error to report
+  const full = (p) => { p.catch(() => {}); return answered.then(() => within(p, 30000, 'the full read took longer than 30 seconds')); };
   const savedAt = (at) => `${String(at).replace('T', ' ').replace(/:\d\dZ$/, '').replace(/Z$/, '')} UTC`;
   const andList = (ids) => (ids.length > 1 ? `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}` : String(ids[0]));
   let all = null, snapshot = null, settled = [], nProof = 0, nTime = 0;
