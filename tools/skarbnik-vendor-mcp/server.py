@@ -369,7 +369,8 @@ def t_watch_start(a):
                 "spends": (f"for each revealed attempt, {gpu_note(None)}. Spend cap: ${g.get('budget_usd', 6.0)} in all; spent so far ${spent}. "
                            "At the cap no new GPU starts" if mode == "gpu" else "this computer's time; no rental")
                           + ". On a Level 1 bounty each check also holds the contract's min_deposit (about 2.8 NEAR) from the submit account while OutLayer works, returned less about 0.011 NEAR",
-                "time": "from a reveal to the submitted proof, about 17 minutes in the measured GPU run (bounty 32)",
+                "time": ("from a reveal to the submitted proof, about 17 minutes in the measured GPU run (bounty 32)" if mode == "gpu" else
+                         "this computer's proving time for each attempt (the check's preview shows the measured time); one attempt at a time"),
                 "confirm_code": new_code("watch_start", path),
                 "next": "ask the vendor; after a clear yes, call watch_start again with this confirm_code"}
     take_code(a["confirm_code"], "watch_start", path)

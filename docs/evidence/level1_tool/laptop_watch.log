@@ -1,0 +1,4 @@
+2026-11-03T13:50:04Z watch started (mode cpu, bounties 37, one job at a time)
+2026-11-03T13:50:08Z bounty 37 attempt 0: proving (patch sha256 e2aa5a8c09d055bd..., seed cf58c836d3717391..., deadline 2026-11-04 13:44 UTC)
+2026-11-03T14:28:08Z bounty 37 attempt 0: proof ready, verdict PASS; prove 1299.18 s, succinct 934.0 s, Groth16 None s
+2026-11-03T14:28:29Z bounty 37 attempt 0: check_with_outlayer 6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS ok; outcome on chain Passed

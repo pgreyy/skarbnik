@@ -1,0 +1,8 @@
+pod gonz2u431qhpn3 created: NVIDIA GeForce RTX 4090 in US-NC-1, $0.89/h, hard cap 20 min
+pod gonz2u431qhpn3: ssh ready after 38 s, GPU NVIDIA GeForce RTX 4090
+pod gonz2u431qhpn3: self stop armed for 24 min (runpodctl)
+pod gonz2u431qhpn3: cached GPU binary in place (sha256 d71c9469f749d05d...)
+pod gonz2u431qhpn3: proved in 10.29 s, secret wiped; segments: 8 journal.verdict: PASS
+pod gonz2u431qhpn3 terminated: 111 s, $0.0274 ($0.89/h); GPU spend so far $0.6228
+DIAG RESULT: proof made {"pod_ready": 39, "binary": "cached", "setup": 59, "prove": 10.29, "succinct": 7.9, "pod_seconds": 111, "cost_usd": 0.0274, "gpu": "NVIDIA GeForce RTX 4090", "pod": "gonz2u431qhpn3"}
+spend total now 0.6228

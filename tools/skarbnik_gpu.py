@@ -7,7 +7,8 @@ keep it), copy the secret input and the bounty's salt into a RAM folder (/dev/sh
 after (whether the proof worked or not), verify, shrink to a succinct receipt on the GPU, fetch it, and terminate the
 pod. The pod is terminated in every case, also on any failure, and no pod lives longer than the hard cap (45 minutes
 by default): every step's time limit is cut to what is left. Pods this tool started and left behind (a crash) are
-terminated at the next start. The Groth16 wrap and the submit stay on the vendor machine.
+terminated at the next start. The Groth16 wrap and the submit stay on the vendor machine. A pod step that fails keeps
+its whole output (keys and links cut) in gpu_errors/ next to the spend file, and its error line carries the end of stderr.
 
 The RunPod API key is read from its file for each request and is never printed, logged, returned or copied. Each
 pod's cost (its hourly price times its life from create to terminate) is logged and added to a spend file; no new pod
@@ -24,7 +25,7 @@ WIPE = ('for f in /dev/shm/skv/exploit.hex /dev/shm/skv/salts/*.salt; do [ -f "$
         'rm -rf /dev/shm/skv; rm -f $HOME/.kintsugi-salts')
 DEFAULTS = {
     'api_key_file': '~/.runpod_key', 'image': 'runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404',
-    'gpu_types': ['NVIDIA L40S', 'NVIDIA RTX 6000 Ada Generation', 'NVIDIA RTX A6000'],
+    'gpu_types': ['NVIDIA L40S', 'NVIDIA RTX 6000 Ada Generation', 'NVIDIA L4', 'NVIDIA GeForce RTX 4090', 'NVIDIA L40'],
     'data_centers': ['EU-RO-1', 'EU-CZ-1', 'EU-SE-1', 'EU-NL-1', 'US-TX-3'], 'container_disk_gb': 60,
     'cap_minutes': 45, 'budget_usd': 6.0, 'spend_file': '~/skarbnik-vendor/gpu_spend.json',
     'ssh_key': '~/.skarbnik-vendor/pod_ed25519', 'binary_cache': '~/skarbnik/gpu/skarbnik-host-cuda',
@@ -39,6 +40,13 @@ DEFAULTS = {
 
 class GpuError(Exception):
     """A failure of the GPU path; the attempt may fall back to CPU proving."""
+
+
+# The cached CUDA build of skarbnik-host runs on NVIDIA Ada generation cards only: on 2026-11-03 it proved on an L4 and
+# an RTX 4090 (and earlier on the L40S and RTX 6000 Ada), and failed on an RTX A6000, an RTX 3090 and an A40 (older
+# Ampere cards) with CUDA's "named symbol not found" (docs/evidence/level1_tool/). The L40 is the same generation as the
+# L40S and was not run. Other types in a config are skipped.
+WORKS_ON = {'NVIDIA L40S', 'NVIDIA L40', 'NVIDIA L4', 'NVIDIA RTX 6000 Ada Generation', 'NVIDIA GeForce RTX 4090'}
 
 
 class BudgetReached(GpuError):
@@ -124,7 +132,10 @@ class Pod:
 
     def create(self):
         """A pod of the first GPU type and cloud that has one free, within the price ceiling if one is set."""
-        types, last = list(self.g['gpu_types']), None
+        types, last = [t for t in self.g['gpu_types'] if t in WORKS_ON], None
+        skipped = [t for t in self.g['gpu_types'] if t not in WORKS_ON]
+        if skipped: self.log(f'skipped GPU types the prover build does not run on: {", ".join(skipped)}')
+        if not types: raise GpuError('none of the configured GPU types runs the prover build (Ada generation only: ' + ', '.join(sorted(WORKS_ON)) + ')')
         ceiling = float(self.g['max_usd_per_hr']) if self.g.get('max_usd_per_hr') else None
         for cloud in list(self.g.get('cloud_types') or ['SECURE']):
             while types:
@@ -205,7 +216,19 @@ class Pod:
         except subprocess.TimeoutExpired:
             raise GpuError(f'a pod step ran past its time limit ({round(t)} s)') from None
         if p.returncode != 0:
-            raise GpuError(f'pod step failed (exit {p.returncode}): {(p.stdout + p.stderr).strip()[-300:]}')
+            # Keep the whole output of a failed step (an abort says why on stderr, often well before its last line), with
+            # anything that looks like a key or a link cut, in gpu_errors/ next to the spend log; the error line carries
+            # the end of stderr.
+            text = re.sub(r'(ed25519:|sk1_|RUNPOD_API_KEY=)\S+', r'\1(cut)', f'$ (pod step)\n--- stderr\n{p.stderr}\n--- stdout\n{p.stdout}')
+            where = ''
+            try:
+                d = os.path.join(os.path.dirname(os.path.expanduser(self.g['spend_file'])), 'gpu_errors'); os.makedirs(d, mode=0o700, exist_ok=True)
+                f = os.path.join(d, f'{self.id}-{utc().replace(":", "")}.log')
+                fd = os.open(f, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600); os.write(fd, text.encode()); os.close(fd); where = f'; full output in {f}'
+            except OSError:
+                pass
+            tail = (p.stderr.strip() or p.stdout.strip())[-600:]
+            raise GpuError(f'pod step failed (exit {p.returncode}): {tail}{where}')
         return p.stdout
 
     def scp(self, src, dst, limit=600):
@@ -383,14 +406,16 @@ def prove_on_gpu(cfg, job, log):
         # No /usr/bin/time here: a pod with the cached binary has no apt step, and this step is timed from the VPS.
         out = pod.ssh('set +e; RISC0_DEV_MODE=0 RISC0_PROVER=local '
                       f'./skarbnik-host prove run/patch.wasm {args} --out run/u.bin > run/prove.log 2>&1; rc=$?; {WIPE}; '
-                      'test ! -e /dev/shm/skv && echo SECRET_WIPED; grep -E "^(segments|prove seconds|journal.verdict|wall_seconds)" run/prove.log; exit $rc')
+                      'test ! -e /dev/shm/skv && echo SECRET_WIPED; grep -E "^(segments|prove seconds|journal.verdict|wall_seconds)" run/prove.log; '
+                      '[ $rc -ne 0 ] && tail -n 60 run/prove.log >&2; exit $rc')  # on a failure, why (the end of its log)
         times['prove'] = round(time.time() - t, 2)
         if 'SECRET_WIPED' not in out:
             raise GpuError('could not confirm the secret was wiped from the pod')
         log(f'pod {pod.id}: proved in {times["prove"]} s, secret wiped; ' + ' '.join(l.strip() for l in out.splitlines() if l.startswith(('segments', 'journal.verdict'))))
         pod.ssh('./skarbnik-host verify run/u.bin | grep -q "^VALID"', 300)
         t = time.time()
-        pod.ssh('RISC0_DEV_MODE=0 RISC0_PROVER=local ./skarbnik-host compress run/u.bin run/u_succinct.bin succinct > run/succinct.log 2>&1', 1800)
+        pod.ssh('RISC0_DEV_MODE=0 RISC0_PROVER=local ./skarbnik-host compress run/u.bin run/u_succinct.bin succinct > run/succinct.log 2>&1 '
+                '|| { rc=$?; tail -n 60 run/succinct.log >&2; exit $rc; }', 1800)
         times['succinct'] = round(time.time() - t, 2)
         pod.scp(pod.remote('run/u_succinct.bin'), os.path.join(w, 'u_succinct.bin'), 300)
         pod.scp(pod.remote('run/prove.log'), os.path.join(w, 'gpu_prove.log'), 60)
@@ -424,7 +449,8 @@ def shrink_on_gpu(cfg, receipt, out_path, label, image_id, log):
         times['upload'] = round(time.time() - t, 2)
         pod.ssh('./skarbnik-host verify run/u.bin | grep -q "^VALID"', 300)
         t = time.time()
-        pod.ssh('RISC0_DEV_MODE=0 RISC0_PROVER=local ./skarbnik-host compress run/u.bin run/u_succinct.bin succinct > run/succinct.log 2>&1', 1800)
+        pod.ssh('RISC0_DEV_MODE=0 RISC0_PROVER=local ./skarbnik-host compress run/u.bin run/u_succinct.bin succinct > run/succinct.log 2>&1 '
+                '|| { rc=$?; tail -n 60 run/succinct.log >&2; exit $rc; }', 1800)
         times['succinct'] = round(time.time() - t, 2)
         pod.scp(pod.remote('run/u_succinct.bin'), out_path, 300)
         pod.scp(pod.remote('run/succinct.log'), out_path + '.gpu_succinct.log', 60)

@@ -7,11 +7,11 @@
   "level": 1,
   "amount": "100000000000000000000000",
   "max_commits": 2,
-  "active": 0,
-  "commits": 0,
+  "active": 1,
+  "commits": 1,
   "pending": 0,
   "max_commits_per_account": null,
-  "next_fee": "10000000000000000000000",
+  "next_fee": "15000000000000000000000",
   "max_patch_bytes": 1024,
   "reveal_gap_ns": "60000000000",
   "reveal_window_ns": "3600000000000",
@@ -25,7 +25,7 @@
  },
  "expires_at_utc": "2026-11-07T13:34:52Z",
  "level_meaning": "the contract trusts an answer from OutLayer running our pinned verifier program; the vendor's watch asks for the check; if no check arrives, the timeout rule applies.",
- "tell_the_user": "Fee 0.01 NEAR. Level 1: the contract trusts an answer from OutLayer running our pinned verifier program; the vendor's watch asks for the check; if no check arrives, the timeout rule applies. Wait for their yes before commit.",
+ "tell_the_user": "Fee 0.015 NEAR. Level 1: the contract trusts an answer from OutLayer running our pinned verifier program; the vendor's watch asks for the check; if no check arrives, the timeout rule applies. Wait for their yes before commit.",
  "checks": {
   "open": true,
   "level_allowed": true,
@@ -36,7 +36,18 @@
   "fee_within_limit": true,
   "ok_to_commit": true
  },
- "checks_for_account": "kintsugi-res2-prnvm.testnet"
+ "checks_for_account": "skarbnik-agentc-d48260.testnet"
 }
-== commit (error)
-refused: the key ed25519:3s7Q4iM6CiU2... of kintsugi-res2-prnvm.testnet is a full access key. Use a function call key limited to commit and reveal.
+== commit 
+{
+ "committed": true,
+ "tx": "tQMCUJw7eAssQ2MPVbZL5BXvrkbavJX1Ps9HPcZTYRe",
+ "bounty_id": "37",
+ "index": 1,
+ "fingerprint": "df5ebd06c6cadec42c31e868ae1ea695da27a7b42f151d45fc0b8cf6e1a5dd5d",
+ "payout": "skarbnik-agentc-d48260.testnet",
+ "fee_yocto": "15000000000000000000000",
+ "reveal_after_seconds": 60.0,
+ "reveal_within_seconds": 3600.0,
+ "next": "call reveal with bounty_id 37 and index 1 after 60 s and within 3600 s"
+}

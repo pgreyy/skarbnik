@@ -505,7 +505,7 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
     if journal(v, 'submission_id') != sid: raise RuntimeError('the proof is for another submission id; not submitting')
     verdict = journal(v, 'verdict')
     extra = f'; on {t["gpu"]}, pod {t["pod_seconds"]} s, ${t["cost_usd"]}' if t.get('gpu') else ''
-    log_line(wcfg, f'bounty {bid} attempt {i}: proof ready, verdict {verdict}; prove {t.get("prove")} s, succinct {t.get("succinct")} s, Groth16 {t.get("groth16")} s{extra}')
+    log_line(wcfg, f'bounty {bid} attempt {i}: proof ready, verdict {verdict}; prove {t.get("prove")} s, succinct {t.get("succinct")} s{f", Groth16 {t['groth16']} s" if t.get("groth16") else ""}{extra}')
     st[key] = {'state': 'proof ready', 'verdict': verdict, 'times_s': t, 'submit_failures': prev.get('submit_failures', 0)}; state_save(wcfg, st)
     fresh = view(wcfg, 'get_submission', {'bounty_id': bid, 'index': i})
     if fresh['outcome'] != 'Open': log_line(wcfg, f'bounty {bid} attempt {i}: already decided on chain ({fresh["outcome"]}); not submitting'); st[key] = {'state': 'decided elsewhere', 'outcome': fresh['outcome']}; return

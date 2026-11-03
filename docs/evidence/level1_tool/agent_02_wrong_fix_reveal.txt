@@ -1,0 +1,41 @@
+== reveal 
+{
+ "revealed": true,
+ "tx": "CuZmnu1scD8cTvd3TaoTh8hX5d6n1iod69BP68PqKb9M",
+ "bounty_id": "37",
+ "index": 1,
+ "next": "the vendor now proves the patch; call status to see the outcome (PASS pays, FAIL spends the attempt, a timeout splits the reward among waiting attempts)"
+}
+== status 
+{
+ "account": "skarbnik-agentc-d48260.testnet",
+ "attempts": [
+  {
+   "contract": "kintsugi-l2-cihdp.testnet",
+   "network": "testnet",
+   "bounty_id": "37",
+   "index": 1,
+   "account": "skarbnik-agentc-d48260.testnet",
+   "payout": "skarbnik-agentc-d48260.testnet",
+   "patch_path": "~/kintsugi/data/attacks/wrong_fix.wasm",
+   "patch_sha256": "79fde4285378fb5c0470c3eca8ff9078e57f8d660ca22ca55d3e64aa1be2f0de",
+   "patch_len": 564,
+   "fingerprint": "df5ebd06c6cadec42c31e868ae1ea695da27a7b42f151d45fc0b8cf6e1a5dd5d",
+   "fee_yocto": "15000000000000000000000",
+   "committed_at_utc": "2026-11-03T13:43:21Z",
+   "commit_tx": "tQMCUJw7eAssQ2MPVbZL5BXvrkbavJX1Ps9HPcZTYRe",
+   "reveal_tx": "CuZmnu1scD8cTvd3TaoTh8hX5d6n1iod69BP68PqKb9M",
+   "outcome": "Open",
+   "verdict": null,
+   "revealed_at_utc": "2026-11-03T13:44:43Z",
+   "deadline_utc": "2026-11-04T13:44:43Z"
+  }
+ ],
+ "meaning": {
+  "Open": "waiting (not revealed, or revealed and waiting for the vendor's proof)",
+  "Passed": "PASS: paid by proof",
+  "Failed": "FAIL: attempt spent",
+  "TimedOut": "paid by the timeout rule (not a verdict)",
+  "Released": "not revealed in time; slot freed"
+ }
+}

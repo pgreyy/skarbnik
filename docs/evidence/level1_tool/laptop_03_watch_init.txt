@@ -1,0 +1,6 @@
+== watch_init 
+{
+ "watch_config": "~/skarbnik-vendor/l1tool-watch.toml",
+ "bounty_id": "37",
+ "next": "call watch_start with config_path ~/skarbnik-vendor/l1tool-watch.toml"
+}

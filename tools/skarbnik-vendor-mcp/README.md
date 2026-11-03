@@ -6,7 +6,7 @@ before anything is spent. It runs on your own computer, because the secret input
 hosted link. One file, `server.py`, Python 3.9 or later, standard library only. The vendor tool it runs needs Python
 3.11 or later, the project's programs (`skarbnik-host`, `skarbnik-check`), NEAR CLI with your vendor account, and for
 the Groth16 wrap (Level 2, the default) an x86 computer with Docker and about 7.6 GiB of memory plus swap (docs/VENDOR.md).
-The vendor tool's Level 1 mode has not been run end to end yet.
+The vendor tool's Level 1 mode has not been run end to end yet. Which GPUs work: the prover build runs on NVIDIA Ada generation cards only. Shown working: L40S, RTX 6000 Ada, L4 and RTX 4090. Shown failing, with CUDA's "named symbol not found": RTX A6000, RTX 3090 and A40 (older Ampere cards; ../../docs/evidence/level1_tool/gpu_diag_ampere.txt). The L40 is the same generation as the L40S and was not run. The tool skips other types.
 
 ## Tools
 

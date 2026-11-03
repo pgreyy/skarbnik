@@ -54,7 +54,8 @@ vendor_account = "you.testnet"
 # machine = "my-vps"
 # [gpu]                        # only for mode "gpu" (docs/VENDOR.md, "GPU mode")
 # api_key_file = "~/.runpod_key"   # mode 600; never printed, logged or copied
-# gpu_types = ["NVIDIA L40S", "NVIDIA RTX 6000 Ada Generation", "NVIDIA RTX A6000"]
+# gpu_types = ["NVIDIA L40S", "NVIDIA RTX 6000 Ada Generation", "NVIDIA L4", "NVIDIA GeForce RTX 4090", "NVIDIA L40"]
+#                            (the prover build runs on NVIDIA Ada generation cards only; older types are skipped)
 # data_centers = ["EU-RO-1", "EU-CZ-1", "EU-SE-1", "EU-NL-1", "US-TX-3"]
 # cap_minutes = 45
 # budget_usd = 6.0

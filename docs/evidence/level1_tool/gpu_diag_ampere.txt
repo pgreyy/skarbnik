@@ -1,0 +1,12 @@
+pod jlvuu34jcw2ssp created: NVIDIA A40 in EU-SE-1, $0.59/h, hard cap 20 min
+pod jlvuu34jcw2ssp: ssh ready after 38 s, GPU NVIDIA A40
+pod jlvuu34jcw2ssp: self stop armed for 24 min (runpodctl)
+pod jlvuu34jcw2ssp: cached GPU binary in place (sha256 d71c9469f749d05d...)
+pod jlvuu34jcw2ssp terminated: 79 s, $0.0129 ($0.59/h); GPU spend so far $0.6357
+DIAG RESULT: FAILED GpuError pod step failed (exit 134): 5d4d8145d31ae1300943000188b909e85221fefcc3bad98 --submission-id b20eff5691389a03cf27aec992a6aa692bf235e583da6e132b04ef3413cbd80f --out run/u.bin > run/prove.log 2>&1
+salt: the private salt of bounty l1tool (existing)
+
+thread 'main' (294) panicked at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/risc0-zkp-3.0.5/src/hal/cuda.rs:890:10:
+called `Result::unwrap()` on an `Err` value: cudaLaunchKernelEx(&config, kernel, std::forward<ActTypes>(args)...)@kernels/zkp/cuda/cuda.h:92 failed: "named symbol not found"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace; full output in /home/skarbnik/skarbnik-vendor/gpu_errors/jlvuu34jcw2ssp-2026-11-03T143051Z.log
+spend total now 0.6357
