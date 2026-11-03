@@ -36,7 +36,7 @@ by `<repo>` and `~`.
 Question: can the RISC Zero prove step of a revealed attempt run inside an attested confidential VM, with the secret
 sent only after a fresh quote and a check that nobody can log in, and the result still settle on chain by proof?
 
-- Setup: test bounty 33 (public demo program, fresh private secret). Proof 0 on a normal RunPod L40S (prove 30.21 s,
+- Setup: test bounty 33 (public demo program, fresh private secret). Proof 0 on a normal rented L40S GPU (prove 30.21 s,
   shrink 21.85 s, $0.0409; a CPU Proof 0 on the VPS was stopped on the owner's order). Published: create
   `5kDG7MMat1VtLcLJibSafMSfzpqS87fCXZ3jKVuG9tnN`, open `2c5HgCeL9jTHRJTAPeWXcYSkBUxPmecLViZzVdy7dJD7`. Attempt with a
   limited key through `tools/skarbnik-mcp`: commit `8Bs9mYwhw7JusbXyLaPkQN86ekc3sRHB6gnrToWWiYnQ`, reveal
@@ -48,9 +48,9 @@ sent only after a fresh quote and a check that nobody can log in, and the result
   SSH keys in the user config or on the account; a scan of every TCP port inside the VM found only 8080 (ours) and
   8090 (Phala's info page); a fresh quote bound to a nonce made seconds before passed the same checks with the same
   key and measurements. The prove step ran 6,226.5 s inside the CVM, PASS, the secret erased; the receipt came out with
-  the hash the sealed status gave; the CVM was deleted (6,491 s after create); shrink on a RunPod L40S (58.63 s,
+  the hash the sealed status gave; the CVM was deleted (6,491 s after create); shrink on a rented L40S GPU (58.63 s,
   $0.0515); Groth16 on the VPS (379.81 s); `submit_groth16` `Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS`: Passed,
-  bounty 33 Paid. Phala $0.838183 for the whole spike, RunPod $0.0924. Raw files: `docs/evidence/tee_spike/prove_run/`,
+  bounty 33 Paid. Phala $0.838183 for the whole spike, the rented GPU $0.0924. Raw files: `docs/evidence/tee_spike/prove_run/`,
   `prove_try1_intel_dns/`, `prove_try2_phala_api_timeout/`, `proof0_gpu/`; write-up `docs/evidence/tee_spike/README.md`.
 - Verdict: PASS. Not shown: the OS image against a rebuild of Phala's dstack OS; a reproducible image; a GPU TEE.
 
@@ -124,7 +124,7 @@ send `submit_groth16` on its own, with the secret never leaving the vendor's mac
   create `8vAT8wZQNwcGMz1heC5v7nWrCeHdPorgVNmGRBDJLL6J`, open `ErytPEKYGSZNWMjWFJWjS5xmGZ8RqWZ3ixEf39EZLnQM`. Its
   secret was made on the VPS; the program is the public demo. Watch runs on the VPS in tmux with a restart runner and
   an `@reboot` crontab line, mode gpu (`docs/evidence/vendor_tool/watch.toml`), covering bounty 32 and judge bounties
-  27 to 31. The RunPod API key stays in a mode 600 file on the VPS; it appears in no log.
+  27 to 31. The GPU rental API key stays in a mode 600 file on the VPS; it appears in no log.
 - Bounty 32: a researcher account committed the demo fix with its limited key (`86dYS838ZfwHPnJepKcpL3t5SYQ93hsUJbEcEmgBUyhg`),
   revealed it 57 s later and was refused ("reveal gap has not passed"), then revealed at 08:45:31 UTC
   (`HCjck1DLb5GS4YcRWH3oozJ9gm2EhJejkHyVrcJJQN4L`). From there, nobody did anything. Watch's log
@@ -148,7 +148,7 @@ send `submit_groth16` on its own, with the secret never leaving the vendor's mac
   3. Restarted: "the proof is already made; submitting it again", `submit_groth16`
      `73xzLn4vmLyma5wF7qm9KY7qJoJz7ZkNJ2sAR4bTfipG`, outcome Passed, no new pod.
 - Cost: five pods, $0.303 in all (`docs/evidence/vendor_tool/gpu_spend.json`); one proof with the cached binary costs
-  $0.04. Every pod's termination was confirmed by the RunPod API; no pod is left on the account.
+  $0.04. Every pod's termination was confirmed by the GPU rental API; no pod is left on the account.
 
 Verdict: PASS. Watch proved and submitted bounty 32's attempt on its own, and judge bounty 27's after two fixes. Limits:
 two attempts, one GPU type; the secret is in a rented machine's RAM during each proof; the demo program and bounty 17's
@@ -196,11 +196,11 @@ each spend, file paths only, and the GPU steps within a price ceiling and a spen
 - Driven by an MCP client script, stdio (laptop) and stdio over ssh (VPS). Bounty name mcpdemo: the public demo program
   and the public demo input and fix, copied into `~/.skarbnik-vendor/mcpdemo/` (mode 600) on both machines; the salt
   was made on the VPS by `skarbnik-host` and never opened. Split as the owner set it: init, check, publish and status on
-  the laptop (vendor key); prove0 and watch on the VPS (RunPod key, prover key); no key moved.
+  the laptop (vendor key); prove0 and watch on the VPS (GPU rental key, prover key); no key moved.
 - Laptop: `init` wrote the config; `check` passed every point but memory (4,417 MiB available plus swap, the Groth16
   wrap needs about 7,600 MiB). VPS: `init` (with the VPS's program paths) and `check` passed.
 - `prove0`, GPU: the first run's pod (NVIDIA L40S, EU-NL-1, $1.09/h, 138 s, $0.0418) proved, but the Groth16 wrap failed:
-  the server's job did not have the VPS's `bin` folder on its PATH (fixed: `job_env`). Then RunPod had no free L40S,
+  the server's job did not have the VPS's `bin` folder on its PATH (fixed: `job_env`). Then the GPU rental had no free L40S,
   RTX 6000 Ada or RTX A6000 in the five listed data centers on six tries 5 minutes apart (no pod, no cost).
 - With the owner's yes the choice was widened: nine NVIDIA types with 24 GB or more, any data center, secure and
   community clouds, a ceiling of $1.00 an hour, a 60 minute cap and a self stop timer. Two pods ended early on a bug in
@@ -387,7 +387,7 @@ in time without heavy work on its own laptop, so the contract pays by proof (not
   folder. Its code never reads that folder, but nothing technical stopped a process of that user from doing so. A
   stronger setup, the agent on a separate machine or under a separate account with no access to the vendor's files, is
   future work.
-- Attempt proof on a rented GPU (RunPod, 1x NVIDIA L40S; `notes`-side script, logs in `gpu/`): the checker image id
+- Attempt proof on a rented GPU (1x NVIDIA L40S; `notes`-side script, logs in `gpu/`): the checker image id
   was checked before proving; the secret was copied into the pod's memory only (`/dev/shm`) and removed afterwards
   (`gpu/01_secret_out.log`). Prove 29.82 s (33 segments, `--po2 19`, PASS, peak GPU memory 9,275 MiB), shrink to a
   succinct receipt 21.71 s; the succinct receipt verified on the laptop and its journal matched the chain. Cost $0.60.
@@ -1141,7 +1141,7 @@ What this changes:
 - Docker downloads were slow: the `r0.1.88.0` image (1.60 GB) took 804 s, about 2.0 MB/s, and `r0.1.97.0` (1.73 GB)
   took 1,116 s, about 1.5 MB/s (`docker_pull*.log`; sizes are unpacked, so the network speed was lower).
 
-## S2 on a GPU: the 16 input proof on a rented RunPod pod (S6 preparation)
+## S2 on a GPU: the 16 input proof on a rented GPU pod (S6 preparation)
 
 Question: how long does the same 16 input proof take on an NVIDIA GPU, against the laptop baseline of **2,814.45 s
 (46.9 min), S2b, commit `5ba0298`**? The pod was to prove commit `1439e37` (same guest program, image id `3edbc2e6...`).
@@ -1151,7 +1151,7 @@ image id is `dfd48a5e39296bf288baf8df898c8e8ab00d793a2d16ee3d9f3564f8804d7633`, 
 owner's rule the run stopped there (no verify, no compression).** The first attempt (three builds) failed; the owner's
 final attempt, with a changed build, made the proof. Details of both below.
 
-Machine (`docs/evidence/S2/gpu/01_check.log`): RunPod pod, NVIDIA L40S with 46,068 MiB, driver 595.91.07, nvcc 12.8.93
+Machine (`docs/evidence/S2/gpu/01_check.log`): a rented GPU pod, NVIDIA L40S with 46,068 MiB, driver 595.91.07, nvcc 12.8.93
 already installed, Ubuntu 24.04.5, root. Every step was sent over ssh from the laptop and logged, stopping at the first
 failure (IP address and port removed from the copies in `docs/evidence/S2/gpu/`).
 
@@ -1197,8 +1197,8 @@ Not done because of the stop: `verify`, the succinct compression, and Groth16 (n
 The receipt is in `target/gpu-results/receipt_f16.bin` on the laptop (SHA-256 `9cc7c4a5...d8ff`, not committed).
 Time on the pod for both attempts: 16:45:12 to 17:10:42 UTC, about 25.5 minutes of use by the test steps.
 
-**Cost (reported by the owner from RunPod):** the pod ran about 30 minutes in total, from when the owner started it
-until it was stopped and terminated; the RunPod balance went from $10.00 to $9.52, so the whole GPU test (both
+**Cost (reported by the owner from the GPU rental account):** the pod ran about 30 minutes in total, from when the owner started it
+until it was stopped and terminated; the GPU rental balance went from $10.00 to $9.52, so the whole GPU test (both
 attempts) cost about **$0.48**. The pod is terminated.
 
 `circom-witnesscalc` comes in with RISC Zero's GPU Groth16 prover when `risc0-zkvm` is built with `cuda`. Its build needs

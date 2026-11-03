@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: docs/EVIDENCE.md prose: a rented GPU, the GPU rental
+
+- docs/EVIDENCE.md lines 39, 51, 53, 127, 151, 199, 203, 390, 1144 (a heading; nothing links to it), 1154, 1200 and
+  1201: sentences that named the GPU provider now say "a rented L40S GPU", "the rented GPU", "the GPU rental API
+  key", "the GPU rental API", "GPU rental key", "the GPU rental", "a rented GPU pod", "the GPU rental account" and
+  "the GPU rental balance". Amounts, times and file names are unchanged. docs/SECURITY.md needed no change: its one
+  remaining mention is the class name `RunPod` in tools/skarbnik_gpu.py. Evidence logs under docs/evidence/, this log
+  and git history are untouched.
+
 ## 2026-11-03: For vendors: sealed hardware wording
 
 - Compute, sealed hardware row (page and saved page): "a sealed GPU is not tested yet" now reads "a sealed GPU is
