@@ -2,6 +2,16 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Test NEAR links
+
+- Added "Need test NEAR? Get free testnet NEAR from the official faucet or near-faucet.io. A faucet can run out; if it
+  does, ask in the NEAR dev Telegram." with the three links, to For agents step 02, the Judge guide's Quick step 4 and
+  Verify requirements (JUDGE_GUIDE.md and the page), and the README's judge bounty line. The near-cli-rs command that
+  makes a funded account stays as the other way. Saved /agents/ and /judge/ regenerated.
+- The links were fetched first: docs.near.org/getting-started/faucet answers 200, "Token Faucet - NEAR Docs: Learn how
+  to get free testnet tokens"; near-faucet.io answers 200, "NEAR TESTNET Faucet: request testnet NEAR or provided
+  Fungible Tokens"; t.me/neardev answers 200, the "NEAR Dev" Telegram group, "Discuss development on NEAR".
+
 ## 2026-11-03: The GPU provider's name taken out of what people read
 
 - The For vendors page and its saved copy say "A GPU rental account, for a rented GPU", "A rented GPU needs a GPU

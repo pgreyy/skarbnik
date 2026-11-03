@@ -104,7 +104,10 @@ One verdict also tells the agent one bit about the secret, so each bounty caps i
 - **An honest timeout:** [bounty 17](https://skarbnik.xyz/bounties/17/). The fix was right, but a laptop proof was too
   slow for the 4 hour window, so the timeout rule paid it, labelled as a timeout, not a proof.
 - **Open a judge bounty yourself:** judge bounties 28 to 31 are closed; send bounty 17's stored proof from any testnet
-  account and the contract checks it and opens one ([docs/TRY_IT.md](docs/TRY_IT.md), step 5).
+  account and the contract checks it and opens one ([docs/TRY_IT.md](docs/TRY_IT.md), step 5). Need test NEAR? Get free
+  testnet NEAR from the [official faucet](https://docs.near.org/getting-started/faucet) or
+  [near-faucet.io](https://near-faucet.io/). A faucet can run out; if it does, ask in the
+  [NEAR dev Telegram](https://t.me/neardev). The near-cli-rs command in TRY_IT step 5 makes a funded account too.
 - **Verify the contract yourself:** rebuild it with `cargo near build reproducible-wasm` at commit `c74bd5c` and get the
   code hash on chain, `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u` ([docs/TRY_IT.md](docs/TRY_IT.md), step 11).
 - **The full tour:** [JUDGE_GUIDE.md](JUDGE_GUIDE.md): four steps in the browser (Quick), then an optional check on your

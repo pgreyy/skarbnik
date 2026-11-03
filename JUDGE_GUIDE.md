@@ -52,8 +52,12 @@ Open bounty 17: the same kind of task, but the vendor's proof finished after the
 
 Judge bounties 28 to 31 have the same hashes as bounty 17 and were created closed, so anyone can open one with a real
 proof. Each can be opened once: send bounty 17's stored Proof 0 to one that is still closed (28; use 29, 30 or 31 if 28
-is already open). Each judge bounty takes K = 2 attempts, at most 1 per account, with a 41 hour verdict window. Make a
-testnet account from the faucet with near-cli-rs 0.30.1, then, from a clone of the repository:
+is already open). Each judge bounty takes K = 2 attempts, at most 1 per account, with a 41 hour verdict window.
+
+Need test NEAR? Get free testnet NEAR from the [official faucet](https://docs.near.org/getting-started/faucet) or
+[near-faucet.io](https://near-faucet.io/). A faucet can run out; if it does, ask in the
+[NEAR dev Telegram](https://t.me/neardev). Or make a testnet account funded by the faucet with near-cli-rs 0.30.1, then, from a clone of
+the repository:
 
     near account create-account sponsor-by-faucet-service <you>.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
     near contract call-function as-transaction kintsugi-l2-cihdp.testnet open_with_groth16 file-args docs/evidence/receipts/judge_open_28.json prepaid-gas '300 Tgas' attached-deposit '0 NEAR' sign-as <you>.testnet network-config testnet sign-with-legacy-keychain send
@@ -70,7 +74,10 @@ testnet account from the faucet with near-cli-rs 0.30.1, then, from a clone of t
 What you need: Linux (on Windows, use WSL), Docker with buildx, an x86 computer, about 8 GB of free memory and about
 10 GB of free disk, the Rust toolchain and RISC Zero's toolchain ([docs/VERSIONS.md](docs/VERSIONS.md)). The first
 checker build downloads RISC Zero's guest builder image, 7.46 GB: it took 5 min 12 s with that download and 2 min 20 s
-with the image cached ([docs/numbers.md](docs/numbers.md)).
+with the image cached ([docs/numbers.md](docs/numbers.md)). The on chain steps below (B2, B3) also need a testnet
+account. Need test NEAR? Get free testnet NEAR from the [official faucet](https://docs.near.org/getting-started/faucet) or
+[near-faucet.io](https://near-faucet.io/). A faucet can run out; if it does, ask in the
+[NEAR dev Telegram](https://t.me/neardev).
 
 Judges never need to run the expensive proof. A full vendor proof takes 1.5 to 4 hours on a laptop CPU and its Groth16
 step needs about 7 GiB of memory; the proofs these steps check are already on chain.
