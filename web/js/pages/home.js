@@ -249,7 +249,7 @@ const chrome = (inner) => `<div class="lay-wrap">
 <nav class="lay-nav" aria-label="Home sections">
 <div class="rail-top"><button class="rail-tg" type="button" id="railTg" aria-controls="railList">${icon('sidebar')}</button>
 <ol class="ln-list" id="railList">${NAMES.map((n, i) => `<li><button class="ln-i" type="button" data-sec="${i}" aria-label="${esc(n)}" title="${esc(n)}: ${esc(HINTS[i])}" aria-current="${i === current}"><span class="ln-n">${two(i)}</span><span class="ln-w"><span class="ln-t">${esc(n)}</span><span class="ln-d">${esc(HINTS[i])}</span></span></button></li>`).join('')}</ol></div>
-<div class="ln-links"><a href="#/judge">Judge guide</a><a href="#/evidence">Proof &amp; evidence</a><a href="#/bounties">Browse bounties</a></div>
+<div class="ln-links"><a href="#/judge">Judge guide</a><a href="#/evidence">Evidence</a><a href="#/bounties">Browse bounties</a></div>
 </nav>
 <main id="main" class="home p-home" tabindex="-1">${inner}</main>
 </div>

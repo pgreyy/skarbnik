@@ -2,6 +2,15 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Menu order and the Evidence label
+
+- The top menu, the phone menu and the footer now read Bounties, For vendors, For agents, How it works, Evidence,
+  Judge guide; "Proof & evidence" is now "Evidence" in the menus, the footer, Home's links and llms.txt. Addresses and
+  page headings are unchanged (the Evidence page keeps its eyebrow and heading). Applied to `web/index.html` and the
+  menus and footers of the saved no-JS pages, with nothing else in them changed.
+- Checked with a private script: the order and labels on eight routes, one line at 1440; the phone menu at 390 (each
+  link one row, no sideways scroll); the saved pages' menus and footers; dark and light; no script errors.
+
 ## 2026-11-03: Single bounty pages draw at once; saved bounty snapshots
 
 - `scripts/gen_feed.py` now also writes `web/data/bounty_snapshots.json` in the same run as feed.json, with the same
