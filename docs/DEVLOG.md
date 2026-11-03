@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Saved pages for readers without scripts: titles, descriptions, Open Graph, /bounties/
+
+- `scripts/snapshot_pages.mjs`: each saved page now gets its own one sentence description and its own Open Graph
+  title, description and address. Fixed: the saved pages carried two canonical links (their own and the home page's);
+  now one. It waits until no live value still says "Loading from the contract" (up to 40 s) and otherwise keeps the
+  old copy. New saved page: /bounties/ (every bounty, with status, reward, attempts and the deciding transaction).
+- `web/index.html`: the home description is one sentence. `web/sitemap.xml` lists /bounties/ too (robots.txt was
+  already there and names the sitemap).
+- All eleven saved pages regenerated from the chain. Checked: one canonical link each, unique titles, no loading text,
+  no dismiss X.
+
 ## 2026-11-03: Test NEAR links
 
 - Added "Need test NEAR? Get free testnet NEAR from the official faucet or near-faucet.io. A faucet can run out; if it

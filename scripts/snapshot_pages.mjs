@@ -1,9 +1,10 @@
 // Saves rendered copies of the key pages as real static HTML, for readers that run no JavaScript (crawlers, agents,
-// curl): web/how-it-works/, web/bounties/24/, web/bounties/32/, web/bounties/17/, web/bounties/33/, web/evidence/,
-// web/judge/, web/vendors/, web/agents/
+// curl): web/how-it-works/, web/bounties/, web/bounties/24/, web/bounties/32/, web/bounties/17/, web/bounties/33/,
+// web/evidence/, web/judge/, web/vendors/, web/agents/
 // (each an index.html). For each one it opens the live route in a headless Chromium against a local copy of web/
 // (which reads the chain like any visitor), waits for the data, shows every tab as a section, and writes the page's
-// shell with that content in place of "Loading…", a snapshot time, the page's own title and canonical address, and
+// shell with that content in place of "Loading…", a snapshot time, the page's own title, one sentence description,
+// canonical address and Open Graph title, description and address, and
 // <base href="/"> so the shared files load from any path. With JavaScript, js/app.js turns the path into its #/ route
 // and draws the live page over the copy. Run it after the data scripts (scripts/rebuild_site_data.sh).
 // Needs playwright-core and a Chromium: NODE_PATH=/path/to/node_modules CHROME=/path/to/chrome node scripts/snapshot_pages.mjs
@@ -15,16 +16,18 @@ const require = createRequire(process.env.NODE_PATH ? process.env.NODE_PATH + '/
 const { chromium } = require('playwright-core');
 
 const SITE = 'https://skarbnik.xyz';
+// each page's own title and one sentence description (also its Open Graph title and description)
 const PAGES = [
-  { path: 'how-it-works', route: '#/how-it-works', title: 'How it works · Skarbnik' },
-  { path: 'bounties/24', route: '#/bounties/24', title: 'Bounty 24 · Skarbnik' },
-  { path: 'bounties/32', route: '#/bounties/32', title: 'Bounty 32 · Skarbnik' },
-  { path: 'bounties/17', route: '#/bounties/17', title: 'Bounty 17 · Skarbnik' },
-  { path: 'bounties/33', route: '#/bounties/33', title: 'Bounty 33 · Skarbnik' },
-  { path: 'evidence', route: '#/evidence', title: 'Proof and evidence · Skarbnik' },
-  { path: 'judge', route: '#/judge', title: 'Judge guide · Skarbnik' },
-  { path: 'vendors', route: '#/vendors', title: 'For vendors · Skarbnik' },
-  { path: 'agents', route: '#/agents', title: 'For agents · Skarbnik' },
+  { path: 'how-it-works', route: '#/how-it-works', title: 'How it works · Skarbnik', desc: 'How a Skarbnik bounty works, step by step: the vendor keeps the crashing input secret, agents send sealed fixes, a zero knowledge proof checks each fix, and a NEAR testnet contract pays by rule.' },
+  { path: 'bounties', route: '#/bounties', title: 'Bounties · Skarbnik', desc: 'Every bounty on the Skarbnik contract on NEAR testnet, with its status, reward, attempts and the transaction that decided it.' },
+  { path: 'bounties/24', route: '#/bounties/24', title: 'Bounty 24 · Skarbnik', desc: 'Bounty 24: an AI agent fixed a private bug it could not see, and the NEAR testnet contract paid it after checking a proof.' },
+  { path: 'bounties/32', route: '#/bounties/32', title: 'Bounty 32 · Skarbnik', desc: 'Bounty 32: the vendor\'s watch tool proved an attempt on a rented GPU and sent the proof with no one at the keyboard, and the NEAR testnet contract paid by proof.' },
+  { path: 'bounties/17', route: '#/bounties/17', title: 'Bounty 17 · Skarbnik', desc: 'Bounty 17: the vendor\'s proof came too late, so the NEAR testnet contract paid by its timeout rule, shown as a timeout and never as a pass.' },
+  { path: 'bounties/33', route: '#/bounties/33', title: 'Bounty 33 · Skarbnik', desc: 'Bounty 33: one attempt was proved inside sealed hardware, an Intel TDX confidential VM, and paid by proof on NEAR testnet.' },
+  { path: 'evidence', route: '#/evidence', title: 'Proof and evidence · Skarbnik', desc: 'The evidence for each Skarbnik claim on NEAR testnet: paid bounties with their transactions, the approved checker, the contract and how to verify it, and the known limits.' },
+  { path: 'judge', route: '#/judge', title: 'Judge guide · Skarbnik', desc: 'Check Skarbnik in five minutes: four browser steps on NEAR testnet, an optional check on your own machine, each claim with what it does not prove, and the limits.' },
+  { path: 'vendors', route: '#/vendors', title: 'For vendors · Skarbnik', desc: 'Host a private repair bounty on NEAR testnet: keep the test that finds the bug secret, prove each fix in private, and let the contract pay by rule.' },
+  { path: 'agents', route: '#/agents', title: 'For agents · Skarbnik', desc: 'Put your AI agent to work on Skarbnik bounties on NEAR testnet: connect it with a link, a local MCP server or a guide, using a key that can only commit and reveal.' },
 ];
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml',
   '.woff2': 'font/woff2', '.png': 'image/png', '.ico': 'image/x-icon', '.txt': 'text/plain', '.md': 'text/markdown', '.wasm': 'application/wasm' };
@@ -50,6 +53,9 @@ const only = process.env.ONLY ? process.env.ONLY.split(',') : null;
 for (const entry of PAGES.filter((e) => !only || only.includes(e.path))) {
   await p.goto(base + entry.route, { waitUntil: 'networkidle' });
   await p.waitForTimeout(9000);
+  // live values fill in after the page is drawn: wait until none says it is still loading, or skip this page
+  const loaded = await p.waitForFunction(() => !document.querySelector('#view').innerText.includes('Loading from the contract'), null, { timeout: 40000 }).then(() => true, () => false);
+  if (!loaded) { console.log(`web/${entry.path}/index.html: NOT saved, the chain did not answer in time (the old copy stays)`); continue; }
   // Every tab as a section with its own heading (a page tab's heading carries its short link id, so /agents/#connect
   // lands on it; a picker inside a tab gets a smaller heading); every drop down (details) and collapsible panel open;
   // tab buttons and interactive controls do nothing without JavaScript.
@@ -93,7 +99,12 @@ for (const entry of PAGES.filter((e) => !only || only.includes(e.path))) {
   const note = `<p class="small faint" style="padding:16px 24px">A saved copy of <a href="/${entry.route}">this page</a>, made ${at} from the chain and the site's data files. With JavaScript the page shows the live data.</p>`;
   let html = shell
     .replace('<head>', '<head>\n<base href="/">')
-    .replace(/<title>[^<]*<\/title>/, `<title>${esc(entry.title)}</title>\n<link rel="canonical" href="${canonical}">`)
+    .replace(/<title>[^<]*<\/title>/, `<title>${esc(entry.title)}</title>`)
+    .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(entry.desc)}">`)
+    .replace(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${canonical}">`)
+    .replace(/<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${canonical}">`)
+    .replace(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${esc(entry.title)}">`)
+    .replace(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${esc(entry.desc)}">`)
     .replace(/<div class="view" id="view">[\s\S]*?<\/main><\/div>/, `<div class="view" id="view">${note}${main}</div>`)
     .replace(/<noscript>[\s\S]*?<\/noscript>/, '<noscript><p style="padding:24px">You are reading a saved copy. For agents: <a href="/agents.md">agents.md</a>, <a href="/llms.txt">llms.txt</a>, <a href="/feed.json">feed.json</a>.</p></noscript>');
   if (!html.includes(main.slice(0, 200))) throw new Error(`${entry.path}: the shell's view did not match; nothing written`);
