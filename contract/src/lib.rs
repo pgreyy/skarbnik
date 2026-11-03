@@ -40,12 +40,16 @@
 //! verifier account's own access key, so NEAR's transaction signature check is the signature check.
 //! Every state change writes a NEP-297 style `EVENT_JSON:` log line.
 //!
-//! OutLayer as one verifier (spike S5, Level 1): the owner sets the OutLayer contract account and the exact
-//! verifier program (URL and sha256) with `set_outlayer`, and registers that OutLayer account as a verifier.
-//! Anyone may call `request_outlayer_check` with the receipt; this contract itself sends the job to OutLayer,
-//! and only the callback of that request (`on_outlayer_result`, private) can add OutLayer's attestation. The
-//! callback carries only the program's JSON answer (no signature, no program hash), so it is accepted only if
-//! every echoed value matches what this contract holds. This trusts the OutLayer contract and its operator.
+//! Level 1: a bounty created with `level: 1` opens and settles through OutLayer. Anyone (normally the vendor's watch)
+//! sends the RISC Zero receipt and its journal with `open_with_outlayer` (Proof 0) or `check_with_outlayer` (an
+//! attempt), attaching OutLayer's fee and deposit. The contract first runs the same journal checks as Level 2 (the
+//! bounty's fields, and for an attempt the submission id, the seed recorded at reveal and the revealed patch), then
+//! asks OutLayer to run the verifier program the owner pinned (`set_outlayer`: an https URL and its sha256) on the
+//! receipt. Only the callback of that request counts: the contract accepts the answer if it says ok and echoes the
+//! image id, the submission id, the receipt hash and the sha256 of the journal it checked. PASS pays and FAIL spends the
+//! attempt exactly as at Level 2; no answer, an error or a mismatch records nothing, and the timeout rule still applies.
+//! One check per attempt can wait at a time. This trusts OutLayer to run the pinned program; the contract does not check
+//! the proof itself.
 //!
 //! Level 2 (spike S6c): a bounty created with `level: 2` takes no verifier attestations at all. It opens when anyone
 //! submits a Groth16 proof of its Proof 0 (`open_with_groth16`), and each revealed attempt is decided when anyone
@@ -107,9 +111,19 @@ const ACCOUNT_SLOTS_PREFIX: &[u8] = b"ACCOUNT_SLOTS:";
 /// Domain tag of the submission id a Proof 0 journal carries: sha256(PROOF0_DOMAIN || reference fix hash), as in
 /// harness/checker/src/zk.rs.
 pub const PROOF0_DOMAIN: &[u8] = b"kintsugi-proof0-v1";
-/// Bounty levels: 0 = verdicts need two verifier attestations; 2 = verdicts come only from a Groth16 proof.
+/// Bounty levels: 0 = verdicts need two verifier attestations; 1 = verdicts come from OutLayer running the pinned
+/// verifier program on the receipt; 2 = verdicts come only from a Groth16 proof the contract checks itself.
 pub const LEVEL_0: u8 = 0;
+pub const LEVEL_1: u8 = 1;
 pub const LEVEL_2: u8 = 2;
+/// Raw storage key prefix of a Level 1 check waiting for OutLayer: the prefix, then bounty id (u64 LE) and the attempt
+/// index (u32 LE; `PROOF0_INDEX` for Proof 0). The value is borsh `OutLayerCheck`. Raw keys keep the stored layout of
+/// bounties and submissions unchanged.
+const OUTLAYER_CHECK_PREFIX: &[u8] = b"OUTLAYER_CHECK:";
+/// The index a Proof 0 check is stored under.
+pub const PROOF0_INDEX: u32 = u32::MAX;
+/// A waiting check older than this may be replaced (OutLayer cancels a request after 10 minutes).
+pub const OUTLAYER_STALE_NS: u64 = 20 * 60 * 1_000_000_000;
 /// Gas sent with the OutLayer request (it reserves its own callback gas from this) and kept for ours.
 const OUTLAYER_REQUEST_GAS: Gas = Gas::from_tgas(150);
 const OUTLAYER_CALLBACK_GAS: Gas = Gas::from_tgas(30);
@@ -118,9 +132,10 @@ const OUTLAYER_CALLBACK_GAS: Gas = Gas::from_tgas(30);
 #[near(serializers = [borsh, json])]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct OutLayerConfig {
-    /// The OutLayer contract, for example `outlayer.testnet`. Must also be a registered verifier.
+    /// The OutLayer contract, for example `outlayer.testnet`.
     pub account_id: AccountId,
-    /// https URL of the verifier wasm and its sha256 (64 hex); OutLayer's worker refuses other bytes.
+    /// https URL of the verifier wasm and its sha256 (64 hex); OutLayer's worker refuses other bytes. Callers cannot
+    /// name another program: every request carries these two values.
     pub wasm_url: String,
     pub wasm_sha256: String,
     /// For example `wasm32-wasip1`.
@@ -128,6 +143,43 @@ pub struct OutLayerConfig {
     pub max_instructions: U64,
     pub max_memory_mb: u32,
     pub max_execution_seconds: U64,
+    /// The least a caller must attach: OutLayer's fee plus the deposit it holds for a receipt-sized input (returned
+    /// to the caller when the job ends). Below it OutLayer would refuse the request at the door.
+    pub min_deposit: U128,
+}
+
+/// A Level 1 check waiting for OutLayer's answer. The journal was checked against the bounty (and attempt) when the
+/// check was asked; the answer must echo its sha256 and the receipt hash.
+#[near(serializers = [borsh])]
+pub struct OutLayerCheck {
+    asker: AccountId,
+    deposit: u128,
+    journal_hash: [u8; 32],
+    receipt_hash: [u8; 32],
+    verdict: Verdict,
+    requested_at_ns: u64,
+}
+
+/// A waiting Level 1 check, as `get_outlayer_check` returns it.
+#[near(serializers = [json])]
+pub struct OutLayerCheckView {
+    pub asker: AccountId,
+    pub deposit: U128,
+    pub journal_hash: String,
+    pub receipt_hash: String,
+    pub verdict: Verdict,
+    pub requested_at_ns: U64,
+}
+
+fn outlayer_check_key(bounty_id: u64, index: u32) -> Vec<u8> {
+    let mut k = OUTLAYER_CHECK_PREFIX.to_vec();
+    k.extend_from_slice(&bounty_id.to_le_bytes());
+    k.extend_from_slice(&index.to_le_bytes());
+    k
+}
+
+fn outlayer_check(bounty_id: u64, index: u32) -> Option<OutLayerCheck> {
+    env::storage_read(&outlayer_check_key(bounty_id, index)).map(|b| near_sdk::borsh::from_slice(&b).expect("stored check decodes"))
 }
 
 /// The submission id a proof's journal must carry:
@@ -283,12 +335,68 @@ fn refund_undecided_revealed(
     }
 }
 
-/// The journal fields that are the same for every proof of one bounty.
-fn check_bounty_fields(bounty: &Bounty, j: &groth16::Journal) {
-    require!(j.original_hash == bounty.original_hash, "the journal's original is not this bounty's");
-    require!(j.exploit_commitment == bounty.exploit_commitment, "the journal's exploit commitment is not this bounty's");
-    require!(j.corpus_hash == bounty.corpus_hash, "the journal's tests are not this bounty's");
-    require!(j.fuzz_count == bounty.fuzz_count && j.variant_count == bounty.variant_count, "the journal's check size is not this bounty's");
+/// The journal fields that are the same for every proof of one bounty. Level 1 and Level 2 share this and the two
+/// functions below, so their binding checks cannot drift apart.
+fn bounty_fields_problem(bounty: &Bounty, j: &groth16::Journal) -> Option<&'static str> {
+    if j.original_hash != bounty.original_hash {
+        return Some("the journal's original is not this bounty's");
+    }
+    if j.exploit_commitment != bounty.exploit_commitment {
+        return Some("the journal's exploit commitment is not this bounty's");
+    }
+    if j.corpus_hash != bounty.corpus_hash {
+        return Some("the journal's tests are not this bounty's");
+    }
+    if j.fuzz_count != bounty.fuzz_count || j.variant_count != bounty.variant_count {
+        return Some("the journal's check size is not this bounty's");
+    }
+    None
+}
+
+/// The checks that make a journal this bounty's Proof 0: the bounty's fields, the journal sha256 fixed at creation, the
+/// reference fix as candidate, the Proof 0 id and PASS.
+fn proof0_journal_problem(bounty: &Bounty, journal: &[u8], j: &groth16::Journal) -> Option<&'static str> {
+    if let Some(e) = bounty_fields_problem(bounty, j) {
+        return Some(e);
+    }
+    if env::sha256_array(journal) != bounty.proof0_journal_hash {
+        return Some("the journal is not this bounty's Proof 0 journal");
+    }
+    if j.candidate_hash != bounty.reference_fix_hash {
+        return Some("the journal's candidate is not this bounty's reference fix");
+    }
+    if j.submission_id != proof0_id(&bounty.reference_fix_hash) {
+        return Some("the journal is not a Proof 0 journal");
+    }
+    if j.verdict != 1 {
+        return Some("the Proof 0 verdict is not PASS");
+    }
+    None
+}
+
+/// The checks that tie a journal to THIS revealed attempt: the submission id (contract, bounty, index, patch hash), the
+/// seed recorded at reveal, the revealed patch as candidate, and the bounty's fields.
+fn attempt_journal_problem(bounty_id: u64, index: u32, bounty: &Bounty, sub: &Submission, j: &groth16::Journal) -> Option<&'static str> {
+    let Some(patch_hash) = sub.patch_hash else { return Some("submission not revealed") };
+    if j.submission_id != submission_id(&env::current_account_id(), bounty_id, index, &patch_hash) {
+        return Some("the journal belongs to another bounty or attempt (submission id)");
+    }
+    if Some(j.fuzz_seed) != sub.seed {
+        return Some("the journal's seed is not the seed recorded at reveal");
+    }
+    if j.candidate_hash != patch_hash {
+        return Some("the journal's candidate is not the revealed patch");
+    }
+    bounty_fields_problem(bounty, j)
+}
+
+/// The message a method gives when a bounty of another level reaches it.
+fn wrong_level(level: u8) -> &'static str {
+    match level {
+        LEVEL_0 => "this is a Level 0 bounty: verdicts need two verifier attestations",
+        LEVEL_1 => "this is a Level 1 bounty: it opens and settles only through the OutLayer check",
+        _ => "this is a Level 2 bounty: verdicts come only from a Groth16 proof",
+    }
 }
 
 #[near(serializers = [borsh])]
@@ -672,7 +780,10 @@ impl Contract {
         require!(reveal_gap_ns.0 > 0, "reveal_gap_ns must be above zero: a commit and its reveal cannot share a block");
         require!(reveal_window_ns.0 > reveal_gap_ns.0, "reveal_window_ns must be longer than reveal_gap_ns");
         let level = level.unwrap_or(LEVEL_0);
-        require!(level == LEVEL_0 || level == LEVEL_2, "level must be 0 or 2");
+        require!(level == LEVEL_0 || level == LEVEL_1 || level == LEVEL_2, "level must be 0, 1 or 2");
+        if level == LEVEL_1 {
+            require!(self.get_outlayer().is_some(), "Level 1 needs the OutLayer settings: ask the owner to set them (set_outlayer)");
+        }
         require!(fuzz_count > 0 && variant_count > 0, "fuzz_count and variant_count must be above zero");
         let image = parse_hash("image_id", &image_id);
         require!(image_id_allowed(&image), "image_id is not an allowed checker: ask the owner to allow it (allow_image_id)");
@@ -743,7 +854,7 @@ impl Contract {
         let now = env::block_timestamp();
         let bounty = self.bounties.get(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(env::predecessor_account_id() == bounty.vendor, "only the vendor can post a verdict");
-        require!(bounty.level == LEVEL_0, "this is a Level 2 bounty: verdicts come only from a Groth16 proof");
+        require!(bounty.level == LEVEL_0, wrong_level(bounty.level));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         let verdict_window = bounty.verdict_window_ns;
         let sub = self
@@ -961,7 +1072,7 @@ impl Contract {
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(verifier != bounty.vendor, "the vendor cannot attest");
-        require!(bounty.level == LEVEL_0, "this is a Level 2 bounty: it opens only with a Groth16 proof");
+        require!(bounty.level == LEVEL_0, wrong_level(bounty.level));
         require!(!bounty.opened, "bounty is already open");
         require!(
             bounty.proof0_journal_hash == journal && bounty.proof0_receipt_hash == receipt,
@@ -992,13 +1103,16 @@ impl Contract {
         self.record_attestation(bounty_id, index, verifier, verdict, journal, receipt)
     }
 
-    // ---------- OutLayer (verifier 1) ----------
+    // ---------- Level 1: OutLayer runs the pinned verifier program ----------
 
-    /// Owner only. Sets the OutLayer contract and the exact verifier program it must run.
+    /// Owner only. Sets the OutLayer contract and the exact verifier program every Level 1 request carries (an https
+    /// URL and its sha256), the resource limits and the least deposit a caller must attach.
     pub fn set_outlayer(&mut self, config: OutLayerConfig) {
         require!(env::predecessor_account_id() == self.owner, "only the owner can set OutLayer");
         parse_hash("wasm_sha256", &config.wasm_sha256);
         require!(config.wasm_url.starts_with("https://"), "wasm_url must be https");
+        require!(!config.build_target.is_empty(), "build_target must be set");
+        require!(config.min_deposit.0 > 0, "min_deposit must be above zero");
         emit("outlayer_set", json!({ "config": config }));
         env::storage_write(OUTLAYER_KEY, &near_sdk::borsh::to_vec(&config).expect("config serializes"));
     }
@@ -1014,26 +1128,109 @@ impl Contract {
         Some(to_hex(&submission_id(&env::current_account_id(), bounty_id.0, index, &patch_hash)))
     }
 
-    /// Anyone. Sends the posted verdict's receipt (bincode, base64) to OutLayer to be checked by the pinned
-    /// verifier program. Attach NEAR for OutLayer's fee; OutLayer refunds what it does not use to the caller.
-    /// The answer comes back to `on_outlayer_result`.
+    /// The Level 1 check waiting for OutLayer on an attempt (`index`) or on Proof 0 (no index), if any.
+    pub fn get_outlayer_check(&self, bounty_id: U64, index: Option<u32>) -> Option<OutLayerCheckView> {
+        outlayer_check(bounty_id.0, index.unwrap_or(PROOF0_INDEX)).map(|c| OutLayerCheckView {
+            asker: c.asker,
+            deposit: U128(c.deposit),
+            journal_hash: to_hex(&c.journal_hash),
+            receipt_hash: to_hex(&c.receipt_hash),
+            verdict: c.verdict,
+            requested_at_ns: U64(c.requested_at_ns),
+        })
+    }
+
+    /// Level 1 bounties only. Anyone, attaching at least `min_deposit`: opens the bounty with its Proof 0. The journal
+    /// must pass the same checks as at Level 2 (`open_with_groth16`); then OutLayer runs the pinned verifier program on
+    /// the receipt (bincode, base64; `receipt_sha256` is the sha256 of its bytes) and the bounty opens only if its answer
+    /// confirms the receipt is valid for the bounty's image id and carries this journal.
     #[payable]
-    pub fn request_outlayer_check(&mut self, bounty_id: U64, index: u32, receipt_b64: String) -> Promise {
-        let cfg = self.get_outlayer().unwrap_or_else(|| env::panic_str("OutLayer is not set"));
-        require!(self.verifiers.contains_key(&cfg.account_id), "the OutLayer account is not a registered verifier");
+    pub fn open_with_outlayer(&mut self, bounty_id: U64, receipt_b64: String, receipt_sha256: String, journal: Base64VecU8) -> Promise {
+        let now = env::block_timestamp();
         let bounty = self.bounties.get(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        require!(bounty.level == LEVEL_1, wrong_level(bounty.level));
         require!(bounty.state == BountyState::Open, "bounty is closed");
-        require!(bounty.level == LEVEL_0, "this is a Level 2 bounty: verdicts come only from a Groth16 proof");
+        require!(now < bounty.expires_at_ns, "bounty has expired");
+        require!(!bounty.opened, "bounty is already open");
+        let j = groth16::parse_journal(&journal.0);
+        if let Some(e) = proof0_journal_problem(bounty, &journal.0, &j) {
+            env::panic_str(e);
+        }
+        let sid = proof0_id(&bounty.reference_fix_hash);
+        let image_id = bounty.image_id;
+        self.ask_outlayer(bounty_id.0, PROOF0_INDEX, receipt_b64, &receipt_sha256, &journal.0, Verdict::Pass, image_id, sid, now)
+            .then(Self::ext(env::current_account_id()).with_static_gas(OUTLAYER_CALLBACK_GAS).on_outlayer_open(bounty_id))
+    }
+
+    /// Level 1 bounties only. Anyone, attaching at least `min_deposit` (normally the vendor's watch: an agent's
+    /// function call key cannot attach a deposit): decides a revealed attempt, within its verdict window. The journal
+    /// must pass the same checks as at Level 2 (`submit_groth16`): THIS bounty, THIS attempt, the seed recorded at reveal,
+    /// the revealed patch. Then OutLayer runs the pinned verifier program on the receipt, and the answer settles the
+    /// attempt in `on_outlayer_check`. One check per attempt can wait at a time.
+    #[payable]
+    pub fn check_with_outlayer(&mut self, bounty_id: U64, index: u32, receipt_b64: String, receipt_sha256: String, journal: Base64VecU8) -> Promise {
+        let now = env::block_timestamp();
+        let bounty = self.bounties.get(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        require!(bounty.level == LEVEL_1, wrong_level(bounty.level));
+        require!(bounty.state == BountyState::Open, "bounty is closed");
+        require!(bounty.opened, "bounty is not open: Proof 0 has not been proved");
         let sub = self.submissions.get(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
         require!(sub.outcome == Outcome::Open, "verdict already final");
-        let posted = sub.verdict.as_ref().unwrap_or_else(|| env::panic_str("no verdict posted"));
+        let revealed = sub.revealed_at_ns.unwrap_or_else(|| env::panic_str("submission not revealed"));
+        require!(now <= revealed.saturating_add(bounty.verdict_window_ns), "verdict window has closed");
+        let j = groth16::parse_journal(&journal.0);
+        if j.verdict == 1 {
+            require!(!earlier_reveal_undecided(&self.submissions, bounty_id.0, bounty.commits, index, revealed), "an attempt revealed earlier is still undecided: decide it or time it out first");
+        }
+        if let Some(e) = attempt_journal_problem(bounty_id.0, index, bounty, sub, &j) {
+            env::panic_str(e);
+        }
         let patch_hash = sub.patch_hash.unwrap_or_else(|| env::panic_str("submission not revealed"));
         let sid = submission_id(&env::current_account_id(), bounty_id.0, index, &patch_hash);
+        let verdict = if j.verdict == 1 { Verdict::Pass } else { Verdict::Fail };
+        let image_id = bounty.image_id;
+        self.ask_outlayer(bounty_id.0, index, receipt_b64, &receipt_sha256, &journal.0, verdict, image_id, sid, now)
+            .then(Self::ext(env::current_account_id()).with_static_gas(OUTLAYER_CALLBACK_GAS).on_outlayer_check(bounty_id, index))
+    }
+
+    /// Not callable from outside. Records the waiting check (refusing a second one while the first waits) and sends the
+    /// job to OutLayer with the pinned program, the caller's whole deposit, and the caller as the account OutLayer
+    /// refunds.
+    #[allow(clippy::too_many_arguments)]
+    fn ask_outlayer(
+        &mut self,
+        bounty_id: u64,
+        index: u32,
+        receipt_b64: String,
+        receipt_sha256: &str,
+        journal: &[u8],
+        verdict: Verdict,
+        image_id: [u8; 32],
+        sid: [u8; 32],
+        now: u64,
+    ) -> Promise {
+        let cfg = self.get_outlayer().unwrap_or_else(|| env::panic_str("OutLayer is not set"));
+        let deposit = env::attached_deposit();
+        require!(deposit.as_yoctonear() >= cfg.min_deposit.0, "attach at least min_deposit (get_outlayer) for OutLayer's fee and deposit");
+        if let Some(waiting) = outlayer_check(bounty_id, index) {
+            require!(now >= waiting.requested_at_ns.saturating_add(OUTLAYER_STALE_NS), "a check of this attempt is already waiting for OutLayer");
+        }
+        let receipt_hash = parse_hash("receipt_sha256", receipt_sha256);
+        let asker = env::predecessor_account_id();
+        let check = OutLayerCheck {
+            asker: asker.clone(),
+            deposit: deposit.as_yoctonear(),
+            journal_hash: env::sha256_array(journal),
+            receipt_hash,
+            verdict,
+            requested_at_ns: now,
+        };
+        env::storage_write(&outlayer_check_key(bounty_id, index), &near_sdk::borsh::to_vec(&check).expect("check serializes"));
         let input = json!({
             "receipt_b64": receipt_b64,
-            "image_id": to_hex(&bounty.image_id),
+            "image_id": to_hex(&image_id),
             "submission_id": to_hex(&sid),
-            "receipt_sha256": to_hex(&posted.receipt_hash),
+            "receipt_sha256": to_hex(&receipt_hash),
         })
         .to_string();
         let args = json!({
@@ -1045,74 +1242,104 @@ impl Contract {
             },
             "input_data": input,
             "response_format": "Json",
-            "payer_account_id": env::predecessor_account_id(),
+            "payer_account_id": asker,
         });
-        emit("outlayer_requested", json!({ "bounty_id": bounty_id, "index": index, "outlayer": cfg.account_id }));
-        Promise::new(cfg.account_id)
-            .function_call(
-                "request_execution".to_string(),
-                args.to_string().into_bytes(),
-                env::attached_deposit(),
-                OUTLAYER_REQUEST_GAS,
-            )
-            .then(Self::ext(env::current_account_id()).with_static_gas(OUTLAYER_CALLBACK_GAS).on_outlayer_result(bounty_id, index))
+        let index_view = if index == PROOF0_INDEX { None } else { Some(index) };
+        emit("outlayer_requested", json!({ "bounty_id": U64(bounty_id), "index": index_view, "verdict": verdict_str(verdict), "asker": check.asker, "outlayer": cfg.account_id }));
+        Promise::new(cfg.account_id).function_call("request_execution".to_string(), args.to_string().into_bytes(), deposit, OUTLAYER_REQUEST_GAS)
     }
 
-    /// Private: only this contract can call it, as the callback of its own OutLayer request. Accepts OutLayer's
-    /// answer as an attestation only if it says ok and every echoed value matches this contract's record.
-    /// Returns what happened; a rejected answer records nothing.
+    /// Private: only this contract can call it, as the callback of its own OutLayer request. Removes the waiting check
+    /// first. If OutLayer refused the request at the door (the call failed), its deposit came back to this contract, so
+    /// it is returned to the asker here (audit finding 13). If OutLayer ran the job and it failed or timed out, OutLayer
+    /// refunded the asker itself and the answer is empty. Otherwise the answer is accepted only if it says ok and echoes
+    /// what the waiting check holds. Never panics after reading the check, so a refusal records nothing but the removal.
+    fn take_outlayer_answer(&mut self, bounty_id: U64, index: u32, answer: Result<Option<Value>, PromiseError>, image_id: [u8; 32], sid: [u8; 32]) -> Result<OutLayerCheck, String> {
+        let Some(check) = outlayer_check(bounty_id.0, index) else { return Err("no check is waiting".into()) };
+        env::storage_remove(&outlayer_check_key(bounty_id.0, index));
+        let a = match answer {
+            Err(_) => {
+                Promise::new(check.asker.clone()).transfer(NearToken::from_yoctonear(check.deposit)).detach();
+                return Err("OutLayer refused the request; the deposit was returned to the asker".into());
+            }
+            Ok(None) => return Err("no answer from OutLayer".into()),
+            Ok(Some(a)) => a,
+        };
+        if a.get("ok").and_then(Value::as_bool) != Some(true) {
+            return Err("answer is not ok".into());
+        }
+        let field = |k: &str| a.get(k).and_then(Value::as_str).map(str::to_lowercase);
+        for (k, want) in [
+            ("image_id", to_hex(&image_id)),
+            ("submission_id", to_hex(&sid)),
+            ("receipt_sha256", to_hex(&check.receipt_hash)),
+            ("journal_sha256", to_hex(&check.journal_hash)),
+        ] {
+            if field(k).as_deref() != Some(want.as_str()) {
+                return Err(format!("{k} differs"));
+            }
+        }
+        if a.get("verdict").and_then(Value::as_str) != Some(verdict_str(check.verdict)) {
+            return Err("verdict differs from the journal's".into());
+        }
+        Ok(check)
+    }
+
     #[private]
-    pub fn on_outlayer_result(
-        &mut self,
-        bounty_id: U64,
-        index: u32,
-        #[callback_result] answer: Result<Option<Value>, PromiseError>,
-    ) -> String {
-        // `#[private]` already enforces this in the on-chain entry point; checked here too so the rule
-        // also holds (and is tested) when the method is called directly.
-        require!(env::predecessor_account_id() == env::current_account_id(), "on_outlayer_result is private");
+    pub fn on_outlayer_open(&mut self, bounty_id: U64, #[callback_result] answer: Result<Option<Value>, PromiseError>) -> String {
+        // `#[private]` already enforces this in the on-chain entry point; checked here too so the rule also holds (and is
+        // tested) when the method is called directly.
+        require!(env::predecessor_account_id() == env::current_account_id(), "on_outlayer_open is private");
+        let reject = |why: &str| -> String {
+            emit("outlayer_rejected", json!({ "bounty_id": bounty_id, "index": Value::Null, "reason": why }));
+            format!("rejected: {why}")
+        };
+        let Some(bounty) = self.bounties.get(&bounty_id.0) else { return reject("no such bounty") };
+        let (image_id, sid) = (bounty.image_id, proof0_id(&bounty.reference_fix_hash));
+        if let Err(e) = self.take_outlayer_answer(bounty_id, PROOF0_INDEX, answer, image_id, sid) {
+            return reject(&e);
+        }
+        let now = env::block_timestamp();
+        let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        if bounty.state != BountyState::Open || bounty.opened || now >= bounty.expires_at_ns {
+            return reject("the bounty is closed, expired or already open");
+        }
+        bounty.opened = true;
+        emit("bounty_opened", json!({ "bounty_id": bounty_id, "by": "outlayer", "caller": env::signer_account_id() }));
+        "opened".to_string()
+    }
+
+    #[private]
+    pub fn on_outlayer_check(&mut self, bounty_id: U64, index: u32, #[callback_result] answer: Result<Option<Value>, PromiseError>) -> String {
+        require!(env::predecessor_account_id() == env::current_account_id(), "on_outlayer_check is private");
         let reject = |why: &str| -> String {
             emit("outlayer_rejected", json!({ "bounty_id": bounty_id, "index": index, "reason": why }));
             format!("rejected: {why}")
         };
-        let Ok(Some(a)) = answer else { return reject("no answer from OutLayer") };
-        let Some(cfg) = self.get_outlayer() else { return reject("OutLayer is not set") };
         let Some(bounty) = self.bounties.get(&bounty_id.0) else { return reject("no such bounty") };
         let Some(sub) = self.submissions.get(&(bounty_id.0, index)) else { return reject("no such submission") };
-        let (Some(posted), Some(patch_hash)) = (sub.verdict.as_ref(), sub.patch_hash) else {
-            return reject("no verdict posted");
+        let Some(patch_hash) = sub.patch_hash else { return reject("submission not revealed") };
+        let (image_id, sid) = (bounty.image_id, submission_id(&env::current_account_id(), bounty_id.0, index, &patch_hash));
+        let check = match self.take_outlayer_answer(bounty_id, index, answer, image_id, sid) {
+            Ok(c) => c,
+            Err(e) => return reject(&e),
         };
-        let field = |k: &str| a.get(k).and_then(Value::as_str).map(str::to_lowercase);
-        if a.get("ok").and_then(Value::as_bool) != Some(true) {
-            return reject("answer is not ok");
+        // The bounty or the attempt may have changed while OutLayer worked (a timeout claim, another attempt's PASS).
+        let bounty = self.bounties.get(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        let sub = self.submissions.get(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
+        if bounty.state != BountyState::Open || sub.outcome != Outcome::Open {
+            return reject("the bounty or the attempt was decided while OutLayer worked");
         }
-        let sid = submission_id(&env::current_account_id(), bounty_id.0, index, &patch_hash);
-        let checks = [
-            ("image_id", to_hex(&bounty.image_id)),
-            ("submission_id", to_hex(&sid)),
-            ("receipt_sha256", to_hex(&posted.receipt_hash)),
-            ("journal_sha256", to_hex(&posted.journal_hash)),
-        ];
-        for (k, want) in checks {
-            if field(k).as_deref() != Some(want.as_str()) {
-                return reject(&format!("{k} differs"));
-            }
+        let revealed = sub.revealed_at_ns.unwrap_or(u64::MAX);
+        if check.verdict == Verdict::Pass && earlier_reveal_undecided(&self.submissions, bounty_id.0, bounty.commits, index, revealed) {
+            return reject("an attempt revealed earlier is still undecided");
         }
-        let verdict = match a.get("verdict").and_then(Value::as_str) {
-            Some("PASS") => Verdict::Pass,
-            Some("FAIL") => Verdict::Fail,
-            _ => return reject("verdict is not PASS or FAIL"),
-        };
-        if verdict != posted.verdict {
-            return reject("verdict differs from the posted verdict");
-        }
-        let (journal, receipt) = (posted.journal_hash, posted.receipt_hash);
-        self.record_attestation(bounty_id, index, cfg.account_id, verdict, journal, receipt)
+        // The check was asked within the verdict window; the answer may arrive just after it.
+        self.settle_attempt(bounty_id, index, check.verdict, check.journal_hash, check.receipt_hash, check.requested_at_ns, "outlayer")
     }
 
-    /// Shared by `attest` and `on_outlayer_result` (not callable from outside): adds one registered
-    /// verifier's attestation if it matches the posted verdict, journal hash and receipt hash, and finalizes
-    /// on the second different verifier.
+    /// Used by `attest` (Level 0, not callable from outside): adds one registered verifier's attestation if it matches
+    /// the posted verdict, journal hash and receipt hash, and finalizes on the second different verifier.
     fn record_attestation(
         &mut self,
         bounty_id: U64,
@@ -1127,7 +1354,7 @@ impl Contract {
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(verifier != bounty.vendor, "the vendor cannot attest");
-        require!(bounty.level == LEVEL_0, "this is a Level 2 bounty: verdicts come only from a Groth16 proof");
+        require!(bounty.level == LEVEL_0, wrong_level(bounty.level));
         let sub = self
             .submissions
             .get_mut(&(bounty_id.0, index))
@@ -1183,18 +1410,16 @@ impl Contract {
     pub fn open_with_groth16(&mut self, bounty_id: U64, seal: Base64VecU8, journal: Base64VecU8) -> String {
         let now = env::block_timestamp();
         let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
-        require!(bounty.level == LEVEL_2, "this is a Level 0 bounty: it opens with two verifier attestations");
+        require!(bounty.level == LEVEL_2, wrong_level(bounty.level));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         require!(now < bounty.expires_at_ns, "bounty has expired");
         require!(!bounty.opened, "bounty is already open");
         let j = groth16::parse_journal(&journal.0);
         // Cheap binding checks first, the pairing check last (audit hardening S3): a wrong journal fails for a few Tgas
         // with a message that names the field, instead of for the whole proof check.
-        check_bounty_fields(bounty, &j);
-        require!(env::sha256_array(&journal.0) == bounty.proof0_journal_hash, "the journal is not this bounty's Proof 0 journal");
-        require!(j.candidate_hash == bounty.reference_fix_hash, "the journal's candidate is not this bounty's reference fix");
-        require!(j.submission_id == proof0_id(&bounty.reference_fix_hash), "the journal is not a Proof 0 journal");
-        require!(j.verdict == 1, "the Proof 0 verdict is not PASS");
+        if let Some(e) = proof0_journal_problem(bounty, &journal.0, &j) {
+            env::panic_str(e);
+        }
         require!(groth16::verify(&seal.0, &bounty.image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
         bounty.opened = true;
         emit("bounty_opened", json!({ "bounty_id": bounty_id, "by": "groth16", "caller": env::predecessor_account_id() }));
@@ -1209,42 +1434,39 @@ impl Contract {
     /// the bounty; FAIL spends the attempt.
     pub fn submit_groth16(&mut self, bounty_id: U64, index: u32, seal: Base64VecU8, journal: Base64VecU8) -> String {
         let now = env::block_timestamp();
-        let contract = env::current_account_id();
-        let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
-        require!(bounty.level == LEVEL_2, "this is a Level 0 bounty: verdicts need two verifier attestations");
+        let bounty = self.bounties.get(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        require!(bounty.level == LEVEL_2, wrong_level(bounty.level));
         require!(bounty.state == BountyState::Open, "bounty is closed");
         // No expiry check here: a reveal always leaves a full verdict window before expiry, and the window alone bounds
         // the proof. Refusing a proof after expiry while the timeout still paid was audit finding F1.
         require!(bounty.opened, "bounty is not open: Proof 0 has not been proved");
-        let sub = self
-            .submissions
-            .get_mut(&(bounty_id.0, index))
-            .unwrap_or_else(|| env::panic_str("no such submission"));
+        let sub = self.submissions.get(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
         require!(sub.outcome == Outcome::Open, "verdict already final");
         let revealed = sub.revealed_at_ns.unwrap_or_else(|| env::panic_str("submission not revealed"));
         require!(now <= revealed.saturating_add(bounty.verdict_window_ns), "verdict window has closed");
         let j = groth16::parse_journal(&journal.0);
-        let (commits, image_id) = (bounty.commits, bounty.image_id);
         if j.verdict == 1 {
-            require!(!earlier_reveal_undecided(&self.submissions, bounty_id.0, commits, index, revealed), "an attempt revealed earlier is still undecided: decide it or time it out first");
+            require!(!earlier_reveal_undecided(&self.submissions, bounty_id.0, bounty.commits, index, revealed), "an attempt revealed earlier is still undecided: decide it or time it out first");
         }
-        let sub = self.submissions.get_mut(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
         // Cheap binding checks first, the pairing check last (audit hardening S3).
-        let patch_hash = sub.patch_hash.unwrap_or_else(|| env::panic_str("submission not revealed"));
-        require!(j.submission_id == submission_id(&contract, bounty_id.0, index, &patch_hash), "the journal belongs to another bounty or attempt (submission id)");
-        require!(Some(j.fuzz_seed) == sub.seed, "the journal's seed is not the seed recorded at reveal");
-        require!(j.candidate_hash == patch_hash, "the journal's candidate is not the revealed patch");
-        check_bounty_fields(bounty, &j);
-        require!(groth16::verify(&seal.0, &image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
+        if let Some(e) = attempt_journal_problem(bounty_id.0, index, bounty, sub, &j) {
+            env::panic_str(e);
+        }
+        require!(groth16::verify(&seal.0, &bounty.image_id, &journal.0), "the Groth16 proof does not verify for this bounty's image id and this journal");
         let verdict = if j.verdict == 1 { Verdict::Pass } else { Verdict::Fail };
-        sub.verdict = Some(PostedVerdict {
-            verdict,
-            journal_hash: env::sha256_array(&journal.0),
-            receipt_hash: env::sha256_array(&seal.0),
-            posted_at_ns: now,
-        });
+        self.settle_attempt(bounty_id, index, verdict, env::sha256_array(&journal.0), env::sha256_array(&seal.0), now, "groth16")
+    }
+
+    /// Shared by Level 2 (`submit_groth16`) and Level 1 (`on_outlayer_check`), not callable from outside: records the
+    /// verdict of a revealed attempt whose journal was already checked, then PASS pays the researcher (with the own fee
+    /// refunded) and closes the bounty, FAIL spends the attempt. `how` names the path in the events ("groth16" or
+    /// "outlayer"), so a reader can tell a proof the contract checked from an answer it trusted.
+    fn settle_attempt(&mut self, bounty_id: U64, index: u32, verdict: Verdict, journal_hash: [u8; 32], receipt_hash: [u8; 32], now: u64, how: &str) -> String {
+        let bounty = self.bounties.get_mut(&bounty_id.0).unwrap_or_else(|| env::panic_str("no such bounty"));
+        let sub = self.submissions.get_mut(&(bounty_id.0, index)).unwrap_or_else(|| env::panic_str("no such submission"));
+        sub.verdict = Some(PostedVerdict { verdict, journal_hash, receipt_hash, posted_at_ns: now });
         bounty.pending -= 1;
-        emit("groth16_verified", json!({ "bounty_id": bounty_id, "index": index, "verdict": verdict_str(verdict), "caller": env::predecessor_account_id() }));
+        emit(&format!("{how}_verified"), json!({ "bounty_id": bounty_id, "index": index, "verdict": verdict_str(verdict), "caller": env::predecessor_account_id() }));
         match verdict {
             Verdict::Pass => {
                 sub.outcome = Outcome::Passed;
@@ -1252,7 +1474,7 @@ impl Contract {
                 bounty.winner = Some(index);
                 emit(
                     "paid",
-                    json!({ "bounty_id": bounty_id, "index": index, "reason": "groth16_pass", "to": sub.payout, "amount": U128(bounty.amount.as_yoctonear()) }),
+                    json!({ "bounty_id": bounty_id, "index": index, "reason": format!("{how}_pass"), "to": sub.payout, "amount": U128(bounty.amount.as_yoctonear()) }),
                 );
                 bounty.fees_collected = bounty.fees_collected.saturating_sub(sub.fee);
                 Promise::new(sub.payout.clone()).transfer(bounty.amount.saturating_add(sub.fee)).detach();
@@ -1315,7 +1537,7 @@ impl Contract {
     /// Anyone. After the bounty's expiry: if nothing was paid and no revealed submission is still waiting
     /// for its verdict or timeout, refunds the bounty to the vendor. In the same call (also for a bounty
     /// that was already paid), sends the fees of decided attempts to the registered verifiers in equal shares (Level 0,
-    /// the remainder of the division to the first one) or to the protocol fee pool (Level 2); commits never revealed go to
+    /// the remainder of the division to the first one) or to the protocol fee pool (Levels 1 and 2); commits never revealed go to
     /// the pool first. Fails if there is nothing left to do.
     pub fn expire(&mut self, bounty_id: U64) {
         let now = env::block_timestamp();
@@ -1344,9 +1566,9 @@ impl Contract {
             acted = true;
         }
         let fees = bounty.fees_collected.as_yoctonear();
-        if !bounty.fees_swept && fees > 0 && bounty.level == LEVEL_2 {
-            // Level 2 has no verifiers to pay, and paying the vendor would reward unfixable or fee-farming bounties
-            // (audit round 1, fix 4): the fees of decided attempts go to the protocol fee pool.
+        if !bounty.fees_swept && fees > 0 && bounty.level != LEVEL_0 {
+            // Levels 1 and 2 have no verifiers to pay, and paying the vendor would reward unfixable or fee-farming
+            // bounties (audit round 1, fix 4): the fees of decided attempts go to the protocol fee pool.
             bounty.fees_swept = true;
             bounty.fees_collected = NearToken::from_yoctonear(0);
             let pool = add_to_pool(NearToken::from_yoctonear(fees));
@@ -1501,3 +1723,5 @@ mod tests;
 mod tests_level2;
 #[cfg(test)]
 mod tests_level2_attempts;
+#[cfg(test)]
+mod tests_level1;
