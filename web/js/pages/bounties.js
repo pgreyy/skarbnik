@@ -27,6 +27,7 @@ function subLine(x, meta, rec) {
   if (waiting) return `${waiting} revealed ${waiting === 1 ? 'attempt' : 'attempts'} waiting for a verdict.${x.accepting ? ` Commits accepted until ${utcShort(commitBy(b))} UTC.` : ''}`;
   if (x.accepting) return `Open until ${utcShort(commitBy(b))} UTC. ${b.commits ? `${b.commits} ${b.commits === 1 ? 'attempt' : 'attempts'} so far.` : 'No attempts yet.'}`;
   if (status === 'Proof rejected') return 'An attempt was rejected by a FAIL proof.';
+  if (status === 'Failed by OutLayer') return 'OutLayer answered FAIL for an attempt; the contract did not check the proof itself.';
   return b.state === 'Open' ? 'Not accepting new commits now.' : '';
 }
 

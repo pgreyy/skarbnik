@@ -81,7 +81,7 @@ ${kv([['Reveal to payout', '2 h 10 min'], ['Sealed compute', 'About $0.84'], ['P
 <div class="txs">${tx('Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS', 'Proof and payment')}<a class="lnk sm" href="${GH}/tree/main/docs/evidence/tee_spike" target="_blank" rel="noopener">docs/evidence/tee_spike/ ${icon('ext')}</a><a class="lnk sm" href="${GH}/blob/main/docs/CONFIDENTIAL_PROVING.md" target="_blank" rel="noopener">docs/CONFIDENTIAL_PROVING.md ${icon('ext')}</a></div></article>
 </div>`;
 
-const VOCAB = ['Proof verified', 'Verified by OutLayer', 'Proof rejected', 'Awaiting evaluation', 'Timeout settlement', 'Refunded', 'Failed', 'Demo or test only', 'Open for attempts', 'Waiting for Proof 0'];
+const VOCAB = ['Proof verified', 'Verified by OutLayer', 'Proof rejected', 'Failed by OutLayer', 'Awaiting evaluation', 'Timeout settlement', 'Refunded', 'Failed', 'Demo or test only', 'Open for attempts', 'Waiting for Proof 0'];
 
 export async function evidence(viewEl, tab) {
   const t0 = { ledger: 'bounties', checker: 'proofs' }[tab] || tab;

@@ -3,7 +3,8 @@
 // module); whether it accepts a commit now; and the chip each status is shown with. Mint is used only for Proof
 // verified, the one status where the contract checked the proof itself (Level 2); a Level 1 payment is Verified by
 // OutLayer (the contract trusted OutLayer's answer), a Level 0 payment Verifiers attested; Timeout settlement and
-// Refunded are neutral; Failed and Proof rejected are coral, always with a word.
+// Refunded are neutral; Failed, Proof rejected (Level 2: a FAIL proof the contract checked) and Failed by OutLayer
+// (Level 1: OutLayer answered FAIL) are coral, always with a word.
 import { commitBy, nsToDate } from './chain.js';
 
 export const STATUS = {
@@ -11,6 +12,7 @@ export const STATUS = {
   'Verified by OutLayer': { cls: 'k-await', icon: 'seal', help: 'OutLayer ran the pinned verifier program on the proof and the contract paid on its answer. The contract did not check the proof itself (Level 1).' },
   'Verifiers attested': { cls: 'k-await', icon: 'seal', help: 'Two registered verifiers attested the verdict and the contract paid on their word (Level 0).' },
   'Proof rejected': { cls: 'k-reject', icon: 'x', help: 'A valid proof said FAIL for an attempt. The bounty is still open.' },
+  'Failed by OutLayer': { cls: 'k-reject', icon: 'x', help: 'OutLayer ran the pinned verifier program on the proof of an attempt and answered FAIL; the attempt is spent. The contract did not check the proof itself (Level 1). The bounty is still open.' },
   'Awaiting evaluation': { cls: 'k-await', icon: 'hourglass', help: 'A patch was revealed and no verdict has arrived yet.' },
   'Timeout settlement': { cls: 'k-timeout', icon: 'hourglass', help: 'No proof arrived in the window. The contract paid by rule. This is not a proof.' },
   'Refunded': { cls: 'k-refund', icon: 'undo', help: 'Nothing was paid out. The vendor got the reward back.' },
@@ -44,7 +46,7 @@ export function statusOf(b, subs, kind, now = Date.now()) {
   if (subs.some((s) => s && s.outcome === 'Open' && s.revealed_at_ns)) return 'Awaiting evaluation';
   if (BigInt(now) * 1000000n >= BigInt(b.expires_at_ns)) return 'Failed';
   if (!b.opened) return 'Waiting for Proof 0';
-  if (subs.some((s) => s && s.outcome === 'Failed')) return 'Proof rejected';
+  if (subs.some((s) => s && s.outcome === 'Failed')) return b.level === 1 ? 'Failed by OutLayer' : 'Proof rejected';
   return accepting(b, now) ? 'Open for attempts' : 'Awaiting evaluation';
 }
 

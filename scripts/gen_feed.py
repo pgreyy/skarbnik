@@ -60,7 +60,7 @@ TARGET = ("Change the program so it no longer crashes (traps or runs out of fuel
           "drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this "
           "checker against the secret and the public tests; it does not prove the patch is secure against everything.")
 # The status vocabulary of each bounty in this feed (documented on the site's For agents page).
-STATUSES = ["Proof verified", "Verified by OutLayer", "Verifiers attested", "Proof rejected", "Awaiting evaluation", "Timeout settlement", "Refunded", "Failed",
+STATUSES = ["Proof verified", "Verified by OutLayer", "Verifiers attested", "Proof rejected", "Failed by OutLayer", "Awaiting evaluation", "Timeout settlement", "Refunded", "Failed",
             "Demo or test only", "Open for attempts", "Waiting for Proof 0"]
 BUILD_TXT = """How to build a patch for this program (the same flags the vendor used for the original):
 rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \\
@@ -140,7 +140,8 @@ def status_of(b, subs, kind, accepting):
     if not b["opened"]:
         return "Waiting for Proof 0"
     if any(s["outcome"] == "Failed" for s in subs):
-        return "Proof rejected"  # an attempt was rejected by a FAIL proof; the bounty is still open
+        # an attempt was rejected: by a FAIL proof the contract checked (Level 2), or by OutLayer's FAIL answer (Level 1)
+        return "Failed by OutLayer" if b.get("level") == 1 else "Proof rejected"
     return "Open for attempts" if accepting else "Awaiting evaluation"
 
 

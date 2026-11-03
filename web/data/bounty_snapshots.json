@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-03T15:47:08Z",
+ "generated_at_utc": "2026-11-03T15:56:46Z",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "A saved snapshot of the contract, not live. Made by scripts/gen_feed.py together with feed.json.",
  "verifiers": [
