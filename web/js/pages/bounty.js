@@ -189,7 +189,7 @@ function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at
 </div>
 <div class="card" style="padding:24px 26px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
 <div><p class="small faint">Reward</p><b class="h3">${esc(near(b.amount).replace(' NEAR', ''))} <span style="font:500 12px/1 var(--fu);color:var(--tx3)">NEAR</span></b></div>
-<div><p class="small faint">Attempts</p><b class="h3">${esc(b.max_commits)} max</b></div>
+<div><p class="small faint">Attempts</p><b class="h3 nw">${esc(b.commits)} of ${esc(b.max_commits)} <span style="font:500 12px/1 var(--fu);color:var(--tx3)">used</span></b></div>
 <div><p class="small faint">Window</p><b class="h3">${esc(span(b.verdict_window_ns).replace(/ hours?/, ' h').replace(/ days?/, ' d'))}</b></div>
 </div>
 </div>

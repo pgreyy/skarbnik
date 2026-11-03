@@ -2,6 +2,22 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Phone desktop mode: Bounties rows and the page check at 980 and 1024
+
+- A phone with "Desktop site" on lays the page out about 980 px wide and shrinks it; Chrome may then enlarge text
+  (text autosizing), which pushed the Bounties row parts over each other. `html` now sets text-size-adjust to 100%, so
+  text keeps the size the layout was made for.
+- Bounties between 700 and 1100 px: the attempts and the transaction with its link get columns of their own (120 px
+  and 180 px at least) instead of sizing to their content. Attempts read "1 of 4 used" on one line, on the list and on
+  the bounty page's header (the facts list already said "1 of 4 used"). The status filters wrap onto a second line
+  instead of running off the edge.
+- Evidence Lab: 6 px between "Bits learned" or "Candidates left" and its large number (their line boxes touched).
+- Checked with a private script, hasTouch on, dark and light: the Bounties list at 820, 900, 980 and 1024 (and with a
+  412 px phone screen laying the page out at 820 and 980, mobile mode on): no part of a row over another, attempts on
+  one line, no sideways scroll. Then Home with its seven sections, Bounties, bounty 24, For agents (every tab and
+  way), For vendors (every tab and way), every Evidence tab, the Judge guide's tabs and How it works at 980, 1024, 768
+  and 390: no text over other text, no text cut off, no sideways scroll, no script errors.
+
 ## 2026-11-03: The judge tour is a 5 minute tour
 
 - Home's "Take the 10 minute judge tour" is now "Take the 5 minute judge tour", and docs/TRY_IT.md says "The 5 minute

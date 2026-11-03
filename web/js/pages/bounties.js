@@ -74,7 +74,7 @@ ${['Proof verified', 'Timeout settlement', 'Refunded'].map((s) => `<div class="k
 <div class="bmain"><a class="h4" style="display:block;text-decoration:none;color:var(--tx)" href="#/bounties/${esc(id)}">${esc((meta.titles || {})[id] || `Bounty ${id}`)}</a>
 <div class="kinds">${kindChips(b, rec).map(([t, c]) => chip(c, t)).join('')}</div></div>
 <div class="bnum n1"><span class="lbl">Reward</span><b>${esc(near(b.amount).replace(' NEAR', ''))}<small>NEAR</small></b></div>
-<div class="bnum n2"><span class="lbl">Attempts</span><b>${esc(b.max_commits)}<small>max</small></b>${b.commits ? `<span class="small faint">${esc(b.commits)} used</span>` : ''}</div>
+<div class="bnum n2"><span class="lbl">Attempts</span><b class="nw">${esc(b.commits || 0)} of ${esc(b.max_commits)}<small>used</small></b></div>
 <div class="bstat">${chip(st.cls, x.status, st.icon)}<p class="small">${esc(subLine(x, meta, rec))}</p></div>
 <div class="bev">${txid ? `<span class="txl">${esc(txl)}</span>${tx(txid)}` : '<span class="txl">No transaction recorded</span>'}
 <a class="lnk" style="min-height:30px;font-size:14px" href="${x.accepting ? '#/agents' : `#/bounties/${esc(id)}`}">${x.accepting ? 'Run an agent' : 'Open bounty'}</a></div>
