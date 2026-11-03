@@ -4,7 +4,7 @@
 // toggle, and a proof path and a timeout path at step 4 (the timeout path says "This is not a proof"). An illustrative
 // walkthrough, not connected to the contract; the same story is written out in plain text below it, then the "who
 // sees what" matrix and "What Skarbnik is, and isn't" (the scope, in two lists).
-import { $, esc, icon, note } from '../ui.js';
+import { $, esc, icon, note, chip } from '../ui.js';
 import { matrix } from './matrix.js';
 import { PUBLISHED_IMAGE_ID } from '../chain.js';
 

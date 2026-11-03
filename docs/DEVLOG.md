@@ -2,6 +2,23 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Phone desktop mode holds; How it works step error fixed
+
+- Looked for what could drop a phone out of desktop mode when Home's next arrow is pressed. (a) No full page load: the
+  arrow and the rail call history.replaceState (the hash changes, no navigation); no location.href, assign, reload or
+  meta refresh, no service worker, no link to another host (www.skarbnik.xyz answers 308 to skarbnik.xyz, a domain
+  setting; no link on the site uses it), no added or dropped trailing slash. (b) No script edits the viewport tag or
+  reads the user agent, touch, pointer or screen size; the layout comes from CSS on the page width only. (c)
+  vercel.json has no redirects or rewrites and nothing for phone user agents; a phone user agent gets the same page.
+- The likely cause, not confirmed on a real phone: Chrome's text autosizing on a shrunk desktop layout enlarges the
+  text of the section that comes into view, which looks like the phone layout. Turned off with text-size-adjust in the
+  previous commit.
+- Found while checking: How it works' settlement step used chip() without importing it since d85749d, so pressing the
+  steps raised "chip is not defined". The import is back.
+- Checked with a private script, a 412 px mobile screen laying the page out at 980 px: Home's next arrow (six times)
+  and rail, How it works' steps, the Evidence Lab probe button, the Judge guide door card, and the For agents and For
+  vendors way pickers: no page load after any tap, layout width 981 px and zoom 0.42 throughout, no script errors.
+
 ## 2026-11-03: Phone desktop mode: Bounties rows and the page check at 980 and 1024
 
 - A phone with "Desktop site" on lays the page out about 980 px wide and shrinks it; Chrome may then enlarge text
