@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: rpc.testnet.near.org is deprecated: commands moved to FastNEAR
+
+- `https://rpc.testnet.near.org` now answers every request with error -429 "THIS ENDPOINT IS DEPRECATED". The judge
+  check `./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 17` read bounty 17's image id from it by default, so it
+  would print "not found" and DIFFERENT. Its default RPC is now `https://test.rpc.fastnear.com` (still `RPC=...` to
+  choose another). The copyable commands in docs/TRY_IT.md, the "How to check it yourself" command in docs/EVIDENCE.md
+  and the Evidence page's code hash command use the same address. Checked: TRY_IT step 3's command against it prints
+  `28 closed` and `31 closed`. Not run: the full check_image_id.sh (its checker build needs the 7.46 GB image).
+- The site and the two MCP servers already try FastNEAR first and fall back to the old address; unchanged. Recorded
+  runs in docs/evidence/ keep the address they used.
+
 ## 2026-11-03: A dismiss X on informational notes
 
 - `web/js/dismiss.js` (new): informational note boxes (the bordered boxes with the info icon) get a small X at their

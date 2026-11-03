@@ -32,14 +32,14 @@ toolchain. Steps 9 and 10 are optional and need Docker.
 
 1. **Read the official demo bounty from the chain.**
 
-       curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiI3In0="}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["level"], b["state"], b["opened"], b["image_id"], b["image_id_allowed"])'
+       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiI3In0="}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["level"], b["state"], b["opened"], b["image_id"], b["image_id_allowed"])'
 
    See: `7 2 Open True dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc True` (Level 2, open, opened by
    its Proof 0, the published checker id, on the allowlist).
 
 2. **Check that the contract accepts only the published checker.**
 
-       curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_allowed_image_ids","args_base64":"e30="}}' | python3 -c 'import json,sys; ids=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(ids, "MATCH" if ids == ["dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"] else "DIFFERENT")'
+       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_allowed_image_ids","args_base64":"e30="}}' | python3 -c 'import json,sys; ids=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(ids, "MATCH" if ids == ["dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"] else "DIFFERENT")'
 
    See: `['dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc'] MATCH`.
 
@@ -49,7 +49,7 @@ toolchain. Steps 9 and 10 are optional and need Docker.
    attempts, at most 1 per account, with a 41 hour verdict window; the vendor's watch proves their attempts on a rented
    GPU. Judge bounties 18 to 22 (round 1) are retired: they stay on chain for the record.
 
-       for i in 27 28 29 30 31; do curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"kintsugi-l2-cihdp.testnet\",\"method_name\":\"get_bounty\",\"args_base64\":\"$(printf '{"bounty_id":"%s"}' $i | base64)\"}}" | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], "opened" if b["opened"] else "closed")'; done
+       for i in 27 28 29 30 31; do curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"kintsugi-l2-cihdp.testnet\",\"method_name\":\"get_bounty\",\"args_base64\":\"$(printf '{"bounty_id":"%s"}' $i | base64)\"}}" | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], "opened" if b["opened"] else "closed")'; done
 
    See, as of 2026-10-27: `27 opened` (opened by our test from a throwaway account, tx
    [`FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV`](https://testnet.nearblocks.io/txns/FPuvqMBp6Kao3GB46p9FDP2hEmS59pCtiLxv4fQdeSnV),
@@ -87,7 +87,7 @@ toolchain. Steps 9 and 10 are optional and need Docker.
    K = 3 and rising fee); the contract counted 3 and ignored 9 at no cost, so at most 3 of the 12 bits of the probe's
    target could ever be learned. The same probe with no cap, simulated on our machine only, learned all 12.
 
-       curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiIyMyJ9"}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["commits"], b["max_commits"], b["fees_collected"])'
+       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiIyMyJ9"}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["commits"], b["max_commits"], b["fees_collected"])'
 
    See: `23 3 3 45000000000000000000000` (3 commits counted of a cap of 3, 0.045 NEAR of fees: 0.01, 0.015 and 0.02). Both
    runs side by side, labelled real and simulated: https://skarbnik.xyz/#/evidence/lab (docs/evidence/arena_probe/).
@@ -143,7 +143,7 @@ toolchain. Steps 9 and 10 are optional and need Docker.
     See: `ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e` from `sha256sum`, and
     `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u` from the last line, the same as the chain's code hash:
 
-        curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"kintsugi-l2-cihdp.testnet"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'
+        curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"kintsugi-l2-cihdp.testnet"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'
 
     The contract also names its own source: `near contract call-function as-read-only kintsugi-l2-cihdp.testnet
     contract_source_metadata json-args {} network-config testnet now` returns the commit link

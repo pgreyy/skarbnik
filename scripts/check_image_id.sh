@@ -8,7 +8,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PUBLISHED=dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
-RPC="${RPC:-https://rpc.testnet.near.org}"
+RPC="${RPC:-https://test.rpc.fastnear.com}"
 cargo build --release -p kintsugi-harness
 methods=$(ls -t target/release/build/kintsugi-harness-*/out/methods.rs | head -1)
 built=$(python3 -I scripts/image_ids.py "$methods" | sed -n 's/^CHECK_GUEST_ID //p')

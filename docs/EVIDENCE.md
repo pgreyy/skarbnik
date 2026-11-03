@@ -107,7 +107,7 @@ each read back from the chain (the transaction's `DeployContract` action carries
 
 How to check it yourself:
 
-    curl -s https://rpc.testnet.near.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"kintsugi-l2-cihdp.testnet"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'
+    curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"kintsugi-l2-cihdp.testnet"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'
 
 It must print `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u`. A different hash means a deploy that is not in this list.
 To rebuild the same wasm yourself: docs/TRY_IT.md, step 11.
