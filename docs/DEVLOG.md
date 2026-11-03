@@ -2,6 +2,14 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Footer: MCP server link
+
+- The footer's Explore column now ends with "MCP server", linking to tools/skarbnik-mcp on GitHub, on the site and on
+  every saved page. `git log -S` on the footer found no commit that removed an MCP link: the footer never had one (it
+  was rebuilt in 2788c05 and d85749d, neither with an MCP link). The MCP server link that existed was on the For agents
+  page (added in 00b45f9, dropped when that page was rolled back in 04b8f89). No footer had a vendor tool link either,
+  so none was added.
+
 ## 2026-11-03: Phone desktop mode holds; How it works step error fixed
 
 - Looked for what could drop a phone out of desktop mode when Home's next arrow is pressed. (a) No full page load: the
