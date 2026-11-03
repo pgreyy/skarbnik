@@ -100,7 +100,7 @@ Each guard: what it stops, where it lives, and what shows it works.
 | No new pod starts once the logged spend (each pod's hourly price times its life) reaches the budget ($6); the attempt is then proved on the vendor's own CPU, with a warning | Spending past the owner's limit | `~/skarbnik-vendor/gpu_spend.json` on the vendor machine |
 | The GPU rental API key is read from its file (mode 600) for each request and never printed, logged or copied; error text is cleaned of it | Leaking the key | `tools/skarbnik_gpu.py` (`RunPod`) |
 | A GPU binary built on a pod must embed the published checker image id; a cached binary must match its recorded sha256 and load on the pod; the proof is still verified, wrapped and checked (verdict, submission id, secret commitment) on the vendor machine before submit | A wrong checker or a changed binary | `put_binary`, `prove_attempt` |
-| After two failed pods for one attempt, the attempt is proved on the vendor's CPU, with a warning | A GPU rental outage leaving an attempt unproved | watch log; it happened once (bounty 27, EVIDENCE, "The vendor tool") |
+| With CPU fallback off (the project's setting): when no GPU is free, the watch waits 5 minutes, then 10 between tries, while at least 2 hours of the verdict window are left; any other failure gets two rounds of two pods; then a loud ALERT line in the log and in `status`, never a silent stop. With CPU fallback on, the attempt is proved on the vendor's CPU instead, with a warning | A GPU rental outage leaving an attempt unproved, or a watch retrying without end | watch log; `python3 -I scripts/test_watch_retry.py`; the CPU fallback happened once (bounty 27, EVIDENCE, "The vendor tool") |
 | Once a proof exists, a failed submit is only sent again (up to 10 times); no new pod starts for that attempt | Paying for the same proof again after a submit fails | bounty 27's second submit (EVIDENCE, "The vendor tool") |
 
 
@@ -378,6 +378,9 @@ check also needs OutLayer's own fee and input deposit, paid by whoever asks for 
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-11-03 `5d9f9a1`: the vendor watch waits for a free GPU instead of retrying at once without end (the failure count
+  reset every round); other failures stop after two rounds with a loud ALERT line. No contract guard changed.
 
 - 2026-11-03 `c86db11`: Level 1 through OutLayer. New guards: OutLayer's answer counts only in the contract's own
   private callback, with every echoed value checked and the verdict equal to the journal's; the program is the owner
