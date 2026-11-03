@@ -64,6 +64,15 @@ one defined test result checkable by anyone.
    among the attempts still waiting, so a silent vendor can't hold the reward hostage. A timeout payout says nothing
    about whether the patch works, and the site labels it apart from proof-checked payouts.
 
+**Who decides: three levels.** The vendor picks one when it creates a bounty, and every bounty page and `feed.json`
+show it.
+
+| Level | Who decides | Shown by |
+| --- | --- | --- |
+| 2 (the default) | The contract checks the Groth16 proof itself, as in step 4 | every proof-paid bounty above; EVIDENCE, S6c |
+| 1 | OutLayer runs our pinned verifier program on the proof and the contract trusts its answer: no Groth16 step for the vendor, but OutLayer and its operator are trusted | bounty 36, opened ([`4GdNLf15…`](https://testnet.nearblocks.io/txns/4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ)) and its real fix's check through OutLayer is pending; EVIDENCE, "Level 1 through OutLayer" |
+| 0 | Registered verifiers attest; today all of them are run by the project | EVIDENCE, S4 |
+
 ## What the checker tests, and what it can't
 
 The checker (`harness/checker`) runs a patched WebAssembly module through five checks, in order. The first failure
@@ -133,7 +142,7 @@ Bounty 24 from attempt to payout (screenshots of the live site and the testnet e
 - **Bounty 32, the vendor side:** `watch` proved and submitted with no human: 17 min 8 s from reveal to verdict. Bounty
   32 uses the public demo program with a private secret made on the vendor's VPS, so it shows the automatic vendor
   workflow, not a newly found bug (docs/EVIDENCE.md, "The vendor tool").
-- **Tests:** 135 contract tests pass (`cargo test -p kintsugi-contract`), including real proofs from testnet checked
+- **Tests:** 155 contract tests pass (`cargo test -p kintsugi-contract`), including real proofs from testnet checked
   natively. The checker gives the expected verdict on 19 of 20 honest and cheating patches, the one difference explained.
 - **Attacks:** 9 proof attacks refused on chain: another attempt's or bounty's proof, a FAIL shown as a PASS, a flipped
   bit, a changed journal, another checker id, second proofs, a proof after expiry (docs/EVIDENCE.md, S6c).
@@ -198,6 +207,10 @@ Details: [docs/numbers.md](docs/numbers.md).
   mainnet contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades
   behind a multisig or DAO with a delay). The deployed code is a reproducible build, and every deploy and the current
   code hash are listed in docs/EVIDENCE.md, so a silent change shows.
+- **Level 1 trusts OutLayer.** On a Level 1 bounty the contract does not check the proof; it trusts OutLayer's answer,
+  and so OutLayer, its operator and its keys. It also depends on OutLayer downloading the pinned verifier file from
+  GitHub (commit `4e6a1f6`, sha256 `e60647ec...46a8`); without a check, the timeout rule applies. Level 2 trusts none
+  of that.
 - **Narrow tasks, testnet only, no external audit.** Only small deterministic WebAssembly repairs are supported. The
   contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)).
 
@@ -261,7 +274,7 @@ You need Rust 1.99.1, Python 3.11 or later, and for the rebuilds Docker with bui
 
 ```
 git clone https://github.com/pgreyy/skarbnik && cd skarbnik
-cargo test -p kintsugi-contract                           # 135 passed
+cargo test -p kintsugi-contract                           # 155 passed
 ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet 17  # rebuilds the checker: MATCH
 git checkout c86db11 && (cd contract && cargo near build reproducible-wasm) && git checkout -
 sha256sum target/near/kintsugi_contract/kintsugi_contract.wasm   # 630ed909...50bb, the code on chain

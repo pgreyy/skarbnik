@@ -5,6 +5,89 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Level 1 through OutLayer: built, deployed and settled on testnet (2026-11-03)
+
+**Question.** Can a bounty be decided by OutLayer running our pinned verifier program, with the contract trusting
+OutLayer's answer, and can OutLayer fetch that program from GitHub?
+
+**1. Can OutLayer download our program from GitHub?** Yes. Before the contract work, four jobs on testnet
+`outlayer.testnet`, each naming a file by its commit pinned raw.githubusercontent.com address in a public probe
+repository (`WasmUrl` source, `wasm32-wasip1`), each answered within 20 s:
+
+| Job | Program | Answer | OutLayer's note | Charged | Transaction | Log |
+| --- | --- | --- | --- | --- | --- | --- |
+| empty input, first use | build 1 (`60e04ada...dd43`) | `ok: false` (no receipt), 17 s | "Freshly compiled" | 0.0011818 NEAR | [`7Pr3stqn...`](https://testnet.nearblocks.io/txns/7Pr3stqnK91xWAy7Xww88Rv1riKngam5tECGmT4SCHTC) | `docs/evidence/OL-diag/probeA1_github_raw_empty.txt` |
+| a real PASS receipt | build 1 | `ok: true`, `PASS`, 19 s | cached | 0.0011013 NEAR | [`E5TmYhW5...`](https://testnet.nearblocks.io/txns/E5TmYhW5vAc9kHcWdAaPiCTxhrccakbi8vd5Pd17a35m) | `probeA_github_raw_good.txt` |
+| the same receipt, one bit flipped | build 1 | `ok: false`, "proof is invalid", 14 s | cached | 0.0010810 NEAR | [`GSopDh1L...`](https://testnet.nearblocks.io/txns/GSopDh1LCjCrvHQLts3vpgnPCXhCVFZozR25vGHeFkxg) | `probeA_github_raw_bad.txt` |
+| empty input, a second new file | build 2 (`7c19a694...99d2`) | `ok: false`, 14 s | "Freshly compiled" | 0.0011758 NEAR | [`2KxPD7fB...`](https://testnet.nearblocks.io/txns/2KxPD7fBNyMJCjjrshCozV3jTmBT6DzRyoex6wybi67e) | `probeA2_github_raw_build2_empty.txt` |
+
+Each job also needs OutLayer's input deposit for a 300 KB input: `estimate_execution_cost` returned 2.6751102 NEAR
+(in `probeA_github_raw_good.txt`); it was refunded with the answer (`payment_refunded` in each log). The earlier
+attempts that never got an answer (links on other hosts, an OutLayer project on FastFS) stay below, in "OutLayer
+(Level 1) on testnet". OutLayer's GitHub build source (it compiles a repository itself) was not tried: the repository
+holds only the built file.
+
+**2. The pinned program.** The real program is the committed build `verifier/outlayer/farbox-verifier.wasm` in this
+repository (commit `4e6a1f6`, rebuilt from `verifier/outlayer` by `scripts/build_verifier_wasm.sh`), sha256
+`e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8`, at the commit pinned address
+
+    https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm
+
+The owner set it with `set_outlayer` (tx
+[`9sXDRkHu4NbGpK3Gsd6jS4R9CWmoGwhLzuzEg3vYZqmr`](https://testnet.nearblocks.io/txns/9sXDRkHu4NbGpK3Gsd6jS4R9CWmoGwhLzuzEg3vYZqmr);
+`get_outlayer` after it: `docs/evidence/level1/set_outlayer.txt`): `outlayer.testnet`, that address and hash,
+`wasm32-wasip1`, at most 2,000,000,000 instructions, 64 MB and 20 s, and `min_deposit` 2.8 NEAR.
+
+**3. The contract.** Commit `c86db11`: a bounty is Level 1 when it is created with `level: 1`. `open_with_outlayer`
+(Proof 0) and `check_with_outlayer` (an attempt) run the same journal checks as Level 2 first, then ask OutLayer to run
+the pinned program on the succinct receipt; only the contract's own private callback reads the answer, which must say
+`ok` and echo the image id, submission id, receipt sha256 and journal sha256 the contract sent. A PASS pays and a FAIL
+spends, the same settlement as Level 2; no answer records nothing, so the timeout rule still applies. One check per
+attempt may wait at a time, a refusal at admission refunds the asker, and OutLayer refunds its unused deposit to the
+asker (`payer_account_id`). The old path, where an OutLayer job was one of two Level 0 verifiers
+(`request_outlayer_check`, `on_outlayer_result`), is removed. Unit tests: 29 in `contract/src/tests_level1.rs`
+(`cargo test -p kintsugi-contract`: 155 passed, `docs/evidence/level1/contract_unit_tests.txt`). The commit message of
+`c86db11` says 31 tests; the right count is 29.
+
+**4. The deploy.** `scripts/repro_deploy.sh build before deploy after` (a private copy with only its folders changed: work files in
+`target/level1/deploy/`, logs in `docs/evidence/level1/deploy/`): reproducible build of `c86db11` (334,143 bytes, sha256 `630ed909...50bb`, 135 s), deploy
+tx [`YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE`](https://testnet.nearblocks.io/txns/YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE),
+code hash `7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC`. All 40 saved views (36 bounties, the bounty count, pool,
+allowlist and owner) were the same byte for byte before and after (`docs/evidence/level1/deploy/deploy_comparison.txt`), so every
+existing bounty reads as before; the storage layout did not change.
+
+**5. One Level 1 bounty on testnet: bounty 36** (`python3 scripts/level1_testnet.py <phase>`; every call's log in
+`docs/evidence/level1/run/`, transactions in `docs/evidence/level1/transactions.tsv`). The demo program, its public
+crashing input and the public demo salt, so nothing secret is in it; check size 1 and 1, K = 2, fee 0.01 NEAR rising
+by 0.005, reward 0.1 NEAR. Every proof was made on the laptop CPU with `--po2 18 --succinct` (no Groth16 step).
+
+| Step | Who | Result | Transaction |
+| --- | --- | --- | --- |
+| Proof 0 (the reference fix) | vendor | PASS, 40 segments, 3,548 s, peak 2.34 GiB (`run/prove_p0.txt`) | |
+| `create_bounty` with `level: 1` | vendor | bounty 36 | [`FdB4oi1e...`](https://testnet.nearblocks.io/txns/FdB4oi1eqKksLk6jeweWPKNve4txW2K6kBz6WsREjzqf) |
+| `open_with_outlayer` (Proof 0) | asker `kintsugi-res2-prnvm` | OutLayer ran the pinned program (request 6650): `ok: true`, PASS, all echoes matched; the contract returned "opened" | [`4GdNLf15...`](https://testnet.nearblocks.io/txns/4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ) |
+| `open_with_outlayer` again (a repeat run of the open step, by mistake) | asker | refused: "bounty is already open" (gas only; the CLI prints no id for a failed call) | |
+| `commit` attempt 0, a wrong fix (`data/attacks/reject_all.wasm`) | `kintsugi-res2-prnvm` | index 0, fee 0.01 NEAR | [`ra9nBCZe...`](https://testnet.nearblocks.io/txns/ra9nBCZeK26wPCS7wJtxYe92K2kJPbqQ6wUUjmnyhkh) |
+| `commit` attempt 1, the real fix (`data/demo/fixed.wasm`) | `kintsugi-res1-prnvm` | index 1, fee 0.015 NEAR | [`FWwFmRrp...`](https://testnet.nearblocks.io/txns/FWwFmRrpDoJYMgYrWaLm2fo8CSfDHoupK1TUhFAmhxZ8) |
+| `reveal` both, after the 60 s gap | each committer | seeds recorded | [`FsbQF2y4...`](https://testnet.nearblocks.io/txns/FsbQF2y44QEX6oWWBqLzbHu5f4Bem4aUHhUXFvWo5tfS), [`3ZKrK5No...`](https://testnet.nearblocks.io/txns/3ZKrK5NoBBZoSwYwJWkrSzo84PdfvZY1Zf3hAKnbTMBZ) |
+| Proof of attempt 0 | vendor | FAIL, 8 segments, 696 s (`run/prove_a0.txt`) | |
+| Attacks (SECURITY.md, section 2) | asker, a stranger | private callback refused; Proof 0 as attempt 0 refused; low deposit refused; flipped seal: OutLayer answered not ok, nothing recorded | [`BmRtsAg7...`](https://testnet.nearblocks.io/txns/BmRtsAg7T6d72G91AyppvUP5S1e4wygPHxsXt8LtsYKt) (flipped seal) |
+| `check_with_outlayer` attempt 0 | asker | OutLayer verified FAIL; the attempt is spent ("Failed"), nothing paid | [`8HYqqjPy...`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY) |
+| Proof and `check_with_outlayer` of attempt 1, the real fix | vendor, asker | pending |  |
+
+**Cost of a check, measured** (`docs/evidence/level1/check_costs.txt`): about 0.0107 NEAR each time: 97 Tgas of gas
+(0.0096 NEAR, most of it for the 300 KB proof sent as an argument) plus OutLayer's charge of 0.0011 NEAR. The 2.8 NEAR
+attached is held while OutLayer works and refunded in the same transaction. Before this run the docs said about
+0.006 NEAR; that was an estimate, and it was wrong.
+
+**What this run did not show.** OutLayer's answers in this run all say "Cached WASM from 2026-10-26": OutLayer already held
+this build (same sha256) in its cache since 2026-10-26 05:34 UTC, the time of our earlier tries. So this run shows OutLayer
+running the pinned program, not a new download of it from GitHub; a fresh download from a commit pinned GitHub address
+is shown only by the probe jobs in part 1. If OutLayer drops its cache and GitHub cannot be reached, no check arrives
+and the timeout rule applies. Proofs here are from the laptop CPU only; the vendor tool's GPU mode was not run for a
+Level 1 bounty.
+
+
 ## Wallet list without MyNearWallet (2026-10-30)
 
 - Question: with MyNearWallet taken out of `web/vendor/wallets/manifest.json` (it no longer connected), does the wallet
@@ -76,7 +159,13 @@ deliberate: it's an experimental testnet contract that will keep changing. The m
 planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a
 delay).
 
-The live code since 2026-10-29 20:34 UTC is a reproducible build: code hash
+The live code since 2026-11-03 08:37 UTC is the Level 1 contract, also a reproducible build: code hash
+`7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC`, wasm sha256
+`630ed90923bda105cfe2f50c4ded6191808425f6710aa773210a7bb6063150bb` (334,143 bytes), commit
+`c86db11bd2c7ac461c4d915b6fd8e125eeb31b9e`, the same command and image (135 s). Its deploy and checks: "Level 1 through
+OutLayer" above.
+
+From 2026-10-29 20:34 UTC to that deploy, the live code was a reproducible build: code hash
 `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u`, the base58 form of the wasm's sha256
 `ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e` (319,347 bytes), built from commit
 `c74bd5c820c1ce684f81e3f794a8e3e804b3d2b5` with `cd contract && cargo near build reproducible-wasm` in
@@ -104,12 +193,13 @@ each read back from the chain (the transaction's `DeployContract` action carries
 | 2026-10-25 03:46 UTC | hardening, the final review's fix | [`EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W`](https://testnet.nearblocks.io/txns/EEckT3Y7Q5guVoXHYvjozdphDD6U5auWSXUD9c56Xx5W) | `938d5456cad92d66ab1d20c77dfc6badcc830e4a69f5cbb48035a8bfd427d1b7` |
 | 2026-10-26 22:38 UTC | per-account cap | [`DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7`](https://testnet.nearblocks.io/txns/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7) | `b863487e3d402251eb385e0b2eae3e85e19843751b4b71800dabcf242da61024` |
 | 2026-10-29 20:34 UTC | the same source, reproducible build (commit `c74bd5c`) | [`83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP`](https://testnet.nearblocks.io/txns/83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP) | `ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e` |
+| 2026-11-03 08:37 UTC | Level 1 through OutLayer, reproducible build (commit `c86db11`) | [`YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE`](https://testnet.nearblocks.io/txns/YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE) | `630ed90923bda105cfe2f50c4ded6191808425f6710aa773210a7bb6063150bb` |
 
 How to check it yourself:
 
     curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"view_account","finality":"final","account_id":"kintsugi-l2-cihdp.testnet"}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["code_hash"])'
 
-It must print `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u`. A different hash means a deploy that is not in this list.
+It must print `7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC`. A different hash means a deploy that is not in this list.
 To rebuild the same wasm yourself: docs/TRY_IT.md, step 11.
 The explorer shows each deploy above with its time; its index API returned no transactions for this account when we
 tried to list deploys through it, so the list comes from our records and the chain, not from that index.

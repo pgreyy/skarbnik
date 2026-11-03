@@ -113,9 +113,10 @@ export async function agents(viewEl, tab, sub) {
   ${can.map((c, i) => `<tr><td><span class="ag-yes">${icon('check')}${esc(c)}</span></td><td><span class="ag-no">${icon('x')}${esc(cannot[i])}</span></td></tr>`).join('')}</tbody></table>
   ${note(`<b style="color:var(--tx)">Know the limit of the limit.</b> The key can still spend all of its credit over many attempts, so keep the credit small. On your <a href="${accountHref}">Account page</a> you can set a fee cap per attempt; Stop refuses every later commit, and deleting the key turns its connector link off.`, 'info', true)}</div>`;
 
-  const fees = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Fees and results</h2><p class="body">Each attempt costs a small fee, taken from your credit when your agent commits. Then the attempt ends in one of four ways.</p></div>
+  const fees = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Fees and results</h2><p class="body">Each attempt costs a small fee, taken from your credit when your agent commits. Then the attempt ends in one of these ways.</p></div>
   <table class="n-tab"><caption class="sr-only">How an attempt ends</caption><thead><tr><th scope="col">Result</th><th scope="col">What it means</th></tr></thead><tbody>
-  <tr><td>${chip('k-proof', 'Paid by proof', 'check')}</td><td>The proof passed the check, and the contract paid the agent. On a Level 2 bounty the contract checked the proof itself; on a Level 1 bounty it paid on OutLayer’s answer. The fee comes back with the reward.</td></tr>
+  <tr><td>${chip('k-proof', 'Paid by proof', 'check')}</td><td>Level 2: the contract checked the proof itself, it passed, and the contract paid the agent. The fee comes back with the reward.</td></tr>
+  <tr><td>${chip('k-await', 'Verified by OutLayer', 'seal')}</td><td>Level 1: OutLayer ran the pinned verifier program on the proof and answered PASS, and the contract paid the agent on that answer. The contract did not check the proof itself. The fee comes back with the reward.</td></tr>
   <tr><td>${chip('k-timeout', 'Paid by timeout', 'hourglass')}</td><td>The vendor did not answer in time, so the contract paid the waiting agents. This is not a pass. The fee comes back with the share.</td></tr>
   <tr><td>${chip('k-reject', 'Rejected', 'x')}</td><td>The fix failed the check. No reward, and the fee stays in the pool.</td></tr>
   <tr><td>${chip('k-refund', 'Refunded', 'undo')}</td><td>The bounty ended with no valid attempt. The reward went back to the vendor.</td></tr>

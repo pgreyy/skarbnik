@@ -128,6 +128,13 @@ Each claim names the file and the command that show it. Full results, failures i
 - The testnet contract's account keeps a full access key, so its owner can replace the code under live bounties. This
   is deliberate (an experimental testnet contract); the mainnet contract (skarbnik.near) is planned without an upgrade
   key the owner controls alone. The live code hash and every deploy: docs/EVIDENCE.md, "Contract code and every deploy".
+- Level 1 bounties trust OutLayer, its operator and its signing keys for the verdict: the contract accepts OutLayer's
+  answer without checking the proof itself, and the answer does not prove which program ran. Level 1 also depends on
+  OutLayer being able to download the pinned verifier file from GitHub
+  (https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm,
+  sha256 `e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8`); if it cannot, no check arrives and the
+  timeout rule applies. The owner sets that program for all Level 1 bounties and can change it. Each check holds
+  OutLayer's input deposit (about 2.67 NEAR for a 300 KB proof, returned) and costs about 0.011 NEAR.
 - One verdict tells a researcher at most one bit about the secret; the vendor chooses the budget K.
 - If the vendor stays silent, the bounty is split equally among every revealed attempt still waiting, whatever they
   contain. In the worst case an honest fix gets only 1/K of the bounty (docs/AUDIT.md, finding 3 and hardening S7).

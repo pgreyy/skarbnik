@@ -362,7 +362,7 @@ def t_watch_start(a):
         return {"needs_yes": True, "watches_bounties": ids, "prover_mode": mode,
                 "spends": (f"for each revealed attempt, {gpu_note()}. Spend cap: ${g.get('budget_usd', 6.0)} in all; spent so far ${spent}. "
                            "At the cap no new GPU starts." if mode == "gpu" else "this computer's time; no rental")
-                          + ". On a Level 1 bounty each check also holds the contract's min_deposit (about 2.8 NEAR) from the submit account while OutLayer works, returned less about 0.006 NEAR",
+                          + ". On a Level 1 bounty each check also holds the contract's min_deposit (about 2.8 NEAR) from the submit account while OutLayer works, returned less about 0.011 NEAR",
                 "time": "from a reveal to the submitted proof, about 17 minutes in the measured GPU run (bounty 32)",
                 "confirm_code": new_code("watch_start", path),
                 "next": "ask the vendor; after a clear yes, call watch_start again with this confirm_code"}
@@ -428,7 +428,7 @@ TOOLS = {
               "module": {"type": "string", "description": "folder with original.wasm and public_tests.txt (default data/demo)"}, "secret_input_path": S, "reference_fix_path": S,
               "vendor_account": S, "reward_near": S, "k": {"type": "integer"}, "attempt_fee_near": S, "fee_step_near": S, "reveal_gap_s": {"type": "integer"},
               "reveal_window_s": {"type": "integer"}, "verdict_window_h": {"type": "integer"}, "expiry_h": {"type": "integer"}, "prover_mode": {"type": "string", "description": "gpu or cpu"},
-              "level": {"type": "integer", "description": "2 (default): the contract checks a Groth16 proof itself; 1: the contract trusts OutLayer running the pinned verifier program, no Groth16 step, about 0.006 NEAR per check and about 2.8 NEAR held and returned; 0: registered verifiers, run by the project"},
+              "level": {"type": "integer", "description": "2 (default): the contract checks a Groth16 proof itself; 1: the contract trusts OutLayer running the pinned verifier program, no Groth16 step, about 0.011 NEAR per check and about 2.8 NEAR held and returned; 0: registered verifiers, run by the project"},
               "machine": S, "workdir": S, "gpu_budget_usd": {"type": "number"}, "path_host": S, "path_check": S, "path_near": S},
              ["out_path", "name", "secret_input_path", "reference_fix_path", "vendor_account", "reward_near"]),
     "check": (t_check, "The preflight (skarbnik-vendor check): module, tests, that the original crashes on the secret, that the fix passes, memory, the checker id, the balance and the window rule, then a preview of fees, windows and time. Spends nothing.",

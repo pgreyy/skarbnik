@@ -103,6 +103,10 @@ BOUNTY_STEPS = [
     # first from a local copy of the function, then from the live site
     ("docs/evidence/hosted_mcp/transactions.tsv", "scripts/hosted_mcp_test.sh; web/api/mcp (the hosted connector)",
      {34: ["hosted_create", "hosted_open", "hosted_local_commit", "hosted_local_reveal", "hosted_live_commit", "hosted_live_reveal"]}),
+    # The Level 1 run (scripts/level1_testnet.py): bounty 36, opened and settled through OutLayer running the pinned
+    # verifier program; a wrong fix (FAIL) and the real fix (PASS); the refused attack calls are in EVIDENCE only
+    ("docs/evidence/level1/transactions.tsv", "scripts/level1_testnet.py",
+     {36: ["l1_create", "l1_open", "l1_commit_", "l1_reveal_", "l1_check_"]}),
     # The testnet cleanup of 2026-10-30: claim_timeout where a revealed attempt waited, expire on the expired bounties
     ("docs/evidence/cleanup_2026-10-30/transactions.tsv", "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)",
      {3: ["cleanup_b3_claim"], 26: ["cleanup_b26_claim"], 0: ["cleanup_b0_expire"], 2: ["cleanup_b2_expire"], 10: ["cleanup_b10_expire"],

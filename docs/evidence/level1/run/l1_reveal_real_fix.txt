@@ -1,0 +1,46 @@
+2026-11-03T09:43:18Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet reveal json-args {"bounty_id": "36", "index": 1, "patch": "(cut: 744 characters of base64)", "nonce": "0d1d2275fdfa34d289a2b90c92a2ab8c81286d8c6303145e3b0f5a63d6161a0a"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res1-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  reveal
+│                       args:         {
+│                                       "bounty_id": "36",
+│                                       "index": 1,
+│                                       "nonce": "0d1d2275fdfa34d289a2b90c92a2ab8c81286d8c6303145e3b0f5a63d6161a0a",
+│                                       "patch": "(cut: 744 characters of base64)"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:4nab7LQVFF5XAGQdk3SACm2PQCmbBJXGcWqL37PiyNxy
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.350 Tgas
+│    Transaction fee: 0.000034925822976 NEAR
+│    Transaction ID: 3ZKrK5NoBBZoSwYwJWkrSzo84PdfvZY1Zf3hAKnbTMBZ
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/3ZKrK5NoBBZoSwYwJWkrSzo84PdfvZY1Zf3hAKnbTMBZ
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"revealed","data":[{"bounty_id":"36","index":1,"patch_hash":"42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97","patch_len":556,"seed":"6e14bb4c4f093113c96fd472b6683c57c60fe88fad0f7d53d6225bdb5ff1436a","revealed_at_ns":"1793699000736926850"}]}
+│    Logs [kintsugi-res1-prnvm.testnet]:   No logs
+│     
+├  Function execution return value:
+│    Empty return value
+│     
+
+
+The "reveal" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-res1-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet reveal json-args '{"bounty_id": "36", "index": 1, "patch": "(cut: 744 characters of base64)", "nonce": "0d1d2275fdfa34d289a2b90c92a2ab8c81286d8c6303145e3b0f5a63d6161a0a"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res1-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0 wall_s=6

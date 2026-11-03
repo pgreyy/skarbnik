@@ -46,7 +46,10 @@ Each guard: what it stops, where it lives, and what shows it works.
 | At most K counted commits per bounty; later ones are ignored and cost nothing | Unlimited attempts, and so unlimited leakage | `commit` | S8 testnet: fourth commit ignored ("max_commits reached") |
 | Attempt fees, rising per attempt, paid from prepaid credit; fees of decided attempts go to the verifiers (Level 0) or the protocol fee pool (Level 2, since audit fix 4), fees of commits never revealed to the protocol fee pool | Free flooding of attempts | `commit`, `deposit_credit`, `expire` | S3b testnet |
 | Withdrawing credit needs 1 yoctoNEAR attached | An agent's function call key draining the credit | `withdraw_credit` | S7: refused for the agent key |
-| OutLayer's answer is accepted only as the callback of the contract's own request, and only if every echoed value matches | A forged OutLayer answer | `request_outlayer_check`, `on_outlayer_result` | 9 unit tests; S5 on chain ("Method on_outlayer_result is private") |
+| Level 1: OutLayer's answer counts only in the contract's own private callback (`#[private]`, and the caller must be the contract itself), only if it says `ok` and echoes the image id, submission id, receipt sha256 and journal sha256 the contract sent, and only if its verdict equals the journal's; the waiting check is removed before the answer is read (added 2026-11-03; the older Level 0 path through OutLayer, `request_outlayer_check` and `on_outlayer_result`, was removed) | A forged or replayed OutLayer answer; an answer about another receipt; a PASS answer for a FAIL journal | `take_outlayer_answer`, `on_outlayer_open`, `on_outlayer_check` | unit tests in `contract/src/tests_level1.rs` (29 in all); testnet (EVIDENCE, "Level 1 through OutLayer") |
+| Level 1: the program OutLayer runs is the one the owner set with `set_outlayer` (an https address and a 64 hex sha256); the caller cannot name another one | A vendor or researcher choosing a verifier that always says PASS | `set_outlayer`, `ask_outlayer` | unit tests `tests_level1` (pinned program in the request; http and short hash refused; owner only) |
+| Level 1: the same journal checks as Level 2 run before OutLayer is asked (bounty fields, submission id, seed, patch hash; for Proof 0 its journal hash, reference fix and PASS); the earliest reveal rule holds for a PASS; one check per attempt may wait at a time (a waiting check older than 20 minutes can be replaced); the deposit must reach `min_deposit`; a refusal at admission refunds the asker, and OutLayer refunds its unused deposit to the asker; no answer records nothing, so the timeout rule still applies (added 2026-11-03) | Replays; mixing Proof 0 and attempt journals; flooding OutLayer for one attempt; a lost deposit; a missing answer freezing a bounty | `check_with_outlayer`, `open_with_outlayer`, `ask_outlayer` | unit tests `tests_level1` |
+| Every call of one level refuses a bounty of another level: Level 0 calls refuse Levels 1 and 2, Level 2 calls refuse Levels 0 and 1, Level 1 calls refuse Levels 0 and 2; a level above 2 is refused at creation; Level 1 needs OutLayer settings (added 2026-11-03) | Deciding a bounty by a weaker rule than the one it was created with | `wrong_level`, `create_bounty` | unit tests `tests_level1` (cross level refusals) |
 | A bounty opens only after two different verifiers attest its Proof 0 (added in S13) | Attempts on a bounty that may be unfixable | `attest_proof0`, `commit` | unit tests `s13_commit_before_proof0_rejected` and others; S13 attacks 1, 6 and 7 on testnet |
 | A reveal window; anyone can free the slot of a commit never revealed (added in S13) | Junk commits holding all K slots forever | `reveal`, `release_unrevealed` | unit test `s13_unrevealed_junk_commits_can_be_released`; S13 attack 2 on testnet |
 | The winner's own attempt fee is refunded with the payout (added in S13) | Penalizing the honest winner | `record_attestation`, `claim_timeout` | unit test `s13_winner_fee_refunded_on_pass`; S13 attack 11 on testnet (+0.51 NEAR = bounty + own fee) |
@@ -161,7 +164,8 @@ kept.
 
 An attempt fee is taken from the committer's credit in the contract (prepaid with `deposit_credit`) when the commit is
 counted. It never goes to the vendor. Where it goes next depends on how the attempt ends (`contract/src/lib.rs`:
-`release_to_pool`, `submit_groth16`, `claim_timeout`, `refund_undecided_revealed`, `expire`):
+`release_to_pool`, `submit_groth16`, `settle_attempt`, `claim_timeout`, `refund_undecided_revealed`, `expire`). A Level 1
+check also needs OutLayer's own fee and input deposit, paid by whoever asks for the check, not from the attempt fee:
 
 | How the attempt ends | Where its fee goes | When |
 | --- | --- | --- |
@@ -169,7 +173,7 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 | Wins with a PASS proof | Back to the winner, with the bounty | Same transaction |
 | Paid by the timeout rule | Back to each account that shares the payout, with its share | Same transaction |
 | Revealed and still waiting when another attempt wins | Back to the committer as credit | Same transaction |
-| Decided FAIL | Level 2 bounties: the protocol fee pool. Level 0: equal shares to the registered verifiers | When anyone calls `expire` after the bounty's expiry |
+| Decided FAIL | Level 2 and Level 1 bounties: the protocol fee pool. Level 0: equal shares to the registered verifiers | When anyone calls `expire` after the bounty's expiry |
 
 - The protocol fee pool cannot be withdrawn: no method takes NEAR out of it (owner's decision, docs/AUDIT.md). It held
   0.09 NEAR on 2026-10-26 (`get_protocol_pool`).
@@ -209,6 +213,10 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 | 2026-10-25 | `95915f2` | (S6c) The same proof submitted twice (FAIL, then PASS after payout) | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "verdict already final", "bounty is closed" |
 | 2026-10-25 | `95915f2` | (S6c) A proof submitted after the bounty expired | `scripts/s6c_testnet.sh attacks` | **blocked** on chain: "bounty has expired" |
 | 2026-10-25 | `95915f2` | (S6c) The vendor blocks its own Level 2 bounty through a second account that takes all K slots and never reveals | `scripts/s6c_testnet.sh selfblock2` | **not blocked before S6c (guard added)**: the honest commit is still ignored for the reveal window, but the vendor side lost 0.045 NEAR in fees plus 0.000830 NEAR in gas and the pool gained exactly 0.045 NEAR; before, a Level 2 vendor would have got those fees back at expiry |
+| 2026-11-03 | `c86db11` | (Level 1) A stranger calls the private OutLayer callback with a made up answer | `python3 scripts/level1_testnet.py private_callback` | **blocked** on chain: "Method on_outlayer_check is private" (`docs/evidence/level1/run/l1_attack_private_callback_2.txt`) |
+| 2026-11-03 | `c86db11` | (Level 1) Bounty 36's Proof 0 sent as the proof of attempt 0 | `python3 scripts/level1_testnet.py attacks` | **blocked** on chain before OutLayer is asked: "the journal belongs to another bounty or attempt (submission id)" |
+| 2026-11-03 | `c86db11` | (Level 1) A check with less than `min_deposit` attached | `python3 scripts/level1_testnet.py attacks` | **blocked** on chain: "attach at least min_deposit" |
+| 2026-11-03 | `c86db11` | (Level 1) Attempt 0's real receipt with one bit of its seal flipped, journal unchanged, so every check in the contract passes | `python3 scripts/level1_testnet.py attacks` | **blocked** by OutLayer: the pinned program answered not ok and the contract recorded nothing ("rejected: answer is not ok", tx `BmRtsAg7T6d72G91AyppvUP5S1e4wygPHxsXt8LtsYKt`); the attempt stayed open and was then decided FAIL by its real proof (tx `8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY`) |
 
 ## 3. Known limits
 
@@ -225,12 +233,21 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
   - Level 0 (works on testnet): the contract trusts its registered verifier accounts to check each receipt before attesting
     (`scripts/verifier_check.sh`). **On testnet all three verifier accounts are run by us**, including the third; a real
     deployment needs verifiers run by independent parties.
-  - Level 1 (built, not working on testnet yet): one verifier is an OutLayer job. The contract then trusts the OutLayer
-    contract, its owner and every key on its operator account, which includes keys that do not need an enclave; who holds them
-    is not known. On testnet OutLayer answers jobs whose program file it already has cached, but none of our jobs (its
-    program must be downloaded first) has been answered: 9 of 9 such jobs (8 of them ours) timed out, by link from two hosts and as an OutLayer project on
-    FastFS, while OutLayer's own cached test program answered in 10 to 14 s (EVIDENCE, "OutLayer (Level 1) on testnet").
-    The cause is inside OutLayer; the FastFS gateway was also down during the project test.
+  - Level 1 (works on testnet since 2026-11-03): the vendor chooses it at creation; OutLayer runs the pinned verifier
+    program on the succinct proof and the contract trusts its answer. It does not check the proof itself, and the
+    answer does not prove which program ran. So it trusts the OutLayer contract, its owner and every key on its
+    operator account, which includes keys that do not need an enclave; who holds them is not known. It also trusts
+    OutLayer's program cache and depends on OutLayer downloading the pinned file from
+    `https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm`
+    (sha256 `e60647ec...46a8`); when that fails, no check arrives and the timeout rule applies. Earlier, 9 of 9 jobs
+    naming a program on other hosts or as a FastFS project were never answered (EVIDENCE, "OutLayer (Level 1) on
+    testnet"); the GitHub address was answered every time (EVIDENCE, "Level 1 through OutLayer"). The owner sets that
+    program for every Level 1 bounty and can change it under a live bounty (the program is read at check time). Each
+    check holds about 2.68 NEAR of OutLayer's input deposit while it runs (returned) and costs about 0.011 NEAR.
+    Anyone may ask for a check of a revealed attempt; while one waits, a second is refused, so someone paying for
+    checks of junk proofs (about 0.011 NEAR each) can hold the slot while OutLayer works, about 20 s, or up to 20
+    minutes when OutLayer does not answer; the verdict window and the timeout rule still bound the delay. If OutLayer took a deposit and its answer then failed, the contract
+    refunds the asker as well, from the contract's balance (not seen on testnet).
   - Level 2 (works on testnet, spike S6c): a bounty created with level 2 is opened and decided only by Groth16 proofs
     that the bounty contract checks itself (`kintsugi-l2-cihdp.testnet`, 35 to 36 Tgas per proof, EVIDENCE S6c). No
     verifier is trusted for those verdicts. The S13 contract and the demo bounty are Level 0.
@@ -271,6 +288,8 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
     proof cannot stop the timeout from paying the researcher.
 - What Level 2 does not trust: any verifier account, OutLayer, or the vendor's word on a verdict; the verdict is the
   journal's, and the journal must match this bounty and this attempt.
+- What Level 1 does not trust: the vendor's or the asker's word on a verdict, or any verifier account; the verdict is
+  the journal's, OutLayer must agree with it, and the journal must match this bounty and this attempt.
 - Protocol fee pool: since S6c, the attempt fees of commits that are never revealed (released, or still unrevealed at
   expiry) are kept in the contract as a pool, shown by `get_protocol_pool`. There is no function to take NEAR out of
   it: its destination is deliberately left open, to be decided after the audit. If the pool ever pays Skarbnik (the
@@ -359,6 +378,13 @@ counted. It never goes to the vendor. Where it goes next depends on how the atte
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-11-03 `c86db11`: Level 1 through OutLayer. New guards: OutLayer's answer counts only in the contract's own
+  private callback, with every echoed value checked and the verdict equal to the journal's; the program is the owner
+  pinned build (`set_outlayer`); the Level 2 journal checks run before a check; one check per attempt waits at a time;
+  refusals refund the asker; cross level refusals. Removed: the Level 0 path where an OutLayer job was one of two
+  verifiers (`request_outlayer_check`, `on_outlayer_result`). Deployed in place (tx `YxMNwuWZ...`), every saved view the
+  same. Known limits updated: what Level 1 trusts, the GitHub download, the cost. Attacks on testnet: the private callback, Proof 0 as an attempt, a low deposit and a flipped seal, all refused (section 2).
 
 - 2026-10-29: the contract redeployed as a reproducible build of the same source (commit `c74bd5c`, wasm sha256
   `ecf697be...421e`, code hash `Gx1JfW7G...BX6u`, tx `83biMoi8vbfr2Mj9zCpTDEj93qHBZMmxjpnja4KPTrTP`); every saved view

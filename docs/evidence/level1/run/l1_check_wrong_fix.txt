@@ -1,0 +1,61 @@
+2026-11-03T10:01:32Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet check_with_outlayer file-args target/level1/args_l1_check_wrong_fix.json prepaid-gas 300 Tgas attached-deposit 2.8 NEAR sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+"final_fail"
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  check_with_outlayer
+│                       args:         {
+│                                       "bounty_id": "36",
+│                                       "index": 0,
+│                                       "journal": "(cut: 294 characters of base64)(cut)0(cut)(cut: 374 characters of base64)(cut)O0AAADGAAAA0QAAACMAAACIAAAAAgAAAMwAAAADAAAA9QAAAIMAAAChAAAA1wAAACsAAAD+AAAAQQAAAMAAAADJAAAA3QAAALwAAAAAAAAA",
+│                                       "receipt_b64": "(cut: 29455 characters of base64)(cut)(cut: 31107 characters of base64)(cut)(cut: 216 characters of base64)(cut)(cut: 10218 characters of base64)(cut)(cut: 576 characters of base64)(cut)(cut: 812 characters of base64)(cut)(cut: 15913 characters of base64)(cut)(cut: 30833 characters of base64)(cut)(cut: 1662 characters of base64)(cut)(cut: 5637 characters of base64)(cut)(cut: 24848 characters of base64)(cut)(cut: 890 characters of base64)(cut)(cut: 47873 characters of base64)(cut)(cut: 8693 characters of base64)(cut)(cut: 7822 characters of base64)(cut)(cut: 21314 characters of base64)(cut)(cut: 12958 characters of base64)(cut)(cut: 2247 characters of base64)(cut)(cut: 3887 characters of base64)(cut)(cut: 12556 characters of base64)(cut)(cut: 13702 characters of base64)(cut)(cut: 4971 characters of base64)(cut)(cut: 6902 characters of base64)(cut)IAAAAOQAAAJUAAAA+AAAA9gAAABI(cut)IAAACBAAAA/gAAANIAAAC/AAAApgAAAMkAAADyAAAAXgAAAHIAAAA7AAAAZQAAAIcAAACI(cut)lAAAAKsAAAA3AAAAmgAAAHYAAADTAAAA8QAAAFQAAADfAAAAHwAAAL0AAADl(cut)I(cut)lAAAA8wAAAIoAAAC+AAAAWQAAALcAAAD/AAAA7AAAAGEAAABSAAAATQAAAM8AAADQAAAAIQAAAKEAAADmAAAAGwAAANMAAAD3AAAA4AAAAD0AAAC0(cut)IAAAAiAAAAJwAAADDAAAAFgAAAH8AAAAkAAAArwAAAD8AAABuAAAAAQAAAAEAAAC4AAAAFgAAALIAAADaAAAAVgAAAGYAAABRAAAACgAAABQAAABgAAAALgAAAKEAAACxAAAA7QAAAMYAAADRAAAAIwAAAI(cut)(cut: 388 characters of base64)(cut)(cut: 235 characters of base64)(cut)0(cut)(cut: 374 characters of base64)(cut)O0AAADGAAAA0QAAACMAAACIAAAAAgAAAMwAAAADAAAA9QAAAIMAAAChAAAA1wAAACsAAAD+AAAAQQAAAMAAAADJAAAA3QAAALwAAAAAAAAA7OXpuK4s1uprGCe0ZP8DSPmn9N7NJpwAh/39dQmNoBM=",
+│                                       "receipt_sha256": "72380757a21aa60554a580456f63aa35583c8b8fb48f290149b10e37b714b4c7"
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      2.8 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 14.7 Tgas
+│    Transaction fee: 0.001465732912009 NEAR
+│    Transaction ID: 8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_requested","data":[{"bounty_id":"36","index":0,"verdict":"FAIL","asker":"kintsugi-res2-prnvm.testnet","outlayer":"outlayer.testnet"}]}
+│    Logs [outlayer.testnet]:
+│      EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_requested","data":[{"request_data":"{\"request_id\":6654,\"sender_id\":\"kintsugi-res2-prnvm.testnet\",\"predecessor_id\":\"kintsugi-l2-cihdp.testnet\",\"code_source\":{\"WasmUrl\":{\"url\":\"https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm\",\"hash\":\"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8\",\"build_target\":\"wasm32-wasip1\"}},\"resource_limits\":{\"max_instructions\":2000000000,\"max_memory_mb\":64,\"max_execution_seconds\":20},\"input_data\":\"\",\"input_data_in_state\":true,\"secrets_ref\":null,\"response_format\":\"Json\",\"payment\":\"2800000000000000000000000\",\"attached_usd\":\"0\",\"timestamp\":1793700095922674322,\"compile_only\":false,\"force_rebuild\":false,\"store_on_fastfs\":false,\"use_bound_identity\":false,\"project_uuid\":null,\"project_id\":null}","data_id":[137,159,107,200,109,50,176,67,51,99,116,113,123,216,28,221,75,4,171,184,54,151,80,90,13,156,73,36,66,143,199,13],"timestamp":1793700095922674322}]}
+│    Logs [outlayer.testnet]:
+│      [[yNEAR charged: "1100187800000000000000"]]
+│      EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_completed","data":[{"sender_id":"kintsugi-res2-prnvm.testnet","code_source":{"WasmUrl":{"url":"https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm","hash":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1"}},"resources_used":{"instructions":878728612,"time_ms":1001,"compile_time_ms":null},"success":true,"error_message":null,"payment_charged":"1100187800000000000000","payment_refunded":"2798899812200000000000000","compilation_note":"Cached WASM from 2026-10-26T05:34:41.403211+00:00","timestamp":1793700102655127755}]}
+│      Execution completed successfully. Output: Json(370 bytes), Resources: { instructions: 878728612, time_ms: 1001 }, Cost: 1100187800000000000000 yoctoNEAR, Refund: 2798899812200000000000000 yoctoNEAR, Cached WASM from 2026-10-26T05:34:41.403211+00:00
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_verified","data":[{"bounty_id":"36","index":0,"verdict":"FAIL","caller":"kintsugi-l2-cihdp.testnet"}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"attempt_spent","data":[{"bounty_id":"36","index":0}]}
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+
+
+The "check_with_outlayer" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet check_with_outlayer file-args target/level1/args_l1_check_wrong_fix.json prepaid-gas '300.0 Tgas' attached-deposit '2.8 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0 wall_s=17

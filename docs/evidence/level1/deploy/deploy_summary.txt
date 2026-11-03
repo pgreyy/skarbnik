@@ -1,0 +1,5 @@
+2026-11-03T08:36:36Z reproducible build of commit c86db11bd2c7ac461c4d915b6fd8e125eeb31b9e: command `cd contract && cargo near build reproducible-wasm`, 334143 bytes, wasm sha256 630ed90923bda105cfe2f50c4ded6191808425f6710aa773210a7bb6063150bb
+2026-11-03T08:36:46Z deployed code before: wasm sha256 ecf697be619d5dc730de58853ae3daa65bff3ac1a23804a1c390663ca059421e, code hash Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u (kept for a rollback)
+2026-11-03T08:37:17Z views saved before the deploy: 36 bounties, pool, allowlist, owner
+2026-11-03T08:37:41Z deployed: wasm sha256 630ed90923bda105cfe2f50c4ded6191808425f6710aa773210a7bb6063150bb, tx YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE
+2026-11-03T08:38:21Z comparison passed: every saved view byte for byte the same; code hash now 7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC; contract_source_metadata saved

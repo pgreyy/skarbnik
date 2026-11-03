@@ -46,7 +46,7 @@ const LIMITS = (live) => [
   ['hash', '', 'One verdict leaks one bit', 'K is the leak budget. A per-account cap (deployed 2026-10-26) limits how many slots one account holds, but one person with many accounts can still fill a bounty’s slots.'],
   ['link', '', 'Level 1 trusts OutLayer', 'At Level 1 the contract does not check the proof itself: it trusts OutLayer running the verifier program pinned on chain (get_outlayer), and the operator of OutLayer. Only Level 2 is checked by the contract itself, and only Level 2 is called paid by proof.'],
   ['link', 'am', 'Level 1 depends on a download from GitHub', 'OutLayer must be able to download the pinned program from its commit pinned address on raw.githubusercontent.com, or still hold it in its cache, which it can drop. If it cannot, a check gets no answer and the attempt goes to the timeout rule.'],
-  ['coin', '', 'Level 1 costs', 'About 0.006 NEAR a check (OutLayer’s fee about 0.0011 NEAR plus about 50 Tgas of gas), and about 2.67 NEAR held while OutLayer works and returned after.'],
+  ['coin', '', 'Level 1 costs', 'About 0.011 NEAR a check (OutLayer’s fee about 0.0011 NEAR plus about 97 Tgas of gas, most of it for the 300 KB proof sent as an argument), and about 2.67 NEAR held while OutLayer works and returned after.'],
   ['wallet', '', 'Only one wallet has signed here', 'NEAR CLI was clicked through to real transactions. The other wallets were only loaded, not signed in.'],
   ['user', '', 'Run by the team, not outside customers', 'These bounties were set up and run by the Skarbnik team on NEAR testnet. They are not outside customers.', '<span id="paidSoFar">Loading from the contract</span>'],
 ];

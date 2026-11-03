@@ -1,0 +1,14 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+l1_create	create_bounty	kintsugi-vendor-prnvm.testnet	FdB4oi1eqKksLk6jeweWPKNve4txW2K6kBz6WsREjzqf	0.355 Tgas		0	8
+l1_open	open_with_outlayer	kintsugi-res2-prnvm.testnet	4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ	14.7 Tgas		0	20
+l1_open_repeat_refused	open_with_outlayer	kintsugi-res2-prnvm.testnet				1	10
+l1_commit_wrong_fix	commit	kintsugi-res2-prnvm.testnet	ra9nBCZeK26wPCS7wJtxYe92K2kJPbqQ6wUUjmnyhkh	0.315 Tgas		0	7
+l1_commit_real_fix	commit	kintsugi-res1-prnvm.testnet	FWwFmRrpDoJYMgYrWaLm2fo8CSfDHoupK1TUhFAmhxZ8	0.315 Tgas		0	11
+l1_reveal_wrong_fix	reveal	kintsugi-res2-prnvm.testnet	FsbQF2y44QEX6oWWBqLzbHu5f4Bem4aUHhUXFvWo5tfS	0.319 Tgas		0	5
+l1_reveal_real_fix	reveal	kintsugi-res1-prnvm.testnet	3ZKrK5NoBBZoSwYwJWkrSzo84PdfvZY1Zf3hAKnbTMBZ	0.350 Tgas		0	6
+l1_attack_private_callback	on_outlayer_check	kintsugi-res2-prnvm.testnet				1	6
+l1_attack_proof0_as_attempt	check_with_outlayer	kintsugi-res2-prnvm.testnet				1	8
+l1_attack_flipped_seal	check_with_outlayer	kintsugi-res2-prnvm.testnet	BmRtsAg7T6d72G91AyppvUP5S1e4wygPHxsXt8LtsYKt	14.7 Tgas		0	15
+l1_attack_low_deposit	check_with_outlayer	kintsugi-res2-prnvm.testnet				1	9
+l1_attack_private_callback_2	on_outlayer_check	kintsugi-res2-prnvm.testnet				1	6
+l1_check_wrong_fix	check_with_outlayer	kintsugi-res2-prnvm.testnet	8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY	14.7 Tgas		0	17

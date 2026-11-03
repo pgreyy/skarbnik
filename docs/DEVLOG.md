@@ -2,6 +2,35 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Level 1 through OutLayer, built, deployed and settled on testnet
+
+- GitHub download test (part A): four OutLayer testnet jobs naming a file by its commit pinned raw.githubusercontent.com
+  address were all answered within 20 s, two of them "Freshly compiled" (EVIDENCE, "Level 1 through OutLayer", part 1).
+- The pinned verifier build committed (`4e6a1f6`, sha256 `e60647ec...46a8`, `scripts/build_verifier_wasm.sh`).
+- Contract (`c86db11`): Level 1 chosen at creation; `open_with_outlayer`, `check_with_outlayer`, `set_outlayer`,
+  `get_outlayer_check`; the same journal checks and settlement as Level 2; the old OutLayer verifier path removed.
+  `cargo test -p kintsugi-contract`: 155 passed (`docs/evidence/level1/contract_unit_tests.txt`); 29 of them are the
+  new Level 1 tests (the commit message says 31; that count was wrong).
+- Deploy in place: reproducible build of `c86db11` (`scripts/repro_deploy.sh build before deploy after`, folders in
+  `docs/evidence/level1/deploy/`), tx `YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE`, 40 of 40 saved views unchanged;
+  `set_outlayer` tx `9sXDRkHu4NbGpK3Gsd6jS4R9CWmoGwhLzuzEg3vYZqmr`.
+- Bounty 36 (`python3 scripts/level1_testnet.py create|open|commit|reveal|ids|attacks|private_callback|check`): opened
+  through OutLayer, a wrong fix decided FAIL through OutLayer, four attacks refused; the real fix's proof and check are pending. Proofs on the laptop CPU:
+  Proof 0 3,548 s, the wrong fix 696 s.
+- Measured: a check costs about 0.0107 NEAR (97 Tgas plus OutLayer's 0.0011 NEAR); the docs' earlier 0.006 NEAR was an
+  estimate and is corrected everywhere.
+- Mistakes: the open step was run twice by mistake (the second call refused, gas only; its first log rebuilt from the
+  chain); the log filter removed the refusal text of the private callback attack, so that call was repeated.
+- Vendor tool and vendor MCP server: a `level` setting (default 2), asked by `init`, a cost preview for all three
+  levels; Level 1 skips the Groth16 step and checks through OutLayer.
+- Site: For vendors has a three level choice; every bounty page shows its level; How it works and the Limits explain
+  the levels; the "Verified by OutLayer" status is separate from "Proof verified".
+- Agents (owner's decision D15): Levels 2 and 1, Level 0 only when the user asks; the level and its meaning are said in
+  the same message as the fee (AGENTS.md, agents.md, agent-quickstart.txt, tools/skarbnik-mcp 0.4.0, the hosted
+  connector 1.1.0, For agents).
+- Not run: the vendor tool's GPU mode for a Level 1 bounty; a fresh GitHub download of the pinned build itself (OutLayer
+  had it cached).
+
 ## 2026-11-03: docs/EVIDENCE.md prose: a rented GPU, the GPU rental
 
 - docs/EVIDENCE.md lines 39, 51, 53, 127, 151, 199, 203, 390, 1144 (a heading; nothing links to it), 1154, 1200 and

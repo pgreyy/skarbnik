@@ -48,7 +48,7 @@ LEVELS = {
     2: ('the contract checks a Groth16 proof itself',
         'per proof about 36 Tgas of gas (about 0.004 NEAR); the Groth16 step needs Docker, an x86 computer and about 7.6 GiB'),
     1: ('the contract trusts OutLayer running the pinned verifier program on the succinct proof',
-        'per check about 0.006 NEAR (OutLayer\'s fee about 0.0011 NEAR plus about 50 Tgas of gas), and min_deposit (about 2.8 NEAR) held while OutLayer works and returned; no Groth16 step'),
+        'per check about 0.011 NEAR (OutLayer\'s fee about 0.0011 NEAR plus about 97 Tgas of gas, mostly for the 300 KB proof sent as an argument), and min_deposit (about 2.8 NEAR) held while OutLayer works and returned; no Groth16 step'),
     0: ('two registered verifiers decide; today both are run by the project, so you trust the project',
         'no proof on chain; the verifiers must attest Proof 0 and each verdict before the windows close'),
 }

@@ -1,0 +1,25 @@
+salt: the PUBLIC demo salt (--demo-salt); for a real bounty use --bounty <name>
+candidate: data/demo/fixed.wasm
+image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+receipt kind: succinct
+segment po2 limit: 18
+fuzz_count: 1 variants: 1
+total cycles: 10256384
+user cycles: 3730517
+segments: 40
+prove seconds: 3548.05
+verify seconds (in process): 0.032
+receipt file: target/level1/p0_succinct.bin (224786 bytes)
+seal bytes: 222668
+journal bytes: 780
+journal.verdict: PASS
+journal.candidate_hash: 42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97
+journal.original_hash: fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8
+journal.exploit_commitment: 9a1be994ab379a76d3f154df1fbde561695377a989c8db432dd1092a09966387
+journal.corpus_hash: 736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b
+journal.fuzz_seed: 6b696e74737567692053312064656d6f207365656420412e2e2e2e2e2e2e2e21
+journal.fuzz_count: 1
+journal.variant_count: 1
+journal.submission_id: 355cf1b54603f863ad114f7d979b8b4352fee947ca6cb846a6d2423485b5e9bd
+wall_seconds=3548.09 max_rss_kib=2450372
+exit 0

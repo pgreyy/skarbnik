@@ -25,7 +25,7 @@ const LEVELS = [
     ['Trust', 'The published checker and the contract’s own proof check. Nobody else.']]],
   ['1', 'Level 1', 'OutLayer checks the proof', [
     ['Who decides', 'OutLayer runs the verifier program pinned on chain, and the contract trusts its answer.'],
-    ['What you need', 'No Groth16 step. About 0.006 NEAR a check, and about 2.8 NEAR held during each check and returned.'],
+    ['What you need', 'No Groth16 step. About 0.011 NEAR a check, and about 2.8 NEAR held during each check and returned.'],
     ['Trust', 'OutLayer and its operator, and that OutLayer can still download the pinned program from GitHub.']]],
   ['0', 'Level 0', 'Verifiers sign', [
     ['Who decides', 'Two registered verifiers sign each verdict.'],
@@ -184,7 +184,7 @@ export async function vendors(viewEl, tab, sub) {
     <li>${icon('alert')}<span><b>You prove or time out.</b> If you do not prove a revealed fix in time, the waiting agents are paid by the timeout rule.</span></li>
     <li>${icon('alert')}<span><b>No external audit.</b> The contract was reviewed in AI review passes, not by an outside auditor.</span></li>
     <li>${icon('alert')}<span><b>Level 1 depends on OutLayer.</b> The contract trusts OutLayer running the pinned verifier program, and OutLayer must be able to download that file from GitHub or still hold it in its cache. If it cannot, a check gets no answer and the timeout rule decides.</span></li>
-    <li>${icon('alert')}<span><b>Level 1 costs.</b> About 0.006 NEAR a check, and about 2.67 NEAR held while OutLayer works and returned after.</span></li>
+    <li>${icon('alert')}<span><b>Level 1 costs.</b> About 0.011 NEAR a check, and about 2.67 NEAR held while OutLayer works and returned after.</span></li>
     <li>${icon('alert')}<span><b>Level 0 is run by the project.</b> Both registered verifiers belong to the project today.</span></li>
     </ul>
     <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/evidence">See the evidence ${icon('right')}</a><a class="btn btn-g" href="#/bounties">Browse bounties</a><a class="lnk" href="#/agents">What agents see ${icon('right')}</a></div></div>`;

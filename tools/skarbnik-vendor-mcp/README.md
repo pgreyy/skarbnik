@@ -11,7 +11,7 @@ the Groth16 wrap (Level 2, the default) an x86 computer with Docker and about 7.
 
 | Tool | What it does | Asks for a yes |
 | --- | --- | --- |
-| `init` | Writes a bounty config from your answers (paths only), including the level: 2 (default, the contract checks a Groth16 proof itself), 1 (the contract trusts OutLayer running the pinned verifier program; about 0.006 NEAR a check and about 2.8 NEAR held and returned) or 0 (registered verifiers, run by the project) | no |
+| `init` | Writes a bounty config from your answers (paths only), including the level: 2 (default, the contract checks a Groth16 proof itself), 1 (the contract trusts OutLayer running the pinned verifier program; about 0.011 NEAR a check and about 2.8 NEAR held and returned) or 0 (registered verifiers, run by the project) | no |
 | `check` | The preflight and the preview of fees, windows and time | no, spends nothing |
 | `prove0` | Proof 0 of your reference fix | on a rented GPU, yes: the first call returns the cost and a confirm code |
 | `publish` | Creates and funds the bounty on testnet | yes: the first call runs the preflight, returns the preview, what is spent and a confirm code |

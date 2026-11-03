@@ -105,7 +105,7 @@ step needs about 7 GiB of memory; the proofs these steps check are already on ch
 
     cargo test -p kintsugi-contract
 
-- You should see: `test result: ok. 135 passed; 0 failed`. Cargo downloads the contract's crates first, about 3 minutes.
+- You should see: `test result: ok. 155 passed; 0 failed`. Cargo downloads the contract's crates first, about 3 minutes.
 - This shows: the contract's rules behave as the tests say, including bounty 1's two real proofs checked natively.
 - Does not show: behaviour on chain (the Quick steps show that), and the tests were written by the same team.
 
@@ -187,7 +187,7 @@ in [docs/EVIDENCE.md](docs/EVIDENCE.md). No step needs real money or a mainnet w
   decided by it. Does not show: that the id is built from this source (Verify step 2 shows that) or that the checker is
   free of bugs.
 - **Read what is not claimed.** https://skarbnik.xyz/#/evidence/limits or the README's "Trust assumptions" (every limit:
-  [docs/CLAIMS.md](docs/CLAIMS.md), "Known limits"): fifteen limits in plain words on the site, among them no external
+  [docs/CLAIMS.md](docs/CLAIMS.md), "Known limits"): seventeen limits in plain words on the site, among them no external
   audit (only AI review passes), a full access key kept on purpose on the testnet contract, and testnet only. Check the
   access key with a `view_access_key_list` call on `kintsugi-l2-cihdp.testnet`, and the live code hash against the last
   deploy in [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy". Does not show: that no other limits
@@ -224,7 +224,7 @@ never shown as done.
 | The attempt cap K limits what repeated probes learn | Demonstrated | bounty 23 (3 of 12 probe commits counted); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Arena: guarded and unguarded" |
 | The checker rebuilds to the image id on chain | Demonstrated | MATCH from a fresh clone: [`docs/evidence/judge/fresh_clone_2026-10-26b.txt`](docs/evidence/judge/fresh_clone_2026-10-26b.txt); B5 |
 | The contract on chain is a reproducible build of a published commit | Demonstrated | code hash `7fgVdHPV…` = the base58 sha256 of `cargo near build reproducible-wasm` at commit `c86db11`; deploy tx [`YxMNwuWZ…`](https://testnet.nearblocks.io/txns/YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE); [docs/EVIDENCE.md](docs/EVIDENCE.md), "Contract code and every deploy, and the reproducible build"; B8 |
-| 135 contract unit tests pass | Implemented | `cargo test -p kintsugi-contract`; [`docs/evidence/account_cap/contract_unit_tests.txt`](docs/evidence/account_cap/contract_unit_tests.txt) |
+| 155 contract unit tests pass | Implemented | `cargo test -p kintsugi-contract`; [`docs/evidence/level1/contract_unit_tests.txt`](docs/evidence/level1/contract_unit_tests.txt) |
 | The checker gives PASS to an honest patch and FAIL to cheating patches | Implemented | `cargo test -p kintsugi-check`; [docs/EVIDENCE.md](docs/EVIDENCE.md), S1 |
 | A per-account cap on attempt slots | Demonstrated | deployed 2026-10-26 (tx [`DVv7N9o1…`](https://testnet.nearblocks.io/txns/DVv7N9o1LWAAR2UJcu2vxyBAaiADECERiL7ayHG365g7)); bounty 25: a second commit by one account refused ([`docs/evidence/account_cap/deploy_summary.txt`](docs/evidence/account_cap/deploy_summary.txt)) |
 | The vendor's `watch` proves revealed attempts on a rented GPU (secret in the pod's RAM only, pod always terminated) and submits with no one's help | Demonstrated | bounty 32, tx [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y), and judge bounty 27, tx [`73xzLn4v…`](https://testnet.nearblocks.io/txns/73xzLn4vmLyma5wF7qm9KY7qJoJz7ZkNJ2sAR4bTfipG); [docs/EVIDENCE.md](docs/EVIDENCE.md), "The vendor tool"; [docs/numbers.md](docs/numbers.md) |
@@ -250,6 +250,8 @@ The short list. Every limit, in plain words, is on the Evidence page.
   opens.
 - No external audit. The contract was reviewed in AI review passes.
 - The testnet contract keeps its full access key on purpose; removing it is planned for the mainnet contract.
+- Level 1 bounties trust OutLayer and its operator for the verdict, and depend on OutLayer downloading the pinned
+  verifier file from GitHub. Level 2 stays the default: there the contract checks the proof itself.
 - Run by the team, not outside customers.
 
 [Every limit, on the Evidence page](https://skarbnik.xyz/#/evidence/limits)

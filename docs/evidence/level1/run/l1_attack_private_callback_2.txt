@@ -1,0 +1,29 @@
+2026-11-03T10:01:16Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet on_outlayer_check json-args {"bounty_id": "36", "index": 0} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  on_outlayer_check
+│                       args:         {
+│                                       "bounty_id": "36",
+│                                       "index": 0
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet on_outlayer_check json-args '{"bounty_id": "36", "index": 0}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: An error occurred during a `FunctionCall` action.
+      ExecutionError("Smart contract panicked: Method on_outlayer_check is private")
+
+Location:
+   src/common.rs:1808
+exit=1 wall_s=6

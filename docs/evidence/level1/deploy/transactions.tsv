@@ -1,0 +1,2 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+repro_deploy	deploy	kintsugi-l2-cihdp.testnet	YxMNwuWZeFMKUg8PJ4kdxgnDXXKv3qH9YmdrmyZ3DzE	2.6 Tgas	0.0002569341174857	0	7.16

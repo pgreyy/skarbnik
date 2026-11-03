@@ -1,0 +1,32 @@
+2026-11-03T10:00:12Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet check_with_outlayer file-args target/level1/args_l1_attack_proof0_as_attempt.json prepaid-gas 300 Tgas attached-deposit 2.8 NEAR sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  check_with_outlayer
+│                       args:         {
+│                                       "bounty_id": "36",
+│                                       "index": 0,
+│                                       "journal": "QgAAAO0AAACqAAAA9QAAAHsAAAAbAAAAQgAAAI(cut)I(cut)OwAAAGUAAACHAAAAiAAAAG0AAABmAAAAfQAAAGIAAAB7AAAA9gAAAI(cut)0(cut)(cut: 570 characters of base64)",
+│                                       "receipt_b64": "(cut: 34434 characters of base64)(cut)(cut: 39220 characters of base64)(cut)(cut: 44061 characters of base64)(cut)(cut: 11897 characters of base64)(cut)(cut: 35477 characters of base64)(cut)(cut: 612 characters of base64)(cut)(cut: 8680 characters of base64)(cut)(cut: 3854 characters of base64)(cut)(cut: 31970 characters of base64)(cut)(cut: 54105 characters of base64)(cut)(cut: 28242 characters of base64)(cut)(cut: 3508 characters of base64)(cut)O(cut)lwAAAPwAAADjAAAAxwAAAPIAAACBAAAA/gAAANIAAAC/AAAApgAAAMkAAADyAAAAXgAAAHIAAAA7AAAAZQAAAIcAAACI(cut)lAAAAKsAAAA3AAAAmgAAAHYAAADTAAAA8QAAAFQAAADfAAAAHwAAAL0AAADl(cut)I(cut)lAAAA8wAAAIoAAAC+AAAAWQAAALcAAAD/AAAA7AAAAGEAAABSAAAATQAAAM8AAADQAAAAIQAAAKEAAADmAAAAGwAAAGsAAABpAAAAbgAAAHQAAABzAAAAdQAAAGcAAABpAAAAIAAAAFMAAAAxAAAAIAAAAGQAAABlAAAAbQAAAG8AAAAgAAAAcwAAAGUAAABl(cut)(cut: 620 characters of base64)(cut)I(cut)OwAAAGUAAACHAAAAiAAAAG0AAABmAAAAfQAAAGIAAAB7AAAA9gAAAI(cut)0(cut)(cut: 614 characters of base64)",
+│                                       "receipt_sha256": "f8014eb25aa5611778cc8b5b2a6df90811968baba495107b991205fb0d024181"
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      2.8 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet check_with_outlayer file-args target/level1/args_l1_attack_proof0_as_attempt.json prepaid-gas '300.0 Tgas' attached-deposit '2.8 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: An error occurred during a `FunctionCall` action.
+      ExecutionError("Smart contract panicked: the journal belongs to another bounty or attempt (submission id)")
+
+Location:
+   src/common.rs:1808
+exit=1 wall_s=8

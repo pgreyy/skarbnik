@@ -1,0 +1,32 @@
+2026-11-03T10:00:36Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet check_with_outlayer file-args target/level1/args_l1_attack_low_deposit.json prepaid-gas 300 Tgas attached-deposit 0.5 NEAR sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  check_with_outlayer
+│                       args:         {
+│                                       "bounty_id": "36",
+│                                       "index": 0,
+│                                       "journal": "(cut: 294 characters of base64)(cut)0(cut)(cut: 374 characters of base64)(cut)O0AAADGAAAA0QAAACMAAACIAAAAAgAAAMwAAAADAAAA9QAAAIMAAAChAAAA1wAAACsAAAD+AAAAQQAAAMAAAADJAAAA3QAAALwAAAAAAAAA",
+│                                       "receipt_b64": "(cut: 29455 characters of base64)(cut)(cut: 31107 characters of base64)(cut)(cut: 216 characters of base64)(cut)(cut: 10218 characters of base64)(cut)(cut: 576 characters of base64)(cut)(cut: 812 characters of base64)(cut)(cut: 15913 characters of base64)(cut)(cut: 30833 characters of base64)(cut)(cut: 1662 characters of base64)(cut)(cut: 5637 characters of base64)(cut)(cut: 24848 characters of base64)(cut)(cut: 890 characters of base64)(cut)(cut: 47873 characters of base64)(cut)(cut: 8693 characters of base64)(cut)(cut: 7822 characters of base64)(cut)(cut: 21314 characters of base64)(cut)(cut: 12958 characters of base64)(cut)(cut: 2247 characters of base64)(cut)(cut: 3887 characters of base64)(cut)(cut: 12556 characters of base64)(cut)(cut: 13702 characters of base64)(cut)(cut: 4971 characters of base64)(cut)(cut: 6902 characters of base64)(cut)IAAAAOQAAAJUAAAA+AAAA9gAAABI(cut)IAAACBAAAA/gAAANIAAAC/AAAApgAAAMkAAADyAAAAXgAAAHIAAAA7AAAAZQAAAIcAAACI(cut)lAAAAKsAAAA3AAAAmgAAAHYAAADTAAAA8QAAAFQAAADfAAAAHwAAAL0AAADl(cut)I(cut)lAAAA8wAAAIoAAAC+AAAAWQAAALcAAAD/AAAA7AAAAGEAAABSAAAATQAAAM8AAADQAAAAIQAAAKEAAADmAAAAGwAAANMAAAD3AAAA4AAAAD0AAAC0(cut)IAAAAiAAAAJwAAADDAAAAFgAAAH8AAAAkAAAArwAAAD8AAABuAAAAAQAAAAEAAAC4AAAAFgAAALIAAADaAAAAVgAAAGYAAABRAAAACgAAABQAAABgAAAALgAAAKEAAACxAAAA7QAAAMYAAADRAAAAIwAAAI(cut)(cut: 388 characters of base64)(cut)(cut: 235 characters of base64)(cut)0(cut)(cut: 374 characters of base64)(cut)O0AAADGAAAA0QAAACMAAACIAAAAAgAAAMwAAAADAAAA9QAAAIMAAAChAAAA1wAAACsAAAD+AAAAQQAAAMAAAADJAAAA3QAAALwAAAAAAAAA7OXpuK4s1uprGCe0ZP8DSPmn9N7NJpwAh/39dQmNoBM=",
+│                                       "receipt_sha256": "72380757a21aa60554a580456f63aa35583c8b8fb48f290149b10e37b714b4c7"
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0.5 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet check_with_outlayer file-args target/level1/args_l1_attack_low_deposit.json prepaid-gas '300.0 Tgas' attached-deposit '0.5 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+Error: 
+   0: Error: An error occurred during a `FunctionCall` action.
+      ExecutionError("Smart contract panicked: attach at least min_deposit (get_outlayer) for OutLayer's fee and deposit")
+
+Location:
+   src/common.rs:1808
+exit=1 wall_s=9

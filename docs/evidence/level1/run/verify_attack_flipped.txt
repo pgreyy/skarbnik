@@ -1,0 +1,7 @@
+flipped one bit in seal word 27833 of 55667
+wrote target/level1/attack_flipped.bin
+receipt file: target/level1/attack_flipped.bin (224786 bytes)
+image id: dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+verify seconds: 0.125
+INVALID: verification indicates proof is invalid
+verify exit=1

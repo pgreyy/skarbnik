@@ -1,0 +1,16 @@
+2026-11-03T08:38:50Z
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet set_outlayer json-args '{"config":{"account_id":"outlayer.testnet","wasm_url":"https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm","wasm_sha256":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1","max_instructions":"2000000000","max_memory_mb":64,"max_execution_seconds":"20","min_deposit":"2800000000000000000000000"}}' prepaid-gas '30 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-l2-cihdp.testnet network-config testnet sign-with-legacy-keychain send
+│    Transaction ID: 9sXDRkHu4NbGpK3Gsd6jS4R9CWmoGwhLzuzEg3vYZqmr
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_set","data":[{"config":{"account_id":"outlayer.testnet","wasm_url":"https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm","wasm_sha256":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1","max_instructions":"2000000000","max_memory_mb":64,"max_execution_seconds":"20","min_deposit":"2800000000000000000000000"}}]}
+The "set_outlayer" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-l2-cihdp.testnet> succeeded.
+== get_outlayer
+{
+  "account_id": "outlayer.testnet",
+  "build_target": "wasm32-wasip1",
+  "max_execution_seconds": "20",
+  "max_instructions": "2000000000",
+  "max_memory_mb": 64,
+  "min_deposit": "2800000000000000000000000",
+  "wasm_sha256": "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8",
+  "wasm_url": "https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm"
+}

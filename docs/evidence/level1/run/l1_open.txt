@@ -1,0 +1,19 @@
+2026-11-03T09:39:19Z (sent; this log was rebuilt from the chain with EXPERIMENTAL_tx_status after a repeat run of the open phase overwrote the CLI log; the repeat was refused: l1_open_repeat_refused.txt)
+tx 4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ, signer kintsugi-res2-prnvm.testnet, open_with_outlayer, attached 2.8 NEAR, prepaid 300 Tgas
+receipt outcomes, in order:
+kintsugi-l2-cihdp.testnet: gas 44.981 Tgas; status SuccessReceiptId
+   EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_requested","data":[{"bounty_id":"36","index":null,"verdict":"PASS","asker":"kintsugi-res2-prnvm.testnet","outlayer":"outlayer.testnet"}]}
+outlayer.testnet: gas 22.627 Tgas; status SuccessReceiptId
+   EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_requested","data":[{"request_data":"{\"request_id\":6650,\"sender_id\":\"kintsugi-res2-prnvm.testnet\",\"predecessor_id\":\"kintsugi-l2-cihdp.testnet\",\"code_source\":{\"WasmUrl\":{\"url\":\"https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm\",\"hash\":\"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8\",\"build_target\":\"wasm32-wasip1\"}},\"resource_limits\":{\"max_instructions\":2000000000,\"max_memory_mb\":64,\"max_execu
+outlayer.testnet: gas 11.190 Tgas; status SuccessValue value {"error":null,"image_id":"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc","journal_sha256":"e9c75e4073b23fad81718f5492bdd537a409e4ae2a005c06c2375c5c891f85ae","ok":true,"receipt_sha256":"f8014eb25aa5611778cc8b5b2a6df90811968baba495107b991205fb0d024181","submission_id":"355cf1b54603f
+   [[yNEAR charged: "1130787800000000000000"]]
+   EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_completed","data":[{"sender_id":"kintsugi-res2-prnvm.testnet","code_source":{"WasmUrl":{"url":"https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm","hash":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1"}},"resources_used":{"instructions":878726842,"time_ms":1307,"compile_time_ms":null},"success":true,"error_message":null,"payment_charged":"1130787800000000000000","payment_refunded":"2798869212
+   Execution completed successfully. Output: Json(370 bytes), Resources: { instructions: 878726842, time_ms: 1307 }, Cost: 1130787800000000000000 yoctoNEAR, Refund: 2798869212200000000000000 yoctoNEAR, Cached WASM from 2026-10-26T05:34:41.403211+00:00
+kintsugi-res2-prnvm.testnet: gas 0.223 Tgas; status SuccessValue
+kintsugi-res2-prnvm.testnet: gas 0.223 Tgas; status SuccessValue
+kintsugi-res2-prnvm.testnet: gas 0.223 Tgas; status SuccessValue
+kintsugi-res2-prnvm.testnet: gas 0.223 Tgas; status SuccessValue
+kintsugi-l2-cihdp.testnet: gas 2.176 Tgas; status SuccessValue value "opened"
+   EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_opened","data":[{"bounty_id":"36","by":"outlayer","caller":"kintsugi-res2-prnvm.testnet"}]}
+kintsugi-res2-prnvm.testnet: gas 0.223 Tgas; status SuccessValue
+kintsugi-res2-prnvm.testnet: gas 0.223 Tgas; status SuccessValue
