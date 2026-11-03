@@ -5,7 +5,7 @@
 // then the Proof Ledger read live from the chain (paid accounts, earnings, the numbers, vendors; rules in
 // js/ledger-core.js, the same as ledger.json). Checker: the approved image id, the rebuild command (shown only after
 // scripts/check_image_id.sh printed MATCH) and what the checker runs. Contract: the deployment read live (code hash,
-// owner, fee pool, full access keys), how to verify the build yourself, what was tested, refused attacks, who may call what, where every fee goes.
+// owner, fee pool, full access keys), how to verify the build yourself, the tests and refused attacks, who may call what, where every fee goes.
 // Security Lab: how much repeated attempts can learn, the recorded probe run, and the guarded (real, testnet) vs
 // unguarded (simulated) recording. Limits: what is not claimed, in plain words. Long tables and command lists sit in
 // closed drop downs (details: they open without JavaScript, and the saved page shows them open). Nothing was removed.
@@ -199,7 +199,7 @@ export async function evidence(viewEl, tab) {
     <div style="max-width:700px"><h2 class="h2s">The contract</h2><p class="body" style="margin-top:12px">It holds the money and the deadlines, checks Groth16 proofs with NEAR’s built in curve functions, and applies the rules. It does not run the private evaluation.</p></div>
     <div class="two">
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px"><h3 class="h3">Deployment, read live</h3><div id="deploy"><p class="small">${LOADING}</p></div></div>
-    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><h3 class="h3">What was tested</h3>
+    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><h3 class="h3">Tests and refused attacks</h3>
     <p class="small"><b class="txt">${esc(nums.contract_unit_tests.value)}</b> contract unit tests pass in the repository. ${esc(nums.contract_unit_tests.detail)}</p>
     <p class="small"><b class="txt">${attacks}</b> proof attacks were refused on chain: ${esc((rec.attacks_s6c || []).map((a) => a.what.charAt(0).toLowerCase() + a.what.slice(1)).join(', '))}.</p>
     <p class="small">A proof for the wrong bounty fails cheaply, at ${esc(nums.wrong_bounty_tgas.value)} Tgas. ${tx(rec.wrong_bounty_refused.tx)}</p>

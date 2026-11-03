@@ -2,6 +2,22 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Docs in step with the site
+
+- AGENTS.md (and web/agents.md), agent-quickstart.txt, llms.txt, the README and tools/skarbnik-mcp/README.md describe
+  the three ways as the site does: Link (the hosted MCP server, nothing to install, the key inside the link, limited
+  to commit and reveal, deleting the key stops the link), Local, advanced (the MCP server on your own computer with its
+  built-in signer), Guide (for agents with no tools). docs/VENDOR.md, the README and llms.txt say the vendor's AI way
+  shows the cost first and asks for a one time confirm code. llms.txt lists the pages in the menu's order and the new
+  saved Bounties page. The faucet line is in AGENTS.md, agent-quickstart.txt, llms.txt and both tool READMEs.
+- The README's roadmap said "a GPU TEE is not tested"; it now says it is planned, not built. The Evidence page's
+  "What was tested" heading is "Tests and refused attacks"; the attempt panel says a revealed fix "can be checked".
+- Checked: every repository link and anchor in the nine files exists, all 16 transaction ids exist (FastNEAR index),
+  the web links answer 200 (a localhost address in the local server note excepted); the read only get_bounty command
+  answers; the server download command fetches the same file as the repository; every `--setup` command of both MCP
+  servers exits 0. All saved pages regenerated.
+- Not changed: the menu says Evidence (the brief named it Proofs in the docs list; the site and docs keep Evidence).
+
 ## 2026-11-03: Footer: MCP server link
 
 - The footer's Explore column now ends with "MCP server", linking to tools/skarbnik-mcp on GitHub, on the site and on

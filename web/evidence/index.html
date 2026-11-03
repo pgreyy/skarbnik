@@ -114,11 +114,11 @@
 </div>
 <nav class="menu-sheet" id="menuSheet" aria-label="Menu" hidden><a href="#/bounties" data-nav="bounties">Bounties</a><a href="#/vendors" data-nav="vendors">For vendors</a><a href="#/agents" data-nav="agents">For agents</a><a href="#/how-it-works" data-nav="how-it-works">How it works</a><a href="#/evidence" data-nav="evidence">Evidence</a><a href="#/judge" data-nav="judge">Judge guide</a><div class="sheet-wallet" id="sheetWallet"></div></nav>
 </header>
-<div class="view" id="view"><p class="small faint" style="padding:16px 24px">A saved copy of <a href="/#/evidence">this page</a>, made 2026-11-03 05:48 UTC from the chain and the site's data files. With JavaScript the page shows the live data.</p><main id="main" class="p-evidence" tabindex="-1">
+<div class="view" id="view"><p class="small faint" style="padding:16px 24px">A saved copy of <a href="/#/evidence">this page</a>, made 2026-11-03 06:29 UTC from the chain and the site's data files. With JavaScript the page shows the live data.</p><main id="main" class="p-evidence" tabindex="-1">
 <section class="n-ph"><div class="wrap">
 <div style="max-width:820px;display:flex;flex-direction:column;gap:24px">
 <p class="eyebrow">Proof &amp; evidence</p>
-<h1 tabindex="-1">Read the real examples first. Then check the record.</h1>
+<h1>Read the real examples first. Then check the record.</h1>
 <p class="lead">Every claim here points to a transaction, a file or a command. Where something is not proven, the label says so. The examples show the outcomes a bounty can have.</p>
 <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center"><a class="btn btn-p" href="#/judge">Take the judge tour <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-right"></use></svg></a><a class="lnk" href="#/evidence/bounties" id="deeperLink">Go to the technical record</a><a class="lnk" href="#/evidence/limits">Read the limits</a></div>
 </div></div></section>
@@ -261,7 +261,7 @@
       <dt>Owner</dt><dd>The contract account itself</dd>
       <dt>Fee pool</dt><dd>0.17 NEAR, locked. No method takes it out.</dd>
       <dt>Full access keys</dt><dd>1</dd></dl><p class="small faint">Read live from testnet just now, except the last deploy (docs/EVIDENCE.md, "Contract code and every deploy" (the reproducible build of commit c74bd5c)).</p></div></div>
-    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><h3 class="h3">What was tested</h3>
+    <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px"><h3 class="h3">Tests and refused attacks</h3>
     <p class="small"><b class="txt">135</b> contract unit tests pass in the repository. 135 with the per-account cap, deployed 2026-10-26 (docs/evidence/account_cap/); the code before it passed 119 (docs/evidence/judge/clean_clone.txt).</p>
     <p class="small"><b class="txt">9</b> proof attacks were refused on chain: proof of another attempt, a FAIL proof presented as a PASS, proof with one bit flipped, proof with a changed journal, proof under another checker image id, second proof for a decided attempt, proof of another bounty, second proof after a PASS, proof after the bounty expired.</p>
     <p class="small">A proof for the wrong bounty fails cheaply, at 2.35 Tgas. <a class="tx" href="https://testnet.nearblocks.io/txns/8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM" target="_blank" rel="noopener" title="8fYiFjirrv8N2XKdxzWJA7y8d9izXUwPJ5d5r4NKMahM" aria-label="Open transaction 8fYiFjir…MahM on the explorer (new tab)">8fYiFjir…MahM<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-ext"></use></svg></a></p>

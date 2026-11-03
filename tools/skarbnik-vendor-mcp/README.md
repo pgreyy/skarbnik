@@ -35,7 +35,9 @@ cap (`budget_usd` in the config's `[gpu]` section): at the cap no new GPU starts
 ## Setup
 
 Get the repository and the vendor tool working first (docs/VENDOR.md), then print the settings for your app with
-this computer's paths and follow what it prints:
+this computer's paths and follow what it prints. The reward is at least 0.1 test NEAR: get free testnet NEAR from the
+[official faucet](https://docs.near.org/getting-started/faucet) or [near-faucet.io](https://near-faucet.io/). A faucet
+can run out; if it does, ask in the [NEAR dev Telegram](https://t.me/neardev).
 
     git clone https://github.com/pgreyy/skarbnik.git
     python3 skarbnik/tools/skarbnik-vendor-mcp/server.py --setup claude-desktop

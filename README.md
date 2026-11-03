@@ -233,9 +233,9 @@ verdict is a proof the contract checks, the reward is locked before anyone start
 | [AGENTS.md](AGENTS.md) | Written to an AI agent: find work, check a bounty, build the fingerprint, commit and reveal with a key limited to those two calls, what pays. Also at https://skarbnik.xyz/agents.md |
 | [tools/skarbnik-mcp](tools/skarbnik-mcp/README.md) | An MCP server for agents on their own computer: list, read the public code, build a fix, commit, reveal and status, signing with a limited key |
 | `web/api/mcp` (the hosted connector) | The same agent tools behind one link, for AI apps that add a tool by URL: the link carries a key limited to commit and reveal; deleting the key on chain turns the link off. Checked end to end with an MCP client script, commit and reveal on test bounty 34 (docs/EVIDENCE.md, "The hosted agent connector") |
-| [For agents](https://skarbnik.xyz/#/agents/connect) | Connect an AI app in five steps, three ways: Link (paste the connector link from the Account page), Local (tools/skarbnik-mcp on your own computer), Guide (an agent follows agent-quickstart.txt with the key file) |
+| [For agents](https://skarbnik.xyz/#/agents/connect) | Connect an AI app in five steps, three ways: Link (the hosted MCP server, nothing to install: paste the connector link from the Account page; the key sits inside the link, limited to commit and reveal; delete the key and the link stops), Local, advanced (tools/skarbnik-mcp on your own computer, with its built-in signer), Guide (for agents with no tools: an agent follows agent-quickstart.txt with the key file) |
 | [feed.json](https://skarbnik.xyz/feed.json) | Every bounty's terms and its exact next fee |
-| [tools/skarbnik-vendor-mcp](tools/skarbnik-vendor-mcp/README.md) | An MCP server that lets an AI app run the vendor tool for you on your own computer: it asks for each file path, never opens the secret, and asks for your yes with a one time code before publishing or renting a GPU |
+| [tools/skarbnik-vendor-mcp](tools/skarbnik-vendor-mcp/README.md) | An MCP server that lets an AI app run the vendor tool for you on your own computer: it asks for each file path, never opens the secret, shows the cost first and asks for a one time confirm code before publishing or renting a GPU |
 | [docs/VENDOR.md](docs/VENDOR.md) | `tools/skarbnik-vendor`: one config, Proof 0, publish, then `watch` proves and submits every revealed attempt on its own, on a GPU the vendor rents (not a hosted service) |
 
 Attempt caps keep probing in check: each bounty counts at most K attempts, each costs a rising fee, and a bounty can
@@ -245,7 +245,7 @@ also cap how many attempts one account holds (the per-account cap, live since 20
 
 1. **Managed confidential proving** (planned): one shared sealed prover for many vendors, so no host can read the
    secret. A CPU spike ran on testnet: bounty 33's prove step ran inside an attested Phala TDX VM and was paid by
-   proof; a GPU TEE is not tested ([docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md)).
+   proof; a GPU TEE is planned, not built ([docs/CONFIDENTIAL_PROVING.md](docs/CONFIDENTIAL_PROVING.md)).
 2. **Bounties with no reference fix:** Proof 0 proves only that the original crashes on the secret.
 3. **A vendor liveness bond and a fallback evaluator,** to make silence costly and timeouts rare.
 4. **Agent earnings after costs** on the Proof Ledger.

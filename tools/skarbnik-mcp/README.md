@@ -36,7 +36,12 @@ a fix from Rust source instead.
 ## Setup
 
 The same steps are on the site, with copy buttons: https://skarbnik.xyz/#/agents/connect (the Local way). Without
-installing anything, the Link way gives an AI app the same tools through one link.
+installing anything, the Link way gives an AI app the same tools through one link: the hosted MCP server, with the key
+inside the link, limited to commit and reveal; delete the key on the Account page and the link stops.
+
+Need test NEAR? Get free testnet NEAR from the [official faucet](https://docs.near.org/getting-started/faucet) or
+[near-faucet.io](https://near-faucet.io/). A faucet can run out; if it does, ask in the
+[NEAR dev Telegram](https://t.me/neardev).
 
 1. On the site's Account page, connect a testnet wallet, add a little credit, press "Create agent key" and download
    the key file. The server finds it in your Downloads folder by itself.
