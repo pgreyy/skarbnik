@@ -41,6 +41,28 @@ One dated entry per work block: what was done, the exact commands, the results, 
   change are not checked yet; bounties the saved feed does not list as open (waiting for Proof 0, awaiting evaluation)
   stay as saved until the next saved feed.
 
+## 2026-11-03: Bounties 40 and 41: a per-account cap, a publish without the secret, one wrong fix each
+
+- `0102977`: `tools/skarbnik-vendor` takes `max_commits_per_account` (asked by `init`, checked 1 to K, shown in the
+  preview, sent by `publish`); the MCP server's `init` takes it and `max_patch_bytes`. The preflight on a computer
+  without the secret and the reference fix relies on the Proof 0 copied there when it says PASS for the module.
+  `python3 -I scripts/test_watch_retry.py`: ALL PASS. Copied to the VPS (`*.before-cap` backups, sha256 match).
+- Bounty 40 (Level 1, `ringlog2`) and bounty 41 (Level 2, `grid`): K 8, 2 per account, 64 and 64, 2,048 bytes, 48 h
+  verdict window, 60 days. `init`, `check` and `prove0` on the VPS through the MCP server; `check` and `publish` on the
+  laptop. Each has its own VPS watch in GPU mode; the judge watch was not touched.
+- Grid's Proof 0 took four tries: no free GPU twice (no cost), "error: verify segment" on an L4 once ($0.086), then a
+  PASS on an L40S.
+- One wrong fix each from `skarbnik-agentc-d48260.testnet` through `tools/skarbnik-mcp`: bounty 40 Failed on
+  OutLayer's answer 4 min 29 s after the reveal; bounty 41 Failed on a FAIL proof the contract checked 9 min 8 s after
+  the reveal. Nobody paid. GPU cost $0.2473 in all. Details and transactions: docs/EVIDENCE.md, "Two bounties with a
+  per-account cap".
+- Site: the public code of both programs in `data/` and the feed (`8df41d8`, `9c6125d`); a bounty with a free slot and
+  time left is "Open for attempts" with "1 of 8 used" even after failed attempts (`fb8c483`).
+- Mistakes: my first syntax check of the changed page scripts did not catch an unescaped apostrophe, and the saved
+  pages were made from a broken page; found by loading the pages, fixed and regenerated before the push. I sent bounty
+  41's commit without waiting for `check_patch`, which had said not ready.
+- Next: the Bounties list says "No transaction recorded" for 40 and 41 until `scripts/gen_site_recorded.py` maps them.
+
 ## 2026-11-03: The vendor watch waits for a GPU instead of giving up
 
 - Found while answering how the watch handles a busy GPU market: each round reset the attempt's saved state, so the

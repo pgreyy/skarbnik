@@ -1,0 +1,5 @@
+2026-11-03T21:27:19Z Proof 0 of grid on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/grid-work)
+2026-11-03T21:27:21Z no free GPU of 5 types on the secure cloud
+2026-11-03T21:27:22Z no free GPU of 5 types on the community cloud
+REFUSED: Proof 0 on a GPU did not finish: no GPU could be rented within the limits (RunPod POST /pods: HTTP 500 {"error":"create pod: There are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available\nThere are no instances currently available","status":500}
+); nothing was sent; run prove0 again later

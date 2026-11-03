@@ -1,0 +1,11 @@
+2026-11-03T22:20:04Z watch started (mode gpu, bounties 41, one job at a time)
+2026-11-03T22:20:04Z GPU mode: rented GPU NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA L4, NVIDIA GeForce RTX 4090, NVIDIA L40 in , cap 60 min per pod, spend so far $1.0013 of a $1.53 budget
+2026-11-03T22:25:06Z bounty 41 attempt 0: proving (patch sha256 6d8a3b5918806824..., seed 8d667b3208302640..., deadline 2026-11-05 22:24 UTC)
+2026-11-03T22:25:08Z bounty 41 attempt 0: pod 7d0vt8rhcyj4lq created: NVIDIA L40S in US-TX-4, $1.09/h, hard cap 60 min
+2026-11-03T22:25:42Z bounty 41 attempt 0: pod 7d0vt8rhcyj4lq: ssh ready after 36 s, GPU NVIDIA L40S
+2026-11-03T22:25:44Z bounty 41 attempt 0: pod 7d0vt8rhcyj4lq: self stop armed for 59 min (runpodctl)
+2026-11-03T22:26:06Z bounty 41 attempt 0: pod 7d0vt8rhcyj4lq: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-11-03T22:26:35Z bounty 41 attempt 0: pod 7d0vt8rhcyj4lq: proved in 6.83 s, secret wiped; segments: 4 journal.verdict: FAIL
+2026-11-03T22:26:55Z bounty 41 attempt 0: pod 7d0vt8rhcyj4lq terminated: 109 s, $0.033 ($1.09/h); GPU spend so far $1.0343
+2026-11-03T22:33:38Z bounty 41 attempt 0: proof ready, verdict FAIL; prove 6.83 s, succinct 5.39 s, Groth16 402.63 s; on NVIDIA L40S, pod 109 s, $0.033
+2026-11-03T22:33:43Z bounty 41 attempt 0: submit_groth16 393Ub7PNLB2EYaRMeJvqkTnZc3JFcDrD6se66ais17np ok; outcome on chain Failed

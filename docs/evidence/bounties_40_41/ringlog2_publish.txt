@@ -1,0 +1,66 @@
+== publish (laptop, tools/skarbnik-vendor-mcp)
+[needs_yes]
+true
+[preview]
+Preflight for ringlog2 (~/skarbnik-vendor/ringlog2.toml)
+  ok   module ~/.skarbnik-vendor/ringlog2/original.wasm, 423 bytes; 14 public tests
+  ok   the secret and the reference fix stay on the proving machine; the Proof 0 made there is here: PASS for this module
+  ok   memory: 5581 MiB available, 7669 MiB swap; proving needs about 2600 MiB at --po2 18
+  ok   Level 1: OutLayer is set (outlayer.testnet, program sha256 e60647ec50f76f59..., min_deposit 2.8 NEAR)
+  ok   checker image id dd6c5f42c117ce3a... is on the contract's allowlist
+  ok   vendor balance 3.988352 NEAR
+  ok   verdict window 48 h covers K x proof time x 1.5 = 50 min 36 s
+
+Preview
+  reward: 0.1 NEAR, locked in the contract when the bounty is created
+  level 1: the contract trusts OutLayer running the pinned verifier program on the succinct proof
+       level 2 costs: per proof about 36 Tgas of gas (about 0.004 NEAR); the Groth16 step needs Docker, an x86 computer and about 7.6 GiB
+    -> level 1 costs: per check about 0.011 NEAR (OutLayer's fee about 0.0011 NEAR plus about 97 Tgas of gas, mostly for the 300 KB proof sent as an argument), and min_deposit (about 2.8 NEAR) held while OutLayer works and returned; no Groth16 step
+       level 0 costs: no proof on chain; the verifiers must attest Proof 0 and each verdict before the windows close
+  per account: at most 2 of the 8 attempt slots at a time
+  attempts: up to 8; fees, taken from each researcher's credit: #1 0.01 NEAR, #2 0.015 NEAR, #3 0.02 NEAR, #4 0.025 NEAR, #5 0.03 NEAR, #6 0.035 NEAR, #7 0.04 NEAR, #8 0.045 NEAR
+  windows: reveal 1 min to 1 h after a commit; your proof within 48 h of each reveal; the bounty expires after 1440 h
+  on timeout: if you do not prove a revealed attempt within its verdict window, anyone can call claim_timeout and the
+    reward is split equally among the revealed attempts still waiting. The contract does not look at the fix: it pays
+    whatever was revealed. That protects researchers from a silent vendor; it is not a verdict.
+  proving one attempt (gpu): about 4 min 13 s (measured, this bounty's own Proof 0); cost: GPU rental time
+  time to open: Proof 0 (about 4 min 13 s) plus two transactions
+
+Preflight passed.
+[spends]
+the reward (0.1 NEAR, locked in the contract) plus a little gas, from kintsugi-vendor-prnvm.testnet; testnet only; Level 1 also holds the contract's min_deposit (about 2.8 NEAR) while OutLayer checks Proof 0, returned less OutLayer's fee (about 0.0011 NEAR)
+[time]
+two transactions, under a minute
+[next]
+show the preview to the vendor; after a clear yes, call publish again with this confirm_code
+
+== publish (laptop, tools/skarbnik-vendor-mcp) with the confirm code (not shown)
+[job]
+publish-20261103-222018-75b0
+[running]
+false
+[minutes]
+0.7
+[output]
+Preview
+  reward: 0.1 NEAR, locked in the contract when the bounty is created
+  level 1: the contract trusts OutLayer running the pinned verifier program on the succinct proof
+       level 2 costs: per proof about 36 Tgas of gas (about 0.004 NEAR); the Groth16 step needs Docker, an x86 computer and about 7.6 GiB
+    -> level 1 costs: per check about 0.011 NEAR (OutLayer's fee about 0.0011 NEAR plus about 97 Tgas of gas, mostly for the 300 KB proof sent as an argument), and min_deposit (about 2.8 NEAR) held while OutLayer works and returned; no Groth16 step
+       level 0 costs: no proof on chain; the verifiers must attest Proof 0 and each verdict before the windows close
+  per account: at most 2 of the 8 attempt slots at a time
+  attempts: up to 8; fees, taken from each researcher's credit: #1 0.01 NEAR, #2 0.015 NEAR, #3 0.02 NEAR, #4 0.025 NEAR, #5 0.03 NEAR, #6 0.035 NEAR, #7 0.04 NEAR, #8 0.045 NEAR
+  windows: reveal 1 min to 1 h after a commit; your proof within 48 h of each reveal; the bounty expires after 1440 h
+  on timeout: if you do not prove a revealed attempt within its verdict window, anyone can call claim_timeout and the
+    reward is split equally among the revealed attempts still waiting. The contract does not look at the fix: it pays
+    whatever was revealed. That protects researchers from a silent vendor; it is not a verdict.
+  proving one attempt (gpu): about 4 min 13 s (measured, this bounty's own Proof 0); cost: GPU rental time
+  time to open: Proof 0 (about 4 min 13 s) plus two transactions
+create_bounty: CPQG1TNNn6RFGNYpSv9k6sfbDeCKtiXhRPwZrWv1FnPm ok
+open_with_outlayer: 33KaXU68dqxRm4uAhgjtL14B2Q4QNFZQc3Pt9c1eLXpp ok; 2.8 NEAR held while OutLayer works, then returned (less its fee)
+bounty 40: state Open, opened True, image id allowed True. Add it to the watch config.
+[exit]
+0
+[ok]
+true
+

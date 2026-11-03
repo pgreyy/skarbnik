@@ -1,0 +1,8 @@
+2026-11-03T21:37:30Z Proof 0 of grid on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/grid-work)
+2026-11-03T21:37:32Z pod 9gcrzko3bk7vbq created: NVIDIA L4 in US-MO-2, $0.59/h, hard cap 60 min
+2026-11-03T21:43:05Z pod 9gcrzko3bk7vbq: ssh ready after 335 s, GPU NVIDIA L4
+2026-11-03T21:43:07Z pod 9gcrzko3bk7vbq: self stop armed for 54 min (container stop)
+2026-11-03T21:43:27Z pod 9gcrzko3bk7vbq: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-11-03T21:46:15Z pod 9gcrzko3bk7vbq terminated: 525 s, $0.086 ($0.59/h); GPU spend so far $0.9256
+REFUSED: Proof 0 on a GPU did not finish: pod step failed (exit 2): salt: the private salt of bounty grid (existing)
+error: verify segment; full output in ~/skarbnik-vendor/gpu_errors/9gcrzko3bk7vbq-2026-11-03T214612Z.log; nothing was sent; run prove0 again later

@@ -1,0 +1,8 @@
+2026-11-03T22:07:33Z Proof 0 of grid on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/grid-work)
+2026-11-03T22:07:35Z pod 0kgnv1osid9n3h created: NVIDIA L40S in None, $1.09/h, hard cap 60 min
+2026-11-03T22:08:08Z pod 0kgnv1osid9n3h: ssh ready after 35 s, GPU NVIDIA L40S
+2026-11-03T22:08:09Z pod 0kgnv1osid9n3h: self stop armed for 59 min (runpodctl)
+2026-11-03T22:08:25Z pod 0kgnv1osid9n3h: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-11-03T22:09:49Z pod 0kgnv1osid9n3h: proved in 77.35 s, secret wiped; segments: 92 journal.verdict: PASS
+2026-11-03T22:10:52Z pod 0kgnv1osid9n3h terminated: 199 s, $0.0603 ($1.09/h); GPU spend so far $1.0013
+2026-11-03T22:18:24Z Proof 0 ready: VALID, PASS; prove 77.35 s, succinct 54.33 s, Groth16 451.42 s. Next: publish

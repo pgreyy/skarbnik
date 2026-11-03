@@ -1,0 +1,11 @@
+2026-11-03T21:36:57Z watch started (mode gpu, bounties 40, one job at a time)
+2026-11-03T21:36:57Z GPU mode: rented GPU NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA L4, NVIDIA GeForce RTX 4090, NVIDIA L40 in , cap 60 min per pod, spend so far $0.8396 of a $1.53 budget
+2026-11-03T21:42:59Z bounty 40 attempt 0: proving (patch sha256 4b98e9886005abfe..., seed c53eaba959723cd5..., deadline 2026-11-05 21:42 UTC)
+2026-11-03T21:46:17Z bounty 40 attempt 0: pod bsotyklok02t4b created: NVIDIA L40S in None, $1.09/h, hard cap 60 min
+2026-11-03T21:46:29Z bounty 40 attempt 0: pod bsotyklok02t4b: ssh ready after 14 s, GPU NVIDIA L40S
+2026-11-03T21:46:31Z bounty 40 attempt 0: pod bsotyklok02t4b: self stop armed for 60 min (runpodctl)
+2026-11-03T21:46:42Z bounty 40 attempt 0: pod bsotyklok02t4b: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-11-03T21:46:55Z bounty 40 attempt 0: pod bsotyklok02t4b: proved in 4.62 s, secret wiped; segments: 4 journal.verdict: FAIL
+2026-11-03T21:47:06Z bounty 40 attempt 0: pod bsotyklok02t4b terminated: 51 s, $0.0154 ($1.09/h); GPU spend so far $0.941
+2026-11-03T21:47:06Z bounty 40 attempt 0: proof ready, verdict FAIL; prove 4.62 s, succinct 3.17 s; on NVIDIA L40S, pod 51 s, $0.0154
+2026-11-03T21:47:24Z bounty 40 attempt 0: check_with_outlayer DvNgEFhAJ6wo9Qp82GHdBssPYZCJ1rJXUoaRduik5JME ok; outcome on chain Failed

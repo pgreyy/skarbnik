@@ -1,0 +1,8 @@
+2026-11-03T21:12:40Z Proof 0 of ringlog2 on a GPU pod: prove and shrink there (logs in ~/skarbnik-vendor/ringlog2-work)
+2026-11-03T21:12:43Z pod rzerxg8wmmklby created: NVIDIA L4 in EUR-IS-1, $0.59/h, hard cap 60 min
+2026-11-03T21:13:06Z pod rzerxg8wmmklby: ssh ready after 25 s, GPU NVIDIA L4
+2026-11-03T21:13:07Z pod rzerxg8wmmklby: self stop armed for 60 min (runpodctl)
+2026-11-03T21:13:23Z pod rzerxg8wmmklby: cached GPU binary in place (sha256 d71c9469f749d05d...)
+2026-11-03T21:16:16Z pod rzerxg8wmmklby: proved in 162.48 s, secret wiped; segments: 90 journal.verdict: PASS
+2026-11-03T21:18:01Z pod rzerxg8wmmklby terminated: 321 s, $0.0526 ($0.59/h); GPU spend so far $0.8396
+2026-11-03T21:18:03Z Proof 0 ready: VALID, PASS; prove 162.48 s, succinct 90.98 s. Next: publish

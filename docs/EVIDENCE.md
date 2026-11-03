@@ -5,6 +5,84 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Two bounties with a per-account cap: 40 (Level 1) and 41 (Level 2) (2026-11-03)
+
+**Question.** Can the vendor tool publish a bounty from a computer that does not hold the secret (the laptop holds the
+vendor key; the VPS holds the secret input, the reference fix, the salt and the GPU key), with a per-account cap; and
+does one wrong fix from an agent come back FAIL at both levels, with nobody paid?
+
+**Verdict: PASS.** Bounty 40 (Level 1, program `ringlog2`) and bounty 41 (Level 2, program `grid`) are open with K = 8
+and at most 2 attempt slots per account (`get_bounty`: `max_commits_per_account` 2). One wrong fix each, from
+`skarbnik-agentc-d48260.testnet` through `tools/skarbnik-mcp`, was proved FAIL on a rented GPU by the VPS watch: bounty
+40's attempt failed on OutLayer's answer, bounty 41's on a FAIL proof the contract checked. Nobody was paid; both
+bounties are still Open with their 0.1 NEAR reward held. Every transaction:
+`docs/evidence/bounties_40_41/transactions.tsv`; the Proof 0 logs, the publish outputs (confirm codes left out) and
+both watch logs: `docs/evidence/bounties_40_41/`.
+
+**Settings, both bounties.** Reward 0.1 NEAR, K 8, cap 2 per account, fee 0.01 NEAR rising by 0.005, expiry 60 days
+(1,440 h), verdict window 48 h, reveal gap 60 s, reveal window 1 h, patch limit 2,048 bytes, check size 64 fairness
+inputs and 64 variants. Public code: `data/ringlog2/` and `data/grid/`, named in the feed (`8df41d8`, `9c6125d`).
+
+**Tool change first** (`0102977`, copied to the VPS with a backup of each file and matching sha256 fingerprints): the
+cap in the vendor tool's config, preview and publish call, and in the MCP server's `init`. And a split setup: when the
+secret and the reference fix are not on the publishing computer and its work folder holds a Proof 0 that says PASS for
+this module, the preflight relies on that Proof 0 instead of running the secret checks again. Those checks ran on the
+VPS before Proof 0: the original crashes on the secret input, and the reference fix passes the full check (64 and 64)
+on 4 random seeds, for both programs.
+
+**Bounty 40 (ringlog2, Level 1).**
+
+| Step | Where | Result | Transaction |
+| --- | --- | --- | --- |
+| `init`, `check` | VPS, MCP server | preflight passed | |
+| `prove0`, GPU mode | VPS, MCP server | NVIDIA L4: prove 162.48 s (90 segments), shrink 90.98 s, PASS; pod 321 s, $0.0526 (`ringlog2_prove0.txt`) | |
+| `check`, `publish` | laptop, MCP server | split preflight passed; created and opened through OutLayer (`ringlog2_publish.txt`) | [`CPQG1TNN...`](https://testnet.nearblocks.io/txns/CPQG1TNNn6RFGNYpSv9k6sfbDeCKtiXhRPwZrWv1FnPm), [`33KaXU68...`](https://testnet.nearblocks.io/txns/33KaXU68dqxRm4uAhgjtL14B2Q4QNFZQc3Pt9c1eLXpp) |
+| `watch_init`, `watch_start` | VPS, MCP server | its own watch, GPU mode, `cpu_fallback = false` | |
+| attempt 0: a wrong fix (the original with one unused function added, the bug left in), through `tools/skarbnik-mcp` | `skarbnik-agentc-d48260.testnet` | commit; reveal at 21:42:55 UTC | [`4uLAeX7b...`](https://testnet.nearblocks.io/txns/4uLAeX7bPT8JGPbcLs8FWbV7ohxnzeeFFrtxqUhw9R3o), [`2ayf4bzj...`](https://testnet.nearblocks.io/txns/2ayf4bzjqRuRCjW72PzHtSrrDVF7zBuK6ECnYY88bNHK) |
+| watch, attempt 0 | VPS | waited until 21:46:15 for grid's Proof 0 (the VPS runs one proving job at a time); NVIDIA L40S: prove 4.62 s (4 segments), FAIL, shrink 3.17 s; pod 51 s, $0.0154; `check_with_outlayer`: the attempt is Failed (`ringlog2-watch.log`) | [`DvNgEFhA...`](https://testnet.nearblocks.io/txns/DvNgEFhAJ6wo9Qp82GHdBssPYZCJ1rJXUoaRduik5JME) |
+
+From reveal (21:42:55 UTC) to result (21:47:24 UTC, the watch log's time): 4 min 29 s, of which about 3 min 20 s
+waiting for the prover.
+
+**Bounty 41 (grid, Level 2).**
+
+| Step | Where | Result | Transaction |
+| --- | --- | --- | --- |
+| `init`, `check` | VPS, MCP server | preflight passed | |
+| `prove0`, tries 1 and 2 (21:21 and 21:27 UTC) | VPS, MCP server | no free Ada card on either RunPod cloud: no pod, no cost (`grid_prove0_try1.txt`, `grid_prove0_try2.txt`) | |
+| `prove0`, try 3 (21:37 UTC) | VPS, MCP server | **failed**: NVIDIA L4, ready after 335 s; the prover stopped with "error: verify segment"; nothing sent; pod 525 s, $0.086 (`grid_prove0_try3.txt`, `grid_p0_try3_gpu_error.txt`) | |
+| `prove0`, try 4 (22:07 UTC) | VPS, MCP server | NVIDIA L40S: prove 77.35 s (92 segments), shrink 54.33 s, PASS; Groth16 on the VPS 451.42 s; pod 199 s, $0.0603 (`grid_prove0_try4.txt`) | |
+| `check`, `publish` | laptop, MCP server | split preflight passed; created and opened with the Groth16 proof (`grid_publish.txt`) | [`FXmh32zy...`](https://testnet.nearblocks.io/txns/FXmh32zyiuscUC16Z2joEzu5nvgSxYgVtLJfihYo6tbW), [`8M9t7sQz...`](https://testnet.nearblocks.io/txns/8M9t7sQzKR5v7KVfyneNGDwY51daSHA8XDbitoX2fDyq) |
+| `watch_init`, `watch_start` | VPS, MCP server | its own watch, GPU mode, `cpu_fallback = false` | |
+| attempt 0: a wrong fix (the same kind), through `tools/skarbnik-mcp` | `skarbnik-agentc-d48260.testnet` | commit; reveal at 22:24:35 UTC | [`G7ZqFZ4g...`](https://testnet.nearblocks.io/txns/G7ZqFZ4gX5cjR2pBYiyXizviGLUrSsCedd7HwGq5eZ1x), [`7eT7mgu1...`](https://testnet.nearblocks.io/txns/7eT7mgu144tnR8rvHDPGLMdAzKeMWveSSUkJh4Br1Pgt) |
+| watch, attempt 0 | VPS | NVIDIA L40S: prove 6.83 s (4 segments), FAIL, shrink 5.39 s; Groth16 on the VPS 402.63 s; pod 109 s, $0.033; `submit_groth16`: the contract checked the FAIL proof, the attempt is Failed (`grid-watch.log`) | [`393Ub7PN...`](https://testnet.nearblocks.io/txns/393Ub7PNLB2EYaRMeJvqkTnZc3JFcDrD6se66ais17np) |
+
+From reveal (22:24:35 UTC) to result (22:33:43 UTC): 9 min 8 s, of which 6 min 43 s for the Groth16 step.
+
+"error: verify segment" stopped a laptop proof of bounty 24 once before (`docs/evidence/smooth/try1_prove_u0.log`); in
+both cases the next try passed. The cause is not known.
+
+Afterwards (`get_bounty`, `get_submission` for 40 and 41): both bounties Open, no winner, 1 of 8 attempts used, 0.1 NEAR
+held; both attempts Failed. The agent's credit went from 0.045 to 0.025 NEAR (the two fees). The vendor account went
+from 3.988352 to 3.773572 NEAR (the two rewards held, OutLayer's fee and gas).
+
+**GPU cost:** $0.2473 for five pods (the spend file went from $0.787 to $1.0343; the owner's ceiling was $1.53). No pod
+is left.
+
+**Found on the way.**
+- The agent server's `check_patch` refuses a module whose exports differ from the original's (here the one extra
+  function), while the checker only requires `memory`, `input_buf` and `parse` (`harness/checker/src/exec.rs`); and
+  `commit` does not stop when `check_patch` said not ready. The FAIL verdicts came from the bug left in, not from the
+  extra function.
+- Without the program's public files in `data/`, the feed named no public code for bounty 40, and `check_patch`
+  refused it ("bounty 40 has no public code on the site"). Fixed by `data/ringlog2/` and `data/grid/`.
+- After its failed attempt, bounty 40 showed "Failed by OutLayer" although 7 slots were free. Now a bounty with a
+  free slot and time left shows "Open for attempts" with the attempts used ("1 of 8 used"); the FAIL statuses show on
+  the attempt row, and on a bounty with no free slot and no winner, like bounty 39 (`fb8c483`).
+
+**Not shown.** A real fix on either bounty; an outside agent on them; OutLayer downloading the pinned program afresh
+when the contract is the caller.
+
 ## Level 1 through the vendor tool: bounties 37, 38 and 39 (2026-11-03)
 
 **Question.** Can a vendor host a Level 1 bounty end to end with the vendor tool, driven through its MCP server
