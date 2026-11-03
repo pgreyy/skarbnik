@@ -247,6 +247,7 @@ QUESTIONS = [
     ('bounty', 'module', 'the folder with original.wasm and public_tests.txt', 'data/demo'),
     ('bounty', 'reward_near', 'reward in NEAR', '0.1'),
     ('bounty', 'k', 'attempts allowed, K (1 to 16)', '1'),
+    ('bounty', 'max_commits_per_account', 'most attempt slots one account may hold at a time (1 to K; 0 = no cap)', '0'),
     ('bounty', 'level', 'level: 2 = the contract checks a Groth16 proof itself (default); 1 = the contract trusts OutLayer running the pinned verifier; 0 = registered verifiers run by the project', '2'),
     ('bounty', 'attempt_fee_near', 'fee of the first attempt, in NEAR', '0.01'),
     ('bounty', 'fee_step_near', 'added to the fee for each earlier attempt, in NEAR', '0.005'),
@@ -278,7 +279,7 @@ def cmd_init(a):
         if sec.startswith('_') or not isinstance(vals, dict): continue
         lines.append(f'[{sec}]')
         for k, v in vals.items():
-            num = isinstance(v, (int, float)) or (isinstance(v, str) and re.fullmatch(r'\d+', v) and k in ('k', 'level', 'reveal_gap_s', 'reveal_window_s', 'verdict_window_h', 'expiry_h', 'po2', 'max_patch_bytes', 'fuzz_count', 'variants'))
+            num = isinstance(v, (int, float)) or (isinstance(v, str) and re.fullmatch(r'\d+', v) and k in ('k', 'max_commits_per_account', 'level', 'reveal_gap_s', 'reveal_window_s', 'verdict_window_h', 'expiry_h', 'po2', 'max_patch_bytes', 'fuzz_count', 'variants'))
             lines.append(f'{k} = {json.dumps(v) if not num else int(v) if isinstance(v, str) else v}')
         lines.append('')
     os.makedirs(os.path.dirname(out), exist_ok=True)
@@ -295,6 +296,8 @@ def preview(cfg, est):
     say(f'  level {lv}: {LEVELS[lv][0]}')
     for n in (2, 1, 0):
         say(f'    {"->" if n == lv else "  "} level {n} costs: {LEVELS[n][1]}')
+    cap = int(b.get('max_commits_per_account', 0) or 0)
+    if cap: say(f'  per account: at most {cap} of the {k} attempt slots at a time')
     say(f'  attempts: up to {k}; fees, taken from each researcher\'s credit: ' + ', '.join(f'#{i + 1} {near_amount(fee + i * step)}' for i in range(k)))
     say(f'  windows: reveal {span(b["reveal_gap_s"])} to {span(b["reveal_window_s"])} after a commit; your proof within {b["verdict_window_h"]} h of each reveal; the bounty expires after {b["expiry_h"]} h')
     say('  on timeout: if you do not prove a revealed attempt within its verdict window, anyone can call claim_timeout and the')
@@ -314,28 +317,42 @@ def cmd_check(a):
     module = os.path.join(ROOT, b['module']) if not os.path.isabs(b['module']) else b['module']
     for f in ('original.wasm', 'public_tests.txt'):
         if not os.path.isfile(f'{module}/{f}'): problems.append(f'{b["module"]}/{f} is missing')
-    for key in ('secret', 'reference_fix'):
-        p = s[key]
-        if inside_repo(p): problems.append(f'{key} is inside the repository; keep it outside')
-        elif not os.path.isfile(p): problems.append(f'{key} file not found: {p}')
-        elif oct(os.stat(p).st_mode)[-3:] != '600': problems.append(f'{key} is readable by others (mode {oct(os.stat(p).st_mode)[-3:]}); make it 600')
+    # A split setup: the secret and the reference fix stay on the proving machine, which made Proof 0 and ran these
+    # checks there; this computer only publishes. Then the Proof 0 files must be here and match this module.
+    w = os.path.expanduser(pr.get('workdir', ''))
+    split = not any(os.path.exists(s[k]) for k in ('secret', 'reference_fix')) and os.path.isfile(f'{w}/verify_p0.txt')
+    if not split:
+        for key in ('secret', 'reference_fix'):
+            p = s[key]
+            if inside_repo(p): problems.append(f'{key} is inside the repository; keep it outside')
+            elif not os.path.isfile(p): problems.append(f'{key} file not found: {p}')
+            elif oct(os.stat(p).st_mode)[-3:] != '600': problems.append(f'{key} is readable by others (mode {oct(os.stat(p).st_mode)[-3:]}); make it 600')
     if problems: fail('; '.join(problems))
+    cap = int(b.get('max_commits_per_account', 0) or 0)
+    if cap and not 1 <= cap <= int(b['k']): problems.append(f'max_commits_per_account is {cap}; it must be 1 to K ({b["k"]}), or 0 for no cap')
     size = os.path.getsize(f'{module}/original.wasm'); tests = sum(1 for l in open(f'{module}/public_tests.txt') if l.strip() and not l.startswith('#'))
     if size > 2048: problems.append(f'the module is {size} bytes; the checker takes at most 2,048')
     else: ok(f'module {b["module"]}/original.wasm, {size} bytes; {tests} public tests')
-    fixsize = os.path.getsize(s['reference_fix'])
-    if fixsize > int(b.get('max_patch_bytes', 1024)): problems.append(f'the reference fix is {fixsize} bytes, above max_patch_bytes')
+    if not split:
+        fixsize = os.path.getsize(s['reference_fix'])
+        if fixsize > int(b.get('max_patch_bytes', 1024)): problems.append(f'the reference fix is {fixsize} bytes, above max_patch_bytes')
     chk = binpath(cfg, 'check'); common = ['--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt', '--exploit', s['secret']]
-    crash = subprocess.run([chk, 'check', '--candidate', f'{module}/original.wasm', *common, '--seed', '00' * 32, '--fuzz-count', '16', '--variants', '32', '--explain'], capture_output=True, text=True)
-    if not re.search(r'exploit: (trapped|out of fuel)', crash.stdout): problems.append('the original does not crash on the secret input')
-    else: ok('the original crashes on the secret input')
-    passes = 0
-    for i in range(4):
-        seed = hashlib.sha256(f'{b["name"]}:{i}:{time.time()}'.encode()).hexdigest()
-        r = subprocess.run([chk, 'proof0', *common, '--reference-fix', s['reference_fix'], '--seed', seed, '--fuzz-count', '64', '--variants', '64'], capture_output=True, text=True)
-        passes += r.returncode == 0 and 'proof0: PASS' in r.stdout
-    if passes != 4: problems.append(f'the reference fix passed the full check on {passes} of 4 seeds')
-    else: ok('the reference fix passes the full check on 4 random seeds')
+    if split:
+        v0 = open(f'{w}/verify_p0.txt').read()
+        if journal(v0, 'original_hash') != sha_file(f'{module}/original.wasm') or journal(v0, 'verdict') != 'PASS':
+            problems.append('the Proof 0 files here are not a PASS for this module')
+        else: ok('the secret and the reference fix stay on the proving machine; the Proof 0 made there is here: PASS for this module')
+    else:
+        crash = subprocess.run([chk, 'check', '--candidate', f'{module}/original.wasm', *common, '--seed', '00' * 32, '--fuzz-count', '16', '--variants', '32', '--explain'], capture_output=True, text=True)
+        if not re.search(r'exploit: (trapped|out of fuel)', crash.stdout): problems.append('the original does not crash on the secret input')
+        else: ok('the original crashes on the secret input')
+        passes = 0
+        for i in range(4):
+            seed = hashlib.sha256(f'{b["name"]}:{i}:{time.time()}'.encode()).hexdigest()
+            r = subprocess.run([chk, 'proof0', *common, '--reference-fix', s['reference_fix'], '--seed', seed, '--fuzz-count', '64', '--variants', '64'], capture_output=True, text=True)
+            passes += r.returncode == 0 and 'proof0: PASS' in r.stdout
+        if passes != 4: problems.append(f'the reference fix passed the full check on {passes} of 4 seeds')
+        else: ok('the reference fix passes the full check on 4 random seeds')
     po2 = int(b.get('po2', 18)); avail, swap = mem_mib(); lv = level_of(cfg)
     if lv not in LEVELS: problems.append(f'bounty.level {lv} is not 0, 1 or 2')
     need = max(PROVE_NEED_MIB.get(po2, 5000), GROTH16_NEED_MIB) if lv == 2 else PROVE_NEED_MIB.get(po2, 5000)
@@ -418,7 +435,8 @@ def cmd_publish(a):
               'max_patch_bytes': int(b.get('max_patch_bytes', 1024)), 'reveal_gap_ns': str(int(b['reveal_gap_s']) * SEC), 'verdict_window_ns': str(int(b['verdict_window_h']) * 3600 * SEC),
               'attest_window_ns': str(3600 * SEC), 'expiry_ns': str(int(b['expiry_h']) * 3600 * SEC), 'attempt_fee': str(yocto(b['attempt_fee_near'])), 'fee_step': str(yocto(b['fee_step_near'])),
               'reference_fix_hash': ref, 'proof0_journal_hash': re.search(r'^journal sha256: (\S+)', v, re.M).group(1), 'reveal_window_ns': str(int(b['reveal_window_s']) * SEC),
-              'fuzz_count': int(b.get('fuzz_count', 16)), 'variant_count': int(b.get('variants', 32)), 'level': level_of(cfg)}
+              'fuzz_count': int(b.get('fuzz_count', 16)), 'variant_count': int(b.get('variants', 32)), 'level': level_of(cfg),
+              'max_commits_per_account': int(b.get('max_commits_per_account', 0) or 0) or None}
     json.dump(create, open(f'{w}/create_call.json', 'w'))
     bid = str(view(cfg, 'get_next_bounty_id'))
     lv = level_of(cfg)

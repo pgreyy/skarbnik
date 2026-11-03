@@ -7,6 +7,7 @@ name = "mybounty"            # also names the bounty's private salt, ~/.kintsugi
 module = "data/demo"         # folder with original.wasm and public_tests.txt
 reward_near = "0.1"
 k = 1                        # attempts allowed (1 to 16): each verdict tells at most one bit about the secret
+max_commits_per_account = 0   # most attempt slots one account may hold at a time (1 to K); 0 = no cap
 level = 2                    # 2: the contract checks a Groth16 proof itself (default). 1: the contract trusts OutLayer running
                              # the pinned verifier program (no Groth16 step; about 0.011 NEAR a check, about 2.8 NEAR held and
                              # returned). 0: two registered verifiers, today run by the project

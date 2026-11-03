@@ -198,10 +198,13 @@ def t_init(a):
     if level not in (0, 1, 2):
         raise Fail("level is 0, 1 or 2 (default 2)")
     fuzz, variants = int(a.get("fuzz_count", 16)), int(a.get("variants", 32))
+    cap = int(a.get("max_commits_per_account", 0) or 0)
+    if cap and not 1 <= cap <= int(a.get("k", 1)):
+        raise Fail("max_commits_per_account is 1 to k (the number of attempt slots), or 0 for no cap")
     if not (1 <= fuzz <= 64 and 1 <= variants <= 64):
         raise Fail("fuzz_count and variants are 1 to 64 (default 16 and 32); a smaller check is faster to prove and tests less")
     cfg = {
-        "bounty": {"name": a["name"], "module": a.get("module", "data/demo"), "reward_near": str(a["reward_near"]), "k": int(a.get("k", 1)), "level": level,
+        "bounty": {"name": a["name"], "module": a.get("module", "data/demo"), "reward_near": str(a["reward_near"]), "k": int(a.get("k", 1)), "max_commits_per_account": cap, "level": level,
                    "attempt_fee_near": str(a.get("attempt_fee_near", "0.01")), "fee_step_near": str(a.get("fee_step_near", "0.005")),
                    "reveal_gap_s": int(a.get("reveal_gap_s", 60)), "reveal_window_s": int(a.get("reveal_window_s", 3600)),
                    "verdict_window_h": int(a.get("verdict_window_h", 24)), "expiry_h": int(a.get("expiry_h", 96)),
@@ -436,6 +439,8 @@ TOOLS = {
               "vendor_account": S, "reward_near": S, "k": {"type": "integer"}, "attempt_fee_near": S, "fee_step_near": S, "reveal_gap_s": {"type": "integer"},
               "reveal_window_s": {"type": "integer"}, "verdict_window_h": {"type": "integer"}, "expiry_h": {"type": "integer"}, "prover_mode": {"type": "string", "description": "gpu or cpu"},
               "level": {"type": "integer", "description": "2 (default): the contract checks a Groth16 proof itself; 1: the contract trusts OutLayer running the pinned verifier program, no Groth16 step, about 0.011 NEAR per check and about 2.8 NEAR held and returned; 0: registered verifiers, run by the project"},
+              "max_commits_per_account": {"type": "integer", "description": "most attempt slots one account may hold at a time, 1 to k (default 0: no cap)"},
+              "max_patch_bytes": {"type": "integer", "description": "largest patch in bytes, up to 2048 (default 1024)"},
               "fuzz_count": {"type": "integer", "description": "fresh inputs from the fairness seed in each check, 1 to 64 (default 16)"},
               "variants": {"type": "integer", "description": "near copies of the secret input in each check, 1 to 64 (default 32)"},
               "machine": S, "workdir": S, "gpu_budget_usd": {"type": "number"}, "path_host": S, "path_check": S, "path_near": S},
