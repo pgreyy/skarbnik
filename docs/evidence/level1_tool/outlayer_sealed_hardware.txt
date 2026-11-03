@@ -1,0 +1,30 @@
+Does OutLayer run our Level 1 checks inside sealed hardware? What was found, 2026-11-03.
+
+OutLayer's own documentation says so:
+- https://app.outlayer.ai/docs/tee-attestation (was outlayer.fastnear.com/docs/tee-attestation): workers run in Intel
+  TDX; a worker registers on worker.outlayer.testnet (worker.outlayer.near on mainnet) with register_worker, which
+  checks its TDX quote and five measurements (MRTD, RTMR0 to RTMR3); is_measurements_approved answers whether they are
+  approved; only the worker's registered key may call resolve_execution; each execution's attestation (WASM hash,
+  input and output hashes, measurement, TDX quote) is kept in OutLayer's coordinator database and shown in its
+  dashboard; the page does not say it is returned with the result.
+- https://app.outlayer.ai/docs/trust-verification: both kinds of worker (self hosted and Phala Cloud) are said to be
+  Intel TDX; results are said to be signed with a TEE generated key registered on chain; resolve_execution,
+  submit_execution_output_and_resolve, resume_topup and resume_delete_payment_key are scoped to worker access keys; an
+  outside party can check an execution in the dashboard or with the outlayer-verify command line tool.
+
+What the chain and our jobs show (read 2026-11-03, view_access_key_list on https://test.rpc.fastnear.com):
+- worker.outlayer.testnet has 41 access keys: 38 function call keys limited to resolve_execution and
+  submit_execution_output_and_resolve (35 of them also resume_topup and resume_delete_payment_key), and 3 FULL ACCESS
+  keys. A full access key can do anything on that account; who holds those 3 keys, and whether they live in an
+  enclave, is not shown on chain.
+- outlayer.testnet has 1 full access key.
+- The answers our contract received (execution_completed events, e.g. tx 3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u)
+  carry these fields only: code_source, compilation_note, error_message, payment_charged, payment_refunded,
+  resources_used, sender_id, success, timestamp. No quote, no measurement, no attestation.
+- Our contract does not check any attestation: it accepts the answer because it arrives in its own callback from
+  outlayer.testnet (docs/SECURITY.md, Level 1 guards).
+
+Verdict: sealed hardware for our checks is CLAIMED by OutLayer's docs and NOT SHOWN by us. We did not open the
+dashboard attestation of any of our executions and did not run outlayer-verify. No page or doc of this project says
+our Level 1 checks run in sealed hardware; docs/SECURITY.md and docs/CLAIMS.md say Level 1 trusts OutLayer, its
+operator and its keys.

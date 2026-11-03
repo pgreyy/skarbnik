@@ -300,7 +300,9 @@ def preview(cfg, est):
     say('    whatever was revealed. That protects researchers from a silent vendor; it is not a verdict.')
     if est:
         mode = cfg['prover']['mode']
-        say(f'  proving one attempt ({mode}): about {hm(est)} (measured, tools/proof_times.json); cost: {"electricity and machine time" if mode == "cpu" else "GPU rental time"}')
+        key = f'{mode}@{cfg["prover"].get("machine", "this machine")}:{os.path.basename(cfg["bounty"]["module"].rstrip("/"))}'
+        src = 'tools/proof_times.json' if key in json.load(open(f'{ROOT}/tools/proof_times.json'))['per_attempt_seconds'] else "this bounty's own Proof 0"
+        say(f'  proving one attempt ({mode}): about {hm(est)} (measured, {src}); cost: {"electricity and machine time" if mode == "cpu" else "GPU rental time"}')
         say(f'  time to open: Proof 0 (about {hm(est)}) plus two transactions')
 
 def cmd_check(a):
@@ -377,7 +379,7 @@ def cmd_prove0(a):
     if cfg['prover']['mode'] == 'gpu':
         # Proof 0 on a rented GPU pod (the secret and the salt in the pod's RAM only, wiped; the pod always terminated),
         # then the Groth16 wrap here, as watch does for attempts.
-        say(f'{now()} Proof 0 of {b["name"]} on a GPU pod: prove and shrink there, Groth16 here (logs in {w})')
+        say(f'{now()} Proof 0 of {b["name"]} on a GPU pod: prove and shrink there{", Groth16 here" if level_of(cfg) == 2 else ""} (logs in {w})')
         job = {'bounty_id': b['name'], 'index': 'p0', 'name': b['name'], 'module': module, 'patch': s['reference_fix'], 'secret': s['secret'],
                'salt': os.path.expanduser(f'~/.kintsugi-salts/{b["name"]}.salt'), 'seed': seed, 'sid': None, 'proof0': True,
                'fuzz': int(b.get('fuzz_count', 16)), 'variants': int(b.get('variants', 32)), 'image_id': cfg['chain']['image_id'], 'workdir': w}

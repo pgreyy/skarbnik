@@ -1,0 +1,7 @@
+== job_status 
+{
+ "job": "prove0-20261103-143207-de00",
+ "running": false,
+ "minutes": 1.7,
+ "output": "2026-11-03T13:32:07Z Proof 0 of l1tool on a GPU pod: prove and shrink there, Groth16 here (logs in /home/skarbnik/skarbnik-vendor/l1tool-work)\n2026-11-03T13:32:10Z pod bgufzcx7xjb8ue created: NVIDIA L4 in EU-RO-1, $0.59/h, hard cap 60 min\n2026-11-03T13:32:33Z pod bgufzcx7xjb8ue: ssh ready after 25 s, GPU NVIDIA L4\n2026-11-03T13:32:34Z pod bgufzcx7xjb8ue: self stop armed for 60 min (runpodctl)\n2026-11-03T13:32:50Z pod bgufzcx7xjb8ue: cached GPU binary in place (sha256 d71c9469f749d05d...)\n2026-11-03T13:33:17Z pod bgufzcx7xjb8ue: proved in 18.54 s, secret wiped; segments: 12 journal.verdict: PASS\n2026-11-03T13:33:35Z pod bgufzcx7xjb8ue terminated: 88 s, $0.0144 ($0.59/h); GPU spend so far $0.5574\n2026-11-03T13:33:35Z Proof 0 ready: VALID, PASS; prove 18.54 s, succinct 11.07 s. Next: publish"
+}

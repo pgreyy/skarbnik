@@ -1,0 +1,34 @@
+== watch_init 
+{
+ "watch_config": "/home/skarbnik/skarbnik-vendor/l1tool-watch.toml",
+ "bounty_id": "37",
+ "next": "call watch_start with config_path /home/skarbnik/skarbnik-vendor/l1tool-watch.toml"
+}
+== watch_start 
+{
+ "needs_yes": true,
+ "watches_bounties": [
+  "37"
+ ],
+ "prover_mode": "gpu",
+ "spends": "for each revealed attempt, one rented GPU for this step: about 1 to 11 minutes (11 when the GPU build of the prover is made for the first time), about $0.04 to $0.20; then the Groth16 wrap on this computer, about 5 minutes. Spend cap: $2.543 in all; spent so far $0.5574. At the cap no new GPU starts.. On a Level 1 bounty each check also holds the contract's min_deposit (about 2.8 NEAR) from the submit account while OutLayer works, returned less about 0.011 NEAR",
+ "time": "from a reveal to the submitted proof, about 17 minutes in the measured GPU run (bounty 32)",
+ "confirm_code": "(code held)",
+ "next": "ask the vendor; after a clear yes, call watch_start again with this confirm_code"
+}
+== watch_start 
+{
+ "running": true,
+ "pid": 655763,
+ "watches_bounties": [
+  "37"
+ ],
+ "log": "/home/skarbnik/skarbnik-vendor/l1tool-watch.log",
+ "next": "watch proves each revealed attempt and submits the proof; follow it with watch_status, stop it with watch_stop"
+}
+== watch_status 
+{
+ "running": true,
+ "pid": 655763,
+ "log_tail": "2026-11-03T13:35:42Z watch started (mode gpu, bounties 37, one job at a time)\n2026-11-03T13:35:42Z GPU mode: rented GPU NVIDIA L40S, NVIDIA RTX 6000 Ada Generation, NVIDIA L40, NVIDIA L4, NVIDIA GeForce RTX 4090, NVIDIA RTX A6000, NVIDIA RTX A5000, NVIDIA A40, NVIDIA GeForce RTX 3090 in , cap 60 min per pod, spend so far $0.5574 of a $2.543 budget"
+}

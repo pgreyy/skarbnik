@@ -19,7 +19,7 @@ import sys
 import tempfile
 import time
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.expanduser(os.environ.get("SKARBNIK_VENDOR_MCP_HOME", "~/.skarbnik-vendor-mcp"))
 CODE_TTL = 900  # a confirm code lasts 15 minutes and works once
@@ -197,12 +197,15 @@ def t_init(a):
     level = int(a.get("level", 2))
     if level not in (0, 1, 2):
         raise Fail("level is 0, 1 or 2 (default 2)")
+    fuzz, variants = int(a.get("fuzz_count", 16)), int(a.get("variants", 32))
+    if not (1 <= fuzz <= 64 and 1 <= variants <= 64):
+        raise Fail("fuzz_count and variants are 1 to 64 (default 16 and 32); a smaller check is faster to prove and tests less")
     cfg = {
         "bounty": {"name": a["name"], "module": a.get("module", "data/demo"), "reward_near": str(a["reward_near"]), "k": int(a.get("k", 1)), "level": level,
                    "attempt_fee_near": str(a.get("attempt_fee_near", "0.01")), "fee_step_near": str(a.get("fee_step_near", "0.005")),
                    "reveal_gap_s": int(a.get("reveal_gap_s", 60)), "reveal_window_s": int(a.get("reveal_window_s", 3600)),
                    "verdict_window_h": int(a.get("verdict_window_h", 24)), "expiry_h": int(a.get("expiry_h", 96)),
-                   "max_patch_bytes": int(a.get("max_patch_bytes", 1024)), "fuzz_count": 16, "variants": 32, "po2": int(a.get("po2", 18))},
+                   "max_patch_bytes": int(a.get("max_patch_bytes", 1024)), "fuzz_count": fuzz, "variants": variants, "po2": int(a.get("po2", 18))},
         "secrets": {"secret": a["secret_input_path"], "reference_fix": a["reference_fix_path"]},
         "prover": {"mode": mode, "machine": a.get("machine", "this-computer"), "workdir": a.get("workdir", f"~/skarbnik-vendor/{a['name']}"), "min_avail_mib": 300},
         "chain": {"network": "testnet", "contract": "kintsugi-l2-cihdp.testnet", "rpc_urls": ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"],
@@ -236,7 +239,10 @@ def t_check(a):
 
 
 def gpu_note(level=2):
+    """level None: a watch, whose bounties may have any level."""
     tail = ("then the Groth16 wrap on this computer, about 5 minutes" if level == 2 else
+            "then, for a Level 2 bounty only, the Groth16 wrap on this computer, about 5 minutes; a Level 1 bounty's succinct proof goes to OutLayer"
+            if level is None else
             "no Groth16 step at this level: the succinct proof goes to OutLayer (Level 1) or to the verifiers (Level 0)")
     return ("one rented GPU for this step: about 1 to 11 minutes (11 when the GPU build of the prover is made "
             "for the first time), about $0.04 to $0.20; " + tail)
@@ -360,8 +366,8 @@ def t_watch_start(a):
             spent = round(sum(float(x.get("cost_usd") or 0) for x in json.load(open(spend_file)).get("pods", [])), 4)
         mode = w.get("prover", {}).get("mode", "cpu")
         return {"needs_yes": True, "watches_bounties": ids, "prover_mode": mode,
-                "spends": (f"for each revealed attempt, {gpu_note()}. Spend cap: ${g.get('budget_usd', 6.0)} in all; spent so far ${spent}. "
-                           "At the cap no new GPU starts." if mode == "gpu" else "this computer's time; no rental")
+                "spends": (f"for each revealed attempt, {gpu_note(None)}. Spend cap: ${g.get('budget_usd', 6.0)} in all; spent so far ${spent}. "
+                           "At the cap no new GPU starts" if mode == "gpu" else "this computer's time; no rental")
                           + ". On a Level 1 bounty each check also holds the contract's min_deposit (about 2.8 NEAR) from the submit account while OutLayer works, returned less about 0.011 NEAR",
                 "time": "from a reveal to the submitted proof, about 17 minutes in the measured GPU run (bounty 32)",
                 "confirm_code": new_code("watch_start", path),
@@ -429,6 +435,8 @@ TOOLS = {
               "vendor_account": S, "reward_near": S, "k": {"type": "integer"}, "attempt_fee_near": S, "fee_step_near": S, "reveal_gap_s": {"type": "integer"},
               "reveal_window_s": {"type": "integer"}, "verdict_window_h": {"type": "integer"}, "expiry_h": {"type": "integer"}, "prover_mode": {"type": "string", "description": "gpu or cpu"},
               "level": {"type": "integer", "description": "2 (default): the contract checks a Groth16 proof itself; 1: the contract trusts OutLayer running the pinned verifier program, no Groth16 step, about 0.011 NEAR per check and about 2.8 NEAR held and returned; 0: registered verifiers, run by the project"},
+              "fuzz_count": {"type": "integer", "description": "fresh inputs from the fairness seed in each check, 1 to 64 (default 16)"},
+              "variants": {"type": "integer", "description": "near copies of the secret input in each check, 1 to 64 (default 32)"},
               "machine": S, "workdir": S, "gpu_budget_usd": {"type": "number"}, "path_host": S, "path_check": S, "path_near": S},
              ["out_path", "name", "secret_input_path", "reference_fix_path", "vendor_account", "reward_near"]),
     "check": (t_check, "The preflight (skarbnik-vendor check): module, tests, that the original crashes on the secret, that the fix passes, memory, the checker id, the balance and the window rule, then a preview of fees, windows and time. Spends nothing.",
