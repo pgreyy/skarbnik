@@ -2,6 +2,12 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: For vendors: sealed hardware wording
+
+- Compute, sealed hardware row (page and saved page): "a sealed GPU is not tested yet" now reads "a sealed GPU is
+  planned, not built", and "tested once on testnet" reads "run once on testnet". The facts are unchanged: one sealed
+  CPU run (bounty 33), no sealed GPU.
+
 ## 2026-11-03: The tour's last step is optional
 
 - Judge guide, Quick: step 4 is now "Optional: run it yourself", with "about 2 more minutes" beside the heading, and the

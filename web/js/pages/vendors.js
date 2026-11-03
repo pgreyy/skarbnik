@@ -156,7 +156,7 @@ export async function vendors(viewEl, tab, sub) {
     <table class="n-tab"><caption class="sr-only">Where proving runs</caption><thead><tr><th scope="col">Where</th><th scope="col">Speed</th><th scope="col">Who can see the secret</th></tr></thead><tbody>
     <tr><td><b>Your own machine</b></td><td><span class="tlab">Speed </span>Depends on your hardware, faster with a GPU</td><td><span class="tlab">Who can see the secret </span>Only you</td></tr>
     <tr><td><b>A GPU you rent</b></td><td><span class="tlab">Speed </span>Fast: in our automatic run about 17 minutes from reveal to payment</td><td><span class="tlab">Who can see the secret </span>You and the GPU host for those minutes</td></tr>
-    <tr><td><b>Sealed hardware</b> <span class="chip l-exp">Experimental</span></td><td><span class="tlab">Speed </span>Depends on CPU or GPU: a sealed CPU took about 2 hours (bounty 33); a sealed GPU is not tested yet</td><td><span class="tlab">Who can see the secret </span>The secret is locked so only the sealed machine can open it, checked with its hardware certificate; tested once on testnet</td></tr>
+    <tr><td><b>Sealed hardware</b> <span class="chip l-exp">Experimental</span></td><td><span class="tlab">Speed </span>Depends on CPU or GPU: a sealed CPU took about 2 hours (bounty 33); a sealed GPU is planned, not built</td><td><span class="tlab">Who can see the secret </span>The secret is locked so only the sealed machine can open it, checked with its hardware certificate; run once on testnet</td></tr>
     </tbody></table></div>`;
   const limits = `<div class="stack g24"><div class="stack g8"><h2 class="h2s">Limits</h2><p class="body">Read these before you plan anything.</p></div>
     <ul class="n-ul warn" style="max-width:820px">
