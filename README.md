@@ -107,7 +107,8 @@ One verdict also tells the agent one bit about the secret, so each bounty caps i
   account and the contract checks it and opens one ([docs/TRY_IT.md](docs/TRY_IT.md), step 5).
 - **Verify the contract yourself:** rebuild it with `cargo near build reproducible-wasm` at commit `c74bd5c` and get the
   code hash on chain, `Gx1JfW7GdpD7sgWf2JwvQhQzfrGy5CnMZyTW2bvFBX6u` ([docs/TRY_IT.md](docs/TRY_IT.md), step 11).
-- **The full tour:** [JUDGE_GUIDE.md](JUDGE_GUIDE.md), 5 to 10 minutes in the browser, then optional reproduction.
+- **The full tour:** [JUDGE_GUIDE.md](JUDGE_GUIDE.md): four steps in the browser (Quick), then an optional check on your
+  own machine (Verify), the claims with what each does not prove, and the limits.
 
 Bounty 24 from attempt to payout (screenshots of the live site and the testnet explorer, 2026-10-26):
 

@@ -2,6 +2,33 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: Judge guide rebuilt: Quick, Verify, Claims, Limits
+
+- `JUDGE_GUIDE.md` is rewritten in the new shape and stays the source of the page: "Check Skarbnik in five minutes.",
+  then Quick (four steps: bounty 24 paid by proof; its payment on the explorer; bounty 17's timeout; opening a judge
+  bounty yourself, with the note that it needs a testnet wallet), Verify (what you need, then clone, check_image_id.sh,
+  the contract tests), Claims (Claim, See it, Does not prove: bounties 24, 1, 32, 33, 17 and 35) and Limits (the short
+  list and a link to every limit on Evidence). Every step has a You should see, This shows and Does not show box.
+- Kept in closed drop downs: under Verify, "Something failed?" (built from the requirements and refusals the guide and
+  docs/TRY_IT.md already name; the old guide had no such section), "Rebuild the contract" (old B8), "Every reproduction
+  step (B1 to B8)" (the old table and the B1, B3, B6 and B7 lines) and "More browser checks" (old Level A steps 1, 4 and
+  5, bounty 16 from step 3, and step 6); under Claims, "Every claim, with its label" (the old claims table).
+- `scripts/gen_judge_data.py` reads the new shape and fails if it changes (4 Quick steps, 3 Verify steps, 6 claims, a
+  limits list and its link). `web/js/pages/judge.js`: the header, four door cards (Quick tab, Verify tab, For vendors,
+  For agents), four tabs with their own links (#/judge/quick, verify, claims, limits; the old #/judge/a and #/judge/b
+  open Quick and Verify), arrow keys; nothing waits on the chain. The step 4 note has the dismiss X. The saved /judge/
+  page has the four sections as plain headings, in order, with every drop down open.
+- Numbers checked against the chain (FastNEAR transaction index and RPC): bounty 24's proof `9nAK8gi2…` is a
+  submit_groth16 of 36.39 Tgas paying 0.11 NEAR to kintsugi-agent-d9410f.testnet; bounty 1's PASS and FAIL 36.39 and
+  35.6 Tgas, only the PASS paying the agent; bounty 32's proof 36.42 Tgas; bounty 17 paid by claim_timeout; bounty 35's
+  FAIL proof pays the agent nothing; the allowlist holds one id (dd6c5f42…); judge bounties 28 to 31 are closed, K = 2,
+  1 per account, 41 h window (bounty snapshot); bounty 24's reward 0.1 NEAR and bounty 17's window 4 h. The moved Level A
+  step 6 said twelve limits; Evidence now lists fifteen, so it says fifteen.
+- README, docs/README.md and llms.txt describe the guide in its new shape. docs/CLAIMS.md needed no change.
+- Checked with a private script: header, doors, tabs, links, arrow keys, step and box counts, the claims table, the
+  limits, closed drop downs, no chips and no tested wording, at 1440 and 390, dark and light; no script errors, no
+  sideways scroll with every drop down open.
+
 ## 2026-11-03: rpc.testnet.near.org is deprecated: commands moved to FastNEAR
 
 - `https://rpc.testnet.near.org` now answers every request with error -429 "THIS ENDPOINT IS DEPRECATED". The judge
