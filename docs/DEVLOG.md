@@ -2,6 +2,27 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-03: A dismiss X on informational notes
+
+- `web/js/dismiss.js` (new): informational note boxes (the bordered boxes with the info icon) get a small X at their
+  right end: an icon button with the chevron's circle, a 44 px target, aria-label "Dismiss", reachable with Tab and
+  Enter. Closing folds the box away (no motion when the reader asks for reduced motion) and remembers it in this
+  browser: one localStorage key per box (`skarbnik-closed-<page>-<hash of its text>`, value "1"), nothing else
+  stored; with storage blocked the box stays closed for this visit only. A box with the info icon about money or key
+  safety is marked `data-keep` and gets no X; boxes inside dialogs or marked as alerts get none either.
+- Got the X: Home "What these show"; Bounties "Every bounty on this contract is listed"; a judge bounty's note; Evidence
+  "Bounty 17 is paid by timeout" and the Proof Ledger team note. No X: the step 03 key dialog warning and the private
+  key warning (alert icon, in a dialog), For agents "Know the limit of the limit" and the Account page's connect note
+  (keys and money, data-keep), the bounty page's saved snapshot and unavailable notes (clock and alert icons), every
+  error message (alert icon), the sealed input note (eye icon), Evidence's audit note (shield) and full access key note
+  (alert), the Judge guide's proof warning (alert). There is no testnet banner box.
+- The X is added by script, so the saved no-JS pages show every note without it; `scripts/snapshot_pages.mjs` strips
+  it if a page is saved again.
+- Checked with a private script at 1440 and 390, dark and light: the X is 44 by 44 with its label; Enter on it closes
+  the box and stores one key; after a reload the box stays closed and others keep their X; no sideways scroll; with
+  storage blocked it hides for the visit and is back after a reload; the saved pages show 12 notes and no X. With
+  storage blocked the bundled wallet library (vendor/near-connect.js) raises its own script error, as it already did.
+
 ## 2026-11-03: Evidence: the "What these show" box removed, two limits added
 
 - The note "What these show: the path works on testnet. What they do not show: ..." is gone from the Evidence page

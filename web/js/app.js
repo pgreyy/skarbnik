@@ -12,6 +12,7 @@
 import { CONTRACT, EXPLORER_ACCOUNT } from './chain.js';
 import { $, esc, initUi, tabNav } from './ui.js';
 import { initAccountUi, accountPage } from './account-ui.js';
+import { initDismiss } from './dismiss.js';
 import { home, HOME_IDS, OLD_IDS, showSection } from './pages/home.js';
 import { how } from './pages/how.js';
 import { bounties } from './pages/bounties.js';
@@ -134,5 +135,6 @@ if (savedPath && savedPath !== 'index.html' && (!savedHash || TAB_LINKS[savedHas
 }
 window.addEventListener('hashchange', async () => { const h1 = await route(); if (h1) { h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true }); } });
 initUi();
+initDismiss();
 initAccountUi();
 route();

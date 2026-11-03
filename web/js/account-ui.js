@@ -433,7 +433,7 @@ async function drawAccount(name) {
         <div><b class="num">${bal === null || bal === undefined ? '–' : esc(near(bal).replace(' NEAR', '').replace(/(\.\d{3})\d+/, '$1'))}<small>NEAR</small></b><span>Wallet balance${bal === null ? ': the account does not exist' : ''}</span></div>
         <div><b class="num">${mine.length}</b><span>Attempts committed</span></div>
         <div><b class="num">${agentKeys.length}</b><span>Agent ${agentKeys.length === 1 ? 'key' : 'keys'} on this contract</span></div></div>
-      ${me ? setupHtml(name, lim, stopped, agentKeys.length) : `<div class="mt32">${note(W.state.status === 'on' ? `You are connected as ${esc(W.state.account)}. Only the owner of ${esc(name)} can set its agent limits or add its keys.` : 'Connect this account’s wallet to set agent limits, stop its agents or add an agent key.', 'info')}</div>`}
+      ${me ? setupHtml(name, lim, stopped, agentKeys.length) : `<div class="mt32">${note(W.state.status === 'on' ? `You are connected as ${esc(W.state.account)}. Only the owner of ${esc(name)} can set its agent limits or add its keys.` : 'Connect this account’s wallet to set agent limits, stop its agents or add an agent key.', 'info', true)}</div>`}
       <h2 class="h2s mt48">Agent keys</h2>
       <div class="mt16">${keys === null ? '<p class="small">Could not read the account’s access keys.</p>'
         : agentKeys.length ? table(['Agent key', 'Scope', 'Spend cap', 'Spent', 'Status', ...(me ? [''] : [])], agentKeys.map((k) => {

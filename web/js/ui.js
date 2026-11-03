@@ -74,7 +74,8 @@ export function table(cols, rows, cls = 'mid', caption = '') {
 // A facts list: rows of [label, value HTML]; empty rows are skipped.
 export const facts = (rows) => `<dl class="facts">${rows.filter(Boolean).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join('')}</dl>`;
 // A note that states a limit: amber outline, an icon, plain words.
-export const note = (html, ic = 'info') => `<div class="note">${icon(ic)}<p>${html}</p></div>`;
+// keep: a note about money or key safety, which never gets the dismiss X (js/dismiss.js)
+export const note = (html, ic = 'info', keep = false) => `<div class="note"${keep ? ' data-keep' : ''}>${icon(ic)}<p>${html}</p></div>`;
 
 // A moment (milliseconds) as UTC and as the visitor's own local time.
 export function bothTimes(ms) {

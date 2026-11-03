@@ -70,6 +70,9 @@ for (const entry of PAGES.filter((e) => !only || only.includes(e.path))) {
       list.remove();
     }
     view.querySelectorAll('details').forEach((d) => d.setAttribute('open', ''));
+    // the dismiss X is added by script (js/dismiss.js): the saved page shows every note without it
+    view.querySelectorAll('.note-x').forEach((x) => x.remove());
+    view.querySelectorAll('.note').forEach((n) => { n.classList.remove('has-x'); n.removeAttribute('data-dm'); n.hidden = false; });
     // the Agent quickstart card: a plain link to the file; its text under a plain heading below the grid
     for (const c of view.querySelectorAll('.qs-card')) {
       const panel = view.querySelector(`#${CSS.escape(c.getAttribute('aria-controls'))}`);
