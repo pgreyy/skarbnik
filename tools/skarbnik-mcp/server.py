@@ -86,14 +86,6 @@ def fetch(url, timeout=60):
 
 
 def feed(cfg):
-    """The live feed (<site>/api/feed, next to feed.json: the open bounties read from the chain, cached about 60 s),
-    or the saved feed.json when the live one does not answer or answers something else."""
-    try:
-        f = json.loads(fetch(site_base(cfg) + "api/feed", timeout=15))
-        if isinstance(f, dict) and isinstance(f.get("bounties"), list):
-            return f
-    except (OSError, ValueError, urllib.error.URLError):
-        pass
     return json.loads(fetch(cfg["feed"]))
 
 
@@ -436,12 +428,11 @@ def t_list_bounties(cfg, a):
     base = site_base(cfg)
     f = feed(cfg)
     rows = [b for b in f["bounties"] if b.get("accepts_commits") or not a.get("only_open", True)]
-    return {"feed": cfg["feed"], "source": f.get("source", "saved"), "updated_at_utc": f.get("updated_at_utc") or f.get("generated_at_utc"),
-            "generated_at_utc": f.get("generated_at_utc"),
-            "note": "Live rows are read from the chain about once a minute (source live), else the saved feed; get_bounty reads the live state before you commit. Tell your user each bounty's level and its meaning with the fee.",
+    return {"feed": cfg["feed"], "generated_at_utc": f.get("generated_at_utc"),
+            "note": "A snapshot; get_bounty reads the live state before you commit. Tell your user each bounty's level and its meaning with the fee.",
             "bounties": [{"bounty_id": b["bounty_id"], "level": b.get("level"), "level_meaning": LEVEL_MEANING.get(b.get("level")),
                           "status": b["status"], "kind": b.get("kind"), "accepts_commits": b.get("accepts_commits"),
-                          "reward": b.get("reward"), "next_fee": b.get("next_fee"), "max_commits": b.get("max_commits"), "attempts": b.get("attempts"),
+                          "reward": b.get("reward"), "next_fee": b.get("next_fee"), "max_commits": b.get("max_commits"),
                           "slots_in_use": b.get("slots_in_use"), "max_commits_per_account": b.get("max_commits_per_account"),
                           "max_patch_bytes": b.get("max_patch_bytes"), "windows": b.get("windows"), "target": b.get("target"),
                           "public_code": {k: base + v for k, v in (b.get("public_code") or {}).items() if k in ("source", "module", "tests", "build")}}

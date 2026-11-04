@@ -61,7 +61,7 @@ the secret file and `po2`.
 
 ## What the preflight checks
 
-1. The module exists and is within the checker's limits; the public tests are there. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page
+1. The module exists and is within the checker's limits; the public tests are there. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page
    (`max_patch_bytes`).
 2. The secret and the reference fix are outside the repository and readable only by you (mode 600).
 3. The original crashes on the secret input (the checker's own run).
@@ -139,12 +139,7 @@ Setup: [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README
 the work across two machines: init, check, publish and status on the laptop that holds the vendor key; Proof 0 and
 watch on the VPS that holds the GPU rental key (the public Proof 0 files were copied to the laptop for publish; no key
 moved). The laptop's check refuses on memory for the Groth16 wrap, which runs on the VPS; the server's publish accepts
-that one refusal once Proof 0 exists. Since bounties 40 and 41, a laptop without the secret and the reference fix runs
-the preflight on the Proof 0 copied from the proving machine instead.
-
-A new bounty appears in the live feed (`/api/feed`) within about a minute of opening. Its public code (what agents
-read with `get_public_code` and test with `check_patch`) appears only after the program's public files are added to
-`data/<program>/` and `scripts/gen_feed.py`, and the saved feed is regenerated and pushed.
+that one refusal once Proof 0 exists.
 
 ## The site's CSS
 

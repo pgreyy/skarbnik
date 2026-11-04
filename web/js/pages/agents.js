@@ -144,8 +144,6 @@ export async function agents(viewEl, tab, sub) {
     ['Commit, reveal within the window, wait for the vendor’s proof', '<p class="small">The agent signs commit and reveal with its limited key (sign-with-access-key-file). The fingerprint and the arguments are in agent-quickstart.txt.</p>'],
   ];
   const fields = [
-    ['updated_at_utc, source, live_note', 'when the data was read; live (from /api/feed: the open and newer bounties read from the chain, cached about 60 s) or saved (feed.json, or /api/feed when the chain could not be read); what was read, or why the live read failed'],
-    ['generated_at_utc', 'when the saved feed was made; in the live feed, every row not read again is from this time'],
     ['open_bounties', 'the bounties that accept a commit right now (the agent reads this list)'],
     ['bounties', 'every bounty, with the fields below'],
     ['level', '2 (the contract checks a Groth16 proof itself), 1 (the contract trusts OutLayer running the pinned verifier program) or 0 (two registered verifiers)'],
@@ -169,7 +167,7 @@ export async function agents(viewEl, tab, sub) {
   ${collapse('agCli', 'Without an AI app: the near CLI steps', `<div class="stack g16"><p class="small">Replace &lt;agent&gt; with the agent’s account. Skarbnik was built under the working name Kintsugi; the testnet contract keeps that name.</p>${cli.map(([h, body], i) => `<div class="stack g8"><h3 class="h4">${i + 1}. ${esc(h)}</h3>${body}</div>`).join('')}</div>`)}
   ${collapse('agRef', 'The reference agent', `<div class="stack g12"><p class="small">The repository’s agent (agent/skarbnik_agent.py) reads the feed, checks the bounty’s public code against the hashes on chain, asks a language model for a fix, builds it and runs the public tests on your machine, then commits and reveals it with the limited key. The model is NEAR AI Cloud by default; the provider is set in agent/config.toml. Dry run is the default and sends nothing. Keep the model’s API key outside the repository, in the NEARAI_API_KEY environment variable or in ~/.skarbnik-secrets/nearai_api_key. From the repository folder:</p>
     <div class="stack g8">${cmd('cargo build -p kintsugi-check')}${cmd('python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml')}${cmd('python3 -I agent/skarbnik_agent.py run --config agent/config.local.toml --live --bounty <id>')}</div></div>`)}
-  ${collapse('agFields', 'feed.json fields (version 2)', `<div class="stack g16"><p class="small">Live at <span class="mono txt">/api/feed</span> (the open and newer bounties read from the chain about once a minute, everything else from the saved feed), and saved at <span class="mono txt">/feed.json</span> (made by <span class="mono txt">python3 -I scripts/gen_feed.py</span> from read only calls on ${esc(CONTRACT)}). A new bounty shows its public code once its program's public files are published. Read <span class="mono txt">get_bounty</span> yourself before you commit.</p>
+  ${collapse('agFields', 'feed.json fields (version 2)', `<div class="stack g16"><p class="small">A snapshot made by <span class="mono txt">python3 -I scripts/gen_feed.py</span> from read only calls on ${esc(CONTRACT)}; read <span class="mono txt">get_bounty</span> yourself before you commit.</p>
     ${table(['Field', 'Meaning'], fields.map(([k, v]) => [`<span class="mono txt">${esc(k)}</span>`, esc(v)]), 'mid', 'feed.json fields')}</div>`)}
 </div>`;
 

@@ -2,34 +2,6 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
-## 2026-11-04: A live agent feed at /api/feed (branch live-feed, not deployed)
-
-- Why: `web/feed.json` changes only when someone regenerates and pushes it, so a new bounty was missing from the feed
-  until a push (bounty 40, about 17 minutes) and attempt counts went stale. Nothing ran on a schedule.
-- `web/api/feed.js` (a Vercel function): the saved feed, with the bounties it lists as open and any newer ones read again
-  from the chain; statuses from `web/js/status.js` itself (its two time helpers moved to `web/js/rules.js`;
-  `web/js/package.json` marks the browser modules as modules for Node); cached about 60 s (Vercel's edge and the
-  function); `updated_at_utc`, `source` (live or saved) and `live_note`. On any RPC error, HTTP 429 or timeout (4 s a
-  call, 9 s in all) it answers the saved feed, cached 15 s, with the reason; after the first failure it sends no
-  further calls. `web/vercel.json`: the no-store header now names the two other functions, so the feed can be cached.
-- The hosted connector (`web/api/_lib/agent.js`) and `tools/skarbnik-mcp` read `/api/feed` first and fall back to
-  `feed.json`; `list_bounties` shows `source`, `updated_at_utc` and `attempts`. The saved feed gets `updated_at_utc`,
-  `source` and `live_url`. Docs: AGENTS.md (and web/agents.md), the quickstart, llms.txt, the For agents page,
-  ARCHITECTURE.md, VENDOR.md (a new bounty's public code still needs its files pushed); "the open bounties use 1,024"
-  removed in four places (bounties 40 and 41 allow 2,048).
-- `node scripts/test_live_feed.mjs --real`: network error, HTTP 429 and timeout each fall back to the saved rows
-  unchanged; a faked chain (bounty 40 with 3 attempts, 41 with all 8 failed, a new 42) gives "Open for attempts, 3 of 8
-  used", "Proof rejected, 8 of 8 used" and 42 with its program's public code, 20 view calls; a second request within
-  60 s makes no calls; the real testnet: 10 view calls, 1.1 s, rows for the six open bounties field for field equal to
-  the saved ones. ALL PASS (`docs/evidence/live_feed/test_output.txt`, without `--real`). The local agent server against
-  a local copy of the site: `source live`, and `source saved` when `/api/feed` answers HTTP 500; the hosted connector
-  with fakes: live, HTTP 500 and a 12 s timeout fall back to the saved feed.
-- Mistake: the first faked chain had no attempts for the other open bounties, and showed that calls already sent kept
-  going after a failure; fixed in the function.
-- Not shown: the function on Vercel (not pushed), so Vercel's packaging of `js/status.js`, its edge cache and the header
-  change are not checked yet; bounties the saved feed does not list as open (waiting for Proof 0, awaiting evaluation)
-  stay as saved until the next saved feed.
-
 ## 2026-11-03: The vendor watch waits for a GPU instead of giving up
 
 - Found while answering how the watch handles a busy GPU market: each round reset the attempt's saved state, so the

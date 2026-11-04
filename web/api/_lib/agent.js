@@ -113,15 +113,7 @@ async function site(path, binary = false) {
   if (!r.ok) throw new Fail(`could not read ${path} (HTTP ${r.status})`);
   return binary ? new Uint8Array(await r.arrayBuffer()) : r.text();
 }
-// The feed: the live one (api/feed.js: the open bounties read from the chain, cached about 60 s), or the saved
-// feed.json when the live one does not answer in time or answers something else.
-async function feed() {
-  try {
-    const r = await fetch(BASE + 'api/feed', { signal: AbortSignal.timeout(12000) });
-    if (r.ok) { const f = await r.json(); if (f && Array.isArray(f.bounties)) return f; }
-  } catch (e) { /* fall back to the saved feed below */ }
-  return JSON.parse(await site('feed.json'));
-}
+const feed = async () => JSON.parse(await site('feed.json'));
 // A bounty's public code: from its feed row, or (for a bounty newer than the feed) from any feed row of the same
 // program, matched by original_hash on chain.
 async function publicCode(bid, b) {
@@ -263,8 +255,8 @@ const TOOLS = {
           reward: near(b.amount), next_fee: near(b.next_fee), slots_left: b.max_commits - b.active, max_commits: b.max_commits, max_commits_per_account: b.max_commits_per_account,
           max_patch_bytes: b.max_patch_bytes, commit_deadline_utc: nsUtc(BigInt(b.expires_at_ns) - BigInt(b.reveal_window_ns) - BigInt(b.verdict_window_ns)) });
       }
-      return { source: f.source || 'saved', updated_at_utc: f.updated_at_utc || f.generated_at_utc, generated_at_utc: f.generated_at_utc, network: 'testnet', bounties: rows.map((b) => ({ bounty_id: String(b.bounty_id), level: b.level, level_meaning: LEVEL_MEANING[b.level], status: b.status, kind: b.kind, test_bounty: b.test_bounty || undefined,
-        program: b.program, description: b.module_description, reward: b.reward, next_fee: b.next_fee, slots_left: b.slots_left, max_commits: b.max_commits, attempts: b.attempts,
+      return { generated_at_utc: f.generated_at_utc, network: 'testnet', bounties: rows.map((b) => ({ bounty_id: String(b.bounty_id), level: b.level, level_meaning: LEVEL_MEANING[b.level], status: b.status, kind: b.kind, test_bounty: b.test_bounty || undefined,
+        program: b.program, description: b.module_description, reward: b.reward, next_fee: b.next_fee, slots_left: b.slots_left, max_commits: b.max_commits,
         max_commits_per_account: b.max_commits_per_account, max_patch_bytes: b.max_patch_bytes, commit_deadline_utc: b.commit_deadline_utc })),
         next: 'pick one, call get_public_code, then check_patch with your fix' };
     },
