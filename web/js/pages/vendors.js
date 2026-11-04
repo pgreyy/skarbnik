@@ -73,7 +73,7 @@ const ext = (label, url) => `<a class="lnk sm" href="${url}" target="_blank" rel
 const install = `<div class="stack g16"><h2 class="h2s">1. Build Skarbnik</h2>
   <p class="body">You need Linux or WSL, git, Python 3.11 or later, near CLI, Rust and Docker.</p>${at('In your terminal', BUILD)}
   <p class="small">The near line makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1 test NEAR. More test NEAR: the ${ext('official faucet', 'https://docs.near.org/getting-started/faucet')} or ${ext('near-faucet.io', 'https://near-faucet.io/')}</p>
-  <p class="small"><span class="mono">pwd</span> prints the folder path, something like <span class="mono">/home/you/skarbnik</span>. You need it when you add the tool to your AI app.</p></div>`;
+  <p class="small"><span class="mono">pwd</span> prints your folder path, something like <span class="mono">/home/you/skarbnik</span>. You need it in part 2.</p></div>`;
 
 // The AI tab: pick your computer, then short numbered steps (a title, one grey line, at most one copy block).
 const step = (n, title, help, more = '') => `<li class="v-st"><span class="v-n" aria-hidden="true">${String(n).padStart(2, '0')}</span><div><b class="v-t">${title}</b>${help.map((h) => `<p class="v-help">${h}</p>`).join('')}${more}</div></li>`;
@@ -81,11 +81,11 @@ const steps = (label, items) => `<ol class="v-steps" aria-label="${esc(label)}">
 const whole = (command, args) => `{\n  "mcpServers": {\n    "skarbnik-vendor": {\n      "command": "${command}",\n      "args": [${args.map((x) => `"${x}"`).join(', ')}]\n    }\n  }\n}`;
 const printIt = (id, where) => collapse(id, 'Print it with your folder path filled in', at(where, `python3 ${SRV} --setup claude-desktop`));
 const SPEND = 'It shows the cost and waits for your yes before it spends anything.';
-const CHECK = 'Open Claude Desktop first. If skarbnik-vendor is not listed under Settings, Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file.';
+const CHECK = 'Open Claude Desktop first. If skarbnik-vendor is not listed under Settings, Local MCP servers, check that mcpServers is still in the file.';
 const OS = [{ id: 'win', label: 'Windows', sub: 'Claude Desktop' }, { id: 'mac', label: 'Mac', sub: 'Claude Desktop' }, { id: 'lin', label: 'Code', sub: 'Claude Code or Codex' }];
 const OS_STEPS = {
   win: steps('Windows, with Claude Desktop', [
-    ['Open the settings file', ['Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder opens. Open claude_desktop_config.json in it. Press Edit config, then quit Claude Desktop fully before you change the file.']],
+    ['Open the settings file', ['Open Claude Desktop, then Settings, Local MCP servers, and press Edit config. A folder opens. Open claude_desktop_config.json in it. Press Edit config, then quit Claude Desktop fully before you change the file.']],
     ['Add Skarbnik', ['Replace everything in the file with this. Put your folder path from step 1 in place of &lt;folder path&gt;. If you already have other MCP servers, add only the mcpServers part instead.'],
       `${block(whole('wsl', ['python3', '-I', `<folder path>/${SRV}`]))}${printIt('vPrWin', 'In your terminal, inside the skarbnik folder')}`],
     ['Ask it to host your bounty', [`${CHECK} Still not listed? The app may read another copy of the file: look in %LOCALAPPDATA%\\Packages\\ (the folder that starts with AnthropicPBC.Claude, then LocalCache, Roaming, Claude) or in %APPDATA%\\Claude.`, `Your secret input, reference fix, public module and tests file must be inside WSL, with paths like /home/you/... ${SPEND}`], block(PROMPT)],

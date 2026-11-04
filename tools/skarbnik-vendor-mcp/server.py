@@ -509,7 +509,7 @@ def setup_text(app):
     entry = {"command": py, "args": ["-I", me]}
     if app == "claude-desktop":
         steps = ("Quit Claude Desktop fully first: it rewrites its settings file when it quits, so an edit made while it is open "
-                 "is lost. Then open claude_desktop_config.json (Settings, Desktop app, Extensions, Local MCP servers, Edit config "
+                 "is lost. Then open claude_desktop_config.json (Settings, Local MCP servers, Edit config "
                  "shows the folder; quit the app again before you edit). Paste this next to the other settings, with a comma after "
                  "the item before it. If the file already has \"mcpServers\", add only the \"skarbnik-vendor\": {...} part inside "
                  "it. Save, then open Claude Desktop.")

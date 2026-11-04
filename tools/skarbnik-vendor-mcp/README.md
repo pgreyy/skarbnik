@@ -58,7 +58,7 @@ The near line makes a testnet account with test NEAR and keeps its key in NEAR C
 NEAR. More test NEAR: the [official faucet](https://docs.near.org/getting-started/faucet) or
 [near-faucet.io](https://near-faucet.io/).
 
-`pwd` prints the folder path, something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
+`pwd` prints your folder path, something like `/home/you/skarbnik`. You need it in part 2.
 
 ### 2. Run it: AI
 
@@ -66,7 +66,7 @@ Do step 1 first. The other way, Terminal (you type each step), is in docs/VENDOR
 
 **Windows (Claude Desktop)**
 
-1. **Open the settings file.** Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and
+1. **Open the settings file.** Open Claude Desktop, then Settings, Local MCP servers, and
    press Edit config. A folder opens. Open claude_desktop_config.json in it. Press Edit config, then quit Claude
    Desktop fully before you change the file.
 
@@ -85,7 +85,7 @@ Do step 1 first. The other way, Terminal (you type each step), is in docs/VENDOR
        }
 
 3. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
-   Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file. Still not listed? The app
+   Local MCP servers, check that mcpServers is still in the file. Still not listed? The app
    may read another copy of the file: look in %LOCALAPPDATA%\Packages\ (the folder that starts with
    AnthropicPBC.Claude, then LocalCache, Roaming, Claude) or in %APPDATA%\Claude. Your secret input,
    reference fix, public module and tests file must be inside WSL, with paths like /home/you/... It shows the cost
@@ -114,7 +114,7 @@ Do step 1 first. The other way, Terminal (you type each step), is in docs/VENDOR
        }
 
 3. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
-   Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file. The log is
+   Local MCP servers, check that mcpServers is still in the file. The log is
    ~/Library/Logs/Claude/mcp.log. It shows the cost and waits for your yes before it spends anything. Send the
    prompt below.
 
