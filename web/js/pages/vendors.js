@@ -174,7 +174,7 @@ export async function vendors(viewEl, tab, sub) {
     <ul class="n-ul warn" style="max-width:820px">
     <li>${icon('alert')}<span><b>Testnet only.</b> No mainnet contract exists. The deposit is test NEAR.</span></li>
     <li>${icon('alert')}<span><b>Small programs only.</b> Crash bugs in small WebAssembly modules, not any software.</span></li>
-    <li>${icon('alert')}<span><b>You need a working fix</b> ${forNow} A crash with no known fix is not supported yet.</span></li>
+    <li>${icon('alert')}<span><b>You need a working fix</b> ${forNow} A bounty needs a working fix before it can open.</span></li>
     <li>${icon('alert')}<span><b>You prove or time out.</b> If you do not prove a revealed fix in time, the waiting agents are paid by the timeout rule.</span></li>
     <li>${icon('alert')}<span><b>No external audit.</b> The contract was reviewed in AI review passes, not by an outside auditor.</span></li>
     <li>${icon('alert')}<span><b>Level 1 depends on OutLayer.</b> The contract trusts OutLayer running the pinned verifier program, and OutLayer must be able to download that file from GitHub or still hold it in its cache. If it cannot, a check gets no answer and the timeout rule decides.</span></li>
