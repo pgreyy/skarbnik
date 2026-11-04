@@ -246,6 +246,14 @@
 .sk .ag-ol li{padding-left:4px}
 .sk .ag-ol li::marker{font:600 13px var(--fm);color:var(--am)}
 .sk .ag-ol li>.code-row{margin-top:10px}
+/* For vendors, AI tab: short numbered steps (number, title, one grey line, at most one copy block) */
+.sk .v-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.sk .v-st{display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;padding:16px 0;border-top:1px solid var(--ln)}
+.sk .v-st:first-child{border-top:0;padding-top:4px}
+.sk .v-n{font:600 13px/1.6 var(--fm);color:var(--am)}
+.sk .v-t{display:block;color:var(--tx);font-size:15px;line-height:1.5}
+.sk .v-help{margin:4px 0 0;color:var(--tx3);font-size:14px;line-height:1.5}
+.sk .v-st .cblk,.sk .v-st .clp{margin-top:10px}
 .sk .ag-sample{font-size:12.5px}
 .sk .clp{border:1px solid var(--ln);border-radius:calc(12px * var(--rs));background:var(--bg)}
 .sk .clp[open]{border-color:var(--ln2)}

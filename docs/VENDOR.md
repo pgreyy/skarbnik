@@ -3,9 +3,9 @@
 A vendor should not have to be a cryptography operator. `tools/skarbnik-vendor` (Python 3.11 or later, no packages)
 takes a private bounty from a config file to an open bounty, and then proves every revealed attempt by itself. A
 bounty is Level 2 by default; Levels 1 and 0 are explained below.
-The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors. First the build, the same for both ways;
-then two ways to run it: In your AI app (an AI app runs these commands through tools/skarbnik-vendor-mcp, shows the
-cost first and asks for a one time confirm code before any spend) and In your terminal (the five commands below).
+The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors. First Build Skarbnik, the same for both ways;
+then two ways to run it: AI (an AI app runs these commands through tools/skarbnik-vendor-mcp, shows the
+cost first and asks for a one time confirm code before any spend) and Terminal (the five commands below).
 It needs Linux (on Windows, WSL), Docker and an x86 computer for the Groth16 step (Level 2), and a GPU rental account
 for a rented GPU.
 It calls the project's own programs (`skarbnik-host`, `skarbnik-check`), `scripts/s2_measure.sh` for timing and the
@@ -29,14 +29,9 @@ proof; `publish` opens with `open_with_outlayer` and `watch` sends each proof wi
 account that can attach a deposit (an agent's limited key cannot). At every level a timeout is a timeout: no verdict
 in time means the waiting attempts are paid by rule.
 
-## Get the project and build it
+## Build Skarbnik
 
-You need Linux or WSL, git, Python 3.11 or later, near CLI, Rust and Docker. On a Mac the tool runs on a Linux
-computer that the Mac reaches over ssh. Nothing in these steps goes into an AI chat.
-
-One block, in this order: get the project, RISC Zero at the versions this project pins, the build, your vendor
-account, the folder path. The first build downloads RISC Zero's guest builder image (about 7.5 GB) and takes a while.
-In your terminal:
+You need Linux or WSL, git, Python 3.11 or later, near CLI, Rust and Docker. In your terminal:
 
     git clone https://github.com/pgreyy/skarbnik.git
     cd skarbnik
@@ -55,13 +50,13 @@ In your terminal:
 
 The near line makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1 test
 NEAR. More test NEAR: the [official faucet](https://docs.near.org/getting-started/faucet) or
-[near-faucet.io](https://near-faucet.io/). A faucet can run out; then ask in the [NEAR dev Telegram](https://t.me/neardev).
+[near-faucet.io](https://near-faucet.io/).
 
 `pwd` prints the folder path, something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
 
 ## Commands
 
-The In your terminal way: you type each step. The In your AI app way runs the same steps for you ([With an AI app](#with-an-ai-app-toolsskarbnik-vendor-mcp)).
+The Terminal way: you type each step. The AI way runs the same steps for you ([With an AI app](#with-an-ai-app-toolsskarbnik-vendor-mcp)).
 
 | Command | What it does |
 | --- | --- |
@@ -166,122 +161,82 @@ pod removes it after this many minutes even if this machine stops watching it) a
 An MCP server that runs these commands for an AI app (Claude Desktop, Claude Code, Codex), on the computer that holds
 the secret. It asks for each file path and never opens the secret or the fix; `publish`, `watch_start` and `prove0` on a
 rented GPU first return the cost and time with a one time confirm code, and run only when called again with it.
-The same setup is in [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README.md). Do [Get the project and build it](#get-the-project-and-build-it) first.
+Do [Build Skarbnik](#build-skarbnik) first. The same steps are in [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README.md).
 
-Do Get the project and build it first. Nothing here goes into an AI chat until the last step.
+**Windows (Claude Desktop)**
 
-### Windows, with Claude Desktop
+1. **Quit Claude Desktop.** Right click its icon near the clock and choose Quit. It rewrites its settings when it
+   quits, so edit them only while it is closed.
+2. **Open the settings file.** Open Notepad, then File, Open, paste this path and pick the Claude folder that starts
+   with AnthropicPBC.Claude (the name differs by version), then claude_desktop_config.json. Edit config in Claude
+   Desktop opens the same folder.
 
-1. Quit Claude Desktop fully before you edit its settings file. Closing the window is not enough: right click its
-   icon near the clock and choose Quit, or end it in Task Manager. Claude Desktop rewrites the file when it quits, so
-   an edit made while it is open is lost.
+       %LOCALAPPDATA%\Packages\
 
-2. Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder
-   opens. Quit Claude Desktop again, the same way as in step 1. Then open `claude_desktop_config.json` from that folder
-   in Notepad. With Claude Desktop from the Microsoft Store, that folder is
-   `%LOCALAPPDATA%\Packages\Claude_...\LocalCache\Roaming\Claude\`.
-
-3. Add the skarbnik-vendor block. Put your folder path from Get the project and build it in place of `<folder path>`. Paste into the file,
-   next to the other settings, with a comma after the item before it:
-
-       "mcpServers": {
-         "skarbnik-vendor": {
-           "command": "wsl",
-           "args": ["python3", "-I", "<folder path>/tools/skarbnik-vendor-mcp/server.py"]
-         }
-       }
-
-   A file that already has other settings looks like this afterwards. See the comma after the item before it, and
-   the braces around everything:
+3. **Add Skarbnik.** Replace everything in the file with this. Put your folder path from Build Skarbnik in place of
+   `<folder path>`. If you already have other MCP servers, add only the mcpServers part instead. To print it with
+   your folder path filled in, run `python3 tools/skarbnik-vendor-mcp/server.py --setup claude-desktop` in your
+   terminal, inside the skarbnik folder.
 
        {
-         "preferences": {
-           "sidebarMode": "chat"
-         },
          "mcpServers": {
            "skarbnik-vendor": {
              "command": "wsl",
-             "args": ["python3", "-I", "/home/you/skarbnik/tools/skarbnik-vendor-mcp/server.py"]
+             "args": ["python3", "-I", "<folder path>/tools/skarbnik-vendor-mcp/server.py"]
            }
          }
        }
 
-   If the file already has `"mcpServers"`, add only the `"skarbnik-vendor": {...}` part inside it, with a comma after
-   the server before it. To get the block with your folder path filled in, run this in your terminal (Ubuntu), inside
-   the skarbnik folder: `python3 tools/skarbnik-vendor-mcp/server.py --setup claude-desktop`. It prints the block.
+4. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
+   Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file. Your secret input,
+   reference fix, public module and tests file must be inside WSL, with paths like /home/you/... It shows the cost
+   and waits for your yes before it spends anything. Send the prompt below.
 
-4. Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers:
-   skarbnik-vendor is listed.
+**Mac (Claude Desktop)**
 
-5. Not listed? Open the file again and check that `"mcpServers"` is still in it. It is lost if Claude Desktop was
-   open while you edited. The logs are in the `logs` folder next to `claude_desktop_config.json`: `mcp.log`.
-
-### Mac, with Claude Desktop
-
-The tool runs on a Linux computer, set up as above. Claude Desktop on the Mac starts it there over ssh.
-
-1. Check that the Mac reaches the Linux computer with ssh, with a key and no password question. In your terminal
-   (Mac):
+1. **Check ssh to your Linux computer.** The tool runs on Linux, so Claude Desktop on the Mac starts it there over
+   ssh. It must finish without asking anything.
 
        ssh you@linux-host true
 
-   It must finish without asking anything.
+2. **Quit Claude Desktop.** Claude menu, Quit Claude. It rewrites its settings when it quits.
+3. **Add Skarbnik.** Open ~/Library/Application Support/Claude/claude_desktop_config.json in TextEdit and replace
+   everything in it with this. Use your ssh login and the folder path from Build Skarbnik. If you already have other MCP
+   servers, add only the mcpServers part instead. To print it, run the `--setup claude-desktop` line above on the
+   Linux computer.
 
-2. Print the block. In your terminal on the Linux computer, inside the skarbnik folder:
-
-       python3 tools/skarbnik-vendor-mcp/server.py --setup claude-desktop
-
-   It prints a block with the folder path. You need that path in step 4.
-
-3. Quit Claude Desktop fully: Claude menu, Quit Claude. It rewrites its settings file when it quits, so an edit made
-   while it is open is lost. Then open `~/Library/Application Support/Claude/claude_desktop_config.json` in TextEdit.
-
-4. Paste into the file, next to the other settings, with a comma after the item before it (the same rule as Windows
-   step 3). Put your ssh login in place of `you@linux-host` and the folder path in place of `<folder path>`:
-
-       "mcpServers": {
-         "skarbnik-vendor": {
-           "command": "ssh",
-           "args": ["you@linux-host", "python3 -I <folder path>/tools/skarbnik-vendor-mcp/server.py"]
+       {
+         "mcpServers": {
+           "skarbnik-vendor": {
+             "command": "ssh",
+             "args": ["you@linux-host", "python3 -I <folder path>/tools/skarbnik-vendor-mcp/server.py"]
+           }
          }
        }
 
-5. Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers:
-   skarbnik-vendor is listed. Not listed? Check that `"mcpServers"` is still in the file. The log is
-   `~/Library/Logs/Claude/mcp.log`.
+4. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
+   Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file. The log is
+   ~/Library/Logs/Claude/mcp.log. It shows the cost and waits for your yes before it spends anything. Send the
+   prompt below.
 
-### Linux, and anyone using Claude Code or Codex
+**Linux (Claude Code or Codex)**
 
-Run one command in your terminal, inside the skarbnik folder.
+1. **Add Skarbnik to your AI app.** In your terminal, inside the skarbnik folder. Claude Code, then Codex:
 
-Claude Code. In your terminal:
+       claude mcp add --scope user skarbnik-vendor -- python3 -I "$PWD/tools/skarbnik-vendor-mcp/server.py"
+       codex mcp add skarbnik-vendor -- python3 -I "$PWD/tools/skarbnik-vendor-mcp/server.py"
 
-    claude mcp add --scope user skarbnik-vendor -- python3 -I "$PWD/tools/skarbnik-vendor-mcp/server.py"
+2. **Ask it to host your bounty.** It shows the cost and waits for your yes before it spends anything. Send the
+   prompt below.
 
-Codex. In your terminal:
-
-    codex mcp add skarbnik-vendor -- python3 -I "$PWD/tools/skarbnik-vendor-mcp/server.py"
-
-`python3 tools/skarbnik-vendor-mcp/server.py --setup claude-code` (or `--setup codex`) prints the same with this
-computer's paths. Claude Desktop on Linux: `--setup claude-desktop` prints the block; quit the app, paste it into the
-file as in Windows step 3, save, open the app.
-
-### Check it
-
-Type this into your AI chat. It should answer with the tool's status:
-
-> Show me the status of my Skarbnik vendor tool.
-
-### Ask your AI to host your bounty
-
-This is the one thing you type into your AI chat:
+**The prompt**
 
 > Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me which level to use, Level 2 unless I
 > choose otherwise, and explain the three levels in plain words. Ask me for each file path you need. Never open, read
 > out or print my secret input file, only use its path. Show me the cost and the time first, and wait for my yes before
 > you publish or spend on a GPU.
 
-What your AI does, and when it asks you:
+**When it asks you**
 
 | Step | When it asks you |
 | --- | --- |
