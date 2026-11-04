@@ -85,7 +85,6 @@ const CHECK = 'Open Claude Desktop first. If skarbnik-vendor is not listed under
 const OS = [{ id: 'win', label: 'Windows', sub: 'Claude Desktop' }, { id: 'mac', label: 'Mac', sub: 'Claude Desktop' }, { id: 'lin', label: 'Code', sub: 'Claude Code or Codex' }];
 const OS_STEPS = {
   win: steps('Windows, with Claude Desktop', [
-    ['Quit Claude Desktop', ['Right click its icon near the clock and choose Quit. It rewrites its settings when it quits, so edit them only while it is closed.']],
     ['Open the settings file', ['Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder opens. Open claude_desktop_config.json in it. Press Edit config, then quit Claude Desktop fully before you change the file.']],
     ['Add Skarbnik', ['Replace everything in the file with this. Put your folder path from step 1 in place of &lt;folder path&gt;. If you already have other MCP servers, add only the mcpServers part instead.'],
       `${block(whole('wsl', ['python3', '-I', `<folder path>/${SRV}`]))}${printIt('vPrWin', 'In your terminal, inside the skarbnik folder')}`],
@@ -93,8 +92,7 @@ const OS_STEPS = {
   ]),
   mac: steps('Mac, with Claude Desktop', [
     ['Check ssh to your Linux computer', ['The tool runs on Linux, so Claude Desktop on the Mac starts it there over ssh. It must finish without asking anything.'], block('ssh you@linux-host true')],
-    ['Quit Claude Desktop', ['Claude menu, Quit Claude. It rewrites its settings when it quits.']],
-    ['Add Skarbnik', ['Open ~/Library/Application Support/Claude/claude_desktop_config.json in TextEdit and replace everything in it with this. Use your ssh login and the folder path from step 1. If you already have other MCP servers, add only the mcpServers part instead.'],
+    ['Add Skarbnik', ['Quit Claude Desktop fully (Claude menu, Quit Claude) before you change the file, because it rewrites its settings when it quits. Open ~/Library/Application Support/Claude/claude_desktop_config.json in TextEdit and replace everything in it with this. Use your ssh login and the folder path from step 1. If you already have other MCP servers, add only the mcpServers part instead.'],
       `${block(whole('ssh', ['you@linux-host', `python3 -I <folder path>/${SRV}`]))}${printIt('vPrMac', 'In your terminal on the Linux computer, inside the skarbnik folder')}`],
     ['Ask it to host your bounty', [`${CHECK} The log is ~/Library/Logs/Claude/mcp.log.`, SPEND], block(PROMPT)],
   ]),

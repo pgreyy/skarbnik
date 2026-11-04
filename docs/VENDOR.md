@@ -165,13 +165,11 @@ Do [Build Skarbnik](#build-skarbnik) first. The same steps are in [tools/skarbni
 
 **Windows (Claude Desktop)**
 
-1. **Quit Claude Desktop.** Right click its icon near the clock and choose Quit. It rewrites its settings when it
-   quits, so edit them only while it is closed.
-2. **Open the settings file.** Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and
+1. **Open the settings file.** Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and
    press Edit config. A folder opens. Open claude_desktop_config.json in it. Press Edit config, then quit Claude
    Desktop fully before you change the file.
 
-3. **Add Skarbnik.** Replace everything in the file with this. Put your folder path from Build Skarbnik in place of
+2. **Add Skarbnik.** Replace everything in the file with this. Put your folder path from Build Skarbnik in place of
    `<folder path>`. If you already have other MCP servers, add only the mcpServers part instead. To print it with
    your folder path filled in, run `python3 tools/skarbnik-vendor-mcp/server.py --setup claude-desktop` in your
    terminal, inside the skarbnik folder.
@@ -185,7 +183,7 @@ Do [Build Skarbnik](#build-skarbnik) first. The same steps are in [tools/skarbni
          }
        }
 
-4. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
+3. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
    Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file. Still not listed? The app
    may read another copy of the file: look in %LOCALAPPDATA%\Packages\ (the folder that starts with
    AnthropicPBC.Claude, then LocalCache, Roaming, Claude) or in %APPDATA%\Claude. Your secret input,
@@ -199,11 +197,11 @@ Do [Build Skarbnik](#build-skarbnik) first. The same steps are in [tools/skarbni
 
        ssh you@linux-host true
 
-2. **Quit Claude Desktop.** Claude menu, Quit Claude. It rewrites its settings when it quits.
-3. **Add Skarbnik.** Open ~/Library/Application Support/Claude/claude_desktop_config.json in TextEdit and replace
-   everything in it with this. Use your ssh login and the folder path from Build Skarbnik. If you already have other MCP
-   servers, add only the mcpServers part instead. To print it, run the `--setup claude-desktop` line above on the
-   Linux computer.
+2. **Add Skarbnik.** Quit Claude Desktop fully (Claude menu, Quit Claude) before you change the file, because it
+   rewrites its settings when it quits. Open ~/Library/Application Support/Claude/claude_desktop_config.json in
+   TextEdit and replace everything in it with this. Use your ssh login and the folder path from Build Skarbnik. If
+   you already have other MCP servers, add only the mcpServers part instead. To print it, run the `--setup
+   claude-desktop` line above on the Linux computer.
 
        {
          "mcpServers": {
@@ -214,7 +212,7 @@ Do [Build Skarbnik](#build-skarbnik) first. The same steps are in [tools/skarbni
          }
        }
 
-4. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
+3. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
    Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file. The log is
    ~/Library/Logs/Claude/mcp.log. It shows the cost and waits for your yes before it spends anything. Send the
    prompt below.
