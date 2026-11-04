@@ -217,7 +217,7 @@ export async function vendors(viewEl, tab, sub) {
 <section class="ag-tabs"><div class="wrap" id="vTabs"></div></section></main>`;
 
   const show = tabbed(viewEl.querySelector('#vTabs'), [
-    { id: 'host', label: 'Host', sub: '5 steps', html: host },
+    { id: 'host', label: 'Host', sub: '2 steps', html: host },
     { id: 'setup', label: 'Setup', html: setup },
     { id: 'privacy', label: 'Privacy', html: privacy },
     { id: 'compute', label: 'Compute', html: compute },
