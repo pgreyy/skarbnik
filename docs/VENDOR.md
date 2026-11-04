@@ -3,7 +3,7 @@
 A vendor should not have to be a cryptography operator. `tools/skarbnik-vendor` (Python 3.11 or later, no packages)
 takes a private bounty from a config file to an open bounty, and then proves every revealed attempt by itself. A
 bounty is Level 2 by default; Levels 1 and 0 are explained below.
-The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors. First the install, the same for both ways;
+The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors. First what you need and the build, the same for both ways;
 then two ways to run it: In your AI app (an AI app runs these commands through tools/skarbnik-vendor-mcp, shows the
 cost first and asks for a one time confirm code before any spend) and In your terminal (the five commands below).
 It needs Linux (on Windows, WSL), Docker and an x86 computer for the Groth16 step (Level 2), and a GPU rental account
@@ -29,100 +29,51 @@ proof; `publish` opens with `open_with_outlayer` and `watch` sends each proof wi
 account that can attach a deposit (an agent's limited key cannot). At every level a timeout is a timeout: no verdict
 in time means the waiting attempts are paid by rule.
 
-## Install on your computer
+## What you need
 
-Nothing in these steps goes into an AI chat. Each command says where it goes: in your terminal, or paste into the
-file. The install is the same for both ways of running the tool.
+The tool runs in Linux. On Windows it runs in WSL (the commands below run in Ubuntu). On a Mac it runs on a Linux
+computer that the Mac reaches over ssh. Nothing in these steps goes into an AI chat. Each check prints a version.
 
-### Windows
+| You need | Check, in your terminal | Install |
+| --- | --- | --- |
+| Linux, or Windows with WSL | `uname -sr` | [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) |
+| git | `git --version` | [git](https://git-scm.com/downloads) |
+| Python 3.11 or later | `python3 --version` | [Python](https://www.python.org/downloads/) |
+| NEAR CLI (near-cli-rs 0.30.1) | `near --version` | [near-cli-rs](https://github.com/near/near-cli-rs) |
+| Rust | `cargo --version` | [Rust](https://www.rust-lang.org/tools/install) |
+| Docker with buildx: needed once to build the two programs, and at Level 2 for the Groth16 step | `docker buildx version` | [Docker](https://docs.docker.com/get-started/get-docker/) |
 
-1. Install WSL once. Open PowerShell and run this, then restart the computer.
+RISC Zero, at the versions this project pins ([RISC Zero install](https://dev.risczero.com/api/zkvm/install)). In your
+terminal:
 
-   In your terminal (PowerShell):
+    curl -L https://risczero.com/install | bash
+    source ~/.bashrc
+    rzup install rust 1.97.0
+    rzup install cargo-risczero 3.0.6
+    rzup install r0vm 3.0.6
+    cargo risczero --version
+    r0vm --version
 
-       wsl --install
+## Get the project and build it
 
-   After the restart, open Ubuntu from the Start menu. Every command from here on runs in this Ubuntu terminal.
+The first build downloads RISC Zero's guest builder image (about 7.5 GB) and takes a while. The last line makes a
+testnet account with test NEAR and keeps its key in NEAR CLI. In your terminal:
 
-2. Install what the tool needs. Each check command prints a version.
+    git clone https://github.com/pgreyy/skarbnik.git
+    cd skarbnik
+    cargo build --release -p skarbnik-host
+    cargo build -p kintsugi-check
+    ls target/release/skarbnik-host target/debug/skarbnik-check
+    near account create-account sponsor-by-faucet-service <you>-vendor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
 
-   Basic tools and Python 3.11 or later. In your terminal (Ubuntu):
+The reward is at least 0.1 test NEAR. More test NEAR: the [official faucet](https://docs.near.org/getting-started/faucet)
+or [near-faucet.io](https://near-faucet.io/). A faucet can run out; then ask in the [NEAR dev Telegram](https://t.me/neardev).
 
-       sudo apt update && sudo apt install -y git python3 curl build-essential pkg-config libssl-dev
-       git --version
-       python3 --version
+Get the folder path. In your terminal, inside the skarbnik folder:
 
-   Rust, to build the project's two programs. In your terminal (Ubuntu):
+    pwd
 
-       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-       source "$HOME/.cargo/env"
-       cargo --version
-
-   RISC Zero, at the versions in [VERSIONS.md](VERSIONS.md). In your terminal (Ubuntu):
-
-       curl -L https://risczero.com/install | bash
-       source ~/.bashrc
-       rzup install rust 1.97.0
-       rzup install cargo-risczero 3.0.6
-       rzup install r0vm 3.0.6
-       cargo risczero --version
-       r0vm --version
-
-   NEAR CLI (near-cli-rs 0.30.1). In your terminal (Ubuntu):
-
-       curl --proto '=https' --tlsv1.2 -LsSf https://github.com/near/near-cli-rs/releases/download/v0.30.1/near-cli-rs-installer.sh | sh
-       near --version
-
-   Docker. The build of the two programs needs it once at every level, because the checker inside them is built in
-   Docker. Level 2 also needs it for the Groth16 step. In your terminal (Ubuntu):
-
-       sudo apt install -y docker.io docker-buildx
-       sudo usermod -aG docker $USER
-
-   Close Ubuntu and open it again. Then, in your terminal (Ubuntu):
-
-       docker --version
-       docker buildx version
-
-3. Get the project, build its two programs and make your vendor account. The first build downloads RISC Zero's
-   guest builder image (about 7.5 GB) and takes a while. In your terminal (Ubuntu):
-
-       git clone https://github.com/pgreyy/skarbnik.git
-       cd skarbnik
-       cargo build --release -p skarbnik-host
-       cargo build -p kintsugi-check
-       ls target/release/skarbnik-host target/debug/skarbnik-check
-       near account create-account sponsor-by-faucet-service <you>-vendor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
-
-   The last command makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1
-   test NEAR. More test NEAR: the [official faucet](https://docs.near.org/getting-started/faucet) or
-   [near-faucet.io](https://near-faucet.io/). A faucet can run out; then ask in the
-   [NEAR dev Telegram](https://t.me/neardev).
-
-4. Get the folder path. In your terminal (Ubuntu), inside the skarbnik folder:
-
-       pwd
-
-   It prints something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
-
-### Mac
-
-The vendor tool needs Linux: it reads the computer's memory from `/proc`, which a Mac does not have. So the tool runs
-on a Linux computer (a server, or a Linux virtual machine), and Claude Desktop on the Mac starts it there over ssh.
-
-1. On the Linux computer, do Windows steps 2 to 4: install what the tool needs, get the project, build it and get the
-   folder path. Run them in your terminal on the Linux computer.
-
-2. Check that the Mac reaches the Linux computer with ssh, with a key and no password question. In your terminal
-   (Mac):
-
-       ssh you@linux-host true
-
-   It must finish without asking anything.
-
-### Linux
-
-Do Windows steps 2 to 4 on the computer where the tool runs (on Windows, inside Ubuntu).
+It prints something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
 
 ## Commands
 
@@ -231,10 +182,10 @@ pod removes it after this many minutes even if this machine stops watching it) a
 An MCP server that runs these commands for an AI app (Claude Desktop, Claude Code, Codex), on the computer that holds
 the secret. It asks for each file path and never opens the secret or the fix; `publish`, `watch_start` and `prove0` on a
 rented GPU first return the cost and time with a one time confirm code, and run only when called again with it.
-The same setup is in [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README.md). Do the install
-([Install on your computer](#install-on-your-computer)) first.
+The same setup is in [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README.md). Do [What you need](#what-you-need) and
+[Get the project and build it](#get-the-project-and-build-it) first.
 
-Do the install first. Nothing here goes into an AI chat until the last step.
+Do What you need and Get the project and build it first. Nothing here goes into an AI chat until the last step.
 
 ### Windows, with Claude Desktop
 
@@ -244,11 +195,10 @@ Do the install first. Nothing here goes into an AI chat until the last step.
 
 2. Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder
    opens. Quit Claude Desktop again, the same way as in step 1. Then open `claude_desktop_config.json` from that folder
-   in Notepad. Installed from the Microsoft Store? Then the file is in
-   `%LOCALAPPDATA%\Packages\Claude_...\LocalCache\Roaming\Claude\` instead of `%APPDATA%\Claude\`. Edit config
-   opens the right folder either way.
+   in Notepad. With Claude Desktop from the Microsoft Store, that folder is
+   `%LOCALAPPDATA%\Packages\Claude_...\LocalCache\Roaming\Claude\`.
 
-3. Add the skarbnik-vendor block. Put your folder path from the install, step 4, in place of `<folder path>`. Paste into the file,
+3. Add the skarbnik-vendor block. Put your folder path from Get the project and build it in place of `<folder path>`. Paste into the file,
    next to the other settings, with a comma after the item before it:
 
        "mcpServers": {
@@ -285,16 +235,25 @@ Do the install first. Nothing here goes into an AI chat until the last step.
 
 ### Mac, with Claude Desktop
 
-1. Print the block. In your terminal on the Linux computer, inside the skarbnik folder:
+The tool runs on a Linux computer, set up as above. Claude Desktop on the Mac starts it there over ssh.
+
+1. Check that the Mac reaches the Linux computer with ssh, with a key and no password question. In your terminal
+   (Mac):
+
+       ssh you@linux-host true
+
+   It must finish without asking anything.
+
+2. Print the block. In your terminal on the Linux computer, inside the skarbnik folder:
 
        python3 tools/skarbnik-vendor-mcp/server.py --setup claude-desktop
 
-   It prints a block with the folder path. You need that path in step 3.
+   It prints a block with the folder path. You need that path in step 4.
 
-2. Quit Claude Desktop fully: Claude menu, Quit Claude. It rewrites its settings file when it quits, so an edit made
+3. Quit Claude Desktop fully: Claude menu, Quit Claude. It rewrites its settings file when it quits, so an edit made
    while it is open is lost. Then open `~/Library/Application Support/Claude/claude_desktop_config.json` in TextEdit.
 
-3. Paste into the file, next to the other settings, with a comma after the item before it (the same rule as Windows
+4. Paste into the file, next to the other settings, with a comma after the item before it (the same rule as Windows
    step 3). Put your ssh login in place of `you@linux-host` and the folder path in place of `<folder path>`:
 
        "mcpServers": {
@@ -304,7 +263,7 @@ Do the install first. Nothing here goes into an AI chat until the last step.
          }
        }
 
-4. Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers:
+5. Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers:
    skarbnik-vendor is listed. Not listed? Check that `"mcpServers"` is still in the file. The log is
    `~/Library/Logs/Claude/mcp.log`.
 
