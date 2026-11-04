@@ -68,11 +68,9 @@ Do step 1 first. The other way, Terminal (you type each step), is in docs/VENDOR
 
 1. **Quit Claude Desktop.** Right click its icon near the clock and choose Quit. It rewrites its settings when it
    quits, so edit them only while it is closed.
-2. **Open the settings file.** Open Notepad, then File, Open, paste this path and pick the Claude folder that starts
-   with AnthropicPBC.Claude (the name differs by version), then claude_desktop_config.json. Edit config in Claude
-   Desktop opens the same folder.
-
-       %LOCALAPPDATA%\Packages\
+2. **Open the settings file.** Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and
+   press Edit config. A folder opens. Open claude_desktop_config.json in it. Press Edit config, then quit Claude
+   Desktop fully before you change the file.
 
 3. **Add Skarbnik.** Replace everything in the file with this. Put your folder path from step 1 in place of
    `<folder path>`. If you already have other MCP servers, add only the mcpServers part instead. To print it with
@@ -89,7 +87,9 @@ Do step 1 first. The other way, Terminal (you type each step), is in docs/VENDOR
        }
 
 4. **Ask it to host your bounty.** Open Claude Desktop first. If skarbnik-vendor is not listed under Settings,
-   Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file. Your secret input,
+   Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file. Still not listed? The app
+   may read another copy of the file: look in %LOCALAPPDATA%\Packages\ (the folder that starts with
+   AnthropicPBC.Claude, then LocalCache, Roaming, Claude) or in %APPDATA%\Claude. Your secret input,
    reference fix, public module and tests file must be inside WSL, with paths like /home/you/... It shows the cost
    and waits for your yes before it spends anything. Send the prompt below.
 

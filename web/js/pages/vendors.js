@@ -85,11 +85,10 @@ const OS = [{ id: 'win', label: 'Windows' }, { id: 'mac', label: 'Mac' }, { id: 
 const OS_STEPS = {
   win: steps('Windows, with Claude Desktop', [
     ['Quit Claude Desktop', ['Right click its icon near the clock and choose Quit. It rewrites its settings when it quits, so edit them only while it is closed.']],
-    ['Open the settings file', ['Open Notepad, then File, Open, paste this path and pick the Claude folder that starts with AnthropicPBC.Claude (the name differs by version), then claude_desktop_config.json.'],
-      `${block('%LOCALAPPDATA%\\Packages\\')}<p class="small faint mt8">Edit config in Claude Desktop opens the same folder.</p>`],
+    ['Open the settings file', ['Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder opens. Open claude_desktop_config.json in it. Press Edit config, then quit Claude Desktop fully before you change the file.']],
     ['Add Skarbnik', ['Replace everything in the file with this. Put your folder path from step 1 in place of &lt;folder path&gt;. If you already have other MCP servers, add only the mcpServers part instead.'],
       `${block(whole('wsl', ['python3', '-I', `<folder path>/${SRV}`]))}${printIt('vPrWin', 'In your terminal, inside the skarbnik folder')}`],
-    ['Ask it to host your bounty', [CHECK, `Your secret input, reference fix, public module and tests file must be inside WSL, with paths like /home/you/... ${SPEND}`], block(PROMPT)],
+    ['Ask it to host your bounty', [`${CHECK} Still not listed? The app may read another copy of the file: look in %LOCALAPPDATA%\\Packages\\ (the folder that starts with AnthropicPBC.Claude, then LocalCache, Roaming, Claude) or in %APPDATA%\\Claude.`, `Your secret input, reference fix, public module and tests file must be inside WSL, with paths like /home/you/... ${SPEND}`], block(PROMPT)],
   ]),
   mac: steps('Mac, with Claude Desktop', [
     ['Check ssh to your Linux computer', ['The tool runs on Linux, so Claude Desktop on the Mac starts it there over ssh. It must finish without asking anything.'], block('ssh you@linux-host true')],
