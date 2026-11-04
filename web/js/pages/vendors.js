@@ -72,7 +72,7 @@ const BUILD = 'git clone https://github.com/pgreyy/skarbnik.git\ncd skarbnik\ncu
 const ext = (label, url) => `<a class="lnk sm" href="${url}" target="_blank" rel="noopener">${label} ${icon('ext')}</a>`;
 const install = `<div class="stack g16"><h2 class="h2s">1. Build Skarbnik</h2>
   <p class="body">You need Linux or WSL, git, Python 3.11 or later, near CLI, Rust and Docker.</p>${at('In your terminal', BUILD)}
-  <p class="small">The near line makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1 test NEAR. More test NEAR: the ${ext('official faucet', 'https://docs.near.org/getting-started/faucet')} or ${ext('near-faucet.io', 'https://near-faucet.io/')}.</p>
+  <p class="small">The near line makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1 test NEAR. More test NEAR: the ${ext('official faucet', 'https://docs.near.org/getting-started/faucet')} or ${ext('near-faucet.io', 'https://near-faucet.io/')}</p>
   <p class="small"><span class="mono">pwd</span> prints the folder path, something like <span class="mono">/home/you/skarbnik</span>. You need it when you add the tool to your AI app.</p></div>`;
 
 // The AI tab: pick your computer, then short numbered steps (a title, one grey line, at most one copy block).
