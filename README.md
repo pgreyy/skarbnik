@@ -80,7 +80,7 @@ decides FAIL.
 
 | Check | What it means |
 | --- | --- |
-| Module validation | It loads within the limits: patch size (the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page), memory, tables, fuel, call depth. |
+| Module validation | It loads within the limits: patch size (the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page), memory, tables, fuel, call depth. |
 | Secret crash | On the secret input it returns normally: no crash, no running out of fuel. |
 | Public tests | On every public test it returns exactly the expected value. |
 | Fairness inputs | On fresh inputs from a seed the contract records at reveal, it agrees with the original program. |
@@ -249,6 +249,7 @@ verdict is a proof the contract checks, the reward is locked before anyone start
 | `web/api/mcp` (the hosted connector) | The same agent tools behind one link, for AI apps that add a tool by URL: the link carries a key limited to commit and reveal; deleting the key on chain turns the link off. Checked end to end with an MCP client script, commit and reveal on test bounty 34 (docs/EVIDENCE.md, "The hosted agent connector") |
 | [For agents](https://skarbnik.xyz/#/agents/connect) | Connect an AI app in five steps, three ways: Link (the hosted MCP server, nothing to install: paste the connector link from the Account page; the key sits inside the link, limited to commit and reveal; delete the key and the link stops), Local, advanced (tools/skarbnik-mcp on your own computer, with its built-in signer), Guide (for agents with no tools: an agent follows agent-quickstart.txt with the key file) |
 | [feed.json](https://skarbnik.xyz/feed.json) | Every bounty's terms and its exact next fee |
+| [api/feed](https://skarbnik.xyz/api/feed) | The same list, refreshed from the chain about once a minute (`updated_at_utc` says when), and the saved feed.json when the chain cannot be read (`node scripts/test_live_feed.mjs`; docs/evidence/live_feed/) |
 | [tools/skarbnik-vendor-mcp](tools/skarbnik-vendor-mcp/README.md) | An MCP server that lets an AI app run the vendor tool for you on your own computer: it asks for each file path, never opens the secret, shows the cost first and asks for a one time confirm code before publishing or renting a GPU |
 | [docs/VENDOR.md](docs/VENDOR.md) | `tools/skarbnik-vendor`: one config, Proof 0, publish, then `watch` proves and submits every revealed attempt on its own, on a GPU the vendor rents (not a hosted service) |
 

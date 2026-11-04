@@ -1,0 +1,10 @@
+# https://skarbnik.xyz/api/feed after the deploy of d7d28b1 (curl, then the summary fields; headers age and x-vercel-cache)
+source: live
+updated_at_utc: 2026-11-04T00:41:31Z
+generated_at_utc: 2026-11-03T23:43:09Z
+live_note: Read from the chain at updated_at_utc: bounties 7, 18, 34, 35, 40, 41 (the ones the saved feed lists as open, and any newer ones), 10 view calls; every other row is the saved feed of generated_at_utc. Cached about 60 seconds. Read get_bounty before you commit.
+bounty 39: Failed by OutLayer, 1 of 1 used, accepts_commits False
+bounty 40: Open for attempts, 1 of 8 used, accepts_commits True
+bounty 41: Open for attempts, 1 of 8 used, accepts_commits True
+age: 0
+x-vercel-cache: MISS
