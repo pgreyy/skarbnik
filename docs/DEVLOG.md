@@ -2,6 +2,17 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-04: The live feed, second try: the packaging fix
+
+- The first deploy of the live feed (`b97f495`) answered only the saved feed on skarbnik.xyz: "exports is not defined
+  in ES module scope / This file is being treated as an ES module because it has a '.js' file extensi" (the reason, cut
+  at 120 characters). Vercel builds `js/status.js` and `js/rules.js` into CommonJS for the function, and
+  `web/js/package.json` (`"type": "module"`) made Node load that build as an ES module. Reverted on main (`ade3703`); the
+  site was back as before (the five pages loaded with no errors; `/api/feed` gone).
+- Fix: `web/js/package.json` removed; `web/api/feed.js` takes the rules' exports in either form (named, or under
+  `default`). Locally Node 22 still loads the two files as ES modules by their syntax. The branch re-applies the live
+  feed as a revert of the revert, then this fix; tested on the Vercel preview before main.
+
 ## 2026-11-04: A live agent feed at /api/feed (branch live-feed, not deployed)
 
 - Why: `web/feed.json` changes only when someone regenerates and pushes it, so a new bounty was missing from the feed

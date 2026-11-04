@@ -19,8 +19,10 @@ const CALL_MS = 4000; // one view call, per RPC address
 const TOTAL_MS = 9000; // the whole live read; past it, the saved feed is answered
 const IN_FLIGHT = 4; // view calls at once, to stay under the RPCs' rate limits
 
+// The site's status rules. Vercel builds js/status.js and js/rules.js into CommonJS for this function, while Node on
+// its own loads them as ES modules: take the named exports either way (on their own, or under default).
 let rulesP = null;
-const rules = () => (rulesP = rulesP || import('../js/status.js'));
+const rules = () => (rulesP = rulesP || import('../js/status.js').then((m) => (m.statusOf ? m : m.default)));
 let cached = null; // { at, body }
 
 const near = (y) => `${(Number(BigInt(y)) / 1e24).toFixed(6).replace(/0+$/, '').replace(/\.$/, '')} NEAR`;
