@@ -1,8 +1,9 @@
 // For vendors: a header (host a private repair bounty), then five tabs with their own links (#/vendors/host, setup,
 // privacy, compute, limits; also #host ...). Host: two ways with their own links (#way-ai, #way-cmd). AI: the vendor
-// MCP server (tools/skarbnik-vendor-mcp) on the vendor's own computer, its requirements, the setup for Claude
-// Desktop, Claude Code and Codex, the prompt, what the AI does and when it asks (with the one time confirm code), and
-// two drop downs. Commands: the five skarbnik-vendor steps with their real arguments (docs/VENDOR.md), the preflight
+// MCP server (tools/skarbnik-vendor-mcp) on the vendor's own computer: one block per operating system (Windows with
+// WSL, Mac through a Linux computer over ssh, Linux and Claude Code or Codex), each command labelled with where it
+// goes, the prompt, what the AI does and when it asks (with the one time confirm code), and what it can see.
+// Commands: the five skarbnik-vendor steps with their real arguments (docs/VENDOR.md), the preflight
 // and the measured time and cost per proof in drop downs. At the bottom of Host, two closed drop downs: how a repair
 // is checked and how payment works. Setup: what a vendor needs. Privacy: what stays private. Compute: where proving
 // runs. Limits: the current limits. Static: no chain reads, no forms, no secrets in the browser; every command runs
@@ -13,7 +14,6 @@ import { getNumbers } from '../data.js';
 const GH = 'https://github.com/pgreyy/skarbnik';
 const VENDOR_MD = `${GH}/blob/main/docs/VENDOR.md`;
 const MCP_README = `${GH}/blob/main/tools/skarbnik-vendor-mcp/README.md`;
-const SERVER = 'skarbnik/tools/skarbnik-vendor-mcp/server.py';
 const T = 'tools/skarbnik-vendor';
 const PROMPT = 'Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me which level to use, Level 2 unless I choose otherwise, and explain the three levels in plain words. Ask me for each file path you need. Never open, read out or print my secret input file, only use its path. Show me the cost and the time first, and wait for my yes before you publish or spend on a GPU.';
 const WAYS = [{ id: 'ai', label: 'AI', sub: 'Easiest' }, { id: 'cmd', label: 'Commands', sub: 'Advanced' }];
@@ -55,17 +55,6 @@ const SEE = collapse('vSee', 'What can my AI see, and what can’t it?', `<ul cl
   'Testnet only.',
 ].map((t) => `<li>${icon('check')}<span>${t}</span></li>`).join('')}</ul>`);
 
-const WORKED = collapse('vWorked', 'Then: how do I know it worked?', `${li([
-  'Quit the app fully and open it again. On Windows, closing the Claude Desktop window is not enough: right click its icon near the clock and choose Quit.',
-  'In Claude Desktop, Settings, then Developer, lists skarbnik-vendor as running. The tools icon by the message box lists it too.',
-  `Type:${block('Show me the status of my Skarbnik vendor tool.')}`,
-  'After publishing, your bounty shows as Open for attempts on the Bounties page.',
-])}${collapse('vNothing', 'Nothing shows?', li([
-  'Quit the app fully and open it again. Closing the window is not enough.',
-  'The settings file must be valid: one missing comma or bracket breaks it. Print the settings again and compare.',
-  'The server must be where the settings say, and the vendor tool must run on its own first (docs/VENDOR.md).',
-]))}`);
-
 const ASKS = [
   ['Set up', 'init', 'Asks you for each file path and detail. Spends nothing.'],
   ['Check', 'check', 'Nothing to approve: the preflight spends nothing.'],
@@ -74,22 +63,74 @@ const ASKS = [
   ['Watch', 'watch_start', 'A clear yes: it shows the GPU cost per attempt, the spending cap and a one time code.'],
 ];
 
+// Where each command goes: in a terminal, or pasted into the settings file. Nothing here goes into an AI chat.
+const at = (where, text) => `<p class="small faint mt8"><b>${where}</b></p>${block(text)}`;
+const TERM = 'In your terminal (Ubuntu)';
+const SRV = 'tools/skarbnik-vendor-mcp/server.py';
+const WIN_BLOCK = `"mcpServers": {
+  "skarbnik-vendor": {
+    "command": "wsl",
+    "args": ["python3", "-I", "<folder path>/${SRV}"]
+  }
+}`;
+const WIN_EXAMPLE = `{
+  "preferences": {
+    "sidebarMode": "chat"
+  },
+  "mcpServers": {
+    "skarbnik-vendor": {
+      "command": "wsl",
+      "args": ["python3", "-I", "/home/you/skarbnik/${SRV}"]
+    }
+  }
+}`;
+const MAC_BLOCK = `"mcpServers": {
+  "skarbnik-vendor": {
+    "command": "ssh",
+    "args": ["you@linux-host", "python3 -I <folder path>/${SRV}"]
+  }
+}`;
+const INSTALL = [
+  ['Basic tools and Python 3.11 or later.', 'sudo apt update && sudo apt install -y git python3 curl build-essential pkg-config libssl-dev\ngit --version\npython3 --version'],
+  ['Rust, to build the project’s two programs.', 'curl --proto \'=https\' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y\nsource "$HOME/.cargo/env"\ncargo --version'],
+  ['RISC Zero, at the versions the project pins.', 'curl -L https://risczero.com/install | bash\nsource ~/.bashrc\nrzup install rust 1.97.0\nrzup install cargo-risczero 3.0.6\nrzup install r0vm 3.0.6\ncargo risczero --version\nr0vm --version'],
+  ['NEAR CLI (near-cli-rs 0.30.1).', 'curl --proto \'=https\' --tlsv1.2 -LsSf https://github.com/near/near-cli-rs/releases/download/v0.30.1/near-cli-rs-installer.sh | sh\nnear --version'],
+  ['Docker. The build of the two programs needs it once at every level, because the checker inside them is built in Docker. Level 2 also needs it for the Groth16 step. After the second line, close Ubuntu and open it again, then run the two checks.', 'sudo apt install -y docker.io docker-buildx\nsudo usermod -aG docker $USER\ndocker --version\ndocker buildx version'],
+];
+const WIN = li([
+  `Install WSL once, then restart the computer. After the restart, open Ubuntu from the Start menu. Every command from here on runs in this Ubuntu terminal.${at('In your terminal (PowerShell)', 'wsl --install')}`,
+  `Install what the tool needs. Each check command prints a version.${INSTALL.map(([what, cmds]) => `<p class="small mt12">${what}</p>${at(TERM, cmds)}`).join('')}`,
+  `Get the project, build its two programs and make your vendor account. The first build downloads RISC Zero’s guest builder image (about 7.5 GB) and takes a while. The last line makes a testnet account with test NEAR and keeps its key in NEAR CLI.${at(TERM, 'git clone https://github.com/pgreyy/skarbnik.git\ncd skarbnik\ncargo build --release -p skarbnik-host\ncargo build -p kintsugi-check\nls target/release/skarbnik-host target/debug/skarbnik-check\nnear account create-account sponsor-by-faucet-service <you>-vendor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create')}`,
+  `Get the folder path. It prints something like <span class="mono">/home/you/skarbnik</span>. You need it in step 7.${at(`${TERM}, inside the skarbnik folder`, 'pwd')}`,
+  '<b>Quit Claude Desktop fully before you edit its settings file.</b> Closing the window is not enough: right click its icon near the clock and choose Quit, or end it in Task Manager. Claude Desktop rewrites the file when it quits, so an edit made while it is open is lost.',
+  'Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder opens. Quit Claude Desktop again, the same way as in step 5. Then open <span class="mono">claude_desktop_config.json</span> from that folder in Notepad.',
+  `Add the skarbnik-vendor block. Put your folder path from step 4 in place of <span class="mono">&lt;folder path&gt;</span>, next to the other settings, with a comma after the item before it.${at('Paste into the file', WIN_BLOCK)}<p class="small mt12">A file that already has other settings looks like this afterwards. See the comma after the item before it, and the braces around everything.</p>${at('Paste into the file (the whole file, as an example)', WIN_EXAMPLE)}<p class="small mt12">If the file already has <span class="mono">"mcpServers"</span>, add only the <span class="mono">"skarbnik-vendor": {...}</span> part inside it, with a comma after the server before it. This prints the block with your folder path filled in:</p>${at(`${TERM}, inside the skarbnik folder`, `python3 ${SRV} --setup claude-desktop`)}`,
+  'Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers: skarbnik-vendor is listed.',
+  'Not listed? Open the file again and check that <span class="mono">"mcpServers"</span> is still in it. It is lost if Claude Desktop was open while you edited. The logs are in the <span class="mono">logs</span> folder next to <span class="mono">claude_desktop_config.json</span>: <span class="mono">mcp.log</span>.',
+]);
+const MAC = `<p class="small">The vendor tool needs Linux: it reads the computer’s memory from <span class="mono">/proc</span>, which a Mac does not have. So the tool runs on a Linux computer (a server, or a Linux virtual machine), and Claude Desktop on the Mac starts it there over ssh.</p>${li([
+  'On the Linux computer, do Windows steps 2 to 4: install what the tool needs, get the project, build it and get the folder path. Run them in your terminal on the Linux computer.',
+  `Check that the Mac reaches the Linux computer with ssh, with a key and no password question. It must finish without asking anything.${at('In your terminal (Mac)', 'ssh you@linux-host true')}`,
+  `Print the block. It prints a block with the folder path. You need that path in step 5.${at('In your terminal on the Linux computer, inside the skarbnik folder', `python3 ${SRV} --setup claude-desktop`)}`,
+  '<b>Quit Claude Desktop fully:</b> Claude menu, Quit Claude. It rewrites its settings file when it quits, so an edit made while it is open is lost. Then open <span class="mono">~/Library/Application Support/Claude/claude_desktop_config.json</span> in TextEdit.',
+  `Put your ssh login in place of <span class="mono">you@linux-host</span> and the folder path in place of <span class="mono">&lt;folder path&gt;</span>, next to the other settings, with a comma after the item before it (the same rule as Windows step 7).${at('Paste into the file', MAC_BLOCK)}`,
+  'Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers: skarbnik-vendor is listed. Not listed? Check that <span class="mono">"mcpServers"</span> is still in the file. The log is <span class="mono">~/Library/Logs/Claude/mcp.log</span>.',
+])}`;
+const LIN = `<p class="small">Do Windows steps 2 to 4 on the computer where the tool runs (on Windows, inside Ubuntu). Then run one command, inside the skarbnik folder.</p>
+  <p class="small mt12">Claude Code</p>${at('In your terminal', `claude mcp add --scope user skarbnik-vendor -- python3 -I "$PWD/${SRV}"`)}
+  <p class="small mt12">Codex</p>${at('In your terminal', `codex mcp add skarbnik-vendor -- python3 -I "$PWD/${SRV}"`)}
+  <p class="small mt12"><span class="mono">--setup claude-code</span> or <span class="mono">--setup codex</span> prints the same with this computer’s paths. Claude Desktop on Linux: <span class="mono">--setup claude-desktop</span> prints the block; quit the app, paste it into the file as in Windows step 7, save, open the app.</p>`;
+
 const aiWay = `<div class="stack g20">
-  <p class="small">Your secret stays on your computer, so this runs there, not as a link.</p>
-  <div class="stack g12"><p class="ag-sub">1. Get the tool (once)</p>${block('git clone https://github.com/pgreyy/skarbnik.git')}<p class="small">${REQ}</p>${NEED}</div>
-  <div class="stack g12"><p class="ag-sub">2. Add it to your AI app</p>${li([
-    'In Claude Desktop open Settings, then Developer, and press Edit Config.',
-    `Paste this inside it, keeping anything already there. Print it with your own paths, in the folder where you ran git clone:${block(`python3 ${SERVER} --setup claude-desktop`)}`,
-    'Save, then quit Claude fully and open it again.',
-  ])}
-    <p class="ag-sub mt12">Claude Code</p>${block(`claude mcp add --scope user skarbnik-vendor -- python3 "$PWD/${SERVER}"`)}
-    <p class="ag-sub mt12">Codex</p>${block(`codex mcp add skarbnik-vendor -- python3 "$PWD/${SERVER}"`)}
-    <p class="small faint">On Windows the tool runs inside WSL, so Claude Desktop starts it with <span class="mono">wsl</span>: the <a href="${MCP_README}" target="_blank" rel="noopener">README</a> shows the block.</p></div>
-  <div class="stack g12"><p class="ag-sub">3. Ask it to host your bounty</p>${block(PROMPT)}</div>
+  <p class="small">Your secret stays on your computer, so the tool runs there, not as a link. Nothing in these steps goes into an AI chat: each command says where it goes, in your terminal or pasted into the file. Pick the block for your computer, then do the last step.</p>
+  ${collapse('vWin', 'Windows, with Claude Desktop', WIN)}
+  ${collapse('vMac', 'Mac, with Claude Desktop', MAC)}
+  ${collapse('vLin', 'Linux, and anyone using Claude Code or Codex', LIN)}
+  <div class="stack g12"><p class="ag-sub">Last step, for everyone: ask your AI to host your bounty</p><p class="small">This is the one thing you type into your AI chat.</p>${block(PROMPT)}</div>
   <div class="stack g12"><p class="ag-sub">What your AI does, and when it asks you</p>
     <table class="n-tab"><caption class="sr-only">What the AI does, and when it asks you</caption><thead><tr><th scope="col">Step</th><th scope="col">When it asks you</th></tr></thead><tbody>
     ${ASKS.map(([st, tool, when]) => `<tr><td><b>${st}</b> <span class="small faint mono">${tool}</span></td><td>${when}</td></tr>`).join('')}</tbody></table></div>
-  ${SEE}${WORKED}</div>`;
+  ${SEE}<p class="small faint">The same steps: <a href="${MCP_README}" target="_blank" rel="noopener">tools/skarbnik-vendor-mcp/README.md</a>.</p></div>`;
 
 const CMDS = [
   ['Prepare your bounty', `${T} init --out ~/skarbnik-vendor/mybounty.toml`, 'A few questions, written to a config outside the repository. <span class="mono txt">--from &lt;older file&gt;</span> reuses an older config.'],
@@ -99,7 +140,7 @@ const CMDS = [
   ['Let it prove for you', `${T} watch --config ~/skarbnik-vendor/watch.toml`, 'When an agent reveals a fix, it rents a GPU, makes the proof and submits it: about 17 minutes and a few cents per attempt. <span class="mono txt">--once</span> does one pass; <span class="mono txt">status --config ~/skarbnik-vendor/watch.toml</span> shows each attempt.'],
 ];
 const PREFLIGHT = [
-  'The module exists and is within the checker’s limits; the public tests are there. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page (max_patch_bytes).',
+  'The module exists and is within the checker’s limits; the public tests are there. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page (max_patch_bytes).',
   'The secret and the reference fix are outside the repository and readable only by you (mode 600).',
   'The original crashes on the secret input (the checker’s own run).',
   'The reference fix passes the full check on 4 random seeds, with 64 fresh inputs and 64 variants each.',
@@ -121,7 +162,7 @@ const cmdWay = `<div class="stack g20">
 const ntab = (cols, rows, caption) => `<table class="n-tab"><caption class="sr-only">${caption}</caption>${cols ? `<thead><tr>${cols.map((c) => `<th scope="col">${c}</th>`).join('')}</tr></thead>` : ''}<tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 const CHECKED = collapse('vChecked', 'How is a repair checked?', `<p class="small">The same approved checker runs every patch. A patch passes only if all of these hold.</p>
 ${ntab(null, [
-    ['<b>It is a valid small module</b>', 'No imports, within the size and memory limits, with the expected entry points. The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.'],
+    ['<b>It is a valid small module</b>', 'No imports, within the size and memory limits, with the expected entry points. The checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page.'],
     ['<b>The private input no longer crashes it</b>', 'The secret input must not crash it or run it out of its work budget.'],
     ['<b>Public tests still pass</b>', 'On every public test it must give the same answers as the original program.'],
     ['<b>Hidden fairness inputs pass</b>', 'Inputs chosen from a random seed fixed at the reveal. A fix cannot be tailored to them.'],

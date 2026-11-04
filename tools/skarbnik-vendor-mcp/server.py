@@ -7,7 +7,8 @@
 # step: publish (the reward and gas), watch_start and, in GPU mode, prove0 (a rented GPU) first return what will be
 # spent and how long it takes, with a one time confirm code; they only run when called again with that code, after the
 # vendor said yes. watch keeps the vendor tool's own GPU spend cap. Long steps run as jobs (job_status follows them).
-# `--setup <app>` prints the settings for Claude Desktop, Claude Code or Codex with this computer's paths. Python 3.9
+# `--setup <app>` prints the settings for Claude Desktop (inside WSL: the block that starts it with wsl), Claude Code
+# or Codex, with this computer's paths. Python 3.9
 # or later, standard library only (the vendor tool itself needs Python 3.11 or later). Testnet only.
 import json
 import os
@@ -493,14 +494,36 @@ def handle(msg):
     raise LookupError(method)
 
 
+def in_wsl():
+    """True inside WSL (Windows Subsystem for Linux), where Claude Desktop on Windows must start this server with wsl."""
+    if os.environ.get("WSL_DISTRO_NAME"):
+        return True
+    try:
+        return "microsoft" in open("/proc/version").read().lower()
+    except OSError:
+        return False
+
+
 def setup_text(app):
     py, me = sys.executable, os.path.abspath(__file__)
     entry = {"command": py, "args": ["-I", me]}
     if app == "claude-desktop":
-        return ("Claude Desktop: Settings, Developer, Edit Config opens claude_desktop_config.json. Paste this inside it, keeping "
-                "anything already there (if it already has \"mcpServers\", add only the \"skarbnik-vendor\": {...} part, with a comma "
-                "between it and the entry before it). Save, then quit Claude fully and open it again.\n\n"
-                + json.dumps({"mcpServers": {"skarbnik-vendor": entry}}, indent=2))
+        steps = ("Quit Claude Desktop fully first: it rewrites its settings file when it quits, so an edit made while it is open "
+                 "is lost. Then open claude_desktop_config.json (Settings, Desktop app, Extensions, Local MCP servers, Edit config "
+                 "shows the folder; quit the app again before you edit). Paste this next to the other settings, with a comma after "
+                 "the item before it. If the file already has \"mcpServers\", add only the \"skarbnik-vendor\": {...} part inside "
+                 "it. Save, then open Claude Desktop.")
+        if in_wsl():
+            block = json.dumps({"mcpServers": {"skarbnik-vendor": {"command": "wsl", "args": ["python3", "-I", me]}}}, indent=2)
+            distro = os.environ.get("WSL_DISTRO_NAME")
+            tail = (f"\n\nThis starts the server in your default WSL distribution. If that is not {distro}, put \"-d\", \"{distro}\" "
+                    "before \"python3\" in args." if distro else "")
+            return "Claude Desktop on Windows, with this server inside WSL. " + steps + "\n\n" + block + tail
+        tail = ""
+        if sys.platform == "darwin":
+            tail = ("\n\nOn a Mac: the vendor tool needs Linux (it reads /proc/meminfo), so this block alone is not enough. Run the "
+                    "server on a Linux computer you reach with ssh instead (docs/VENDOR.md, Mac).")
+        return "Claude Desktop. " + steps + "\n\n" + json.dumps({"mcpServers": {"skarbnik-vendor": entry}}, indent=2) + tail
     if app == "claude-code":
         return f'Run this once in a terminal:\n\nclaude mcp add --scope user skarbnik-vendor -- "{py}" -I "{me}"\n\nThen start claude; /mcp lists skarbnik-vendor.'
     if app == "codex":
