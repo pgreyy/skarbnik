@@ -1,8 +1,8 @@
 // For vendors: a header (host a private repair bounty), then five tabs with their own links (#/vendors/host, setup,
-// privacy, compute, limits; also #host ...). Host: two ways with their own links (#way-ai, #way-cmd). AI: the vendor
-// MCP server (tools/skarbnik-vendor-mcp) on the vendor's own computer: one block per operating system (Windows with
-// WSL, Mac through a Linux computer over ssh, Linux and Claude Code or Codex), each command labelled with where it
-// goes, the prompt, what the AI does and when it asks (with the one time confirm code), and what it can see.
+// privacy, compute, limits; also #host ...). Host: first the install, the same for both ways (one closed block per
+// computer: Windows with WSL, Mac through a Linux computer over ssh, Linux; each command labelled with where it
+// goes), then two ways with their own links: In your AI app (#way-ai: the vendor MCP server, tools/skarbnik-vendor-mcp,
+// added to the app's settings, the check, the prompt, when it asks, what it can see) and In your terminal (#way-cmd).
 // Commands: the five skarbnik-vendor steps with their real arguments (docs/VENDOR.md), the preflight
 // and the measured time and cost per proof in drop downs. At the bottom of Host, two closed drop downs: how a repair
 // is checked and how payment works. Setup: what a vendor needs. Privacy: what stays private. Compute: where proving
@@ -16,7 +16,7 @@ const VENDOR_MD = `${GH}/blob/main/docs/VENDOR.md`;
 const MCP_README = `${GH}/blob/main/tools/skarbnik-vendor-mcp/README.md`;
 const T = 'tools/skarbnik-vendor';
 const PROMPT = 'Host a private Skarbnik bounty for me with the Skarbnik vendor tool. Ask me which level to use, Level 2 unless I choose otherwise, and explain the three levels in plain words. Ask me for each file path you need. Never open, read out or print my secret input file, only use its path. Show me the cost and the time first, and wait for my yes before you publish or spend on a GPU.';
-const WAYS = [{ id: 'ai', label: 'AI', sub: 'Easiest' }, { id: 'cmd', label: 'Commands', sub: 'Advanced' }];
+const WAYS = [{ id: 'ai', label: 'In your AI app', sub: 'You chat, it runs the steps' }, { id: 'cmd', label: 'In your terminal', sub: 'You type each step' }];
 // The level choice: three short cards, Level 2 recommended; a tap shows what that level needs. The full comparison (who
 // decides, what you need, trust) is on How it works (#/how-it-works/levels).
 const LEVELS = [
@@ -97,36 +97,50 @@ const INSTALL = [
   ['NEAR CLI (near-cli-rs 0.30.1).', 'curl --proto \'=https\' --tlsv1.2 -LsSf https://github.com/near/near-cli-rs/releases/download/v0.30.1/near-cli-rs-installer.sh | sh\nnear --version'],
   ['Docker. The build of the two programs needs it once at every level, because the checker inside them is built in Docker. Level 2 also needs it for the Groth16 step. After the second line, close Ubuntu and open it again, then run the two checks.', 'sudo apt install -y docker.io docker-buildx\nsudo usermod -aG docker $USER\ndocker --version\ndocker buildx version'],
 ];
-const WIN = li([
+const WIN_INSTALL = li([
   `Install WSL once, then restart the computer. After the restart, open Ubuntu from the Start menu. Every command from here on runs in this Ubuntu terminal.${at('In your terminal (PowerShell)', 'wsl --install')}`,
   `Install what the tool needs. Each check command prints a version.${INSTALL.map(([what, cmds]) => `<p class="small mt12">${what}</p>${at(TERM, cmds)}`).join('')}`,
   `Get the project, build its two programs and make your vendor account. The first build downloads RISC Zero’s guest builder image (about 7.5 GB) and takes a while. The last line makes a testnet account with test NEAR and keeps its key in NEAR CLI.${at(TERM, 'git clone https://github.com/pgreyy/skarbnik.git\ncd skarbnik\ncargo build --release -p skarbnik-host\ncargo build -p kintsugi-check\nls target/release/skarbnik-host target/debug/skarbnik-check\nnear account create-account sponsor-by-faucet-service <you>-vendor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create')}`,
-  `Get the folder path. It prints something like <span class="mono">/home/you/skarbnik</span>. You need it in step 7.${at(`${TERM}, inside the skarbnik folder`, 'pwd')}`,
+  `Get the folder path. It prints something like <span class="mono">/home/you/skarbnik</span>. You need it when you add the tool to your AI app.${at(`${TERM}, inside the skarbnik folder`, 'pwd')}`,
+]);
+const WIN_AI = li([
   '<b>Quit Claude Desktop fully before you edit its settings file.</b> Closing the window is not enough: right click its icon near the clock and choose Quit, or end it in Task Manager. Claude Desktop rewrites the file when it quits, so an edit made while it is open is lost.',
-  'Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder opens. Quit Claude Desktop again, the same way as in step 5. Then open <span class="mono">claude_desktop_config.json</span> from that folder in Notepad.',
-  `Add the skarbnik-vendor block. Put your folder path from step 4 in place of <span class="mono">&lt;folder path&gt;</span>, next to the other settings, with a comma after the item before it.${at('Paste into the file', WIN_BLOCK)}<p class="small mt12">A file that already has other settings looks like this afterwards. See the comma after the item before it, and the braces around everything.</p>${at('Paste into the file (the whole file, as an example)', WIN_EXAMPLE)}<p class="small mt12">If the file already has <span class="mono">"mcpServers"</span>, add only the <span class="mono">"skarbnik-vendor": {...}</span> part inside it, with a comma after the server before it. This prints the block with your folder path filled in:</p>${at(`${TERM}, inside the skarbnik folder`, `python3 ${SRV} --setup claude-desktop`)}`,
+  'Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder opens. Quit Claude Desktop again, the same way as in step 1. Then open <span class="mono">claude_desktop_config.json</span> from that folder in Notepad. Installed from the Microsoft Store? Then the file is in <span class="mono">%LOCALAPPDATA%\\Packages\\Claude_...\\LocalCache\\Roaming\\Claude\\</span> instead of <span class="mono">%APPDATA%\\Claude\\</span>. Edit config opens the right folder either way.',
+  `Add the skarbnik-vendor block. Put your folder path from the install, step 4, in place of <span class="mono">&lt;folder path&gt;</span>, next to the other settings, with a comma after the item before it.${at('Paste into the file', WIN_BLOCK)}<p class="small mt12">A file that already has other settings looks like this afterwards. See the comma after the item before it, and the braces around everything.</p>${at('Paste into the file (the whole file, as an example)', WIN_EXAMPLE)}<p class="small mt12">If the file already has <span class="mono">"mcpServers"</span>, add only the <span class="mono">"skarbnik-vendor": {...}</span> part inside it, with a comma after the server before it. This prints the block with your folder path filled in:</p>${at(`${TERM}, inside the skarbnik folder`, `python3 ${SRV} --setup claude-desktop`)}`,
   'Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers: skarbnik-vendor is listed.',
   'Not listed? Open the file again and check that <span class="mono">"mcpServers"</span> is still in it. It is lost if Claude Desktop was open while you edited. The logs are in the <span class="mono">logs</span> folder next to <span class="mono">claude_desktop_config.json</span>: <span class="mono">mcp.log</span>.',
 ]);
-const MAC = `<p class="small">The vendor tool needs Linux: it reads the computer’s memory from <span class="mono">/proc</span>, which a Mac does not have. So the tool runs on a Linux computer (a server, or a Linux virtual machine), and Claude Desktop on the Mac starts it there over ssh.</p>${li([
+const MAC_INSTALL = `<p class="small">The vendor tool needs Linux: it reads the computer’s memory from <span class="mono">/proc</span>, which a Mac does not have. So the tool runs on a Linux computer (a server, or a Linux virtual machine), and Claude Desktop on the Mac starts it there over ssh.</p>${li([
   'On the Linux computer, do Windows steps 2 to 4: install what the tool needs, get the project, build it and get the folder path. Run them in your terminal on the Linux computer.',
   `Check that the Mac reaches the Linux computer with ssh, with a key and no password question. It must finish without asking anything.${at('In your terminal (Mac)', 'ssh you@linux-host true')}`,
-  `Print the block. It prints a block with the folder path. You need that path in step 5.${at('In your terminal on the Linux computer, inside the skarbnik folder', `python3 ${SRV} --setup claude-desktop`)}`,
-  '<b>Quit Claude Desktop fully:</b> Claude menu, Quit Claude. It rewrites its settings file when it quits, so an edit made while it is open is lost. Then open <span class="mono">~/Library/Application Support/Claude/claude_desktop_config.json</span> in TextEdit.',
-  `Put your ssh login in place of <span class="mono">you@linux-host</span> and the folder path in place of <span class="mono">&lt;folder path&gt;</span>, next to the other settings, with a comma after the item before it (the same rule as Windows step 7).${at('Paste into the file', MAC_BLOCK)}`,
-  'Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers: skarbnik-vendor is listed. Not listed? Check that <span class="mono">"mcpServers"</span> is still in the file. The log is <span class="mono">~/Library/Logs/Claude/mcp.log</span>.',
 ])}`;
-const LIN = `<p class="small">Do Windows steps 2 to 4 on the computer where the tool runs (on Windows, inside Ubuntu). Then run one command, inside the skarbnik folder.</p>
+const MAC_AI = li([
+  `Print the block. It prints a block with the folder path. You need that path in step 3.${at('In your terminal on the Linux computer, inside the skarbnik folder', `python3 ${SRV} --setup claude-desktop`)}`,
+  '<b>Quit Claude Desktop fully:</b> Claude menu, Quit Claude. It rewrites its settings file when it quits, so an edit made while it is open is lost. Then open <span class="mono">~/Library/Application Support/Claude/claude_desktop_config.json</span> in TextEdit.',
+  `Put your ssh login in place of <span class="mono">you@linux-host</span> and the folder path in place of <span class="mono">&lt;folder path&gt;</span>, next to the other settings, with a comma after the item before it (the same rule as Windows step 3).${at('Paste into the file', MAC_BLOCK)}`,
+  'Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers: skarbnik-vendor is listed. Not listed? Check that <span class="mono">"mcpServers"</span> is still in the file. The log is <span class="mono">~/Library/Logs/Claude/mcp.log</span>.',
+
+]);
+const LIN_INSTALL = '<p class="small">Do Windows steps 2 to 4 on the computer where the tool runs (on Windows, inside Ubuntu).</p>';
+const LIN_AI = `<p class="small">Run one command in your terminal, inside the skarbnik folder.</p>
   <p class="small mt12">Claude Code</p>${at('In your terminal', `claude mcp add --scope user skarbnik-vendor -- python3 -I "$PWD/${SRV}"`)}
   <p class="small mt12">Codex</p>${at('In your terminal', `codex mcp add skarbnik-vendor -- python3 -I "$PWD/${SRV}"`)}
-  <p class="small mt12"><span class="mono">--setup claude-code</span> or <span class="mono">--setup codex</span> prints the same with this computer’s paths. Claude Desktop on Linux: <span class="mono">--setup claude-desktop</span> prints the block; quit the app, paste it into the file as in Windows step 7, save, open the app.</p>`;
+  <p class="small mt12"><span class="mono">--setup claude-code</span> or <span class="mono">--setup codex</span> prints the same with this computer’s paths. Claude Desktop on Linux: <span class="mono">--setup claude-desktop</span> prints the block; quit the app, paste it into the file as in Windows step 3, save, open the app.</p>`;
+
+// Part 1 of Host, shown to everyone above the two ways: the install, the same for both.
+const install = `<div class="stack g16"><h2 class="h2s">1. Install on your computer</h2>
+  <p class="body">The same for both ways below. Nothing in these steps goes into an AI chat: each command says where it goes, in your terminal or pasted into the file. Your secret stays on your computer, so the tool runs there, not as a link.</p>
+  ${collapse('vInWin', 'Windows', WIN_INSTALL)}
+  ${collapse('vInMac', 'Mac', MAC_INSTALL)}
+  ${collapse('vInLin', 'Linux', LIN_INSTALL)}</div>`;
 
 const aiWay = `<div class="stack g20">
-  <p class="small">Your secret stays on your computer, so the tool runs there, not as a link. Nothing in these steps goes into an AI chat: each command says where it goes, in your terminal or pasted into the file. Pick the block for your computer, then do the last step.</p>
-  ${collapse('vWin', 'Windows, with Claude Desktop', WIN)}
-  ${collapse('vMac', 'Mac, with Claude Desktop', MAC)}
-  ${collapse('vLin', 'Linux, and anyone using Claude Code or Codex', LIN)}
-  <div class="stack g12"><p class="ag-sub">Last step, for everyone: ask your AI to host your bounty</p><p class="small">This is the one thing you type into your AI chat.</p>${block(PROMPT)}</div>
+  <p class="small">Do the install first. Nothing here goes into an AI chat until the last step.</p>
+  ${collapse('vWin', 'Windows, with Claude Desktop', WIN_AI)}
+  ${collapse('vMac', 'Mac, with Claude Desktop', MAC_AI)}
+  ${collapse('vLin', 'Linux, and anyone using Claude Code or Codex', LIN_AI)}
+  <div class="stack g12"><p class="ag-sub">Check it</p><p class="small">Type this into your AI chat. It should answer with the tool’s status.</p>${block('Show me the status of my Skarbnik vendor tool.')}</div>
+  <div class="stack g12"><p class="ag-sub">Ask your AI to host your bounty</p><p class="small">This is the one thing you type into your AI chat to start.</p>${block(PROMPT)}</div>
   <div class="stack g12"><p class="ag-sub">What your AI does, and when it asks you</p>
     <table class="n-tab"><caption class="sr-only">What the AI does, and when it asks you</caption><thead><tr><th scope="col">Step</th><th scope="col">When it asks you</th></tr></thead><tbody>
     ${ASKS.map(([st, tool, when]) => `<tr><td><b>${st}</b> <span class="small faint mono">${tool}</span></td><td>${when}</td></tr>`).join('')}</tbody></table></div>
@@ -180,9 +194,11 @@ ${ntab(['Outcome', 'What happens'], [
 export async function vendors(viewEl, tab, sub) {
   const t0 = { need: 'setup', private: 'privacy', proving: 'compute' }[tab] || tab;
   const way = sub === 'way-cmd' ? 'cmd' : 'ai';
-  const host = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">From your bug to a paid fix</h2><p class="body">Everything runs on NEAR testnet. Two ways, same result.</p></div>
+  const host = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">From your bug to a paid fix</h2><p class="body">Everything runs on NEAR testnet. Install once, then run it one of two ways, with the same result.</p></div>
+    ${install}
+    <div class="stack g16"><h2 class="h2s">2. Run it</h2>
     <div class="card ag-card"><div class="ag-step" style="grid-template-columns:minmax(0,1fr)"><div class="stack g16">${picker('vway', WAYS, way, 'Ways to host a bounty')}
-    ${WAYS.map((w) => pickPanel('vway', w.id, way, w.id === 'ai' ? aiWay : cmdWay)).join('')}</div></div></div>
+    ${WAYS.map((w) => pickPanel('vway', w.id, way, w.id === 'ai' ? aiWay : cmdWay)).join('')}</div></div></div></div>
     ${levelsHtml}
     <div class="n-4 a-three">
       <div class="card"><p class="n-who">Then</p><h3 class="h4">Agents send sealed fixes</h3><p class="small">First a sealed copy, then the real one, so nobody can copy a fix in between.</p></div>

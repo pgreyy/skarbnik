@@ -35,10 +35,12 @@ cap (`budget_usd` in the config's `[gpu]` section): at the cap no new GPU starts
 
 ## Setup
 
-Nothing in these steps goes into an AI chat. Each command says where it goes: in your terminal, or paste into the
-file. Pick the block for your computer, then do the last step.
+### 1. Install on your computer
 
-### Windows, with Claude Desktop
+Nothing in these steps goes into an AI chat. Each command says where it goes: in your terminal, or paste into the
+file. The install is the same for both ways of running the tool.
+
+#### Windows
 
 1. Install WSL once. Open PowerShell and run this, then restart the computer.
 
@@ -107,17 +109,49 @@ file. Pick the block for your computer, then do the last step.
 
        pwd
 
-   It prints something like `/home/you/skarbnik`. You need it in step 7.
+   It prints something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
 
-5. Quit Claude Desktop fully before you edit its settings file. Closing the window is not enough: right click its
+#### Mac
+
+The vendor tool needs Linux: it reads the computer's memory from `/proc`, which a Mac does not have. So the tool runs
+on a Linux computer (a server, or a Linux virtual machine), and Claude Desktop on the Mac starts it there over ssh.
+
+1. On the Linux computer, do Windows steps 2 to 4: install what the tool needs, get the project, build it and get the
+   folder path. Run them in your terminal on the Linux computer.
+
+2. Check that the Mac reaches the Linux computer with ssh, with a key and no password question. In your terminal
+   (Mac):
+
+       ssh you@linux-host true
+
+   It must finish without asking anything.
+
+#### Linux
+
+Do Windows steps 2 to 4 on the computer where the tool runs (on Windows, inside Ubuntu).
+
+### 2. Run it
+
+Two ways, the same result: in your AI app (you chat, it runs the steps), below, or in your terminal (you type
+each step: [docs/VENDOR.md](../../docs/VENDOR.md), Commands).
+
+### In your AI app
+
+Do the install first. Nothing here goes into an AI chat until the last step.
+
+#### Windows, with Claude Desktop
+
+1. Quit Claude Desktop fully before you edit its settings file. Closing the window is not enough: right click its
    icon near the clock and choose Quit, or end it in Task Manager. Claude Desktop rewrites the file when it quits, so
    an edit made while it is open is lost.
 
-6. Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder
-   opens. Quit Claude Desktop again, the same way as in step 5. Then open `claude_desktop_config.json` from that folder
-   in Notepad.
+2. Open Claude Desktop, then Settings, Desktop app, Extensions, Local MCP servers, and press Edit config. A folder
+   opens. Quit Claude Desktop again, the same way as in step 1. Then open `claude_desktop_config.json` from that folder
+   in Notepad. Installed from the Microsoft Store? Then the file is in
+   `%LOCALAPPDATA%\Packages\Claude_...\LocalCache\Roaming\Claude\` instead of `%APPDATA%\Claude\`. Edit config
+   opens the right folder either way.
 
-7. Add the skarbnik-vendor block. Put your folder path from step 4 in place of `<folder path>`. Paste into the file,
+3. Add the skarbnik-vendor block. Put your folder path from the install, step 4, in place of `<folder path>`. Paste into the file,
    next to the other settings, with a comma after the item before it:
 
        "mcpServers": {
@@ -146,38 +180,25 @@ file. Pick the block for your computer, then do the last step.
    the server before it. To get the block with your folder path filled in, run this in your terminal (Ubuntu), inside
    the skarbnik folder: `python3 tools/skarbnik-vendor-mcp/server.py --setup claude-desktop`. It prints the block.
 
-8. Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers:
+4. Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers:
    skarbnik-vendor is listed.
 
-9. Not listed? Open the file again and check that `"mcpServers"` is still in it. It is lost if Claude Desktop was
+5. Not listed? Open the file again and check that `"mcpServers"` is still in it. It is lost if Claude Desktop was
    open while you edited. The logs are in the `logs` folder next to `claude_desktop_config.json`: `mcp.log`.
 
-### Mac, with Claude Desktop
+#### Mac, with Claude Desktop
 
-The vendor tool needs Linux: it reads the computer's memory from `/proc`, which a Mac does not have. So the tool runs
-on a Linux computer (a server, or a Linux virtual machine), and Claude Desktop on the Mac starts it there over ssh.
-
-1. On the Linux computer, do Windows steps 2 to 4: install what the tool needs, get the project, build it and get the
-   folder path. Run them in your terminal on the Linux computer.
-
-2. Check that the Mac reaches the Linux computer with ssh, with a key and no password question. In your terminal
-   (Mac):
-
-       ssh you@linux-host true
-
-   It must finish without asking anything.
-
-3. Print the block. In your terminal on the Linux computer, inside the skarbnik folder:
+1. Print the block. In your terminal on the Linux computer, inside the skarbnik folder:
 
        python3 tools/skarbnik-vendor-mcp/server.py --setup claude-desktop
 
-   It prints a block with the folder path. You need that path in step 5.
+   It prints a block with the folder path. You need that path in step 3.
 
-4. Quit Claude Desktop fully: Claude menu, Quit Claude. It rewrites its settings file when it quits, so an edit made
+2. Quit Claude Desktop fully: Claude menu, Quit Claude. It rewrites its settings file when it quits, so an edit made
    while it is open is lost. Then open `~/Library/Application Support/Claude/claude_desktop_config.json` in TextEdit.
 
-5. Paste into the file, next to the other settings, with a comma after the item before it (the same rule as Windows
-   step 7). Put your ssh login in place of `you@linux-host` and the folder path in place of `<folder path>`:
+3. Paste into the file, next to the other settings, with a comma after the item before it (the same rule as Windows
+   step 3). Put your ssh login in place of `you@linux-host` and the folder path in place of `<folder path>`:
 
        "mcpServers": {
          "skarbnik-vendor": {
@@ -186,14 +207,13 @@ on a Linux computer (a server, or a Linux virtual machine), and Claude Desktop o
          }
        }
 
-6. Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers:
+4. Save the file, then open Claude Desktop. Check Settings, Desktop app, Extensions, Local MCP servers:
    skarbnik-vendor is listed. Not listed? Check that `"mcpServers"` is still in the file. The log is
    `~/Library/Logs/Claude/mcp.log`.
 
-### Linux, and anyone using Claude Code or Codex
+#### Linux, and anyone using Claude Code or Codex
 
-Do Windows steps 2 to 4 on the computer where the tool runs (on Windows, inside Ubuntu). Then run one command in your
-terminal, inside the skarbnik folder.
+Run one command in your terminal, inside the skarbnik folder.
 
 Claude Code. In your terminal:
 
@@ -205,9 +225,15 @@ Codex. In your terminal:
 
 `python3 tools/skarbnik-vendor-mcp/server.py --setup claude-code` (or `--setup codex`) prints the same with this
 computer's paths. Claude Desktop on Linux: `--setup claude-desktop` prints the block; quit the app, paste it into the
-file as in Windows step 7, save, open the app.
+file as in Windows step 3, save, open the app.
 
-### Last step, for everyone: ask your AI to host your bounty
+#### Check it
+
+Type this into your AI chat. It should answer with the tool's status:
+
+> Show me the status of my Skarbnik vendor tool.
+
+#### Ask your AI to host your bounty
 
 This is the one thing you type into your AI chat:
 
