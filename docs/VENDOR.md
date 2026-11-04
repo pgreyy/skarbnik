@@ -3,7 +3,7 @@
 A vendor should not have to be a cryptography operator. `tools/skarbnik-vendor` (Python 3.11 or later, no packages)
 takes a private bounty from a config file to an open bounty, and then proves every revealed attempt by itself. A
 bounty is Level 2 by default; Levels 1 and 0 are explained below.
-The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors. First what you need and the build, the same for both ways;
+The same guide, shorter, is on the site: https://skarbnik.xyz/#/vendors. First the build, the same for both ways;
 then two ways to run it: In your AI app (an AI app runs these commands through tools/skarbnik-vendor-mcp, shows the
 cost first and asks for a one time confirm code before any spend) and In your terminal (the five commands below).
 It needs Linux (on Windows, WSL), Docker and an x86 computer for the Groth16 step (Level 2), and a GPU rental account
@@ -29,23 +29,17 @@ proof; `publish` opens with `open_with_outlayer` and `watch` sends each proof wi
 account that can attach a deposit (an agent's limited key cannot). At every level a timeout is a timeout: no verdict
 in time means the waiting attempts are paid by rule.
 
-## What you need
+## Get the project and build it
 
-The tool runs in Linux. On Windows it runs in WSL (the commands below run in Ubuntu). On a Mac it runs on a Linux
-computer that the Mac reaches over ssh. Nothing in these steps goes into an AI chat. Each check prints a version.
+You need Linux or WSL, git, Python 3.11 or later, near CLI, Rust and Docker. On a Mac the tool runs on a Linux
+computer that the Mac reaches over ssh. Nothing in these steps goes into an AI chat.
 
-| You need | Check, in your terminal | Install |
-| --- | --- | --- |
-| Linux, or Windows with WSL | `uname -sr` | [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) |
-| git | `git --version` | [git](https://git-scm.com/downloads) |
-| Python 3.11 or later | `python3 --version` | [Python](https://www.python.org/downloads/) |
-| NEAR CLI (near-cli-rs 0.30.1) | `near --version` | [near-cli-rs](https://github.com/near/near-cli-rs) |
-| Rust | `cargo --version` | [Rust](https://www.rust-lang.org/tools/install) |
-| Docker with buildx: needed once to build the two programs, and at Level 2 for the Groth16 step | `docker buildx version` | [Docker](https://docs.docker.com/get-started/get-docker/) |
+One block, in this order: get the project, RISC Zero at the versions this project pins, the build, your vendor
+account, the folder path. The first build downloads RISC Zero's guest builder image (about 7.5 GB) and takes a while.
+In your terminal:
 
-RISC Zero, at the versions this project pins ([RISC Zero install](https://dev.risczero.com/api/zkvm/install)). In your
-terminal:
-
+    git clone https://github.com/pgreyy/skarbnik.git
+    cd skarbnik
     curl -L https://risczero.com/install | bash
     source ~/.bashrc
     rzup install rust 1.97.0
@@ -53,27 +47,17 @@ terminal:
     rzup install r0vm 3.0.6
     cargo risczero --version
     r0vm --version
-
-## Get the project and build it
-
-The first build downloads RISC Zero's guest builder image (about 7.5 GB) and takes a while. The last line makes a
-testnet account with test NEAR and keeps its key in NEAR CLI. In your terminal:
-
-    git clone https://github.com/pgreyy/skarbnik.git
-    cd skarbnik
     cargo build --release -p skarbnik-host
     cargo build -p kintsugi-check
     ls target/release/skarbnik-host target/debug/skarbnik-check
     near account create-account sponsor-by-faucet-service <you>-vendor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
-
-The reward is at least 0.1 test NEAR. More test NEAR: the [official faucet](https://docs.near.org/getting-started/faucet)
-or [near-faucet.io](https://near-faucet.io/). A faucet can run out; then ask in the [NEAR dev Telegram](https://t.me/neardev).
-
-Get the folder path. In your terminal, inside the skarbnik folder:
-
     pwd
 
-It prints something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
+The near line makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1 test
+NEAR. More test NEAR: the [official faucet](https://docs.near.org/getting-started/faucet) or
+[near-faucet.io](https://near-faucet.io/). A faucet can run out; then ask in the [NEAR dev Telegram](https://t.me/neardev).
+
+`pwd` prints the folder path, something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
 
 ## Commands
 
@@ -182,10 +166,9 @@ pod removes it after this many minutes even if this machine stops watching it) a
 An MCP server that runs these commands for an AI app (Claude Desktop, Claude Code, Codex), on the computer that holds
 the secret. It asks for each file path and never opens the secret or the fix; `publish`, `watch_start` and `prove0` on a
 rented GPU first return the cost and time with a one time confirm code, and run only when called again with it.
-The same setup is in [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README.md). Do [What you need](#what-you-need) and
-[Get the project and build it](#get-the-project-and-build-it) first.
+The same setup is in [tools/skarbnik-vendor-mcp/README.md](../tools/skarbnik-vendor-mcp/README.md). Do [Get the project and build it](#get-the-project-and-build-it) first.
 
-Do What you need and Get the project and build it first. Nothing here goes into an AI chat until the last step.
+Do Get the project and build it first. Nothing here goes into an AI chat until the last step.
 
 ### Windows, with Claude Desktop
 

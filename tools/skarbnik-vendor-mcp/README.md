@@ -35,23 +35,17 @@ cap (`budget_usd` in the config's `[gpu]` section): at the cap no new GPU starts
 
 ## Setup
 
-### 1. What you need
+### 1. Get the project and build it
 
-The tool runs in Linux. On Windows it runs in WSL (the commands below run in Ubuntu). On a Mac it runs on a Linux
-computer that the Mac reaches over ssh. Nothing in these steps goes into an AI chat. Each check prints a version.
+You need Linux or WSL, git, Python 3.11 or later, near CLI, Rust and Docker. On a Mac the tool runs on a Linux
+computer that the Mac reaches over ssh. Nothing in these steps goes into an AI chat.
 
-| You need | Check, in your terminal | Install |
-| --- | --- | --- |
-| Linux, or Windows with WSL | `uname -sr` | [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) |
-| git | `git --version` | [git](https://git-scm.com/downloads) |
-| Python 3.11 or later | `python3 --version` | [Python](https://www.python.org/downloads/) |
-| NEAR CLI (near-cli-rs 0.30.1) | `near --version` | [near-cli-rs](https://github.com/near/near-cli-rs) |
-| Rust | `cargo --version` | [Rust](https://www.rust-lang.org/tools/install) |
-| Docker with buildx: needed once to build the two programs, and at Level 2 for the Groth16 step | `docker buildx version` | [Docker](https://docs.docker.com/get-started/get-docker/) |
+One block, in this order: get the project, RISC Zero at the versions this project pins, the build, your vendor
+account, the folder path. The first build downloads RISC Zero's guest builder image (about 7.5 GB) and takes a while.
+In your terminal:
 
-RISC Zero, at the versions this project pins ([RISC Zero install](https://dev.risczero.com/api/zkvm/install)). In your
-terminal:
-
+    git clone https://github.com/pgreyy/skarbnik.git
+    cd skarbnik
     curl -L https://risczero.com/install | bash
     source ~/.bashrc
     rzup install rust 1.97.0
@@ -59,36 +53,26 @@ terminal:
     rzup install r0vm 3.0.6
     cargo risczero --version
     r0vm --version
-
-### 2. Get the project and build it
-
-The first build downloads RISC Zero's guest builder image (about 7.5 GB) and takes a while. The last line makes a
-testnet account with test NEAR and keeps its key in NEAR CLI. In your terminal:
-
-    git clone https://github.com/pgreyy/skarbnik.git
-    cd skarbnik
     cargo build --release -p skarbnik-host
     cargo build -p kintsugi-check
     ls target/release/skarbnik-host target/debug/skarbnik-check
     near account create-account sponsor-by-faucet-service <you>-vendor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
-
-The reward is at least 0.1 test NEAR. More test NEAR: the [official faucet](https://docs.near.org/getting-started/faucet)
-or [near-faucet.io](https://near-faucet.io/). A faucet can run out; then ask in the [NEAR dev Telegram](https://t.me/neardev).
-
-Get the folder path. In your terminal, inside the skarbnik folder:
-
     pwd
 
-It prints something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
+The near line makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1 test
+NEAR. More test NEAR: the [official faucet](https://docs.near.org/getting-started/faucet) or
+[near-faucet.io](https://near-faucet.io/). A faucet can run out; then ask in the [NEAR dev Telegram](https://t.me/neardev).
 
-### 3. Run it
+`pwd` prints the folder path, something like `/home/you/skarbnik`. You need it when you add the tool to your AI app.
+
+### 2. Run it
 
 Two ways, the same result: in your AI app (you chat, it runs the steps), below, or in your terminal (you type
 each step: [docs/VENDOR.md](../../docs/VENDOR.md), Commands).
 
 ### In your AI app
 
-Do What you need and Get the project and build it first. Nothing here goes into an AI chat until the last step.
+Do Get the project and build it first. Nothing here goes into an AI chat until the last step.
 
 #### Windows, with Claude Desktop
 

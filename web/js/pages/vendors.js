@@ -1,13 +1,12 @@
 // For vendors: a header (host a private repair bounty), then five tabs with their own links (#/vendors/host, setup,
-// privacy, compute, limits; also #host ...). Host: first what you need (a check and the official install page for
-// each; RISC Zero with its pinned install lines) and getting and building the project, each command labelled with
-// where it goes; then two ways with their own links: In your AI app (#way-ai: the vendor MCP server, tools/skarbnik-vendor-mcp,
-// added to the app's settings, the check, the prompt, when it asks, what it can see) and In your terminal (#way-cmd).
-// Commands: the five skarbnik-vendor steps with their real arguments (docs/VENDOR.md), the preflight
-// and the measured time and cost per proof in drop downs. At the bottom of Host, two closed drop downs: how a repair
-// is checked and how payment works. Setup: what a vendor needs. Privacy: what stays private. Compute: where proving
-// runs. Limits: the current limits. Static: no chain reads, no forms, no secrets in the browser; every command runs
-// on the vendor's own machine.
+// privacy, compute, limits; also #host ...). Host: first one terminal block that gets and builds the project (with RISC
+// Zero at the pinned versions and the vendor account); then two ways with their own links: In your AI app (#way-ai: the
+// vendor MCP server, tools/skarbnik-vendor-mcp, added to the app's settings, the check, the prompt, when it asks, what
+// it can see) and In your terminal (#way-cmd). Commands: the five skarbnik-vendor steps with their real arguments
+// (docs/VENDOR.md), the preflight and the measured time and cost per proof in drop downs. At the bottom of Host, two
+// closed drop downs: how a repair is checked and how payment works. Setup: what a vendor needs. Privacy: what stays
+// private. Compute: where proving runs. Limits: the current limits. Static: no chain reads, no forms, no secrets in the
+// browser; every command runs on the vendor's own machine.
 import { esc, icon, chip, table, note, block, cmd, collapse, picker, pickPanel, bindPicker, tabbed, tabNav } from '../ui.js';
 import { getNumbers } from '../data.js';
 
@@ -109,31 +108,18 @@ const LIN_AI = `<p class="small">Run one command in your terminal, inside the sk
   <p class="small mt12">Codex</p>${at('In your terminal', `codex mcp add skarbnik-vendor -- python3 -I "$PWD/${SRV}"`)}
   <p class="small mt12"><span class="mono">--setup claude-code</span> or <span class="mono">--setup codex</span> prints the same with this computer’s paths. Claude Desktop on Linux: <span class="mono">--setup claude-desktop</span> prints the block; quit the app, paste it into the file as in Windows step 3, save, open the app.</p>`;
 
-// Part 1 of Host, shown to everyone above the two ways: what you need (a check command and the official install page
-// for each, commands only for RISC Zero at the pinned versions), then getting and building the project.
-const NEEDS = [
-  ['Linux, or Windows with WSL', 'uname -sr', 'WSL', 'https://learn.microsoft.com/en-us/windows/wsl/install'],
-  ['git', 'git --version', 'git', 'https://git-scm.com/downloads'],
-  ['Python 3.11 or later', 'python3 --version', 'Python', 'https://www.python.org/downloads/'],
-  ['NEAR CLI (near-cli-rs 0.30.1)', 'near --version', 'near-cli-rs', 'https://github.com/near/near-cli-rs'],
-  ['Rust', 'cargo --version', 'Rust', 'https://www.rust-lang.org/tools/install'],
-  ['Docker with buildx: needed once to build the two programs, and at Level 2 for the Groth16 step', 'docker buildx version', 'Docker', 'https://docs.docker.com/get-started/get-docker/'],
-];
-const RISC = 'curl -L https://risczero.com/install | bash\nsource ~/.bashrc\nrzup install rust 1.97.0\nrzup install cargo-risczero 3.0.6\nrzup install r0vm 3.0.6\ncargo risczero --version\nr0vm --version';
-const BUILD = 'git clone https://github.com/pgreyy/skarbnik.git\ncd skarbnik\ncargo build --release -p skarbnik-host\ncargo build -p kintsugi-check\nls target/release/skarbnik-host target/debug/skarbnik-check\nnear account create-account sponsor-by-faucet-service <you>-vendor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create';
+// Part 1 of Host, shown to everyone above the two ways: one terminal block to get the project, install RISC Zero at
+// the pinned versions, build the two programs, make the vendor account and print the folder path.
+const BUILD = 'git clone https://github.com/pgreyy/skarbnik.git\ncd skarbnik\ncurl -L https://risczero.com/install | bash\nsource ~/.bashrc\nrzup install rust 1.97.0\nrzup install cargo-risczero 3.0.6\nrzup install r0vm 3.0.6\ncargo risczero --version\nr0vm --version\ncargo build --release -p skarbnik-host\ncargo build -p kintsugi-check\nls target/release/skarbnik-host target/debug/skarbnik-check\nnear account create-account sponsor-by-faucet-service <you>-vendor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create\npwd';
 const ext = (label, url) => `<a class="lnk sm" href="${url}" target="_blank" rel="noopener">${label} ${icon('ext')}</a>`;
-const install = `<div class="stack g16"><h2 class="h2s">1. What you need</h2>
-  <p class="body">The tool runs in Linux. On Windows it runs in WSL (the commands below run in Ubuntu). On a Mac it runs on a Linux computer that the Mac reaches over ssh. Nothing in these steps goes into an AI chat. Each check prints a version.</p>
-  <table class="n-tab"><caption class="sr-only">What you need, with a check command and the install page</caption><thead><tr><th scope="col">You need</th><th scope="col">Check, in your terminal</th><th scope="col">Install</th></tr></thead><tbody>
-  ${NEEDS.map(([what, check, label, url]) => `<tr><td>${what}</td><td><span class="mono">${esc(check)}</span></td><td>${ext(label, url)}</td></tr>`).join('')}</tbody></table>
-  <p class="small">RISC Zero, at the versions this project pins. ${ext('RISC Zero install', 'https://dev.risczero.com/api/zkvm/install')}</p>${at('In your terminal', RISC)}</div>
-<div class="stack g16"><h2 class="h2s">2. Get the project and build it</h2>
-  <p class="body">The first build downloads RISC Zero’s guest builder image (about 7.5 GB) and takes a while. The last line makes a testnet account with test NEAR and keeps its key in NEAR CLI.</p>${at('In your terminal', BUILD)}
-  <p class="small">The reward is at least 0.1 test NEAR. More test NEAR: the ${ext('official faucet', 'https://docs.near.org/getting-started/faucet')} or ${ext('near-faucet.io', 'https://near-faucet.io/')}. A faucet can run out; then ask in the ${ext('NEAR dev Telegram', 'https://t.me/neardev')}.</p>
-  <p class="small">Get the folder path. It prints something like <span class="mono">/home/you/skarbnik</span>. You need it when you add the tool to your AI app.</p>${at('In your terminal, inside the skarbnik folder', 'pwd')}</div>`;
+const install = `<div class="stack g16"><h2 class="h2s">1. Get the project and build it</h2>
+  <p class="body">You need Linux or WSL, git, Python 3.11 or later, near CLI, Rust and Docker. On a Mac the tool runs on a Linux computer that the Mac reaches over ssh. Nothing in these steps goes into an AI chat.</p>
+  <p class="small">One block, in this order: get the project, RISC Zero at the versions this project pins, the build, your vendor account, the folder path. The first build downloads RISC Zero’s guest builder image (about 7.5 GB) and takes a while.</p>${at('In your terminal', BUILD)}
+  <p class="small">The near line makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1 test NEAR. More test NEAR: the ${ext('official faucet', 'https://docs.near.org/getting-started/faucet')} or ${ext('near-faucet.io', 'https://near-faucet.io/')}. A faucet can run out; then ask in the ${ext('NEAR dev Telegram', 'https://t.me/neardev')}.</p>
+  <p class="small"><span class="mono">pwd</span> prints the folder path, something like <span class="mono">/home/you/skarbnik</span>. You need it when you add the tool to your AI app.</p></div>`;
 
 const aiWay = `<div class="stack g20">
-  <p class="small">Do What you need and Get the project and build it first. Nothing here goes into an AI chat until the last step.</p>
+  <p class="small">Do Get the project and build it first. Nothing here goes into an AI chat until the last step.</p>
   ${collapse('vWin', 'Windows, with Claude Desktop', WIN_AI)}
   ${collapse('vMac', 'Mac, with Claude Desktop', MAC_AI)}
   ${collapse('vLin', 'Linux, and anyone using Claude Code or Codex', LIN_AI)}
@@ -194,7 +180,7 @@ export async function vendors(viewEl, tab, sub) {
   const way = sub === 'way-cmd' ? 'cmd' : 'ai';
   const host = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">From your bug to a paid fix</h2><p class="body">Everything runs on NEAR testnet. Set up once, then run it one of two ways, with the same result.</p></div>
     ${install}
-    <div class="stack g16"><h2 class="h2s">3. Run it</h2>
+    <div class="stack g16"><h2 class="h2s">2. Run it</h2>
     <div class="card ag-card"><div class="ag-step" style="grid-template-columns:minmax(0,1fr)"><div class="stack g16">${picker('vway', WAYS, way, 'Ways to host a bounty')}
     ${WAYS.map((w) => pickPanel('vway', w.id, way, w.id === 'ai' ? aiWay : cmdWay)).join('')}</div></div></div></div>
     ${levelsHtml}
