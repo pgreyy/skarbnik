@@ -1,0 +1,4 @@
+{
+  "description": "Marks the site's browser modules as ES modules for Node, so the live feed function (api/feed.js) and the scripts can import js/status.js and js/rules.js. Browsers ignore this file.",
+  "type": "module"
+}

@@ -3,6 +3,8 @@
 // The contract, RPC addresses, explorer and published checker image id come from the one site config (js/config.js).
 import { CONTRACT, RPCS, EXPLORER_TX, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, NETWORK } from './config.js';
 export { CONTRACT, RPCS, EXPLORER_TX, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, NETWORK };
+import { nsToDate, commitBy } from './rules.js';
+export { nsToDate, commitBy };
 
 const b64 = (s) => btoa(unescape(encodeURIComponent(s)));
 const cache = new Map();
@@ -79,7 +81,6 @@ export function near(yocto) {
   return `${whole}${frac ? '.' + frac.slice(0, 6) : ''} NEAR`;
 }
 
-export const nsToDate = (ns) => new Date(Number(BigInt(ns) / 1000000n));
 export function utc(ns) {
   const d = nsToDate(ns);
   return d.toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
@@ -104,8 +105,6 @@ export function left(ns, now = Date.now()) {
   const m = Math.floor((ms % 3600000) / 60000);
   return h >= 1 ? `${h} ${h === 1 ? 'hour' : 'hours'} ${m} min left` : `${m} min left`;
 }
-// The last moment a commit is accepted: the contract wants the reveal window and the verdict window before expiry.
-export const commitBy = (b) => (BigInt(b.expires_at_ns) - BigInt(b.reveal_window_ns) - BigInt(b.verdict_window_ns)).toString();
 
 // The access keys of an account (view_access_key_list): each key's public key and permission (FullAccess, or a
 // FunctionCall key with its receiver, methods and gas allowance). Read only; tries the second RPC if the first fails.
