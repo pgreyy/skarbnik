@@ -219,7 +219,9 @@ Do [Build Skarbnik](#build-skarbnik) first. The same steps are in [tools/skarbni
    ~/Library/Logs/Claude/mcp.log. It shows the cost and waits for your yes before it spends anything. Send the
    prompt below.
 
-**Linux (Claude Code or Codex)**
+**Claude Code or Codex**
+
+Works on Windows through WSL, on a Mac and on Linux. Run both commands in your terminal, inside the skarbnik folder.
 
 1. **Add Skarbnik to your AI app.** In your terminal, inside the skarbnik folder. Claude Code, then Codex:
 

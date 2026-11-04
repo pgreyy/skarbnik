@@ -1,12 +1,13 @@
 // For vendors: a header (host a private repair bounty), then five tabs with their own links (#/vendors/host, setup,
 // privacy, compute, limits; also #host ...). Host: 1. Build Skarbnik, one terminal block (with RISC Zero at the pinned
-// versions and the vendor account); 2. Run it, two ways with their own links: AI (#way-ai: pick Windows, Mac or Linux,
-// then short numbered steps to add the vendor MCP server, tools/skarbnik-vendor-mcp, to the app and ask it to host;
-// when it asks; what it can see) and Terminal (#way-cmd). Commands: the five skarbnik-vendor steps with their real
-// arguments (docs/VENDOR.md), the preflight and the measured time and cost per proof in drop downs. At the bottom of
-// Host, two closed drop downs: how a repair is checked and how payment works. Setup: what a vendor needs. Privacy: what
-// stays private. Compute: where proving runs. Limits: the current limits. Static: no chain reads, no forms, no secrets
-// in the browser; every command runs on the vendor's own machine.
+// versions and the vendor account); 2. Run it, two ways with their own links: AI (#way-ai: pick Windows, Mac (both
+// Claude Desktop) or Code (Claude Code or Codex), then short numbered steps to add the vendor MCP server,
+// tools/skarbnik-vendor-mcp, to the app and ask it to host; when it asks; what it can see) and Terminal (#way-cmd).
+// Commands: the five skarbnik-vendor steps with their real arguments (docs/VENDOR.md), the preflight and the measured
+// time and cost per proof in drop downs. At the bottom of Host, two closed drop downs: how a repair is checked and how
+// payment works. Setup: what a vendor needs. Privacy: what stays private. Compute: where proving runs. Limits: the
+// current limits. Static: no chain reads, no forms, no secrets in the browser; every command runs on the vendor's own
+// machine.
 import { esc, icon, chip, table, note, block, cmd, collapse, picker, pickPanel, bindPicker, tabbed, tabNav } from '../ui.js';
 import { getNumbers } from '../data.js';
 
@@ -81,7 +82,7 @@ const whole = (command, args) => `{\n  "mcpServers": {\n    "skarbnik-vendor": {
 const printIt = (id, where) => collapse(id, 'Print it with your folder path filled in', at(where, `python3 ${SRV} --setup claude-desktop`));
 const SPEND = 'It shows the cost and waits for your yes before it spends anything.';
 const CHECK = 'Open Claude Desktop first. If skarbnik-vendor is not listed under Settings, Desktop app, Extensions, Local MCP servers, check that mcpServers is still in the file.';
-const OS = [{ id: 'win', label: 'Windows' }, { id: 'mac', label: 'Mac' }, { id: 'lin', label: 'Linux' }];
+const OS = [{ id: 'win', label: 'Windows', sub: 'Claude Desktop' }, { id: 'mac', label: 'Mac', sub: 'Claude Desktop' }, { id: 'lin', label: 'Code', sub: 'Claude Code or Codex' }];
 const OS_STEPS = {
   win: steps('Windows, with Claude Desktop', [
     ['Quit Claude Desktop', ['Right click its icon near the clock and choose Quit. It rewrites its settings when it quits, so edit them only while it is closed.']],
@@ -97,7 +98,7 @@ const OS_STEPS = {
       `${block(whole('ssh', ['you@linux-host', `python3 -I <folder path>/${SRV}`]))}${printIt('vPrMac', 'In your terminal on the Linux computer, inside the skarbnik folder')}`],
     ['Ask it to host your bounty', [`${CHECK} The log is ~/Library/Logs/Claude/mcp.log.`, SPEND], block(PROMPT)],
   ]),
-  lin: steps('Linux, with Claude Code or Codex', [
+  lin: `<p class="v-help">Works on Windows through WSL, on a Mac and on Linux. Run both commands in your terminal, inside the skarbnik folder.</p>` + steps('Claude Code or Codex', [
     ['Add Skarbnik to your AI app', ['In your terminal, inside the skarbnik folder.'],
       `${at('Claude Code', `claude mcp add --scope user skarbnik-vendor -- python3 -I "$PWD/${SRV}"`)}${at('Codex', `codex mcp add skarbnik-vendor -- python3 -I "$PWD/${SRV}"`)}`],
     ['Ask it to host your bounty', [SPEND], block(PROMPT)],
