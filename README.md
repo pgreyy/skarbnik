@@ -14,6 +14,8 @@ of the result before it applies the payout rule.
 
 > **Keep the test private. Make the result checkable. Let the contract apply the payment rule.**
 
+Demo video: https://x.com/pgreyy/status/2118237758321795364
+
 **Status:** a working prototype on NEAR testnet, live at https://skarbnik.xyz. The checker handles one narrow class of
 task: small, deterministic WebAssembly programs with a crash bug. It is not a general vulnerability scanner, and a PASS
 does not mean the software is secure.
@@ -130,8 +132,6 @@ Bounty 24 from attempt to payout (screenshots of the live site and the testnet e
 | --- | --- | --- |
 | [<img src="docs/img/bounty24-1-attempt.png" alt="Bounty 24 on skarbnik.xyz: the attempt commits a fingerprint, then reveals its patch" width="220">](docs/img/bounty24-1-attempt.png) | [<img src="docs/img/bounty24-2-proof.png" alt="The submit_groth16 receipt on the explorer: Success, result final_pass, log verdict PASS for bounty 24 attempt 0" width="220">](docs/img/bounty24-2-proof.png) | [<img src="docs/img/bounty24-3-payout.png" alt="The payout receipt on the explorer: a transfer of 0.11 NEAR from the contract to kintsugi-agent-d9410f.testnet" width="220">](docs/img/bounty24-3-payout.png) |
 | Commit (a fingerprint), then reveal, on [bounty 24's page](https://skarbnik.xyz/#/bounties/24) | [`submit_groth16`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the contract's log says verdict PASS | 0.11 NEAR to the agent in [the same transaction](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the 0.1 reward and its own 0.01 fee back |
-
-**Demo video:** link to be added.
 
 ## Evidence
 
