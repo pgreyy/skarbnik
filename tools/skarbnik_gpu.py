@@ -35,6 +35,9 @@ DEFAULTS = {
     # terminated at once and the next choice tried), and a timer inside the pod that removes it after this many minutes
     # even if this machine stops watching it
     'cloud_types': ['SECURE'], 'max_usd_per_hr': None, 'self_stop_minutes': None,
+    # the start of each pod's name; leftover pods are found by it, so a second setup on the same RunPod account (a
+    # spike) uses its own prefix and never terminates the pods of the running watches
+    'pod_prefix': POD_PREFIX,
 }
 
 
@@ -165,7 +168,7 @@ class Pod:
 
     def _create(self, cloud, types):
         pub = open(self.g['ssh_key'] + '.pub').read().strip()
-        body = {'name': f'{POD_PREFIX}{self.label}-{int(time.time())}', 'imageName': self.g['image'], 'cloudType': cloud,
+        body = {'name': f'{self.g["pod_prefix"]}{self.label}-{int(time.time())}', 'imageName': self.g['image'], 'cloudType': cloud,
                 'computeType': 'GPU', 'gpuCount': 1, 'gpuTypeIds': list(types), 'gpuTypePriority': 'custom',
                 'containerDiskInGb': int(self.g['container_disk_gb']), 'volumeInGb': 0, 'ports': ['22/tcp'],
                 'supportPublicIp': True, 'env': {'PUBLIC_KEY': pub}}
@@ -321,7 +324,7 @@ def clean_orphans(g, rp, log):
         log(f'could not list RunPod pods to look for leftovers: {e}')
         return
     for p in pods if isinstance(pods, list) else pods.get('pods', []):
-        if str(p.get('name', '')).startswith(POD_PREFIX):
+        if str(p.get('name', '')).startswith(g['pod_prefix']):
             log(f'leftover pod {p.get("id")} ({p.get("name")}) found: terminating it')
             pod = Pod(g, rp, log, 'leftover')
             pod.id = p.get('id')
@@ -362,7 +365,9 @@ def put_binary(pod, g, expect_image_id, log):
             continue
         pod.scp(os.path.join(g['guests_dir'], n), pod.remote(f'skb/prebuilt-guests/{n}'), 300)
     pod.ssh('cd skb && KINTSUGI_PREBUILT_GUESTS=$HOME/skb/prebuilt-guests cargo build --release -q -p skarbnik-host --features cuda-prove-only 2>&1 | tail -5', 1800)
-    out = pod.ssh('cd skb && r0vm --id --elf prebuilt-guests/check_guest.bin | tail -1; grep -h "prebuilt guest check_guest" target/release/build/kintsugi-harness-*/output | tail -1', 120)
+    # the build must embed the expected checker: the patch checker, or the output checker where its guest file is there
+    out = pod.ssh('cd skb && for n in check_guest output_guest; do [ -f prebuilt-guests/$n.bin ] && r0vm --id --elf prebuilt-guests/$n.bin | tail -1; done; '
+                  'grep -h -E "prebuilt guest (check|output)_guest" target/release/build/kintsugi-harness-*/output | tail -2', 120)
     if expect_image_id not in out:
         raise GpuError(f'the GPU build embeds another checker image id than {expect_image_id[:16]}...: {out.strip()[-200:]}')
     pod.ssh('cp skb/target/release/skarbnik-host skarbnik-host && ldd skarbnik-host | grep -i -E "cuda|not found" || true', 120)

@@ -1,0 +1,15 @@
+# Clean reproducible rebuild of the guests in an empty build folder, before allow_image_id (2026-11-07T14:12Z)
+$ CARGO_TARGET_DIR=target/spike-clean cargo build --release -p kintsugi-harness
+    Finished `release` profile [optimized] target(s) in 13m 28s
+EXIT 0
+$ python3 -I scripts/image_ids.py target/spike-clean/release/build/kintsugi-harness-*/out/methods.rs
+HELLO_GUEST_ID a8bf1d826c34547b362646569c5d07ad62d678727a1b744d7038de0d7507ef2c
+CHECK_GUEST_ID dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+OUTPUT_GUEST_ID 77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4
+$ sha256sum of the guest files: clean build folder, then the earlier build folder
+4741ef156b297cc8d5a71ee8c181c437ad81845cfbb3459c801e3443f613eb0a  target/spike-clean/riscv-guest/kintsugi-harness/check_guest/riscv32im-risc0-zkvm-elf/docker/check_guest.bin
+78fdb721fe71f087c366b04be2a74d9ed36a72b3dad97afa5124b60cefcae3ca  target/spike-clean/riscv-guest/kintsugi-harness/hello_guest/riscv32im-risc0-zkvm-elf/docker/hello_guest.bin
+58b2d13d5fb629a31b44a69c152b1e66605f96a26bbc03d140fc5b648f8bb995  target/spike-clean/riscv-guest/kintsugi-harness/output_guest/riscv32im-risc0-zkvm-elf/docker/output_guest.bin
+4741ef156b297cc8d5a71ee8c181c437ad81845cfbb3459c801e3443f613eb0a  target/riscv-guest/kintsugi-harness/check_guest/riscv32im-risc0-zkvm-elf/docker/check_guest.bin
+78fdb721fe71f087c366b04be2a74d9ed36a72b3dad97afa5124b60cefcae3ca  target/riscv-guest/kintsugi-harness/hello_guest/riscv32im-risc0-zkvm-elf/docker/hello_guest.bin
+58b2d13d5fb629a31b44a69c152b1e66605f96a26bbc03d140fc5b648f8bb995  target/riscv-guest/kintsugi-harness/output_guest/riscv32im-risc0-zkvm-elf/docker/output_guest.bin

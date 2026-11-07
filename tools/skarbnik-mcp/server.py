@@ -33,6 +33,9 @@ NETWORKS = {
     "mainnet": {"contract": None, "rpc": ["https://rpc.mainnet.near.org"], "feed": None},
 }
 PUBLISHED_IMAGE_ID = "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
+# More checker image ids to accept, only when SKARBNIK_EXTRA_IMAGE_IDS is set (comma separated): the spike of the output
+# checker for wrong output bugs uses it. Unset, only the published patch checker is accepted.
+EXTRA_IMAGE_IDS = {x.strip() for x in os.environ.get("SKARBNIK_EXTRA_IMAGE_IDS", "").split(",") if x.strip()}
 NONCE_FILE = "skarbnik-mcp-nonces.json"
 HERE = os.path.dirname(os.path.abspath(__file__))
 POSIX = os.name == "posix"
@@ -416,7 +419,7 @@ def bounty_checks(cfg, b, acct=None, level_0_ok=False):
     out = {
         "open": b["state"] == "Open" and b["opened"],
         "level_allowed": b["level"] in (1, 2) or (b["level"] == 0 and bool(level_0_ok)),
-        "published_checker": b["image_id_allowed"] and b["image_id"] == PUBLISHED_IMAGE_ID,
+        "published_checker": b["image_id_allowed"] and (b["image_id"] == PUBLISHED_IMAGE_ID or b["image_id"] in EXTRA_IMAGE_IDS),
         "free_slot": b["active"] < b["max_commits"],
         "time_left": now + int(b["reveal_window_ns"]) + int(b["verdict_window_ns"]) <= int(b["expires_at_ns"]),
     }
