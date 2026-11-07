@@ -1,38 +1,73 @@
-[![NEAR testnet](https://img.shields.io/badge/NEAR-testnet-2B9AB0)](https://testnet.nearblocks.io/address/kintsugi-l2-cihdp.testnet) [![Licence: MIT OR Apache-2.0](https://img.shields.io/badge/licence-MIT%20OR%20Apache--2.0-964A32)](#licence)
-
 <p><picture>
   <source media="(prefers-color-scheme: dark)" srcset="web/img/vinyl-lockup-dark.svg">
   <img src="web/img/vinyl-lockup-light.svg" alt="Skarbnik" width="320">
 </picture></p>
 
-**Fix what you can't see.**<br>
-Private evaluation. Verifiable results. Rule-based payment.
+**Fix what you can't see.**
 
-Skarbnik lets a team offer a bounty for a software repair without publishing the secret input that tests the repair.
-An AI agent submits a patch, the vendor checks it privately, and a NEAR smart contract verifies a zero knowledge proof
-of the result before it applies the payout rule.
-
-> **Keep the test private. Make the result checkable. Let the contract apply the payment rule.**
+Skarbnik is a repair bounty where the input that crashes the code stays secret: an AI agent sends a fix, a zero
+knowledge proof says PASS or FAIL, and at the default level a NEAR contract checks that proof itself before it pays.
+It is a working prototype on NEAR testnet, live at https://skarbnik.xyz, for small deterministic WebAssembly programs
+with a crash bug; it is not a security scanner, and a PASS does not mean the software is secure.
 
 Demo video: https://x.com/pgreyy/status/2118237758321795364
 
-**Status:** a working prototype on NEAR testnet, live at https://skarbnik.xyz. The checker handles one narrow class of
-task: small, deterministic WebAssembly programs with a crash bug. It is not a general vulnerability scanner, and a PASS
-does not mean the software is secure.
+Contents: [Try it](#try-it-in-2-minutes) · [On chain or trusted](#what-is-checked-on-chain-and-what-is-trusted) · [The problem](#the-problem) · [How it works](#how-it-works) ·
+[The checker](#what-the-checker-tests-and-what-it-cant) · [Evidence](#evidence) · [Cost](#cost-and-latency) ·
+[Trust](#trust-assumptions) · [For agents and vendors](#for-agents-and-vendors) · [Roadmap](#roadmap) ·
+[Run and reproduce](#run-and-reproduce) · [Licence](#licence)
+
+## Try it in 2 minutes
+
+Steps 1 and 2 need only `curl` and `python3`.
+
+1. **Read a paid bounty from the chain.** Bounty 24: an AI agent's fix, paid by proof.
+
+       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_bounty","args_base64":"eyJib3VudHlfaWQiOiIyNCJ9"}}' | python3 -c 'import json,sys; b=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(b["id"], b["level"], b["state"])'
+
+   You should see: `24 2 Paid` (bounty 24, Level 2, paid).
+
+2. **Check that the contract accepts only the published checker.**
+
+       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_allowed_image_ids","args_base64":"e30="}}' | python3 -c 'import json,sys; ids=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(ids, "MATCH" if ids == ["dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"] else "DIFFERENT")'
+
+   You should see: `['dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc'] MATCH`
+
+3. **Optional, needs Rust: run the contract's tests.**
+
+       git clone https://github.com/pgreyy/skarbnik && cd skarbnik && cargo test -p kintsugi-contract
+
+   You should see: `test result: ok. 155 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`, then the time it took.
+
+- **See it paid:** bounty 24's payout, tx [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR).
+- **Open bounties you can attempt now:** [bounty 40](https://skarbnik.xyz/#/bounties/40) (Level 1) and
+  [bounty 41](https://skarbnik.xyz/#/bounties/41) (Level 2).
+- **Full tour:** [JUDGE_GUIDE.md](JUDGE_GUIDE.md): three steps in the browser, about 5 minutes, an optional fourth where
+  you run it yourself, then optional checks on your own machine, the claims with what each does not prove, and the limits.
+- **Every step:** [docs/TRY_IT.md](docs/TRY_IT.md), eleven steps with their expected output.
+
+## What is checked on chain and what is trusted
+
+| Part | What it does | On chain or trusted |
+| --- | --- | --- |
+| Level 2 | The contract checks the Groth16 proof itself | Checked on chain |
+| Level 1 | The contract takes OutLayer's answer on the proof | Trusted: OutLayer and its operator |
+| Level 0 | Registered verifiers attest the verdict | Trusted: the verifiers, today run by the project |
+| The timeout rule | Pays the waiting attempts without a verdict | Labelled as a timeout, never as a PASS |
+| The vendor's machine | Proves the attempt, so it sees the secret | Trusted: isolating it is the vendor's job |
 
 ## The problem
 
-A team finds a bug in a program. It has a test input that reliably triggers the bug, and that input is sensitive: it
-cannot be published. The team wants an outside developer or AI agent to repair the public code. Two things get in the
-way:
+A team has a bug and a test input that triggers it, and that input can't be published. It wants an outside developer
+or AI agent to repair the public code. Giving every agent the secret exposes it; if the team alone runs the secret test
+and decides whether to pay, the agent has to trust the team's verdict.
 
-1. Giving every agent the secret test exposes what the team needs to protect.
-2. If the team alone runs the secret test and decides whether to pay, the agent has to trust the team's verdict.
+The team may be honest; the problem is that testing and paying sit with one party. Skarbnik separates them: the vendor
+keeps the secret input, a defined checker evaluates the patch inside a zero knowledge machine, and the NEAR contract
+checks the proof of that result before it pays. It does not prove that a program is secure. It makes one defined test
+result checkable by anyone.
 
-The team may be entirely honest. The problem is that testing and paying sit with one party. Skarbnik separates them:
-the vendor keeps the secret input, a defined checker evaluates the patch inside a zero knowledge machine, and the NEAR
-contract checks the proof of that result before it pays. Skarbnik does not prove that a program is secure. It makes
-one defined test result checkable by anyone.
+> **Keep the test private. Make the result checkable. Let the contract apply the payment rule.**
 
 ## How it works
 
@@ -51,28 +86,27 @@ one defined test result checkable by anyone.
 ```
 
 1. **The vendor proves the challenge can be solved.** Before a bounty opens, the vendor sends **Proof 0**: proof that
-   its own reference fix passes the checker. No agent spends effort on a bounty nobody has solved. It also means a
-   vendor needs a fix before posting; a bug with no known fix can't be posted yet.
+   its own reference fix passes the checker. So a vendor needs a fix first; a bug with no known fix can't be posted yet.
 2. **The agent sends a sealed attempt.** It commits a fingerprint of its patch, then reveals the patch, so the patch
-   can't change in between. Once revealed, the patch is public. The agent signs with a key limited to commit and reveal;
-   it never holds its owner's wallet key.
-3. **The vendor checks the patch privately.** It runs the revealed patch through the checker against the secret input
-   and gets a proof: PASS or FAIL, nothing about the secret. The vendor proves on its own machine or on a GPU it rents
-   for a few minutes; `tools/skarbnik-vendor watch` does this and the submit on its own. It is not a hosted service.
-4. **The contract verifies the proof.** Anyone can send the proof (`submit_groth16`). The contract checks it itself
-   (36.4 Tgas), including the checker's identity and the fields that tie the result to this bounty and this attempt. A
-   PASS pays: a **proof-checked payout**. A FAIL spends the attempt and pays nothing.
+   can't change in between and is public once revealed. It signs with a key limited to commit and reveal, never its
+   owner's wallet key.
+3. **The vendor checks the patch privately.** It runs the revealed patch through the checker against the secret and
+   gets a proof of PASS or FAIL that says nothing about the secret. It proves on its own machine or on a GPU it rents
+   for a few minutes; `tools/skarbnik-vendor watch` does this and the submit on its own (not a hosted service).
+4. **The contract verifies the proof.** Anyone can send it (`submit_groth16`); the contract checks it itself for
+   36.4 Tgas, including the checker's identity and the fields that tie it to this bounty and attempt. A PASS pays (a
+   **proof-checked payout**); a FAIL spends the attempt and pays nothing.
 5. **A timeout is not a verdict.** If no proof arrives within the verdict window, the **timeout rule** splits the reward
-   among the attempts still waiting, so a silent vendor can't hold the reward hostage. A timeout payout says nothing
-   about whether the patch works, and the site labels it apart from proof-checked payouts.
+   among the attempts still waiting, so a silent vendor can't hold it hostage. That payout says nothing about the
+   patch, and the site labels it apart from proof-checked payouts.
 
 **Who decides: three levels.** The vendor picks one when it creates a bounty, and every bounty page and `feed.json`
 show it.
 
 | Level | Who decides | Shown by |
 | --- | --- | --- |
-| 2 (the default) | The contract checks the Groth16 proof itself, as in step 4 | every proof-paid bounty above; EVIDENCE, S6c |
-| 1 | OutLayer runs our pinned verifier program on the proof and the contract trusts its answer: no Groth16 step for the vendor, but OutLayer and its operator are trusted | bounty 36, opened ([`4GdNLf15…`](https://testnet.nearblocks.io/txns/4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ)) and paid by OutLayer's PASS ([`3ZpV6zsg…`](https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u)), and a wrong fix FAIL ([`8HYqqjPy…`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY)); through the vendor tool, bounties 37 and 38, each paid on OutLayer's PASS ([`6nKhWdEu…`](https://testnet.nearblocks.io/txns/6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS), [`4heRP1d6…`](https://testnet.nearblocks.io/txns/4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7)); EVIDENCE, "Level 1 through OutLayer" | | bounties 36 to 39 on testnet: bounty 36 paid by OutLayer's PASS ([`3ZpV6zsg…`](https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u)) and a wrong fix FAIL ([`8HYqqjPy…`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY)), sent by a script; through the vendor tool, bounties 37 and 38 paid on OutLayer's PASS ([`6nKhWdEu…`](https://testnet.nearblocks.io/txns/6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS), [`4heRP1d6…`](https://testnet.nearblocks.io/txns/4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7)) and bounty 39's wrong fix FAIL ([`ogTyBybL…`](https://testnet.nearblocks.io/txns/ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR)); EVIDENCE, "Level 1 through OutLayer" and "Level 1 through the vendor tool" |
+| 2 (the default) | The contract checks the Groth16 proof itself, as in step 4 | bounties 1, 16, 24, 27, 32 and 33, paid by proof; EVIDENCE, S6c |
+| 1 | OutLayer runs our pinned verifier program on the proof and the contract trusts its answer; no Groth16 step for the vendor, but OutLayer and its operator are trusted | bounties 36 to 39: 36 (opened [`4GdNLf15…`](https://testnet.nearblocks.io/txns/4GdNLf15abCXgNAgJ6ZKqSiGkk1w8g7an9VZGEgErZTZ)), 37 and 38 paid on OutLayer's PASS ([`3ZpV6zsg…`](https://testnet.nearblocks.io/txns/3ZpV6zsgY8vuTCvZDSHv3E6NuvC6YgXTvtEQkvuqw92u), [`6nKhWdEu…`](https://testnet.nearblocks.io/txns/6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS), [`4heRP1d6…`](https://testnet.nearblocks.io/txns/4heRP1d6XgvuxsmG6MJA2grufk1h93NR7SnqnYr4dEU7)); 36 and 39 show a wrong fix FAIL ([`8HYqqjPy…`](https://testnet.nearblocks.io/txns/8HYqqjPytxz2iTQvG5C6x4f5ywd9xZd9nQ1k2qeqzQLY), [`ogTyBybL…`](https://testnet.nearblocks.io/txns/ogTyBybLFy3c7zUUavCgrKh3rrt92CkQoXc7WZSk8wR)); EVIDENCE, "Level 1 through OutLayer" and "Level 1 through the vendor tool" |
 | 0 | Registered verifiers attest; today all of them are run by the project | EVIDENCE, S4 |
 
 ## What the checker tests, and what it can't
@@ -98,33 +132,43 @@ cloud misconfiguration isn't a program repair at all. Each of those needs its ow
 Skarbnik could judge it. A PASS means the patch passed this checker against this secret and these tests, nothing more.
 One verdict also tells the agent one bit about the secret, so each bounty caps its attempts (K).
 
-## A 2 minute proof
+## Evidence
 
-- **An AI agent fixed a private bug it could not see:** [bounty 24](https://skarbnik.xyz/bounties/24/). The contract
-  checked the proof and paid 0.11 NEAR (the 0.1 reward and the agent's fee back): tx
-  [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR).
+- **An AI agent fixed a private bug it could not see:** [bounty 24](https://skarbnik.xyz/bounties/24/). A model on NEAR
+  AI Cloud fixed a division by zero in a new program from the public code alone; the secret input and the reference
+  fix were never published. The proof was made by hand (GPU prove and shrink, then a Groth16 wrap elsewhere) and
+  reached the contract 6 h 10 min after the reveal. The contract checked it and paid 0.11 NEAR (the 0.1 reward and the
+  agent's fee back): tx [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR)
+  (docs/EVIDENCE.md, "Bounty 24").
 - **The vendor side with no human:** [bounty 32](https://skarbnik.xyz/bounties/32/). The vendor's `watch` saw the reveal,
   proved the attempt on a rented GPU and sent the proof itself, 17 min 8 s later: tx
-  [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y).
+  [`9B7FPyju…`](https://testnet.nearblocks.io/txns/9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y). It uses the public demo
+  program with a private secret made on the vendor's VPS, so it shows the automatic vendor workflow, not a newly found
+  bug (docs/EVIDENCE.md, "The vendor tool").
 - **A PASS and a FAIL on one bounty:** bounty 1's PASS paid
   ([`CczggiUN…`](https://testnet.nearblocks.io/txns/CczggiUNhgiXdaVefHUrB2QEM4GZMqLLDaaRhZ8a4XeY)); its FAIL paid nothing
   ([`6B9ocDas…`](https://testnet.nearblocks.io/txns/6B9ocDasU1BZU28fshj6D72DkA8VCmar1ePNp9m3vtca)).
-- **A cheat refused:** bounty 17's real journal with another real proof's seal, sent to judge bounty 22, refused by the
-  pairing check itself: tx [`5uKLepww…`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj).
-  [9 more attacks](https://skarbnik.xyz/#/evidence/contract) were refused on chain.
+- **Attacks refused:** bounty 17's real journal with another real proof's seal, sent to judge bounty 22, was refused by
+  the pairing check itself: tx [`5uKLepww…`](https://testnet.nearblocks.io/txns/5uKLepwwYEKUXJTavf8BXbQetFbhRpgeaYviVCaBppkj).
+  [9 more attacks](https://skarbnik.xyz/#/evidence/contract) were refused on chain: another attempt's or bounty's proof, a
+  FAIL shown as a PASS, a flipped bit, a changed journal, another checker id, second proofs, a proof after expiry
+  (docs/EVIDENCE.md, S6c).
 - **An honest timeout:** [bounty 17](https://skarbnik.xyz/bounties/17/). The vendor's laptop proof said PASS but
   finished after the 4 hour window and was never sent, so the timeout rule paid it, labelled as a timeout, not a proof:
   tx [`BLcWs7dp…`](https://testnet.nearblocks.io/txns/BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh).
+- **Tests:** 155 contract tests pass (`cargo test -p kintsugi-contract`), including real proofs from testnet checked
+  natively. The checker gives the expected verdict on 19 of 20 honest and cheating patches, the one difference explained.
+- **Security Lab:** a probe agent sent 12 commits to bounty 23 to learn a 12 bit secret; the attempt cap counted 3, so
+  it learned at most 3 bits. The same probe with no cap, simulated, learned all 12
+  ([Security Lab](https://skarbnik.xyz/#/evidence/lab)).
+- **Rebuilds:** the checker rebuilds to the image id on chain (MATCH). The contract rebuilds to its code hash: run
+  `cargo near build reproducible-wasm` at commit `c86db11` and get the code hash on chain,
+  `7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC` ([docs/TRY_IT.md](docs/TRY_IT.md), step 11).
 - **Open a judge bounty yourself:** judge bounties 28 to 31 are closed; send bounty 17's stored proof from any testnet
   account and the contract checks it and opens one ([docs/TRY_IT.md](docs/TRY_IT.md), step 5). Need test NEAR? Get free
   testnet NEAR from the [official faucet](https://docs.near.org/getting-started/faucet) or
   [near-faucet.io](https://near-faucet.io/). A faucet can run out; if it does, ask in the
   [NEAR dev Telegram](https://t.me/neardev). The near-cli-rs command in TRY_IT step 5 makes a funded account too.
-- **Verify the contract yourself:** rebuild it with `cargo near build reproducible-wasm` at commit `c86db11` and get the
-  code hash on chain, `7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC` ([docs/TRY_IT.md](docs/TRY_IT.md), step 11).
-- **The full tour:** [JUDGE_GUIDE.md](JUDGE_GUIDE.md): three steps in the browser, about 5 minutes (Quick), an optional
-  fourth where you run it yourself, about 2 more minutes, then an optional check on your own machine (Verify), the
-  claims with what each does not prove, and the limits.
 
 Bounty 24 from attempt to payout (screenshots of the live site and the testnet explorer, 2026-10-26):
 
@@ -133,32 +177,16 @@ Bounty 24 from attempt to payout (screenshots of the live site and the testnet e
 | [<img src="docs/img/bounty24-1-attempt.png" alt="Bounty 24 on skarbnik.xyz: the attempt commits a fingerprint, then reveals its patch" width="220">](docs/img/bounty24-1-attempt.png) | [<img src="docs/img/bounty24-2-proof.png" alt="The submit_groth16 receipt on the explorer: Success, result final_pass, log verdict PASS for bounty 24 attempt 0" width="220">](docs/img/bounty24-2-proof.png) | [<img src="docs/img/bounty24-3-payout.png" alt="The payout receipt on the explorer: a transfer of 0.11 NEAR from the contract to kintsugi-agent-d9410f.testnet" width="220">](docs/img/bounty24-3-payout.png) |
 | Commit (a fingerprint), then reveal, on [bounty 24's page](https://skarbnik.xyz/#/bounties/24) | [`submit_groth16`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the contract's log says verdict PASS | 0.11 NEAR to the agent in [the same transaction](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the 0.1 reward and its own 0.01 fee back |
 
-## Evidence
-
-- **Bounty 24, the agent side:** a model on NEAR AI Cloud fixed a division by zero in a new program from the public code
-  alone; the secret input and the reference fix were never published. The proof was made by hand (GPU prove and shrink,
-  then a Groth16 wrap elsewhere) and reached the contract 6 h 10 min after the reveal. Paid by proof
-  (docs/EVIDENCE.md, "Bounty 24").
-- **Bounty 32, the vendor side:** `watch` proved and submitted with no human: 17 min 8 s from reveal to verdict. Bounty
-  32 uses the public demo program with a private secret made on the vendor's VPS, so it shows the automatic vendor
-  workflow, not a newly found bug (docs/EVIDENCE.md, "The vendor tool").
-- **Tests:** 155 contract tests pass (`cargo test -p kintsugi-contract`), including real proofs from testnet checked
-  natively. The checker gives the expected verdict on 19 of 20 honest and cheating patches, the one difference explained.
-- **Attacks:** 9 proof attacks refused on chain: another attempt's or bounty's proof, a FAIL shown as a PASS, a flipped
-  bit, a changed journal, another checker id, second proofs, a proof after expiry (docs/EVIDENCE.md, S6c).
-- **Security Lab:** a probe agent sent 12 commits to bounty 23 to learn a 12 bit secret; the attempt cap counted 3, so
-  it learned at most 3 bits. The same probe with no cap, simulated, learned all 12
-  ([Security Lab](https://skarbnik.xyz/#/evidence/lab)).
-- **Rebuilds:** the checker rebuilds to the image id on chain (MATCH), and the contract rebuilds to its code hash.
-
-Every bounty today, read from the chain:
+Every bounty, read from the chain on 2026-11-07:
 
 | Status | Bounties |
 | --- | --- |
-| Paid by a checked proof | 1, 16, 24, 27, 32, 33 (33: the sealed prove step test) |
+| Paid by a checked proof (Level 2) | 1, 16, 24, 27, 32, 33 (33: the sealed prove step test) |
+| Paid on OutLayer's PASS (Level 1) | 36, 37, 38 |
 | Paid by the timeout rule | 3, 4, 9, 11, 12, 13, 14, 15, 17, 26 (and 8 on paper only: its transfer failed) |
-| Refunded to the vendor | 5, 6 |
-| Demo or test bounties, not settled | 0, 2, 3, 7, 10, 23, 25, 26 |
+| Refunded to the vendor | 0, 2, 5, 6, 10, 23, 25 |
+| Open for attempts | 40 (Level 1) and 41 (Level 2); demo and test bounties 7 and 35 |
+| Not settled | 39 (Level 1: its one attempt failed on OutLayer's answer, nobody was paid); 34 (a test bounty past its expiry) |
 | Judge bounties, closed until a judge opens one | 28, 29, 30, 31 (18 to 22 are retired) |
 
 Every claim with its evidence: [docs/CLAIMS.md](docs/CLAIMS.md). Every run, failures included: [docs/EVIDENCE.md](docs/EVIDENCE.md).
@@ -211,7 +239,7 @@ Details: [docs/numbers.md](docs/numbers.md).
   and so OutLayer, its operator and its keys. It also depends on OutLayer downloading the pinned verifier file from
   GitHub (commit `4e6a1f6`, sha256 `e60647ec...46a8`); without a check, the timeout rule applies. Level 2 trusts none
   of that.
-- **Narrow tasks, testnet only, no external audit.** Only small deterministic WebAssembly repairs are supported. The
+- **Narrow tasks, testnet only, no external audit.** Only small deterministic WebAssembly repairs fit. The
   contract was reviewed in AI review passes ([docs/AUDIT.md](docs/AUDIT.md)).
 
 Every limit: [docs/LIMITS.md](docs/LIMITS.md). Who can do what: [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md).
@@ -309,6 +337,8 @@ Ukrainian for treasurer; in folklore, the mine spirit who rewards honest miners.
 Kintsugi, which the testnet contract keeps.
 
 ## Licence
+
+[![NEAR testnet](https://img.shields.io/badge/NEAR-testnet-2B9AB0)](https://testnet.nearblocks.io/address/kintsugi-l2-cihdp.testnet) [![Licence: MIT OR Apache-2.0](https://img.shields.io/badge/licence-MIT%20OR%20Apache--2.0-964A32)](#licence)
 
 Licensed under either of the Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE)) or the MIT licence
 ([LICENSE-MIT](LICENSE-MIT)), at your option: **MIT OR Apache-2.0**. Copyright 2026 the Skarbnik contributors (see
