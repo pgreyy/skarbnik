@@ -23,13 +23,20 @@
 //! demo salt of the demo bounties), --original <file> and --tests <file> (the bounty's original module and public
 //! tests; default the demo files data/demo/original.wasm and data/demo/public_tests.txt). Proving runs on this machine through the installed
 //! r0vm; nothing is sent to a remote prover.
+//!
+//! --output (any command but hello): the output checker for wrong output bugs (harness/output-guest, its own image id)
+//! instead of the crash checker. With it, execute and prove take --secret <file> (one line: the secret input as hex and
+//! the value a correct program returns; never printed) and --reference-fix <file> (the vendor's hidden reference fix)
+//! in place of --exploit; with --proof0 the candidate must be that reference fix. verify, compress and groth16-args
+//! check the receipt against the output checker's image id.
 
 use std::process::ExitCode;
 use std::time::Instant;
 
 use kintsugi_check::text::{parse_hex, parse_seed, parse_tests, to_hex};
 use kintsugi_check::zk::{GuestInput, Journal, VERDICT_FAIL, VERDICT_PASS};
-use kintsugi_harness::{CHECK_GUEST_ELF, CHECK_GUEST_ID, HELLO_GUEST_ELF, HELLO_GUEST_ID};
+use kintsugi_check_output::zk::OutputGuestInput;
+use kintsugi_harness::{CHECK_GUEST_ELF, CHECK_GUEST_ID, HELLO_GUEST_ELF, HELLO_GUEST_ID, OUTPUT_GUEST_ELF, OUTPUT_GUEST_ID};
 use risc0_zkvm::{default_executor, default_prover, sha::Digest, ExecutorEnv, InnerReceipt, ProverOpts, Receipt};
 
 /// The S1 demo seed ("kintsugi S1 demo seed A........!").
@@ -39,6 +46,22 @@ const DEMO_SEED: &str = "6b696e74737567692053312064656d6f207365656420412e2e2e2e2
 /// secret is short or predictable; a real vendor uses `--bounty <name>`, a private random salt per bounty.
 /// Public on purpose: anyone can recompute the demo bounties' exploit commitment from it and data/demo/exploit.hex.
 const DEMO_SALT: [u8; 32] = *b"kintsugi demo salt, not a secret";
+
+/// The guest program and its image id: the crash checker, or with `--output` the output checker.
+fn guest(output: bool) -> (&'static [u8], [u32; 8]) {
+    if output {
+        (OUTPUT_GUEST_ELF, OUTPUT_GUEST_ID)
+    } else {
+        (CHECK_GUEST_ELF, CHECK_GUEST_ID)
+    }
+}
+
+/// Takes `--output` out of an argument list and says whether it was there.
+fn take_output_flag(args: &[String]) -> (Vec<String>, bool) {
+    let rest: Vec<String> = args.iter().filter(|a| a.as_str() != "--output").cloned().collect();
+    let found = rest.len() != args.len();
+    (rest, found)
+}
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -100,6 +123,10 @@ struct Opts {
     /// The bounty's original module and public tests.
     original: String,
     tests: String,
+    /// `--output`: the output checker; then `secret` and `reference_fix` are the bounty's private files.
+    output: bool,
+    secret: Option<String>,
+    reference_fix: Option<String>,
 }
 
 fn parse_opts(args: &[String]) -> Result<Opts, String> {
@@ -120,6 +147,9 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
         exploit: "data/demo/exploit.hex".to_string(),
         original: "data/demo/original.wasm".to_string(),
         tests: "data/demo/public_tests.txt".to_string(),
+        output: false,
+        secret: None,
+        reference_fix: None,
     };
     let mut i = 1;
     while i < args.len() {
@@ -151,6 +181,13 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
                 i += 1;
                 continue;
             }
+            "--output" => {
+                opts.output = true;
+                i += 1;
+                continue;
+            }
+            "--secret" => opts.secret = Some(value()?.clone()),
+            "--reference-fix" => opts.reference_fix = Some(value()?.clone()),
             "--bounty" => opts.bounty = Some(value()?.clone()),
             "--exploit" => opts.exploit = value()?.clone(),
             "--original" => opts.original = value()?.clone(),
@@ -208,7 +245,47 @@ fn salt_for(opts: &Opts) -> Result<[u8; 32], String> {
     Ok(salt)
 }
 
-fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
+/// What goes into the guest: the crash checker's input, or the output checker's.
+enum Input {
+    Crash(GuestInput),
+    Output(OutputGuestInput),
+}
+
+fn guest_input(opts: &Opts) -> Result<Input, String> {
+    if opts.output {
+        return output_input(opts).map(Input::Output);
+    }
+    crash_input(opts).map(Input::Crash)
+}
+
+/// The output checker's input. The secret file holds one line, "<input as hex> <expected value>"; it is never printed.
+fn output_input(opts: &Opts) -> Result<OutputGuestInput, String> {
+    let secret_path = opts.secret.as_ref().ok_or("--output needs --secret <file>")?;
+    let fix_path = opts.reference_fix.as_ref().ok_or("--output needs --reference-fix <file>")?;
+    let secret_text = String::from_utf8(read(secret_path)?).map_err(|_| "the secret file is not text")?;
+    let mut secret = parse_tests(&secret_text).map_err(|_| "the secret file must hold one line: <input as hex> <expected value>")?;
+    if secret.len() != 1 {
+        return Err("the secret file must hold exactly one line: <input as hex> <expected value>".into());
+    }
+    let secret = secret.remove(0);
+    let tests = parse_tests(&String::from_utf8(read(&opts.tests)?).map_err(|e| e.to_string())?)?;
+    Ok(OutputGuestInput {
+        original: read(&opts.original)?,
+        secret_input: secret.input,
+        expected: secret.expected,
+        reference_fix: read(fix_path)?,
+        salt: salt_for(opts)?,
+        public_tests: tests.into_iter().map(|t| (t.input, t.expected)).collect(),
+        candidate: read(&opts.candidate)?,
+        fuzz_seed: opts.seed,
+        fuzz_count: opts.fuzz_count,
+        variant_count: opts.variants,
+        submission_id: opts.submission_id,
+        mode: if opts.proof0 { kintsugi_check::zk::MODE_PROOF0 } else { kintsugi_check::zk::MODE_CHECK },
+    })
+}
+
+fn crash_input(opts: &Opts) -> Result<GuestInput, String> {
     let exploit_text = String::from_utf8(read(&opts.exploit)?).map_err(|e| e.to_string())?;
     let tests_text = String::from_utf8(read(&opts.tests)?).map_err(|e| e.to_string())?;
     let tests = parse_tests(&tests_text)?;
@@ -227,9 +304,12 @@ fn guest_input(opts: &Opts) -> Result<GuestInput, String> {
     })
 }
 
-fn env_for(input: &GuestInput, po2: Option<u32>) -> Result<ExecutorEnv<'static>, String> {
+fn env_for(input: &Input, po2: Option<u32>) -> Result<ExecutorEnv<'static>, String> {
     let mut builder = ExecutorEnv::builder();
-    builder.write(input).map_err(|e| e.to_string())?;
+    match input {
+        Input::Crash(i) => builder.write(i).map_err(|e| e.to_string())?,
+        Input::Output(i) => builder.write(i).map_err(|e| e.to_string())?,
+    };
     if let Some(p) = po2 {
         builder.segment_limit_po2(p);
     }
@@ -260,11 +340,12 @@ fn execute(args: &[String]) -> Result<(), String> {
     let opts = parse_opts(args)?;
     let input = guest_input(&opts)?;
     let started = Instant::now();
-    let session = default_executor().execute(env_for(&input, opts.po2)?, CHECK_GUEST_ELF).map_err(|e| e.to_string())?;
+    let (elf, id) = guest(opts.output);
+    let session = default_executor().execute(env_for(&input, opts.po2)?, elf).map_err(|e| e.to_string())?;
     let secs = started.elapsed().as_secs_f64();
     let journal: Journal = session.journal.decode().map_err(|e| e.to_string())?;
     println!("candidate: {}", opts.candidate);
-    println!("image id: {}", Digest::from(CHECK_GUEST_ID));
+    println!("image id: {}", Digest::from(id));
     println!("fuzz_count: {} variants: {}", opts.fuzz_count, opts.variants);
     println!("user cycles: {}", session.cycles());
     println!("segments: {}", session.segments.len());
@@ -280,14 +361,15 @@ fn prove(args: &[String]) -> Result<(), String> {
     let input = guest_input(&opts)?;
     let prover_opts = if opts.succinct { ProverOpts::succinct() } else { ProverOpts::composite() };
     let started = Instant::now();
+    let (elf, id) = guest(opts.output);
     let info = default_prover()
-        .prove_with_opts(env_for(&input, opts.po2)?, CHECK_GUEST_ELF, &prover_opts)
+        .prove_with_opts(env_for(&input, opts.po2)?, elf, &prover_opts)
         .map_err(|e| e.to_string())?;
     let prove_secs = started.elapsed().as_secs_f64();
     let receipt = info.receipt;
 
     let started = Instant::now();
-    receipt.verify(CHECK_GUEST_ID).map_err(|e| format!("verification failed: {e}"))?;
+    receipt.verify(id).map_err(|e| format!("verification failed: {e}"))?;
     let verify_secs = started.elapsed().as_secs_f64();
 
     let bytes = bincode::serialize(&receipt).map_err(|e| e.to_string())?;
@@ -303,7 +385,7 @@ fn prove(args: &[String]) -> Result<(), String> {
     let journal: Journal = receipt.journal.decode().map_err(|e| e.to_string())?;
 
     println!("candidate: {}", opts.candidate);
-    println!("image id: {}", Digest::from(CHECK_GUEST_ID));
+    println!("image id: {}", Digest::from(id));
     println!("receipt kind: {}", if opts.succinct { "succinct" } else { "composite" });
     println!("segment po2 limit: {}", opts.po2.map(|p| p.to_string()).unwrap_or_else(|| "default".to_string()));
     println!("fuzz_count: {} variants: {}", opts.fuzz_count, opts.variants);
@@ -321,6 +403,8 @@ fn prove(args: &[String]) -> Result<(), String> {
 
 /// Separate process check: exit 0 if the receipt verifies against the checker image id, 1 if not.
 fn verify(args: &[String]) -> ExitCode {
+    let (args, output) = take_output_flag(args);
+    let (_, id) = guest(output);
     let Some(path) = args.first() else {
         eprintln!("error: missing receipt file");
         return ExitCode::from(2);
@@ -340,10 +424,10 @@ fn verify(args: &[String]) -> ExitCode {
         }
     };
     let started = Instant::now();
-    let result = receipt.verify(CHECK_GUEST_ID);
+    let result = receipt.verify(id);
     let secs = started.elapsed().as_secs_f64();
     println!("receipt file: {path} ({} bytes)", bytes.len());
-    println!("image id: {}", Digest::from(CHECK_GUEST_ID));
+    println!("image id: {}", Digest::from(id));
     println!("verify seconds: {secs:.3}");
     match result {
         Ok(()) => match receipt.journal.decode::<Journal>() {
@@ -368,8 +452,10 @@ fn verify(args: &[String]) -> ExitCode {
 
 /// Compresses a receipt (composite to succinct, or to Groth16), times it, verifies the result and writes it.
 fn compress(args: &[String]) -> Result<(), String> {
-    let [input, output, kind] = args else {
-        return Err("usage: compress <in.bin> <out.bin> <succinct|groth16>".to_string());
+    let (args, output_mode) = take_output_flag(args);
+    let (_, id) = guest(output_mode);
+    let [input, output, kind] = args.as_slice() else {
+        return Err("usage: compress <in.bin> <out.bin> <succinct|groth16> [--output]".to_string());
     };
     let opts = match kind.as_str() {
         "succinct" => ProverOpts::succinct(),
@@ -382,7 +468,7 @@ fn compress(args: &[String]) -> Result<(), String> {
     let compressed = default_prover().compress(&opts, &receipt).map_err(|e| e.to_string())?;
     let secs = started.elapsed().as_secs_f64();
     let started = Instant::now();
-    compressed.verify(CHECK_GUEST_ID).map_err(|e| format!("verification failed: {e}"))?;
+    compressed.verify(id).map_err(|e| format!("verification failed: {e}"))?;
     let verify_secs = started.elapsed().as_secs_f64();
     let out_bytes = bincode::serialize(&compressed).map_err(|e| e.to_string())?;
     std::fs::write(output, &out_bytes).map_err(|e| format!("{output}: {e}"))?;
@@ -435,19 +521,21 @@ fn tamper(args: &[String]) -> Result<(), String> {
 /// own, so a contract's computation can be compared with it.
 fn groth16_args(args: &[String]) -> Result<(), String> {
     use risc0_zkvm::sha::Digestible;
-    let [input, out] = args else { return Err("usage: groth16-args <groth16 receipt.bin> <out.json>".into()) };
+    let (args, output) = take_output_flag(args);
+    let (_, id) = guest(output);
+    let [input, out] = args.as_slice() else { return Err("usage: groth16-args <groth16 receipt.bin> <out.json> [--output]".into()) };
     let receipt: Receipt = bincode::deserialize(&read(input)?).map_err(|e| format!("receipt does not decode: {e}"))?;
-    receipt.verify(CHECK_GUEST_ID).map_err(|e| format!("receipt does not verify: {e}"))?;
+    receipt.verify(id).map_err(|e| format!("receipt does not verify: {e}"))?;
     let groth16 = receipt.inner.groth16().map_err(|e| format!("not a Groth16 receipt: {e}"))?;
     let ctx = risc0_zkvm::VerifierContext::default();
     let params = ctx.groth16_verifier_parameters.as_ref().ok_or("no Groth16 verifier parameters")?;
     let defaults = risc0_zkvm::Groth16ReceiptVerifierParameters::default();
-    let claim = risc0_zkvm::ReceiptClaim::ok(Digest::from(CHECK_GUEST_ID), receipt.journal.bytes.clone());
+    let claim = risc0_zkvm::ReceiptClaim::ok(Digest::from(id), receipt.journal.bytes.clone());
     let hex = |b: &[u8]| b.iter().map(|x| format!("{x:02x}")).collect::<String>();
     let json = format!(
         "{{\"seal\":\"{}\",\"image_id\":\"{}\",\"journal\":\"{}\",\"control_root\":\"{}\",\"bn254_control_id\":\"{}\",\"claim_digest\":\"{}\",\"default_control_root\":\"{}\",\"default_bn254_control_id\":\"{}\"}}\n",
         hex(&groth16.seal),
-        hex(Digest::from(CHECK_GUEST_ID).as_bytes()),
+        hex(Digest::from(id).as_bytes()),
         hex(&receipt.journal.bytes),
         hex(params.control_root.as_bytes()),
         hex(params.bn254_control_id.as_bytes()),

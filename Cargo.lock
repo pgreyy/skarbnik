@@ -2752,6 +2752,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "kintsugi-check-output"
+version = "0.1.0"
+dependencies = [
+ "kintsugi-check",
+ "serde",
+]
+
+[[package]]
 name = "kintsugi-contract"
 version = "0.1.0"
 dependencies = [
@@ -5237,6 +5245,7 @@ version = "0.1.0"
 dependencies = [
  "bincode",
  "kintsugi-check",
+ "kintsugi-check-output",
  "kintsugi-harness",
  "risc0-circuit-keccak",
  "risc0-circuit-recursion",
