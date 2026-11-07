@@ -5,6 +5,76 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Spike output: a second checker for wrong output bugs, end to end on testnet (2026-11-07, branch spike-output)
+
+**Question.** Can Skarbnik pay for a fix of a logic bug (a wrong answer, no crash) with the same contract? The secret is a
+pair, an input and its right answer, under one commitment. A fix must give that answer on the secret input, pass the
+public tests, and agree with the vendor's hidden reference fix on random inputs and on variants of the secret.
+
+**Verdict: PASS for the checker, the proofs and the paid PASS. The FAIL attempt was proved but not recorded on chain.**
+The output checker runs in its own guest with its own image id and commits the crash checker's journal unchanged, so
+the contract needed no code change, only `allow_image_id`. Scratch bounty 42 (Level 2, reward 0.1 NEAR, K 3) was opened
+by a Groth16 Proof 0 and paid the correct fix through a Groth16 proof the contract checked. The partial fix got a valid
+Groth16 FAIL proof, but the PASS was submitted first: it closed the bounty and refunded the open attempt, so the FAIL
+could no longer be submitted. Submitting the FAIL first would have recorded both.
+
+**Design.** `harness/checker-output/` (checker), `harness/output-guest/` (guest), `data/feecalc/` (demo program: a fee
+calculator that rounds down by one for totals of 1000 or more; original 207 bytes, fix 215 bytes),
+`data/attacks/output/` (8 modules). The commitment is sha256 over the salt and a record: `skarbnik-output-v1`, the
+secret input, the right answer and the sha256 of the reference fix. Binding the fix's hash keeps the journal at the same
+780 bytes. In Proof 0 the guest also requires the candidate to be the reference fix.
+
+**Image ids.** A clean rebuild in an empty build folder gave the same ids as before, and the same guest file bytes:
+crash checker `dd6c5f42…a2fc` (unchanged), output checker `77c2e2d1…41c4`.
+`docs/evidence/spike_output/clean_rebuild.txt`.
+
+**Native corpus** (`cargo test -p kintsugi-check-output`, seeds 0, 7 and 201, 64 fairness inputs and 64 variants): 8
+of 8 modules give the expected verdict. The correct fixes pass; the original fails at the secret check; a fix that
+special cases the secret fails at fairness, and with fairness off the variants alone catch it; fixes right on the secret
+and wrong elsewhere fail at fairness.
+
+**On testnet** (contract `kintsugi-l2-cihdp.testnet`, all on 2026-11-07):
+
+| Step | Signer | Result | Transaction | Gas burned |
+| --- | --- | --- | --- | --- |
+| `allow_image_id` `77c2e2d1…` | contract owner | allowlist holds 2 ids | `FdyenSdojsdUqYcNqtnWAwNUKbNfp1ZVMAxVCvfwUKxW` | 2.36 Tgas |
+| `create_bounty` 42 | vendor | Level 2, 0.1 NEAR, K 3, 64 and 64 | `5YEGujgrbeu7BUTssSuztP7KLXvA2u6LR9vJfuqLYjrN` | 2.93 Tgas |
+| `open_with_groth16` | vendor | opened | `EQepjeDqhBNwbRqensG8a5WxUqiiLso2euU1niSirpyt` | 35.27 Tgas |
+| `commit` attempt 0, correct fix | agent | fee 0.01 NEAR | `7hRpSR7CAxEXrTwa99eGF5zvZAf32ruNM86rtF89poy3` | 3.10 Tgas |
+| `commit` attempt 1, partial fix | agent | fee 0.015 NEAR | `Bk8nRMX2vQ3Y1ANbLL4sGqiD2XQno9oYeJyBzwms8JKW` | 3.11 Tgas |
+| `reveal` attempt 0 | agent | seed recorded | `m3KV3VxzrzAWhCzZ1zuDGaUSze3vu2NkLmaQk6bZ9w4` | 2.80 Tgas |
+| `reveal` attempt 1 | agent | seed recorded | `2yiLwfQ2oTGALbp1i2SSpz8Sa7cgFCWFAc8qa4CvGkBG` | 2.82 Tgas |
+| `submit_groth16` attempt 0 | vendor | PASS; 0.1 NEAR paid to the agent; attempt 1's fee refunded | `GwPAbiUJaLC3QSj4Kg92XFP97HeVB47D5tBqXBUymH4r` | 37.02 Tgas |
+
+Vendor `kintsugi-vendor-prnvm.testnet`, agent `skarbnik-agentc-d48260.testnet` through `tools/skarbnik-mcp` with
+`SKARBNIK_EXTRA_IMAGE_IDS` set (the server accepts only the crash checker otherwise). Gas is the total over all receipts,
+read from the chain: `python3 -I scripts/s3_measure.py gas docs/evidence/spike_output/transactions.tsv
+docs/evidence/spike_output/gas.tsv`. State after: `docs/evidence/spike_output/final_state.txt`.
+
+**Proofs.** GPU pods from the VPS with `scripts/spike_output_gpu.py` (its own pod names, spend file and binary, so the
+watches' pods and files were not touched; it waits while a watch pod runs or a watched bounty has an attempt waiting).
+Segment size po2 19. Groth16 wrap on the laptop (Docker).
+
+| Run | Verdict | User cycles | Segments | Prove | Shrink | Pod life, cost | Groth16 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Proof 0, reference fix | PASS | 19,502,925 | 56 | 37.39 s | 27.98 s | 622 s, $0.1538 (RTX 4090; 505 s of it built the GPU binary) | 486.07 s |
+| Attempt 0, correct fix | PASS | 18,570,626 | 54 | 32.13 s | 24.45 s | 95 s, $0.0235 (RTX 4090) | 196.31 s |
+| Attempt 1, partial fix | FAIL | 1,849,941 | 6 | 7.92 s | 4.53 s | 577 s, $0.1426 (RTX 4090; about 460 s of it copying the cached binary to the pod) | 191.30 s |
+
+GPU spend for the spike: $0.3199 over 3 pods (cap $2). Prove and shrink are the times the host printed on the pod. Each
+Groth16 receipt is 2,057 bytes with a 256 byte seal and verifies with `skarbnik-host verify <receipt> --output`. The
+first wrap took longer than the other two (486 s against about 195 s). Raw logs: `docs/evidence/spike_output/proof0/`,
+`attempt0_correct_fix/`, `attempt1_partial_fix/`.
+
+**Kept out of the way.** No contract field holds a name, so bounty 42 carries none. Its commit window was 15 minutes from
+creation (until 14:51:44 UTC); the live feed listed it as open in that time, with no public code, and the published agent
+server refuses it (not the published checker). The site and the feed now show it as a private bounty; marking it as a
+test needs an entry in the site data on main.
+
+**Known limits.** The fairness generator makes inputs in the demo program's format only. The testnet cheat was the
+partial fix, not one that special cases the secret: that one would print the private secret in its revealed code. The
+special case cheat is covered in the native corpus with a public demo secret.
+
 ## Two bounties with a per-account cap: 40 (Level 1) and 41 (Level 2) (2026-11-03)
 
 **Question.** Can the vendor tool publish a bounty from a computer that does not hold the secret (the laptop holds the

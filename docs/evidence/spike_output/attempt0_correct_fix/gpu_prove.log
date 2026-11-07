@@ -1,0 +1,23 @@
+salt: the private salt of bounty feecalc-out (existing)
+candidate: run/patch.wasm
+image id: 77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 64 variants: 64
+total cycles: 27918336
+user cycles: 18570626
+segments: 54
+prove seconds: 32.13
+verify seconds (in process): 0.997
+receipt file: run/u.bin (14453308 bytes)
+seal bytes: 14441584
+journal bytes: 780
+journal.verdict: PASS
+journal.candidate_hash: 87366222115578a56b81b4ba1dc68a44207bdcaa73d4b583e1e93be330b52926
+journal.original_hash: 3788ba07f1dc9c1137e2fcd4434fd692d5906b733913e961b77cf56d2653011b
+journal.exploit_commitment: 9fbfabce77a5f6e96ee527fa5a10c73665a8a9acdd7bcfd81ce3e7b5a493a77c
+journal.corpus_hash: 1523a14d930c52eca97e38b43969c2bc4d44e1e8df4dff25f08a0845bc1b05e3
+journal.fuzz_seed: 66fd604cbe4b4aba8c1cfacc4766bb7cc7303c79fab68ce79ec092ce8c0f41b9
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: 465af050147975509e6692d76ef4fc6926dbb198b38b4bb4ce6bedb4f2971ac9

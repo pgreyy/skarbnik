@@ -2,6 +2,24 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-07: Spike output: a checker for wrong output bugs, on testnet (branch spike-output, not merged)
+
+- Built a second checker for logic bugs: `harness/checker-output/`, its guest `harness/output-guest/` (image id
+  `77c2e2d1…41c4`), the demo program `data/feecalc/` and a corpus of 8 modules in `data/attacks/output/`. The crash
+  checker and its id `dd6c5f42…` did not change. The journal is the same 780 bytes, so the contract did not change.
+- A clean rebuild in an empty build folder (`CARGO_TARGET_DIR=target/spike-clean cargo build --release -p
+  kintsugi-harness`, 13 min 28 s) gave the same ids and guest bytes. Then `allow_image_id` from the contract owner.
+- Tool changes: the GPU helper takes a pod name prefix setting (a second setup must not terminate the watches' pods,
+  which it did by name before) and accepts a pod build of either checker. `scripts/spike_output_gpu.py` proves one job
+  and lets the watches go first. The agent server accepts more checker ids only when `SKARBNIK_EXTRA_IMAGE_IDS` is set.
+- Scratch bounty 42: Proof 0 on a rented RTX 4090 (PASS, 56 segments), Groth16 on the laptop, created and opened with
+  a 15 minute commit window. The agent committed a correct fix and a partial fix. The correct fix was proved PASS and
+  paid 0.1 NEAR. The partial fix was proved FAIL, but I submitted the PASS first, which closed the bounty and refunded
+  the other attempt, so the FAIL is not on chain. Lesson: submit FAIL proofs before a PASS when both are ready.
+- GPU spend $0.3199 of the $2 cap. All transactions, gas and times: `docs/EVIDENCE.md`, section Spike output.
+- Next: the owner decides on a second scratch bounty to record a FAIL on chain (Proof 0 can be reused), and whether
+  the mode goes into the vendor tool, the agent server and the site.
+
 ## 2026-11-04: The live feed, second try: the packaging fix
 
 - The first deploy of the live feed (`b97f495`) answered only the saved feed on skarbnik.xyz: "exports is not defined

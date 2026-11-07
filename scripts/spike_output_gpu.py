@@ -50,9 +50,10 @@ def main():
             sys.exit(f'the watches stayed busy for {WAIT_MAX_S} s ({why}); no pod was started')
         log(f'waiting: {why}')
         time.sleep(60)
+    waited = round(time.time() - t0)
     os.makedirs(job['workdir'], mode=0o700, exist_ok=True)
     _, times = gpu.prove_on_gpu(cfg, job, log)
-    times['waited_for_watches_s'] = round(time.time() - t0) if time.time() - t0 > 5 else 0
+    times['waited_for_watches_s'] = waited if waited > 5 else 0
     json.dump(times, open(os.path.join(job['workdir'], 'times.json'), 'w'), indent=1)
     print(json.dumps(times))
 
