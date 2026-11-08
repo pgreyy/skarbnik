@@ -1,0 +1,109 @@
+{
+ "pods": [
+  {
+   "id": "rlosfv7mdmk87j",
+   "label": "bscratchap0",
+   "created_utc": "2026-11-08T20:12:47Z",
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "data_center": "EU-RO-1",
+   "cost_per_hr": 0.89,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-11-08T20:24:13Z",
+   "seconds": 686,
+   "cost_usd": 0.1696,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "7e5poy0t6135cp",
+   "label": "bscratchap0",
+   "created_utc": "2026-11-08T20:25:43Z",
+   "gpu": "NVIDIA L40S",
+   "data_center": null,
+   "cost_per_hr": 1.09,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-11-08T20:25:45Z",
+   "seconds": 3,
+   "cost_usd": 0.0009,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "qnhocucu1r76ps",
+   "label": "bscratchap0",
+   "created_utc": "2026-11-08T20:25:45Z",
+   "gpu": "NVIDIA RTX 6000 Ada Generation",
+   "data_center": "US-WA-1",
+   "cost_per_hr": 0.99,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-11-08T20:25:48Z",
+   "seconds": 3,
+   "cost_usd": 0.0008,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "0e38hpbkor4373",
+   "label": "bscratchap0",
+   "created_utc": "2026-11-08T20:27:58Z",
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "data_center": "EUR-NO-1",
+   "cost_per_hr": 0.89,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-11-08T20:32:50Z",
+   "seconds": 293,
+   "cost_usd": 0.0724,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "2c66hab2kilpwi",
+   "label": "b44a0",
+   "created_utc": "2026-11-08T20:42:05Z",
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "data_center": "US-NC-1",
+   "cost_per_hr": 0.89,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-11-08T20:44:38Z",
+   "seconds": 152,
+   "cost_usd": 0.0376,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "qdplu267sqbng9",
+   "label": "b44a1",
+   "created_utc": "2026-11-08T20:44:40Z",
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "data_center": "US-NC-1",
+   "cost_per_hr": 0.89,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-11-08T20:49:40Z",
+   "seconds": 300,
+   "cost_usd": 0.0742,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "8r37t2hl5tnvo1",
+   "label": "bpostageap0",
+   "created_utc": "2026-11-08T21:21:48Z",
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "data_center": null,
+   "cost_per_hr": 0.89,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-11-08T21:33:46Z",
+   "seconds": 718,
+   "cost_usd": 0.1775,
+   "terminate_confirmed": true
+  },
+  {
+   "id": "jjxkimahh6xgbc",
+   "label": "bshelvesap0",
+   "created_utc": "2026-11-08T21:40:18Z",
+   "gpu": "NVIDIA GeForce RTX 4090",
+   "data_center": "EUR-IS-2",
+   "cost_per_hr": 0.89,
+   "image": "runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404",
+   "terminated_utc": "2026-11-08T22:00:44Z",
+   "seconds": 1227,
+   "cost_usd": 0.3033,
+   "terminate_confirmed": true
+  }
+ ],
+ "total_usd": 0.8363
+}

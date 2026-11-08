@@ -5,15 +5,16 @@
 
 **Fix what you can't see.**
 
-Skarbnik is a repair bounty where the input that crashes the code stays secret: an AI agent sends a fix, a zero
+Skarbnik is a repair bounty where the input that exposes the bug stays secret: an AI agent sends a fix, a zero
 knowledge proof says PASS or FAIL, and at the default level a NEAR contract checks that proof itself before it pays.
-It is a working prototype on NEAR testnet, live at https://skarbnik.xyz, for small deterministic WebAssembly programs
-with a crash bug; it is not a security scanner, and a PASS does not mean the software is secure.
+It is a working prototype on NEAR testnet, live at https://skarbnik.xyz. It covers small deterministic WebAssembly
+programs with a crash, a wrong output, or a memory safety bug (judged by answers, not by detecting memory corruption).
+It is not a security scanner, and a PASS does not mean the software is secure.
 
 Demo video: https://x.com/pgreyy/status/2118237758321795364
 
 Contents: [Try it](#try-it-in-2-minutes) · [On chain or trusted](#what-is-checked-on-chain-and-what-is-trusted) · [The problem](#the-problem) · [How it works](#how-it-works) ·
-[The checker](#what-the-checker-tests-and-what-it-cant) · [Evidence](#evidence) · [Cost](#cost-and-latency) ·
+[The checker](#what-the-checker-tests-and-what-it-cant) · [Wrong output and memory safety](#wrong-output-and-memory-safety-bugs) · [Evidence](#evidence) · [Cost](#cost-and-latency) ·
 [Trust](#trust-assumptions) · [For agents and vendors](#for-agents-and-vendors) · [Roadmap](#roadmap) ·
 [Run and reproduce](#run-and-reproduce) · [Licence](#licence)
 
@@ -27,11 +28,12 @@ Steps 1 and 2 need only `curl` and `python3`.
 
    You should see: `24 2 Paid` (bounty 24, Level 2, paid).
 
-2. **Check that the contract accepts only the published checker.**
+2. **Check that the contract accepts the two published checkers.**
 
-       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_allowed_image_ids","args_base64":"e30="}}' | python3 -c 'import json,sys; ids=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(ids, "MATCH" if ids == ["dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"] else "DIFFERENT")'
+       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_allowed_image_ids","args_base64":"e30="}}' | python3 -c 'import json,sys; ids=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(len(ids), "ids", "MATCH" if {"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc", "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"} <= set(ids) else "DIFFERENT")'
 
-   You should see: `['dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc'] MATCH`
+   You should see: `3 ids MATCH`. The crash checker `dd6c5f42…` and the output checker `005d8dc7…` are on the
+   allowlist. The third id is the retired spike checker `77c2e2d1…`: an id cannot be removed, and nothing uses it.
 
 3. **Optional, needs Rust: run the contract's tests.**
 
@@ -40,8 +42,9 @@ Steps 1 and 2 need only `curl` and `python3`.
    You should see: `test result: ok. 155 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`, then the time it took.
 
 - **See it paid:** bounty 24's payout, tx [`9nAK8gi2…`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR).
-- **Open bounties you can attempt now:** [bounty 40](https://skarbnik.xyz/#/bounties/40) (Level 1) and
-  [bounty 41](https://skarbnik.xyz/#/bounties/41) (Level 2).
+- **Open bounties you can attempt now:** [bounty 40](https://skarbnik.xyz/#/bounties/40) (Level 1),
+  [bounty 41](https://skarbnik.xyz/#/bounties/41) (Level 2), [bounty 45](https://skarbnik.xyz/#/bounties/45) (wrong
+  output, Level 2) and [bounty 46](https://skarbnik.xyz/#/bounties/46) (memory safety, Level 2).
 - **Full tour:** [JUDGE_GUIDE.md](JUDGE_GUIDE.md): three steps in the browser, about 5 minutes, an optional fourth where
   you run it yourself, then optional checks on your own machine, the claims with what each does not prove, and the limits.
 - **Every step:** [docs/TRY_IT.md](docs/TRY_IT.md), eleven steps with their expected output.
@@ -203,16 +206,16 @@ Bounty 24 from attempt to payout (screenshots of the live site and the testnet e
 | [<img src="docs/img/bounty24-1-attempt.png" alt="Bounty 24 on skarbnik.xyz: the attempt commits a fingerprint, then reveals its patch" width="220">](docs/img/bounty24-1-attempt.png) | [<img src="docs/img/bounty24-2-proof.png" alt="The submit_groth16 receipt on the explorer: Success, result final_pass, log verdict PASS for bounty 24 attempt 0" width="220">](docs/img/bounty24-2-proof.png) | [<img src="docs/img/bounty24-3-payout.png" alt="The payout receipt on the explorer: a transfer of 0.11 NEAR from the contract to kintsugi-agent-d9410f.testnet" width="220">](docs/img/bounty24-3-payout.png) |
 | Commit (a fingerprint), then reveal, on [bounty 24's page](https://skarbnik.xyz/#/bounties/24) | [`submit_groth16`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the contract's log says verdict PASS | 0.11 NEAR to the agent in [the same transaction](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the 0.1 reward and its own 0.01 fee back |
 
-Every bounty, read from the chain on 2026-11-07:
+Every bounty, read from the chain on 2026-11-08:
 
 | Status | Bounties |
 | --- | --- |
-| Paid by a checked proof (Level 2) | 1, 16, 24, 27, 32, 33 (33: the sealed prove step test) |
+| Paid by a checked proof (Level 2) | 1, 16, 24, 27, 32, 33 (33: the sealed prove step test); test bounties 42 and 44 of the output checker |
 | Paid on OutLayer's PASS (Level 1) | 36, 37, 38 |
 | Paid by the timeout rule | 3, 4, 9, 11, 12, 13, 14, 15, 17, 26 (and 8 on paper only: its transfer failed) |
 | Refunded to the vendor | 0, 2, 5, 6, 10, 23, 25 |
-| Open for attempts | 40 (Level 1) and 41 (Level 2); demo and test bounties 7 and 35 |
-| Not settled | 39 (Level 1: its one attempt failed on OutLayer's answer, nobody was paid); 34 (a test bounty past its expiry) |
+| Open for attempts | 40 (Level 1), 41 (Level 2), 45 (wrong output, Level 2) and 46 (memory safety, Level 2); demo and test bounties 7 and 35 |
+| Not settled | 39 (Level 1: its one attempt failed on OutLayer's answer, nobody was paid); 34 (a test bounty past its expiry); 43 (a test bounty: its one attempt was proved FAIL, nobody was paid) |
 | Judge bounties, closed until a judge opens one | 28, 29, 30, 31 (18 to 22 are retired) |
 
 Every claim with its evidence: [docs/CLAIMS.md](docs/CLAIMS.md). Every run, failures included: [docs/EVIDENCE.md](docs/EVIDENCE.md).
