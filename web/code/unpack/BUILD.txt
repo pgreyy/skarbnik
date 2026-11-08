@@ -3,5 +3,8 @@ rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-
   -C codegen-units=1 -C target-cpu=mvp -C link-arg=-zstack-size=8192 -C link-arg=--initial-memory=131072 \
   -C link-arg=--max-memory=131072 -o patch.wasm patch.rs
 Keep the interface: input_buf() -> i32 and parse(len: i32) -> i32. The patch must be at most the bounty's max_patch_bytes: the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page.
+Size: with these flags a fix stays close to the original (a few hundred bytes). Code that can panic (checked slice
+indexing, unwrap, integer overflow checks, format strings) pulls in about 2 KB of panic message code and can go over the
+limit: use the original's style (raw pointer reads or get() with a default, plain arithmetic) and keep its panic handler.
 Public tests: one per line, <input as hex, or - for empty> <value the original returns>. corpus_hash is sha256 over, for
 each test in order: input length (u32 little endian), input bytes, expected value (i32 little endian).

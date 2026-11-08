@@ -1942,6 +1942,256 @@
     "script": "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp"
    }
   ],
+  "42": [
+   {
+    "step": "create_spike",
+    "method": "create_bounty",
+    "tx": "5YEGujgrbeu7BUTssSuztP7KLXvA2u6LR9vJfuqLYjrN",
+    "what": "Bounty created",
+    "time": "2026-11-07 14:36 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "open_spike",
+    "method": "open_with_groth16",
+    "tx": "EQepjeDqhBNwbRqensG8a5WxUqiiLso2euU1niSirpyt",
+    "what": "Opened with its Proof 0",
+    "time": "2026-11-07 14:36 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "agent_commit_a0_correct_fix",
+    "method": "commit",
+    "tx": "7hRpSR7CAxEXrTwa99eGF5zvZAf32ruNM86rtF89poy3",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "agent_commit_a1_partial_fix",
+    "method": "commit",
+    "tx": "Bk8nRMX2vQ3Y1ANbLL4sGqiD2XQno9oYeJyBzwms8JKW",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "agent_reveal_a0",
+    "method": "reveal",
+    "tx": "m3KV3VxzrzAWhCzZ1zuDGaUSze3vu2NkLmaQk6bZ9w4",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "agent_reveal_a1",
+    "method": "reveal",
+    "tx": "2yiLwfQ2oTGALbp1i2SSpz8Sa7cgFCWFAc8qa4CvGkBG",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "submit_a0_correct_fix",
+    "method": "submit_groth16",
+    "tx": "GwPAbiUJaLC3QSj4Kg92XFP97HeVB47D5tBqXBUymH4r",
+    "what": "Proof of an attempt sent",
+    "time": "2026-11-07 14:52 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   }
+  ],
+  "43": [
+   {
+    "step": "create_43",
+    "method": "create_bounty",
+    "tx": "8CFNeEjderoiCo7sXQvKC3kYcQjvaFLMffndrGrE6DFH",
+    "what": "Bounty created",
+    "time": "2026-11-08 18:10 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "open_43",
+    "method": "open_with_groth16",
+    "tx": "7XmZDUvKLQ9ChRocNQHsWxGAqXN5p92NiDLaZiVzsPCM",
+    "what": "Opened with its Proof 0",
+    "time": "2026-11-08 18:10 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "submit_43_partial_fix_fail",
+    "method": "submit_groth16",
+    "tx": "9ahn3Mt38iQyAVZfkQLVJQxWeidADL61DcfbmnG6uxKp",
+    "what": "Proof of an attempt sent",
+    "time": "2026-11-08 19:03 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "agent_commit_43_partial_fix",
+    "method": "commit",
+    "tx": "EoYpB23Yj1pPbwUsvp8hNXVgCyAiXcMu5wUgrS48hrW8",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "agent_reveal_43",
+    "method": "reveal",
+    "tx": "Agy73zEZQH4RBVA9VeZmbu6gercoP2vETq68MCynXci7",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/spike_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   }
+  ],
+  "44": [
+   {
+    "step": "ms_create",
+    "method": "create_bounty",
+    "tx": "EuqRbRzNYRkXGx2oUKHJ5cLjMwtr5KqBfHyphk2rMn5M",
+    "what": "Bounty created",
+    "time": "2026-11-08 20:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "ms_open",
+    "method": "open_with_groth16",
+    "tx": "DqiGXVvV1aXvoURDk2MnjEnnBSs1NzELdGraReq5hLmt",
+    "what": "Opened with its Proof 0",
+    "time": "2026-11-08 20:39 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "ms_agent_commit_a0_partial_fix",
+    "method": "commit",
+    "tx": "3yiqTBrnBadvNxNVNX1CDUH8uMywrYHowUbfgNzCNGqS",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "ms_agent_commit_a1_correct_fix",
+    "method": "commit",
+    "tx": "82m3Wdk4aduGxNBiuiJoJuJAznPGYiqYfgfh45M6prjh",
+    "what": "Attempt committed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "ms_agent_reveal_a0",
+    "method": "reveal",
+    "tx": "Bf3baKJ8HCm6Yub7sN58ay6WckF8jxvGAFoei7iG1uXC",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "ms_agent_reveal_a1",
+    "method": "reveal",
+    "tx": "ALJE5y29pHxkNf9Fo3x5PBhA4SUbVLehKMitQbnNPjSy",
+    "what": "Attempt revealed",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "ms_submit_a0_partial_fix_FAIL",
+    "method": "submit_groth16",
+    "tx": "FDk65JiRdQbukG5wi42L7G4GekGK1yBPrJFxMrrP8AcQ",
+    "what": "Proof of an attempt sent",
+    "time": "2026-11-08 20:54 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   },
+   {
+    "step": "ms_submit_a1_correct_fix_PASS",
+    "method": "submit_groth16",
+    "tx": "8y5VPFGPoQzfCaETWBeTGVkLYY9F7ywpHBYCQzxNbQwk",
+    "what": "Proof of an attempt sent",
+    "time": "2026-11-08 20:57 UTC",
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/transactions.tsv",
+    "script": "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)"
+   }
+  ],
+  "45": [
+   {
+    "step": "b45_create",
+    "method": "create_bounty",
+    "tx": "3J8sUV5gMVS1niTt4jBjbRuaB2vmzsChQvZqzDRong58",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/public_bounties/transactions.tsv",
+    "script": "tools/skarbnik-vendor (check and prove0 on the VPS, publish on the laptop, watch on the VPS)"
+   },
+   {
+    "step": "b45_open",
+    "method": "open_with_groth16",
+    "tx": "4U4jznhEdcuU5yDkmgM1zifJMLiCmMuuymrWo4SMdB97",
+    "what": "Opened with its Proof 0",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/public_bounties/transactions.tsv",
+    "script": "tools/skarbnik-vendor (check and prove0 on the VPS, publish on the laptop, watch on the VPS)"
+   }
+  ],
+  "46": [
+   {
+    "step": "b46_create",
+    "method": "create_bounty",
+    "tx": "GUbiYKUhuntEjC2iaokGZodzCvR4zQaRP3aN25PsNTXN",
+    "what": "Bounty created",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/public_bounties/transactions.tsv",
+    "script": "tools/skarbnik-vendor (check and prove0 on the VPS, publish on the laptop, watch on the VPS)"
+   },
+   {
+    "step": "b46_open",
+    "method": "open_with_groth16",
+    "tx": "FXiEVMSUaCSTBy6JFUJ5RkR99WwNrkoBiTvVkRUf2P7Y",
+    "what": "Opened with its Proof 0",
+    "time": null,
+    "result": "succeeded",
+    "source": "docs/evidence/feature_output/public_bounties/transactions.tsv",
+    "script": "tools/skarbnik-vendor (check and prove0 on the VPS, publish on the laptop, watch on the VPS)"
+   }
+  ],
   "23": [
    {
     "step": "cleanup_b23_expire",
@@ -2506,6 +2756,9 @@
   "35": "Test bounty: made by the vendor MCP server's end to end run. The public demo program and the public demo input, with a private salt; its first attempt was a wrong fix on purpose (FAIL), and it stays open for a recorded walkthrough. Not a demo.",
   "34": "Test bounty: made for the hosted agent connector's tests (commit and reveal through the link). The program is the public demo; nobody proves its attempts, so the timeout rule settles them. Not a demo.",
   "32": "Test bounty: made for the vendor tool's end to end test (tools/skarbnik-vendor watch proves its attempt on a rented GPU with no one's help). Its secret is private, made on the vendor's VPS, but the program is the public demo.",
+  "42": "Test bounty: a scratch bounty of the output checker spike (wrong output, the fee calculator), on the spike checker 77c2e2d1... that is now retired. A correct fix was paid by a PASS proof. Not a demo.",
+  "43": "Test bounty: a scratch bounty of the output checker spike, opened with bounty 42's Proof 0 to record the partial fix's FAIL proof on chain. Retired spike checker. Not a demo.",
+  "44": "Test bounty: the scratch bounty of the memory safety mode (output checker 005d8dc7..., one sweep position): a partial fix FAIL and a correct fix PASS, the FAIL submitted first. Not a demo.",
   "23": "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
  },
  "last_image_check": {
@@ -2520,6 +2773,14 @@
  "new_module_programs": {
   "17": "data/unpack/",
   "24": "data/smooth/"
+ },
+ "output_checker": {
+  "image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+  "allow_tx": "8mdstCU5xyTc2whyi4R15oxNtY4FpxpWbYMPKRY2wchf",
+  "source": "docs/evidence/feature_output/transactions.tsv"
+ },
+ "retired_checkers": {
+  "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4": "The output checker of the spike (no byte sweep). Retired: used only by test bounties 42 and 43. It stays on the allowlist because an id cannot be removed; the site, the feed, the agent servers and the vendor tool accept only the crash checker dd6c5f42... and the output checker 005d8dc7...."
  },
  "judge_bounties": {
   "18": "Retired judge bounty (round 1, K = 3, 24 h window): the same hashes as private bounty 17. Use a judge bounty still to open instead: 28 to 31 (27 is used). After its expiry anyone can call expire, which refunds the vendor.",

@@ -1,0 +1,41 @@
+{
+ "note": "Made by scripts/gen_feed.py: each published program by the sha256 of its original module, with its kind of bug.",
+ "programs": {
+  "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8": {
+   "program": "demo",
+   "bug": "crash"
+  },
+  "7911181d1c1981a0f4b76a5a8345bf0ea21d5c82514ba24847f926a5304e8bc5": {
+   "program": "unpack",
+   "bug": "crash"
+  },
+  "aca5599b379f936e920f0c8d766d2af481a248f7d46d898d65481d0eb6d360f9": {
+   "program": "smooth",
+   "bug": "crash"
+  },
+  "c4fa58a2bafe3d2595c57f9049a765c12c90329dd45977a2840c41a2012cfe5c": {
+   "program": "ringlog2",
+   "bug": "crash"
+  },
+  "52f3b28a273de0752a52a48e611ebc9a4907cccb22a234e2a27343a9435d259d": {
+   "program": "grid",
+   "bug": "crash"
+  },
+  "3788ba07f1dc9c1137e2fcd4434fd692d5906b733913e961b77cf56d2653011b": {
+   "program": "feecalc",
+   "bug": "wrong output"
+  },
+  "568ae6244ef385f707b7b99ebb70057f072eb925fe1e288a64675bb5bfe68174": {
+   "program": "memsafe",
+   "bug": "memory safety"
+  },
+  "df95f243bed5fb68aa94336fdef3c8aa31120fea6095b0da292d9c125e68e86a": {
+   "program": "postage",
+   "bug": "wrong output"
+  },
+  "a665c1aef80663bff97717f7919d839b65e1865f323f5e626abcd3e5c8383d58": {
+   "program": "shelves",
+   "bug": "memory safety"
+  }
+ }
+}

@@ -1,0 +1,6 @@
+How to build a patch for this program (the same flags the vendor used for the original; clang from wasi-sdk 34):
+clang --target=wasm32 -Oz -nostdlib -ffreestanding -mbulk-memory -Wl,--no-entry -Wl,--strip-all -Wl,--gc-sections \
+  -Wl,--initial-memory=131072 -Wl,--max-memory=131072 -Wl,-z,stack-size=8192 -o patch.wasm patch.c
+rt.h (next to the source) is the program's runtime: keep it as it is and include it. Keep the interface: input_buf() -> i32
+and parse(len: i32) -> i32. No C library and no imports. The patch must be at most the bounty's max_patch_bytes.
+Public tests: one per line, <input as hex, or - for empty> <value the original returns>. corpus_hash as in the other programs.

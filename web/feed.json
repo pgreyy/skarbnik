@@ -19,14 +19,34 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-11-03T23:43:09Z",
- "updated_at_utc": "2026-11-03T23:43:09Z",
+ "generated_at_utc": "2026-11-08T22:09:42Z",
+ "updated_at_utc": "2026-11-08T22:09:42Z",
  "source": "saved",
  "live_url": "https://skarbnik.xyz/api/feed",
  "note": "Snapshot made by scripts/gen_feed.py. The live feed at live_url re-reads the open and newer bounties from the chain about once a minute. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
-  "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
+  "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+  "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4",
+  "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"
  ],
+ "checkers": {
+  "crash": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+  "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"
+ },
+ "checkers_note": "Agents and the site take only these two checkers: crash, and output (wrong answers and memory safety bugs). Any other id on the allowlist is retired (retired_checkers).",
+ "retired_checkers": {
+  "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4": "The output checker of the spike (no byte sweep). Retired: used only by test bounties 42 and 43. It stays on the allowlist because an id cannot be removed; the site, the feed, the agent servers and the vendor tool accept only the crash checker dd6c5f42... and the output checker 005d8dc7...."
+ },
+ "bug_kinds": {
+  "crash": "the original crashes on a secret input (checker dd6c5f42...)",
+  "wrong output": "the original returns a wrong answer on a secret input; a fix must return the right answer and match the vendor's hidden reference fix on random and nearby inputs (checker 005d8dc7...)",
+  "memory safety": "a memory bug such as a buffer overflow that gives a wrong answer without crashing; judged like wrong output (checker 005d8dc7...). It does not detect memory corruption in general"
+ },
+ "targets": {
+  "crash": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
+  "wrong output": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). PASS means it passed this checker; it does not prove the program correct everywhere.",
+  "memory safety": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). Fix the memory bug itself: the checker judges the answers on the overflow input and nearby inputs; it does not detect memory corruption in general."
+ },
  "test_bounty_ids": [
   13,
   14,
@@ -37,7 +57,10 @@
   26,
   32,
   34,
-  35
+  35,
+  42,
+  43,
+  44
  ],
  "test_bounty_note": "Test bounties are for trying the site and the wallet flow, not demos.",
  "open_bounties": [
@@ -51,6 +74,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "500000000000000000000000",
@@ -84,7 +109,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    },
    "slots_left": 3,
    "commit_deadline_utc": "2026-11-23T19:19:44Z",
@@ -102,6 +128,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -135,64 +163,14 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    },
    "slots_left": 2,
    "commit_deadline_utc": "2026-12-04T09:39:50Z",
    "expires_at_utc": "2026-12-05T10:39:50Z",
    "bounty_amount": "0.1 NEAR",
    "test_bounty": false
-  },
-  {
-   "bounty_id": 34,
-   "status": "Demo or test only",
-   "kind": "test",
-   "judge_bounty": false,
-   "retired_judge_bounty": false,
-   "accepts_commits": true,
-   "level": 2,
-   "program": "demo",
-   "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
-   "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
-   "max_patch_bytes": 1024,
-   "reward_yocto": "100000000000000000000000",
-   "reward": "0.1 NEAR",
-   "max_commits": 6,
-   "attempts_used": 2,
-   "attempts": "2 of 6 used",
-   "slots_in_use": 2,
-   "max_commits_per_account": null,
-   "fee_schedule": {
-    "base_yocto": "10000000000000000000000",
-    "step_yocto": "5000000000000000000000",
-    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
-   },
-   "next_fee_yocto": "20000000000000000000000",
-   "next_fee": "0.02 NEAR",
-   "windows": {
-    "reveal_gap_ns": "60000000000",
-    "reveal_window_ns": "7200000000000",
-    "verdict_window_ns": "14400000000000",
-    "commit_deadline_utc": "2026-11-05T14:11:37Z",
-    "expires_at_utc": "2026-11-05T20:11:37Z"
-   },
-   "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
-   "image_id_allowed": true,
-   "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
-   "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
-   "public_code": {
-    "source": "code/demo/original.rs",
-    "module": "code/demo/original.wasm",
-    "tests": "code/demo/public_tests.txt",
-    "build": "code/demo/BUILD.txt",
-    "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
-   },
-   "slots_left": 4,
-   "commit_deadline_utc": "2026-11-05T14:11:37Z",
-   "expires_at_utc": "2026-11-05T20:11:37Z",
-   "bounty_amount": "0.1 NEAR",
-   "test_bounty": true
   },
   {
    "bounty_id": 35,
@@ -204,6 +182,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -237,7 +217,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    },
    "slots_left": 3,
    "commit_deadline_utc": "2026-11-15T21:43:58Z",
@@ -255,6 +236,8 @@
    "level": 1,
    "program": "ringlog2",
    "module_description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 2048,
    "reward_yocto": "100000000000000000000000",
@@ -288,7 +271,8 @@
     "tests": "code/ringlog2/public_tests.txt",
     "build": "code/ringlog2/BUILD.txt",
     "program": "ringlog2",
-    "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"
+    "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug",
+    "bug": "crash"
    },
    "slots_left": 7,
    "commit_deadline_utc": "2026-12-31T20:20:33Z",
@@ -306,6 +290,8 @@
    "level": 2,
    "program": "grid",
    "module_description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 2048,
    "reward_yocto": "100000000000000000000000",
@@ -339,11 +325,123 @@
     "tests": "code/grid/public_tests.txt",
     "build": "code/grid/BUILD.txt",
     "program": "grid",
-    "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug"
+    "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug",
+    "bug": "crash"
    },
    "slots_left": 7,
    "commit_deadline_utc": "2026-12-31T21:19:34Z",
    "expires_at_utc": "2027-01-02T22:19:34Z",
+   "bounty_amount": "0.1 NEAR",
+   "test_bounty": false
+  },
+  {
+   "bounty_id": 45,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "postage",
+   "module_description": "a postage calculator (a cost per parcel by weight, a surcharge for heavy parcels, a discount for large orders); no hint at its bug",
+   "bug_kind": "wrong output",
+   "checker": "output",
+   "target": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). PASS means it passed this checker; it does not prove the program correct everywhere.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "attempts": "0 of 8 used",
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2027-01-05T20:44:30Z",
+    "expires_at_utc": "2027-01-07T21:44:30Z"
+   },
+   "image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+   "image_id_allowed": true,
+   "original_hash": "df95f243bed5fb68aa94336fdef3c8aa31120fea6095b0da292d9c125e68e86a",
+   "corpus_hash": "957f79719bf7fa02924492d004feb668d112bbbe43f63bf5512c46327304e619",
+   "public_code": {
+    "source": "code/postage/original.rs",
+    "module": "code/postage/original.wasm",
+    "tests": "code/postage/public_tests.txt",
+    "build": "code/postage/BUILD.txt",
+    "program": "postage",
+    "description": "a postage calculator (a cost per parcel by weight, a surcharge for heavy parcels, a discount for large orders); no hint at its bug",
+    "bug": "wrong output"
+   },
+   "slots_left": 8,
+   "commit_deadline_utc": "2027-01-05T20:44:30Z",
+   "expires_at_utc": "2027-01-07T21:44:30Z",
+   "bounty_amount": "0.1 NEAR",
+   "test_bounty": false
+  },
+  {
+   "bounty_id": 46,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "shelves",
+   "module_description": "a C shelf counter (10 shelves, quantities that stop at 255, a bonus for full shelves); no hint at its bug",
+   "bug_kind": "memory safety",
+   "checker": "output",
+   "target": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). Fix the memory bug itself: the checker judges the answers on the overflow input and nearby inputs; it does not detect memory corruption in general.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "attempts": "0 of 8 used",
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2027-01-05T21:08:05Z",
+    "expires_at_utc": "2027-01-07T22:08:05Z"
+   },
+   "image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+   "image_id_allowed": true,
+   "original_hash": "a665c1aef80663bff97717f7919d839b65e1865f323f5e626abcd3e5c8383d58",
+   "corpus_hash": "0c69d2b5fc90ab7e5af3396f97b3fc8ef388600e83067d3e1bb9c8f2df7b1e1f",
+   "public_code": {
+    "source": "code/shelves/original.c",
+    "module": "code/shelves/original.wasm",
+    "tests": "code/shelves/public_tests.txt",
+    "build": "code/shelves/BUILD.txt",
+    "program": "shelves",
+    "description": "a C shelf counter (10 shelves, quantities that stop at 255, a bonus for full shelves); no hint at its bug",
+    "bug": "memory safety",
+    "extra_files": [
+     "code/shelves/rt.h"
+    ]
+   },
+   "slots_left": 8,
+   "commit_deadline_utc": "2027-01-05T21:08:05Z",
+   "expires_at_utc": "2027-01-07T22:08:05Z",
    "bounty_amount": "0.1 NEAR",
    "test_bounty": false
   }
@@ -359,6 +457,8 @@
    "level": 0,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -392,7 +492,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -405,6 +506,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -438,7 +541,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -451,6 +555,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "other",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -484,7 +590,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -497,6 +604,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -530,7 +639,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -543,6 +653,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -576,7 +688,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -589,6 +702,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -622,7 +737,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -635,6 +751,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -668,7 +786,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -681,6 +800,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "500000000000000000000000",
@@ -714,7 +835,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -727,6 +849,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -760,7 +884,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -773,6 +898,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -806,7 +933,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -819,6 +947,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -852,7 +982,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -865,6 +996,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -898,7 +1031,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -911,6 +1045,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "500000000000000000000000",
@@ -944,7 +1080,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -957,6 +1094,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -990,7 +1129,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1003,6 +1143,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1036,7 +1178,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1049,6 +1192,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1082,7 +1227,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1095,6 +1241,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1128,7 +1276,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1141,6 +1290,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1174,7 +1325,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1187,6 +1339,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1220,7 +1374,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1233,6 +1388,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1266,7 +1423,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1279,6 +1437,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1312,7 +1472,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1325,6 +1486,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1358,7 +1521,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1371,6 +1535,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1404,7 +1570,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1417,6 +1584,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 2048,
    "reward_yocto": "100000000000000000000000",
@@ -1450,7 +1619,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1463,6 +1633,8 @@
    "level": 2,
    "program": "smooth",
    "module_description": "a smoothing filter for a stream of sensor samples; no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1496,7 +1668,8 @@
     "tests": "code/smooth/public_tests.txt",
     "build": "code/smooth/BUILD.txt",
     "program": "smooth",
-    "description": "a smoothing filter for a stream of sensor samples; no hint at its bug"
+    "description": "a smoothing filter for a stream of sensor samples; no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1509,6 +1682,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1542,7 +1717,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1555,6 +1731,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1588,7 +1766,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1601,6 +1780,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1634,7 +1815,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1647,6 +1829,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1680,7 +1864,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1693,6 +1878,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1726,7 +1913,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1739,6 +1927,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1772,7 +1962,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1785,6 +1976,8 @@
    "level": 2,
    "program": "unpack",
    "module_description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1818,7 +2011,8 @@
     "tests": "code/unpack/public_tests.txt",
     "build": "code/unpack/BUILD.txt",
     "program": "unpack",
-    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug"
+    "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -1831,6 +2025,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1864,7 +2060,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1877,6 +2074,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1910,7 +2109,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1919,10 +2119,12 @@
    "kind": "test",
    "judge_bounty": false,
    "retired_judge_bounty": false,
-   "accepts_commits": true,
+   "accepts_commits": false,
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -1956,7 +2158,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -1969,6 +2172,8 @@
    "level": 2,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -2002,7 +2207,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -2015,6 +2221,8 @@
    "level": 1,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -2048,7 +2256,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -2061,6 +2270,8 @@
    "level": 1,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -2094,7 +2305,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -2107,6 +2319,8 @@
    "level": 1,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -2140,12 +2354,13 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
    "bounty_id": 39,
-   "status": "Failed by OutLayer",
+   "status": "Failed",
    "kind": "private",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -2153,6 +2368,8 @@
    "level": 1,
    "program": "demo",
    "module_description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 1024,
    "reward_yocto": "100000000000000000000000",
@@ -2186,7 +2403,8 @@
     "tests": "code/demo/public_tests.txt",
     "build": "code/demo/BUILD.txt",
     "program": "demo",
-    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment"
+    "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+    "bug": "crash"
    }
   },
   {
@@ -2199,6 +2417,8 @@
    "level": 1,
    "program": "ringlog2",
    "module_description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 2048,
    "reward_yocto": "100000000000000000000000",
@@ -2232,7 +2452,8 @@
     "tests": "code/ringlog2/public_tests.txt",
     "build": "code/ringlog2/BUILD.txt",
     "program": "ringlog2",
-    "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"
+    "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug",
+    "bug": "crash"
    }
   },
   {
@@ -2245,6 +2466,8 @@
    "level": 2,
    "program": "grid",
    "module_description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug",
+   "bug_kind": "crash",
+   "checker": "crash",
    "target": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
    "max_patch_bytes": 2048,
    "reward_yocto": "100000000000000000000000",
@@ -2278,7 +2501,259 @@
     "tests": "code/grid/public_tests.txt",
     "build": "code/grid/BUILD.txt",
     "program": "grid",
-    "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug"
+    "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug",
+    "bug": "crash"
+   }
+  },
+  {
+   "bounty_id": 42,
+   "status": "Proof verified",
+   "kind": "test",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": false,
+   "level": 2,
+   "program": "feecalc",
+   "module_description": "a fee calculator (2.5 percent of a list of amounts, rounded up); its public source names its bug in a comment",
+   "bug_kind": "wrong output",
+   "checker": "other",
+   "target": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). PASS means it passed this checker; it does not prove the program correct everywhere.",
+   "max_patch_bytes": 1024,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 3,
+   "attempts_used": 2,
+   "attempts": "2 of 3 used",
+   "slots_in_use": 2,
+   "max_commits_per_account": null,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "20000000000000000000000",
+   "next_fee": "0.02 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "21600000000000",
+    "commit_deadline_utc": "2026-11-07T14:51:44Z",
+    "expires_at_utc": "2026-11-07T21:51:44Z"
+   },
+   "image_id": "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4",
+   "image_id_allowed": true,
+   "original_hash": "3788ba07f1dc9c1137e2fcd4434fd692d5906b733913e961b77cf56d2653011b",
+   "corpus_hash": "1523a14d930c52eca97e38b43969c2bc4d44e1e8df4dff25f08a0845bc1b05e3",
+   "public_code": {
+    "source": "code/feecalc/original.rs",
+    "module": "code/feecalc/original.wasm",
+    "tests": "code/feecalc/public_tests.txt",
+    "build": "code/feecalc/BUILD.txt",
+    "program": "feecalc",
+    "description": "a fee calculator (2.5 percent of a list of amounts, rounded up); its public source names its bug in a comment",
+    "bug": "wrong output"
+   }
+  },
+  {
+   "bounty_id": 43,
+   "status": "Demo or test only",
+   "kind": "test",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": false,
+   "level": 2,
+   "program": "feecalc",
+   "module_description": "a fee calculator (2.5 percent of a list of amounts, rounded up); its public source names its bug in a comment",
+   "bug_kind": "wrong output",
+   "checker": "other",
+   "target": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). PASS means it passed this checker; it does not prove the program correct everywhere.",
+   "max_patch_bytes": 1024,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 1,
+   "attempts_used": 1,
+   "attempts": "1 of 1 used",
+   "slots_in_use": 1,
+   "max_commits_per_account": null,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "15000000000000000000000",
+   "next_fee": "0.015 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "21600000000000",
+    "commit_deadline_utc": "2026-11-08T18:25:55Z",
+    "expires_at_utc": "2026-11-09T01:25:55Z"
+   },
+   "image_id": "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4",
+   "image_id_allowed": true,
+   "original_hash": "3788ba07f1dc9c1137e2fcd4434fd692d5906b733913e961b77cf56d2653011b",
+   "corpus_hash": "1523a14d930c52eca97e38b43969c2bc4d44e1e8df4dff25f08a0845bc1b05e3",
+   "public_code": {
+    "source": "code/feecalc/original.rs",
+    "module": "code/feecalc/original.wasm",
+    "tests": "code/feecalc/public_tests.txt",
+    "build": "code/feecalc/BUILD.txt",
+    "program": "feecalc",
+    "description": "a fee calculator (2.5 percent of a list of amounts, rounded up); its public source names its bug in a comment",
+    "bug": "wrong output"
+   }
+  },
+  {
+   "bounty_id": 44,
+   "status": "Proof verified",
+   "kind": "test",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": false,
+   "level": 2,
+   "program": "memsafe",
+   "module_description": "a C record parser that copies a name into a 16 byte buffer; its public source names its buffer overflow",
+   "bug_kind": "memory safety",
+   "checker": "output",
+   "target": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). Fix the memory bug itself: the checker judges the answers on the overflow input and nearby inputs; it does not detect memory corruption in general.",
+   "max_patch_bytes": 1024,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 2,
+   "attempts_used": 2,
+   "attempts": "2 of 2 used",
+   "slots_in_use": 2,
+   "max_commits_per_account": null,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "20000000000000000000000",
+   "next_fee": "0.02 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "21600000000000",
+    "commit_deadline_utc": "2026-11-08T20:54:22Z",
+    "expires_at_utc": "2026-11-09T03:54:22Z"
+   },
+   "image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+   "image_id_allowed": true,
+   "original_hash": "568ae6244ef385f707b7b99ebb70057f072eb925fe1e288a64675bb5bfe68174",
+   "corpus_hash": "c12823f8e9c068a49b15fa5f055b3d5775cb07830f0ffbb7f58357705daa0c40",
+   "public_code": {
+    "source": "code/memsafe/original.c",
+    "module": "code/memsafe/original.wasm",
+    "tests": "code/memsafe/public_tests.txt",
+    "build": "code/memsafe/BUILD.txt",
+    "program": "memsafe",
+    "description": "a C record parser that copies a name into a 16 byte buffer; its public source names its buffer overflow",
+    "bug": "memory safety",
+    "extra_files": [
+     "code/memsafe/rt.h"
+    ]
+   }
+  },
+  {
+   "bounty_id": 45,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "postage",
+   "module_description": "a postage calculator (a cost per parcel by weight, a surcharge for heavy parcels, a discount for large orders); no hint at its bug",
+   "bug_kind": "wrong output",
+   "checker": "output",
+   "target": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). PASS means it passed this checker; it does not prove the program correct everywhere.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "attempts": "0 of 8 used",
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2027-01-05T20:44:30Z",
+    "expires_at_utc": "2027-01-07T21:44:30Z"
+   },
+   "image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+   "image_id_allowed": true,
+   "original_hash": "df95f243bed5fb68aa94336fdef3c8aa31120fea6095b0da292d9c125e68e86a",
+   "corpus_hash": "957f79719bf7fa02924492d004feb668d112bbbe43f63bf5512c46327304e619",
+   "public_code": {
+    "source": "code/postage/original.rs",
+    "module": "code/postage/original.wasm",
+    "tests": "code/postage/public_tests.txt",
+    "build": "code/postage/BUILD.txt",
+    "program": "postage",
+    "description": "a postage calculator (a cost per parcel by weight, a surcharge for heavy parcels, a discount for large orders); no hint at its bug",
+    "bug": "wrong output"
+   }
+  },
+  {
+   "bounty_id": 46,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "shelves",
+   "module_description": "a C shelf counter (10 shelves, quantities that stop at 255, a bonus for full shelves); no hint at its bug",
+   "bug_kind": "memory safety",
+   "checker": "output",
+   "target": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). Fix the memory bug itself: the checker judges the answers on the overflow input and nearby inputs; it does not detect memory corruption in general.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "attempts": "0 of 8 used",
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2027-01-05T21:08:05Z",
+    "expires_at_utc": "2027-01-07T22:08:05Z"
+   },
+   "image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+   "image_id_allowed": true,
+   "original_hash": "a665c1aef80663bff97717f7919d839b65e1865f323f5e626abcd3e5c8383d58",
+   "corpus_hash": "0c69d2b5fc90ab7e5af3396f97b3fc8ef388600e83067d3e1bb9c8f2df7b1e1f",
+   "public_code": {
+    "source": "code/shelves/original.c",
+    "module": "code/shelves/original.wasm",
+    "tests": "code/shelves/public_tests.txt",
+    "build": "code/shelves/BUILD.txt",
+    "program": "shelves",
+    "description": "a C shelf counter (10 shelves, quantities that stop at 255, a bonus for full shelves); no hint at its bug",
+    "bug": "memory safety",
+    "extra_files": [
+     "code/shelves/rt.h"
+    ]
    }
   }
  ],

@@ -399,7 +399,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 /* The "New" sticker on wrong output and memory safety bounties (switches off by itself: web/js/status.js, newBadgeOn) */
 .sk .new-sticker{display:inline-flex;align-items:center;min-height:20px;padding:0 8px;border-radius:999px;background:var(--am);color:var(--bg);font:700 11px/1 var(--fu);letter-spacing:.04em;text-transform:uppercase;vertical-align:middle;white-space:nowrap}
-.sk a.n-sc{text-decoration:none;color:var(--tx2)}
+.sk a.n-sc{text-decoration:none;color:var(--tx2);padding:6px 12px;border-radius:18px}
 .sk a.n-sc:hover{border-color:var(--am);color:var(--tx)}
 .sk a.n-sc:focus-visible{outline:2px solid var(--am);outline-offset:2px}
 .sk .bugk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 0;color:var(--tx2)}

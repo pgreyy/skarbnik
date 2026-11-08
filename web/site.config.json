@@ -1,5 +1,5 @@
 {
- "note": "The one place for the site's own address and the chain it reads. The browser reads it through web/js/config.js; scripts/gen_feed.py and scripts/gen_site_recorded.py read it too, and scripts/apply_site_config.py writes site_url into the static files (index.html meta tags, sitemap.xml, agent-quickstart.txt, README). Switching to mainnet: change network, contract, rpc_urls, explorer_tx, explorer_account and tx_index here. checkers lists the two checker image ids on the contract's allowlist: crash (published_image_id, the same) and output (wrong answers, also memory safety bugs).",
+ "note": "The one place for the site's own address and the chain it reads. The browser reads it through web/js/config.js; scripts/gen_feed.py and scripts/gen_site_recorded.py read it too, and scripts/apply_site_config.py writes site_url into the static files (index.html meta tags, sitemap.xml, agent-quickstart.txt, README). Switching to mainnet: change network, contract, rpc_urls, explorer_tx, explorer_account and tx_index here. checkers lists the two checker image ids on the contract's allowlist: crash (published_image_id, the same) and output (wrong answers, also memory safety bugs). new_badge_until_utc ends the \"New\" sticker on wrong output and memory safety bounties: the ship date (2026-11-08) plus 30 days, a UTC date; the site hides the sticker from that day on, with no redeploy.",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
@@ -14,5 +14,6 @@
  "checkers": {
   "crash": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
   "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"
- }
+ },
+ "new_badge_until_utc": "2026-12-08"
 }

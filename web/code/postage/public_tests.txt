@@ -1,0 +1,18 @@
+# Public tests for the postage calculator (data/postage/original.rs).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+- 0
+00 40
+14 40
+15 42
+95 298
+97 327
+ff 535
+0a14 80
+9597989798 1610
+9597141500ff 1282
+a7e672 1072
+98c507d929d937 1898
+00bf98ceef2a86bf 2321
+d900d9ab67ddc8fa5e 2940
+06ccff31e6eafe27c52b2cb7 3450
+1a8cfe4d0482c93480cd6c1502bc314e 3276
