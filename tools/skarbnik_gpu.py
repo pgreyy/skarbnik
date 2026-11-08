@@ -35,6 +35,9 @@ DEFAULTS = {
     # terminated at once and the next choice tried), and a timer inside the pod that removes it after this many minutes
     # even if this machine stops watching it
     'cloud_types': ['SECURE'], 'max_usd_per_hr': None, 'self_stop_minutes': None,
+    # the start of each pod's name; leftover pods are found by it, so a second setup on the same RunPod account (a
+    # spike) uses its own prefix and never terminates the pods of the running watches
+    'pod_prefix': POD_PREFIX,
 }
 
 
@@ -165,7 +168,7 @@ class Pod:
 
     def _create(self, cloud, types):
         pub = open(self.g['ssh_key'] + '.pub').read().strip()
-        body = {'name': f'{POD_PREFIX}{self.label}-{int(time.time())}', 'imageName': self.g['image'], 'cloudType': cloud,
+        body = {'name': f'{self.g["pod_prefix"]}{self.label}-{int(time.time())}', 'imageName': self.g['image'], 'cloudType': cloud,
                 'computeType': 'GPU', 'gpuCount': 1, 'gpuTypeIds': list(types), 'gpuTypePriority': 'custom',
                 'containerDiskInGb': int(self.g['container_disk_gb']), 'volumeInGb': 0, 'ports': ['22/tcp'],
                 'supportPublicIp': True, 'env': {'PUBLIC_KEY': pub}}
@@ -321,7 +324,7 @@ def clean_orphans(g, rp, log):
         log(f'could not list RunPod pods to look for leftovers: {e}')
         return
     for p in pods if isinstance(pods, list) else pods.get('pods', []):
-        if str(p.get('name', '')).startswith(POD_PREFIX):
+        if str(p.get('name', '')).startswith(g['pod_prefix']):
             log(f'leftover pod {p.get("id")} ({p.get("name")}) found: terminating it')
             pod = Pod(g, rp, log, 'leftover')
             pod.id = p.get('id')
