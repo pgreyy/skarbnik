@@ -1,0 +1,46 @@
+utc_start=2026-11-08T20:39:27.514451323Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  open_with_groth16
+│                       args:         {
+│                                       "bounty_id": "44",
+│                                       "seal": "ILJDc37Z1yIHrcXUyDuZ3c5Np2nKNiC+J+RQZaUc7f8aRpafPbRxv1Gn/MmuBSev9hkKB0V4IqIicC0lsaDhmAhXg/Z2tLxYUb63adq1oAYk+sV3kHzuFbCPa0F5k3ZxLLEMFJ/PmJkLp9MaiiYY5sSL9EvLsT1TLdBRsmufeQwJYwAdzhGPv2Y3g8lzO/SP0iM+B/fHaYyw838FUkKFwCk8qj6/wtv1/4duWK0mW6xd0/wyyHMzmsl17S1sEYUiFOECaW8RVuUSnuF4ZxWxH6+NclW8bmeZubn1vtedVmoAefGBTFBqeXEqPZwkDc2ZH7CbJ7Ofui+pzxN3euABSQ=="
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.377 Tgas
+│    Transaction fee: 0.000037681941703 NEAR
+│    Transaction ID: DqiGXVvV1aXvoURDk2MnjEnnBSs1NzELdGraReq5hLmt
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/DqiGXVvV1aXvoURDk2MnjEnnBSs1NzELdGraReq5hLmt
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_opened","data":[{"bounty_id":"44","by":"groth16","caller":"kintsugi-vendor-prnvm.testnet"}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"opened"
+
+
+The "open_with_groth16" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+
+
+`near` CLI has a new update available 0.30.1 →  0.31.1
+To update `near` CLI use: near extensions self-update
+exit=0
+wall_seconds=8.44

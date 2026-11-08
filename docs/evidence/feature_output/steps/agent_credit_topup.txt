@@ -1,0 +1,45 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args {} prepaid-gas 100 Tgas attached-deposit 0.03 NEAR sign-as skarbnik-agentc-d48260.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-11-08T20:34:18.692653328Z
+├  Unsigned transaction:
+│    signer_id:    skarbnik-agentc-d48260.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  deposit_credit
+│                       args:         {}
+│                       gas:          100.0 Tgas
+│                       deposit:      0.03 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:4AkdoJsPh5XSYEFZKw5PecRjqHMJCJ5bd9iYEca9XF6X
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.000030882243944 NEAR
+│    Transaction ID: 9ZfLfEDVfSd5rS83Xwx6NHMakrF1rGiS9J5q2jUDRLvX
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/9ZfLfEDVfSd5rS83Xwx6NHMakrF1rGiS9J5q2jUDRLvX
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"credit_deposited","data":[{"account_id":"skarbnik-agentc-d48260.testnet","amount":"30000000000000000000000","total":"35000000000000000000000"}]}
+│    Logs [skarbnik-agentc-d48260.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"35000000000000000000000"
+
+
+The "deposit_credit" call to <kintsugi-l2-cihdp.testnet> on behalf of <skarbnik-agentc-d48260.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet deposit_credit json-args {} prepaid-gas '100.0 Tgas' attached-deposit '0.03 NEAR' sign-as skarbnik-agentc-d48260.testnet network-config testnet sign-with-legacy-keychain send
+
+
+`near` CLI has a new update available 0.30.1 →  0.31.1
+To update `near` CLI use: near extensions self-update
+exit=0
+wall_seconds=7.42

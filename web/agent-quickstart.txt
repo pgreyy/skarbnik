@@ -88,9 +88,11 @@ time, and it does not show that a fix is correct. Timeout payouts are labelled "
    Read them back with get_agent_limits. Clear them with nulls (again 1 yoctoNEAR).
 
 7. WHAT TO CHECK
-   The image id of a bounty should be the published checker,
-   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc,
-   and get_bounty should show "image_id_allowed": true. Rebuild the checker yourself and compare:
+   The image id of a bounty should be one of the two published checkers:
+   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc (crash bugs), or
+   005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089 (wrong output and memory safety bugs),
+   and get_bounty should show "image_id_allowed": true. Any other id is retired. Tell your user the kind of bug
+   (bug_kind in the feed) with the fee and the level. Rebuild both checkers yourself and compare:
      ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet <bounty id>    prints MATCH
    Known limits: docs/SECURITY.md and docs/AUDIT.md in the repository.
 

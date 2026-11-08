@@ -11,6 +11,36 @@ for a rented GPU.
 It calls the project's own programs (`skarbnik-host`, `skarbnik-check`), `scripts/s2_measure.sh` for timing and the
 memory guard, and NEAR CLI (near-cli-rs) for transactions. Testnet only.
 
+Already a vendor? Pull the latest code and rebuild (`git pull`, then the build in Build Skarbnik) to get output mode
+for wrong output and memory safety bugs.
+
+## Kinds of bug: crash or output
+
+A bounty has a mode (`bounty.mode` in the config):
+
+- `crash` (the default): the original crashes on the secret input. The secret file is the crashing input as hex. The
+  crash checker (`dd6c5f42…`) judges it.
+- `output`: the original returns a wrong answer on the secret input. This also covers memory safety bugs, such as a
+  buffer overflow that corrupts memory without crashing. The secret file is one line:
+  `<input as hex> <expected value> sweep=<p>,<p>`. The output checker (`005d8dc7…`) passes a fix that returns the
+  expected value on the secret input, gives the original's answers on the public tests, and gives the same answers as
+  your hidden reference fix on random inputs, near copies of the secret, and every value 0 to 255 at each sweep
+  position. The reference fix goes with every proof; like the secret, it stays in a mode 600 file outside the
+  repository, and only its hash is public.
+
+Sweep positions are byte positions of the secret input, private and bound into the commitment. Name the bytes a partial
+fix could get wrong, such as a length field: a fix that refuses names over 20 bytes when the buffer holds 16 passes
+random inputs often, and the sweep of the length byte catches it every time. `bounty.sweep` in the config must list the
+same positions as the secret line. The default is one position. At most 4.
+
+What each sweep position costs: about 32 million more cycles in every proof (512 more runs), measured on the two demo
+programs (`docs/evidence/feature_output/sweep_cost.txt`). Proof 0 with no sweep is about 20 million cycles (58
+segments); with 1 position about 51 million (149 segments); with 4 about 147 million (425 segments). On a rented RTX
+4090, a proof with 1 position took 140 s to prove and 100 s to shrink. The Groth16 step does not change.
+
+The output checker judges answers. It does not detect memory corruption in general: a fix passes if its answers match
+on the inputs the check tries.
+
 ## Levels
 
 `level` in the config's `[bounty]` section (0, 1 or 2, default 2) is fixed when the bounty is created.
@@ -77,22 +107,30 @@ outside the repository (for example `~/skarbnik-vendor/<name>.toml`, mode 600). 
   reward, K, the fee of the first attempt and the step per later attempt, the reveal gap and window, the verdict window,
   the expiry, the patch size limit (the checker allows up to 2,048 bytes; each bounty sets its own), the check size and the proof segment size (`po2`: 18 needs about 2.5 GiB, 19 about
   5 GiB).
-- `[secrets]`: the secret crashing input and the reference fix. Files of mode 600, outside the repository.
+- `[secrets]`: the secret (crash mode: the crashing input; output mode: the line above) and the reference fix. Files of
+  mode 600, outside the repository.
 - `[prover]`: the mode (`cpu`), the machine's name (proof times differ by machine), the work folder.
-- `[chain]`: contract, RPC addresses, the published checker image id and the vendor account that signs create and open.
+- `[chain]`: contract, RPC addresses, the checker image id of the bounty's mode (`init` sets it) and the vendor account
+  that signs create and open.
 - `[paths]` (optional): where the binaries are.
 
 A watch config has `[watch]` (state file, log, work folder, poll interval), `[prover]`, `[chain]` with the account that
 signs `submit_groth16`, `[paths]`, and one `[[bounties]]` block per secret: the bounty ids, the salt name, the module,
-the secret file and `po2`.
+the secret file and `po2`; for output mode also `mode = "output"` and `reference_fix`.
+
+When several revealed attempts of one bounty wait, the watch submits every FAIL proof before a PASS: a PASS pays and
+closes the bounty, and an attempt still open is then refunded without its verdict. It holds a ready PASS while another
+revealed attempt has no proof yet, but submits it anyway once less than 2 hours of its own verdict window are left, and
+logs why: a FAIL still being proved never costs a correct fix its payout.
 
 ## What the preflight checks
 
 1. The module exists and is within the checker's limits; the public tests are there. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page
    (`max_patch_bytes`).
 2. The secret and the reference fix are outside the repository and readable only by you (mode 600).
-3. The original crashes on the secret input (the checker's own run).
-4. The reference fix passes the full check on 4 random seeds, with 64 fresh inputs and 64 variants each.
+3. Crash mode: the original crashes on the secret input (the checker's own run). Output mode: the original gives
+   another answer than the expected value there, and the sweep positions on the secret line and in the config agree.
+4. Proof 0 passes on 4 random seeds, with 64 fresh inputs and 64 variants each: the reference fix passes the full check.
 5. Enough memory for the prover mode: the prover at the chosen `po2`, and about 7.6 GiB of memory plus swap for the
    Groth16 wrap.
 6. The checker's image id is on the contract's allowlist.

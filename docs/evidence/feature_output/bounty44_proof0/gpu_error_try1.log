@@ -1,0 +1,7 @@
+$ (pod step)
+--- stderr
+salt: the private salt of bounty memsafe-scratch (existing)
+error: verify segment
+
+--- stdout
+SECRET_WIPED

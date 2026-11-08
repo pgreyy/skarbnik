@@ -1,0 +1,18 @@
+2026-11-08T20:12:49Z pod rlosfv7mdmk87j created: NVIDIA GeForce RTX 4090 in EU-RO-1, $0.89/h, hard cap 45 min
+2026-11-08T20:13:23Z pod rlosfv7mdmk87j: ssh ready after 35 s, GPU NVIDIA GeForce RTX 4090
+2026-11-08T20:13:23Z pod rlosfv7mdmk87j: self stop armed for 49 min (runpodctl)
+2026-11-08T20:23:17Z pod rlosfv7mdmk87j: built the GPU binary in 593 s (sha256 07a6d7b36e05be3b...), kept for the next pods
+2026-11-08T20:24:13Z pod rlosfv7mdmk87j terminated: 686 s, $0.1696 ($0.89/h); GPU spend so far $0.1696
+Traceback (most recent call last):
+  File "~/skarbnik-fo/scripts/spike_output_gpu.py", line 62, in <module>
+    main()
+  File "~/skarbnik-fo/scripts/spike_output_gpu.py", line 55, in main
+    _, times = gpu.prove_on_gpu(cfg, job, log)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik-fo/scripts/../tools/skarbnik_gpu.py", line 431, in prove_on_gpu
+    out = pod.ssh('set +e; RISC0_DEV_MODE=0 RISC0_PROVER=local '
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik-fo/scripts/../tools/skarbnik_gpu.py", line 239, in ssh
+    raise GpuError(f'pod step failed (exit {p.returncode}): {tail}{where}')
+skarbnik_gpu.GpuError: pod step failed (exit 2): salt: the private salt of bounty memsafe-scratch (existing)
+error: verify segment; full output in ~/skarbnik-fo/gpu_errors/rlosfv7mdmk87j-2026-11-08T202411Z.log

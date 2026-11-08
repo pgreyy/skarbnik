@@ -5,10 +5,13 @@
 // after scripts/check_image_id.sh printed MATCH) and a comparison. Everything except the descriptive words is read from
 // the chain and from data/recorded.json; until the chain answers, a saved snapshot for the bounties the site points
 // people to (data/bounty_snapshots.json). Also the raw data page (#/raw/<id>).
-import { CONTRACT, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, submissions, near, utc, utcShort, span, left, commitBy } from '../chain.js';
+import { CONTRACT, EXPLORER_ACCOUNT, view, submissions, near, utc, utcShort, span, left, commitBy } from '../chain.js';
 import { $, esc, icon, copyBtn, chip, tx, acct, hashCell, table, facts, note, cmd, tabbed } from '../ui.js';
-import { STATUS, kindOf, kindChips, statusOf, accepting, isJudge, isNewModule } from '../status.js';
-import { getRecorded, getMeta, getBountySnapshots } from '../data.js';
+import { STATUS, kindOf, kindChips, statusOf, accepting, isJudge, isNewModule, bugKindOf, BUG_LABEL, isNewKind } from '../status.js';
+import { getRecorded, getMeta, getBountySnapshots, getPrograms } from '../data.js';
+import { CHECKERS, NEW_UNTIL_UTC } from '../config.js';
+
+let programs = { programs: {} }; // data/programs.json: each published program's kind of bug
 import { attemptPanel } from '../account-ui.js';
 
 const STEP = {
@@ -67,7 +70,7 @@ export async function bounty(viewEl, id, tab) {
   const liveP = bP.then(rest).catch(() => view('get_bounty', { bounty_id: String(id) }).then(rest));
   liveP.catch(() => {});
   let rec, meta;
-  try { [rec, meta] = await Promise.all([getRecorded(), getMeta()]); } catch (e) {
+  try { [rec, meta, programs] = await Promise.all([getRecorded(), getMeta(), getPrograms()]); } catch (e) {
     const st = viewEl.querySelector('.state'); if (st) st.textContent = `Could not load the site's data: ${e.message}. Reload to try again.`; return;
   }
   const snaps = await getBountySnapshots().catch(() => null);
@@ -104,7 +107,7 @@ function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at
   const kind = kindOf(b, rec), status = statusOf(b, subs, kind), st = STATUS[status], acc = accepting(b);
   const title = (meta.titles || {})[id] || `Bounty ${id}`, story = (meta.story || {})[id] || {};
   const txs = (rec.bounties && rec.bounties[String(id)]) || [], recNote = rec.bounty_notes && rec.bounty_notes[String(id)];
-  const imgOk = b.image_id === PUBLISHED_IMAGE_ID, demo = kind === 'demo' || (rec.notes.demo_exploit_commitment || {}).commitment === b.exploit_commitment;
+  const imgOk = Object.values(CHECKERS).includes(b.image_id), retired = ((rec.retired_checkers || {})[b.image_id]) || null, demo = kind === 'demo' || (rec.notes.demo_exploit_commitment || {}).commitment === b.exploit_commitment;
   const check = rec.last_image_check && rec.last_image_check.result === 'MATCH' ? rec.last_image_check : null;
   const program = isNewModule(b, rec) ? (rec.new_module_programs || {})[String(id)] : demo ? 'data/demo/ (public demo module)' : isJudge(b, rec) ? 'data/unpack/ (same as bounty 17)' : null;
   const lead = story.lead || (status === 'Proof verified' ? 'A revealed attempt was proven PASS and the contract paid on that proof.'
@@ -177,7 +180,7 @@ function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at
     ${rec.test_bounties && rec.test_bounties[String(id)] ? note(esc(rec.test_bounties[String(id)]), 'flask') : ''}
     ${story.claims ? table(['Claim', 'Label', 'Where it is recorded'], story.claims.map(([c, l, w]) => [`<b>${esc(c)}</b>`, l === 'Not claimed' ? '<span class="chip k-fail" style="color:var(--tx2);border-color:var(--ln2)">Not claimed</span>' : `<span class="chip l-demo">${esc(l)}</span>`, esc(w)]), 'mid', 'Claims') : ''}
     <div class="card pad24">${facts([
-      ['Checker image id', `${hashCell(b.image_id)}<div class="chips mt8">${imgOk ? chip('l-demo', 'The published checker', 'check') : chip('k-fail', 'Not the published checker', 'x')}${b.image_id_allowed ? chip('l-demo', 'On the allowlist', 'check') : chip('k-fail', 'Not on the allowlist', 'x')}</div>`],
+      ['Checker image id', `${hashCell(b.image_id)}<div class="chips mt8">${imgOk ? chip('l-demo', b.image_id === CHECKERS.output ? 'The published output checker' : 'The published crash checker', 'check') : chip('k-fail', retired ? 'A retired checker' : 'Not a published checker', 'x')}${b.image_id_allowed ? chip('l-demo', 'On the allowlist', 'check') : chip('k-fail', 'Not on the allowlist', 'x')}</div>`],
       ['Check size', `${esc(b.fuzz_count)} fresh inputs, ${esc(b.variant_count)} variants of the secret input`],
       ['Exploit commitment', hashCell(b.exploit_commitment) + (demo ? '<span class="small">equals the demo commitment (data/demo/exploit.hex, public salt)</span>' : '')],
       ['Proof 0 journal hash', hashCell(b.proof0_journal_hash)],
@@ -194,6 +197,7 @@ function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at
 <div class="ph-grid">
 <div style="display:flex;flex-direction:column;gap:22px">
 <div style="display:flex;flex-wrap:wrap;gap:8px">${chip(st.cls, status, st.icon)}${kindChips(b, rec).map(([t, c]) => chip(c, t)).join('')}<span class="chip k-refund">Level ${esc(b.level)}</span></div>
+<p class="small bugk">${esc(BUG_LABEL[bugKindOf(b, programs, CHECKERS)])} bug${isNewKind(b, rec, programs, CHECKERS, NEW_UNTIL_UTC) ? ' <span class="new-sticker">New</span>' : ''}</p>
 <h1>Bounty ${esc(id)}: ${esc(title.charAt(0).toLowerCase() + title.slice(1))}</h1>
 <p class="lead" style="max-width:640px">${esc(lead)}</p>
 </div>

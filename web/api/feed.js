@@ -13,6 +13,7 @@ const REC = require('../data/recorded.json');
 const SITE = require('../site.config.json');
 
 const CONTRACT = SITE.contract;
+const CHECKERS = SITE.checkers;
 const RPCS = SITE.rpc_urls;
 const CACHE_MS = 60000; // how long one live answer is reused, here and at Vercel's edge
 const CALL_MS = 4000; // one view call, per RPC address
@@ -65,13 +66,16 @@ function reader(deadline, stats) {
 
 // One feed row, in the same shape and order as scripts/gen_feed.py writes it.
 function row(b, subs, kind, status, acc, pc) {
+  // the kind of bug: the published program's, else from the checker (scripts/gen_feed.py, bug_kind)
+  const bug = pc && pc.bug ? pc.bug : b.image_id === CHECKERS.output ? 'wrong output' : 'crash';
   const cb = (BigInt(b.expires_at_ns) - BigInt(b.reveal_window_ns) - BigInt(b.verdict_window_ns)).toString();
   return {
     bounty_id: Number(b.id), status, kind,
     judge_bounty: !!(REC.judge_bounties && REC.judge_bounties[String(b.id)]),
     retired_judge_bounty: (REC.retired_judge_bounties || []).includes(String(b.id)), accepts_commits: acc, level: b.level,
     program: pc ? pc.program : null, module_description: pc ? pc.description : null,
-    target: SAVED.bounties.length ? SAVED.bounties[0].target : null, max_patch_bytes: b.max_patch_bytes,
+    bug_kind: bug, checker: b.image_id === CHECKERS.output ? 'output' : b.image_id === CHECKERS.crash ? 'crash' : 'other',
+    target: (SAVED.targets || {})[bug] || (SAVED.bounties.length ? SAVED.bounties[0].target : null), max_patch_bytes: b.max_patch_bytes,
     reward_yocto: b.amount, reward: near(b.amount),
     max_commits: b.max_commits, attempts_used: b.commits, attempts: `${b.commits} of ${b.max_commits} used`, slots_in_use: b.active,
     max_commits_per_account: b.max_commits_per_account === undefined ? null : b.max_commits_per_account,

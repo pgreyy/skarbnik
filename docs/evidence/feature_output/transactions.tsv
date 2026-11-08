@@ -1,2 +1,11 @@
 step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
 allow_output_checker	allow_image_id	kintsugi-l2-cihdp.testnet	8mdstCU5xyTc2whyi4R15oxNtY4FpxpWbYMPKRY2wchf	0.309 Tgas	0.0000308267441862	0	6.98
+agent_credit_topup	deposit_credit	skarbnik-agentc-d48260.testnet	9ZfLfEDVfSd5rS83Xwx6NHMakrF1rGiS9J5q2jUDRLvX	0.309 Tgas	0.000030882243944	0	7.42
+ms_create	create_bounty	kintsugi-vendor-prnvm.testnet	EuqRbRzNYRkXGx2oUKHJ5cLjMwtr5KqBfHyphk2rMn5M	0.355 Tgas	0.000035412196869	0	9.55
+ms_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	DqiGXVvV1aXvoURDk2MnjEnnBSs1NzELdGraReq5hLmt	0.377 Tgas	0.000037681941703	0	8.44
+ms_agent_commit_a0_partial_fix	commit	skarbnik-agentc-d48260.testnet	3yiqTBrnBadvNxNVNX1CDUH8uMywrYHowUbfgNzCNGqS	-	-	0	-
+ms_agent_commit_a1_correct_fix	commit	skarbnik-agentc-d48260.testnet	82m3Wdk4aduGxNBiuiJoJuJAznPGYiqYfgfh45M6prjh	-	-	0	-
+ms_agent_reveal_a0	reveal	skarbnik-agentc-d48260.testnet	Bf3baKJ8HCm6Yub7sN58ay6WckF8jxvGAFoei7iG1uXC	-	-	0	-
+ms_agent_reveal_a1	reveal	skarbnik-agentc-d48260.testnet	ALJE5y29pHxkNf9Fo3x5PBhA4SUbVLehKMitQbnNPjSy	-	-	0	-
+ms_submit_a0_partial_fix_FAIL	submit_groth16	kintsugi-vendor-prnvm.testnet	FDk65JiRdQbukG5wi42L7G4GekGK1yBPrJFxMrrP8AcQ	0.378 Tgas	0.0000377153203035	0	6.75
+ms_submit_a1_correct_fix_PASS	submit_groth16	kintsugi-vendor-prnvm.testnet	8y5VPFGPoQzfCaETWBeTGVkLYY9F7ywpHBYCQzxNbQwk	0.378 Tgas	0.0000377153203035	0	8.25

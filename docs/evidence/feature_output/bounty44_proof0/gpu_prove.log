@@ -1,0 +1,23 @@
+salt: the private salt of bounty memsafe-scratch (existing)
+candidate: run/patch.wasm
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 64 variants: 64
+total cycles: 78118912
+user cycles: 51182183
+segments: 149
+prove seconds: 134.20
+verify seconds (in process): 4.714
+receipt file: run/u.bin (39943514 bytes)
+seal bytes: 39914120
+journal bytes: 780
+journal.verdict: PASS
+journal.candidate_hash: ffe2315b6fdd9003d1bfae041bbf5e65246c58f6a99745a86683cefa921dc118
+journal.original_hash: 568ae6244ef385f707b7b99ebb70057f072eb925fe1e288a64675bb5bfe68174
+journal.exploit_commitment: 19f1e058a984529291faa613104cbf84923c0a15d773c3b76a419c1ec1a06aae
+journal.corpus_hash: c12823f8e9c068a49b15fa5f055b3d5775cb07830f0ffbb7f58357705daa0c40
+journal.fuzz_seed: 4ebc34e5719d18c2b394bf666877536ad1124e5df75a92b703b7d0d591dd1467
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: dcb451e9461efa3b6c86a83acc1aab247ef0785fb43b12768103510c68e391b6

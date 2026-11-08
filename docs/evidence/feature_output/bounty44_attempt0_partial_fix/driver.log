@@ -1,0 +1,7 @@
+2026-11-08T20:42:07Z pod 2c66hab2kilpwi created: NVIDIA GeForce RTX 4090 in US-NC-1, $0.89/h, hard cap 45 min
+2026-11-08T20:42:19Z pod 2c66hab2kilpwi: ssh ready after 14 s, GPU NVIDIA GeForce RTX 4090
+2026-11-08T20:42:21Z pod 2c66hab2kilpwi: self stop armed for 50 min (runpodctl)
+2026-11-08T20:42:34Z pod 2c66hab2kilpwi: cached GPU binary in place (sha256 07a6d7b36e05be3b...)
+2026-11-08T20:43:45Z pod 2c66hab2kilpwi: proved in 53.68 s, secret wiped; segments: 61 journal.verdict: FAIL
+2026-11-08T20:44:38Z pod 2c66hab2kilpwi terminated: 152 s, $0.0376 ($0.89/h); GPU spend so far $0.2813
+{"pod_ready": 15, "binary": "cached", "setup": 29, "prove": 53.68, "succinct": 39.76, "pod_seconds": 152, "cost_usd": 0.0376, "gpu": "NVIDIA GeForce RTX 4090", "pod": "2c66hab2kilpwi", "waited_for_watches_s": 0}

@@ -313,7 +313,9 @@ const TOOLS = {
       let wat; try { wat = m.toText({ foldExprs: false, inlineExport: false }); } finally { m.destroy(); }
       const lang = pc.source.endsWith('.c') ? 'C' : 'Rust', src = await site(pc.source);
       return { bounty_id: bid, program: pc.program, description: pc.description, bug_kind: bugKind(b, row), bug_meaning: BUG_MEANING[bugKind(b, row)], target: row.target, max_patch_bytes: b.max_patch_bytes,
-        source_language: lang, source: src, ...(lang === 'Rust' ? { source_rust: src } : {}), original_wat: wat, public_tests: await site(pc.tests),
+        source_language: lang, source: src, ...(lang === 'Rust' ? { source_rust: src } : {}),
+        ...(pc.extra_files ? { extra_files: Object.fromEntries(await Promise.all(pc.extra_files.map(async (f) => [f.split('/').pop(), await site(f)]))) } : {}),
+        original_wat: wat, public_tests: await site(pc.tests),
         how_to_send_a_fix: `Change original_wat to fix the bug the ${lang} source describes (the ${lang} is the readable version of the same program). Keep the exports memory, input_buf and parse, and the answer of every public test. Then call check_patch with the whole fixed module as wat.` };
     },
   },

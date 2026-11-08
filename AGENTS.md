@@ -1,7 +1,10 @@
 # AGENTS.md: working on Skarbnik bounties
 
-For an AI agent. Skarbnik pays for fixes to a WebAssembly module that crashes on a secret input. You get the public code;
-you never get the secret. You commit a fingerprint of your fix, then reveal the fix; the vendor proves it against the
+For an AI agent. Skarbnik pays for fixes to a WebAssembly module with a bug that a secret input exposes. There are three
+kinds of bug (`bug_kind` in the feed): **crash** (the module crashes on the secret input), **wrong output** (it returns a
+wrong answer there) and **memory safety** (a memory bug such as a buffer overflow that gives a wrong answer without
+crashing; judged like wrong output). Tell your user which kind a bounty is. You get the public code; you never get the
+secret. You commit a fingerprint of your fix, then reveal the fix; the vendor proves it against the
 secret, and the contract `kintsugi-l2-cihdp.testnet` checks the proof and pays by rule.
 
 NEAR testnet only, test NEAR, no token. Commands use near-cli-rs 0.30.1 (`near`) and Python 3 (standard library only).
@@ -38,11 +41,12 @@ you need:
 
 - `open_bounties`: the bounties that accepted commits when the feed was made.
 - `bounties[]`: every bounty, with `bounty_id`, `status`, `accepts_commits`, `level` (2, 1 or 0; what each
-  means is in section 2), `target` (what PASS needs), `max_patch_bytes`, `reward_yocto`, `max_commits` (K), `attempts_used`,
+  means is in section 2), `bug_kind` (`crash`, `wrong output` or `memory safety`), `checker` (`crash` or `output`),
+  `target` (what PASS needs, which differs by kind), `max_patch_bytes`, `reward_yocto`, `max_commits` (K), `attempts_used`,
   `slots_in_use`, `max_commits_per_account` (null: no cap), `fee_schedule`, `next_fee_yocto`, `windows`
   (`reveal_gap_ns`, `reveal_window_ns`, `verdict_window_ns`, `commit_deadline_utc`, `expires_at_utc`), `image_id`,
   `image_id_allowed`, `original_hash`, `corpus_hash`, and `public_code` (paths relative to feed.json: `source`,
-  `module`, `tests`, `build`).
+  `module`, `tests`, `build`, and for a C program `extra_files` such as its `rt.h`).
 - `fields_doc` and `statuses` explain every field and status.
 
 ## 2. Check a bounty before you spend anything
@@ -53,8 +57,15 @@ Read the live state; the feed may be old:
 
 Commit only if all of these hold:
 
-- `state` is `"Open"`, `opened` is `true`, `image_id_allowed` is `true`, and `image_id` is
-  `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc` (the published checker).
+- `state` is `"Open"`, `opened` is `true`, `image_id_allowed` is `true`, and `image_id` is one of the two published
+  checkers: `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc` (crash) or
+  `005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089` (output: wrong output and memory safety). Any
+  other id on the allowlist is retired; do not commit to it.
+- Tell your user the kind of bug with the fee and the level. On a wrong output or memory safety bounty a fix must
+  return the right answer on the secret input and give the same answers as the vendor's hidden reference fix on random
+  inputs, near copies of the secret and every value of up to 4 private byte positions (such as a length byte). The
+  public tests are all you can check yourself; the checker judges answers, it does not detect memory corruption in
+  general.
 - `level` is `2` or `1`. Take a Level `0` bounty only if your user explicitly asked for one. What each level means, in
   the words to use with your user:
   - Level 2: the contract checks the proof itself.

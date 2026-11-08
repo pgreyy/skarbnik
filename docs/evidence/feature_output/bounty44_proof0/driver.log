@@ -1,0 +1,7 @@
+2026-11-08T20:27:59Z pod 0e38hpbkor4373 created: NVIDIA GeForce RTX 4090 in EUR-NO-1, $0.89/h, hard cap 45 min
+2026-11-08T20:28:22Z pod 0e38hpbkor4373: ssh ready after 24 s, GPU NVIDIA GeForce RTX 4090
+2026-11-08T20:28:22Z pod 0e38hpbkor4373: self stop armed for 50 min (runpodctl)
+2026-11-08T20:28:31Z pod 0e38hpbkor4373: cached GPU binary in place (sha256 07a6d7b36e05be3b...)
+2026-11-08T20:30:59Z pod 0e38hpbkor4373: proved in 139.9 s, secret wiped; segments: 149 journal.verdict: PASS
+2026-11-08T20:32:50Z pod 0e38hpbkor4373 terminated: 293 s, $0.0724 ($0.89/h); GPU spend so far $0.2437
+{"pod_ready": 25, "binary": "cached", "setup": 33, "prove": 139.9, "succinct": 100.24, "pod_seconds": 293, "cost_usd": 0.0724, "gpu": "NVIDIA GeForce RTX 4090", "pod": "0e38hpbkor4373", "waited_for_watches_s": 0}

@@ -2,13 +2,17 @@
 // count tiles, a filter per status that is present (with counts; one line that scrolls sideways when it does not fit,
 // arrow keys move between them), and one row per bounty: id, title and kind,
 // reward, attempts, status with a plain line, and its evidence (the payout or creation transaction from
-// data/recorded.json) with a link. On narrow screens the rows stack into cards.
+// data/recorded.json) with a link. Each row names its kind of bug (crash, wrong output, memory safety); wrong output and
+// memory safety bounties carry a "New" sticker until the date in site.config.json. On narrow screens the rows stack into cards.
 import { near, utcShort, commitBy, CONTRACT } from '../chain.js';
 import { $, esc, icon, chip, tx, note } from '../ui.js';
-import { STATUS, kindChips } from '../status.js';
-import { loadAll, fromFeed, getRecorded, getMeta, firstTx, lastTx } from '../data.js';
+import { STATUS, kindChips, bugKindOf, BUG_LABEL, isNewKind } from '../status.js';
+import { loadAll, fromFeed, getRecorded, getMeta, getPrograms, firstTx, lastTx } from '../data.js';
+import { CHECKERS, NEW_UNTIL_UTC } from '../config.js';
 
 let filter = 'all';
+// #/bounties?kind=new (the home page's link): only open wrong output and memory safety bounties
+const newOnly = () => /[?&]kind=new\b/.test(location.hash);
 
 // A plain line under the status, from the chain (and the bounty's own note when one is recorded).
 function subLine(x, meta, rec) {
@@ -59,8 +63,8 @@ ${['Proof verified', 'Timeout settlement', 'Refunded'].map((s) => `<div class="k
 <div class="wrap" id="blist"><p class="state">Reading every bounty from testnet…</p></div>
 </section>
 </main>`;
-  let all, rec, meta, snapshot = null;
-  try { [rec, meta] = await Promise.all([getRecorded(), getMeta()]); } catch (e) {
+  let all, rec, meta, programs, snapshot = null;
+  try { [rec, meta, programs] = await Promise.all([getRecorded(), getMeta(), getPrograms()]); } catch (e) {
     if ($('#blist')) $('#blist').innerHTML = note(`Could not load the site's data: ${esc(e.message)}. Reload to try again.`, 'alert'); return;
   }
   // First the last feed snapshot (scripts/gen_feed.py), labelled with its time, so the list shows at once and survives
@@ -75,6 +79,7 @@ ${['Proof verified', 'Timeout settlement', 'Refunded'].map((s) => `<div class="k
     return `<div class="brow" role="listitem">
 <div class="bid">#${esc(id)}</div>
 <div class="bmain"><a class="h4" style="display:block;text-decoration:none;color:var(--tx)" href="#/bounties/${esc(id)}">${esc((meta.titles || {})[id] || `Bounty ${id}`)}</a>
+<p class="small bugk">${esc(BUG_LABEL[bugKindOf(b, programs, CHECKERS)])} bug${isNewKind(b, rec, programs, CHECKERS, NEW_UNTIL_UTC) ? ' <span class="new-sticker">New</span>' : ''}</p>
 <div class="kinds">${kindChips(b, rec).map(([t, c]) => chip(c, t)).join('')}</div></div>
 <div class="bnum n1"><span class="lbl">Reward</span><b>${esc(near(b.amount).replace(' NEAR', ''))}<small>NEAR</small></b></div>
 <div class="bnum n2"><span class="lbl">Attempts</span><b class="nw">${esc(b.commits || 0)} of ${esc(b.max_commits)}<small>used</small></b></div>
@@ -89,7 +94,8 @@ ${['Proof verified', 'Timeout settlement', 'Refunded'].map((s) => `<div class="k
     const failed8 = list.filter((x) => rec.bounty_notes && rec.bounty_notes[String(x.b.id)] && rec.bounty_notes[String(x.b.id)].transfer_failed).length;
     const present = Object.keys(STATUS).filter((st) => n(st));
     if (filter !== 'all' && !present.includes(filter)) filter = 'all';
-    const rows = list.filter((x) => filter === 'all' || x.status === filter);
+    const only = newOnly();
+    const rows = list.filter((x) => (filter === 'all' || x.status === filter) && (!only || (x.accepting && bugKindOf(x.b, programs, CHECKERS) !== 'crash' && !((rec.retired_checkers || {})[x.b.image_id]))));
     $('#blist').innerHTML = `
 <div class="strip" aria-label="Summary of the ${list.length} bounties on the contract">
 <div><b>${list.filter((x) => x.accepting).length}</b><span>Accepting commits now</span></div>
@@ -99,11 +105,11 @@ ${['Proof verified', 'Timeout settlement', 'Refunded'].map((s) => `<div class="k
 </div>
 <div class="bar">
 <div class="seg" role="group" aria-label="Filter bounties">${[['all', 'All', list.length], ...present.map((s) => [s, s, n(s)])].map(([k, t, c]) => `<button type="button" data-f="${esc(k)}" aria-pressed="${filter === k}">${esc(t)} <span style="color:var(--tx3)">${c}</span></button>`).join('')}</div>
-<p class="small faint" aria-live="polite">Showing ${rows.length} of ${list.length} on ${esc(CONTRACT)}</p>
+<p class="small faint" aria-live="polite">Showing ${rows.length} of ${list.length} on ${esc(CONTRACT)}${only ? ': open wrong output and memory safety bounties only. <a class="lnk" href="#/bounties">Show all</a>' : ''}</p>
 </div>
 <div class="blist" role="list" aria-label="Bounties">
 <div class="bhead" aria-hidden="true"><span>Id</span><span>Bounty</span><span>Reward</span><span>Attempts</span><span>Status</span><span>Evidence</span></div>
-${rows.length ? rows.map(row).join('') : '<p class="empty">No bounties match this filter.</p>'}
+${rows.length ? rows.map(row).join('') : `<p class="empty">${only ? 'No wrong output or memory safety bounty is open right now.' : 'No bounties match this filter.'}</p>`}
 </div>
 ${snapshot ? `<div style="margin-top:24px">${note(snapshot.err ? `The contract could not be read just now (${esc(snapshot.err)}). This list is the feed snapshot made at ${esc(snapshot.at)}: reload to read it live.` : `This list is the feed snapshot made at ${esc(snapshot.at)}. Reading the contract live…`, snapshot.err ? 'alert' : 'clock')}</div>` : ''}
 <div style="margin-top:24px">${note(`Every bounty on this contract is listed, read live from testnet. Test, demo and judge bounties are labelled. Titles are short descriptions; every status, amount and count comes from the chain.`)}</div>

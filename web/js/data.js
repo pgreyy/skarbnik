@@ -10,6 +10,7 @@ const json = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error(`${url
 
 export const getRecorded = once(() => json('data/recorded.json'));
 export const getMeta = once(() => json('data/bounty_meta.json'));
+export const getPrograms = once(() => json('data/programs.json').catch(() => ({ programs: {} })));
 export const getNumbers = once(() => json('data/numbers.json'));
 export const getConfig = once(() => json('site.config.json'));
 // saved snapshots of the bounties the site points people to (scripts/gen_feed.py), shown until the chain answers

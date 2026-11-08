@@ -22,6 +22,21 @@ export const STATUS = {
   'Waiting for Proof 0': { cls: 'k-open', icon: 'clock', help: 'Created, not opened yet. It opens when its Proof 0 is accepted.' },
 };
 
+// The kind of bug a bounty is about: its published program's (data/programs.json, by original_hash), else from its
+// checker: the output checker judges wrong answers, the crash checker crashes. Pure: the checkers come in as an argument,
+// so the live feed function can use it too.
+export function bugKindOf(b, programs, checkers) {
+  const p = programs && programs.programs && programs.programs[b.original_hash];
+  if (p && p.bug) return p.bug;
+  return checkers && b.image_id === checkers.output ? 'wrong output' : 'crash';
+}
+export const BUG_LABEL = { crash: 'Crash', 'wrong output': 'Wrong output', 'memory safety': 'Memory safety' };
+// The "New" sticker: wrong output and memory safety bounties that are not tests and not on a retired checker, until
+// the date in web/site.config.json (new_badge_until_utc) has passed. It switches off by itself, with no redeploy.
+export const newBadgeOn = (until, now = Date.now()) => !!until && now < Date.parse(`${until}T00:00:00Z`);
+export const isNewKind = (b, rec, programs, checkers, until, now = Date.now()) =>
+  newBadgeOn(until, now) && bugKindOf(b, programs, checkers) !== 'crash' && kindOf(b, rec) !== 'test' && !((rec && rec.retired_checkers) || {})[b.image_id];
+
 // What kind of bounty: 'test' (made for trying the site), 'demo' (the public demo input), or 'private'.
 export function kindOf(b, rec) {
   if (rec && rec.test_bounties && rec.test_bounties[String(b.id)]) return 'test';

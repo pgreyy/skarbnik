@@ -19,7 +19,7 @@ const README = `${REPO}/blob/main/tools/skarbnik-mcp/README.md`;
 const EXAMPLE_LINK = 'https://skarbnik.xyz/api/mcp/sk1_EXAMPLE…';
 const PROMPT = 'Find an open Skarbnik bounty, read its public code and try to fix it. Tell me the fee and the bounty’s level before you spend anything.';
 const FIRST_MSG = 'List the open Skarbnik bounties.';
-const GUIDE = 'Open skarbnik.xyz/agent-quickstart.txt and follow it. Use my agent key file at <path to your key file>. Find an open bounty, try to fix it, and tell me the fee and its level first.';
+const GUIDE = 'Open skarbnik.xyz/agent-quickstart.txt and follow it. Use my agent key file at <path to your key file>. Find an open bounty, try to fix it, and tell me the fee, its level and the kind of bug first.';
 const WAYS = [{ id: 'link', label: 'Link', sub: 'Easiest' }, { id: 'local', label: 'Local', sub: 'Advanced' }, { id: 'guide', label: 'Guide', sub: 'For agents without tools' }];
 const li = (items) => `<ol class="ag-ol">${items.map((t) => `<li>${t}</li>`).join('')}</ol>`;
 // The Link way, in plain view: three steps, a short table of where the settings are, and an illustration (a made-up,

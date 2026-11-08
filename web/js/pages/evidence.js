@@ -11,12 +11,13 @@
 // closed drop downs (details: they open without JavaScript, and the saved page shows them open). Nothing was removed.
 // The page is drawn at once; live values say "Loading from the contract" until they arrive, and if the testnet node
 // gives no answer within 4 seconds the saved snapshots are shown, labelled with their time.
-import { CONTRACT, RPCS, EXPLORER_ACCOUNT, PUBLISHED_IMAGE_ID, view, near, submissions, accessKeys, allBounties } from '../chain.js';
+import { CONTRACT, RPCS, EXPLORER_ACCOUNT, view, near, submissions, accessKeys, allBounties } from '../chain.js';
 import { $, esc, icon, copyBtn, chip, tx, acct, hashCell, table, note, cmd, facts, tabbed, seg, bindSeg, collapse } from '../ui.js';
 import { STATUS } from '../status.js';
 import { loadAll, fromFeed, getRecorded, getMeta, getNumbers, txsOf, paidByProof } from '../data.js';
 import { buildLedger } from '../ledger-core.js';
 import { hex } from '../attempt.js';
+import { CHECKERS } from '../config.js';
 
 const dur = (sec) => { const m = Math.round(sec / 60), h = Math.floor(m / 60); return h ? `${h} h ${m % 60} min` : `${m} min`; };
 const kindChip = (k) => `<span class="chip k-refund">${esc(k)}</span>`;
@@ -162,17 +163,22 @@ export async function evidence(viewEl, tab) {
   // ---- Checker
   const check = rec.last_image_check && rec.last_image_check.result === 'MATCH' ? rec.last_image_check : null;
   const checker = `<div class="stack g24">
-    <div style="max-width:700px"><h2 class="h2s">The approved checker</h2><p class="body" style="margin-top:12px">A proof counts only for one checker program. Its fingerprint, the image id, is the only id on the contract’s allowlist, and anyone can rebuild the checker and compare.</p></div>
+    <div style="max-width:700px"><h2 class="h2s">The approved checkers</h2><p class="body" style="margin-top:12px">A proof counts only for an approved checker program. There are two: one for crashes, and one for wrong answers and memory safety bugs. Each fingerprint, the image id, is on the contract’s allowlist, and anyone can rebuild both and compare.</p></div>
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px">
-    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><p class="eyebrow" style="color:var(--tx3)">Image id on the allowlist</p>${check ? chip('l-demo', `MATCH on rebuild, ${check.utc.slice(0, 10)}`, 'check') : ''}</div>
-    <div class="cblk"><p class="imgid">${esc(PUBLISHED_IMAGE_ID)}</p>${copyBtn(PUBLISHED_IMAGE_ID)}</div>
-    <p class="small" id="allowLine">${LOADING}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><p class="eyebrow" style="color:var(--tx3)">Crash checker</p>${check ? chip('l-demo', `MATCH on rebuild, ${check.utc.slice(0, 10)}`, 'check') : ''}</div>
+    <div class="cblk"><p class="imgid">${esc(CHECKERS.crash)}</p>${copyBtn(CHECKERS.crash)}</div>
     <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">${tx(nums.allowlist_tx.tx, 'allowlisted in')}</div>
+    <p class="eyebrow" style="color:var(--tx3);margin-top:8px">Output checker: wrong output and memory safety</p>
+    <div class="cblk"><p class="imgid">${esc(CHECKERS.output)}</p>${copyBtn(CHECKERS.output)}</div>
+    ${rec.output_checker && rec.output_checker.allow_tx ? `<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">${tx(rec.output_checker.allow_tx, 'allowlisted in')}</div>` : ''}
+    <p class="small">It passes a fix that returns the right answer on the secret input and the same answers as the vendor’s hidden reference fix on random inputs, near copies of the secret and every value of up to 4 private byte positions. It judges answers; it does not detect memory corruption in general.</p>
+    <p class="small" id="allowLine">${LOADING}</p>
+    ${Object.keys(rec.retired_checkers || {}).map((r) => `<p class="small faint">Retired: <span class="mono">${esc(r.slice(0, 16))}…</span> ${esc(rec.retired_checkers[r])}</p>`).join('')}
     </div>
     <div class="two">
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px">
     <h3 class="h3">Rebuild it yourself</h3>
-    ${check ? `<p class="small">Level B of the judge guide. It builds the checker in a pinned container and compares the id.</p>${cmd('./scripts/check_image_id.sh')}
+    ${check ? `<p class="small">Level B of the judge guide. It builds both checkers in a pinned container and compares both ids.</p>${cmd('./scripts/check_image_id.sh')}
     <p class="small">The last line should read <b class="txt">MATCH</b>. It took ${esc(nums.image_rebuild.cached)} with the Docker images cached, and ${esc(nums.image_rebuild.fresh)} with the ${esc(nums.image_rebuild.download)} image download. Needs Docker.</p>
     <p class="small faint">Shown on one machine so far (${esc(check.source)}).</p>` : '<p class="small">The rebuild command is shown here once scripts/check_image_id.sh has printed MATCH.</p>'}
     </div>
@@ -322,7 +328,7 @@ export async function evidence(viewEl, tab) {
       <dt>Owner</dt><dd>${owner ? (owner === CONTRACT ? 'The contract account itself' : acct(owner)) : 'could not read'}</dd>
       <dt>Fee pool</dt><dd>${pool !== null ? `${esc(near(pool))}, locked. No method takes it out.` : 'could not read'}</dd>
       <dt>Full access keys</dt><dd>${fullKeys === null ? 'could not read' : fullKeys}</dd></dl><p class="small faint">Read live from testnet just now, except the last deploy (${esc(nums.last_deploy.source)}).</p>`;
-    const al = $('#allowLine'); if (al) al.textContent = allowed === null ? 'The allowlist could not be read just now.' : `Read live: the allowlist holds ${allowed.length} ${allowed.length === 1 ? 'id' : 'ids'}${allowed.length === 1 && allowed[0] === PUBLISHED_IMAGE_ID ? ', this one' : ''}.`;
+    const al = $('#allowLine'); if (al) al.textContent = allowed === null ? 'The allowlist could not be read just now.' : `Read live: the allowlist holds ${allowed.length} ${allowed.length === 1 ? 'id' : 'ids'}: ${allowed.map((a) => a === CHECKERS.crash ? 'the crash checker' : a === CHECKERS.output ? 'the output checker' : (rec.retired_checkers || {})[a] ? 'a retired checker' : 'an unknown id').join(', ')}.`;
     const kn = $('#keyNote'); if (kn && fullKeys) kn.innerHTML = note(`Read live just now: the contract account has ${fullKeys} full access ${fullKeys === 1 ? 'key' : 'keys'}. The testnet contract’s account keeps a full access key, so its owner can replace the code under live bounties. This is deliberate: it’s an experimental testnet contract that will keep changing. The mainnet contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay). To check that the code has not changed silently, compare the live code hash above with the last deploy in docs/EVIDENCE.md, “Contract code and every deploy”, which lists every deploy transaction.`, 'alert');
     drawLimits({ fullKeys });
   })();

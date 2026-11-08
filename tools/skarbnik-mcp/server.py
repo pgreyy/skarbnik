@@ -511,6 +511,7 @@ def t_get_public_code(cfg, a):
             "max_patch_bytes": b["max_patch_bytes"], "original_module_bytes": len(module),
             "module_matches_chain": True, "source_file": base + pc["source"], "source": fetch(base + pc["source"]).decode(),
             "build": fetch(base + pc["build"]).decode(), "public_tests": tests, "original_wat": wat,
+            **({"extra_files": {f.rsplit("/", 1)[-1]: fetch(base + f).decode() for f in pc["extra_files"]}} if pc.get("extra_files") else {}),
             "next": f"change original_wat (the same program as WebAssembly text) to fix the bug the {lang} source describes, then call "
                     "check_patch with the whole module as wat; keep the exports and every public test's answer. "
                     + ("With Rust installed you may write the fixed Rust file and call build_patch instead" if lang == "Rust" else

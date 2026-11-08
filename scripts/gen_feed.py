@@ -57,8 +57,20 @@ PACKAGES = {"demo": {"dir": "data/demo", "source": "original.rs", "module": "ori
             "ringlog2": {"dir": "data/ringlog2", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
                          "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug"},
             "grid": {"dir": "data/grid", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt",
-                     "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug"}}
-# What every fix must do, for every program (the checker's rules: harness/checker/src/lib.rs).
+                     "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug"},
+            "feecalc": {"dir": "data/feecalc", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt", "bug": "wrong output",
+                        "description": "a fee calculator (2.5 percent of a list of amounts, rounded up); its public source names its bug in a comment"},
+            "memsafe": {"dir": "data/memsafe", "source": "original.c", "module": "original.wasm", "tests": "public_tests.txt", "bug": "memory safety",
+                        "build": "c", "extra": ["rt.h"],
+                        "description": "a C record parser that copies a name into a 16 byte buffer; its public source names its buffer overflow"}}
+# The kind of bug of each program (default crash), and the two checkers that judge them (web/site.config.json).
+CHECKERS = SITE["checkers"]
+BUG_KINDS = {
+    "crash": "the original crashes on a secret input (checker dd6c5f42...)",
+    "wrong output": "the original returns a wrong answer on a secret input; a fix must return the right answer and match the vendor's hidden reference fix on random and nearby inputs (checker 005d8dc7...)",
+    "memory safety": "a memory bug such as a buffer overflow that gives a wrong answer without crashing; judged like wrong output (checker 005d8dc7...). It does not detect memory corruption in general",
+}
+# What every fix must do, by kind of bug (the checkers' rules: harness/checker/src/lib.rs, harness/checker-output/src/lib.rs).
 TARGET = ("Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies "
           "of it where the original crashes, while giving the original's answers on every public test and on fresh inputs "
           "drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this "
@@ -66,6 +78,22 @@ TARGET = ("Change the program so it no longer crashes (traps or runs out of fuel
 # The status vocabulary of each bounty in this feed (documented on the site's For agents page).
 STATUSES = ["Proof verified", "Verified by OutLayer", "Verifiers attested", "Proof rejected", "Failed by OutLayer", "Awaiting evaluation", "Timeout settlement", "Refunded", "Failed",
             "Demo or test only", "Open for attempts", "Waiting for Proof 0"]
+OUTPUT_TARGET = ("Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), "
+                 "gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix "
+                 "on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the "
+                 "vendor's private sweep positions. Keep the interface input_buf() and parse(len). PASS means it passed this checker; "
+                 "it does not prove the program correct everywhere.")
+MEMORY_TARGET = OUTPUT_TARGET.replace("PASS means it passed this checker; it does not prove the program correct everywhere.",
+                                      "Fix the memory bug itself: the checker judges the answers on the overflow input and nearby "
+                                      "inputs; it does not detect memory corruption in general.")
+TARGETS = {"crash": TARGET, "wrong output": OUTPUT_TARGET, "memory safety": MEMORY_TARGET}
+BUILD_C_TXT = """How to build a patch for this program (the same flags the vendor used for the original; clang from wasi-sdk 34):
+clang --target=wasm32 -Oz -nostdlib -ffreestanding -mbulk-memory -Wl,--no-entry -Wl,--strip-all -Wl,--gc-sections \\
+  -Wl,--initial-memory=131072 -Wl,--max-memory=131072 -Wl,-z,stack-size=8192 -o patch.wasm patch.c
+rt.h (next to the source) is the program's runtime: keep it as it is and include it. Keep the interface: input_buf() -> i32
+and parse(len: i32) -> i32. No C library and no imports. The patch must be at most the bounty's max_patch_bytes.
+Public tests: one per line, <input as hex, or - for empty> <value the original returns>. corpus_hash as in the other programs.
+"""
 BUILD_TXT = """How to build a patch for this program (the same flags the vendor used for the original):
 rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \\
   -C codegen-units=1 -C target-cpu=mvp -C link-arg=-zstack-size=8192 -C link-arg=--initial-memory=131072 \\
@@ -93,14 +121,27 @@ for name, pk in PACKAGES.items():
     os.makedirs(dst_dir, exist_ok=True)
     for key in ("source", "module", "tests"):
         shutil.copyfile(os.path.join(ROOT, pk["dir"], pk[key]), os.path.join(dst_dir, pk[key]))
+    for extra in pk.get("extra", []):
+        shutil.copyfile(os.path.join(ROOT, pk["dir"], extra), os.path.join(dst_dir, extra))
     with open(os.path.join(dst_dir, "BUILD.txt"), "w") as f:
-        f.write(BUILD_TXT)
+        f.write(BUILD_C_TXT if pk.get("build") == "c" else BUILD_TXT)
     module = open(os.path.join(dst_dir, pk["module"]), "rb").read()
     tests = open(os.path.join(dst_dir, pk["tests"])).read()
     public_code[(hashlib.sha256(module).hexdigest(), corpus_hash(tests))] = {
         "source": f"code/{name}/{pk['source']}", "module": f"code/{name}/{pk['module']}",
         "tests": f"code/{name}/{pk['tests']}", "build": f"code/{name}/BUILD.txt", "program": name,
-        "description": pk["description"]}
+        "description": pk["description"], "bug": pk.get("bug", "crash"),
+        **({"extra_files": [f"code/{name}/{x}" for x in pk["extra"]]} if pk.get("extra") else {})}
+# The browser's map from a program's original module to its kind of bug (web/js/status.js, bugKindOf).
+with open(os.path.join(ROOT, "web/data/programs.json"), "w") as f:
+    json.dump({"note": "Made by scripts/gen_feed.py: each published program by the sha256 of its original module, with its kind of bug.",
+               "programs": {k[0]: {"program": v["program"], "bug": v["bug"]} for k, v in public_code.items()}}, f, indent=1)
+    f.write("\n")
+
+
+def bug_kind(b, pc):
+    """The kind of bug: the program's when it is published, else from the checker."""
+    return pc["bug"] if pc else "wrong output" if b["image_id"] == CHECKERS["output"] else "crash"
 
 now_ns = int(datetime.datetime.now(datetime.UTC).timestamp() * 1e9)
 # Test bounties (made for trying the site), from web/data/recorded.json (scripts/gen_site_recorded.py)
@@ -171,7 +212,8 @@ for i in range(n):
         "bounty_id": int(b["id"]), "status": status_of(b, subs, kind, accepting), "kind": kind,
         "judge_bounty": str(i) in judge_ids, "retired_judge_bounty": str(i) in retired_judge_ids, "accepts_commits": accepting, "level": b["level"],
         "program": pc["program"] if pc else None, "module_description": pc["description"] if pc else None,
-        "target": TARGET, "max_patch_bytes": b["max_patch_bytes"],
+        "bug_kind": bug_kind(b, pc), "checker": "output" if b["image_id"] == CHECKERS["output"] else "crash" if b["image_id"] == CHECKERS["crash"] else "other",
+        "target": TARGETS[bug_kind(b, pc)], "max_patch_bytes": b["max_patch_bytes"],
         "reward_yocto": b["amount"], "reward": near(b["amount"]),
         "max_commits": b["max_commits"], "attempts_used": b["commits"], "attempts": f"{b['commits']} of {b['max_commits']} used", "slots_in_use": b["active"],
         "max_commits_per_account": b.get("max_commits_per_account"),
@@ -231,6 +273,11 @@ feed = {
     "live_url": f"{SITE_URL}/api/feed",
     "note": "Snapshot made by scripts/gen_feed.py. The live feed at live_url re-reads the open and newer bounties from the chain about once a minute. Read get_bounty on the contract for the current state before you commit.",
     "allowed_image_ids": allowed,
+    "checkers": CHECKERS,
+    "checkers_note": "Agents and the site take only these two checkers: crash, and output (wrong answers and memory safety bugs). Any other id on the allowlist is retired (retired_checkers).",
+    "retired_checkers": _recorded.get("retired_checkers", {}),
+    "bug_kinds": BUG_KINDS,
+    "targets": TARGETS,
     "test_bounty_ids": sorted(int(x) for x in test_ids),
     "test_bounty_note": "Test bounties are for trying the site and the wallet flow, not demos.",
     "open_bounties": open_bounties,

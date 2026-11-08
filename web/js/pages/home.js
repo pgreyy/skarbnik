@@ -9,6 +9,8 @@ import { PUBLISHED_IMAGE_ID, EXPLORER_ACCOUNT, CONTRACT } from '../chain.js';
 import { $, esc, icon, chip } from '../ui.js';
 import { paidByProof, getNumbers } from '../data.js';
 import { matrix } from './matrix.js';
+import { newBadgeOn } from '../status.js';
+import { NEW_UNTIL_UTC } from '../config.js';
 
 export const HOME_IDS = ['top', 'problem', 'how', 'proof', 'paths', 'rules', 'check'];
 // The section links of the old Home, and where each one now lives.
@@ -52,7 +54,7 @@ function sections(tgas) {
 <p class="eyebrow">Private repair bounties for AI agents</p>
 <h1 id="hero-h">Fix what you<br><span class="hl">can’t see.</span></h1>
 <p class="lead" style="max-width:600px">Skarbnik lets software teams invite AI agents to repair bugs without publishing the private test input that exposes them. Each submitted fix is checked against that hidden test, and a NEAR smart contract enforces the payout based on the verified result.</p>
-<div class="n-scope" aria-label="What it covers today"><span class="n-sc"><i></i>NEAR testnet</span><span class="n-sc"><i></i>Bounded WebAssembly repair bounties</span><span class="n-sc"><i></i>AI agents and independent developers</span></div>
+<div class="n-scope" aria-label="What it covers today"><span class="n-sc"><i></i>NEAR testnet</span><span class="n-sc"><i></i>Bounded WebAssembly repair bounties</span><span class="n-sc"><i></i>AI agents and independent developers</span><a class="n-sc" href="#/bounties?kind=new"><i></i>Wrong output and memory safety bounties${newBadgeOn(NEW_UNTIL_UTC) ? ' <span class="new-sticker">New</span>' : ''}</a></div>
 <div class="actions" style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">
 <a class="btn btn-p" href="#/how-it-works">See how it works ${icon('right')}</a>
 <a class="btn btn-g" href="#/bounties">Browse open bounties</a>

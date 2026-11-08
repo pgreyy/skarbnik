@@ -116,6 +116,13 @@ BOUNTY_STEPS = [
     # without the secret, Proof 0 and the watches on the VPS, one wrong fix each through tools/skarbnik-mcp (FAIL)
     ("docs/evidence/bounties_40_41/transactions.tsv", "tools/skarbnik-vendor-mcp (init, check, prove0, publish, watch); tools/skarbnik-mcp",
      {40: ["b40_"], 41: ["b41_"]}),
+    # The output checker spike (docs/evidence/spike_output/): scratch bounties 42 and 43 on the spike checker 77c2e2d1...
+    # (no sweep, retired): 42 paid a correct fix by a PASS proof; 43 recorded the partial fix's FAIL
+    ("docs/evidence/spike_output/transactions.tsv", "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)",
+     {42: ["create_spike", "open_spike", "agent_commit_a", "agent_reveal_a", "submit_a0"], 43: ["create_43", "open_43", "agent_commit_43", "agent_reveal_43", "submit_43"]}),
+    # The output checker with the sweep (docs/evidence/feature_output/): the memory safety scratch bounty
+    ("docs/evidence/feature_output/transactions.tsv", "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)",
+     {int(os.environ.get("MEMSAFE_SCRATCH", "44")): ["ms_"]}),
     # The testnet cleanup of 2026-10-30: claim_timeout where a revealed attempt waited, expire on the expired bounties
     ("docs/evidence/cleanup_2026-10-30/transactions.tsv", "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)",
      {3: ["cleanup_b3_claim"], 26: ["cleanup_b26_claim"], 0: ["cleanup_b0_expire"], 2: ["cleanup_b2_expire"], 10: ["cleanup_b10_expire"],
@@ -292,6 +299,17 @@ out["test_bounties"]["26"] = "Test bounty: made for the agent access tests (AGEN
 out["test_bounties"]["35"] = "Test bounty: made by the vendor MCP server's end to end run. The public demo program and the public demo input, with a private salt; its first attempt was a wrong fix on purpose (FAIL), and it stays open for a recorded walkthrough. Not a demo."
 out["test_bounties"]["34"] = "Test bounty: made for the hosted agent connector's tests (commit and reveal through the link). The program is the public demo; nobody proves its attempts, so the timeout rule settles them. Not a demo."
 out["test_bounties"]["32"] = "Test bounty: made for the vendor tool's end to end test (tools/skarbnik-vendor watch proves its attempt on a rented GPU with no one's help). Its secret is private, made on the vendor's VPS, but the program is the public demo."
+out["test_bounties"]["42"] = "Test bounty: a scratch bounty of the output checker spike (wrong output, the fee calculator), on the spike checker 77c2e2d1... that is now retired. A correct fix was paid by a PASS proof. Not a demo."
+out["test_bounties"]["43"] = "Test bounty: a scratch bounty of the output checker spike, opened with bounty 42's Proof 0 to record the partial fix's FAIL proof on chain. Retired spike checker. Not a demo."
+out["test_bounties"][os.environ.get("MEMSAFE_SCRATCH", "44")] = "Test bounty: the scratch bounty of the memory safety mode (output checker 005d8dc7..., one sweep position): a partial fix FAIL and a correct fix PASS, the FAIL submitted first. Not a demo."
+# The output checker (wrong answers and memory safety bugs) and the transaction that put it on the allowlist.
+_fo = tsv("docs/evidence/feature_output/transactions.tsv")
+out["output_checker"] = {"image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+                         "allow_tx": next((r["tx_hash"] for r in _fo if r["step"] == "allow_output_checker"), None),
+                         "source": "docs/evidence/feature_output/transactions.tsv"}
+# Checkers once allowed on the contract and no longer used: an id cannot be removed from the allowlist.
+out["retired_checkers"] = {"77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4":
+    "The output checker of the spike (no byte sweep). Retired: used only by test bounties 42 and 43. It stays on the allowlist because an id cannot be removed; the site, the feed, the agent servers and the vendor tool accept only the crash checker dd6c5f42... and the output checker 005d8dc7...."}
 if ARENA_BOUNTY:
     out["test_bounties"][ARENA_BOUNTY] = "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
 out["judge_bounties"] = {str(j): "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself." for j in JUDGE_IDS}
