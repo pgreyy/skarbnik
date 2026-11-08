@@ -1,0 +1,8 @@
+== reveal 
+{
+ "revealed": true,
+ "tx": "Agy73zEZQH4RBVA9VeZmbu6gercoP2vETq68MCynXci7",
+ "bounty_id": "43",
+ "index": 0,
+ "next": "the vendor now proves the patch; call status to see the outcome (PASS pays, FAIL spends the attempt, a timeout splits the reward among waiting attempts)"
+}

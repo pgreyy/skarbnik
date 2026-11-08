@@ -16,7 +16,7 @@ The output checker runs in its own guest with its own image id and commits the c
 the contract needed no code change, only `allow_image_id`. Scratch bounty 42 (Level 2, reward 0.1 NEAR, K 3) was opened
 by a Groth16 Proof 0 and paid the correct fix through a Groth16 proof the contract checked. The partial fix got a valid
 Groth16 FAIL proof, but the PASS was submitted first: it closed the bounty and refunded the open attempt, so the FAIL
-could no longer be submitted. Submitting the FAIL first would have recorded both.
+could no longer be submitted there; bounty 43 then recorded that FAIL on chain (below).
 
 **Design.** `harness/checker-output/` (checker), `harness/output-guest/` (guest), `data/feecalc/` (demo program: a fee
 calculator that rounds down by one for totals of 1000 or more; original 207 bytes, fix 215 bytes),
@@ -70,6 +70,28 @@ first wrap took longer than the other two (486 s against about 195 s). Raw logs:
 creation (until 14:51:44 UTC); the live feed listed it as open in that time, with no public code, and the published agent
 server refuses it (not the published checker). The site and the feed now show it as a private bounty; marking it as a
 test needs an entry in the site data on main.
+
+**Bounty 43: the FAIL on chain (2026-11-08).** A second scratch bounty with K 1 and the same terms, opened with bounty
+42's Proof 0 (its journal names no bounty, so the same seal and journal open it). The agent committed only the partial
+fix; it was proved FAIL and the contract recorded it: attempt 0 outcome Failed, verdict FAIL, nobody paid. The bounty
+holds its 0.1 NEAR until it expires at 2026-11-09T01:25:55Z; then `expire` refunds the vendor.
+
+| Step | Signer | Result | Transaction | Gas burned |
+| --- | --- | --- | --- | --- |
+| `create_bounty` 43 | vendor | Level 2, 0.1 NEAR, K 1, 64 and 64 | `8CFNeEjderoiCo7sXQvKC3kYcQjvaFLMffndrGrE6DFH` | 2.93 Tgas |
+| `open_with_groth16` | vendor | opened with bounty 42's Proof 0 | `7XmZDUvKLQ9ChRocNQHsWxGAqXN5p92NiDLaZiVzsPCM` | 35.27 Tgas |
+| `commit` attempt 0, partial fix | agent | fee 0.01 NEAR | `EoYpB23Yj1pPbwUsvp8hNXVgCyAiXcMu5wUgrS48hrW8` | 3.10 Tgas |
+| `reveal` attempt 0 | agent | seed recorded | `Agy73zEZQH4RBVA9VeZmbu6gercoP2vETq68MCynXci7` | 2.81 Tgas |
+| `submit_groth16` attempt 0 | vendor | FAIL recorded; attempt Failed | `9ahn3Mt38iQyAVZfkQLVJQxWeidADL61DcfbmnG6uxKp` | 35.66 Tgas |
+
+The proof: 1,882,730 user cycles, 7 segments, prove 8.46 s, shrink 5.50 s, Groth16 181.83 s on the laptop. Uploads
+from the VPS to the pods ran at about 26 to 65 KB/s that day (bytes acknowledged on the copy's connection, `ss -tin`),
+so two pods could not receive the 121 MB GPU binary: one was stopped by hand after 757 s ($0.1871), one hit the copy
+time limit after 933 s ($0.2307). The third pod built the binary from the 8.6 MB source and guest files instead (915 s)
+and proved: 1,003 s, $0.248 (RTX 4090). A fourth pod above the price ceiling was dropped after 3 s ($0.0009). The GPU
+helper on this branch now gives up keeping a built binary after a set time instead of failing the pod's proof.
+GPU spend for the spike after bounty 43: $0.9866 of the $2 cap. Logs: `docs/evidence/spike_output/bounty43_partial_fix/`,
+state after: `final_state_43.txt`.
 
 **Known limits.** The fairness generator makes inputs in the demo program's format only. The testnet cheat was the
 partial fix, not one that special cases the secret: that one would print the private secret in its revealed code. The

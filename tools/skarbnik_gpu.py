@@ -372,7 +372,11 @@ def put_binary(pod, g, expect_image_id, log):
         raise GpuError(f'the GPU build embeds another checker image id than {expect_image_id[:16]}...: {out.strip()[-200:]}')
     pod.ssh('cp skb/target/release/skarbnik-host skarbnik-host && ldd skarbnik-host | grep -i -E "cuda|not found" || true', 120)
     os.makedirs(os.path.dirname(cache), exist_ok=True)
-    pod.scp(pod.remote('skarbnik-host'), cache + '.part', 900)
+    try:  # keeping a copy for the next pods is a saving, not a need: a slow link must not cost this pod's proof
+        pod.scp(pod.remote('skarbnik-host'), cache + '.part', int(g.get('keep_binary_timeout', 900)))
+    except GpuError as e:
+        log(f'pod {pod.id}: built the GPU binary in {round(time.time() - t)} s; no copy kept ({e}); proving with it on this pod')
+        return 'built, not kept'
     sha = hashlib.sha256(open(cache + '.part', 'rb').read()).hexdigest()
     os.replace(cache + '.part', cache)
     json.dump({'sha256': sha, 'built_utc': utc(), 'image': g['image'], 'gpu': pod.rec.get('gpu'), 'image_id': expect_image_id,

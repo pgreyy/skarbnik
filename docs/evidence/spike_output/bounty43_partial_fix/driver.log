@@ -1,0 +1,10 @@
+2026-11-08T18:42:17Z pod xjrhm9t0wrc2d0 created: NVIDIA L40S in US-TX-4, $1.09/h, hard cap 45 min
+2026-11-08T18:42:17Z pod xjrhm9t0wrc2d0: NVIDIA L40S at $1.09/h is above the $0.9/h ceiling; terminating it
+2026-11-08T18:42:18Z pod xjrhm9t0wrc2d0 terminated: 3 s, $0.0009 ($1.09/h); GPU spend so far $0.7386
+2026-11-08T18:42:20Z pod h3xfyvzueenmlv created: NVIDIA GeForce RTX 4090 in None, $0.89/h, hard cap 45 min
+2026-11-08T18:42:47Z pod h3xfyvzueenmlv: ssh ready after 28 s, GPU NVIDIA GeForce RTX 4090
+2026-11-08T18:42:49Z pod h3xfyvzueenmlv: self stop armed for 50 min (runpodctl)
+2026-11-08T18:58:03Z pod h3xfyvzueenmlv: built the GPU binary in 915 s (sha256 8118215d46b53e7f...), kept for the next pods
+2026-11-08T18:58:37Z pod h3xfyvzueenmlv: proved in 11.29 s, secret wiped; segments: 7 journal.verdict: FAIL
+2026-11-08T18:59:01Z pod h3xfyvzueenmlv terminated: 1003 s, $0.248 ($0.89/h); GPU spend so far $0.9866
+{"pod_ready": 30, "binary": "built", "setup": 945, "prove": 11.29, "succinct": 8.02, "pod_seconds": 1003, "cost_usd": 0.248, "gpu": "NVIDIA GeForce RTX 4090", "pod": "h3xfyvzueenmlv", "waited_for_watches_s": 0}

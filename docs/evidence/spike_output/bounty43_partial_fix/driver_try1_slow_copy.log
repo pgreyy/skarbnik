@@ -1,0 +1,18 @@
+2026-11-08T18:13:01Z pod 2l8vx4qkpk5tpz created: NVIDIA GeForce RTX 4090 in None, $0.89/h, hard cap 45 min
+2026-11-08T18:13:37Z pod 2l8vx4qkpk5tpz: ssh ready after 39 s, GPU NVIDIA GeForce RTX 4090
+2026-11-08T18:13:39Z pod 2l8vx4qkpk5tpz: self stop armed for 49 min (runpodctl)
+2026-11-08T18:25:36Z pod 2l8vx4qkpk5tpz terminated: 757 s, $0.1871 ($0.89/h); GPU spend so far $0.507
+Traceback (most recent call last):
+  File "~/skarbnik-spike-output/scripts/spike_output_gpu.py", line 62, in <module>
+    main()
+  File "~/skarbnik-spike-output/scripts/spike_output_gpu.py", line 55, in main
+    _, times = gpu.prove_on_gpu(cfg, job, log)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik-spike-output/scripts/../tools/skarbnik_gpu.py", line 403, in prove_on_gpu
+    times['binary'] = put_binary(pod, g, job['image_id'], log)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik-spike-output/scripts/../tools/skarbnik_gpu.py", line 347, in put_binary
+    pod.scp(cache, pod.remote('skarbnik-host'), 900)
+  File "~/skarbnik-spike-output/scripts/../tools/skarbnik_gpu.py", line 251, in scp
+    raise GpuError(f'copy failed: {p.stderr.strip()[-200:]}')
+skarbnik_gpu.GpuError: copy failed: 
