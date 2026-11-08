@@ -22,7 +22,18 @@ One dated entry per work block: what was done, the exact commands, the results, 
   (`new_badge_until_utc` in `web/site.config.json`); the saved pages leave the sticker out.
 - Testnet: `allow_image_id` (`8mdstCU5…`); scratch bounty 44: FAIL (`FDk65JiR…`) then PASS and paid (`8y5VPFGP…`). GPU
   $0.3555, including one pod whose proof failed "verify segment" on that card.
-- Next: the owner's yes on two public bounties (Phase 4), then the full checks and the ship.
+- Public bounties 45 (postage, wrong output, Rust) and 46 (shelves, memory safety, C): Level 2, 0.1 NEAR, K 8, at most
+  2 per account, 60 days. Proof 0 on the VPS through the vendor tool (GPU), published from the laptop, a watch each with
+  its own pod prefix and a $1.50 budget. The VPS binaries were built in a Debian bookworm container (the VPS has an older
+  C library than the laptop).
+- Checks before the ship: every workspace test in the debug profile (181 passed; the release profile aborts the
+  contract's panic tests by design), the live feed test (it now uses a bounty one past the saved feed's newest), the
+  watch rule tests, the agent dry run (11 of 11), the page scan at 1440 and 390 in both themes on a local copy and on
+  the live site, the word scan and the secrets scan (256 file versions, 16 private values: no hits).
+- Shipped `021bfd8` to main and ui-preview. The VPS runs it: code and binaries in `~/skarbnik` (backup
+  `~/skarbnik.before-021bfd8.tar.gz`), all five watches restarted with no revealed attempt waiting, each with its own pod
+  name prefix (before, the three older watches shared one, so one watch's leftover cleanup could stop another's pod).
+- The "New" sticker ends on 2026-12-08 (ship date plus 30 days, `new_badge_until_utc`).
 
 ## 2026-11-08: Spike memory: can Skarbnik check a C buffer overflow that does not crash in WebAssembly? (branch spike-memory, not merged)
 
