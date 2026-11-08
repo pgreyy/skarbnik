@@ -1,0 +1,7 @@
+# Sweep of byte 0 (the name length) of the secret over 0..255: inputs where the candidate and the reference fix
+# (plain-heap-fixed.wasm) give different answers, by target/debug/skarbnik-check run. Counts that depend on the
+# secret's own length are left out, so the secret's length is not published.
+partial_fix_20.wasm       differs on 4 of 256 values (name length 17 to 20): caught every time
+truncate_fix.wasm         differs on every overflowing length the secret's size allows: caught
+plain-heap-original.wasm  differs on every overflowing length the secret's size allows: caught
+fortify-heap-fixed.wasm   differs on 0 of 256 values: a correct fix, another build

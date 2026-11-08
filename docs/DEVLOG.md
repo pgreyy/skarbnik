@@ -2,6 +2,39 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-08: Spike memory: can Skarbnik check a C buffer overflow that does not crash in WebAssembly? (branch spike-memory, not merged)
+
+- Demo: `data/memsafe/` (C, no C library, no imports): a record parser that trusts a length byte when it copies a name
+  into a 16 byte buffer. `fixed.c` refuses a name over 16 bytes (-2). 14 public tests; the secret input is outside the
+  repository. `data/memsafe/build.sh` builds every variant with wasi-sdk 34 (clang 23.1.0); versions:
+  `docs/evidence/spike_memory/versions.txt`. The plain build returns a value on the secret: the overflow is silent.
+- Every result below comes from the real checker (`target/debug/skarbnik-check`, wasmi 2.0.0, 2,048 byte cap, 2 memory
+  pages, 50,000 fuel per run): `python3 -I scripts/spike_memory_matrix.py <secret file>`, `docs/evidence/spike_memory/`.
+
+| Option | Builds | Module (original, fixed) | Traps on the secret | Imports | Executor, Proof 0 | Problem |
+| --- | --- | --- | --- | --- | --- | --- |
+| a. AddressSanitizer (Emscripten 6.0.13) | yes | 226,018 B | yes, a stack-buffer-overflow report, then exit | 8 WASI | not run: the guest refuses it | 110 times the size cap, 933 memory pages, 132 million instructions to start (the cap is 50,000 per run) |
+| b. Guard bytes around each heap block, checked on free | yes | 410 B, 413 B | yes | none (`unreachable`) | 21.3 M cycles, 64 segments | heap only; misses a write of the guard value, a write that skips the guard, a block never freed |
+| c1. Compiler object size check at the copy (fortify) | yes | 292 B, 292 B (stack: 255 B) | yes | none | 19.6 M cycles, 58 segments | only copies whose size the compiler can see; the allocator must stay out of line |
+| c2. Stack canary (`-fstack-protector-all`) | yes | 404 B, 407 B | not always | none | 16.9 M cycles, FAIL | a short overflow misses the canary: Proof 0 fails on variant 33 |
+| c3. Array index checks (`-fsanitize=bounds`) | yes | 323 B, 310 B | no | none | | does not see a `memcpy` |
+| c4. The overflow as a wrong output bug (output checker, branch spike-output) | yes | 289 B, 292 B, plain | no trap needed: wrong answer | none | 19.4 M cycles, 58 segments | needs the reference fix's answer on the secret; random inputs catch a partial fix on 1 seed in 4 |
+
+- The main finding: with the crash checker, every trapping option is cheatable. A patch that drops the instrumentation
+  and keeps the bug passes Proof 0 and the check for b and c1, because the patch is the whole module and the researcher
+  builds it (`checker_verdicts.txt`). A diff patch does not close this: the fortify check sits inside the function the
+  fix must change.
+- c4 has no such hole: the unchanged original returns a wrong answer on the secret and fails; the instrumented original
+  traps and fails; three correct fixes pass (`output_checker.txt`). Its weak point is the input generator: a fix that
+  refuses only names over 20 bytes passed 3 seeds of 4. Sweeping the length byte of the secret through 0 to 255 finds
+  it every time (`length_sweep.txt`). A fix that truncates instead of refusing fails: the vendor must publish the
+  required behaviour.
+- Patch size, fortify build against its published original: whole module 292 B, byte diff 95 B, function diff 157 B
+  (`scripts/spike_memory_patchsize.py`, `patch_size.txt`). All modules here are far below the 2,048 byte cap.
+- No GPU was rented. Part B asked for an option that traps reliably and is practical; the trapping options are not safe
+  as a bounty mode, and c4 uses the output guest whose proving was measured on 2026-11-07 at nearly the same size.
+- Next: the owner decides between c4 with a byte sweep generator and checker side instrumentation.
+
 ## 2026-11-04: The live feed, second try: the packaging fix
 
 - The first deploy of the live feed (`b97f495`) answered only the saved feed on skarbnik.xyz: "exports is not defined

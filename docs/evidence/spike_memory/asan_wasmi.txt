@@ -1,0 +1,17 @@
+# Spike memory, option a: Emscripten 6.0.13 AddressSanitizer build (-fsanitize=address -sSTANDALONE_WASM -Oz -sINITIAL_MEMORY=1MB, stack buffer) run in wasmi 2.0.0 by a private harness
+# with stub WASI imports (fd_write captured, proc_exit traps). The checker itself refuses this module: 8 imports, 226,018 bytes, 933 memory pages.
+# Fuel counts WebAssembly instructions; the checker allows 50,000 per run.
+== ASan original (226018 bytes), secret input:
+trapped: proc_exit(1)
+fuel: instantiate 0 _initialize 132444786 parse 278713206
+stderr: 5338 bytes; first line: ==<pid>==ERROR: AddressSanitizer: stack-buffer-overflow on address <addr> at pc <addr> bp <addr> sp <addr>
+== ASan original, public test 0f2a86...:
+returned -1255735947
+fuel: instantiate 0 _initialize 132444786 parse 5724
+== ASan fixed (226020 bytes), secret input:
+returned -2
+fuel: instantiate 0 _initialize 132444786 parse 3328
+stderr: 0 bytes; first line: 
+== ASan fixed, public test 0f2a86...:
+returned -1255735947
+fuel: instantiate 0 _initialize 132444786 parse 5737

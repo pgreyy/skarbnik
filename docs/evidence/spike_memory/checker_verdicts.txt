@@ -1,0 +1,23 @@
+# Spike memory: crash checker verdicts with an instrumented build as the original (native, target/debug/skarbnik-check).
+# Seed 6d656d736166652d7370696b652d736565640000000000000000000000000000, 64 fairness inputs, 64 variants of the secret; the secret file is outside the repository.
+# $ skarbnik-check proof0 --reference-fix <fix> --original <original> ...   and   skarbnik-check check --candidate <c> --original <original> ... --explain
+== original: fortify-heap-original.wasm
+proof0 with fortify-heap-fixed: proof0: PASS reason: - 
+check correct fix, same instrumentation (fortify-heap-fixed): PASS reason (internal): - 
+check CHEAT, instrumentation removed, bug kept (plain-heap-original): PASS reason (internal): - 
+check correct fix, instrumentation removed (plain-heap-fixed): PASS reason (internal): - 
+== original: guard-heap-original.wasm
+proof0 with guard-heap-fixed: proof0: PASS reason: - 
+check correct fix, same instrumentation (guard-heap-fixed): PASS reason (internal): - 
+check CHEAT, instrumentation removed, bug kept (plain-heap-original): PASS reason (internal): - 
+check correct fix, instrumentation removed (plain-heap-fixed): PASS reason (internal): - 
+== original: ssp-stack-original.wasm
+proof0 with ssp-stack-fixed: proof0: FAIL reason: proof0: reference fix fails: 5 variants: variant #33: original returned 1470048908, candidate returned -2 
+check correct fix, same instrumentation (ssp-stack-fixed): FAIL reason (internal): 5 variants: variant #33: original returned 1470048908, candidate returned -2 
+check CHEAT, instrumentation removed, bug kept (plain-stack-original): PASS reason (internal): - 
+check correct fix, instrumentation removed (plain-stack-fixed): FAIL reason (internal): 5 variants: variant #33: original returned 1470048908, candidate returned -2 
+== original: fortify-stack-original.wasm
+proof0 with fortify-stack-fixed: proof0: PASS reason: - 
+check correct fix, same instrumentation (fortify-stack-fixed): PASS reason (internal): - 
+check CHEAT, instrumentation removed, bug kept (plain-stack-original): PASS reason (internal): - 
+check correct fix, instrumentation removed (plain-stack-fixed): PASS reason (internal): - 

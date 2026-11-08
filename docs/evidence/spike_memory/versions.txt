@@ -1,0 +1,6 @@
+# Spike memory: tool versions and download fingerprints (installed in a private folder, not in the repository)
+wasi-sdk 34.0 (clang 23.1.0): wasi-sdk-34.0-x86_64-linux.tar.gz sha256 b761e3a0721dbae9c09a0059e5fdb2bf917d1b4a8a7b430fb3b5aafb0984b2c4, 635 MB unpacked
+binaryen version_133 (wasm-opt): binaryen-version_133-x86_64-linux.tar.gz sha256 2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489, 305 MB unpacked
+Emscripten 6.0.13 (emsdk release eb132757325583b787fe9414b09afea9442b72ad): wasm-binaries.tar.xz sha256 cda6801012ff3319a539111826ed02a9abd7eff135c2ef261c8941caf5a3763e, 312 MB download, 1,558 MB unpacked; 7.0.0 was skipped (2 days old)
+Node v22.23.4 (Emscripten's NODE_JS); wasmi =2.0.0 (the checker's interpreter, also in the AddressSanitizer harness)
+Checkers: crash checker guest dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc; output checker guest 77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4 (branch spike-output)

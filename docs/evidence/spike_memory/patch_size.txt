@@ -1,0 +1,5 @@
+fixed module                        whole byte diff function diff  changed functions
+fortify-heap-fixed.wasm               292        95           157  1 of 3 (index [1])
+fortify-stack-fixed.wasm              255        38           164  1 of 2 (index [1])
+guard-heap-fixed.wasm                 413        53           212  1 of 3 (index [1])
+fortify-heap-fixed.opt.wasm           243       123           171  1 of 2 (index [1])

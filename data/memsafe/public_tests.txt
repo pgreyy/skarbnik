@@ -1,0 +1,18 @@
+# Public tests for the memory safety demo (data/memsafe/original.c).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+# Every name here is at most 16 bytes, so the overflow cannot show. Values from the plain build:
+#   target/debug/skarbnik-check run --module target/memsafe/plain-heap-original.wasm --input <hex>
+- -1
+00 -1
+0300 -1
+000102 2
+01410203 133
+04746573740507 17782497
+10abababababababababababababababab0301 -910221055
+10000102030405060708090a0b0c0d0e0fffff -475555593
+056869 -1
+0be67298c507d929d93700bf98ce -2127296810
+0f2a86bfd900d9ab67ddc8fa5e06ccff31e6 -1255735947
+0ffe27c52b2cb71a8cfe4d0482c93480cd6c -1828170632
+0202bc314e 12328
+0afca941eebc39ebc3017d6d7e -1025731411

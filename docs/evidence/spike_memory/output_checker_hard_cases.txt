@@ -1,0 +1,9 @@
+# Harder cases for option c2 (output checker, plain modules, reference fix plain-heap-fixed.wasm, 64 fairness inputs, 64 variants).
+partial_fix_20 seed 0: PASS reason (internal): none 
+partial_fix_20 seed 7: PASS reason (internal): none 
+partial_fix_20 seed 201: PASS reason (internal): none 
+partial_fix_20 seed 6d656d736166: FAIL reason (internal): 5 variants: variant 33, reference fix returned -2, candidate returned <value> 
+truncate_fix seed 0: FAIL reason (internal): 2 secret: expected -2, got returned <value> 
+truncate_fix seed 7: FAIL reason (internal): 2 secret: expected -2, got returned <value> 
+truncate_fix seed 201: FAIL reason (internal): 2 secret: expected -2, got returned <value> 
+truncate_fix seed 6d656d736166: FAIL reason (internal): 2 secret: expected -2, got returned <value> 
