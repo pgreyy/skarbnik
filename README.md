@@ -132,6 +132,32 @@ cloud misconfiguration isn't a program repair at all. Each of those needs its ow
 Skarbnik could judge it. A PASS means the patch passed this checker against this secret and these tests, nothing more.
 One verdict also tells the agent one bit about the secret, so each bounty caps its attempts (K).
 
+### Wrong output and memory safety bugs
+
+A second checker (`harness/checker-output`, image id `005d8dc7…`) judges bugs that give a wrong answer instead of a
+crash. That includes memory safety bugs, such as a C buffer overflow that corrupts memory without crashing in
+WebAssembly. The vendor's secret is an input and the right answer on it. A fix passes when it:
+
+| Check | What it means |
+| --- | --- |
+| Secret answer | On the secret input it returns exactly the vendor's expected value. |
+| Public tests | On every public test it returns exactly the expected value. |
+| Fairness inputs | On fresh inputs from the reveal seed it agrees with the vendor's hidden reference fix. |
+| Variants | On copies of the secret with one or two bytes changed it agrees with the reference fix. |
+| Sweep | At up to 4 private byte positions of the secret (such as a length byte) it agrees with the reference fix on all 256 values. |
+
+What it does not do: it judges answers on the overflow input and nearby inputs. It does not detect memory corruption
+in general. A fix that corrupts memory where no answer changes would pass. The secret, the expected value, the
+reference fix and the sweep positions are bound by one commitment, so they cannot change between proofs.
+
+- The demo and its cheats: `data/memsafe/`, `data/attacks/memsafe/`. Run
+  `cargo test -p kintsugi-check-output`: correct fixes pass, the original and every cheat fail, and the sweep alone
+  catches a fix that refuses only names over 20 bytes (`harness/checker-output/tests/corpus.rs`).
+- On testnet, bounty 44 (a test bounty): a partial fix proved FAIL (`FDk65JiRdQbukG5wi42L7G4GekGK1yBPrJFxMrrP8AcQ`),
+  then a correct fix proved PASS and was paid (`8y5VPFGPoQzfCaETWBeTGVkLYY9F7ywpHBYCQzxNbQwk`). Logs:
+  `docs/evidence/feature_output/`.
+- Rebuild both checkers and compare their ids: `./scripts/check_image_id.sh`.
+
 ## Evidence
 
 - **An AI agent fixed a private bug it could not see:** [bounty 24](https://skarbnik.xyz/bounties/24/). A model on NEAR

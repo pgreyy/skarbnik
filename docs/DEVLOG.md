@@ -2,6 +2,28 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-08: Output mode for wrong output and memory safety bugs (branch feature-output)
+
+- Branch feature-output from main with spike-output and spike-memory merged in.
+- The output checker gained the private byte sweep (`harness/checker-output/src/lib.rs`, step 6): up to 4 positions of
+  the secret, all 256 values each, bound into the commitment. Final image id `005d8dc7…`; two clean rebuilds gave the
+  same id and guest bytes; the crash checker `dd6c5f42…` did not change. A first build stopped on a network error
+  inside Docker (crates.io unreachable); the retry from an empty folder worked.
+- Memory safety corpus `data/attacks/memsafe/` and a public demo secret with `sweep=0`; the demo modules
+  `data/memsafe/original.wasm` and `fixed.wasm` are the plain heap builds (`data/memsafe/build.sh`).
+- Vendor tool: `bounty.mode` crash or output, `bounty.sweep` (default one position), the reference fix in every GPU
+  job, `--output` on the host's steps, an output preflight. The watch holds a PASS until the other revealed attempts of
+  the bounty are proved (FAIL first), and submits it anyway once less than 2 hours of its window are left. The vendor
+  MCP server's init and watch_init take the mode.
+- Agent servers (hosted and local) accept only the crash and output checkers, name the kind of bug in list_bounties,
+  get_bounty and the sentence for the user, and say that check_patch runs the public tests only on output bounties.
+- Site and feed: every bounty shows its kind of bug; feecalc and memsafe are published programs; the evidence page lists
+  both checkers and the retired spike checker; a "New" sticker on wrong output and memory safety bounties ends by date
+  (`new_badge_until_utc` in `web/site.config.json`); the saved pages leave the sticker out.
+- Testnet: `allow_image_id` (`8mdstCU5…`); scratch bounty 44: FAIL (`FDk65JiR…`) then PASS and paid (`8y5VPFGP…`). GPU
+  $0.3555, including one pod whose proof failed "verify segment" on that card.
+- Next: the owner's yes on two public bounties (Phase 4), then the full checks and the ship.
+
 ## 2026-11-08: Spike memory: can Skarbnik check a C buffer overflow that does not crash in WebAssembly? (branch spike-memory, not merged)
 
 - Demo: `data/memsafe/` (C, no C library, no imports): a record parser that trusts a length byte when it copies a name

@@ -5,6 +5,70 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Output mode: wrong output and memory safety bugs, with the byte sweep (2026-11-08, branch feature-output)
+
+**Question.** Can one final output checker judge wrong output bugs and memory safety bugs, stop the partial fix the
+spikes let through, keep the journal the contract reads, and settle a memory safety bounty on testnet?
+
+**Verdict: PASS.** The output checker with the sweep (image id
+`005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089`) rebuilt to the same id twice from empty build
+folders. On scratch bounty 44 (a test bounty, the memory safety demo, one sweep position) a partial fix proved FAIL and a
+correct fix proved PASS and was paid, the FAIL submitted first. The contract did not change; the crash checker
+`dd6c5f42…` did not change.
+
+**The sweep.** The vendor names up to 4 byte positions of the secret input (such as a length byte) at the end of the
+private secret line (`sweep=0`). The checker tries all 256 values at each position against the hidden reference fix.
+The positions are bound into the commitment, so they never appear in public data and cannot change between proofs.
+Sweeping every byte was not chosen: up to 65,536 runs per check. Cost on Proof 0 in the zkVM executor
+(`sweep_cost.txt`): no sweep about 20 million cycles (58 segments), 1 position about 51 million (149 to 150), 4
+positions about 147 million (424 to 425), for both demos.
+
+**Native corpus** (`corpus.txt`, `cargo test -p kintsugi-check-output`): three seeds each. Fee calculator: Proof 0 PASS,
+8 of 8 modules as expected. Memory safety: Proof 0 PASS, 7 of 7: both correct fixes PASS; the original (a wrong answer
+on the secret), the instrumented original (a trap), the truncating fix (another answer), the fix that refuses only
+names over 20 bytes (caught by the sweep at length 17) and the fix that recognises the demo secret (caught by the
+variants) all FAIL. Without the sweep, the over 20 fix passes on at least one of the three seeds.
+
+**On testnet** (contract `kintsugi-l2-cihdp.testnet`; gas is the total over all receipts, `gas.tsv`):
+
+| Step | Signer | Result | Transaction | Gas burned |
+| --- | --- | --- | --- | --- |
+| `allow_image_id` `005d8dc7…` | contract owner | allowlist holds 3 ids | `8mdstCU5xyTc2whyi4R15oxNtY4FpxpWbYMPKRY2wchf` | 2.37 Tgas |
+| `deposit_credit` 0.03 NEAR | agent | credit for two attempts | `9ZfLfEDVfSd5rS83Xwx6NHMakrF1rGiS9J5q2jUDRLvX` | 2.36 Tgas |
+| `create_bounty` 44 | vendor | Level 2, 0.1 NEAR, K 2, 64 and 64 | `EuqRbRzNYRkXGx2oUKHJ5cLjMwtr5KqBfHyphk2rMn5M` | 2.93 Tgas |
+| `open_with_groth16` | vendor | opened | `DqiGXVvV1aXvoURDk2MnjEnnBSs1NzELdGraReq5hLmt` | 35.27 Tgas |
+| `commit` attempt 0, partial fix | agent | fee 0.01 NEAR | `3yiqTBrnBadvNxNVNX1CDUH8uMywrYHowUbfgNzCNGqS` | 3.10 Tgas |
+| `commit` attempt 1, correct fix | agent | fee 0.015 NEAR | `82m3Wdk4aduGxNBiuiJoJuJAznPGYiqYfgfh45M6prjh` | 3.11 Tgas |
+| `reveal` attempt 0 | agent | seed recorded | `Bf3baKJ8HCm6Yub7sN58ay6WckF8jxvGAFoei7iG1uXC` | 2.83 Tgas |
+| `reveal` attempt 1 | agent | seed recorded | `ALJE5y29pHxkNf9Fo3x5PBhA4SUbVLehKMitQbnNPjSy` | 2.82 Tgas |
+| `submit_groth16` attempt 0 | vendor | FAIL, attempt Failed (submitted first) | `FDk65JiRdQbukG5wi42L7G4GekGK1yBPrJFxMrrP8AcQ` | 35.67 Tgas |
+| `submit_groth16` attempt 1 | vendor | PASS, 0.1 NEAR paid to the agent | `8y5VPFGPoQzfCaETWBeTGVkLYY9F7ywpHBYCQzxNbQwk` | 36.68 Tgas |
+
+The agent committed and revealed through `tools/skarbnik-mcp`, which now accepts both checkers. State after:
+`final_state_44.txt`.
+
+**Proofs** (rented RTX 4090 from the VPS with `scripts/spike_output_gpu.py`, its own pod names and spend file; Groth16
+on the laptop):
+
+| Run | Verdict | Segments | Prove | Shrink | Pod, cost | Groth16 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Proof 0, reference fix | PASS | 149 | 139.9 s | 100.2 s | 293 s, $0.0724 | 285.5 s |
+| Attempt 0, partial fix | FAIL | 61 | 53.7 s | 39.8 s | 152 s, $0.0376 | 170.7 s |
+| Attempt 1, correct fix | PASS | 146 | 120.8 s | 92.0 s | 300 s, $0.0742 | 166.8 s |
+
+Prove and shrink are the pod step times from the VPS. The first Proof 0 pod built the new GPU binary (593 s) and then
+its proof failed with "verify segment" (`bounty44_proof0/gpu_error_try1.log`); the same binary proved on the next pod,
+so this was a fault on that card. Two pods priced above the $0.90 per hour ceiling were dropped after 3 s. GPU spend for
+this job: $0.3555 of a $3 cap.
+
+**Watch rule, FAIL before PASS** (`python3 -I scripts/test_watch_retry.py`, ALL PASS): with two revealed attempts, the
+PASS revealed first is held, the FAIL is proved and submitted, then the PASS; once less than 2 hours of the PASS's own
+verdict window are left it is submitted at once and the log says why.
+
+**Known limits.** The output checker judges answers; it does not detect memory corruption in general. The fairness
+generator knows only the demo format; the sweep covers the bytes the vendor names. The spike checker `77c2e2d1…` stays
+on the allowlist and is retired (bounties 42 and 43 only).
+
 ## Spike output: a second checker for wrong output bugs, end to end on testnet (2026-11-07, branch spike-output)
 
 **Question.** Can Skarbnik pay for a fix of a logic bug (a wrong answer, no crash) with the same contract? The secret is a
