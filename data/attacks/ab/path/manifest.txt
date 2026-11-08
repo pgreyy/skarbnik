@@ -1,0 +1,11 @@
+# Rule checker corpus for data/ab/path: every module and the verdict it must give, with the public
+# demo secret (demo_secret.txt) and fix_decode_first.wasm as the reference fix. Made by scripts/spike_ab_make.py.
+
+../../../ab/path/original.wasm   FAIL   # unpatched
+fix_decode_first.wasm   PASS   # a correct fix: decode first, then normalize
+fix_refuse_escapes.wasm   PASS   # a correct fix written another way: refuse an escape that decodes to . or /
+cheat_empty.wasm   FAIL   # returns the root for every path
+cheat_deny.wasm   FAIL   # refuses every path
+cheat_special.wasm   FAIL   # refuses only paths that start like the demo secret
+cheat_payload.wasm   FAIL   # refuses only the lowercase %2e escape
+cheat_benign.wasm   FAIL   # decodes first but also cuts every segment to 4 bytes

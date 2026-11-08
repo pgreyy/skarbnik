@@ -2760,6 +2760,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kintsugi-check-rule"
+version = "0.1.0"
+dependencies = [
+ "kintsugi-check",
+ "serde",
+ "wasmi",
+]
+
+[[package]]
 name = "kintsugi-contract"
 version = "0.1.0"
 dependencies = [

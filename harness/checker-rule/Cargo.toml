@@ -1,0 +1,26 @@
+# The rule checker (spike A and B): one checker for bugs judged by a public rule instead of one exact answer. A program
+# keeps state across a sequence of calls and returns byte strings; the vendor publishes a small rule module that says
+# ok or violation for a call sequence and its outputs. Property bugs (injection, path traversal) are one call sequences;
+# access control bugs are longer sequences. Built next to the crash checker (harness/checker) without changing it, so
+# the crash checker's and the output checker's image ids stay the same. The command line tool is skarbnik-check-rule.
+[package]
+name = "kintsugi-check-rule"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "kintsugi_check_rule"
+path = "src/lib.rs"
+
+[[bin]]
+name = "skarbnik-check-rule"
+path = "src/main.rs"
+
+[dependencies]
+kintsugi-check = { path = "../checker", default-features = false }
+wasmi = { version = "=2.0.0", default-features = false, features = ["std", "validate"] }
+serde = { version = "=1.0.229", default-features = false, features = ["std", "derive"], optional = true }
+
+[features]
+# The shapes the zkVM host sends into the rule guest (src/lib.rs, mod zk).
+zk = ["dep:serde", "kintsugi-check/zk"]

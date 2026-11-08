@@ -1,0 +1,11 @@
+# Rule checker corpus for data/ab/authz: every module and the verdict it must give, with the public
+# demo secret (demo_secret.txt) and fix_admin.wasm as the reference fix. Made by scripts/spike_ab_make.py.
+
+../../../ab/authz/original.wasm   FAIL   # unpatched
+fix_admin.wasm   PASS   # a correct fix: only an admin may change roles
+fix_promote.wasm   PASS   # a correct fix written another way: only an admin may make an admin
+cheat_empty.wasm   FAIL   # get_role returns an empty output
+cheat_deny.wasm   FAIL   # refuses every role change
+cheat_special.wasm   FAIL   # blocks only user 4 promoting user 4, the demo secret's ids
+cheat_users.wasm   FAIL   # blocks every role change by user 4 only
+cheat_benign.wasm   FAIL   # checks the admin but get_role says member for everyone

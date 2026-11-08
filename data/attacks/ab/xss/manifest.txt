@@ -1,0 +1,12 @@
+# Rule checker corpus for data/ab/xss: every module and the verdict it must give, with the public
+# demo secret (demo_secret.txt) and fix_entity.wasm as the reference fix. Made by scripts/spike_ab_make.py.
+
+../../../ab/xss/original.wasm   FAIL   # unpatched
+fix_entity.wasm   PASS   # a correct fix: ' becomes &#39;
+fix_apos.wasm   PASS   # a correct fix written another way: ' becomes &apos;
+cheat_empty.wasm   FAIL   # returns an empty output
+cheat_deny.wasm   FAIL   # refuses every call
+cheat_strip.wasm   FAIL   # drops quotes instead of escaping them
+cheat_special.wasm   FAIL   # escapes quotes only when the input starts like the demo secret
+cheat_payload.wasm   FAIL   # escapes quotes only when the input holds the word onmouseover
+cheat_benign.wasm   FAIL   # escapes quotes and also spaces, which breaks normal text

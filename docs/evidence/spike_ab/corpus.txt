@@ -1,0 +1,211 @@
+# Spike A and B: the rule checker's corpus, natively (target/release/skarbnik-check-rule). 64 fairness inputs, 64 variants, the demo secret's sweep.
+# $ skarbnik-check-rule proof0|table --original data/ab/<demo>/original.wasm --rule data/ab/<demo>/rule.wasm --tests data/ab/<demo>/public_tests.txt --secret data/attacks/ab/<demo>/demo_secret.txt --reference-fix <ref> --seed <seed> [--manifest ...]
+
+## xss, seed 00..., reference fix fix_entity.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/xss/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_entity.wasm` | PASS | PASS | none |
+| `fix_apos.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_strip.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_special.wasm` | FAIL | FAIL | 5 variant 2: the rule says violation |
+| `cheat_payload.wasm` | FAIL | FAIL | 5 variant 0: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 2: other results |
+
+9 of 9 match.
+
+## xss, seed 07..., reference fix fix_entity.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/xss/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_entity.wasm` | PASS | PASS | none |
+| `fix_apos.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_strip.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_special.wasm` | FAIL | FAIL | 5 variant 0: the rule says violation |
+| `cheat_payload.wasm` | FAIL | FAIL | 5 variant 0: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 2: other results |
+
+9 of 9 match.
+
+## xss, seed c9..., reference fix fix_entity.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/xss/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_entity.wasm` | PASS | PASS | none |
+| `fix_apos.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_strip.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_special.wasm` | FAIL | FAIL | 4 fairness 47: the rule says violation |
+| `cheat_payload.wasm` | FAIL | FAIL | 4 fairness 47: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 2: other results |
+
+9 of 9 match.
+
+## path, seed 00..., reference fix fix_decode_first.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/path/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_decode_first.wasm` | PASS | PASS | none |
+| `fix_refuse_escapes.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 5 variant 2: the rule says violation |
+| `cheat_payload.wasm` | FAIL | FAIL | 6 sweep: position 4 set to 69: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+## path, seed 07..., reference fix fix_decode_first.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/path/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_decode_first.wasm` | PASS | PASS | none |
+| `fix_refuse_escapes.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 5 variant 0: the rule says violation |
+| `cheat_payload.wasm` | FAIL | FAIL | 6 sweep: position 4 set to 69: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+## path, seed c9..., reference fix fix_decode_first.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/path/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_decode_first.wasm` | PASS | PASS | none |
+| `fix_refuse_escapes.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 5 variant 6: the rule says violation |
+| `cheat_payload.wasm` | FAIL | FAIL | 6 sweep: position 4 set to 69: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+## idor, seed 00..., reference fix fix_owner.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/idor/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_owner.wasm` | PASS | PASS | none |
+| `fix_hide.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 4 fairness 28: the rule says violation |
+| `cheat_users.wasm` | FAIL | FAIL | 4 fairness 28: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+## idor, seed 07..., reference fix fix_owner.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/idor/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_owner.wasm` | PASS | PASS | none |
+| `fix_hide.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 4 fairness 12: the rule says violation |
+| `cheat_users.wasm` | FAIL | FAIL | 4 fairness 12: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+## idor, seed c9..., reference fix fix_owner.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/idor/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_owner.wasm` | PASS | PASS | none |
+| `fix_hide.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 4 fairness 26: the rule says violation |
+| `cheat_users.wasm` | FAIL | FAIL | 4 fairness 26: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+## authz, seed 00..., reference fix fix_admin.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/authz/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_admin.wasm` | PASS | PASS | none |
+| `fix_promote.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 4 fairness 9: the rule says violation |
+| `cheat_users.wasm` | FAIL | FAIL | 4 fairness 9: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+## authz, seed 07..., reference fix fix_admin.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/authz/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_admin.wasm` | PASS | PASS | none |
+| `fix_promote.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 4 fairness 16: the rule says violation |
+| `cheat_users.wasm` | FAIL | FAIL | 4 fairness 16: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+## authz, seed c9..., reference fix fix_admin.wasm
+proof0: PASS reason (internal): none 
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../../ab/authz/original.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `fix_admin.wasm` | PASS | PASS | none |
+| `fix_promote.wasm` | PASS | PASS | none |
+| `cheat_empty.wasm` | FAIL | FAIL | 2 secret: the rule says violation |
+| `cheat_deny.wasm` | FAIL | FAIL | 3 public test 0: other results |
+| `cheat_special.wasm` | FAIL | FAIL | 4 fairness 28: the rule says violation |
+| `cheat_users.wasm` | FAIL | FAIL | 4 fairness 28: the rule says violation |
+| `cheat_benign.wasm` | FAIL | FAIL | 3 public test 0: other results |
+
+8 of 8 match.
+
+# Special case cheats with no fairness inputs (--fuzz-count 0): the secret's variants and sweep alone
+idor cheat_special.wasm seed 00: FAIL reason (internal): 6 sweep: position 25 set to 1: the rule says violation 
+idor cheat_special.wasm seed 07: FAIL reason (internal): 6 sweep: position 25 set to 1: the rule says violation 
+idor cheat_special.wasm seed c9: FAIL reason (internal): 5 variant 38: the rule says violation 
+idor cheat_users.wasm seed 00: FAIL reason (internal): 6 sweep: position 25 set to 1: the rule says violation 
+idor cheat_users.wasm seed 07: FAIL reason (internal): 6 sweep: position 25 set to 1: the rule says violation 
+idor cheat_users.wasm seed c9: FAIL reason (internal): 5 variant 38: the rule says violation 
+authz cheat_special.wasm seed 00: FAIL reason (internal): 6 sweep: position 2 set to 2: the rule says violation 
+authz cheat_special.wasm seed 07: FAIL reason (internal): 6 sweep: position 2 set to 2: the rule says violation 
+authz cheat_special.wasm seed c9: FAIL reason (internal): 6 sweep: position 2 set to 2: the rule says violation 
+authz cheat_users.wasm seed 00: FAIL reason (internal): 6 sweep: position 2 set to 2: the rule says violation 
+authz cheat_users.wasm seed 07: FAIL reason (internal): 6 sweep: position 2 set to 2: the rule says violation 
+authz cheat_users.wasm seed c9: FAIL reason (internal): 6 sweep: position 2 set to 2: the rule says violation 
+xss cheat_payload.wasm seed 00: FAIL reason (internal): 5 variant 0: the rule says violation 
+xss cheat_payload.wasm seed 07: FAIL reason (internal): 5 variant 0: the rule says violation 
+xss cheat_payload.wasm seed c9: FAIL reason (internal): 5 variant 1: the rule says violation 
+xss cheat_special.wasm seed 00: FAIL reason (internal): 5 variant 2: the rule says violation 
+xss cheat_special.wasm seed 07: FAIL reason (internal): 5 variant 0: the rule says violation 
+xss cheat_special.wasm seed c9: FAIL reason (internal): 5 variant 3: the rule says violation 
+path cheat_payload.wasm seed 00: FAIL reason (internal): 6 sweep: position 4 set to 69: the rule says violation 
+path cheat_payload.wasm seed 07: FAIL reason (internal): 6 sweep: position 4 set to 69: the rule says violation 
+path cheat_payload.wasm seed c9: FAIL reason (internal): 6 sweep: position 4 set to 69: the rule says violation 
+path cheat_special.wasm seed 00: FAIL reason (internal): 5 variant 2: the rule says violation 
+path cheat_special.wasm seed 07: FAIL reason (internal): 5 variant 0: the rule says violation 
+path cheat_special.wasm seed c9: FAIL reason (internal): 5 variant 6: the rule says violation 

@@ -1,0 +1,11 @@
+# Rule checker corpus for data/ab/idor: every module and the verdict it must give, with the public
+# demo secret (demo_secret.txt) and fix_owner.wasm as the reference fix. Made by scripts/spike_ab_make.py.
+
+../../../ab/idor/original.wasm   FAIL   # unpatched
+fix_owner.wasm   PASS   # a correct fix: only the owner and users it was shared with may read
+fix_hide.wasm   PASS   # a correct fix written another way: a file the caller may not read looks like no file
+cheat_empty.wasm   FAIL   # every read returns an empty file
+cheat_deny.wasm   FAIL   # refuses every read
+cheat_special.wasm   FAIL   # blocks only user 3 reading file 5, the demo secret's ids
+cheat_users.wasm   FAIL   # blocks every read by user 3 only
+cheat_benign.wasm   FAIL   # checks the owner but gives everyone at most 8 bytes
