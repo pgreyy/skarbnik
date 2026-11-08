@@ -62,7 +62,12 @@ PACKAGES = {"demo": {"dir": "data/demo", "source": "original.rs", "module": "ori
                         "description": "a fee calculator (2.5 percent of a list of amounts, rounded up); its public source names its bug in a comment"},
             "memsafe": {"dir": "data/memsafe", "source": "original.c", "module": "original.wasm", "tests": "public_tests.txt", "bug": "memory safety",
                         "build": "c", "extra": ["rt.h"],
-                        "description": "a C record parser that copies a name into a 16 byte buffer; its public source names its buffer overflow"}}
+                        "description": "a C record parser that copies a name into a 16 byte buffer; its public source names its buffer overflow"},
+            "postage": {"dir": "data/postage", "source": "original.rs", "module": "original.wasm", "tests": "public_tests.txt", "bug": "wrong output",
+                        "description": "a postage calculator (a cost per parcel by weight, a surcharge for heavy parcels, a discount for large orders); no hint at its bug"},
+            "shelves": {"dir": "data/shelves", "source": "original.c", "module": "original.wasm", "tests": "public_tests.txt", "bug": "memory safety",
+                        "build": "c", "extra": ["rt.h"],
+                        "description": "a C shelf counter (10 shelves, quantities that stop at 255, a bonus for full shelves); no hint at its bug"}}
 # The kind of bug of each program (default crash), and the two checkers that judge them (web/site.config.json).
 CHECKERS = SITE["checkers"]
 BUG_KINDS = {
