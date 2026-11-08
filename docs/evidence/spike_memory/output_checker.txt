@@ -1,0 +1,9 @@
+# Spike memory, option c2: the overflow as a wrong output bug, with the output checker of branch spike-output (skarbnik-check-output rebuilt from b4fe1cb).
+# Plain modules, no instrumentation. The secret is the overflow input and the reference fix's answer (-2), in a file outside the repository.
+# Reference fix: plain-heap-fixed.wasm. Seed 6d656d736166652d7370696b652d736565640000000000000000000000000000, 64 fairness inputs, 64 variants.
+proof0 (plain original, reference fix): proof0: PASS
+check correct fix (plain-heap-fixed): PASS reason (internal): none 
+check correct fix, another build (instrumented) (fortify-heap-fixed): PASS reason (internal): none 
+check correct fix, stack buffer (plain-stack-fixed): PASS reason (internal): none 
+check CHEAT, the original unchanged (plain-heap-original): FAIL reason (internal): 2 secret: expected -2, got returned <value> 
+check the instrumented original (traps on the secret) (fortify-heap-original): FAIL reason (internal): 2 secret: expected -2, got trapped 

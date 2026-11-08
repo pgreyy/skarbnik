@@ -1,0 +1,30 @@
+# Spike memory, option c2 in the zkVM executor (no proving): output checker guest, plain modules, reference fix plain-heap-fixed.wasm, po2 19, 64 and 64.
+# $ RISC0_DEV_MODE=0 target/release/skarbnik-host execute <candidate> --output --secret <secret file> --reference-fix <fix> --original target/memsafe/plain-heap-original.wasm [--proof0] --bounty memsafe-spike --tests data/memsafe/public_tests.txt --fuzz-count 64 --variants 64 --seed 6d656d736166652d7370696b652d736565640000000000000000000000000000 --po2 19
+### proof0, reference fix
+image id: 77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4
+user cycles: 19411156
+segments: 58
+padded cycles (sum of 2^po2, the work a proof must cover): 29949952
+execute seconds: 1.86
+journal.verdict: PASS
+### check, correct fix (another build)
+image id: 77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4
+user cycles: 18279713
+segments: 53
+padded cycles (sum of 2^po2, the work a proof must cover): 27787264
+execute seconds: 1.15
+journal.verdict: PASS
+### check, CHEAT original unchanged
+image id: 77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4
+user cycles: 722743
+segments: 3
+padded cycles (sum of 2^po2, the work a proof must cover): 1572864
+execute seconds: 0.28
+journal.verdict: FAIL
+### check, truncating fix
+image id: 77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4
+user cycles: 722010
+segments: 3
+padded cycles (sum of 2^po2, the work a proof must cover): 1572864
+execute seconds: 0.27
+journal.verdict: FAIL

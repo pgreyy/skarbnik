@@ -1,0 +1,63 @@
+# Spike memory: zkVM executor only (no proving), crash checker guest dd6c5f42..., po2 19, 64 fairness inputs, 64 variants.
+# $ RISC0_DEV_MODE=0 target/release/skarbnik-host execute <candidate> --original <original> [--proof0] --bounty memsafe-spike --exploit <secret file> --tests data/memsafe/public_tests.txt --fuzz-count 64 --variants 64 --seed 6d656d736166652d7370696b652d73656564... --po2 19
+### plain-heap check (baseline, no instrumentation)
+user cycles: 10314760
+segments: 31
+padded cycles (sum of 2^po2, the work a proof must cover): 15990784
+execute seconds: 1.02
+journal.verdict: FAIL
+### fortify-heap proof0
+user cycles: 19566261
+segments: 58
+padded cycles (sum of 2^po2, the work a proof must cover): 30408704
+execute seconds: 1.26
+journal.verdict: PASS
+### fortify-heap check fixed
+user cycles: 18370008
+segments: 54
+padded cycles (sum of 2^po2, the work a proof must cover): 28311552
+execute seconds: 1.24
+journal.verdict: PASS
+### guard-heap proof0
+user cycles: 21276494
+segments: 64
+padded cycles (sum of 2^po2, the work a proof must cover): 33554432
+execute seconds: 1.54
+journal.verdict: PASS
+### guard-heap check fixed
+user cycles: 19977285
+segments: 60
+padded cycles (sum of 2^po2, the work a proof must cover): 31457280
+execute seconds: 1.45
+journal.verdict: PASS
+### ssp-stack proof0
+user cycles: 16864200
+segments: 51
+padded cycles (sum of 2^po2, the work a proof must cover): 26738688
+execute seconds: 1.43
+journal.verdict: FAIL
+### ssp-stack check fixed
+user cycles: 15579521
+segments: 47
+padded cycles (sum of 2^po2, the work a proof must cover): 24379392
+execute seconds: 1.12
+journal.verdict: FAIL
+### fortify-stack proof0
+user cycles: 19640578
+segments: 59
+padded cycles (sum of 2^po2, the work a proof must cover): 30474240
+execute seconds: 1.64
+journal.verdict: PASS
+### fortify-stack check fixed
+user cycles: 18446725
+segments: 54
+padded cycles (sum of 2^po2, the work a proof must cover): 28311552
+execute seconds: 1.67
+journal.verdict: PASS
+### fortify-heap check CHEAT plain-heap-original
+user cycles: 18898118
+segments: 56
+padded cycles (sum of 2^po2, the work a proof must cover): 29360128
+execute seconds: 1.97
+journal.verdict: PASS
+### done
