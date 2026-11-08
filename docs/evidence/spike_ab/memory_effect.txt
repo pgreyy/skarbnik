@@ -1,0 +1,10 @@
+# Spike A and B: how the modules' declared memory changes the proving cost (zkVM executor, Proof 0 with one sweep
+# position, po2 19, 64 and 64, public demo salt). Every run instantiates the program (three per fairness input:
+# original, reference fix, candidate) and the rule, and the zkVM pays for every memory page the instance touches.
+# $ RISC0_DEV_MODE=0 target/release/skarbnik-host execute <reference fix> --rule data/ab/<demo>/rule.wasm ... --proof0
+| demo | rule 4 pages, program 2 pages | rule 2 pages, program 2 | rule 1 page, program 2 | rule 1 page, program 1 page |
+| --- | --- | --- | --- | --- |
+| xss | 106.5 M cycles, 446 segments | 89.0 M, 286 | 80.6 M, 299 | 68.2 M, 194 |
+| idor | 93.4 M cycles, 383 segments | 75.9 M, 237 | 67.3 M, 210 | 55.2 M, 153 |
+The last column is what data/ab now builds (scripts/spike_ab_make.py: RULE_MEM and PROGRAM_MEM 65536). With the
+first settings, path Proof 0 was 381 segments, authz 362, and an IDOR secret of 50 calls 917.

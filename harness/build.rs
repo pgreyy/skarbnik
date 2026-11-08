@@ -5,7 +5,7 @@
 // depend on where the repository sits or which user builds it. Needs Docker with the buildx plugin.
 //
 // Prebuilt mode, for a machine without Docker (the rented GPU pod): if KINTSUGI_PREBUILT_GUESTS names a folder that
-// holds `hello_guest.bin`, `check_guest.bin` and `output_guest.bin` (the guest files a reproducible build wrote, copied from another
+// holds `hello_guest.bin`, `check_guest.bin`, `output_guest.bin` and `rule_guest.bin` (the guest files a reproducible build wrote, copied from another
 // machine; see scripts/export_guests.sh), those files are embedded as they are and their image ids are computed from
 // their bytes. Nothing is compiled for the guest, so the ids are the ones of the machine that built the files.
 use std::{collections::HashMap, env, fmt::Write as _, fs, path::PathBuf};
@@ -14,7 +14,7 @@ use risc0_build::{embed_methods_with_options, DockerOptionsBuilder, GuestOptions
 
 // The guest builder image tag: Rust 1.97.0, the same guest toolchain version as the local rzup install.
 const BUILDER_TAG: &str = "r0.1.97.0";
-const GUESTS: [&str; 3] = ["hello_guest", "check_guest", "output_guest"];
+const GUESTS: [&str; 4] = ["hello_guest", "check_guest", "output_guest", "rule_guest"];
 
 fn reproducible(root: &PathBuf) -> GuestOptions {
     let docker = DockerOptionsBuilder::default()

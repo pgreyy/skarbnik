@@ -1,0 +1,110 @@
+# Spike A and B, zkVM executor (no proving): rule guest, po2 19, 64 fairness inputs, 64 variants, public demo salt.
+# $ RISC0_DEV_MODE=0 target/release/skarbnik-host execute <candidate> --rule data/ab/<demo>/rule.wasm ... --seed 73706b2d61622d636f7374000000000000000000000000000000000000000000 --po2 19 [--proof0]
+### xss: Proof 0, no sweep
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 28733415
+segments: 82
+execute seconds: 1.38
+journal.verdict: PASS
+### xss: Proof 0, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 68159471
+segments: 194
+execute seconds: 3.14
+journal.verdict: PASS
+### xss: check fix_apos, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 69099640
+segments: 196
+execute seconds: 3.35
+journal.verdict: PASS
+### path: Proof 0, no sweep
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 24296131
+segments: 69
+execute seconds: 1.15
+journal.verdict: PASS
+### path: Proof 0, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 53855295
+segments: 151
+execute seconds: 2.24
+journal.verdict: PASS
+### path: check fix_refuse_escapes, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 55166288
+segments: 154
+execute seconds: 2.30
+journal.verdict: PASS
+### idor: Proof 0, no sweep
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 24300109
+segments: 69
+execute seconds: 1.10
+journal.verdict: PASS
+### idor: Proof 0, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 55179055
+segments: 153
+execute seconds: 2.22
+journal.verdict: PASS
+### idor: check fix_hide, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 54184133
+segments: 148
+execute seconds: 2.15
+journal.verdict: PASS
+### authz: Proof 0, no sweep
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 24102834
+segments: 68
+execute seconds: 1.16
+journal.verdict: PASS
+### authz: Proof 0, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 51623228
+segments: 142
+execute seconds: 2.11
+journal.verdict: PASS
+### authz: check fix_promote, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 50795686
+segments: 138
+execute seconds: 1.92
+journal.verdict: PASS
+### idor: Proof 0, 5 calls, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 54697867
+segments: 152
+execute seconds: 2.19
+journal.verdict: PASS
+### idor: check fix_hide, 5 calls, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 53706095
+segments: 147
+execute seconds: 2.10
+journal.verdict: PASS
+### idor: Proof 0, 20 calls, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 109414595
+segments: 318
+execute seconds: 5.20
+journal.verdict: PASS
+### idor: check fix_hide, 20 calls, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 107519827
+segments: 303
+execute seconds: 4.44
+journal.verdict: PASS
+### idor: Proof 0, 50 calls, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 237713452
+segments: 688
+execute seconds: 11.40
+journal.verdict: PASS
+### idor: check fix_hide, 50 calls, 1 sweep position
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+user cycles: 235955719
+segments: 681
+execute seconds: 10.83
+journal.verdict: PASS

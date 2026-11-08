@@ -29,6 +29,12 @@
 //! the value a correct program returns; never printed) and --reference-fix <file> (the vendor's hidden reference fix)
 //! in place of --exploit; with --proof0 the candidate must be that reference fix. verify, compress and groth16-args
 //! check the receipt against the output checker's image id.
+//!
+//! --rule <rule.wasm> (execute and prove): the rule checker (harness/rule-guest, its own image id) for bugs judged by a
+//! public rule module: the candidate and --original are call interface programs, --tests holds call sequences with
+//! their transcripts, --secret holds the secret call sequence (one line, hex, then optional sweep=<p>,<p>; never
+//! printed) and --reference-fix the vendor's hidden reference fix. verify, compress and groth16-args take a bare --rule
+//! to check the receipt against the rule checker's image id.
 
 use std::process::ExitCode;
 use std::time::Instant;
@@ -36,7 +42,10 @@ use std::time::Instant;
 use kintsugi_check::text::{parse_hex, parse_seed, parse_tests, to_hex};
 use kintsugi_check::zk::{GuestInput, Journal, VERDICT_FAIL, VERDICT_PASS};
 use kintsugi_check_output::zk::OutputGuestInput;
-use kintsugi_harness::{CHECK_GUEST_ELF, CHECK_GUEST_ID, HELLO_GUEST_ELF, HELLO_GUEST_ID, OUTPUT_GUEST_ELF, OUTPUT_GUEST_ID};
+use kintsugi_check_rule::zk::RuleGuestInput;
+use kintsugi_harness::{
+    CHECK_GUEST_ELF, CHECK_GUEST_ID, HELLO_GUEST_ELF, HELLO_GUEST_ID, OUTPUT_GUEST_ELF, OUTPUT_GUEST_ID, RULE_GUEST_ELF, RULE_GUEST_ID,
+};
 use risc0_zkvm::{default_executor, default_prover, sha::Digest, ExecutorEnv, InnerReceipt, ProverOpts, Receipt};
 
 /// The S1 demo seed ("kintsugi S1 demo seed A........!").
@@ -47,20 +56,34 @@ const DEMO_SEED: &str = "6b696e74737567692053312064656d6f207365656420412e2e2e2e2
 /// Public on purpose: anyone can recompute the demo bounties' exploit commitment from it and data/demo/exploit.hex.
 const DEMO_SALT: [u8; 32] = *b"kintsugi demo salt, not a secret";
 
-/// The guest program and its image id: the crash checker, or with `--output` the output checker.
-fn guest(output: bool) -> (&'static [u8], [u32; 8]) {
-    if output {
-        (OUTPUT_GUEST_ELF, OUTPUT_GUEST_ID)
-    } else {
-        (CHECK_GUEST_ELF, CHECK_GUEST_ID)
+/// Which checker: the crash checker, the output checker (`--output`) or the rule checker (`--rule`).
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Which {
+    Crash,
+    Output,
+    Rule,
+}
+
+/// The guest program and its image id.
+fn guest(which: Which) -> (&'static [u8], [u32; 8]) {
+    match which {
+        Which::Crash => (CHECK_GUEST_ELF, CHECK_GUEST_ID),
+        Which::Output => (OUTPUT_GUEST_ELF, OUTPUT_GUEST_ID),
+        Which::Rule => (RULE_GUEST_ELF, RULE_GUEST_ID),
     }
 }
 
-/// Takes `--output` out of an argument list and says whether it was there.
-fn take_output_flag(args: &[String]) -> (Vec<String>, bool) {
-    let rest: Vec<String> = args.iter().filter(|a| a.as_str() != "--output").cloned().collect();
-    let found = rest.len() != args.len();
-    (rest, found)
+/// Takes a bare `--output` or `--rule` out of an argument list and says which checker it names.
+fn take_output_flag(args: &[String]) -> (Vec<String>, Which) {
+    let rest: Vec<String> = args.iter().filter(|a| a.as_str() != "--output" && a.as_str() != "--rule").cloned().collect();
+    let which = if args.iter().any(|a| a == "--rule") {
+        Which::Rule
+    } else if args.iter().any(|a| a == "--output") {
+        Which::Output
+    } else {
+        Which::Crash
+    };
+    (rest, which)
 }
 
 fn main() -> ExitCode {
@@ -127,6 +150,20 @@ struct Opts {
     output: bool,
     secret: Option<String>,
     reference_fix: Option<String>,
+    /// `--rule <file>`: the rule checker, with this public rule module.
+    rule: Option<String>,
+}
+
+impl Opts {
+    fn which(&self) -> Which {
+        if self.rule.is_some() {
+            Which::Rule
+        } else if self.output {
+            Which::Output
+        } else {
+            Which::Crash
+        }
+    }
 }
 
 fn parse_opts(args: &[String]) -> Result<Opts, String> {
@@ -150,6 +187,7 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
         output: false,
         secret: None,
         reference_fix: None,
+        rule: None,
     };
     let mut i = 1;
     while i < args.len() {
@@ -187,6 +225,7 @@ fn parse_opts(args: &[String]) -> Result<Opts, String> {
                 continue;
             }
             "--secret" => opts.secret = Some(value()?.clone()),
+            "--rule" => opts.rule = Some(value()?.clone()),
             "--reference-fix" => opts.reference_fix = Some(value()?.clone()),
             "--bounty" => opts.bounty = Some(value()?.clone()),
             "--exploit" => opts.exploit = value()?.clone(),
@@ -249,9 +288,13 @@ fn salt_for(opts: &Opts) -> Result<[u8; 32], String> {
 enum Input {
     Crash(GuestInput),
     Output(OutputGuestInput),
+    Rule(RuleGuestInput),
 }
 
 fn guest_input(opts: &Opts) -> Result<Input, String> {
+    if opts.rule.is_some() {
+        return rule_input(opts).map(Input::Rule);
+    }
     if opts.output {
         return output_input(opts).map(Input::Output);
     }
@@ -301,11 +344,37 @@ fn crash_input(opts: &Opts) -> Result<GuestInput, String> {
     })
 }
 
+/// The rule checker's input. The secret file holds one line, "<call sequence as hex> [sweep=<p>,<p>]"; never printed.
+fn rule_input(opts: &Opts) -> Result<RuleGuestInput, String> {
+    let secret_path = opts.secret.as_ref().ok_or("--rule needs --secret <file>")?;
+    let fix_path = opts.reference_fix.as_ref().ok_or("--rule needs --reference-fix <file>")?;
+    let secret_text = String::from_utf8(read(secret_path)?).map_err(|_| "the secret file is not text")?;
+    let (secret, sweep) = kintsugi_check_rule::parse_secret(&secret_text)?;
+    let tests_text = String::from_utf8(read(&opts.tests)?).map_err(|e| e.to_string())?;
+    let tests = kintsugi_check_rule::parse_tests(&tests_text)?;
+    Ok(RuleGuestInput {
+        original: read(&opts.original)?,
+        rule: read(opts.rule.as_ref().expect("rule mode"))?,
+        public_tests: tests.into_iter().map(|t| (t.sequence, t.expected)).collect(),
+        secret,
+        reference_fix: read(fix_path)?,
+        sweep_positions: sweep,
+        salt: salt_for(opts)?,
+        candidate: read(&opts.candidate)?,
+        fuzz_seed: opts.seed,
+        fuzz_count: opts.fuzz_count,
+        variant_count: opts.variants,
+        submission_id: opts.submission_id,
+        mode: if opts.proof0 { kintsugi_check::zk::MODE_PROOF0 } else { kintsugi_check::zk::MODE_CHECK },
+    })
+}
+
 fn env_for(input: &Input, po2: Option<u32>) -> Result<ExecutorEnv<'static>, String> {
     let mut builder = ExecutorEnv::builder();
     match input {
         Input::Crash(i) => builder.write(i).map_err(|e| e.to_string())?,
         Input::Output(i) => builder.write(i).map_err(|e| e.to_string())?,
+        Input::Rule(i) => builder.write(i).map_err(|e| e.to_string())?,
     };
     if let Some(p) = po2 {
         builder.segment_limit_po2(p);
@@ -337,7 +406,7 @@ fn execute(args: &[String]) -> Result<(), String> {
     let opts = parse_opts(args)?;
     let input = guest_input(&opts)?;
     let started = Instant::now();
-    let (elf, id) = guest(opts.output);
+    let (elf, id) = guest(opts.which());
     let session = default_executor().execute(env_for(&input, opts.po2)?, elf).map_err(|e| e.to_string())?;
     let secs = started.elapsed().as_secs_f64();
     let journal: Journal = session.journal.decode().map_err(|e| e.to_string())?;
@@ -358,7 +427,7 @@ fn prove(args: &[String]) -> Result<(), String> {
     let input = guest_input(&opts)?;
     let prover_opts = if opts.succinct { ProverOpts::succinct() } else { ProverOpts::composite() };
     let started = Instant::now();
-    let (elf, id) = guest(opts.output);
+    let (elf, id) = guest(opts.which());
     let info = default_prover()
         .prove_with_opts(env_for(&input, opts.po2)?, elf, &prover_opts)
         .map_err(|e| e.to_string())?;

@@ -1,0 +1,15 @@
+# The zkVM guest of the rule checker (spike A and B): runs harness/checker-rule inside the RISC Zero machine and
+# publishes the same journal as the crash checker (hashes, seed, counts and PASS or FAIL). A separate program with
+# its own image id, so the crash checker's image id does not change. Its own workspace, built by harness/build.rs.
+[package]
+name = "rule_guest"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+# The same allocator choice as the crash checker's guest (see harness/check-guest/Cargo.toml).
+risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["std", "heap-embedded-alloc"] }
+kintsugi-check = { path = "../checker", default-features = false, features = ["zk"] }
+kintsugi-check-rule = { path = "../checker-rule", default-features = false, features = ["zk"] }

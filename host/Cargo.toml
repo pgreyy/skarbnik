@@ -11,6 +11,7 @@ kintsugi-harness = { path = "../harness" }
 kintsugi-check = { path = "../harness/checker", features = ["zk"] }
 # The output checker's guest input (--output).
 kintsugi-check-output = { path = "../harness/checker-output", features = ["zk"] }
+kintsugi-check-rule = { path = "../harness/checker-rule", features = ["zk"] }
 # "client" proves through the locally installed r0vm. The default "bonsai" feature (remote proving
 # service) is left out on purpose: the vendor's secret input must never leave the vendor's machine.
 risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["client"] }

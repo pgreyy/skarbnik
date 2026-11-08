@@ -10,8 +10,8 @@ CC = os.path.join(os.environ["WASI_SDK"], "bin", "clang")
 CHECK = os.path.join(ROOT, "target", "release", "skarbnik-check-rule")
 BASE = ["--target=wasm32", "-Oz", "-nostdlib", "-ffreestanding", "-mbulk-memory", "-Wl,--no-entry", "-Wl,--strip-all",
         "-Wl,--gc-sections", "-Wl,-z,stack-size=8192"]
-PROGRAM_MEM = ["-Wl,--initial-memory=131072", "-Wl,--max-memory=131072"]
-RULE_MEM = ["-Wl,--initial-memory=262144", "-Wl,--max-memory=262144"]
+PROGRAM_MEM = ["-Wl,--initial-memory=65536", "-Wl,--max-memory=65536"]
+RULE_MEM = ["-Wl,--initial-memory=65536", "-Wl,--max-memory=65536"]
 
 
 def call(op, args):

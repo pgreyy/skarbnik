@@ -5,7 +5,7 @@
 typedef unsigned char u8;
 typedef unsigned long usize;
 
-#define RULE_BUF 65536
+#define RULE_BUF 16384
 static u8 T[RULE_BUF];
 __attribute__((export_name("rule_buf"))) int rule_buf(void) { return (int)(usize)T; }
 

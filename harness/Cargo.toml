@@ -1,5 +1,6 @@
 # The proof harness. Its build script compiles the zkVM guest programs (harness/guest: hello world;
-# harness/check-guest: the patch checker; harness/output-guest: the output checker for wrong output bugs)
+# harness/check-guest: the patch checker; harness/output-guest: the output checker for wrong output bugs;
+# harness/rule-guest: the rule checker for bugs judged by a public rule)
 # and exposes each one's ELF (the program) and image id (its fingerprint) to the host.
 [package]
 name = "kintsugi-harness"
@@ -12,4 +13,4 @@ risc0-build = "=3.0.6"
 risc0-binfmt = { version = "=3.0.5", default-features = false, features = ["std"] }
 
 [package.metadata.risc0]
-methods = ["guest", "check-guest", "output-guest"]
+methods = ["guest", "check-guest", "output-guest", "rule-guest"]
