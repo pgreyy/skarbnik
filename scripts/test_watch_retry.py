@@ -2,9 +2,10 @@
 # Tests the vendor watch's retry rules with no GPU, no chain and no money: it loads tools/skarbnik-vendor, fakes the GPU
 # rental (tools/skarbnik_gpu.py prove_on_gpu), the chain calls and the clock, and runs the real watch loop (cmd_watch,
 # scan, prove_attempt, failed_round) on one revealed Level 1 attempt. Cases: no GPU free for two rounds, then one
-# frees up; no GPU ever free; a card that crashes every round. Prints the watch log of each case and checks the result.
+# frees up; no GPU ever free; a card that crashes every round. And two revealed attempts on one bounty, the PASS
+# revealed first: the FAIL must be submitted before the PASS closes the bounty. Prints the watch logs and checks them.
 # Usage, from the repo root: python3 -I scripts/test_watch_retry.py
-import contextlib, importlib.machinery, importlib.util, os, sys, tempfile, types
+import contextlib, importlib.machinery, importlib.util, json, os, sys, tempfile, types
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'tools'))
@@ -57,7 +58,7 @@ def run(name, verdict_window_h, outcomes, d=None, start=T0, limit=400, calls=Non
     fake = types.SimpleNamespace(time=clock.time, sleep=clock.sleep)
     patches = {'load': lambda p: wcfg, 'attempts': lambda cfg, bid: (bounty, [sub] if sub['outcome'] == 'Open' else []),
                'view': view, 'send': send, 'ProverLock': contextlib.nullcontext,
-               'verify_succinct': lambda cfg, w, tag: 'VALID\njournal.verdict: PASS\njournal.exploit_commitment: ' + 'ec' * 32 + '\njournal.submission_id: ' + 'aa' * 32,
+               'verify_succinct': lambda cfg, w, tag, mode='crash': 'VALID\njournal.verdict: PASS\njournal.exploit_commitment: ' + 'ec' * 32 + '\njournal.submission_id: ' + 'aa' * 32,
                'outlayer_args': lambda w, tag, extra: f'{w}/args.json', 'time': fake}
     saved = {k: getattr(m, k) for k in patches}; saved_gpu = gpu.prove_on_gpu
     for k, v in patches.items(): setattr(m, k, v)
@@ -92,5 +93,57 @@ calls = []
 st1, _, _, d, t1 = run('restart while waiting: first watch (stopped while it waits)', 24, ['nogpu', 'nogpu', 'ok'], limit=2, calls=calls)
 st2, _, log2, *_ = run('restart while waiting: second watch on the same state', 24, ['nogpu', 'nogpu', 'ok'], d=d, start=t1, calls=calls)
 ok &= st1.get('gpu_wait', {}).get('tries') == 1 and st2.get('state') == 'submitted' and len(calls) == 3 and 'try 2,' in log2
+
+
+def run_two():
+    """Two revealed attempts of one Level 2 bounty: attempt 0 (revealed first) proves PASS, attempt 1 proves FAIL."""
+    d = tempfile.mkdtemp(prefix='watchtest-'); clock = Clock(T0, 60); order = []; proofs = []
+    dl = str(int((T0 + 24 * 3600) * 1e9))
+    subs = [{'outcome': 'Open', 'revealed_at_ns': str(int((T0 - 600 + 300 * i) * 1e9)), 'deadline_ns': dl, 'seed': 'ab' * 32, 'patch': 'AGFzbQEAAAA='} for i in range(2)]
+    bounty = {'state': 'Open', 'level': 2, 'fuzz_count': 1, 'variant_count': 1, 'image_id': 'dd' * 32, 'exploit_commitment': 'ec' * 32}
+    wcfg = {'watch': {'state': f'{d}/state.json', 'log': f'{d}/watch.log', 'workdir': f'{d}/work', 'poll_s': 60},
+            'prover': {'mode': 'gpu', 'machine': 'test'}, 'chain': {'submit_account': 'tester.testnet'},
+            'gpu': {'spend_file': f'{d}/spend.json', 'budget_usd': 1.0, 'cpu_fallback': False},
+            'bounties': [{'name': 'test', 'ids': [99], 'module': f'{d}/module', 'secret': f'{d}/secret.hex'}]}
+    sid = lambda i: ('aa' if i == 0 else 'bb') * 32
+    def journal(w):
+        i = int(w.rstrip('/').rsplit('_a', 1)[1])
+        return 'VALID\njournal.verdict: ' + ('PASS' if i == 0 else 'FAIL') + '\njournal.exploit_commitment: ' + 'ec' * 32 + '\njournal.submission_id: ' + sid(i)
+    def prove_on_gpu(cfg, job, log):
+        proofs.append(job['index']); open(f'{job["workdir"]}/u_succinct.bin', 'wb').write(b'receipt')
+        return f'{job["workdir"]}/u_succinct.bin', {'prove': 10.0, 'succinct': 7.0, 'gpu': 'NVIDIA L4', 'pod_seconds': 100, 'cost_usd': 0.02}
+    def view(cfg, method, args=None):
+        if method == 'get_submission_id': return sid(args['index'])
+        if method == 'get_submission': return subs[args['index']]
+        raise AssertionError(method)
+    def send(cfg, signer, method, args_file, deposit='0 NEAR', gas='300 Tgas', log=None):
+        i = json.load(open(args_file))['index']; order.append(i)
+        if i == 0: subs[0]['outcome'] = 'Passed'; bounty['state'] = 'Paid'   # a PASS pays and closes the bounty
+        else: subs[1]['outcome'] = 'Failed'
+        return f'FakeTx{i}', True, ''
+    def wrap(cfg, w, tag, mode='crash'):
+        json.dump({'seal': '00', 'journal': '00'}, open(f'{w}/{tag}_args.json', 'w')); open(f'{w}/verify_{tag}.txt', 'w').write(journal(w))
+        return journal(w), 99.0
+    fake = types.SimpleNamespace(time=clock.time, sleep=clock.sleep)
+    patches = {'load': lambda p: wcfg, 'attempts': lambda cfg, bid: (bounty, subs), 'view': view, 'send': send, 'wrap': wrap,
+               'ProverLock': contextlib.nullcontext, 'time': fake}
+    saved = {k: getattr(m, k) for k in patches}; saved_gpu = gpu.prove_on_gpu
+    for k, v in patches.items(): setattr(m, k, v)
+    gpu.prove_on_gpu = prove_on_gpu; real_time = gpu.time; gpu.time = fake
+    try:
+        with contextlib.redirect_stdout(open(os.devnull, 'w')):
+            try: m.cmd_watch(types.SimpleNamespace(config='test.toml', once=False))
+            except StopIteration: pass
+    finally:
+        for k, v in saved.items(): setattr(m, k, v)
+        gpu.prove_on_gpu = saved_gpu; gpu.time = real_time
+    log = open(wcfg['watch']['log']).read()
+    print('===== two attempts, the PASS revealed first: proofs', proofs, 'submit order', order)
+    for line in log.splitlines(): print('   ', line.split(' ', 1)[1])
+    return order, proofs, log
+
+
+order, proofs, log2 = run_two()
+ok &= order == [1, 0] and proofs == [0, 1] and log2.count('PASS held') == 1
 print('ALL PASS' if ok else 'FAILED')
 sys.exit(0 if ok else 1)

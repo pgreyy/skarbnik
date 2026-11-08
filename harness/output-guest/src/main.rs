@@ -1,9 +1,10 @@
 //! zkVM guest of the output checker (wrong output bugs). It reads the bounty (original module, secret input, the
-//! expected value, the vendor's reference fix, salt, public tests) and the candidate from the host, runs the same output
+//! expected value, the vendor's reference fix, the private sweep positions, salt, public tests) and the candidate from
+//! the host, runs the same output
 //! checker as the native tool, and commits the crash checker's journal unchanged. The secret input, the expected value,
 //! the reference fix and the salt never leave the guest: the journal's exploit commitment is
-//! sha256(salt || secret_record(secret input, expected value, sha256(reference fix))), so one commitment binds all
-//! three for every proof of the bounty. In Proof 0 mode the candidate must be the reference fix itself: the guest checks
+//! sha256(salt || secret_record(secret input, expected value, sha256(reference fix), sweep positions)), so one
+//! commitment binds all four for every proof of the bounty. In Proof 0 mode the candidate must be the reference fix itself: the guest checks
 //! that the original is really wrong on the secret and passes the tests, and that the reference fix passes the full
 //! check, and sets the submission id to sha256("kintsugi-proof0-v1" || fix hash) itself, as the crash checker does.
 
@@ -33,6 +34,7 @@ fn main() {
         expected: input.expected,
         reference_fix: &input.reference_fix,
         public_tests: &tests,
+        sweep_positions: &input.sweep_positions,
     };
     let round = Round { fuzz_seed: input.fuzz_seed, fuzz_count: input.fuzz_count, variant_count: input.variant_count };
     let candidate_hash = sha256(&input.candidate);
@@ -51,7 +53,7 @@ fn main() {
         }
         _ => panic!("unknown mode"),
     };
-    let record = secret_record(&input.secret_input, input.expected, &reference_fix_hash);
+    let record = secret_record(&input.secret_input, input.expected, &reference_fix_hash, &input.sweep_positions);
     let journal = Journal {
         candidate_hash,
         original_hash: sha256(&input.original),

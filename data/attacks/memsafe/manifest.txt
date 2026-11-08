@@ -1,0 +1,13 @@
+# Memory safety corpus: every module the output checker is run on for the memory safety demo, and the verdict it must
+# give, with the public demo secret (demo_secret.txt, sweep=0) and data/memsafe/fixed.wasm as the reference fix.
+# Format: <module path relative to this file> <expected verdict>. Built by data/memsafe/build.sh. Used by
+#   skarbnik-check-output table --manifest data/attacks/memsafe/manifest.txt ...
+# and by harness/checker-output/tests/corpus.rs.
+
+../../memsafe/fixed.wasm      PASS   # the reference fix itself
+stack_fix.wasm                PASS   # the same fix with the buffer on the stack
+../../memsafe/original.wasm   FAIL   # unpatched: the overflow gives a wrong answer on the secret
+fortify_original.wasm         FAIL   # unpatched, built with a size check: it traps on the secret
+truncate_fix.wasm             FAIL   # safe, but copies 16 bytes instead of refusing: another answer
+partial_fix_20.wasm           FAIL   # refuses only names over 20 bytes: 17 to 20 still overflow
+special_case_secret.wasm      FAIL   # refuses only the demo secret's name

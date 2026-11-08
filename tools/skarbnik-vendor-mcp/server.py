@@ -30,6 +30,10 @@ class Fail(Exception):
     """A refusal or error in plain words; returned to the client as a tool error."""
 
 
+# The two checkers on the contract's allowlist (the same ids as tools/skarbnik-vendor): crash, and wrong output.
+CHECKERS = {"crash": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+            "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"}
+
 def log(msg):
     print(f"skarbnik-vendor-mcp: {msg}", file=sys.stderr, flush=True)
 
@@ -199,6 +203,14 @@ def t_init(a):
     if level not in (0, 1, 2):
         raise Fail("level is 0, 1 or 2 (default 2)")
     fuzz, variants = int(a.get("fuzz_count", 16)), int(a.get("variants", 32))
+    bug = str(a.get("mode", "crash")).lower()
+    if bug not in ("crash", "output"):
+        raise Fail("mode is crash (the original crashes on the secret input) or output (it returns a wrong answer there; also memory safety bugs)")
+    sweep = str(a.get("sweep", "") or "").replace(" ", "")
+    if bug == "crash" and sweep:
+        raise Fail("sweep is for output mode only")
+    if sweep and (not re.fullmatch(r"\d+(,\d+){0,3}", sweep)):
+        raise Fail("sweep is up to 4 byte positions, comma separated, for example 0 or 0,5")
     cap = int(a.get("max_commits_per_account", 0) or 0)
     if cap and not 1 <= cap <= int(a.get("k", 1)):
         raise Fail("max_commits_per_account is 1 to k (the number of attempt slots), or 0 for no cap")
@@ -209,11 +221,12 @@ def t_init(a):
                    "attempt_fee_near": str(a.get("attempt_fee_near", "0.01")), "fee_step_near": str(a.get("fee_step_near", "0.005")),
                    "reveal_gap_s": int(a.get("reveal_gap_s", 60)), "reveal_window_s": int(a.get("reveal_window_s", 3600)),
                    "verdict_window_h": int(a.get("verdict_window_h", 24)), "expiry_h": int(a.get("expiry_h", 96)),
-                   "max_patch_bytes": int(a.get("max_patch_bytes", 1024)), "fuzz_count": fuzz, "variants": variants, "po2": int(a.get("po2", 18))},
+                   "max_patch_bytes": int(a.get("max_patch_bytes", 1024)), "fuzz_count": fuzz, "variants": variants, "po2": int(a.get("po2", 18)),
+                   "mode": bug, **({"sweep": sweep} if bug == "output" else {})},
         "secrets": {"secret": a["secret_input_path"], "reference_fix": a["reference_fix_path"]},
         "prover": {"mode": mode, "machine": a.get("machine", "this-computer"), "workdir": a.get("workdir", f"~/skarbnik-vendor/{a['name']}"), "min_avail_mib": 300},
         "chain": {"network": "testnet", "contract": "kintsugi-l2-cihdp.testnet", "rpc_urls": ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"],
-                  "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc", "vendor_account": a["vendor_account"]},
+                  "image_id": CHECKERS[bug], "vendor_account": a["vendor_account"]},
     }
     paths = {k: a[f"path_{k}"] for k in ("host", "check", "near") if a.get(f"path_{k}")}
     if paths:
@@ -343,7 +356,10 @@ def t_watch_init(a):
         lines += [f"{k} = {toml_value(v)}" for k, v in vals.items()]
         lines.append("")
     lines += ["[[bounties]]", f"name = {toml_value(b['name'])}", f"ids = [{int(a['bounty_id'])}]", f"module = {toml_value(b['module'])}",
-              f"secret = {toml_value(src['secrets']['secret'])}", f"po2 = {int(b.get('po2', 18))}", ""]
+              f"secret = {toml_value(src['secrets']['secret'])}", f"po2 = {int(b.get('po2', 18))}"]
+    if str(b.get("mode", "crash")) == "output":  # the output checker needs the reference fix for every proof
+        lines += ['mode = "output"', f"reference_fix = {toml_value(src['secrets']['reference_fix'])}"]
+    lines.append("")
     fd = os.open(out, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "w") as f:
         f.write("# skarbnik-vendor watch config, written by skarbnik-vendor-mcp. Keep it outside the repository.\n" + "\n".join(lines))
@@ -443,10 +459,12 @@ TOOLS = {
               "max_commits_per_account": {"type": "integer", "description": "most attempt slots one account may hold at a time, 1 to k (default 0: no cap)"},
               "max_patch_bytes": {"type": "integer", "description": "largest patch in bytes, up to 2048 (default 1024)"},
               "fuzz_count": {"type": "integer", "description": "fresh inputs from the fairness seed in each check, 1 to 64 (default 16)"},
+              "mode": {"type": "string", "description": "crash (default): the original crashes on the secret input. output: it returns a wrong answer there (also memory safety bugs that corrupt memory without crashing); then the secret file is one line <input as hex> <expected value> [sweep=<p>,<p>]"},
+              "sweep": {"type": "string", "description": "output mode only: up to 4 byte positions of the secret input to try with all 256 values, comma separated (for example a length byte); the secret line must end with the same sweep=<p>,<p>. Each position adds about 32 million cycles to every proof"},
               "variants": {"type": "integer", "description": "near copies of the secret input in each check, 1 to 64 (default 32)"},
               "machine": S, "workdir": S, "gpu_budget_usd": {"type": "number"}, "path_host": S, "path_check": S, "path_near": S},
              ["out_path", "name", "secret_input_path", "reference_fix_path", "vendor_account", "reward_near"]),
-    "check": (t_check, "The preflight (skarbnik-vendor check): module, tests, that the original crashes on the secret, that the fix passes, memory, the checker id, the balance and the window rule, then a preview of fees, windows and time. Spends nothing.",
+    "check": (t_check, "The preflight (skarbnik-vendor check): module, tests, that the original crashes on the secret (crash mode) or gives a wrong answer there (output mode), that the fix passes, memory, the checker id, the balance and the window rule, then a preview of fees, windows and time. Spends nothing.",
               {"config_path": S, "wait_seconds": {"type": "number"}}, ["config_path"]),
     "prove0": (t_prove0, "Proof 0: proves the reference fix passes the secret test, so agents know the bounty can be fixed. On a GPU this spends rental money: the first call returns what it costs and a confirm code; call again with the code after the vendor says yes.",
                {"config_path": S, "confirm_code": S, "wait_seconds": {"type": "number"}}, ["config_path"]),

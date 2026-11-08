@@ -1,0 +1,42 @@
+# Sweep cost in the zkVM executor (no proving): final output checker guest 005d8dc7..., po2 19, 64 fairness inputs, 64 variants, public demo secrets.
+# $ target/fo-clean1/release/skarbnik-host execute <fix> --output --secret <file> --reference-fix <fix> --original <original> --proof0 --demo-salt --tests <tests> --fuzz-count 64 --variants 64 --seed 5357454550000000000000000000000000000000000000000000000000000000 --po2 19
+### memsafe Proof 0, nosweep ()
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+user cycles: 19532606
+segments: 58
+journal.verdict: PASS
+### memsafe Proof 0, sweep1 (sweep=0)
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+user cycles: 51218269
+segments: 149
+journal.verdict: PASS
+### memsafe Proof 0, sweep4 (sweep=0,1,2,3)
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+user cycles: 146854792
+segments: 425
+journal.verdict: PASS
+### feecalc Proof 0, nosweep ()
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+user cycles: 19782493
+segments: 58
+journal.verdict: PASS
+### feecalc Proof 0, sweep1 (sweep=7)
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+user cycles: 51816435
+segments: 150
+journal.verdict: PASS
+### feecalc Proof 0, sweep4 (sweep=4,5,6,7)
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+user cycles: 147917042
+segments: 424
+journal.verdict: PASS
+
+# Checks in the executor, memsafe, sweep=0, submission id 11..11
+### check stack_fix.wasm
+user cycles: 50426712
+segments: 146
+journal.verdict: PASS
+### check partial_fix_20.wasm
+user cycles: 20784068
+segments: 61
+journal.verdict: FAIL

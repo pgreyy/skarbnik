@@ -1,6 +1,7 @@
 //! skarbnik-check-output: the native command line tool of the output checker (src/lib.rs). It reads the files and
-//! prints the verdict; the internal reason only with --explain. The secret file holds one line in the public test
-//! format, "<input as hex> <expected value>", and stays outside the repository except for public demo secrets.
+//! prints the verdict; the internal reason only with --explain. The secret file holds one line,
+//! "<input as hex> <expected value> [sweep=<p>,<p>]" (the sweep positions are optional, at most 4), and stays outside
+//! the repository except for public demo secrets.
 //!   check  --candidate F --original F --tests F --secret F --reference-fix F --seed HEX [--fuzz-count N] [--variants N] [--explain]
 //!   proof0 --original F --tests F --secret F --reference-fix F --seed HEX [--fuzz-count N] [--variants N]
 //!   run    --module F --input HEX
@@ -10,7 +11,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use kintsugi_check::{text, Limits, Loaded, Outcome, Round, TestCase, Verdict};
-use kintsugi_check_output::{check_report, proof0_report, OutputBounty, Reason, Report};
+use kintsugi_check_output::{check_report, parse_secret, proof0_report, OutputBounty, Reason, Report, Secret};
 
 struct Args(HashMap<String, String>);
 
@@ -46,7 +47,7 @@ fn read(p: &Path) -> Result<Vec<u8>, String> {
 struct Setup {
     original: Vec<u8>,
     tests: Vec<TestCase>,
-    secret: TestCase,
+    secret: Secret,
     reference_fix: Vec<u8>,
 }
 
@@ -54,14 +55,11 @@ impl Setup {
     fn load(args: &Args) -> Result<Setup, String> {
         let tests_text = String::from_utf8(read(Path::new(&args.need("tests")?))?).map_err(|_| "tests are not text")?;
         let secret_text = String::from_utf8(read(Path::new(&args.need("secret")?))?).map_err(|_| "secret is not text")?;
-        let mut secret = text::parse_tests(&secret_text)?;
-        if secret.len() != 1 {
-            return Err("the secret file must hold exactly one line: <input as hex> <expected value>".into());
-        }
+        let secret = parse_secret(&secret_text)?;
         Ok(Setup {
             original: read(Path::new(&args.need("original")?))?,
             tests: text::parse_tests(&tests_text)?,
-            secret: secret.remove(0),
+            secret,
             reference_fix: read(Path::new(&args.need("reference-fix")?))?,
         })
     }
@@ -72,6 +70,7 @@ impl Setup {
             expected: self.secret.expected,
             reference_fix: &self.reference_fix,
             public_tests: &self.tests,
+            sweep_positions: &self.secret.sweep,
         }
     }
 }
@@ -101,6 +100,12 @@ fn reason(r: &Option<Reason>) -> String {
         Some(Reason::VariantMismatch { index, reference, candidate }) => {
             format!("5 variants: variant {index}, reference fix {}, candidate {}", outcome(reference), outcome(candidate))
         }
+        Some(Reason::SweepMismatch { position, value, reference, candidate }) => format!(
+            "6 sweep: position {position} set to {value}, reference fix {}, candidate {}",
+            outcome(reference),
+            outcome(candidate)
+        ),
+        Some(Reason::SweepInvalid(why)) => format!("setup: {why}"),
         Some(r) => r.step().to_string(),
     }
 }

@@ -1,0 +1,94 @@
+# Phase 1 native corpus, final output checker (sweep included), branch feature-output. Three seeds each, 64 fairness inputs, 64 variants.
+
+## feecalc, corpus data/attacks/output, seed 0000000000000000000000000000000000000000000000000000000000000000
+$ skarbnik-check-output proof0 --original data/feecalc/original.wasm --tests data/feecalc/public_tests.txt --secret data/attacks/output/demo_secret.txt --reference-fix data/feecalc/fixed.wasm --seed 0000000000000000000000000000000000000000000000000000000000000000
+proof0: PASS
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../feecalc/fixed.wasm` | PASS | PASS | none |
+| `alt_fix.wasm` | PASS | PASS | none |
+| `../../feecalc/original.wasm` | FAIL | FAIL | 2 secret: expected 38, got returned 37 |
+| `special_case_secret.wasm` | FAIL | FAIL | 4 fairness: input 0, reference fix returned 45, candidate returned 44 |
+| `below_2000_fix.wasm` | FAIL | FAIL | 4 fairness: input 1, reference fix returned 63, candidate returned 62 |
+| `length_special.wasm` | FAIL | FAIL | 4 fairness: input 0, reference fix returned 45, candidate returned 44 |
+| `always_plus_one.wasm` | FAIL | FAIL | 3 public tests |
+| `constant.wasm` | FAIL | FAIL | 3 public tests |
+
+8 of 8 match.
+
+## feecalc, corpus data/attacks/output, seed 0707070707070707070707070707070707070707070707070707070707070707
+$ skarbnik-check-output proof0 --original data/feecalc/original.wasm --tests data/feecalc/public_tests.txt --secret data/attacks/output/demo_secret.txt --reference-fix data/feecalc/fixed.wasm --seed 0707070707070707070707070707070707070707070707070707070707070707
+proof0: PASS
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../feecalc/fixed.wasm` | PASS | PASS | none |
+| `alt_fix.wasm` | PASS | PASS | none |
+| `../../feecalc/original.wasm` | FAIL | FAIL | 2 secret: expected 38, got returned 37 |
+| `special_case_secret.wasm` | FAIL | FAIL | 4 fairness: input 0, reference fix returned 51, candidate returned 50 |
+| `below_2000_fix.wasm` | FAIL | FAIL | 4 fairness: input 0, reference fix returned 51, candidate returned 50 |
+| `length_special.wasm` | FAIL | FAIL | 4 fairness: input 0, reference fix returned 51, candidate returned 50 |
+| `always_plus_one.wasm` | FAIL | FAIL | 3 public tests |
+| `constant.wasm` | FAIL | FAIL | 3 public tests |
+
+8 of 8 match.
+
+## feecalc, corpus data/attacks/output, seed c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9
+$ skarbnik-check-output proof0 --original data/feecalc/original.wasm --tests data/feecalc/public_tests.txt --secret data/attacks/output/demo_secret.txt --reference-fix data/feecalc/fixed.wasm --seed c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9
+proof0: PASS
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../feecalc/fixed.wasm` | PASS | PASS | none |
+| `alt_fix.wasm` | PASS | PASS | none |
+| `../../feecalc/original.wasm` | FAIL | FAIL | 2 secret: expected 38, got returned 37 |
+| `special_case_secret.wasm` | FAIL | FAIL | 4 fairness: input 1, reference fix returned 82, candidate returned 81 |
+| `below_2000_fix.wasm` | FAIL | FAIL | 4 fairness: input 1, reference fix returned 82, candidate returned 81 |
+| `length_special.wasm` | FAIL | FAIL | 4 fairness: input 1, reference fix returned 82, candidate returned 81 |
+| `always_plus_one.wasm` | FAIL | FAIL | 3 public tests |
+| `constant.wasm` | FAIL | FAIL | 3 public tests |
+
+8 of 8 match.
+
+## memsafe, corpus data/attacks/memsafe, seed 0000000000000000000000000000000000000000000000000000000000000000
+$ skarbnik-check-output proof0 --original data/memsafe/original.wasm --tests data/memsafe/public_tests.txt --secret data/attacks/memsafe/demo_secret.txt --reference-fix data/memsafe/fixed.wasm --seed 0000000000000000000000000000000000000000000000000000000000000000
+proof0: PASS
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../memsafe/fixed.wasm` | PASS | PASS | none |
+| `stack_fix.wasm` | PASS | PASS | none |
+| `../../memsafe/original.wasm` | FAIL | FAIL | 2 secret: expected -2, got returned 1940358880 |
+| `fortify_original.wasm` | FAIL | FAIL | 2 secret: expected -2, got trapped |
+| `truncate_fix.wasm` | FAIL | FAIL | 2 secret: expected -2, got returned 1940358880 |
+| `partial_fix_20.wasm` | FAIL | FAIL | 6 sweep: position 0 set to 17, reference fix returned -2, candidate returned -254583274 |
+| `special_case_secret.wasm` | FAIL | FAIL | 5 variants: variant 7, reference fix returned -2, candidate returned 1844556187 |
+
+7 of 7 match.
+
+## memsafe, corpus data/attacks/memsafe, seed 0707070707070707070707070707070707070707070707070707070707070707
+$ skarbnik-check-output proof0 --original data/memsafe/original.wasm --tests data/memsafe/public_tests.txt --secret data/attacks/memsafe/demo_secret.txt --reference-fix data/memsafe/fixed.wasm --seed 0707070707070707070707070707070707070707070707070707070707070707
+proof0: PASS
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../memsafe/fixed.wasm` | PASS | PASS | none |
+| `stack_fix.wasm` | PASS | PASS | none |
+| `../../memsafe/original.wasm` | FAIL | FAIL | 2 secret: expected -2, got returned 1940358880 |
+| `fortify_original.wasm` | FAIL | FAIL | 2 secret: expected -2, got trapped |
+| `truncate_fix.wasm` | FAIL | FAIL | 2 secret: expected -2, got returned 1940358880 |
+| `partial_fix_20.wasm` | FAIL | FAIL | 6 sweep: position 0 set to 17, reference fix returned -2, candidate returned -254583274 |
+| `special_case_secret.wasm` | FAIL | FAIL | 5 variants: variant 1, reference fix returned -2, candidate returned -1584691709 |
+
+7 of 7 match.
+
+## memsafe, corpus data/attacks/memsafe, seed c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9
+$ skarbnik-check-output proof0 --original data/memsafe/original.wasm --tests data/memsafe/public_tests.txt --secret data/attacks/memsafe/demo_secret.txt --reference-fix data/memsafe/fixed.wasm --seed c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9
+proof0: PASS
+| module | expected | got | step |
+| --- | --- | --- | --- |
+| `../../memsafe/fixed.wasm` | PASS | PASS | none |
+| `stack_fix.wasm` | PASS | PASS | none |
+| `../../memsafe/original.wasm` | FAIL | FAIL | 2 secret: expected -2, got returned 1940358880 |
+| `fortify_original.wasm` | FAIL | FAIL | 2 secret: expected -2, got trapped |
+| `truncate_fix.wasm` | FAIL | FAIL | 2 secret: expected -2, got returned 1940358880 |
+| `partial_fix_20.wasm` | FAIL | FAIL | 6 sweep: position 0 set to 17, reference fix returned -2, candidate returned -254583274 |
+| `special_case_secret.wasm` | FAIL | FAIL | 5 variants: variant 3, reference fix returned -2, candidate returned 1837099521 |
+
+7 of 7 match.

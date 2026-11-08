@@ -263,11 +263,7 @@ fn output_input(opts: &Opts) -> Result<OutputGuestInput, String> {
     let secret_path = opts.secret.as_ref().ok_or("--output needs --secret <file>")?;
     let fix_path = opts.reference_fix.as_ref().ok_or("--output needs --reference-fix <file>")?;
     let secret_text = String::from_utf8(read(secret_path)?).map_err(|_| "the secret file is not text")?;
-    let mut secret = parse_tests(&secret_text).map_err(|_| "the secret file must hold one line: <input as hex> <expected value>")?;
-    if secret.len() != 1 {
-        return Err("the secret file must hold exactly one line: <input as hex> <expected value>".into());
-    }
-    let secret = secret.remove(0);
+    let secret = kintsugi_check_output::parse_secret(&secret_text)?;
     let tests = parse_tests(&String::from_utf8(read(&opts.tests)?).map_err(|e| e.to_string())?)?;
     Ok(OutputGuestInput {
         original: read(&opts.original)?,
@@ -282,6 +278,7 @@ fn output_input(opts: &Opts) -> Result<OutputGuestInput, String> {
         variant_count: opts.variants,
         submission_id: opts.submission_id,
         mode: if opts.proof0 { kintsugi_check::zk::MODE_PROOF0 } else { kintsugi_check::zk::MODE_CHECK },
+        sweep_positions: secret.sweep,
     })
 }
 
