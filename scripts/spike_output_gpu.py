@@ -4,9 +4,9 @@
 # files. Before it rents a pod it lets the running watches go first: it waits while a watch pod exists on the RunPod
 # account or while one of the watched bounties has a revealed attempt that is not settled yet.
 # Usage: python3 -I scripts/spike_output_gpu.py <gpu config json> <job json>
-#   gpu config: {"gpu": {...settings of tools/skarbnik_gpu.py...}, "watched": [40, 41], "contract": ..., "rpc": ...}
+#   gpu config: {"gpu": {...settings of tools/skarbnik_gpu.py...}, "watched": [40, 41, 45, 46], "contract": ..., "rpc": ...}
 #   job: the job of skarbnik_gpu.prove_on_gpu (name, module, patch, secret, salt, reference_fix, seed, sid, fuzz,
-#        variants, image_id, workdir, bounty_id, index, proof0)
+#        variants, image_id, workdir, bounty_id, index, proof0; rule for the rule checker)
 import base64, json, os, sys, time, urllib.request
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'tools'))

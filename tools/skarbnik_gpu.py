@@ -359,15 +359,15 @@ def put_binary(pod, g, expect_image_id, log):
     pod.ssh(f'curl -sL https://risczero.com/install | bash >/dev/null && rzup install cargo-risczero {g["risc0"]} >/dev/null && rzup install r0vm {g["risc0"]} >/dev/null && r0vm --version', 900)
     pod.scp(g['src_tarball'], pod.remote('src.tar.gz'), 600)
     pod.ssh('rm -rf skb && mkdir skb && tar -xzf src.tar.gz -C skb && mkdir -p skb/prebuilt-guests', 120)
-    # output_guest.bin (the output checker for wrong output bugs) only where the source and the guest files have it
-    for n in ('hello_guest.bin', 'check_guest.bin', 'output_guest.bin'):
-        if n == 'output_guest.bin' and not os.path.exists(os.path.join(g['guests_dir'], n)):
+    # output_guest.bin and rule_guest.bin (the output and rule checkers) only where the source and the guest files have them
+    for n in ('hello_guest.bin', 'check_guest.bin', 'output_guest.bin', 'rule_guest.bin'):
+        if n in ('output_guest.bin', 'rule_guest.bin') and not os.path.exists(os.path.join(g['guests_dir'], n)):
             continue
         pod.scp(os.path.join(g['guests_dir'], n), pod.remote(f'skb/prebuilt-guests/{n}'), 300)
     pod.ssh('cd skb && KINTSUGI_PREBUILT_GUESTS=$HOME/skb/prebuilt-guests cargo build --release -q -p skarbnik-host --features cuda-prove-only 2>&1 | tail -5', 1800)
     # the build must embed the expected checker: the patch checker, or the output checker where its guest file is there
-    out = pod.ssh('cd skb && for n in check_guest output_guest; do [ -f prebuilt-guests/$n.bin ] && r0vm --id --elf prebuilt-guests/$n.bin | tail -1; done; '
-                  'grep -h -E "prebuilt guest (check|output)_guest" target/release/build/kintsugi-harness-*/output | tail -2', 120)
+    out = pod.ssh('cd skb && for n in check_guest output_guest rule_guest; do [ -f prebuilt-guests/$n.bin ] && r0vm --id --elf prebuilt-guests/$n.bin | tail -1; done; '
+                  'grep -h -E "prebuilt guest (check|output|rule)_guest" target/release/build/kintsugi-harness-*/output | tail -3', 120)
     if expect_image_id not in out:
         raise GpuError(f'the GPU build embeds another checker image id than {expect_image_id[:16]}...: {out.strip()[-200:]}')
     pod.ssh('cp skb/target/release/skarbnik-host skarbnik-host && ldd skarbnik-host | grep -i -E "cuda|not found" || true', 120)
@@ -389,7 +389,8 @@ def put_binary(pod, g, expect_image_id, log):
 def prove_on_gpu(cfg, job, log):
     """Proves one attempt on a new pod and returns (path of the succinct receipt, times and cost). Always terminates
     the pod. job: name, module (folder with original.wasm and public_tests.txt), patch, secret, salt, seed, sid, fuzz,
-    variants, image_id, workdir; and for the output checker (wrong output bugs) reference_fix: the vendor's hidden
+    variants, image_id, workdir; for the rule checker also rule (the public rule module) with reference_fix; and for
+    the output checker (wrong output bugs) reference_fix: the vendor's hidden
     reference fix, which goes to the pod's RAM folder with the secret and is wiped with it."""
     g = settings(cfg)
     rp = RunPod(g['api_key_file'])
@@ -421,6 +422,10 @@ def prove_on_gpu(cfg, job, log):
             pod.scp(job['reference_fix'], pod.remote('/dev/shm/skv/reference_fix.wasm'), 60)
             secret_args = '--output --secret /dev/shm/skv/exploit.hex --reference-fix /dev/shm/skv/reference_fix.wasm'
             out_flag = ' --output'
+        if job.get('rule'):  # the rule checker: the public rule module next to the module, the private parts in RAM
+            pod.scp(job['rule'], pod.remote('run/rule.wasm'), 120)
+            secret_args = '--rule run/rule.wasm --secret /dev/shm/skv/exploit.hex --reference-fix /dev/shm/skv/reference_fix.wasm'
+            out_flag = ' --rule'
         args = (f'--bounty {shlex.quote(job["name"])} {secret_args} --original run/original.wasm '
                 f'--tests run/public_tests.txt --fuzz-count {job["fuzz"]} --variants {job["variants"]} --po2 {g["po2"]} '
                 f'--seed {job["seed"]}' + (f' --submission-id {job["sid"]}' if job.get('sid') else ''))
