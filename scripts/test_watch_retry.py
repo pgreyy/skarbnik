@@ -95,10 +95,10 @@ st2, _, log2, *_ = run('restart while waiting: second watch on the same state', 
 ok &= st1.get('gpu_wait', {}).get('tries') == 1 and st2.get('state') == 'submitted' and len(calls) == 3 and 'try 2,' in log2
 
 
-def run_two():
+def run_two(window_h=24):
     """Two revealed attempts of one Level 2 bounty: attempt 0 (revealed first) proves PASS, attempt 1 proves FAIL."""
     d = tempfile.mkdtemp(prefix='watchtest-'); clock = Clock(T0, 60); order = []; proofs = []
-    dl = str(int((T0 + 24 * 3600) * 1e9))
+    dl = str(int((T0 + window_h * 3600) * 1e9))
     subs = [{'outcome': 'Open', 'revealed_at_ns': str(int((T0 - 600 + 300 * i) * 1e9)), 'deadline_ns': dl, 'seed': 'ab' * 32, 'patch': 'AGFzbQEAAAA='} for i in range(2)]
     bounty = {'state': 'Open', 'level': 2, 'fuzz_count': 1, 'variant_count': 1, 'image_id': 'dd' * 32, 'exploit_commitment': 'ec' * 32}
     wcfg = {'watch': {'state': f'{d}/state.json', 'log': f'{d}/watch.log', 'workdir': f'{d}/work', 'poll_s': 60},
@@ -145,5 +145,8 @@ def run_two():
 
 order, proofs, log2 = run_two()
 ok &= order == [1, 0] and proofs == [0, 1] and log2.count('PASS held') == 1
+# the PASS's window ends in 1.5 h: it is not held; it goes at once, with the reason in the log
+order, proofs, log3 = run_two(window_h=1.5)
+ok &= order[:1] == [0] and 'PASS held' not in log3 and 'PASS submitted now without waiting' in log3
 print('ALL PASS' if ok else 'FAILED')
 sys.exit(0 if ok else 1)

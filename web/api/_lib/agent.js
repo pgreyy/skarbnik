@@ -12,11 +12,22 @@ const crypto = require('node:crypto');
 const { Worker } = require('node:worker_threads');
 const SITE = require('../../site.config.json');
 
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const BASE = 'https://skarbnik.xyz/';
 const CONTRACT = SITE.contract;
 const RPCS = SITE.rpc_urls;
-const IMAGE_ID = SITE.published_image_id;
+// The checkers on the contract's allowlist: the crash checker and the output checker (wrong answers, also memory
+// safety bugs that corrupt memory without crashing). A bounty with any other checker is refused.
+const CHECKERS = SITE.checkers;
+const isPublished = (b) => b.image_id_allowed && Object.values(CHECKERS).includes(b.image_id);
+// The kind of bug a bounty is about: the feed row's (its program's) when known, else from its checker.
+const bugKind = (b, row) => (row && row.bug_kind) || (b.image_id === CHECKERS.output ? 'wrong output' : 'crash');
+const isOutput = (b) => b.image_id === CHECKERS.output;
+const BUG_MEANING = {
+  crash: 'the original crashes on a secret input; a fix must stop the crash and keep the answers of the public tests and of fresh inputs.',
+  'wrong output': 'the original returns a wrong answer on a secret input; a fix must return the right answer there and give the same answers as the vendor\'s hidden reference fix on random inputs and on inputs near the secret.',
+  'memory safety': 'a memory bug (such as a buffer overflow) that gives a wrong answer without crashing; judged like wrong output: the right answer on the secret input and the same answers as the vendor\'s hidden reference fix on nearby inputs. It does not detect memory corruption in general.',
+};
 if (SITE.network !== 'testnet') throw new Error('the hosted connector runs on testnet only');
 
 class Fail extends Error {}
@@ -196,7 +207,7 @@ async function checkPatch(bid, bytes, b) {
   const bad = iface(bytes, original);
   // On a bounty that uses the public demo input, that input runs too (the last item): the fix must not crash on it.
   let demo = false;
-  if (!bad) { const d = bid === DEMO_BOUNTY ? b : await bounty(DEMO_BOUNTY).catch(() => null); demo = !!d && d.exploit_commitment === b.exploit_commitment; }
+  if (!bad && !isOutput(b)) { const d = bid === DEMO_BOUNTY ? b : await bounty(DEMO_BOUNTY).catch(() => null); demo = !!d && d.exploit_commitment === b.exploit_commitment; }
   const extra = demo ? [{ hex: (await (await fetch(DEMO_INPUT_URL, { signal: AbortSignal.timeout(20000) })).text()).replace(/\s+/g, ''), want: null }] : [];
   const res = bad ? null : await runTests(bytes, tests.concat(extra));
   const fails = res ? tests.map((t, i) => ({ ...t, ...res[i] })).filter((t) => t.trap || t.got !== t.want) : [];
@@ -208,7 +219,9 @@ async function checkPatch(bid, bytes, b) {
     public_tests: res ? { passed: tests.length - fails.length, of: tests.length, failures: fails.slice(0, 5).map((f) => ({ input_hex: f.hex.slice(0, 64), expected: f.want, got: f.got, trapped: f.trap })) }
       : bad ? undefined : { passed: 0, of: tests.length, note: 'the tests did not finish within 4 seconds (too slow or an endless loop)' },
     public_demo_input: demo ? (demoRun ? { crashes: !!demoRun.trap, trap: demoRun.trap } : { crashes: null, note: 'did not finish within 4 seconds' }) : undefined,
-    note: 'This checks the module, its exports and the public tests' + (demo ? ' and the public demo input' : '') + '. It does not show that the fix passes the bounty\'s private test: only the vendor\'s proof decides that.',
+    note: isOutput(b)
+      ? 'Wrong output bounty: this checks the module, its exports and the public tests only. The private check also needs the right answer on the secret input and the same answers as the vendor\'s hidden reference fix on random inputs and on inputs near the secret; only the vendor\'s proof decides that.'
+      : 'This checks the module, its exports and the public tests' + (demo ? ' and the public demo input' : '') + '. It does not show that the fix passes the bounty\'s private test: only the vendor\'s proof decides that.',
   };
 }
 const patchOk = (c) => c.fits && !c.same_as_original && c.interface_ok && c.public_tests && c.public_tests.passed === c.public_tests.of && !(c.public_demo_input && c.public_demo_input.crashes !== false);
@@ -231,7 +244,7 @@ const LEVEL_MEANING = {
 async function checks(b, account, level0ok = false) {
   const now = BigInt(Date.now()) * 1000000n;
   const out = {
-    open: b.state === 'Open' && b.opened, level_allowed: b.level === 2 || b.level === 1 || (b.level === 0 && level0ok === true), published_checker: b.image_id_allowed && b.image_id === IMAGE_ID,
+    open: b.state === 'Open' && b.opened, level_allowed: b.level === 2 || b.level === 1 || (b.level === 0 && level0ok === true), published_checker: isPublished(b),
     free_slot: b.active < b.max_commits, time_left: now + BigInt(b.reveal_window_ns) + BigInt(b.verdict_window_ns) <= BigInt(b.expires_at_ns),
   };
   const [credit, limits] = await Promise.all([view('get_credit', { account_id: account }), view('get_agent_limits', { account_id: account })]);
@@ -247,7 +260,7 @@ async function bounty(bid) { const b = await view('get_bounty', { bounty_id: bid
 // ---------- tools ----------
 const TOOLS = {
   list_bounties: {
-    ro: true, d: 'Open Skarbnik bounties from the feed (a snapshot): each bounty\'s level and what it means, reward, next attempt fee, slots, windows. Call get_bounty for the live state.',
+    ro: true, d: 'Open Skarbnik bounties from the feed (a snapshot): each bounty\'s level and what it means, the kind of bug (crash, wrong output or memory safety) and what a fix must do, reward, next attempt fee, slots, windows. Call get_bounty for the live state.',
     p: { only_open: { type: 'boolean', description: 'only bounties accepting attempts (default true)' } }, r: [],
     async run(k, a) {
       const f = await feed();
@@ -259,24 +272,26 @@ const TOOLS = {
         const b = await view('get_bounty', { bounty_id: String(id) }).catch(() => null);
         if (!b || b.state !== 'Open' || !b.opened || b.active >= b.max_commits) continue;
         const same = f.bounties.find((x) => x.original_hash === b.original_hash && x.public_code);
-        rows.push({ bounty_id: id, level: b.level, status: 'Open for attempts (newer than the feed)', kind: same ? same.kind : undefined, program: same && same.program, module_description: same && same.module_description,
+        rows.push({ bounty_id: id, level: b.level, status: 'Open for attempts (newer than the feed)', kind: same ? same.kind : undefined, bug_kind: bugKind(b, same), program: same && same.program, module_description: same && same.module_description,
           reward: near(b.amount), next_fee: near(b.next_fee), slots_left: b.max_commits - b.active, max_commits: b.max_commits, max_commits_per_account: b.max_commits_per_account,
           max_patch_bytes: b.max_patch_bytes, commit_deadline_utc: nsUtc(BigInt(b.expires_at_ns) - BigInt(b.reveal_window_ns) - BigInt(b.verdict_window_ns)) });
       }
-      return { source: f.source || 'saved', updated_at_utc: f.updated_at_utc || f.generated_at_utc, generated_at_utc: f.generated_at_utc, network: 'testnet', bounties: rows.map((b) => ({ bounty_id: String(b.bounty_id), level: b.level, level_meaning: LEVEL_MEANING[b.level], status: b.status, kind: b.kind, test_bounty: b.test_bounty || undefined,
+      return { source: f.source || 'saved', updated_at_utc: f.updated_at_utc || f.generated_at_utc, generated_at_utc: f.generated_at_utc, network: 'testnet', bounties: rows.map((b) => ({ bounty_id: String(b.bounty_id), level: b.level, level_meaning: LEVEL_MEANING[b.level], bug_kind: b.bug_kind || bugKind(b, null), bug_meaning: BUG_MEANING[b.bug_kind || bugKind(b, null)], status: b.status, kind: b.kind, test_bounty: b.test_bounty || undefined,
         program: b.program, description: b.module_description, reward: b.reward, next_fee: b.next_fee, slots_left: b.slots_left, max_commits: b.max_commits, attempts: b.attempts,
         max_commits_per_account: b.max_commits_per_account, max_patch_bytes: b.max_patch_bytes, commit_deadline_utc: b.commit_deadline_utc })),
         next: 'pick one, call get_public_code, then check_patch with your fix' };
     },
   },
   get_bounty: {
-    ro: true, d: 'One bounty read live from the contract: its level and what it means, the sentence to tell the user (the fee and the level with its meaning, in one message), and the checks to pass before committing for this link\'s account (credit, fee limit, slots, time).',
+    ro: true, d: 'One bounty read live from the contract: its level and what it means, the kind of bug, the sentence to tell the user (the fee, the level with its meaning and the kind of bug, in one message), and the checks to pass before committing for this link\'s account (credit, fee limit, slots, time).',
     p: { bounty_id: { type: 'string' } }, r: ['bounty_id'],
     async run(k, a) {
       const b = await bounty(String(a.bounty_id));
       const c = await checks(b, k.account);
-      return { bounty_id: String(b.id), level: b.level, level_meaning: LEVEL_MEANING[b.level],
-        tell_the_user: `Fee ${near(b.next_fee)}. Level ${b.level}: ${LEVEL_MEANING[b.level] || 'unknown level'} Wait for their yes before commit.`,
+      const row = await feed().then((f) => f.bounties.find((x) => String(x.bounty_id) === String(b.id) || (x.original_hash === b.original_hash && x.bug_kind))).catch(() => null);
+      const bug = bugKind(b, row);
+      return { bounty_id: String(b.id), level: b.level, level_meaning: LEVEL_MEANING[b.level], bug_kind: bug, bug_meaning: BUG_MEANING[bug],
+        tell_the_user: `Fee ${near(b.next_fee)}. Level ${b.level}: ${LEVEL_MEANING[b.level] || 'unknown level'} Kind of bug: ${bug}: ${BUG_MEANING[bug]} Wait for their yes before commit.`,
         state: b.state, opened: b.opened, reward: near(b.amount), next_fee: near(b.next_fee), next_fee_yocto: b.next_fee,
         slots_in_use: b.active, max_commits: b.max_commits, max_patch_bytes: b.max_patch_bytes, reveal_gap_seconds: Number(BigInt(b.reveal_gap_ns) / 1000000000n),
         reveal_window_seconds: Number(BigInt(b.reveal_window_ns) / 1000000000n), verdict_window_hours: Number(BigInt(b.verdict_window_ns) / 3600000000000n),
@@ -284,7 +299,7 @@ const TOOLS = {
     },
   },
   get_public_code: {
-    ro: true, d: 'The public code of a bounty: the Rust source with its known bug, the original module as WebAssembly text (WAT, the form a fix is sent in), the public tests and what a fix must do. The module is checked against the hash on chain.',
+    ro: true, d: 'The public code of a bounty: the source (Rust or C) with its known bug, the original module as WebAssembly text (WAT, the form a fix is sent in), the public tests and what a fix must do. The module is checked against the hash on chain.',
     p: { bounty_id: { type: 'string' } }, r: ['bounty_id'],
     async run(k, a) {
       const bid = String(a.bounty_id);
@@ -296,18 +311,19 @@ const TOOLS = {
       const w = await wabt();
       const m = w.readWasm(new Uint8Array(mod), { readDebugNames: false });
       let wat; try { wat = m.toText({ foldExprs: false, inlineExport: false }); } finally { m.destroy(); }
-      return { bounty_id: bid, program: pc.program, description: pc.description, target: row.target, max_patch_bytes: b.max_patch_bytes,
-        source_rust: await site(pc.source), original_wat: wat, public_tests: await site(pc.tests),
-        how_to_send_a_fix: 'Change original_wat to fix the bug the Rust source describes (the Rust is the readable version of the same program). Keep the exports memory, input_buf and parse, and the answer of every public test. Then call check_patch with the whole fixed module as wat.' };
+      const lang = pc.source.endsWith('.c') ? 'C' : 'Rust', src = await site(pc.source);
+      return { bounty_id: bid, program: pc.program, description: pc.description, bug_kind: bugKind(b, row), bug_meaning: BUG_MEANING[bugKind(b, row)], target: row.target, max_patch_bytes: b.max_patch_bytes,
+        source_language: lang, source: src, ...(lang === 'Rust' ? { source_rust: src } : {}), original_wat: wat, public_tests: await site(pc.tests),
+        how_to_send_a_fix: `Change original_wat to fix the bug the ${lang} source describes (the ${lang} is the readable version of the same program). Keep the exports memory, input_buf and parse, and the answer of every public test. Then call check_patch with the whole fixed module as wat.` };
     },
   },
   check_patch: {
-    ro: true, d: 'Check a fix before spending anything: turns the WebAssembly text (or patch_base64) into a module, confirms it is valid, that its size fits and that its exports match the public program, and runs the public tests; on a bounty that uses the public demo input it runs that input too. Sends nothing and spends nothing. It does not show that the fix passes the bounty\'s private test: only the vendor\'s proof decides that.',
+    ro: true, d: 'Check a fix before spending anything: turns the WebAssembly text (or patch_base64) into a module, confirms it is valid, that its size fits and that its exports match the public program, and runs the public tests; on a crash bounty that uses the public demo input it runs that input too; on a wrong output or memory safety bounty it runs the public tests only and says so. Sends nothing and spends nothing. It does not show that the fix passes the bounty\'s private test: only the vendor\'s proof decides that.',
     p: { bounty_id: { type: 'string' }, wat: { type: 'string', description: 'the whole fixed module as WebAssembly text' }, patch_base64: { type: 'string', description: 'or the fixed .wasm module in base64' } }, r: ['bounty_id'],
     async run(k, a) {
       const bid = String(a.bounty_id); const b = await bounty(bid); const bytes = await patchBytes(a);
       const c = await checkPatch(bid, bytes, b);
-      return { ...c, ready_to_commit: patchOk(c), fee: near(b.next_fee), level: b.level, next: patchOk(c) ? `tell the user in one message the fee (${near(b.next_fee)}) and the level: Level ${b.level}: ${LEVEL_MEANING[b.level] || 'unknown level'} Wait for a yes, then call commit with the same wat` : 'fix the problems above and check again' };
+      return { ...c, ready_to_commit: patchOk(c), fee: near(b.next_fee), level: b.level, next: patchOk(c) ? `tell the user in one message the fee (${near(b.next_fee)}), the level (Level ${b.level}: ${LEVEL_MEANING[b.level] || 'unknown level'}) and the kind of bug (get_bounty's tell_the_user). Wait for a yes, then call commit with the same wat` : 'fix the problems above and check again' };
     },
   },
   get_credit: {
@@ -315,7 +331,7 @@ const TOOLS = {
     async run(k) { const [c, l] = await Promise.all([view('get_credit', { account_id: k.account }), view('get_agent_limits', { account_id: k.account })]); return { account: k.account, credit: near(c), credit_yocto: String(c), limits: l }; },
   },
   commit: {
-    ro: false, d: 'Commit a fix to a bounty: sends a sealed fingerprint of it and takes the attempt fee from credit. Only after you told the user in one message the fee and the bounty\'s level with its meaning (get_bounty\'s tell_the_user) and they said yes. Levels 2 and 1 are taken; Level 0 only if the user explicitly asked for it (level_0_ok). The fix must pass check_patch. Keep the same wat: reveal needs it.',
+    ro: false, d: 'Commit a fix to a bounty: sends a sealed fingerprint of it and takes the attempt fee from credit. Only after you told the user in one message the fee, the bounty\'s level with its meaning and the kind of bug (get_bounty\'s tell_the_user) and they said yes. Levels 2 and 1 are taken; Level 0 only if the user explicitly asked for it (level_0_ok). The fix must pass check_patch. Keep the same wat: reveal needs it.',
     p: { bounty_id: { type: 'string' }, wat: { type: 'string' }, patch_base64: { type: 'string' }, payout: { type: 'string', description: 'payout account (default: the account\'s fixed payout, else the account)' },
       level_0_ok: { type: 'boolean', description: 'true only if the user explicitly asked for a Level 0 bounty' } }, r: ['bounty_id'],
     async run(k, a) {
@@ -375,7 +391,7 @@ async function handleMessage(k, msg) {
   if (method === 'initialize') {
     const want = msg.params && msg.params.protocolVersion;
     return ok({ protocolVersion: SUPPORTED.includes(want) ? want : SUPPORTED[1], capabilities: { tools: { listChanged: false } }, serverInfo: { name: 'skarbnik', title: 'Skarbnik (testnet)', version: VERSION },
-      instructions: 'Skarbnik repair bounties on NEAR testnet, with a key that can only commit and reveal. Order: list_bounties, get_public_code, check_patch until it is ready, get_bounty, tell the user the fee and the bounty\'s level with its meaning in one message and wait for a yes, commit, then reveal after the gap with the same wat, then status.' });
+      instructions: 'Skarbnik repair bounties on NEAR testnet, with a key that can only commit and reveal. Order: list_bounties, get_public_code, check_patch until it is ready, get_bounty, tell the user the fee, the bounty\'s level with its meaning and the kind of bug (crash, wrong output or memory safety) in one message and wait for a yes, commit, then reveal after the gap with the same wat, then status.' });
   }
   if (id === undefined || id === null) return null; // notifications (initialized, cancelled) need no answer
   if (method === 'ping') return ok({});

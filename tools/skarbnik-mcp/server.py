@@ -33,8 +33,24 @@ NETWORKS = {
     "mainnet": {"contract": None, "rpc": ["https://rpc.mainnet.near.org"], "feed": None},
 }
 PUBLISHED_IMAGE_ID = "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
-# More checker image ids to accept, only when SKARBNIK_EXTRA_IMAGE_IDS is set (comma separated): the spike of the output
-# checker for wrong output bugs uses it. Unset, only the published patch checker is accepted.
+# The checkers on the contract's allowlist (web/site.config.json, checkers): the crash checker and the output checker
+# (wrong answers, also memory safety bugs that corrupt memory without crashing).
+CHECKERS = {"crash": PUBLISHED_IMAGE_ID, "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"}
+BUG_MEANING = {
+    "crash": "the original crashes on a secret input; a fix must stop the crash and keep the answers of the public tests and of fresh inputs.",
+    "wrong output": ("the original returns a wrong answer on a secret input; a fix must return the right answer there and give the same "
+                     "answers as the vendor's hidden reference fix on random inputs and on inputs near the secret."),
+    "memory safety": ("a memory bug (such as a buffer overflow) that gives a wrong answer without crashing; judged like wrong output: the right "
+                      "answer on the secret input and the same answers as the vendor's hidden reference fix on nearby inputs. It does not "
+                      "detect memory corruption in general."),
+}
+
+
+def bug_kind(b, row=None):
+    """The kind of bug of a bounty: its feed row's (its program's) when known, else from its checker."""
+    return (row or {}).get("bug_kind") or ("wrong output" if b.get("image_id") == CHECKERS["output"] else "crash")
+# More checker image ids to accept, only when SKARBNIK_EXTRA_IMAGE_IDS is set (comma separated), for trying a new checker
+# before it is published. Unset, only the two published checkers are accepted.
 EXTRA_IMAGE_IDS = {x.strip() for x in os.environ.get("SKARBNIK_EXTRA_IMAGE_IDS", "").split(",") if x.strip()}
 NONCE_FILE = "skarbnik-mcp-nonces.json"
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -406,10 +422,10 @@ def near(yocto):
     return f"{whole}{'.' + frac if frac else ''} NEAR"
 
 
-def level_line(b):
-    """The sentence to tell the user before a commit: the fee and the level with its meaning."""
-    lv = b.get("level")
-    return f"Fee {near(b['next_fee'])}. Level {lv}: {LEVEL_MEANING.get(lv, 'unknown level')}"
+def level_line(b, row=None):
+    """The sentence to tell the user before a commit: the fee, the level with its meaning and the kind of bug."""
+    lv, bug = b.get("level"), bug_kind(b, row)
+    return f"Fee {near(b['next_fee'])}. Level {lv}: {LEVEL_MEANING.get(lv, 'unknown level')} Kind of bug: {bug}: {BUG_MEANING[bug]}"
 
 
 def bounty_checks(cfg, b, acct=None, level_0_ok=False):
@@ -419,7 +435,7 @@ def bounty_checks(cfg, b, acct=None, level_0_ok=False):
     out = {
         "open": b["state"] == "Open" and b["opened"],
         "level_allowed": b["level"] in (1, 2) or (b["level"] == 0 and bool(level_0_ok)),
-        "published_checker": b["image_id_allowed"] and (b["image_id"] == PUBLISHED_IMAGE_ID or b["image_id"] in EXTRA_IMAGE_IDS),
+        "published_checker": b["image_id_allowed"] and (b["image_id"] in CHECKERS.values() or b["image_id"] in EXTRA_IMAGE_IDS),
         "free_slot": b["active"] < b["max_commits"],
         "time_left": now + int(b["reveal_window_ns"]) + int(b["verdict_window_ns"]) <= int(b["expires_at_ns"]),
     }
@@ -443,6 +459,7 @@ def t_list_bounties(cfg, a):
             "generated_at_utc": f.get("generated_at_utc"),
             "note": "Live rows are read from the chain about once a minute (source live), else the saved feed; get_bounty reads the live state before you commit. Tell your user each bounty's level and its meaning with the fee.",
             "bounties": [{"bounty_id": b["bounty_id"], "level": b.get("level"), "level_meaning": LEVEL_MEANING.get(b.get("level")),
+                          "bug_kind": b.get("bug_kind") or "crash", "bug_meaning": BUG_MEANING.get(b.get("bug_kind") or "crash"),
                           "status": b["status"], "kind": b.get("kind"), "accepts_commits": b.get("accepts_commits"),
                           "reward": b.get("reward"), "next_fee": b.get("next_fee"), "max_commits": b.get("max_commits"), "attempts": b.get("attempts"),
                           "slots_in_use": b.get("slots_in_use"), "max_commits_per_account": b.get("max_commits_per_account"),
@@ -461,9 +478,13 @@ def t_get_bounty(cfg, a):
     keep = ("id", "state", "opened", "level", "amount", "max_commits", "active", "commits", "pending", "max_commits_per_account",
             "next_fee", "max_patch_bytes", "reveal_gap_ns", "reveal_window_ns", "verdict_window_ns", "expires_at_ns",
             "image_id", "image_id_allowed", "original_hash", "corpus_hash", "winner")
+    try:
+        row = next((x for x in feed(cfg)["bounties"] if str(x["bounty_id"]) == str(b["id"]) or (x.get("original_hash") == b["original_hash"] and x.get("bug_kind"))), None)
+    except (Fail, OSError, ValueError, KeyError):
+        row = None
     return {"bounty": {k: b.get(k) for k in keep}, "expires_at_utc": ns_utc(b["expires_at_ns"]),
-            "level_meaning": LEVEL_MEANING.get(b.get("level")),
-            "tell_the_user": level_line(b) + " Wait for their yes before commit.",
+            "level_meaning": LEVEL_MEANING.get(b.get("level")), "bug_kind": bug_kind(b, row), "bug_meaning": BUG_MEANING[bug_kind(b, row)],
+            "tell_the_user": level_line(b, row) + " Wait for their yes before commit.",
             "checks": bounty_checks(cfg, b, acct), "checks_for_account": acct}
 
 
@@ -484,13 +505,16 @@ def t_get_public_code(cfg, a):
         wat = remote_check({"bounty_id": bid, "want": "original_wat"}).get("original_wat")
     except (Fail, OSError, ValueError):
         wat = None
+    lang = "C" if pc["source"].endswith(".c") else "Rust"
     return {"bounty_id": bid, "program": pc.get("program"), "description": pc.get("description"), "target": row.get("target"),
+            "bug_kind": bug_kind(b, row), "bug_meaning": BUG_MEANING[bug_kind(b, row)], "source_language": lang,
             "max_patch_bytes": b["max_patch_bytes"], "original_module_bytes": len(module),
             "module_matches_chain": True, "source_file": base + pc["source"], "source": fetch(base + pc["source"]).decode(),
             "build": fetch(base + pc["build"]).decode(), "public_tests": tests, "original_wat": wat,
-            "next": "change original_wat (the same program as WebAssembly text) to fix the bug the Rust source describes, then call "
-                    "check_patch with the whole module as wat; keep the exports and every public test's answer. With Rust installed "
-                    "you may write the fixed Rust file and call build_patch instead"}
+            "next": f"change original_wat (the same program as WebAssembly text) to fix the bug the {lang} source describes, then call "
+                    "check_patch with the whole module as wat; keep the exports and every public test's answer. "
+                    + ("With Rust installed you may write the fixed Rust file and call build_patch instead" if lang == "Rust" else
+                       "Or build the fixed C file yourself with the flags in build and call check_patch with patch_path")}
 
 
 CHECK_URL = os.environ.get("SKARBNIK_CHECK_URL", "https://skarbnik.xyz/api/check")
@@ -533,7 +557,7 @@ def t_check_patch(cfg, a):
     with open(path, "wb") as f:
         f.write(mod)
     r["patch_path"] = path
-    r["next"] = (f"tell the user in one message the fee and the bounty's level with its meaning (get_bounty's tell_the_user) and wait for a yes, then commit with patch_path {path}" if r.get("ready_to_commit")
+    r["next"] = (f"tell the user in one message the fee, the bounty's level with its meaning and the kind of bug (get_bounty's tell_the_user) and wait for a yes, then commit with patch_path {path}" if r.get("ready_to_commit")
                  else "fix the problems above and check again")
     return r
 
@@ -687,9 +711,9 @@ def t_status(cfg, a):
 
 
 TOOLS = {
-    "list_bounties": (t_list_bounties, "Bounties from the Skarbnik feed (a snapshot): each bounty's level and what it means, terms, next fee, slots, windows and the public code links.",
+    "list_bounties": (t_list_bounties, "Bounties from the Skarbnik feed (a snapshot): each bounty's level and what it means, the kind of bug (crash, wrong output or memory safety), terms, next fee, slots, windows and the public code links.",
                       {"only_open": {"type": "boolean", "description": "only bounties accepting commits (default true)"}}, []),
-    "get_bounty": (t_get_bounty, "The live state of one bounty from the contract, its level and what that means, the sentence to tell your user (the fee and the level with its meaning, in one message), and the checks to pass before committing (for the key's account when a key is set).",
+    "get_bounty": (t_get_bounty, "The live state of one bounty from the contract, its level and what that means, the kind of bug, the sentence to tell your user (the fee, the level with its meaning and the kind of bug, in one message), and the checks to pass before committing (for the key's account when a key is set).",
                    {"bounty_id": {"type": "string", "description": "the bounty id"}}, ["bounty_id"]),
     "get_public_code": (t_get_public_code, "The public code of a bounty: the Rust source with its known bug, the build flags, the public tests (input as hex and the value the original returns) and what a fix must do. The module is checked against the hash on chain.",
                         {"bounty_id": {"type": "string"}}, ["bounty_id"]),
@@ -716,8 +740,8 @@ def handle(msg):
         return {"protocolVersion": (msg.get("params") or {}).get("protocolVersion", "2025-06-18"),
                 "capabilities": {"tools": {}}, "serverInfo": {"name": "skarbnik", "version": VERSION},
                 "instructions": "Skarbnik bounties on NEAR (testnet by default). Read AGENTS.md at https://skarbnik.xyz/agents.md. "
-                                "Work order: list_bounties, get_public_code, check_patch (WebAssembly text; or build_patch from Rust), get_bounty (tell the user in one message the fee and "
-                                "the bounty's level with its meaning, and wait for a yes), commit, then reveal after the reveal gap, then status."}
+                                "Work order: list_bounties, get_public_code, check_patch (WebAssembly text; or build_patch from Rust), get_bounty (tell the user in one message the fee, "
+                                "the bounty's level with its meaning and the kind of bug: crash, wrong output or memory safety; and wait for a yes), commit, then reveal after the reveal gap, then status."}
     if method == "ping":
         return {}
     if method == "tools/list":

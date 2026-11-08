@@ -206,7 +206,7 @@ def t_init(a):
     bug = str(a.get("mode", "crash")).lower()
     if bug not in ("crash", "output"):
         raise Fail("mode is crash (the original crashes on the secret input) or output (it returns a wrong answer there; also memory safety bugs)")
-    sweep = str(a.get("sweep", "") or "").replace(" ", "")
+    sweep = str(a.get("sweep", "0" if bug == "output" else "") or "").replace(" ", "")  # output mode: 1 position by default
     if bug == "crash" and sweep:
         raise Fail("sweep is for output mode only")
     if sweep and (not re.fullmatch(r"\d+(,\d+){0,3}", sweep)):

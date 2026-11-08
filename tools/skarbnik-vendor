@@ -266,7 +266,7 @@ def proof_args(w, tag, extra):
 QUESTIONS = [
     ('bounty', 'name', 'a short name for this bounty (also names its salt in ~/.kintsugi-salts/)', 'mybounty'),
     ('bounty', 'mode', 'kind of bug: crash (the original crashes on the secret input) or output (it returns a wrong answer there; also memory safety bugs)', 'crash'),
-    ('bounty', 'sweep', 'output mode only: byte positions of the secret input to try with all 256 values, comma separated, at most 4 (for example a length byte); write the same list as sweep=<p>,<p> at the end of the secret line; empty for none', ''),
+    ('bounty', 'sweep', 'output mode only: byte positions of the secret input to try with all 256 values, comma separated, at most 4 (for example a length byte); write the same list as sweep=<p>,<p> at the end of the secret line; each position adds about 32 million cycles to every proof; empty for none', '0'),
     ('bounty', 'module', 'the folder with original.wasm and public_tests.txt', 'data/demo'),
     ('bounty', 'reward_near', 'reward in NEAR', '0.1'),
     ('bounty', 'k', 'attempts allowed, K (1 to 16)', '1'),
@@ -585,11 +585,14 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
     extra = f'; on {t["gpu"]}, pod {t["pod_seconds"]} s, ${t["cost_usd"]}' if t.get('gpu') else ''
     log_line(wcfg, f'bounty {bid} attempt {i}: proof ready, verdict {verdict}; prove {t.get("prove")} s, succinct {t.get("succinct")} s{f", Groth16 {t['groth16']} s" if t.get("groth16") else ""}{extra}')
     st[key] = {'state': 'proof ready', 'verdict': verdict, 'times_s': t, 'submit_failures': prev.get('submit_failures', 0)}; state_save(wcfg, st)
-    if verdict == 'PASS' and hold_pass(wcfg, st, bid, i, s):
+    hold = hold_pass(wcfg, st, bid, i, s) if verdict == 'PASS' else None
+    if hold == 'hold':
         if not prev.get('hold_next'):
             log_line(wcfg, f'bounty {bid} attempt {i}: PASS held: another revealed attempt of this bounty is proved first, so every FAIL is submitted before a PASS closes the bounty')
         st[key]['hold_next'] = time.time() + int(wcfg['watch'].get('poll_s', 60)); state_save(wcfg, st)
         return
+    if hold == 'margin':
+        log_line(wcfg, f'bounty {bid} attempt {i}: PASS submitted now without waiting for the other attempts: less than {HOLD_PASS_MIN_LEFT_S // 3600} h of its verdict window are left, and a FAIL still being proved must never cost a correct fix its payout')
     fresh = view(wcfg, 'get_submission', {'bounty_id': bid, 'index': i})
     if fresh['outcome'] != 'Open': log_line(wcfg, f'bounty {bid} attempt {i}: already decided on chain ({fresh["outcome"]}); not submitting'); st[key] = {'state': 'decided elsewhere', 'outcome': fresh['outcome']}; return
     if level == 2:
@@ -617,17 +620,19 @@ HOLD_PASS_MIN_LEFT_S = 7200  # a held PASS is submitted anyway once less than 2 
 
 def hold_pass(wcfg, st, bid, i, s, t=None):
     """FAIL proofs go first: a PASS pays and closes the bounty, and every attempt still open is then refunded unproved,
-    so its FAIL could never be recorded. Hold this PASS while another revealed, open attempt of the same bounty has no
-    proof yet, unless less than 2 h of this attempt's verdict window are left."""
+    so its FAIL could never be recorded. 'hold' this PASS while another revealed, open attempt of the same bounty has no
+    proof yet; but 'margin' (submit it now) once less than 2 h of this PASS's own verdict window are left, so a FAIL
+    still being proved never costs a correct fix its payout; None when nothing else waits."""
     t = time.time() if t is None else t
-    if int(s['deadline_ns']) / SEC - t < HOLD_PASS_MIN_LEFT_S: return False
     try: _, subs = attempts(wcfg, bid)
-    except Exception: return False  # noqa: BLE001 (cannot read: do not hold)
+    except Exception: return None  # noqa: BLE001 (cannot read: do not hold)
+    waiting = False
     for j, o in enumerate(subs):
         if j == i or o['outcome'] != 'Open' or not o.get('revealed_at_ns'): continue
         rec = st.get(f'{bid}:{j}', {})
-        if rec.get('state') not in ('proof ready', 'submitted', 'decided elsewhere', 'deadline passed', 'gave up'): return True
-    return False
+        if rec.get('state') not in ('proof ready', 'submitted', 'decided elsewhere', 'deadline passed', 'gave up'): waiting = True
+    if not waiting: return None
+    return 'margin' if int(s['deadline_ns']) / SEC - t < HOLD_PASS_MIN_LEFT_S else 'hold'
 
 def utc_at(t): return f'{datetime.fromtimestamp(t, timezone.utc):%Y-%m-%d %H:%M} UTC'
 
