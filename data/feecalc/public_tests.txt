@@ -1,0 +1,16 @@
+# Public tests for the fee calculator (data/feecalc/original.rs).
+# One test per line: <input as hex, or - for empty> <value the original returns>.
+# The expected values were produced by running the original module:
+#   target/debug/skarbnik-check-output run --module original.wasm --input <hex>
+-                                        0      # no amounts
+05                                       1      # one small amount
+0a0b0c                                   1      # three amounts
+6464646464                               13     # total 500
+6f6f6f6f6f6f6f6f6f                       25     # total 999, just under 1000
+c8c8c8c8c8                               25     # total 1000
+c8c8c8c8c828                             26     # total 1040
+c8c8c8c8c8c8c8c8c8c8                     50     # total 2000
+ffffffffffffffff                         51     # total 2040
+0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101 5      # 200 amounts of 1
+e8030000                                 6      # total 235
+6400c8                                   8      # total 300 with a zero

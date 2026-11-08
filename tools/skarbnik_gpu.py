@@ -21,7 +21,7 @@ API = 'https://rest.runpod.io/v1'
 POD_PREFIX = 'skarbnik-watch-'
 REMOTE_ENV = ('set -euo pipefail; export PATH=$HOME/.cargo/bin:$HOME/.risc0/bin:/usr/local/cuda/bin:$PATH; '
               'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH:-}; cd $HOME;')
-WIPE = ('for f in /dev/shm/skv/exploit.hex /dev/shm/skv/salts/*.salt; do [ -f "$f" ] && shred -u -n 3 "$f"; done; '
+WIPE = ('for f in /dev/shm/skv/exploit.hex /dev/shm/skv/reference_fix.wasm /dev/shm/skv/salts/*.salt; do [ -f "$f" ] && shred -u -n 3 "$f"; done; '
         'rm -rf /dev/shm/skv; rm -f $HOME/.kintsugi-salts')
 DEFAULTS = {
     'api_key_file': '~/.runpod_key', 'image': 'runpod/pytorch:1.4.1-cu1281-torch280-ubuntu2404',
@@ -359,15 +359,24 @@ def put_binary(pod, g, expect_image_id, log):
     pod.ssh(f'curl -sL https://risczero.com/install | bash >/dev/null && rzup install cargo-risczero {g["risc0"]} >/dev/null && rzup install r0vm {g["risc0"]} >/dev/null && r0vm --version', 900)
     pod.scp(g['src_tarball'], pod.remote('src.tar.gz'), 600)
     pod.ssh('rm -rf skb && mkdir skb && tar -xzf src.tar.gz -C skb && mkdir -p skb/prebuilt-guests', 120)
-    for n in ('hello_guest.bin', 'check_guest.bin'):
+    # output_guest.bin (the output checker for wrong output bugs) only where the source and the guest files have it
+    for n in ('hello_guest.bin', 'check_guest.bin', 'output_guest.bin'):
+        if n == 'output_guest.bin' and not os.path.exists(os.path.join(g['guests_dir'], n)):
+            continue
         pod.scp(os.path.join(g['guests_dir'], n), pod.remote(f'skb/prebuilt-guests/{n}'), 300)
     pod.ssh('cd skb && KINTSUGI_PREBUILT_GUESTS=$HOME/skb/prebuilt-guests cargo build --release -q -p skarbnik-host --features cuda-prove-only 2>&1 | tail -5', 1800)
-    out = pod.ssh('cd skb && r0vm --id --elf prebuilt-guests/check_guest.bin | tail -1; grep -h "prebuilt guest check_guest" target/release/build/kintsugi-harness-*/output | tail -1', 120)
+    # the build must embed the expected checker: the patch checker, or the output checker where its guest file is there
+    out = pod.ssh('cd skb && for n in check_guest output_guest; do [ -f prebuilt-guests/$n.bin ] && r0vm --id --elf prebuilt-guests/$n.bin | tail -1; done; '
+                  'grep -h -E "prebuilt guest (check|output)_guest" target/release/build/kintsugi-harness-*/output | tail -2', 120)
     if expect_image_id not in out:
         raise GpuError(f'the GPU build embeds another checker image id than {expect_image_id[:16]}...: {out.strip()[-200:]}')
     pod.ssh('cp skb/target/release/skarbnik-host skarbnik-host && ldd skarbnik-host | grep -i -E "cuda|not found" || true', 120)
     os.makedirs(os.path.dirname(cache), exist_ok=True)
-    pod.scp(pod.remote('skarbnik-host'), cache + '.part', 900)
+    try:  # keeping a copy for the next pods is a saving, not a need: a slow link must not cost this pod's proof
+        pod.scp(pod.remote('skarbnik-host'), cache + '.part', int(g.get('keep_binary_timeout', 900)))
+    except GpuError as e:
+        log(f'pod {pod.id}: built the GPU binary in {round(time.time() - t)} s; no copy kept ({e}); proving with it on this pod')
+        return 'built, not kept'
     sha = hashlib.sha256(open(cache + '.part', 'rb').read()).hexdigest()
     os.replace(cache + '.part', cache)
     json.dump({'sha256': sha, 'built_utc': utc(), 'image': g['image'], 'gpu': pod.rec.get('gpu'), 'image_id': expect_image_id,
@@ -380,7 +389,8 @@ def put_binary(pod, g, expect_image_id, log):
 def prove_on_gpu(cfg, job, log):
     """Proves one attempt on a new pod and returns (path of the succinct receipt, times and cost). Always terminates
     the pod. job: name, module (folder with original.wasm and public_tests.txt), patch, secret, salt, seed, sid, fuzz,
-    variants, image_id, workdir."""
+    variants, image_id, workdir; and for the output checker (wrong output bugs) reference_fix: the vendor's hidden
+    reference fix, which goes to the pod's RAM folder with the secret and is wiped with it."""
     g = settings(cfg)
     rp = RunPod(g['api_key_file'])
     total = spend_total(g)
@@ -405,7 +415,13 @@ def prove_on_gpu(cfg, job, log):
                 'rm -rf $HOME/.kintsugi-salts && ln -s /dev/shm/skv/salts $HOME/.kintsugi-salts', 60)
         pod.scp(job['salt'], pod.remote(f'/dev/shm/skv/salts/{job["name"]}.salt'), 60)
         pod.scp(job['secret'], pod.remote('/dev/shm/skv/exploit.hex'), 60)
-        args = (f'--bounty {shlex.quote(job["name"])} --exploit /dev/shm/skv/exploit.hex --original run/original.wasm '
+        secret_args = '--exploit /dev/shm/skv/exploit.hex'
+        out_flag = ''
+        if job.get('reference_fix'):
+            pod.scp(job['reference_fix'], pod.remote('/dev/shm/skv/reference_fix.wasm'), 60)
+            secret_args = '--output --secret /dev/shm/skv/exploit.hex --reference-fix /dev/shm/skv/reference_fix.wasm'
+            out_flag = ' --output'
+        args = (f'--bounty {shlex.quote(job["name"])} {secret_args} --original run/original.wasm '
                 f'--tests run/public_tests.txt --fuzz-count {job["fuzz"]} --variants {job["variants"]} --po2 {g["po2"]} '
                 f'--seed {job["seed"]}' + (f' --submission-id {job["sid"]}' if job.get('sid') else ''))
         if job.get('proof0'):
@@ -420,9 +436,9 @@ def prove_on_gpu(cfg, job, log):
         if 'SECRET_WIPED' not in out:
             raise GpuError('could not confirm the secret was wiped from the pod')
         log(f'pod {pod.id}: proved in {times["prove"]} s, secret wiped; ' + ' '.join(l.strip() for l in out.splitlines() if l.startswith(('segments', 'journal.verdict'))))
-        pod.ssh('./skarbnik-host verify run/u.bin | grep -q "^VALID"', 300)
+        pod.ssh(f'./skarbnik-host verify run/u.bin{out_flag} | grep -q "^VALID"', 300)
         t = time.time()
-        pod.ssh('RISC0_DEV_MODE=0 RISC0_PROVER=local ./skarbnik-host compress run/u.bin run/u_succinct.bin succinct > run/succinct.log 2>&1 '
+        pod.ssh(f'RISC0_DEV_MODE=0 RISC0_PROVER=local ./skarbnik-host compress run/u.bin run/u_succinct.bin succinct{out_flag} > run/succinct.log 2>&1 '
                 '|| { rc=$?; tail -n 60 run/succinct.log >&2; exit $rc; }', 1800)
         times['succinct'] = round(time.time() - t, 2)
         pod.scp(pod.remote('run/u_succinct.bin'), os.path.join(w, 'u_succinct.bin'), 300)

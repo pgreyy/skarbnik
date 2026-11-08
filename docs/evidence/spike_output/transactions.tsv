@@ -1,0 +1,14 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+allow_output_image	allow_image_id	kintsugi-l2-cihdp.testnet	FdyenSdojsdUqYcNqtnWAwNUKbNfp1ZVMAxVCvfwUKxW	0.309 Tgas	0.0000308267441862	0	5.7
+create_spike	create_bounty	kintsugi-vendor-prnvm.testnet	5YEGujgrbeu7BUTssSuztP7KLXvA2u6LR9vJfuqLYjrN	0.355 Tgas	0.000035412196869	0	8.24
+open_spike	open_with_groth16	kintsugi-vendor-prnvm.testnet	EQepjeDqhBNwbRqensG8a5WxUqiiLso2euU1niSirpyt	0.377 Tgas	0.000037681941703	0	5.75
+agent_commit_a0_correct_fix	commit	skarbnik-agentc-d48260.testnet	7hRpSR7CAxEXrTwa99eGF5zvZAf32ruNM86rtF89poy3	-	-	0	-
+agent_commit_a1_partial_fix	commit	skarbnik-agentc-d48260.testnet	Bk8nRMX2vQ3Y1ANbLL4sGqiD2XQno9oYeJyBzwms8JKW	-	-	0	-
+agent_reveal_a0	reveal	skarbnik-agentc-d48260.testnet	m3KV3VxzrzAWhCzZ1zuDGaUSze3vu2NkLmaQk6bZ9w4	-	-	0	-
+agent_reveal_a1	reveal	skarbnik-agentc-d48260.testnet	2yiLwfQ2oTGALbp1i2SSpz8Sa7cgFCWFAc8qa4CvGkBG	-	-	0	-
+submit_a0_correct_fix	submit_groth16	kintsugi-vendor-prnvm.testnet	GwPAbiUJaLC3QSj4Kg92XFP97HeVB47D5tBqXBUymH4r	0.378 Tgas	0.0000377153203035	0	7.35
+create_43	create_bounty	kintsugi-vendor-prnvm.testnet	8CFNeEjderoiCo7sXQvKC3kYcQjvaFLMffndrGrE6DFH	0.355 Tgas	0.000035412196869	0	6.73
+open_43	open_with_groth16	kintsugi-vendor-prnvm.testnet	7XmZDUvKLQ9ChRocNQHsWxGAqXN5p92NiDLaZiVzsPCM	0.377 Tgas	0.000037681941703	0	5.26
+submit_43_partial_fix_fail	submit_groth16	kintsugi-vendor-prnvm.testnet	9ahn3Mt38iQyAVZfkQLVJQxWeidADL61DcfbmnG6uxKp	0.378 Tgas	0.0000377153203035	0	6.71
+agent_commit_43_partial_fix	commit	skarbnik-agentc-d48260.testnet	EoYpB23Yj1pPbwUsvp8hNXVgCyAiXcMu5wUgrS48hrW8	-	-	0	-
+agent_reveal_43	reveal	skarbnik-agentc-d48260.testnet	Agy73zEZQH4RBVA9VeZmbu6gercoP2vETq68MCynXci7	-	-	0	-

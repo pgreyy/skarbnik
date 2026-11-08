@@ -1,0 +1,66 @@
+== get_bounty 
+{
+ "bounty": {
+  "id": "42",
+  "state": "Open",
+  "opened": true,
+  "level": 2,
+  "amount": "100000000000000000000000",
+  "max_commits": 3,
+  "active": 0,
+  "commits": 0,
+  "pending": 0,
+  "max_commits_per_account": null,
+  "next_fee": "10000000000000000000000",
+  "max_patch_bytes": 1024,
+  "reveal_gap_ns": "60000000000",
+  "reveal_window_ns": "3600000000000",
+  "verdict_window_ns": "21600000000000",
+  "expires_at_ns": "1794088304774267054",
+  "image_id": "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4",
+  "image_id_allowed": true,
+  "original_hash": "3788ba07f1dc9c1137e2fcd4434fd692d5906b733913e961b77cf56d2653011b",
+  "corpus_hash": "1523a14d930c52eca97e38b43969c2bc4d44e1e8df4dff25f08a0845bc1b05e3",
+  "winner": null
+ },
+ "expires_at_utc": "2026-11-07T21:51:44Z",
+ "level_meaning": "the contract checks the proof itself.",
+ "tell_the_user": "Fee 0.01 NEAR. Level 2: the contract checks the proof itself. Wait for their yes before commit.",
+ "checks": {
+  "open": true,
+  "level_allowed": true,
+  "published_checker": true,
+  "free_slot": true,
+  "time_left": true,
+  "credit_covers_fee": true,
+  "fee_within_limit": true,
+  "ok_to_commit": true
+ },
+ "checks_for_account": "skarbnik-agentc-d48260.testnet"
+}
+== commit 
+{
+ "committed": true,
+ "tx": "7hRpSR7CAxEXrTwa99eGF5zvZAf32ruNM86rtF89poy3",
+ "bounty_id": "42",
+ "index": 0,
+ "fingerprint": "e8e2cb64fdb1273287ba65eb2e2dc6e92bd070b670340a853f0d03d5943819c7",
+ "payout": "skarbnik-agentc-d48260.testnet",
+ "fee_yocto": "10000000000000000000000",
+ "reveal_after_seconds": 60.0,
+ "reveal_within_seconds": 3600.0,
+ "next": "call reveal with bounty_id 42 and index 0 after 60 s and within 3600 s"
+}
+== commit 
+{
+ "committed": true,
+ "tx": "Bk8nRMX2vQ3Y1ANbLL4sGqiD2XQno9oYeJyBzwms8JKW",
+ "bounty_id": "42",
+ "index": 1,
+ "fingerprint": "67470f81357893279f72daa01123f4838d222d249949fec5f490638f35b26a8d",
+ "payout": "skarbnik-agentc-d48260.testnet",
+ "fee_yocto": "15000000000000000000000",
+ "reveal_after_seconds": 60.0,
+ "reveal_within_seconds": 3600.0,
+ "next": "call reveal with bounty_id 42 and index 1 after 60 s and within 3600 s"
+}

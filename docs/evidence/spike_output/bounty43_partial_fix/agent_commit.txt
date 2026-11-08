@@ -1,0 +1,13 @@
+== commit 
+{
+ "committed": true,
+ "tx": "EoYpB23Yj1pPbwUsvp8hNXVgCyAiXcMu5wUgrS48hrW8",
+ "bounty_id": "43",
+ "index": 0,
+ "fingerprint": "95f082f51d8e5c3c96613666ad5c9d68dde9e5afac046682915922ac6b21a301",
+ "payout": "skarbnik-agentc-d48260.testnet",
+ "fee_yocto": "10000000000000000000000",
+ "reveal_after_seconds": 60.0,
+ "reveal_within_seconds": 3600.0,
+ "next": "call reveal with bounty_id 43 and index 0 after 60 s and within 3600 s"
+}

@@ -1,0 +1,18 @@
+2026-11-08T18:25:54Z pod g2mwk9e4mdur8f created: NVIDIA GeForce RTX 4090 in None, $0.89/h, hard cap 45 min
+2026-11-08T18:26:18Z pod g2mwk9e4mdur8f: ssh ready after 26 s, GPU NVIDIA GeForce RTX 4090
+2026-11-08T18:26:20Z pod g2mwk9e4mdur8f: self stop armed for 50 min (runpodctl)
+2026-11-08T18:41:24Z pod g2mwk9e4mdur8f terminated: 933 s, $0.2307 ($0.89/h); GPU spend so far $0.7377
+Traceback (most recent call last):
+  File "~/skarbnik-spike-output/scripts/spike_output_gpu.py", line 62, in <module>
+    main()
+  File "~/skarbnik-spike-output/scripts/spike_output_gpu.py", line 55, in main
+    _, times = gpu.prove_on_gpu(cfg, job, log)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik-spike-output/scripts/../tools/skarbnik_gpu.py", line 403, in prove_on_gpu
+    times['binary'] = put_binary(pod, g, job['image_id'], log)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/skarbnik-spike-output/scripts/../tools/skarbnik_gpu.py", line 347, in put_binary
+    pod.scp(cache, pod.remote('skarbnik-host'), 900)
+  File "~/skarbnik-spike-output/scripts/../tools/skarbnik_gpu.py", line 249, in scp
+    raise GpuError('a copy to or from the pod ran past its time limit') from None
+skarbnik_gpu.GpuError: a copy to or from the pod ran past its time limit

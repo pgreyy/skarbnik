@@ -1,0 +1,50 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet allow_image_id json-args {"image_id":"77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4"} prepaid-gas 100 Tgas attached-deposit 0 NEAR sign-as kintsugi-l2-cihdp.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-11-07T14:12:30.923072723Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-l2-cihdp.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  allow_image_id
+│                       args:         {
+│                                       "image_id": "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:A1kuE8J7zaYKoErnxQpMLauqVmrp3UVvNiYuamXtLDjN
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.309 Tgas
+│    Transaction fee: 0.0000308267441862 NEAR
+│    Transaction ID: FdyenSdojsdUqYcNqtnWAwNUKbNfp1ZVMAxVCvfwUKxW
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/FdyenSdojsdUqYcNqtnWAwNUKbNfp1ZVMAxVCvfwUKxW
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"image_id_allowed","data":[{"image_id":"77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4","count":2}]}
+│    Logs [kintsugi-l2-cihdp.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+[
+  "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+  "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4"
+]
+
+
+The "allow_image_id" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-l2-cihdp.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet allow_image_id json-args '{"image_id":"77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as kintsugi-l2-cihdp.testnet network-config testnet sign-with-legacy-keychain send
+
+
+`near` CLI has a new update available 0.30.1 →  0.31.1
+To update `near` CLI use: near extensions self-update
+exit=0
+wall_seconds=5.7

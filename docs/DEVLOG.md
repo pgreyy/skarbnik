@@ -34,6 +34,28 @@ One dated entry per work block: what was done, the exact commands, the results, 
 - No GPU was rented. Part B asked for an option that traps reliably and is practical; the trapping options are not safe
   as a bounty mode, and c4 uses the output guest whose proving was measured on 2026-11-07 at nearly the same size.
 - Next: the owner decides between c4 with a byte sweep generator and checker side instrumentation.
+## 2026-11-07: Spike output: a checker for wrong output bugs, on testnet (branch spike-output, not merged)
+
+- Built a second checker for logic bugs: `harness/checker-output/`, its guest `harness/output-guest/` (image id
+  `77c2e2d1…41c4`), the demo program `data/feecalc/` and a corpus of 8 modules in `data/attacks/output/`. The crash
+  checker and its id `dd6c5f42…` did not change. The journal is the same 780 bytes, so the contract did not change.
+- A clean rebuild in an empty build folder (`CARGO_TARGET_DIR=target/spike-clean cargo build --release -p
+  kintsugi-harness`, 13 min 28 s) gave the same ids and guest bytes. Then `allow_image_id` from the contract owner.
+- Tool changes: the GPU helper takes a pod name prefix setting (a second setup must not terminate the watches' pods,
+  which it did by name before) and accepts a pod build of either checker. `scripts/spike_output_gpu.py` proves one job
+  and lets the watches go first. The agent server accepts more checker ids only when `SKARBNIK_EXTRA_IMAGE_IDS` is set.
+  The pod name prefix part of the GPU helper change is now on main on its own (`f8e714f`, 2026-11-08), and the VPS
+  watches run it; the build check for either checker stays on this branch.
+- Scratch bounty 42: Proof 0 on a rented RTX 4090 (PASS, 56 segments), Groth16 on the laptop, created and opened with
+  a 15 minute commit window. The agent committed a correct fix and a partial fix. The correct fix was proved PASS and
+  paid 0.1 NEAR. The partial fix was proved FAIL, but I submitted the PASS first, which closed the bounty and refunded
+  the other attempt, so the FAIL is not on chain. Lesson: submit FAIL proofs before a PASS when both are ready.
+- GPU spend $0.3199 of the $2 cap. All transactions, gas and times: `docs/EVIDENCE.md`, section Spike output.
+- 2026-11-08: scratch bounty 43 (K 1) reused bounty 42's Proof 0; the partial fix was proved FAIL and the contract
+  recorded it (`9ahn3Mt3…`). Slow uploads from the VPS to the pods cost two failed pods; the third built the GPU
+  binary on the pod. GPU spend $0.9866 of $2. Bounty 43 expires 2026-11-09T01:25:55Z, then it is refunded.
+- Next: refund 43 after expiry, then delete the secret copies on the VPS; the owner decides whether the mode goes
+  into the vendor tool, the agent server and the site.
 
 ## 2026-11-04: The live feed, second try: the packaging fix
 

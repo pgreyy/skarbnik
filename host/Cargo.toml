@@ -1,5 +1,6 @@
 # The host program: runs the zkVM guests, produces proofs (receipts), verifies them, and measures
-# cycles, time and receipt size. Commands: hello, execute, prove, verify, tamper, compress.
+# cycles, time and receipt size. Commands: hello, execute, prove, verify, tamper, compress, groth16-args; --output
+# switches to the output checker (wrong output bugs).
 [package]
 name = "skarbnik-host"
 version = "0.1.0"
@@ -8,6 +9,8 @@ edition = "2021"
 [dependencies]
 kintsugi-harness = { path = "../harness" }
 kintsugi-check = { path = "../harness/checker", features = ["zk"] }
+# The output checker's guest input (--output).
+kintsugi-check-output = { path = "../harness/checker-output", features = ["zk"] }
 # "client" proves through the locally installed r0vm. The default "bonsai" feature (remote proving
 # service) is left out on purpose: the vendor's secret input must never leave the vendor's machine.
 risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["client"] }

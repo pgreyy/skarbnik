@@ -1,0 +1,3 @@
+read at 2026-11-08T19:03:44Z
+bounty 43: {'state': 'Open', 'level': 2, 'max_commits': 1, 'commits': 1, 'active': 1, 'image_id': '77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4'} expires 2026-11-09T01:25:55Z
+attempt 0: {'outcome': 'Failed', 'verdict': 'FAIL', 'committer': 'skarbnik-agentc-d48260.testnet'}

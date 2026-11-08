@@ -1,0 +1,16 @@
+== reveal 
+{
+ "revealed": true,
+ "tx": "m3KV3VxzrzAWhCzZ1zuDGaUSze3vu2NkLmaQk6bZ9w4",
+ "bounty_id": "42",
+ "index": 0,
+ "next": "the vendor now proves the patch; call status to see the outcome (PASS pays, FAIL spends the attempt, a timeout splits the reward among waiting attempts)"
+}
+== reveal 
+{
+ "revealed": true,
+ "tx": "2yiLwfQ2oTGALbp1i2SSpz8Sa7cgFCWFAc8qa4CvGkBG",
+ "bounty_id": "42",
+ "index": 1,
+ "next": "the vendor now proves the patch; call status to see the outcome (PASS pays, FAIL spends the attempt, a timeout splits the reward among waiting attempts)"
+}

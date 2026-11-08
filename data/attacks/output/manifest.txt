@@ -1,0 +1,14 @@
+# Output checker corpus: every module the output checker is run on for the fee calculator, and the verdict it must
+# give, with the public demo secret (demo_secret.txt) and data/feecalc/fixed.wasm as the reference fix.
+# Format: <module path relative to this file> <expected verdict>. Used by
+#   skarbnik-check-output table --manifest data/attacks/output/manifest.txt ...
+# and by harness/checker-output/tests/corpus.rs.
+
+../../feecalc/fixed.wasm      PASS   # the reference fix itself
+alt_fix.wasm                  PASS   # a correct fix written another way
+../../feecalc/original.wasm   FAIL   # unpatched: the wrong fee on the secret
+special_case_secret.wasm      FAIL   # right only on the exact secret bytes
+below_2000_fix.wasm           FAIL   # right on the secret, wrong above 2000
+length_special.wasm           FAIL   # right on the secret and its near copies, wrong on other lengths
+always_plus_one.wasm          FAIL   # right on the secret, wrong where the fee is exact
+constant.wasm                 FAIL   # the secret's fee for everything
