@@ -123,6 +123,10 @@ BOUNTY_STEPS = [
     # The output checker with the sweep (docs/evidence/feature_output/): the memory safety scratch bounty
     ("docs/evidence/feature_output/transactions.tsv", "scripts/spike_output_gpu.py (GPU), NEAR CLI (vendor), tools/skarbnik-mcp (agent)",
      {int(os.environ.get("MEMSAFE_SCRATCH", "44")): ["ms_"]}),
+    # The public output mode bounties: 45 (postage, wrong output) and 46 (shelves, memory safety), published with the
+    # vendor tool from the laptop with Proof 0 made on the VPS; the VPS watches prove their attempts
+    ("docs/evidence/feature_output/public_bounties/transactions.tsv", "tools/skarbnik-vendor (check and prove0 on the VPS, publish on the laptop, watch on the VPS)",
+     {45: ["b45_"], 46: ["b46_"]}),
     # The testnet cleanup of 2026-10-30: claim_timeout where a revealed attempt waited, expire on the expired bounties
     ("docs/evidence/cleanup_2026-10-30/transactions.tsv", "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)",
      {3: ["cleanup_b3_claim"], 26: ["cleanup_b26_claim"], 0: ["cleanup_b0_expire"], 2: ["cleanup_b2_expire"], 10: ["cleanup_b10_expire"],

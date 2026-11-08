@@ -1,0 +1,8 @@
+2026-11-08T21:21:47Z Proof 0 of postage on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/postage-work)
+2026-11-08T21:21:49Z pod 8r37t2hl5tnvo1 created: NVIDIA GeForce RTX 4090 in None, $0.89/h, hard cap 45 min
+2026-11-08T21:22:06Z pod 8r37t2hl5tnvo1: ssh ready after 18 s, GPU NVIDIA GeForce RTX 4090
+2026-11-08T21:22:08Z pod 8r37t2hl5tnvo1: self stop armed for 50 min (runpodctl)
+2026-11-08T21:27:35Z pod 8r37t2hl5tnvo1: cached GPU binary in place (sha256 07a6d7b36e05be3b...)
+2026-11-08T21:31:10Z pod 8r37t2hl5tnvo1: proved in 191.13 s, secret wiped; segments: 163 journal.verdict: PASS
+2026-11-08T21:33:46Z pod 8r37t2hl5tnvo1 terminated: 718 s, $0.1775 ($0.89/h); GPU spend so far $0.533
+2026-11-08T21:40:16Z Proof 0 ready: VALID, PASS; prove 191.13 s, succinct 130.55 s, Groth16 390.04 s. Next: publish

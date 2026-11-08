@@ -27,7 +27,12 @@
   "23": "Arena guarded probe",
   "24": "Second new module, private secret",
   "25": "Per-account cap test",
-  "33": "Sealed prove step (TEE spike)"
+  "33": "Sealed prove step (TEE spike)",
+  "42": "Output checker spike (test)",
+  "43": "Output checker spike, the FAIL on chain (test)",
+  "44": "Memory safety scratch (test)",
+  "45": "Postage calculator: wrong output",
+  "46": "Shelf counter: memory safety"
  },
  "notes": {
   "12": "Paid by timeout, not by a proof: its one attempt came from a team-run account (the owner's account, external agent software), and the vendor's watch does not cover bounty 12.",
@@ -42,7 +47,9 @@
   "17": "The vendor's proof finished after the 4 hour window, so the contract paid by timeout. Not a proof.",
   "24": "An AI agent's fix of a private bug it could not see, proven PASS and paid by the contract. Proved and shrunk on a rented GPU, wrapped to Groth16 on a separate Docker machine; the secret never left the vendor's control.",
   "25": "A throwaway bounty for the live test of the per-account cap: one account's second commit was refused.",
-  "33": "A team-run test of the confidential proving spike: Proof 0 on a rented GPU; the attempt's prove step ran inside an attested Phala Cloud confidential VM (Intel TDX), then the shrink on a rented GPU and the Groth16 proof the contract checked. The researcher account is the project's own test account. docs/evidence/tee_spike/README.md"
+  "33": "A team-run test of the confidential proving spike: Proof 0 on a rented GPU; the attempt's prove step ran inside an attested Phala Cloud confidential VM (Intel TDX), then the shrink on a rented GPU and the Groth16 proof the contract checked. The researcher account is the project's own test account. docs/evidence/tee_spike/README.md",
+  "45": "A wrong output bounty: the postage calculator gives a wrong total for some orders. A fix must give the right total on the secret order and the same totals as the vendor's hidden reference fix on random orders, near copies of the secret and every value of one private byte. Rust: build with the flags in BUILD.txt; code that can panic grows a fix by about 2 KB.",
+  "46": "A memory safety bounty: the C shelf counter writes outside one of its arrays for some inputs, without crashing, and gives a wrong answer. A fix must give the right answer on the secret input and the same answers as the vendor's hidden reference fix on random inputs, near copies of the secret and every value of one private byte. The checker judges answers; it does not detect memory corruption in general."
  },
  "agent_runs": {
   "16": {

@@ -1,0 +1,8 @@
+2026-11-08T21:40:17Z Proof 0 of shelves on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/shelves-work)
+2026-11-08T21:40:19Z pod jjxkimahh6xgbc created: NVIDIA GeForce RTX 4090 in EUR-IS-2, $0.89/h, hard cap 45 min
+2026-11-08T21:40:54Z pod jjxkimahh6xgbc: ssh ready after 37 s, GPU NVIDIA GeForce RTX 4090
+2026-11-08T21:40:55Z pod jjxkimahh6xgbc: self stop armed for 49 min (runpodctl)
+2026-11-08T21:41:06Z pod jjxkimahh6xgbc: cached GPU binary in place (sha256 07a6d7b36e05be3b...)
+2026-11-08T21:49:42Z pod jjxkimahh6xgbc: proved in 506.17 s, secret wiped; segments: 156 journal.verdict: PASS
+2026-11-08T22:00:44Z pod jjxkimahh6xgbc terminated: 1227 s, $0.3033 ($0.89/h); GPU spend so far $0.8363
+2026-11-08T22:07:10Z Proof 0 ready: VALID, PASS; prove 506.17 s, succinct 647.27 s, Groth16 385.12 s. Next: publish

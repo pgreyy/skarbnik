@@ -1,0 +1,23 @@
+salt: the private salt of bounty shelves (existing)
+candidate: run/patch.wasm
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 64 variants: 64
+total cycles: 81395712
+user cycles: 53244157
+segments: 156
+prove seconds: 495.96
+verify seconds (in process): 6.137
+receipt file: run/u.bin (41796040 bytes)
+seal bytes: 41765344
+journal bytes: 780
+journal.verdict: PASS
+journal.candidate_hash: 883768b049b1ebe2ad3b6fa29804ffefea916479d0891c07716580092dc6d9c8
+journal.original_hash: a665c1aef80663bff97717f7919d839b65e1865f323f5e626abcd3e5c8383d58
+journal.exploit_commitment: 7a62198d50b8e911e3c0dda6a1548475667ee7e63403d4f33eef060449c6be12
+journal.corpus_hash: 0c69d2b5fc90ab7e5af3396f97b3fc8ef388600e83067d3e1bb9c8f2df7b1e1f
+journal.fuzz_seed: a8b42ac6b5c0725f9aa908bed9b87dae1ed8ca664d094c7856ffedd4b1e5a604
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: 8e76c4df56d484e7a014b727d86ba54e7410dab76e275ab5b555c40007aed3f2

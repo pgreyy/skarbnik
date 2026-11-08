@@ -1,0 +1,5 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+b45_create	create_bounty	kintsugi-vendor-prnvm.testnet	3J8sUV5gMVS1niTt4jBjbRuaB2vmzsChQvZqzDRong58	-	-	0	-
+b45_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	4U4jznhEdcuU5yDkmgM1zifJMLiCmMuuymrWo4SMdB97	-	-	0	-
+b46_create	create_bounty	kintsugi-vendor-prnvm.testnet	GUbiYKUhuntEjC2iaokGZodzCvR4zQaRP3aN25PsNTXN	-	-	0	-
+b46_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	FXiEVMSUaCSTBy6JFUJ5RkR99WwNrkoBiTvVkRUf2P7Y	-	-	0	-

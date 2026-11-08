@@ -1,0 +1,23 @@
+salt: the private salt of bounty postage (existing)
+candidate: run/patch.wasm
+image id: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 64 variants: 64
+total cycles: 85458944
+user cycles: 55664177
+segments: 163
+prove seconds: 181.82
+verify seconds (in process): 6.449
+receipt file: run/u.bin (43696438 bytes)
+seal bytes: 43664440
+journal bytes: 780
+journal.verdict: PASS
+journal.candidate_hash: a68bf408e0dc509bddda62fc3062fa3c68192e68fa7d1cea76c2c4e67400527c
+journal.original_hash: df95f243bed5fb68aa94336fdef3c8aa31120fea6095b0da292d9c125e68e86a
+journal.exploit_commitment: 2486975896c78e655e374d79cee8a2800059244b152d9b90625b7cbd209dcdf4
+journal.corpus_hash: 957f79719bf7fa02924492d004feb668d112bbbe43f63bf5512c46327304e619
+journal.fuzz_seed: 92249b8af7159b062e20ed97dbd4a619697a0db650426ca283ef237bef52cf27
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: 257e09d21f3a6782e004972a8203de4238ec9a932d8cd9502418529c881e3f78
