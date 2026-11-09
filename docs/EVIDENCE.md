@@ -88,6 +88,38 @@ private secrets and reference fixes: `data/assets` (a path resolver; rule: a cle
 fairness inputs and 64 variants: Proof 0 passes for both, two private correct fixes each pass, and the original and 11
 private cheats fail. One projects cheat (blocks every transfer by one user) failed only at the sweep.
 
+**Public bounties 49 and 50.** Proof 0 of each ran on a rented GPU from the VPS (`skarbnik-vendor prove0`, GPU mode,
+64 fairness inputs, 64 variants), with the Groth16 wrap on the VPS; both are VALID and PASS by the rule checker
+`2c7b601a…`, and each journal's original hash is the sha256 of the committed `original.wasm`. The vendor tool on the
+laptop then recomputed the corpus hash from the public rule module and tests, and created and opened each bounty
+(`skarbnik-vendor publish`). Settings as 45 and 46: Level 2, 0.1 NEAR, K 8, at most 2 attempts per account, verdict
+window 48 h, expiry 1440 h, one sweep position.
+
+| Bounty | Proof 0 | Segments | Prove | Shrink | Groth16 | Pod, cost |
+| --- | --- | --- | --- | --- | --- | --- |
+| 49 assets | PASS | 155 | 171.81 s | 121.4 s | 463.72 s | 949 s, $0.2346 (cached GPU binary) |
+| 50 projects | PASS | 177 | 197.08 s | 138.76 s | 386.94 s | 1,391 s, $0.3439 (GPU binary built on the pod in 986 s) |
+
+| Transaction | Result | Hash | Gas |
+| --- | --- | --- | --- |
+| `create_bounty` 49 | 0.1 NEAR locked | `Dh5h1V8Rb332fEuHgA4bxY3RJ2TEvArHJc8Yjg5PcG9W` | 3.06 Tgas |
+| `open_with_groth16` 49 | opened | `DiuovVg3g43kv5reUAWAdNdkUPkZcdXEzA7zZwHNnfiQ` | 35.27 Tgas |
+| `create_bounty` 50 | 0.1 NEAR locked | `GgaSV2CKDCkMkZ9Uv4UrbZVQe8aqXqZbbNBXnk9cSHZi` | 3.06 Tgas |
+| `open_with_groth16` 50 | opened | `EBjiSkirpzQXFsYNymRoa8qGZwHrvsQ8RP2AYxcTZfw2` | 35.27 Tgas |
+
+**Failed: the first Proof 0 pod of projects.** Copying the cached 124 MB GPU binary from the VPS to the pod ran past
+its 900 s limit, so the pod was terminated with nothing sent on chain ($0.2339). The assets pod the same morning took
+570 s for the same copy, about 0.2 MB/s. The retry built the binary on the pod instead. GPU spend for both Proof 0s:
+$0.8124 over 3 pods (`public_bounties/gpu_spend.json`, `public_bounties/proof0_vps.txt`).
+
+**Fallback for slow copies.** With `binary_min_mb_s` set in a config's `[gpu]` section, the copy of the cached binary
+is checked every `binary_rate_check_s` seconds (60) and stopped when its average rate is below the floor; the binary is
+then built on the pod. The watches of 49 and 50 use a floor of 1 MB/s. `python3 -I scripts/test_gpu_copy_rate.py`
+against the VPS as a stand-in pod: a small copy finishes whole, and a copy below the floor is stopped at the first check
+with no copy process left (`public_bounties/copy_rate_check.txt`). Not yet seen on a real pod. At 0.2 MB/s the copy
+would have finished in about 10 min, faster than a 16 min build: the floor trades that time for never losing a pod to
+the 900 s limit.
+
 **Known limits.** The rule is the vendor's: a weak rule lets a weak fix pass, and the agent can read it before trying.
 The fairness inputs are mutations of the public tests, so a fix can differ from the reference fix on inputs far from
 them. The sweep covers the positions the vendor names. Cost grows with the number of calls and the modules' memory.

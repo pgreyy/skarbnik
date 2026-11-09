@@ -34,7 +34,9 @@
   "45": "Postage calculator: wrong output",
   "46": "Shelf counter: memory safety",
   "47": "Rule checker spike: injection (test)",
-  "48": "Rule checker spike: access control (test)"
+  "48": "Rule checker spike: access control (test)",
+  "49": "Asset path resolver: path traversal",
+  "50": "Project registry: access control"
  },
  "notes": {
   "12": "Paid by timeout, not by a proof: its one attempt came from a team-run account (the owner's account, external agent software), and the vendor's watch does not cover bounty 12.",
@@ -51,7 +53,9 @@
   "25": "A throwaway bounty for the live test of the per-account cap: one account's second commit was refused.",
   "33": "A team-run test of the confidential proving spike: Proof 0 on a rented GPU; the attempt's prove step ran inside an attested Phala Cloud confidential VM (Intel TDX), then the shrink on a rented GPU and the Groth16 proof the contract checked. The researcher account is the project's own test account. docs/evidence/tee_spike/README.md",
   "45": "A wrong output bounty: the postage calculator gives a wrong total for some orders. A fix must give the right total on the secret order and the same totals as the vendor's hidden reference fix on random orders, near copies of the secret and every value of one private byte. Rust: build with the flags in BUILD.txt; code that can panic grows a fix by about 2 KB.",
-  "46": "A memory safety bounty: the C shelf counter writes outside one of its arrays for some inputs, without crashing, and gives a wrong answer. A fix must give the right answer on the secret input and the same answers as the vendor's hidden reference fix on random inputs, near copies of the secret and every value of one private byte. The checker judges answers; it does not detect memory corruption in general."
+  "46": "A memory safety bounty: the C shelf counter writes outside one of its arrays for some inputs, without crashing, and gives a wrong answer. A fix must give the right answer on the secret input and the same answers as the vendor's hidden reference fix on random inputs, near copies of the secret and every value of one private byte. The checker judges answers; it does not detect memory corruption in general.",
+  "49": "A path traversal bounty: for some upload path, the C path resolver returns a path that the public rule forbids. A fix must make every output obey the rule on the secret input, keep the exact results of the public tests, and behave like the vendor's hidden reference fix on calls near the public tests, on near copies of the secret and on every value of one private byte.",
+  "50": "An access control bounty: after a secret series of calls, the C project registry lets a caller hand over a project it does not own. A fix must refuse that, keep the exact results of the public tests, and keep normal use working, judged against the vendor's hidden reference fix on calls near the public tests, on near copies of the secret and on every value of one private byte."
  },
  "agent_runs": {
   "16": {

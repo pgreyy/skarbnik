@@ -35,6 +35,10 @@ DEFAULTS = {
     # terminated at once and the next choice tried), and a timer inside the pod that removes it after this many minutes
     # even if this machine stops watching it
     'cloud_types': ['SECURE'], 'max_usd_per_hr': None, 'self_stop_minutes': None,
+    # optional: the slowest copy of the cached GPU binary to the pod worth waiting for, in MB/s, checked every
+    # binary_rate_check_s seconds; below it the copy is stopped and the binary is built on the pod instead (a slow
+    # vendor uplink). None keeps the plain copy, which fails the pod when it runs past its time limit.
+    'binary_min_mb_s': None, 'binary_rate_check_s': 60,
     # the start of each pod's name; leftover pods are found by it, so a second setup on the same RunPod account (a
     # spike) uses its own prefix and never terminates the pods of the running watches
     'pod_prefix': POD_PREFIX,
@@ -250,6 +254,35 @@ class Pod:
         if p.returncode != 0:
             raise GpuError(f'copy failed: {p.stderr.strip()[-200:]}')
 
+    def scp_up_checked(self, src, dst_path, limit, min_mb_s, every):
+        """Copies src to dst_path on the pod. Every `every` seconds it reads the size copied so far on the pod and stops
+        the copy when the average rate since the start is below min_mb_s."""
+        t = min(limit, self.left())
+        if t <= 5:
+            raise GpuError('the hard cap per pod is reached')
+        p = subprocess.Popen(['scp', '-q', *self._ssh_base(), '-P', str(self.port), src, self.remote(dst_path)],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+        start = time.time(); check_at = start + every
+        try:
+            while p.poll() is None:
+                now = time.time()
+                if now - start > t:
+                    raise GpuError('a copy to or from the pod ran past its time limit')
+                if now >= check_at:
+                    check_at = now + every
+                    try:
+                        got = int(self.ssh(f'stat -c %s {shlex.quote(dst_path)} 2>/dev/null || echo 0', 30).split()[-1])
+                    except (GpuError, ValueError, IndexError):
+                        got = None  # the size could not be read this time: no verdict, the next check decides
+                    if got is not None and p.poll() is None and got / 1e6 / (now - start) < min_mb_s:
+                        raise GpuError(f'the copy ran at {got / 1e6 / (now - start):.2f} MB/s over {round(now - start)} s, below {min_mb_s} MB/s')
+                time.sleep(2)
+        finally:
+            if p.poll() is None:
+                p.kill(); p.wait()
+        if p.returncode != 0:
+            raise GpuError(f'copy failed: {p.stderr.read().strip()[-200:]}')
+
     def remote(self, path):
         return f'root@{self.host}:{path}'
 
@@ -338,13 +371,23 @@ def clean_orphans(g, rp, log):
 # ---------------------------------------------------------------- the binary
 def put_binary(pod, g, expect_image_id, log):
     """Puts the CUDA build of skarbnik-host on the pod: the cached copy if it runs there, otherwise a build on this pod
-    (Rust, RISC Zero, the committed source and the reproducible guest files), whose result is kept for the next pods."""
+    (Rust, RISC Zero, the committed source and the reproducible guest files), whose result is kept for the next pods.
+    With binary_min_mb_s set, a copy of the cached binary slower than that is stopped and the binary is built here."""
     cache, meta = g['binary_cache'], g['binary_cache'] + '.json'
+    copied = False
     if os.path.exists(cache) and os.path.exists(meta):
         want = json.load(open(meta))['sha256']
         if hashlib.sha256(open(cache, 'rb').read()).hexdigest() != want:
             raise GpuError('the cached GPU binary does not match its recorded sha256')
-        pod.scp(cache, pod.remote('skarbnik-host'), 900)
+        rate = g.get('binary_min_mb_s')
+        if not rate:
+            pod.scp(cache, pod.remote('skarbnik-host'), 900); copied = True
+        else:
+            try:
+                pod.scp_up_checked(cache, 'skarbnik-host', 900, float(rate), int(g.get('binary_rate_check_s') or 60)); copied = True
+            except GpuError as e:
+                log(f'pod {pod.id}: the cached GPU binary was not copied ({e}); building on this pod')
+    if copied:
         try:
             out = pod.ssh('chmod +x skarbnik-host && sha256sum skarbnik-host | cut -c1-64 && '
                           '{ ldd skarbnik-host | grep -q "not found" && echo LIBS_MISSING || echo LIBS_OK; }', 120)

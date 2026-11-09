@@ -1,0 +1,23 @@
+salt: the private salt of bounty assets (existing)
+candidate: run/patch.wasm
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 64 variants: 64
+total cycles: 81002496
+user cycles: 55594148
+segments: 155
+prove seconds: 162.72
+verify seconds (in process): 6.369
+receipt file: run/u.bin (41539686 bytes)
+seal bytes: 41509176
+journal bytes: 780
+journal.verdict: PASS
+journal.candidate_hash: a5a06843492d92e9092ad01b14a910720d41383959b6e6db4d8fa71ee2133ea7
+journal.original_hash: 236cb72f37e622b9cf507a68053d6875b4904de4c0f49462928f24889ebb84c6
+journal.exploit_commitment: b5b46b0578b28eb1766628de1a103ba720c3694978b10db5d2df8a7ca06c02d4
+journal.corpus_hash: f664a2d7362d877924d0e8c7192cf1591c026dda14fbc5f00bc55158d2247606
+journal.fuzz_seed: 5acfb197a5138d682dc0fe125896e537a56a31139ac1ef9b83d3132264ccbfa2
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: 7f8c600916871770efb6ffef0f86d412d1a2c800b1958141177be715820f3338

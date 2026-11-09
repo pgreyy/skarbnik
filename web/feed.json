@@ -19,8 +19,8 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-11-09T08:50:59Z",
- "updated_at_utc": "2026-11-09T08:50:59Z",
+ "generated_at_utc": "2026-11-09T12:48:51Z",
+ "updated_at_utc": "2026-11-09T12:48:51Z",
  "source": "saved",
  "live_url": "https://skarbnik.xyz/api/feed",
  "note": "Snapshot made by scripts/gen_feed.py. The live feed at live_url re-reads the open and newer bounties from the chain about once a minute. Read get_bounty on the contract for the current state before you commit.",
@@ -454,6 +454,132 @@
    "slots_left": 8,
    "commit_deadline_utc": "2027-01-05T21:08:05Z",
    "expires_at_utc": "2027-01-07T22:08:05Z",
+   "bounty_amount": "0.1 NEAR",
+   "test_bounty": false
+  },
+  {
+   "bounty_id": 49,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "assets",
+   "module_description": "a C path resolver for uploads (both / and \\ separate folders; .. goes up one folder); no hint at its bug",
+   "bug_kind": "path traversal",
+   "checker": "rule",
+   "target": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every path the program returns.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "attempts": "0 of 8 used",
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2027-01-06T10:50:57Z",
+    "expires_at_utc": "2027-01-08T11:50:57Z"
+   },
+   "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa",
+   "image_id_allowed": true,
+   "original_hash": "236cb72f37e622b9cf507a68053d6875b4904de4c0f49462928f24889ebb84c6",
+   "corpus_hash": "f664a2d7362d877924d0e8c7192cf1591c026dda14fbc5f00bc55158d2247606",
+   "public_code": {
+    "source": "code/assets/original.c",
+    "module": "code/assets/original.wasm",
+    "tests": "code/assets/public_tests.txt",
+    "build": "code/assets/BUILD.txt",
+    "program": "assets",
+    "description": "a C path resolver for uploads (both / and \\ separate folders; .. goes up one folder); no hint at its bug",
+    "bug": "path traversal",
+    "extra_files": [
+     "code/assets/rt_call.h"
+    ],
+    "checker": "rule",
+    "rule": {
+     "source": "code/assets/rule.c",
+     "module": "code/assets/rule.wasm",
+     "header": "code/assets/rt_rule.h"
+    }
+   },
+   "slots_left": 8,
+   "commit_deadline_utc": "2027-01-06T10:50:57Z",
+   "expires_at_utc": "2027-01-08T11:50:57Z",
+   "bounty_amount": "0.1 NEAR",
+   "test_bounty": false
+  },
+  {
+   "bounty_id": 50,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "projects",
+   "module_description": "a C project registry (users log in, create projects, hand them over, rename them); no hint at its bug",
+   "bug_kind": "access control",
+   "checker": "rule",
+   "target": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every call that went through, across the whole call sequence.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "attempts": "0 of 8 used",
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2027-01-06T10:51:18Z",
+    "expires_at_utc": "2027-01-08T11:51:18Z"
+   },
+   "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa",
+   "image_id_allowed": true,
+   "original_hash": "a2028e10216f1b911ff9e231a78f42287c3db9212f16d4ae5df773a848b84bd2",
+   "corpus_hash": "9104467afdf3abfe6a6984cdadf02bdfee0391a83b65d70fac1e5f7d72d567ed",
+   "public_code": {
+    "source": "code/projects/original.c",
+    "module": "code/projects/original.wasm",
+    "tests": "code/projects/public_tests.txt",
+    "build": "code/projects/BUILD.txt",
+    "program": "projects",
+    "description": "a C project registry (users log in, create projects, hand them over, rename them); no hint at its bug",
+    "bug": "access control",
+    "extra_files": [
+     "code/projects/rt_call.h"
+    ],
+    "checker": "rule",
+    "rule": {
+     "source": "code/projects/rule.c",
+     "module": "code/projects/rule.wasm",
+     "header": "code/projects/rt_rule.h"
+    }
+   },
+   "slots_left": 8,
+   "commit_deadline_utc": "2027-01-06T10:51:18Z",
+   "expires_at_utc": "2027-01-08T11:51:18Z",
    "bounty_amount": "0.1 NEAR",
    "test_bounty": false
   }
@@ -2849,6 +2975,122 @@
    "original_hash": "971414a50dba9afe5647238b61d2f164e2b33bf38e9069dad99d79367339d0a2",
    "corpus_hash": "4f51b0857d833d11784381306b8f1282936543b32cd4a5c6f5d1f8b60e7c9e64",
    "public_code": null
+  },
+  {
+   "bounty_id": 49,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "assets",
+   "module_description": "a C path resolver for uploads (both / and \\ separate folders; .. goes up one folder); no hint at its bug",
+   "bug_kind": "path traversal",
+   "checker": "rule",
+   "target": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every path the program returns.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "attempts": "0 of 8 used",
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2027-01-06T10:50:57Z",
+    "expires_at_utc": "2027-01-08T11:50:57Z"
+   },
+   "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa",
+   "image_id_allowed": true,
+   "original_hash": "236cb72f37e622b9cf507a68053d6875b4904de4c0f49462928f24889ebb84c6",
+   "corpus_hash": "f664a2d7362d877924d0e8c7192cf1591c026dda14fbc5f00bc55158d2247606",
+   "public_code": {
+    "source": "code/assets/original.c",
+    "module": "code/assets/original.wasm",
+    "tests": "code/assets/public_tests.txt",
+    "build": "code/assets/BUILD.txt",
+    "program": "assets",
+    "description": "a C path resolver for uploads (both / and \\ separate folders; .. goes up one folder); no hint at its bug",
+    "bug": "path traversal",
+    "extra_files": [
+     "code/assets/rt_call.h"
+    ],
+    "checker": "rule",
+    "rule": {
+     "source": "code/assets/rule.c",
+     "module": "code/assets/rule.wasm",
+     "header": "code/assets/rt_rule.h"
+    }
+   }
+  },
+  {
+   "bounty_id": 50,
+   "status": "Open for attempts",
+   "kind": "private",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": true,
+   "level": 2,
+   "program": "projects",
+   "module_description": "a C project registry (users log in, create projects, hand them over, rename them); no hint at its bug",
+   "bug_kind": "access control",
+   "checker": "rule",
+   "target": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every call that went through, across the whole call sequence.",
+   "max_patch_bytes": 2048,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 8,
+   "attempts_used": 0,
+   "attempts": "0 of 8 used",
+   "slots_in_use": 0,
+   "max_commits_per_account": 2,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "10000000000000000000000",
+   "next_fee": "0.01 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "172800000000000",
+    "commit_deadline_utc": "2027-01-06T10:51:18Z",
+    "expires_at_utc": "2027-01-08T11:51:18Z"
+   },
+   "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa",
+   "image_id_allowed": true,
+   "original_hash": "a2028e10216f1b911ff9e231a78f42287c3db9212f16d4ae5df773a848b84bd2",
+   "corpus_hash": "9104467afdf3abfe6a6984cdadf02bdfee0391a83b65d70fac1e5f7d72d567ed",
+   "public_code": {
+    "source": "code/projects/original.c",
+    "module": "code/projects/original.wasm",
+    "tests": "code/projects/public_tests.txt",
+    "build": "code/projects/BUILD.txt",
+    "program": "projects",
+    "description": "a C project registry (users log in, create projects, hand them over, rename them); no hint at its bug",
+    "bug": "access control",
+    "extra_files": [
+     "code/projects/rt_call.h"
+    ],
+    "checker": "rule",
+    "rule": {
+     "source": "code/projects/rule.c",
+     "module": "code/projects/rule.wasm",
+     "header": "code/projects/rt_rule.h"
+    }
+   }
   }
  ],
  "paid_by_timeout": [

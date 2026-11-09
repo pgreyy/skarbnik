@@ -230,7 +230,9 @@ submit expire. The
 (45), `budget_usd` (6), and optionally `image`, `spend_file`, `ssh_key`, `binary_cache`, `src_tarball`, `guests_dir`,
 `po2` (19), `cloud_types` (default `["SECURE"]`; add `"COMMUNITY"` to rent from both), `max_usd_per_hr` (a price
 ceiling: a pod priced above it is terminated at once and the next choice tried), `self_stop_minutes` (a timer inside the
-pod removes it after this many minutes even if this machine stops watching it) and `cpu_fallback`. An empty
+pod removes it after this many minutes even if this machine stops watching it), `binary_min_mb_s` (when set, a copy of
+the cached GPU binary to the pod slower than this many MB/s, checked every `binary_rate_check_s` seconds, default 60,
+is stopped and the binary is built on the pod instead) and `cpu_fallback`. An empty
 `data_centers` lets the GPU rental pick any data center.
 
 ## With an AI app: `tools/skarbnik-vendor-mcp`

@@ -2,6 +2,27 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-09: Public bounties 49 and 50 open, their watches, and a fallback for slow GPU binary copies
+
+- Opened from the laptop with `python3 -I tools/skarbnik-vendor publish --config <laptop config> --yes`, using the
+  Proof 0 files made on the VPS: bounty 49 (assets, path traversal) and bounty 50 (projects, access control), Level 2,
+  0.1 NEAR each. Transaction hashes, gas and Proof 0 numbers: EVIDENCE, "Spike A and B", "Public bounties 49 and 50";
+  files in `docs/evidence/spike_ab/public_bounties/`.
+- Two watches on the VPS (one per bounty, $1.50 GPU budget each, own pod prefix and spend file).
+- Stranger path through the hosted agent MCP: `list_bounties` lists 49 as path traversal and 50 as access control;
+  `get_public_code` gives the C source, the original module as WebAssembly text, the public tests and the rule; a wrong
+  fix (refuses every call) passed 2 of 13 and 1 of 7 public tests, `ready_to_commit` false. The live site lists both
+  with their bug kind and the New sticker on `#/bounties?kind=rule` and on their pages.
+- Site data: titles and notes for 49 and 50 in `web/data/bounty_meta.json`; site data and saved pages rebuilt by
+  `scripts/rebuild_site_data.sh`. README status table and CLAIMS name 49 and 50.
+- Agent servers (`web/api/_lib/agent.js` 1.3.1, `tools/skarbnik-mcp/server.py` 0.5.1): the bug kinds in the tool
+  descriptions are now crash, wrong output, memory safety, path traversal and access control.
+- `tools/skarbnik_gpu.py`: optional `binary_min_mb_s`. The cached GPU binary's copy to a pod is checked every 60 s and,
+  below the floor, stopped and the binary built on the pod; without the setting nothing changes. Why: the first projects
+  Proof 0 pod lost $0.2339 when the copy ran past 900 s. `python3 -I scripts/test_gpu_copy_rate.py`: ALL PASS (VPS as a
+  stand-in pod). Not yet seen on a real pod.
+- Next: wait for attempts on 49 and 50; the watches prove them.
+
 ## 2026-11-09: The rule checker on the site, the feed, the agent servers and the vendor tool (branch spike-ab)
 
 - Site (`web/site.config.json`, `web/js/status.js`, pages): a third checker `rule` (`2c7b601a…`); bug kinds path

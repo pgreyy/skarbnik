@@ -1,0 +1,14 @@
+receipt file: ~/skarbnik-vendor/projects-work/p0_groth16.bin (2057 bytes)
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+verify seconds: 0.011
+VALID
+journal sha256: 961648473e47c3135776df0a930c39b094b82f951da7a43bfdd55b5368d4365f
+journal.verdict: PASS
+journal.candidate_hash: dfa1ab3a6f38e240a97efa318649aad574178c3676627ee410d7ffa6fb3beec9
+journal.original_hash: a2028e10216f1b911ff9e231a78f42287c3db9212f16d4ae5df773a848b84bd2
+journal.exploit_commitment: beb241cc8559967d98777d3ad39505deba3684a3ff1a55c597ac0c8ddb95b752
+journal.corpus_hash: 9104467afdf3abfe6a6984cdadf02bdfee0391a83b65d70fac1e5f7d72d567ed
+journal.fuzz_seed: 3e288b9064533c2a9cb0c765417cc20bce46cb8d165baf7063d2e6cfc49c4ab3
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: 52955a88e2b1f5ff3f42d08f6906a0bd7b2f9e7d04791711dd964a5394bc4aef

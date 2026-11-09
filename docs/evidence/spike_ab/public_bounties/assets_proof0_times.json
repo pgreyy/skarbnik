@@ -1,0 +1,1 @@
+{"times_s": {"pod_ready": 29, "binary": "cached", "setup": 598, "prove": 171.81, "succinct": 121.4, "pod_seconds": 949, "cost_usd": 0.2346, "gpu": "NVIDIA GeForce RTX 4090", "pod": "co5sdrdd5a7u91", "groth16": 463.72}, "at": "2026-11-09T09:25:48Z"}

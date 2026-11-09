@@ -1,0 +1,28 @@
+=== assets start 2026-11-09T09:02:14Z
+2026-11-09T09:02:14Z Proof 0 of assets on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/assets-work)
+2026-11-09T09:02:16Z pod co5sdrdd5a7u91 created: NVIDIA GeForce RTX 4090 in None, $0.89/h, hard cap 45 min
+2026-11-09T09:02:42Z pod co5sdrdd5a7u91: ssh ready after 27 s, GPU NVIDIA GeForce RTX 4090
+2026-11-09T09:02:43Z pod co5sdrdd5a7u91: self stop armed for 50 min (runpodctl)
+2026-11-09T09:12:13Z pod co5sdrdd5a7u91: cached GPU binary in place (sha256 202e87536039517e...)
+2026-11-09T09:15:35Z pod co5sdrdd5a7u91: proved in 171.81 s, secret wiped; segments: 155 journal.verdict: PASS
+2026-11-09T09:18:04Z pod co5sdrdd5a7u91 terminated: 949 s, $0.2346 ($0.89/h); GPU spend so far $0.2346
+2026-11-09T09:25:48Z Proof 0 ready: VALID, PASS; prove 171.81 s, succinct 121.4 s, Groth16 463.72 s. Next: publish
+=== assets exit 0 2026-11-09T09:25:48Z
+=== projects start 2026-11-09T09:25:48Z
+2026-11-09T09:25:49Z Proof 0 of projects on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/projects-work)
+2026-11-09T09:25:51Z pod zr9d00n2er9g50 created: NVIDIA GeForce RTX 4090 in None, $0.89/h, hard cap 45 min
+2026-11-09T09:26:27Z pod zr9d00n2er9g50: ssh ready after 37 s, GPU NVIDIA GeForce RTX 4090
+2026-11-09T09:26:29Z pod zr9d00n2er9g50: self stop armed for 49 min (runpodctl)
+2026-11-09T09:41:35Z pod zr9d00n2er9g50 terminated: 946 s, $0.2339 ($0.89/h); GPU spend so far $0.4685
+REFUSED: Proof 0 on a GPU did not finish: a copy to or from the pod ran past its time limit; nothing was sent; run prove0 again later
+=== projects exit 2 2026-11-09T09:41:35Z
+=== projects retry start 2026-11-09T09:55:31Z
+2026-11-09T09:55:32Z Proof 0 of projects on a GPU pod: prove and shrink there, Groth16 here (logs in ~/skarbnik-vendor/projects-work)
+2026-11-09T09:55:34Z pod 4lyz3cfw5p8e8s created: NVIDIA GeForce RTX 4090 in None, $0.89/h, hard cap 45 min
+2026-11-09T09:55:48Z pod 4lyz3cfw5p8e8s: ssh ready after 16 s, GPU NVIDIA GeForce RTX 4090
+2026-11-09T09:55:51Z pod 4lyz3cfw5p8e8s: self stop armed for 50 min (runpodctl)
+2026-11-09T10:12:17Z pod 4lyz3cfw5p8e8s: built the GPU binary in 986 s (sha256 4100c83e9be23b74...), kept for the next pods
+2026-11-09T10:16:01Z pod 4lyz3cfw5p8e8s: proved in 197.08 s, secret wiped; segments: 177 journal.verdict: PASS
+2026-11-09T10:18:44Z pod 4lyz3cfw5p8e8s terminated: 1391 s, $0.3439 ($0.89/h); GPU spend so far $0.8124
+2026-11-09T10:25:11Z Proof 0 ready: VALID, PASS; prove 197.08 s, succinct 138.76 s, Groth16 386.94 s. Next: publish
+=== projects exit 0 2026-11-09T10:25:11Z

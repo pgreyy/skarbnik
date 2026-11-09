@@ -189,6 +189,10 @@ the sweep positions are bound by one commitment.
   then a fix proved PASS and was paid (`4M5FbnG421ftbJdmroczYZoF1VK48kTXbpUnZE6pgSj8`). Test bounty 48 (a file store
   with no owner check): FAIL (`6hKgYNpwiCK2XyEBJrPPqavuP8fArBHbAXzaSsiWEChS`), then PASS and paid
   (`AK2ikyVSh4WFhZhpxanhhPhV7kfo9sDXcXasNM72X28b`). Logs: `docs/evidence/spike_ab/`.
+- Open on testnet with private secrets: bounty 49 (an asset path resolver, path traversal; created
+  `Dh5h1V8Rb332fEuHgA4bxY3RJ2TEvArHJc8Yjg5PcG9W`, opened `DiuovVg3g43kv5reUAWAdNdkUPkZcdXEzA7zZwHNnfiQ`) and bounty 50
+  (a project registry, access control; created `GgaSV2CKDCkMkZ9Uv4UrbZVQe8aqXqZbbNBXnk9cSHZi`, opened
+  `EBjiSkirpzQXFsYNymRoa8qGZwHrvsQ8RP2AYxcTZfw2`). Proof 0 logs: `docs/evidence/spike_ab/public_bounties/`.
 
 ## Evidence
 
@@ -243,7 +247,7 @@ Every bounty, read from the chain on 2026-11-09:
 | Paid on OutLayer's PASS (Level 1) | 36, 37, 38 |
 | Paid by the timeout rule | 3, 4, 9, 11, 12, 13, 14, 15, 17, 26 (and 8 on paper only: its transfer failed) |
 | Refunded to the vendor | 0, 2, 5, 6, 10, 23, 25; 43 (a test bounty: its one attempt was proved FAIL, nobody was paid) |
-| Open for attempts | 40 (Level 1), 41 (Level 2), 45 (wrong output, Level 2) and 46 (memory safety, Level 2); demo and test bounties 7 and 35 |
+| Open for attempts | 40 (Level 1), 41 (Level 2), 45 (wrong output, Level 2), 46 (memory safety, Level 2), 49 (path traversal, Level 2) and 50 (access control, Level 2); demo and test bounties 7 and 35 |
 | Not settled | 39 (Level 1: its one attempt failed on OutLayer's answer, nobody was paid); 34 (a test bounty past its expiry) |
 | Judge bounties, closed until a judge opens one | 28, 29, 30, 31 (18 to 22 are retired) |
 

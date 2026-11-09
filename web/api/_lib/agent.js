@@ -13,7 +13,7 @@ const crypto = require('node:crypto');
 const { Worker } = require('node:worker_threads');
 const SITE = require('../../site.config.json');
 
-const VERSION = '1.3.0';
+const VERSION = '1.3.1';
 const BASE = 'https://skarbnik.xyz/';
 const CONTRACT = SITE.contract;
 const RPCS = SITE.rpc_urls;
@@ -37,7 +37,7 @@ const BUG_MEANING = {
   'access control': 'the original lets a caller do something the public rule forbids after a secret series of calls; a fix must refuse it, keep the exact results of the public tests and keep normal use working (judged against the vendor\'s hidden reference fix on calls near the public tests).',
   'security rule': 'the original\'s results break the vendor\'s public rule on a secret input or series of calls; a fix must make every result obey the rule (the rule module is public), keep the exact results of the public tests, and behave like the vendor\'s hidden reference fix on normal calls near the public tests; many different correct fixes can pass.',
 };
-const KINDS_TEXT = 'crash, wrong output, memory safety, path traversal, access control, injection or security rule';
+const KINDS_TEXT = 'crash, wrong output, memory safety, path traversal or access control';
 if (SITE.network !== 'testnet') throw new Error('the hosted connector runs on testnet only');
 
 class Fail extends Error {}

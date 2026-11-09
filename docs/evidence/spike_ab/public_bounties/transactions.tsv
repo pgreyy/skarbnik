@@ -1,0 +1,5 @@
+step	method	signer	tx_hash	gas_tgas	status
+b49_create	create_bounty	kintsugi-vendor-prnvm.testnet	Dh5h1V8Rb332fEuHgA4bxY3RJ2TEvArHJc8Yjg5PcG9W	3.06	SuccessValue
+b49_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	DiuovVg3g43kv5reUAWAdNdkUPkZcdXEzA7zZwHNnfiQ	35.27	SuccessValue
+b50_create	create_bounty	kintsugi-vendor-prnvm.testnet	GgaSV2CKDCkMkZ9Uv4UrbZVQe8aqXqZbbNBXnk9cSHZi	3.06	SuccessValue
+b50_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	EBjiSkirpzQXFsYNymRoa8qGZwHrvsQ8RP2AYxcTZfw2	35.27	SuccessValue

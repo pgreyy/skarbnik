@@ -1,0 +1,6 @@
+$ python3 -I scripts/test_gpu_copy_rate.py <user@vps> <key file> <known_hosts>   (from the laptop, the VPS standing in for a pod; 2026-11-09)
+a) finished in 9.1 s; whole: True
+b) stopped after 8.9 s: the copy ran at 0.83 MB/s over 6 s, below 1000.0 MB/s | scp processes left: 0
+ALL PASS
+
+An earlier run of the same checks gave the same two results, then its final cleanup login was reset by the host; the cleanup now tries again after 10 s.

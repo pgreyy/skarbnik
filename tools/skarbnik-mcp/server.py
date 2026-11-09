@@ -26,7 +26,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 NETWORKS = {
     "testnet": {"contract": "kintsugi-l2-cihdp.testnet", "rpc": ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"],
                 "feed": "https://skarbnik.xyz/feed.json"},
@@ -41,7 +41,7 @@ CHECKERS = {"crash": PUBLISHED_IMAGE_ID, "output": "005d8dc7e6fa2b936d960f6c81af
 RULE_PROPERTY = ("the original's output breaks the vendor's public safety rule on a secret input; a fix must make every output obey "
                  "the rule (the rule module is public), keep the exact results of the public tests, and behave like the vendor's "
                  "hidden reference fix on normal inputs near the public tests; many different correct fixes can pass.")
-KINDS_TEXT = "crash, wrong output, memory safety, path traversal, access control, injection or security rule"
+KINDS_TEXT = "crash, wrong output, memory safety, path traversal or access control"
 BUG_MEANING = {
     "crash": "the original crashes on a secret input; a fix must stop the crash and keep the answers of the public tests and of fresh inputs.",
     "wrong output": ("the original returns a wrong answer on a secret input; a fix must return the right answer there and give the same "

@@ -1,5 +1,5 @@
 {
- "made_at": "2026-11-09T08:52:44Z",
+ "made_at": "2026-11-09T12:50:50Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Every account in this ledger is run by the Skarbnik team or was seeded by its scripts (accounts.kinds). No scores, no ranks, no credit for unpaid attempts. Amounts in yoctoNEAR; a paid fix also got its own attempt fee back.",
@@ -735,7 +735,7 @@
   {
    "vendor": "kintsugi-vendor-prnvm.testnet",
    "kind": "team-run",
-   "bounties": 49,
+   "bounties": 51,
    "proved_on_time": 24,
    "not_proved_in_time": 16,
    "waiting_past_deadline": 3
