@@ -1,0 +1,27 @@
+# Spike A and B: two clean reproducible builds of the guests, each in an empty build folder (branch spike-ab), 2026-11-09
+$ CARGO_TARGET_DIR=target/ab-clean1 cargo build --release -p kintsugi-harness
+    Finished `release` profile [optimized] target(s) in 10m 45s
+EXIT 0
+HELLO_GUEST_ID a8bf1d826c34547b362646569c5d07ad62d678727a1b744d7038de0d7507ef2c
+CHECK_GUEST_ID dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+OUTPUT_GUEST_ID 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+RULE_GUEST_ID 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+$ CARGO_TARGET_DIR=target/ab-clean2 cargo build --release -p kintsugi-harness
+    Finished `release` profile [optimized] target(s) in 8m 50s
+EXIT 0
+HELLO_GUEST_ID a8bf1d826c34547b362646569c5d07ad62d678727a1b744d7038de0d7507ef2c
+CHECK_GUEST_ID dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc
+OUTPUT_GUEST_ID 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+RULE_GUEST_ID 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+$ sha256sum of the guest files (build 1, then build 2)
+78fdb721fe71f087c366b04be2a74d9ed36a72b3dad97afa5124b60cefcae3ca  ab-clean1/riscv-guest/kintsugi-harness/hello_guest/riscv32im-risc0-zkvm-elf/docker/hello_guest.bin
+78fdb721fe71f087c366b04be2a74d9ed36a72b3dad97afa5124b60cefcae3ca  ab-clean2/riscv-guest/kintsugi-harness/hello_guest/riscv32im-risc0-zkvm-elf/docker/hello_guest.bin
+4741ef156b297cc8d5a71ee8c181c437ad81845cfbb3459c801e3443f613eb0a  ab-clean1/riscv-guest/kintsugi-harness/check_guest/riscv32im-risc0-zkvm-elf/docker/check_guest.bin
+4741ef156b297cc8d5a71ee8c181c437ad81845cfbb3459c801e3443f613eb0a  ab-clean2/riscv-guest/kintsugi-harness/check_guest/riscv32im-risc0-zkvm-elf/docker/check_guest.bin
+53d5f4a800fa01e3fddde06eddc5db3f11c67a2eeebc4a84feb333e27bf92db2  ab-clean1/riscv-guest/kintsugi-harness/output_guest/riscv32im-risc0-zkvm-elf/docker/output_guest.bin
+53d5f4a800fa01e3fddde06eddc5db3f11c67a2eeebc4a84feb333e27bf92db2  ab-clean2/riscv-guest/kintsugi-harness/output_guest/riscv32im-risc0-zkvm-elf/docker/output_guest.bin
+710694a32f1d4182c834f446651395892b5acd0cff9e19c95884731913f07f90  ab-clean1/riscv-guest/kintsugi-harness/rule_guest/riscv32im-risc0-zkvm-elf/docker/rule_guest.bin
+710694a32f1d4182c834f446651395892b5acd0cff9e19c95884731913f07f90  ab-clean2/riscv-guest/kintsugi-harness/rule_guest/riscv32im-risc0-zkvm-elf/docker/rule_guest.bin
+$ git diff origin/main --stat -- harness/checker harness/check-guest harness/guest harness/checker-output harness/output-guest   (the crash and output checkers: no change)
+(empty)
+Note: earlier tries of these builds stopped when the Windows drive that holds the Linux disk filled up; these two ran after space was freed.

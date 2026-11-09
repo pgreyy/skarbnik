@@ -2,6 +2,38 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-09: Spike A and B: a rule checker for property bugs and access control bugs (branch spike-ab, not merged)
+
+- One new checker, `harness/checker-rule`, and one guest, `harness/rule-guest` (image id `2c7b601a…`), for both modes.
+  A program keeps state across a sequence of calls: `call(op, len)` with its arguments at `input_buf` and its output
+  bytes at `output_buf`, and an optional `init()`; a fresh instance per run. Mode A (injection, path traversal) is a
+  one call sequence; mode B (IDOR, missing authorization) is a longer one. The vendor publishes a small rule module
+  (`rule_buf`, `check(len)`: 0 ok, anything else a violation); its sha256 is bound into the corpus hash, and the secret
+  sequence, the reference fix's hash and the sweep positions into the commitment, so the journal and the contract do
+  not change.
+- The checks: the secret (no trap, the rule says ok), the public tests (exact), fairness on mutations of the public
+  tests (no trap where the reference fix does not, the rule says ok, and the reference fix's exact results wherever the
+  original and the reference fix agree), variants of the secret (bytes changed, inserted or deleted, calls swapped,
+  repeated or dropped) and the sweep, both judged by the rule. Proof 0: the original does not trap on the secret and the
+  rule says violation, it gives its public tests' results, and the reference fix passes.
+- Demos (`data/ab/`, built by `scripts/spike_ab_make.py` with wasi-sdk 34): A1 an HTML attribute escaper that misses
+  the single quote; A2 a path cleaner that decodes after it normalizes; B1 a file store whose read checks only that
+  someone is logged in; B2 an account store whose role change forgets the admin check. Corpus
+  (`data/attacks/ab/`, `cargo test -p kintsugi-check-rule`, `docs/evidence/spike_ab/corpus.txt`): on three seeds
+  each, Proof 0 passes, two correct fixes pass and the original and every cheat fail (empty output, deny every call,
+  special case the secret, block the exact payload or user ids, break benign inputs). With no fairness inputs, the
+  special case and payload cheats still fail on the secret's variants and sweep.
+- What the corpus taught: variants must also change lengths (a cheat that matched the secret's exact length passed
+  until bytes were inserted and deleted); a property secret should carry each dangerous byte once and name it as a
+  sweep position (a repeated payload let a cheat that blocks one spelling pass); a sweep position must be computed, not
+  counted by hand (one was on the wrong byte).
+- Cost in the zkVM executor (`scripts/spike_ab_cost.py`, `docs/evidence/spike_ab/executor.txt`): Proof 0 with one
+  sweep position 142 to 194 segments for the four demos; an IDOR secret of 5, 20 and 50 calls 152, 318 and 688. The
+  modules' declared memory matters: with a 4 page rule and a 2 page program the same Proof 0 was 362 to 446 segments
+  (`memory_effect.txt`).
+- Two clean reproducible builds gave the same four ids and guest bytes; the crash checker `dd6c5f42…` and the output
+  checker `005d8dc7…` did not change (`clean_rebuilds.txt`). Not done yet: allow_image_id and the two scratch bounties.
+
 ## 2026-11-08: Output mode for wrong output and memory safety bugs (branch feature-output)
 
 - Branch feature-output from main with spike-output and spike-memory merged in.
