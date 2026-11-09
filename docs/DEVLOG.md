@@ -2,6 +2,23 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-09: Two programs for public rule checker bounties (branch spike-ab)
+
+- The demo fixes and demo secrets of `data/ab/` are public, so the public bounties need new programs with private
+  secrets and private reference fixes. `data/assets`: a path resolver for uploads where the spec says both "/" and "\\"
+  separate segments; its rule says a clean path stays inside the root. `data/projects`: a project registry with login,
+  create, transfer, rename and lookups; its rule says only a project's owner can hand it to someone else. No comment
+  names either bug.
+- `WASI_SDK=... python3 -I scripts/rule_bounty_make.py` builds both programs and rules (one memory page each) and writes
+  the public tests from the original: assets 476 B program, 473 B rule, 13 tests; projects 654 B program, 474 B rule, 7
+  tests. No public test triggers a bug.
+- The secrets (assets one call, projects 7 calls, one sweep position each), the reference fixes and a private corpus of
+  two correct fixes and five or six cheats per program stay with the vendor, outside the repository. With
+  `skarbnik-check-rule proof0` and `table` on three seeds (64 fairness inputs, 64 variants): Proof 0 passes for both,
+  both correct fixes pass, and the original and every cheat fail (empty output, deny everything, special case the
+  secret's length or ids, block one word or one user, break normal results). One cheat of projects was caught only by
+  the sweep.
+
 ## 2026-11-09: Spike A and B: a rule checker for property bugs and access control bugs (branch spike-ab, not merged)
 
 - One new checker, `harness/checker-rule`, and one guest, `harness/rule-guest` (image id `2c7b601a…`), for both modes.
