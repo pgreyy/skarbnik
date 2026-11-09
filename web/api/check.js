@@ -1,9 +1,11 @@
 // The keyless patch check at /api/check, for the local MCP server (tools/skarbnik-mcp) and anyone else: POST a JSON
 // body {bounty_id, wat} (the whole fixed module as WebAssembly text) or {bounty_id, patch_base64}; the answer is the
 // assembled module in base64 and the same checks as the hosted connector's check_patch (size, exports against the
-// public program, the public tests, the public demo input on demo bounties). No key, nothing sent to the chain,
-// nothing stored, no logging; rate limited per address. It does not show that a fix passes the private test.
-// {bounty_id, want: "original_wat"} returns the bounty's public code with the original module as WebAssembly text.
+// public program, the public tests, the public demo input on demo bounties; on a rule checker bounty each public call
+// sequence and its exact results). No key, nothing sent to the chain, nothing stored, no logging; rate limited per
+// address. It does not show that a fix passes the private test.
+// {bounty_id, want: "original_wat"} returns the bounty's public code with the original module as WebAssembly text
+// (and on a rule checker bounty the public rule as C and as WebAssembly text).
 'use strict';
 const { checkPatch, patchBytes, patchOk, bounty, Fail, TOOLS } = require('./_lib/agent.js');
 

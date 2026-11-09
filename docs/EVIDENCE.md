@@ -5,6 +5,93 @@ failed. Failures stay in this file. Times are wall clock on the development mach
 16 cores, 10 GiB RAM for WSL) unless stated otherwise. Raw output is in `docs/evidence/<spike>/`, with local paths replaced
 by `<repo>` and `~`.
 
+## Spike A and B: a rule checker for property bugs and access control bugs (2026-11-09, branch spike-ab)
+
+**Question.** Can one more checker judge bugs that have no single right answer: a property bug (an injection or a path
+traversal, where many correct fixes give different outputs) and an access control bug (a missing owner or admin check
+that shows only after a series of calls)? Can it keep the journal the contract reads and settle bounties on testnet?
+
+**Verdict: PASS.** The rule checker (`harness/checker-rule`, guest `harness/rule-guest`, image id
+`2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa`) rebuilt to the same id twice from empty build
+folders (`docs/evidence/spike_ab/clean_rebuilds.txt`). On scratch test bounties 47 (an HTML escaper that misses the
+single quote) and 48 (a file store with no owner check on read), a cheat proved FAIL and was submitted first, then a
+correct fix proved PASS and was paid. The contract did not change; the crash checker `dd6c5f42…` and the output checker
+`005d8dc7…` did not change.
+
+**How it judges.** The program keeps state across a sequence of calls (`call(op, len)`). The vendor publishes a small
+rule module that reads every call and its result and says ok or violation. A fix passes when, on the private secret
+call sequence, it does not trap and the rule says ok; it gives the exact results of the public tests; on mutations of
+the public tests it never breaks the rule and matches the hidden reference fix where the original and the reference fix
+agree; and on changed copies of the secret (bytes changed, inserted or deleted, calls swapped, repeated or dropped) and
+on every value at up to 4 private byte positions, the rule says ok. The rule's sha256 is in the corpus hash; the
+secret, the reference fix's hash and the positions are in the commitment.
+
+**Native corpus** (`docs/evidence/spike_ab/corpus.txt`, `cargo test -p kintsugi-check-rule`): four demos in `data/ab/`,
+three seeds each. Proof 0 passes, two correct fixes pass, and the original and every cheat fail (empty output, deny
+every call, special case the secret, block the exact payload or user ids, break benign inputs).
+
+**Failures found on the way, fixed before any proof.** A cheat that matched the secret's exact length passed until the
+variants also inserted and deleted bytes. A secret that repeated its payload let a cheat that blocks one spelling pass;
+the secret now carries the dangerous byte once and names it as a sweep position. One sweep position was counted by
+hand onto the wrong byte; positions are now computed.
+
+**Cost** (zkVM executor, `executor.txt`, `memory_effect.txt`): Proof 0 with one sweep position 142 to 194 segments for
+the four demos; an access control secret of 5, 20 and 50 calls 152, 318 and 688 segments. Module memory matters: with a
+4 page rule and 2 page programs the same Proof 0 took 362 to 446 segments, so programs and rules are built with one
+page. Worst case on the build pod (`chain/buildpod.log`): a 64 call secret, a 4 page rule and 2 page programs, Proof 0
+335 million cycles in 1,061 segments.
+
+**On testnet** (contract `kintsugi-l2-cihdp.testnet`; `chain/transactions.tsv`, gas over all receipts `chain/gas.tsv`):
+
+| Step | Signer | Result | Transaction | Gas burned |
+| --- | --- | --- | --- | --- |
+| `allow_image_id` `2c7b601a…` | contract owner | allowlist holds 4 ids | `ABDP1WFVsxCXGuDM3B3kxWLZk7nrbM2WqL8qdnjVGA5a` | 2.38 Tgas |
+| `deposit_credit` 0.05 NEAR | agent | credit for the four attempts | `5mr8Td8ydWKBuBJ4yzbb47RpF6qCSDrgV9uCAy6Zz9r2` | 2.36 Tgas |
+| `create_bounty` 47 | vendor | Level 2, 0.1 NEAR, K 2, 64 and 64 | `HSJvX5zYbDFvPD5jwZJszHQu2zuYFuM2vwV77EfqLwv4` | 2.93 Tgas |
+| `open_with_groth16` 47 | vendor | opened | `8bnabZEVi6vuDmRMzSaVsBA49TAbD19uqZN6RzkHxrCM` | 35.27 Tgas |
+| `create_bounty` 48 | vendor | Level 2, 0.1 NEAR, K 2, 64 and 64 | `4gXzoGXQt3vfQdiWUZn5fze4daZ4v7Fr2Xky1wWhaaEi` | 2.93 Tgas |
+| `open_with_groth16` 48 | vendor | opened | `FchbM7JgQZevxSDbpE6Eh3zegpXcYp8vf5rDANKA6TCN` | 35.27 Tgas |
+| `commit` 47 attempt 0, cheat | agent | fee 0.01 NEAR | `82C2vStzhuLKkxTMBGTfKn8GVMGGLBGGFuWUxSoWM4DV` | 3.10 Tgas |
+| `commit` 47 attempt 1, fix | agent | fee 0.015 NEAR | `HZN9uRf2WdbvwNS2MhA6UyhGLC7QmwSL2a3W2AsviFmn` | 3.11 Tgas |
+| `reveal` 47 attempt 0 | agent | seed recorded | `3maH9HGiEoWdJwuQVZ4E84ZyeAqnnPNWuDZr2FMcxm6s` | 2.89 Tgas |
+| `reveal` 47 attempt 1 | agent | seed recorded | `2sF5pi4YpPQ6cWNqvQGUTsF7pmie42YBo48YRvyFQfNk` | 2.86 Tgas |
+| `commit` 48 attempt 0, cheat | agent | fee 0.01 NEAR | `2EvqAWV8yVeCLnUc6SQ3THByyBc7K2wH8baY4D3HrPeZ` | 3.10 Tgas |
+| `commit` 48 attempt 1, fix | agent | fee 0.015 NEAR | `DiNXS5tKBfxbkC2rEXnRM7xUu3ZREr7m4p5if6Zena4E` | 3.10 Tgas |
+| `reveal` 48 attempt 0 | agent | seed recorded | `2vHWPfVcPaLuELczPHbyiuJdsQSCqGAx78qeetYEYLaE` | 2.88 Tgas |
+| `reveal` 48 attempt 1 | agent | seed recorded | `XnLrBMwdZhzAXhZm7Lv3qPnXHSeyxTdH1hnXpsCztTd` | 2.89 Tgas |
+| `submit_groth16` 47 attempt 0 | vendor | FAIL, attempt Failed (submitted first) | `7NpEGy6Hnt69Ko2LHMtDrF8e4yCNRcMXxZdd92xW6YWf` | 35.70 Tgas |
+| `submit_groth16` 47 attempt 1 | vendor | PASS, 0.1 NEAR paid to the agent | `4M5FbnG421ftbJdmroczYZoF1VK48kTXbpUnZE6pgSj8` | 36.72 Tgas |
+| `submit_groth16` 48 attempt 0 | vendor | FAIL, attempt Failed (submitted first) | `6hKgYNpwiCK2XyEBJrPPqavuP8fArBHbAXzaSsiWEChS` | 35.69 Tgas |
+| `submit_groth16` 48 attempt 1 | vendor | PASS, 0.1 NEAR paid to the agent | `AK2ikyVSh4WFhZhpxanhhPhV7kfo9sDXcXasNM72X28b` | 36.73 Tgas |
+
+State after: `chain/final_state.txt`.
+
+**Proofs** (rented RTX 4090 pods from the VPS with `scripts/spike_ab_prove.sh`; Groth16 on the VPS CPU):
+
+| Run | Verdict | Segments | Prove | Shrink | Pod, cost | Groth16 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 47 Proof 0, reference fix | PASS | 238 | 288.0 s | 195.5 s | 610 s, $0.1508 | 385 s |
+| 47 attempt 0, cheat | FAIL | 7 | 11.2 s | 8.3 s | 164 s, $0.0405 | 403 s |
+| 47 attempt 1, fix | PASS | 245 | 282.6 s | 191.7 s | 585 s, $0.1446 | 365 s |
+| 48 Proof 0, reference fix | PASS | 154 | 98.1 s | 72.7 s | 232 s, $0.0574 | 403 s |
+| 48 attempt 0, cheat | FAIL | 6 | 10.3 s | 6.7 s | 358 s, $0.0885 | 388 s |
+| 48 attempt 1, fix | PASS | 148 | 163.6 s | 119.6 s | 343 s, $0.0848 | 379 s |
+
+GPU spend for the spike: $0.8127 of a $3 cap, 8 pods including the build pod (`chain/gpu_spend.json`). The first
+Groth16 step failed with "No such file or directory": the wrap could not find `r0vm`; with the vendor tool's binary
+folder on the path it ran.
+
+**Programs for public bounties.** The demo fixes and secrets above are public, so two new programs were written with
+private secrets and reference fixes: `data/assets` (a path resolver; rule: a clean path stays inside the root) and
+`data/projects` (a project registry; rule: only the owner can hand a project to someone else), built with
+`scripts/rule_bounty_make.py`. Checked natively with `skarbnik-check-rule proof0` and `table` on three seeds, 64
+fairness inputs and 64 variants: Proof 0 passes for both, two private correct fixes each pass, and the original and 11
+private cheats fail. One projects cheat (blocks every transfer by one user) failed only at the sweep.
+
+**Known limits.** The rule is the vendor's: a weak rule lets a weak fix pass, and the agent can read it before trying.
+The fairness inputs are mutations of the public tests, so a fix can differ from the reference fix on inputs far from
+them. The sweep covers the positions the vendor names. Cost grows with the number of calls and the modules' memory.
+
 ## Output mode: wrong output and memory safety bugs, with the byte sweep (2026-11-08, branch feature-output)
 
 **Question.** Can one final output checker judge wrong output bugs and memory safety bugs, stop the partial fix the

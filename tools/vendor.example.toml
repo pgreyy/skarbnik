@@ -5,11 +5,13 @@
 [bounty]
 name = "mybounty"            # also names the bounty's private salt, ~/.kintsugi-salts/<name>.salt (made at the first proof)
 mode = "crash"               # crash: the original crashes on the secret input. output: it returns a wrong answer there
-                             # (also memory safety bugs that corrupt memory without crashing); see docs/VENDOR.md
-sweep = "0"                  # output mode only: private byte positions of the secret input tried with all 256 values
+                             # (also memory safety bugs that corrupt memory without crashing). rule: the original breaks
+                             # the public rule module (path traversal, injection, access control); see docs/VENDOR.md
+sweep = "0"                  # output and rule modes: private byte positions of the secret tried with all 256 values
                              # (at most 4; the secret line must end with the same sweep=<p>,<p>); each adds about 32
                              # million cycles to every proof
-module = "data/demo"         # folder with original.wasm and public_tests.txt
+module = "data/demo"         # folder with original.wasm and public_tests.txt (rule mode: also rule.wasm)
+# rule = "data/mymodule/rule.wasm"   # rule mode only: the public rule module (default <module>/rule.wasm)
 reward_near = "0.1"
 k = 1                        # attempts allowed (1 to 16): each verdict tells at most one bit about the secret
 max_commits_per_account = 0   # most attempt slots one account may hold at a time (1 to K); 0 = no cap
@@ -28,7 +30,8 @@ variants = 32
 po2 = 18                     # proof segment size: 18 needs about 2.5 GiB of memory, 19 about 5 GiB
 
 [secrets]                    # files of mode 600, outside the repository, never printed or committed
-secret = "~/.skarbnik-vendor/mybounty/exploit.hex"   # crash: the input as hex; output: <input hex> <expected> sweep=<p>
+secret = "~/.skarbnik-vendor/mybounty/exploit.hex"   # crash: the input as hex; output: <input hex> <expected> sweep=<p>;
+                                                     # rule: <call sequence hex> sweep=<p>
 reference_fix = "~/.skarbnik-vendor/mybounty/fixed.wasm"
 
 [prover]
@@ -41,7 +44,8 @@ min_avail_mib = 300          # stop a proving step if available memory falls bel
 network = "testnet"
 contract = "kintsugi-l2-cihdp.testnet"
 rpc_urls = ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"]
-image_id = "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"   # crash checker; output mode: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089
+image_id = "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"   # crash checker; output mode: 005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089;
+                                                                                  # rule mode: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
 vendor_account = "you.testnet"
 
 [paths]                      # optional: where the binaries are (defaults: this repository's target/ and `near` on PATH)
@@ -73,6 +77,7 @@ vendor_account = "you.testnet"
 # ids = [33]
 # module = "data/mymodule"
 # secret = "/path/outside/the/repository/exploit.hex"
-# mode = "output"              # output mode only, with the reference fix every proof needs:
+# mode = "output"              # output or rule mode, with the reference fix every proof needs:
 # reference_fix = "/path/outside/the/repository/fixed.wasm"
+# rule = "data/mymodule/rule.wasm"   # rule mode only
 # po2 = 18                     # for cpu proving

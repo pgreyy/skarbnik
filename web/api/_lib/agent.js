@@ -4,7 +4,8 @@
 // and refuses (plain 404) unless it is a function call key for the contract limited to commit and reveal, so deleting
 // the key on chain turns the link off at once. Nothing is stored: each attempt's nonce is derived from the key and the
 // patch (HMAC), so a reveal only needs the same patch again. Patches are WebAssembly text (WAT) assembled here with
-// wabt, or a base64 module; check_patch runs the bounty's public tests on it in a worker with a time limit. Signing:
+// wabt, or a base64 module; check_patch runs the bounty's public tests on it in a worker with a time limit (one input
+// and its return value per test, or on a rule checker bounty a call sequence and its exact results). Signing:
 // Ed25519 (node:crypto) over NEAR's transaction format (Borsh), as in tools/skarbnik-mcp/server.py. Testnet only.
 // Nothing here logs: no console calls, and errors returned to the client never carry the link or the key.
 'use strict';
@@ -12,22 +13,31 @@ const crypto = require('node:crypto');
 const { Worker } = require('node:worker_threads');
 const SITE = require('../../site.config.json');
 
-const VERSION = '1.2.0';
+const VERSION = '1.3.0';
 const BASE = 'https://skarbnik.xyz/';
 const CONTRACT = SITE.contract;
 const RPCS = SITE.rpc_urls;
-// The checkers on the contract's allowlist: the crash checker and the output checker (wrong answers, also memory
-// safety bugs that corrupt memory without crashing). A bounty with any other checker is refused.
-const CHECKERS = SITE.checkers;
+// The checkers on the contract's allowlist: the crash checker, the output checker (wrong answers, also memory safety
+// bugs that corrupt memory without crashing) and the rule checker (bugs judged by a public rule: path traversal,
+// injection, access control). site.config.json lists them; the rule id is also written here so it is accepted even
+// before that file lists it. A bounty with any other checker is refused.
+const CHECKERS = { rule: '2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa', ...SITE.checkers };
 const isPublished = (b) => b.image_id_allowed && Object.values(CHECKERS).includes(b.image_id);
-// The kind of bug a bounty is about: the feed row's (its program's) when known, else from its checker.
-const bugKind = (b, row) => (row && row.bug_kind) || (b.image_id === CHECKERS.output ? 'wrong output' : 'crash');
 const isOutput = (b) => b.image_id === CHECKERS.output;
+const isRule = (b) => b.image_id === CHECKERS.rule;
+// The kind of bug a bounty is about: the feed row's (its program's) when known, else from its checker.
+const bugKind = (b, row) => (row && row.bug_kind) || (isOutput(b) ? 'wrong output' : isRule(b) ? 'security rule' : 'crash');
+const RULE_PROPERTY = 'the original\'s output breaks the vendor\'s public safety rule on a secret input; a fix must make every output obey the rule (the rule module is public), keep the exact results of the public tests, and behave like the vendor\'s hidden reference fix on normal inputs near the public tests; many different correct fixes can pass.';
 const BUG_MEANING = {
   crash: 'the original crashes on a secret input; a fix must stop the crash and keep the answers of the public tests and of fresh inputs.',
   'wrong output': 'the original returns a wrong answer on a secret input; a fix must return the right answer there and give the same answers as the vendor\'s hidden reference fix on random inputs and on inputs near the secret.',
   'memory safety': 'a memory bug (such as a buffer overflow) that gives a wrong answer without crashing; judged like wrong output: the right answer on the secret input and the same answers as the vendor\'s hidden reference fix on nearby inputs. It does not detect memory corruption in general.',
+  'path traversal': RULE_PROPERTY,
+  injection: RULE_PROPERTY,
+  'access control': 'the original lets a caller do something the public rule forbids after a secret series of calls; a fix must refuse it, keep the exact results of the public tests and keep normal use working (judged against the vendor\'s hidden reference fix on calls near the public tests).',
+  'security rule': 'the original\'s results break the vendor\'s public rule on a secret input or series of calls; a fix must make every result obey the rule (the rule module is public), keep the exact results of the public tests, and behave like the vendor\'s hidden reference fix on normal calls near the public tests; many different correct fixes can pass.',
 };
+const KINDS_TEXT = 'crash, wrong output, memory safety, path traversal, access control, injection or security rule';
 if (SITE.network !== 'testnet') throw new Error('the hosted connector runs on testnet only');
 
 class Fail extends Error {}
@@ -134,10 +144,11 @@ async function feed() {
   return JSON.parse(await site('feed.json'));
 }
 // A bounty's public code: from its feed row, or (for a bounty newer than the feed) from any feed row of the same
-// program, matched by original_hash on chain.
+// program, matched by original_hash on chain (a row with the same corpus_hash too when there is one).
 async function publicCode(bid, b) {
   const rows = (await feed()).bounties;
-  const row = rows.find((x) => String(x.bounty_id) === bid && x.public_code) || rows.find((x) => x.public_code && x.original_hash === b.original_hash);
+  const same = (x) => x.public_code && x.original_hash === b.original_hash;
+  const row = rows.find((x) => String(x.bounty_id) === bid && x.public_code) || rows.find((x) => same(x) && x.corpus_hash === b.corpus_hash) || rows.find(same);
   if (!row) throw new Fail(`bounty ${bid} has no public code on the site`);
   return row;
 }
@@ -192,16 +203,97 @@ for (const t of workerData.tests) {
   catch (e) { out.push({ trap: String(e.message || e).slice(0, 80) }); }
 }
 parentPort.postMessage(out);`;
-function runTests(bytes, tests, ms = 4000) {
+// Rule checker programs (harness/checker-rule/src/lib.rs): exports memory, input_buf, output_buf, call(op, len) and
+// optionally init. A public test line is "<call sequence hex> <transcript hex>" ("-" for empty, # starts a comment).
+// A call sequence is, per call, op (1 byte), argument length (1 byte), the arguments. One run is a fresh instance,
+// init if exported, then per call: the arguments written at input_buf(), code = call(op, len), and when code > 0 the
+// code bytes at output_buf() (more than 1,024 counts as a trap). The transcript is, per call, status (0 returned,
+// 1 trapped, 2 out of fuel), code (i32 little endian, 0 for a trap), output length (u16 little endian), the output; a
+// trap ends the run. Running out of fuel cannot be measured here: the worker's time limit stands in for it.
+function parseRuleTests(text) {
+  const hex = (h) => { if (h === '-') return ''; if (!/^([0-9a-fA-F]{2})*$/.test(h)) throw new Fail('the bounty\'s public tests file does not parse'); return h.toLowerCase(); };
+  return text.split('\n').map((l) => l.split('#')[0].trim()).filter(Boolean).map((l) => {
+    const f = l.split(/\s+/); if (f.length !== 2) throw new Fail('the bounty\'s public tests file does not parse');
+    return { seq: hex(f[0]), want: hex(f[1]) };
+  });
+}
+// The public corpus a rule bounty's corpus_hash covers (corpus_bytes in harness/checker-rule/src/lib.rs): the domain
+// tag, the rule module's sha256, then each test's sequence and transcript, each after its length (u32 little endian).
+function ruleCorpusHash(tests, rule) {
+  const parts = [Buffer.from('skarbnik-rule-corpus-v1'), crypto.createHash('sha256').update(rule).digest()];
+  for (const t of tests) for (const h of [t.seq, t.want]) { const b = Buffer.from(h, 'hex'); const l = Buffer.alloc(4); l.writeUInt32LE(b.length); parts.push(l, b); }
+  return sha256(Buffer.concat(parts));
+}
+const RULE_WORKER = `const { parentPort, workerData } = require('node:worker_threads');
+const m = new WebAssembly.Module(workerData.bytes); const out = [];
+const MAX_CALLS = 64, MAX_OUTPUT = 1024, MAX_MEMORY = 2 * 65536;
+function decode(b) { const calls = []; let i = 0;
+  while (i < b.length) { if (i + 1 >= b.length || i + 2 + b[i + 1] > b.length) return null; calls.push({ op: b[i], args: b.subarray(i + 2, i + 2 + b[i + 1]) }); i += 2 + b[i + 1]; }
+  return calls; }
+function rec(status, code, o) { const h = Buffer.alloc(7); h[0] = status; h.writeInt32LE(code, 1); h.writeUInt16LE(o.length, 5); return Buffer.concat([h, o]); }
+for (const t of workerData.tests) {
+  const calls = decode(Buffer.from(t.seq, 'hex'));
+  if (!calls) { out.push({ bad: 'the sequence is not a whole number of calls' }); continue; }
+  const parts = []; let trap = null;
+  try {
+    const x = new WebAssembly.Instance(m, {}).exports; const mem = x.memory;
+    if (typeof x.init === 'function') x.init();
+    for (const c of calls.slice(0, MAX_CALLS)) {
+      const p = x.input_buf() >>> 0;
+      if (p + c.args.length > mem.buffer.byteLength) { trap = 'the arguments do not fit in memory'; break; }
+      new Uint8Array(mem.buffer, p, c.args.length).set(c.args);
+      const code = x.call(c.op, c.args.length) | 0;
+      if (mem.buffer.byteLength > MAX_MEMORY) { trap = 'memory grew past 2 pages (128 KiB)'; break; }
+      let o = Buffer.alloc(0);
+      if (code > 0) {
+        if (code > MAX_OUTPUT) { trap = 'output longer than 1,024 bytes'; break; }
+        const q = x.output_buf() >>> 0;
+        if (q + code > mem.buffer.byteLength) { trap = 'the output is outside memory'; break; }
+        o = Buffer.from(new Uint8Array(mem.buffer, q, code));
+      }
+      parts.push(rec(0, code, o));
+    }
+  } catch (e) { trap = String(e.message || e).slice(0, 80); }
+  if (trap) parts.push(rec(1, 0, Buffer.alloc(0)));
+  out.push({ got: Buffer.concat(parts).toString('hex'), trap: trap || undefined });
+}
+parentPort.postMessage(out);`;
+// The rule checker's load limits that the export check does not cover: memory starts at 2 pages (128 KiB) or less.
+function ruleMemoryProblem(bytes) {
+  try {
+    const mem = new WebAssembly.Instance(new WebAssembly.Module(bytes), {}).exports.memory;
+    return mem && mem.buffer.byteLength > 2 * 65536 ? 'the memory starts larger than 2 pages (128 KiB); the rule checker allows 2' : null;
+  } catch (e) { return `the module does not start: ${String(e.message || e).slice(0, 200)}`; }
+}
+function runTests(bytes, tests, ms = 4000, src = WORKER) {
   return new Promise((resolve) => {
-    const w = new Worker(WORKER, { eval: true, workerData: { bytes, tests }, resourceLimits: { maxOldGenerationSizeMb: 64 } });
+    const w = new Worker(src, { eval: true, workerData: { bytes, tests }, resourceLimits: { maxOldGenerationSizeMb: 64 } });
     const t = setTimeout(() => { w.terminate(); resolve(null); }, ms);
     w.once('message', (m) => { clearTimeout(t); w.terminate(); resolve(m); });
     w.once('error', () => { clearTimeout(t); resolve(null); });
   });
 }
+// The public tests of a rule checker bounty on a fix: each call sequence must give exactly the expected transcript.
+async function checkRulePatch(bytes, b, row) {
+  const tests = parseRuleTests(await site(row.public_code.tests));
+  const original = await site(row.public_code.module, true);
+  const bad = iface(bytes, original) || ruleMemoryProblem(bytes);
+  const res = bad ? null : await runTests(bytes, tests, 4000, RULE_WORKER);
+  const fails = res ? tests.map((t, i) => ({ ...t, ...res[i] })).filter((t) => t.bad || t.got !== t.want) : [];
+  const firstDiff = (a, c) => { let i = 0; while (i < a.length && i < c.length && a[i] === c[i]) i++; return Math.floor(i / 2); };
+  const hash = sha256(bytes);
+  return {
+    bytes: bytes.length, sha256: hash, max_patch_bytes: b.max_patch_bytes, fits: bytes.length <= b.max_patch_bytes,
+    same_as_original: hash === b.original_hash, interface_ok: !bad, interface_problem: bad || undefined,
+    public_tests: res ? { passed: tests.length - fails.length, of: tests.length, failures: fails.slice(0, 5).map((f) => (f.bad ? { sequence_hex: f.seq.slice(0, 80), problem: f.bad }
+      : { sequence_hex: f.seq.slice(0, 80), expected_hex: f.want.slice(0, 80), got_hex: f.got.slice(0, 80), first_different_byte: firstDiff(f.want, f.got), trapped: f.trap })) }
+      : bad ? undefined : { passed: 0, of: tests.length, note: 'the tests did not finish within 4 seconds (too slow or an endless loop; the checker would stop it as out of fuel)' },
+    note: 'Rule checker bounty: this checks the module, its exports and the public tests (every call sequence must give exactly the expected results, byte for byte). The private check also runs the secret input or series of calls, the public rule on every result, calls near the public tests against the vendor\'s hidden reference fix, and changed copies of the secret; only the vendor\'s proof decides that.',
+  };
+}
 async function checkPatch(bid, bytes, b) {
   const row = await publicCode(bid, b);
+  if (isRule(b)) return checkRulePatch(bytes, b, row);
   const tests = parseTests(await site(row.public_code.tests));
   const original = await site(row.public_code.module, true);
   const bad = iface(bytes, original);
@@ -260,7 +352,7 @@ async function bounty(bid) { const b = await view('get_bounty', { bounty_id: bid
 // ---------- tools ----------
 const TOOLS = {
   list_bounties: {
-    ro: true, d: 'Open Skarbnik bounties from the feed (a snapshot): each bounty\'s level and what it means, the kind of bug (crash, wrong output or memory safety) and what a fix must do, reward, next attempt fee, slots, windows. Call get_bounty for the live state.',
+    ro: true, d: 'Open Skarbnik bounties from the feed (a snapshot): each bounty\'s level and what it means, the kind of bug (' + KINDS_TEXT + ') and what a fix must do, reward, next attempt fee, slots, windows. Call get_bounty for the live state.',
     p: { only_open: { type: 'boolean', description: 'only bounties accepting attempts (default true)' } }, r: [],
     async run(k, a) {
       const f = await feed();
@@ -299,7 +391,7 @@ const TOOLS = {
     },
   },
   get_public_code: {
-    ro: true, d: 'The public code of a bounty: the source (Rust or C) with its known bug, the original module as WebAssembly text (WAT, the form a fix is sent in), the public tests and what a fix must do. The module is checked against the hash on chain.',
+    ro: true, d: 'The public code of a bounty: the source (Rust or C) with its known bug, the original module as WebAssembly text (WAT, the form a fix is sent in), the public tests and what a fix must do. On a rule checker bounty also the public rule (C source and WebAssembly text) and its headers. The module (and on a rule checker bounty the rule and the tests) is checked against the hashes on chain.',
     p: { bounty_id: { type: 'string' } }, r: ['bounty_id'],
     async run(k, a) {
       const bid = String(a.bounty_id);
@@ -312,15 +404,31 @@ const TOOLS = {
       const m = w.readWasm(new Uint8Array(mod), { readDebugNames: false });
       let wat; try { wat = m.toText({ foldExprs: false, inlineExport: false }); } finally { m.destroy(); }
       const lang = pc.source.endsWith('.c') ? 'C' : 'Rust', src = await site(pc.source);
-      return { bounty_id: bid, program: pc.program, description: pc.description, bug_kind: bugKind(b, row), bug_meaning: BUG_MEANING[bugKind(b, row)], target: row.target, max_patch_bytes: b.max_patch_bytes,
+      const tests = await site(pc.tests);
+      const extra = (pc.extra_files || []).concat(isRule(b) && pc.rule && pc.rule.header ? [pc.rule.header] : []);
+      const out = { bounty_id: bid, program: pc.program, description: pc.description, bug_kind: bugKind(b, row), bug_meaning: BUG_MEANING[bugKind(b, row)], target: row.target, max_patch_bytes: b.max_patch_bytes,
         source_language: lang, source: src, ...(lang === 'Rust' ? { source_rust: src } : {}),
-        ...(pc.extra_files ? { extra_files: Object.fromEntries(await Promise.all(pc.extra_files.map(async (f) => [f.split('/').pop(), await site(f)]))) } : {}),
-        original_wat: wat, public_tests: await site(pc.tests),
+        ...(extra.length ? { extra_files: Object.fromEntries(await Promise.all(extra.map(async (f) => [f.split('/').pop(), await site(f)]))) } : {}),
+        original_wat: wat, public_tests: tests,
         how_to_send_a_fix: `Change original_wat to fix the bug the ${lang} source describes (the ${lang} is the readable version of the same program). Keep the exports memory, input_buf and parse, and the answer of every public test. Then call check_patch with the whole fixed module as wat.` };
+      if (!isRule(b)) return out;
+      // A rule checker bounty: the public rule, checked with the public tests against corpus_hash on chain.
+      if (!pc.rule) throw new Fail(`bounty ${bid} has no public rule on the site`);
+      const ruleMod = await site(pc.rule.module, true);
+      if (ruleCorpusHash(parseRuleTests(tests), ruleMod) !== b.corpus_hash) throw new Fail(`the public rule and tests of bounty ${bid} do not match corpus_hash on chain; do not use them`);
+      const rm = w.readWasm(new Uint8Array(ruleMod), { readDebugNames: false });
+      let ruleWat; try { ruleWat = rm.toText({ foldExprs: false, inlineExport: false }); } finally { rm.destroy(); }
+      const init = exportsOf(mod).list.includes('init:function/0');
+      const keep = init ? 'memory, input_buf, output_buf, call and init' : 'memory, input_buf, output_buf and call';
+      return { ...out,
+        rule: { source_file: pc.rule.source.split('/').pop(), source: await site(pc.rule.source), module_wat: ruleWat, module_form: 'WebAssembly text (WAT) of the rule module, made from the module checked against corpus_hash', sha256: sha256(ruleMod),
+          meaning: 'the rule reads every call and its result (see the header) and check(len) returns 0 when they obey it; the vendor runs it on the secret and on calls near the public tests' },
+        public_tests_format: 'One test per line: <call sequence as hex> <the original\'s results as hex>, "-" for empty. A call sequence is, per call: op (1 byte), argument length (1 byte), the arguments. The results are, per call: status (1 byte: 0 returned, 1 trapped, 2 out of fuel), code (4 bytes, little endian; the output length when 0 or more), output length (2 bytes, little endian), the output bytes. A trap ends the run. A fix passes a public test only when its results equal these bytes exactly.',
+        how_to_send_a_fix: `Change original_wat to fix the bug the C source describes (the C is the readable version of the same program; ${(pc.extra_files || []).map((f) => f.split('/').pop()).join(', ') || 'its header'} holds its buffers). Keep the exports ${keep} with the same parameters, and the exact results of every public test. Every result must obey the rule in rule.source; normal calls must keep working. The checker refuses floating point instructions, a start function and memory above 2 pages (128 KiB); each call has a fuel limit. Then call check_patch with the whole fixed module as wat.` };
     },
   },
   check_patch: {
-    ro: true, d: 'Check a fix before spending anything: turns the WebAssembly text (or patch_base64) into a module, confirms it is valid, that its size fits and that its exports match the public program, and runs the public tests; on a crash bounty that uses the public demo input it runs that input too; on a wrong output or memory safety bounty it runs the public tests only and says so. Sends nothing and spends nothing. It does not show that the fix passes the bounty\'s private test: only the vendor\'s proof decides that.',
+    ro: true, d: 'Check a fix before spending anything: turns the WebAssembly text (or patch_base64) into a module, confirms it is valid, that its size fits and that its exports match the public program, and runs the public tests; on a crash bounty that uses the public demo input it runs that input too; on a wrong output or memory safety bounty it runs the public tests only and says so; on a rule checker bounty (path traversal, access control, injection) it runs each public call sequence and compares the results byte for byte. Sends nothing and spends nothing. It does not show that the fix passes the bounty\'s private test: only the vendor\'s proof decides that.',
     p: { bounty_id: { type: 'string' }, wat: { type: 'string', description: 'the whole fixed module as WebAssembly text' }, patch_base64: { type: 'string', description: 'or the fixed .wasm module in base64' } }, r: ['bounty_id'],
     async run(k, a) {
       const bid = String(a.bounty_id); const b = await bounty(bid); const bytes = await patchBytes(a);
@@ -393,7 +501,7 @@ async function handleMessage(k, msg) {
   if (method === 'initialize') {
     const want = msg.params && msg.params.protocolVersion;
     return ok({ protocolVersion: SUPPORTED.includes(want) ? want : SUPPORTED[1], capabilities: { tools: { listChanged: false } }, serverInfo: { name: 'skarbnik', title: 'Skarbnik (testnet)', version: VERSION },
-      instructions: 'Skarbnik repair bounties on NEAR testnet, with a key that can only commit and reveal. Order: list_bounties, get_public_code, check_patch until it is ready, get_bounty, tell the user the fee, the bounty\'s level with its meaning and the kind of bug (crash, wrong output or memory safety) in one message and wait for a yes, commit, then reveal after the gap with the same wat, then status.' });
+      instructions: 'Skarbnik repair bounties on NEAR testnet, with a key that can only commit and reveal. Order: list_bounties, get_public_code, check_patch until it is ready, get_bounty, tell the user the fee, the bounty\'s level with its meaning and the kind of bug (' + KINDS_TEXT + ') in one message and wait for a yes, commit, then reveal after the gap with the same wat, then status.' });
   }
   if (id === undefined || id === null) return null; // notifications (initialized, cancelled) need no answer
   if (method === 'ping') return ok({});
@@ -416,4 +524,6 @@ async function handleMessage(k, msg) {
   return { jsonrpc: '2.0', id, error: { code: -32601, message: 'method not found' } };
 }
 
-module.exports = { decodeToken, keyAllowed, handleMessage, VERSION, TOOLS, b58encode, b58decode, functionCallTx, fingerprint, checkPatch, patchBytes, patchOk, bounty, Fail };
+module.exports = { decodeToken, keyAllowed, handleMessage, VERSION, TOOLS, b58encode, b58decode, functionCallTx, fingerprint, checkPatch, patchBytes, patchOk, bounty, Fail,
+  // for local tests of the rule checker's runner (no network)
+  RULE_WORKER, runTests, parseRuleTests, ruleCorpusHash, iface, ruleMemoryProblem };

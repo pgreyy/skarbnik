@@ -23,16 +23,24 @@ export const STATUS = {
 };
 
 // The kind of bug a bounty is about: its published program's (data/programs.json, by original_hash), else from its
-// checker: the output checker judges wrong answers, the crash checker crashes. Pure: the checkers come in as an argument,
-// so the live feed function can use it too.
+// checker: the output checker judges wrong answers, the rule checker bugs judged by a public rule (a security rule), the
+// crash checker crashes. Pure: the checkers come in as an argument, so the live feed function can use it too.
 export function bugKindOf(b, programs, checkers) {
   const p = programs && programs.programs && programs.programs[b.original_hash];
   if (p && p.bug) return p.bug;
-  return checkers && b.image_id === checkers.output ? 'wrong output' : 'crash';
+  if (checkers && b.image_id === checkers.output) return 'wrong output';
+  if (checkers && b.image_id === checkers.rule) return 'security rule';
+  return 'crash';
 }
-export const BUG_LABEL = { crash: 'Crash', 'wrong output': 'Wrong output', 'memory safety': 'Memory safety' };
-// The "New" sticker: wrong output and memory safety bounties that are not tests and not on a retired checker, until
-// the date in web/site.config.json (new_badge_until_utc) has passed. It switches off by itself, with no redeploy.
+export const BUG_LABEL = {
+  crash: 'Crash', 'wrong output': 'Wrong output', 'memory safety': 'Memory safety',
+  'path traversal': 'Path traversal', 'access control': 'Access control', injection: 'Injection', 'security rule': 'Security rule',
+};
+// The kinds of bug each newer checker judges (the home page's links filter the Bounties list by them).
+export const OUTPUT_KINDS = ['wrong output', 'memory safety'];
+export const RULE_KINDS = ['path traversal', 'access control', 'injection', 'security rule'];
+// The "New" sticker: bounties of every kind except crash that are not tests and not on a retired checker, until the
+// date in web/site.config.json (new_badge_until_utc) has passed. It switches off by itself, with no redeploy.
 export const newBadgeOn = (until, now = Date.now()) => !!until && now < Date.parse(`${until}T00:00:00Z`);
 export const isNewKind = (b, rec, programs, checkers, until, now = Date.now()) =>
   newBadgeOn(until, now) && bugKindOf(b, programs, checkers) !== 'crash' && kindOf(b, rec) !== 'test' && !((rec && rec.retired_checkers) || {})[b.image_id];

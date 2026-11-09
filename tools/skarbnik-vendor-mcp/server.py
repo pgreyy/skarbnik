@@ -30,9 +30,11 @@ class Fail(Exception):
     """A refusal or error in plain words; returned to the client as a tool error."""
 
 
-# The two checkers on the contract's allowlist (the same ids as tools/skarbnik-vendor): crash, and wrong output.
+# The three checkers on the contract's allowlist (the same ids as tools/skarbnik-vendor): crash, wrong output, and
+# bugs judged by a public rule module.
 CHECKERS = {"crash": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
-            "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"}
+            "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+            "rule": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa"}
 
 def log(msg):
     print(f"skarbnik-vendor-mcp: {msg}", file=sys.stderr, flush=True)
@@ -204,11 +206,14 @@ def t_init(a):
         raise Fail("level is 0, 1 or 2 (default 2)")
     fuzz, variants = int(a.get("fuzz_count", 16)), int(a.get("variants", 32))
     bug = str(a.get("mode", "crash")).lower()
-    if bug not in ("crash", "output"):
-        raise Fail("mode is crash (the original crashes on the secret input) or output (it returns a wrong answer there; also memory safety bugs)")
-    sweep = str(a.get("sweep", "0" if bug == "output" else "") or "").replace(" ", "")  # output mode: 1 position by default
+    if bug not in ("crash", "output", "rule"):
+        raise Fail("mode is crash (the original crashes on the secret input), output (it returns a wrong answer there; also memory safety bugs) "
+                   "or rule (a program with the call interface breaks a public rule module on a secret call sequence)")
+    sweep = str(a.get("sweep", "" if bug == "crash" else "0") or "").replace(" ", "")  # output and rule mode: 1 position by default
     if bug == "crash" and sweep:
-        raise Fail("sweep is for output mode only")
+        raise Fail("sweep is for output and rule mode only")
+    if a.get("rule_path") and bug != "rule":
+        raise Fail("rule_path is for rule mode only")
     if sweep and (not re.fullmatch(r"\d+(,\d+){0,3}", sweep)):
         raise Fail("sweep is up to 4 byte positions, comma separated, for example 0 or 0,5")
     cap = int(a.get("max_commits_per_account", 0) or 0)
@@ -222,13 +227,13 @@ def t_init(a):
                    "reveal_gap_s": int(a.get("reveal_gap_s", 60)), "reveal_window_s": int(a.get("reveal_window_s", 3600)),
                    "verdict_window_h": int(a.get("verdict_window_h", 24)), "expiry_h": int(a.get("expiry_h", 96)),
                    "max_patch_bytes": int(a.get("max_patch_bytes", 1024)), "fuzz_count": fuzz, "variants": variants, "po2": int(a.get("po2", 18)),
-                   "mode": bug, **({"sweep": sweep} if bug == "output" else {})},
+                   "mode": bug, **({"sweep": sweep} if bug != "crash" else {}), **({"rule": a["rule_path"]} if bug == "rule" and a.get("rule_path") else {})},
         "secrets": {"secret": a["secret_input_path"], "reference_fix": a["reference_fix_path"]},
         "prover": {"mode": mode, "machine": a.get("machine", "this-computer"), "workdir": a.get("workdir", f"~/skarbnik-vendor/{a['name']}"), "min_avail_mib": 300},
         "chain": {"network": "testnet", "contract": "kintsugi-l2-cihdp.testnet", "rpc_urls": ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"],
                   "image_id": CHECKERS[bug], "vendor_account": a["vendor_account"]},
     }
-    paths = {k: a[f"path_{k}"] for k in ("host", "check", "near") if a.get(f"path_{k}")}
+    paths = {k: a[f"path_{k}"] for k in ("host", "check", "check_output", "check_rule", "near") if a.get(f"path_{k}")}
     if paths:
         cfg["paths"] = paths
     if mode == "gpu" and a.get("gpu_budget_usd") is not None:
@@ -252,7 +257,8 @@ def t_init(a):
 
 
 def t_check(a):
-    return job_result(start_job(["check", "--config", config_path(a["config_path"])], "check"), wait=float(a.get("wait_seconds", 40)))
+    extra = ["--candidate", os.path.abspath(os.path.expanduser(a["candidate_path"]))] if a.get("candidate_path") else []
+    return job_result(start_job(["check", "--config", config_path(a["config_path"])] + extra, "check"), wait=float(a.get("wait_seconds", 40)))
 
 
 def gpu_note(level=2):
@@ -295,7 +301,15 @@ def make_salt(cfg):
     root = os.path.dirname(os.path.dirname(vendor_tool()))
     module = cfg["bounty"]["module"] if os.path.isabs(cfg["bounty"]["module"]) else os.path.join(root, cfg["bounty"]["module"])
     host = os.path.expanduser(cfg.get("paths", {}).get("host", os.path.join(root, "target/release/skarbnik-host")))
-    p = subprocess.run([host, "execute", os.path.expanduser(cfg["secrets"]["reference_fix"]), "--proof0", "--exploit", os.path.expanduser(cfg["secrets"]["secret"]),
+    sec, fix, bug = os.path.expanduser(cfg["secrets"]["secret"]), os.path.expanduser(cfg["secrets"]["reference_fix"]), str(cfg["bounty"].get("mode", "crash"))
+    if bug == "rule":
+        rule = os.path.expanduser(str(cfg["bounty"].get("rule") or os.path.join(module, "rule.wasm")))
+        which = ["--rule", rule if os.path.isabs(rule) else os.path.join(root, rule), "--secret", sec, "--reference-fix", fix]
+    elif bug == "output":
+        which = ["--output", "--secret", sec, "--reference-fix", fix]
+    else:
+        which = ["--exploit", sec]
+    p = subprocess.run([host, "execute", fix, "--proof0", *which,
                         "--bounty", name, "--original", f"{module}/original.wasm", "--tests", f"{module}/public_tests.txt", "--fuzz-count", "4", "--variants", "4"],
                        capture_output=True, text=True, timeout=900, cwd=root)
     # skarbnik-host makes the salt before it runs the checker; on a machine without the guest files (one that only
@@ -357,8 +371,10 @@ def t_watch_init(a):
         lines.append("")
     lines += ["[[bounties]]", f"name = {toml_value(b['name'])}", f"ids = [{int(a['bounty_id'])}]", f"module = {toml_value(b['module'])}",
               f"secret = {toml_value(src['secrets']['secret'])}", f"po2 = {int(b.get('po2', 18))}"]
-    if str(b.get("mode", "crash")) == "output":  # the output checker needs the reference fix for every proof
-        lines += ['mode = "output"', f"reference_fix = {toml_value(src['secrets']['reference_fix'])}"]
+    if str(b.get("mode", "crash")) in ("output", "rule"):  # the output and rule checkers need the reference fix for every proof
+        lines += [f"mode = {toml_value(b['mode'])}", f"reference_fix = {toml_value(src['secrets']['reference_fix'])}"]
+    if str(b.get("mode", "crash")) == "rule":  # and the rule checker its public rule module
+        lines.append(f"rule = {toml_value(b.get('rule') or os.path.join(str(b['module']), 'rule.wasm'))}")
     lines.append("")
     fd = os.open(out, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "w") as f:
@@ -452,20 +468,21 @@ S = {"type": "string"}
 TOOLS = {
     "init": (t_init, "Write a new bounty config from the vendor's answers. Takes file PATHS only: the secret input and the reference fix are never opened. Ask the vendor for each detail.",
              {"out_path": {"type": "string", "description": "where to write the config (outside the repository)"}, "name": {"type": "string", "description": "short bounty name (also names its salt)"},
-              "module": {"type": "string", "description": "folder with original.wasm and public_tests.txt (default data/demo)"}, "secret_input_path": S, "reference_fix_path": S,
+              "module": {"type": "string", "description": "folder with original.wasm and public_tests.txt (default data/demo); rule mode: also rule.wasm"}, "secret_input_path": S, "reference_fix_path": S,
               "vendor_account": S, "reward_near": S, "k": {"type": "integer"}, "attempt_fee_near": S, "fee_step_near": S, "reveal_gap_s": {"type": "integer"},
               "reveal_window_s": {"type": "integer"}, "verdict_window_h": {"type": "integer"}, "expiry_h": {"type": "integer"}, "prover_mode": {"type": "string", "description": "gpu or cpu"},
               "level": {"type": "integer", "description": "2 (default): the contract checks a Groth16 proof itself; 1: the contract trusts OutLayer running the pinned verifier program, no Groth16 step, about 0.011 NEAR per check and about 2.8 NEAR held and returned; 0: registered verifiers, run by the project"},
               "max_commits_per_account": {"type": "integer", "description": "most attempt slots one account may hold at a time, 1 to k (default 0: no cap)"},
               "max_patch_bytes": {"type": "integer", "description": "largest patch in bytes, up to 2048 (default 1024)"},
               "fuzz_count": {"type": "integer", "description": "fresh inputs from the fairness seed in each check, 1 to 64 (default 16)"},
-              "mode": {"type": "string", "description": "crash (default): the original crashes on the secret input. output: it returns a wrong answer there (also memory safety bugs that corrupt memory without crashing); then the secret file is one line <input as hex> <expected value> [sweep=<p>,<p>]"},
-              "sweep": {"type": "string", "description": "output mode only: up to 4 byte positions of the secret input to try with all 256 values, comma separated (for example a length byte); the secret line must end with the same sweep=<p>,<p>. Each position adds about 32 million cycles to every proof"},
+              "mode": {"type": "string", "description": "crash (default): the original crashes on the secret input. output: it returns a wrong answer there (also memory safety bugs that corrupt memory without crashing); then the secret file is one line <input as hex> <expected value> [sweep=<p>,<p>]. rule: a program with the call interface breaks a public rule module on a secret call sequence (injection, path traversal, missing authorization, IDOR); then the secret file is one line <call sequence as hex> [sweep=<p>,<p>]"},
+              "sweep": {"type": "string", "description": "output and rule mode: up to 4 byte positions of the secret input (rule mode: of the call sequence) to try with all 256 values, comma separated (default 0); the secret line must end with the same sweep=<p>,<p>. Each position adds work to every proof"},
+              "rule_path": {"type": "string", "description": "rule mode only: the public rule module (.wasm); default <module>/rule.wasm"},
               "variants": {"type": "integer", "description": "near copies of the secret input in each check, 1 to 64 (default 32)"},
-              "machine": S, "workdir": S, "gpu_budget_usd": {"type": "number"}, "path_host": S, "path_check": S, "path_near": S},
+              "machine": S, "workdir": S, "gpu_budget_usd": {"type": "number"}, "path_host": S, "path_check": S, "path_check_output": S, "path_check_rule": S, "path_near": S},
              ["out_path", "name", "secret_input_path", "reference_fix_path", "vendor_account", "reward_near"]),
-    "check": (t_check, "The preflight (skarbnik-vendor check): module, tests, that the original crashes on the secret (crash mode) or gives a wrong answer there (output mode), that the fix passes, memory, the checker id, the balance and the window rule, then a preview of fees, windows and time. Spends nothing.",
-              {"config_path": S, "wait_seconds": {"type": "number"}}, ["config_path"]),
+    "check": (t_check, "The preflight (skarbnik-vendor check): module, tests, that the original crashes on the secret (crash mode), gives a wrong answer there (output mode) or breaks the rule there (rule mode), that the fix passes, memory, the checker id, the balance and the window rule, then a preview of fees, windows and time. With candidate_path it only runs the checker on that one file and gives PASS or FAIL (no chain). Spends nothing.",
+              {"config_path": S, "candidate_path": {"type": "string", "description": "optional: a fix to try with the checker on this computer; only its verdict comes back"}, "wait_seconds": {"type": "number"}}, ["config_path"]),
     "prove0": (t_prove0, "Proof 0: proves the reference fix passes the secret test, so agents know the bounty can be fixed. On a GPU this spends rental money: the first call returns what it costs and a confirm code; call again with the code after the vendor says yes.",
                {"config_path": S, "confirm_code": S, "wait_seconds": {"type": "number"}}, ["config_path"]),
     "publish": (t_publish, "Create and fund the bounty on testnet. Two steps: the first call runs the preflight and returns the preview, what is spent and a confirm code; call again with the code only after the vendor says yes.",

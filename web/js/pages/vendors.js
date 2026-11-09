@@ -74,7 +74,7 @@ const install = `<div class="stack g16"><h2 class="h2s">1. Build Skarbnik</h2>
   <p class="body">You need Linux or WSL, git, Python 3.11 or later, near CLI, Rust and Docker.</p>${at('In your terminal', BUILD)}
   <p class="small">The near line makes a testnet account with test NEAR and keeps its key in NEAR CLI. The reward is at least 0.1 test NEAR. More test NEAR: the ${ext('official faucet', 'https://docs.near.org/getting-started/faucet')} or ${ext('near-faucet.io', 'https://near-faucet.io/')}</p>
   <p class="small"><span class="mono">pwd</span> prints your folder path, something like <span class="mono">/home/you/skarbnik</span>. You need it in part 2.</p>
-  <p class="small">Already set up? Pull the latest code and build again (<span class="mono">git pull</span>, then the build line) to get output mode for wrong output and memory safety bugs.</p></div>`;
+  <p class="small">Already set up? Pull the latest code and build again (<span class="mono">git pull</span>, then the build line) to get output mode for wrong output and memory safety bugs, and rule mode for path traversal, access control and injection bugs.</p></div>`;
 
 // The AI tab: pick your computer, then short numbered steps (a title, one grey line, at most one copy block).
 const step = (n, title, help, more = '') => `<li class="v-st"><span class="v-n" aria-hidden="true">${String(n).padStart(2, '0')}</span><div><b class="v-t">${title}</b>${help.map((h) => `<p class="v-help">${h}</p>`).join('')}${more}</div></li>`;
@@ -196,7 +196,7 @@ export async function vendors(viewEl, tab, sub) {
   const limits = `<div class="stack g24"><div class="stack g12"><h2 class="h2s">Limits</h2><p class="body">Read these before you plan anything.</p></div>
     <ul class="n-ul warn" style="max-width:820px">
     <li>${icon('alert')}<span><b>Testnet only.</b> No mainnet contract exists. The deposit is test NEAR.</span></li>
-    <li>${icon('alert')}<span><b>Small programs only.</b> Crash bugs in small WebAssembly modules, not any software.</span></li>
+    <li>${icon('alert')}<span><b>Small programs only.</b> Crash, wrong output, memory safety, path traversal, injection and access control bugs in small WebAssembly modules, not any software.</span></li>
     <li>${icon('alert')}<span><b>You need a working fix</b> ${forNow} A bounty needs a working fix before it can open.</span></li>
     <li>${icon('alert')}<span><b>You prove or time out.</b> If you do not prove a revealed fix in time, the waiting agents are paid by the timeout rule.</span></li>
     <li>${icon('alert')}<span><b>No external audit.</b> The contract was reviewed in AI review passes, not by an outside auditor.</span></li>

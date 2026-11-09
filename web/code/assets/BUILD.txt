@@ -1,0 +1,30 @@
+How to build a patch for this program (the same flags the vendor used for the original; clang from wasi-sdk 34):
+clang --target=wasm32 -Oz -nostdlib -ffreestanding -mbulk-memory -Wl,--no-entry -Wl,--strip-all -Wl,--gc-sections \
+  -Wl,-z,stack-size=8192 -Wl,--initial-memory=65536 -Wl,--max-memory=65536 -o patch.wasm patch.c
+rt_call.h (next to the source) is the program's runtime: keep it as it is and include it. No C library and no imports.
+The patch must be at most the bounty's max_patch_bytes (the checker allows up to 2,048 bytes).
+
+The interface: the module exports memory, input_buf() -> i32 (where the checker writes a call's argument bytes),
+output_buf() -> i32 (where the program leaves its output bytes), call(op: i32, len: i32) -> i32 (runs operation op on
+the first len argument bytes and returns the output's length, or a negative code with no output) and, if the original
+has it, init(), run once before the first call. One run is a fresh instance, init, then the calls in order: memory
+persists across the calls of one run and never between runs.
+
+The rule: rule.c (built to rule.wasm with the same flags, rt_rule.h next to it) is public. The checker writes the
+transcript of a run (every call and its result) into it and check(len) returns 0 for ok and anything else for a
+violation. The rule is fixed for the bounty: its sha256 is part of the corpus_hash.
+
+Public tests: one per line, <call sequence as hex> <transcript as hex> (- for empty); # starts a comment.
+A call sequence: for each call, the op (1 byte), the argument length (1 byte), the argument bytes.
+A transcript: for each call, a status byte (0 returned, 1 trapped, 2 out of fuel), the code (i32 little endian), the
+output length (u16 little endian) and the output bytes. A trap ends the run, so the trap is the last entry.
+corpus_hash is sha256 over: the bytes "skarbnik-rule-corpus-v1", sha256(rule.wasm) (32 bytes), then for each test in
+order: the sequence length (u32 little endian), the sequence, the transcript length (u32 little endian), the transcript.
+
+What PASS needs (harness/checker-rule/src/lib.rs), in order: the patch loads under the limits; on the secret call
+sequence it does not trap and the rule says ok; on every public test its transcript is exactly the expected one; on
+changed copies of the public tests (drawn from the seed recorded at reveal) it does not trap where the vendor's hidden
+reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results
+(so a fix that refuses everything or breaks normal use fails); on variants of the secret (argument bytes changed, a
+byte inserted or deleted, two calls swapped, a call repeated or dropped) it does not trap and the rule says ok; and at
+up to 4 private byte positions of the secret, every value 0 to 255, it does not trap and the rule says ok.

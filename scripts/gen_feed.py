@@ -2,8 +2,10 @@
 # Writes web/feed.json: the bounties of the testnet contract that accept commits right now, read live from the chain
 # with read only calls (get_next_bounty_id, get_bounty). The file is a snapshot: it says when it was made, and an agent
 # should read get_bounty itself before committing. No key is used and nothing is sent.
-# It also publishes the public code of each known program in web/code/<name>/ (copied from data/), and names it in the
-# feed for every bounty whose original_hash and corpus_hash match those files, so an agent can download and check it.
+# It also publishes the public code of each known program in web/code/<name>/ (copied from data/; for a rule checker
+# program also its public rule module), and names it in the feed for every bounty whose original_hash and corpus_hash
+# match those files, so an agent can download and check it. It writes web/data/programs.json, each program's kind of
+# bug by the sha256 of its original module (with the rule checker's scratch bounties 47 and 48, which are not packages).
 # It also writes web/data/bounty_snapshots.json in the same run, with the same time: the raw get_bounty and every
 # get_submission of the bounties the site points people to, and get_verifiers, so a bounty page can show them at once
 # (labelled as a saved snapshot with its time) while it reads the contract live.
@@ -67,15 +69,32 @@ PACKAGES = {"demo": {"dir": "data/demo", "source": "original.rs", "module": "ori
                         "description": "a postage calculator (a cost per parcel by weight, a surcharge for heavy parcels, a discount for large orders); no hint at its bug"},
             "shelves": {"dir": "data/shelves", "source": "original.c", "module": "original.wasm", "tests": "public_tests.txt", "bug": "memory safety",
                         "build": "c", "extra": ["rt.h"],
-                        "description": "a C shelf counter (10 shelves, quantities that stop at 255, a bonus for full shelves); no hint at its bug"}}
-# The kind of bug of each program (default crash), and the two checkers that judge them (web/site.config.json).
+                        "description": "a C shelf counter (10 shelves, quantities that stop at 255, a bonus for full shelves); no hint at its bug"},
+            # rule checker programs: the call interface (rt_call.h) and a public rule module (rule.c, rule.wasm, rt_rule.h)
+            "assets": {"dir": "data/assets", "source": "original.c", "module": "original.wasm", "tests": "public_tests.txt", "bug": "path traversal",
+                       "build": "rule", "extra": ["rt_call.h"], "rule": {"source": "rule.c", "module": "rule.wasm", "header": "rt_rule.h"},
+                       "description": "a C path resolver for uploads (both / and \\ separate folders; .. goes up one folder); no hint at its bug"},
+            "projects": {"dir": "data/projects", "source": "original.c", "module": "original.wasm", "tests": "public_tests.txt", "bug": "access control",
+                         "build": "rule", "extra": ["rt_call.h"], "rule": {"source": "rule.c", "module": "rule.wasm", "header": "rt_rule.h"},
+                         "description": "a C project registry (users log in, create projects, hand them over, rename them); no hint at its bug"}}
+# Programs that are not published as packages but whose kind of bug the site should still show: the rule checker's
+# scratch bounties 47 (mode A) and 48 (mode B), whose fixes are public (docs/evidence/spike_ab/). Only programs.json names them.
+EXTRA_PROGRAMS = {"xss": {"module": "data/ab/xss/original.wasm", "bug": "injection"},
+                  "idor": {"module": "data/ab/idor/original.wasm", "bug": "access control"}}
+# The kind of bug of each program (default crash), and the three checkers that judge them (web/site.config.json).
 CHECKERS = SITE["checkers"]
 BUG_KINDS = {
     "crash": "the original crashes on a secret input (checker dd6c5f42...)",
     "wrong output": "the original returns a wrong answer on a secret input; a fix must return the right answer and match the vendor's hidden reference fix on random and nearby inputs (checker 005d8dc7...)",
     "memory safety": "a memory bug such as a buffer overflow that gives a wrong answer without crashing; judged like wrong output (checker 005d8dc7...). It does not detect memory corruption in general",
+    "path traversal": "a path the program returns leaves its root folder on a secret input; every output must obey the vendor's public rule module (checker 2c7b601a...)",
+    "access control": "after a secret series of calls on a program that keeps state, a user acts on something it does not own; every result must obey the vendor's public rule module (checker 2c7b601a...)",
+    "injection": "the program's output carries unsafe input on a secret input, for example HTML that can run a script; every output must obey the vendor's public rule module (checker 2c7b601a...)",
+    "security rule": "a bounty on the rule checker whose program is not published here; the bounty's public rule module decides (checker 2c7b601a...)",
 }
-# What every fix must do, by kind of bug (the checkers' rules: harness/checker/src/lib.rs, harness/checker-output/src/lib.rs).
+RULE_KINDS = ("path traversal", "access control", "injection", "security rule")
+# What every fix must do, by kind of bug (the checkers' rules: harness/checker/src/lib.rs, harness/checker-output/src/lib.rs,
+# harness/checker-rule/src/lib.rs).
 TARGET = ("Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies "
           "of it where the original crashes, while giving the original's answers on every public test and on fresh inputs "
           "drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this "
@@ -91,13 +110,56 @@ OUTPUT_TARGET = ("Change the program so it returns the right answer on the bount
 MEMORY_TARGET = OUTPUT_TARGET.replace("PASS means it passed this checker; it does not prove the program correct everywhere.",
                                       "Fix the memory bug itself: the checker judges the answers on the overflow input and nearby "
                                       "inputs; it does not detect memory corruption in general.")
-TARGETS = {"crash": TARGET, "wrong output": OUTPUT_TARGET, "memory safety": MEMORY_TARGET}
+RULE_TARGET = ("Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule "
+               "module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies "
+               "of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix "
+               "does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on "
+               "variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule "
+               "says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), "
+               "output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it "
+               "does not prove the program right in every case.")
+TARGETS = {"crash": TARGET, "wrong output": OUTPUT_TARGET, "memory safety": MEMORY_TARGET,
+           "path traversal": RULE_TARGET + " The rule judges every path the program returns.",
+           "access control": RULE_TARGET + " The rule judges every call that went through, across the whole call sequence.",
+           "injection": RULE_TARGET + " The rule judges every output the program returns.",
+           "security rule": RULE_TARGET}
 BUILD_C_TXT = """How to build a patch for this program (the same flags the vendor used for the original; clang from wasi-sdk 34):
 clang --target=wasm32 -Oz -nostdlib -ffreestanding -mbulk-memory -Wl,--no-entry -Wl,--strip-all -Wl,--gc-sections \\
   -Wl,--initial-memory=131072 -Wl,--max-memory=131072 -Wl,-z,stack-size=8192 -o patch.wasm patch.c
 rt.h (next to the source) is the program's runtime: keep it as it is and include it. Keep the interface: input_buf() -> i32
 and parse(len: i32) -> i32. No C library and no imports. The patch must be at most the bounty's max_patch_bytes.
 Public tests: one per line, <input as hex, or - for empty> <value the original returns>. corpus_hash as in the other programs.
+"""
+BUILD_RULE_TXT = """How to build a patch for this program (the same flags the vendor used for the original; clang from wasi-sdk 34):
+clang --target=wasm32 -Oz -nostdlib -ffreestanding -mbulk-memory -Wl,--no-entry -Wl,--strip-all -Wl,--gc-sections \\
+  -Wl,-z,stack-size=8192 -Wl,--initial-memory=65536 -Wl,--max-memory=65536 -o patch.wasm patch.c
+rt_call.h (next to the source) is the program's runtime: keep it as it is and include it. No C library and no imports.
+The patch must be at most the bounty's max_patch_bytes (the checker allows up to 2,048 bytes).
+
+The interface: the module exports memory, input_buf() -> i32 (where the checker writes a call's argument bytes),
+output_buf() -> i32 (where the program leaves its output bytes), call(op: i32, len: i32) -> i32 (runs operation op on
+the first len argument bytes and returns the output's length, or a negative code with no output) and, if the original
+has it, init(), run once before the first call. One run is a fresh instance, init, then the calls in order: memory
+persists across the calls of one run and never between runs.
+
+The rule: rule.c (built to rule.wasm with the same flags, rt_rule.h next to it) is public. The checker writes the
+transcript of a run (every call and its result) into it and check(len) returns 0 for ok and anything else for a
+violation. The rule is fixed for the bounty: its sha256 is part of the corpus_hash.
+
+Public tests: one per line, <call sequence as hex> <transcript as hex> (- for empty); # starts a comment.
+A call sequence: for each call, the op (1 byte), the argument length (1 byte), the argument bytes.
+A transcript: for each call, a status byte (0 returned, 1 trapped, 2 out of fuel), the code (i32 little endian), the
+output length (u16 little endian) and the output bytes. A trap ends the run, so the trap is the last entry.
+corpus_hash is sha256 over: the bytes "skarbnik-rule-corpus-v1", sha256(rule.wasm) (32 bytes), then for each test in
+order: the sequence length (u32 little endian), the sequence, the transcript length (u32 little endian), the transcript.
+
+What PASS needs (harness/checker-rule/src/lib.rs), in order: the patch loads under the limits; on the secret call
+sequence it does not trap and the rule says ok; on every public test its transcript is exactly the expected one; on
+changed copies of the public tests (drawn from the seed recorded at reveal) it does not trap where the vendor's hidden
+reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results
+(so a fix that refuses everything or breaks normal use fails); on variants of the secret (argument bytes changed, a
+byte inserted or deleted, two calls swapped, a call repeated or dropped) it does not trap and the rule says ok; and at
+up to 4 private byte positions of the secret, every value 0 to 255, it does not trap and the rule says ok.
 """
 BUILD_TXT = """How to build a patch for this program (the same flags the vendor used for the original):
 rustc --edition 2021 --target wasm32-unknown-unknown --crate-type cdylib -C opt-level=z -C panic=abort -C strip=symbols \\
@@ -123,6 +185,19 @@ def corpus_hash(text):
     return hashlib.sha256(out).hexdigest()
 
 
+def rule_corpus_hash(text, rule_module):
+    """The rule checker's corpus hash (harness/checker-rule/src/lib.rs, corpus_bytes): the domain tag, sha256 of the
+    rule module, then each public test (sequence length u32 LE, sequence, transcript length u32 LE, transcript)."""
+    h = hashlib.sha256(b"skarbnik-rule-corpus-v1" + hashlib.sha256(rule_module).digest())
+    for line in text.splitlines():
+        line = line.split("#")[0].split()
+        if not line:
+            continue
+        seq, tr = (b"" if x == "-" else bytes.fromhex(x) for x in line[:2])
+        h.update(len(seq).to_bytes(4, "little") + seq + len(tr).to_bytes(4, "little") + tr)
+    return h.hexdigest()
+
+
 public_code = {}
 for name, pk in PACKAGES.items():
     dst_dir = os.path.join(ROOT, "web/code", name)
@@ -131,25 +206,46 @@ for name, pk in PACKAGES.items():
         shutil.copyfile(os.path.join(ROOT, pk["dir"], pk[key]), os.path.join(dst_dir, pk[key]))
     for extra in pk.get("extra", []):
         shutil.copyfile(os.path.join(ROOT, pk["dir"], extra), os.path.join(dst_dir, extra))
+    for rf in pk.get("rule", {}).values():
+        shutil.copyfile(os.path.join(ROOT, pk["dir"], rf), os.path.join(dst_dir, rf))
     with open(os.path.join(dst_dir, "BUILD.txt"), "w") as f:
-        f.write(BUILD_C_TXT if pk.get("build") == "c" else BUILD_TXT)
+        f.write(BUILD_RULE_TXT if pk.get("build") == "rule" else BUILD_C_TXT if pk.get("build") == "c" else BUILD_TXT)
     module = open(os.path.join(dst_dir, pk["module"]), "rb").read()
     tests = open(os.path.join(dst_dir, pk["tests"])).read()
-    public_code[(hashlib.sha256(module).hexdigest(), corpus_hash(tests))] = {
+    if pk.get("rule"):
+        chash = rule_corpus_hash(tests, open(os.path.join(dst_dir, pk["rule"]["module"]), "rb").read())
+    else:
+        chash = corpus_hash(tests)
+    public_code[(hashlib.sha256(module).hexdigest(), chash)] = {
         "source": f"code/{name}/{pk['source']}", "module": f"code/{name}/{pk['module']}",
         "tests": f"code/{name}/{pk['tests']}", "build": f"code/{name}/BUILD.txt", "program": name,
         "description": pk["description"], "bug": pk.get("bug", "crash"),
-        **({"extra_files": [f"code/{name}/{x}" for x in pk["extra"]]} if pk.get("extra") else {})}
+        **({"extra_files": [f"code/{name}/{x}" for x in pk["extra"]]} if pk.get("extra") else {}),
+        **({"checker": "rule", "rule": {k: f"code/{name}/{v}" for k, v in pk["rule"].items()}} if pk.get("rule") else {})}
 # The browser's map from a program's original module to its kind of bug (web/js/status.js, bugKindOf).
+_programs = {k[0]: {"program": v["program"], "bug": v["bug"]} for k, v in public_code.items()}
+for name, ep in EXTRA_PROGRAMS.items():
+    _programs[hashlib.sha256(open(os.path.join(ROOT, ep["module"]), "rb").read()).hexdigest()] = {"program": name, "bug": ep["bug"]}
 with open(os.path.join(ROOT, "web/data/programs.json"), "w") as f:
-    json.dump({"note": "Made by scripts/gen_feed.py: each published program by the sha256 of its original module, with its kind of bug.",
-               "programs": {k[0]: {"program": v["program"], "bug": v["bug"]} for k, v in public_code.items()}}, f, indent=1)
+    json.dump({"note": "Made by scripts/gen_feed.py: each program by the sha256 of its original module, with its kind of bug: "
+                       "the published programs, and the rule checker's scratch bounties 47 (xss) and 48 (idor), which are not published as packages.",
+               "programs": _programs}, f, indent=1)
     f.write("\n")
 
 
+def checker_of(b):
+    """The checker that judges a bounty: crash, output, rule, or other (a retired or unknown id)."""
+    return next((k for k, v in CHECKERS.items() if v == b["image_id"]), "other")
+
+
 def bug_kind(b, pc):
-    """The kind of bug: the program's when it is published, else from the checker."""
-    return pc["bug"] if pc else "wrong output" if b["image_id"] == CHECKERS["output"] else "crash"
+    """The kind of bug: the program's when it is published or named in programs.json (by original_hash), else from the
+    checker (web/js/status.js, bugKindOf, says the same)."""
+    if pc:
+        return pc["bug"]
+    if b["original_hash"] in _programs:
+        return _programs[b["original_hash"]]["bug"]
+    return {"output": "wrong output", "rule": "security rule"}.get(checker_of(b), "crash")
 
 now_ns = int(datetime.datetime.now(datetime.UTC).timestamp() * 1e9)
 # Test bounties (made for trying the site), from web/data/recorded.json (scripts/gen_site_recorded.py)
@@ -220,7 +316,7 @@ for i in range(n):
         "bounty_id": int(b["id"]), "status": status_of(b, subs, kind, accepting), "kind": kind,
         "judge_bounty": str(i) in judge_ids, "retired_judge_bounty": str(i) in retired_judge_ids, "accepts_commits": accepting, "level": b["level"],
         "program": pc["program"] if pc else None, "module_description": pc["description"] if pc else None,
-        "bug_kind": bug_kind(b, pc), "checker": "output" if b["image_id"] == CHECKERS["output"] else "crash" if b["image_id"] == CHECKERS["crash"] else "other",
+        "bug_kind": bug_kind(b, pc), "checker": checker_of(b),
         "target": TARGETS[bug_kind(b, pc)], "max_patch_bytes": b["max_patch_bytes"],
         "reward_yocto": b["amount"], "reward": near(b["amount"]),
         "max_commits": b["max_commits"], "attempts_used": b["commits"], "attempts": f"{b['commits']} of {b['max_commits']} used", "slots_in_use": b["active"],
@@ -282,7 +378,7 @@ feed = {
     "note": "Snapshot made by scripts/gen_feed.py. The live feed at live_url re-reads the open and newer bounties from the chain about once a minute. Read get_bounty on the contract for the current state before you commit.",
     "allowed_image_ids": allowed,
     "checkers": CHECKERS,
-    "checkers_note": "Agents and the site take only these two checkers: crash, and output (wrong answers and memory safety bugs). Any other id on the allowlist is retired (retired_checkers).",
+    "checkers_note": "Agents and the site take only these three checkers: crash, output (wrong answers and memory safety bugs) and rule (bugs judged by a public rule module: path traversal, access control, injection). Any other id on the allowlist is retired (retired_checkers).",
     "retired_checkers": _recorded.get("retired_checkers", {}),
     "bug_kinds": BUG_KINDS,
     "targets": TARGETS,
@@ -293,6 +389,8 @@ feed = {
     "paid_by_timeout": paid_by_timeout,
     "paid_by_timeout_note": "These bounties were paid by the timeout rule (the vendor gave no verdict in time), not by a proof.",
     "public_code_note": "public_code paths are relative to this file. Check sha256(module) == original_hash and the tests' corpus_hash before you use them.",
+    # every published program with its hashes, so the live feed (web/api/feed.js) can name the public code of a bounty newer than this file
+    "public_programs": [{"original_hash": k[0], "corpus_hash": k[1], **v} for k, v in public_code.items()],
     "quickstart": "agent-quickstart.txt",
     "quickstart_url": f"{SITE_URL}/agent-quickstart.txt",
 }

@@ -88,11 +88,19 @@ time, and it does not show that a fix is correct. Timeout payouts are labelled "
    Read them back with get_agent_limits. Clear them with nulls (again 1 yoctoNEAR).
 
 7. WHAT TO CHECK
-   The image id of a bounty should be one of the two published checkers:
-   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc (crash bugs), or
-   005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089 (wrong output and memory safety bugs),
+   The image id of a bounty should be one of the three published checkers:
+   dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc (crash bugs),
+   005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089 (wrong output and memory safety bugs), or
+   2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa (rule: path traversal, injection, access control),
    and get_bounty should show "image_id_allowed": true. Any other id is retired. Tell your user the kind of bug
-   (bug_kind in the feed) with the fee and the level. Rebuild both checkers yourself and compare:
+   (bug_kind in the feed) with the fee and the level.
+   Rule bounties: the program exports memory, input_buf, output_buf, call(op, len) and maybe init; keep them all.
+   A public test line is <call sequence hex> <results hex>. A call is op (1 byte), argument length (1 byte), the
+   arguments. Each result is status (1 byte: 0 returned, 1 trapped, 2 out of fuel), code (i32 little endian), output
+   length (u16 little endian), the output. A fix passes a public test only when its results equal these bytes
+   exactly. The vendor's check also needs every result to obey the public rule module (public_code.rule in the feed)
+   on the secret and on calls near it, and normal calls to match the vendor's hidden reference fix.
+   Rebuild the checkers yourself and compare:
      ./scripts/check_image_id.sh kintsugi-l2-cihdp.testnet <bounty id>    prints MATCH
    Known limits: docs/SECURITY.md and docs/AUDIT.md in the repository.
 

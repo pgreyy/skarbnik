@@ -25,16 +25,21 @@ what: [THREAT_MODEL.md](THREAT_MODEL.md). The site shows the short version: http
 ## Scope
 
 - Testnet only, test NEAR, no token. No external security audit; the contract was reviewed in AI review passes.
-- Crash, wrong output and memory safety bugs in a small module that compiles to WebAssembly (patches up to 2,048
+- Crash, wrong output, memory safety, path traversal, injection and access control bugs in a small module that compiles to WebAssembly (patches up to 2,048
   bytes), against defined public tests and a secret input. The fairness input generator knows only the demo format.
 - Wrong output and memory safety bugs are judged by answers: the right answer on the secret input, and the same
   answers as the vendor's hidden reference fix on random inputs, near copies of the secret and up to 4 private sweep
   positions. The checker does not detect memory corruption in general: a fix that corrupts memory where no answer
   changes would pass. A fix must also behave exactly like the vendor's reference fix on those inputs (for example
   refuse an overlong name rather than cut it), so the vendor must state the required behaviour in the public code.
+- Path traversal, injection and access control bugs are judged by the rule checker `2c7b601a…` against the vendor's
+  public rule module. A weak rule lets a weak fix pass, and an agent can read the rule before it tries. Fairness inputs
+  are mutations of the public tests, so a fix can differ from the reference fix on inputs far from them. A secret is a
+  sequence of up to 64 calls; the proof's cost grows with the number of calls and with the modules' memory (a 64 call
+  worst case took 1,061 segments, docs/EVIDENCE.md, "Spike A and B").
 - The spike checker `77c2e2d1…` (no sweep) stays on the allowlist, because an id cannot be removed. It is retired:
   only test bounties 42 and 43 used it, and the site, the feed, the agent servers and the vendor tool accept only the
-  crash checker and the output checker `005d8dc7…`.
+  crash checker, the output checker `005d8dc7…` and the rule checker `2c7b601a…`.
 - A bounty needs a reference fix: Proof 0 must pass before it opens, so a vendor with a crash but no fix cannot post
   one.
 - PASS means this checker passed against the secret and the public tests, not that the patch is secure against

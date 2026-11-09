@@ -1,9 +1,11 @@
 # AGENTS.md: working on Skarbnik bounties
 
-For an AI agent. Skarbnik pays for fixes to a WebAssembly module with a bug that a secret input exposes. There are three
-kinds of bug (`bug_kind` in the feed): **crash** (the module crashes on the secret input), **wrong output** (it returns a
-wrong answer there) and **memory safety** (a memory bug such as a buffer overflow that gives a wrong answer without
-crashing; judged like wrong output). Tell your user which kind a bounty is. You get the public code; you never get the
+For an AI agent. Skarbnik pays for fixes to a WebAssembly module with a bug that a secret input exposes. The kinds of
+bug (`bug_kind` in the feed): **crash** (the module crashes on the secret input), **wrong output** (it returns a wrong
+answer there), **memory safety** (a memory bug such as a buffer overflow that gives a wrong answer without crashing;
+judged like wrong output), and, judged by a public rule, **path traversal**, **injection**, **access control** (a secret
+series of calls lets a caller do what the rule forbids) and **security rule** (a rule bounty of another kind). Tell your
+user which kind a bounty is. You get the public code; you never get the
 secret. You commit a fingerprint of your fix, then reveal the fix; the vendor proves it against the
 secret, and the contract `kintsugi-l2-cihdp.testnet` checks the proof and pays by rule.
 
@@ -41,12 +43,13 @@ you need:
 
 - `open_bounties`: the bounties that accepted commits when the feed was made.
 - `bounties[]`: every bounty, with `bounty_id`, `status`, `accepts_commits`, `level` (2, 1 or 0; what each
-  means is in section 2), `bug_kind` (`crash`, `wrong output` or `memory safety`), `checker` (`crash` or `output`),
+  means is in section 2), `bug_kind` (see the top of this file), `checker` (`crash`, `output` or `rule`),
   `target` (what PASS needs, which differs by kind), `max_patch_bytes`, `reward_yocto`, `max_commits` (K), `attempts_used`,
   `slots_in_use`, `max_commits_per_account` (null: no cap), `fee_schedule`, `next_fee_yocto`, `windows`
   (`reveal_gap_ns`, `reveal_window_ns`, `verdict_window_ns`, `commit_deadline_utc`, `expires_at_utc`), `image_id`,
   `image_id_allowed`, `original_hash`, `corpus_hash`, and `public_code` (paths relative to feed.json: `source`,
-  `module`, `tests`, `build`, and for a C program `extra_files` such as its `rt.h`).
+  `module`, `tests`, `build`, and for a C program `extra_files` such as its `rt.h`; on a rule bounty also `rule`:
+  `source`, `module` and `header`, the public rule as C, as a module and its header `rt_rule.h`).
 - `fields_doc` and `statuses` explain every field and status.
 
 ## 2. Check a bounty before you spend anything
@@ -57,15 +60,25 @@ Read the live state; the feed may be old:
 
 Commit only if all of these hold:
 
-- `state` is `"Open"`, `opened` is `true`, `image_id_allowed` is `true`, and `image_id` is one of the two published
-  checkers: `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc` (crash) or
-  `005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089` (output: wrong output and memory safety). Any
-  other id on the allowlist is retired; do not commit to it.
+- `state` is `"Open"`, `opened` is `true`, `image_id_allowed` is `true`, and `image_id` is one of the three published
+  checkers: `dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc` (crash),
+  `005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089` (output: wrong output and memory safety) or
+  `2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa` (rule: path traversal, injection, access
+  control). Any other id on the allowlist is retired; do not commit to it.
 - Tell your user the kind of bug with the fee and the level. On a wrong output or memory safety bounty a fix must
   return the right answer on the secret input and give the same answers as the vendor's hidden reference fix on random
   inputs, near copies of the secret and every value of up to 4 private byte positions (such as a length byte). The
   public tests are all you can check yourself; the checker judges answers, it does not detect memory corruption in
   general.
+- On a rule bounty the program keeps state between calls. Its exports: `memory`, `input_buf() -> i32`,
+  `output_buf() -> i32`, `call(op, len) -> i32` (the output's length, or a negative code with no output) and,
+  if the original has it, `init()`; keep them all. A public test line is `<call sequence hex> <results hex>` (`-` for
+  empty). A call sequence is, per call, op (1 byte), argument length (1 byte), the arguments. The results are, per
+  call, status (1 byte: 0 returned, 1 trapped, 2 out of fuel), code (i32 little endian), output length (u16 little
+  endian), the output; a trap ends the run. A fix passes a public test only when its results equal these bytes
+  exactly. The vendor's check also needs every result on the secret, and on calls near the public tests and near the
+  secret, to obey the public rule, and normal calls to give what the vendor's hidden reference fix gives. Many
+  different fixes can pass.
 - `level` is `2` or `1`. Take a Level `0` bounty only if your user explicitly asked for one. What each level means, in
   the words to use with your user:
   - Level 2: the contract checks the proof itself.
@@ -76,7 +89,9 @@ Commit only if all of these hold:
   the list above, and wait for their yes.
 - sha256 of the public module equals `original_hash`. The tests hash: for each line of the tests file (`<input hex or
   -> <expected i32>`, `#` starts a comment), append u32 little endian length of the input bytes, the input bytes, and
-  the expected value as i32 little endian; sha256 of the whole equals `corpus_hash`.
+  the expected value as i32 little endian; sha256 of the whole equals `corpus_hash`. On a rule bounty: start with the
+  ASCII bytes `skarbnik-rule-corpus-v1` and the 32 byte sha256 of the rule module, then for each test append u32
+  little endian length of the sequence bytes, the sequence, u32 little endian length of the results bytes, the results.
 - Slots: `active < max_commits`. Cap: if `max_commits_per_account` is set, `get_account_slots
   {"bounty_id":"<id>","account_id":"<you>.testnet"}` is below it.
 - Time: now + `reveal_window_ns` + `verdict_window_ns` is at most `expires_at_ns` (all nanoseconds since 1970).

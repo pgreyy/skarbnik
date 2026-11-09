@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 """skarbnik-vendor: the vendor's command line tool for private bounties on the Skarbnik contract (NEAR testnet).
 
-Each bounty has a mode (bounty.mode): "crash" (default; the original crashes on the secret input) or "output" (the
-original returns a wrong answer on it, which also covers memory safety bugs that corrupt memory without crashing).
-In output mode the secret file holds one line "<input as hex> <expected value> [sweep=<p>,<p>]", the reference fix
-travels with every proof (the output checker compares fixes with it), and bounty.sweep names the same private byte
-positions as the secret line (at most 4; each is tried with all 256 values). Each bounty has a level (bounty.level, default 2): 2 = the contract checks a Groth16 proof itself; 1 = the contract
+Each bounty has a mode (bounty.mode): "crash" (default; the original crashes on the secret input), "output" (the
+original returns a wrong answer on it, which also covers memory safety bugs that corrupt memory without crashing) or
+"rule" (a program with the call interface breaks a public rule module on a secret call sequence: injection, path
+traversal, missing authorization, IDOR). In output mode the secret file holds one line "<input as hex> <expected value>
+[sweep=<p>,<p>]"; in rule mode one line "<call sequence as hex> [sweep=<p>,<p>]", and bounty.rule names the public rule
+module (default <module>/rule.wasm). In both, the reference fix travels with every proof (the checker compares fixes
+with it), and bounty.sweep names the same private byte positions as the secret line (at most 4; each is tried with all
+256 values). Each bounty has a level (bounty.level, default 2): 2 = the contract checks a Groth16 proof itself; 1 = the contract
 trusts OutLayer running the pinned verifier program on the succinct proof (no Groth16 step, so no Docker and no 7.6 GiB
 here); 0 = two registered verifiers decide (today both are run by the project).
 
 A vendor should not have to be a cryptography operator. Commands:
   init     ask a few questions (or copy an older config with --from) and write a bounty config (TOML), outside the repo
-  check    the preflight: module, public tests, the secret crashes the original, the reference fix passes on several
+  check    the preflight: module, public tests, the original is buggy on the secret, the reference fix passes on several
            seeds, memory for the prover mode, the checker id on the allowlist, the vendor's balance, and the verdict
-           window against K times the measured proof time; prints a preview and refuses with a plain reason
+           window against K times the measured proof time; prints a preview and refuses with a plain reason.
+           With --candidate F it only runs the native checker on that one file and prints its verdict (no chain)
   prove0   Proof 0 of the reference fix: prove, shrink to succinct, then (Level 2 only) Groth16, verify, the contract
            arguments (mode gpu: prove and shrink on a rented GPU pod, Groth16 here); one job at a
            time, memory watched (scripts/s2_measure.sh)
@@ -59,21 +63,48 @@ LEVELS = {
         'no proof on chain; the verifiers must attest Proof 0 and each verdict before the windows close'),
 }
 def level_of(cfg): return int(cfg['bounty'].get('level', 2))
-# The two checkers on the contract's allowlist: the patch checker for crashes, and the output checker for wrong answers
-# (with the byte sweep). Rebuild either with scripts/check_image_id.sh.
+# The three checkers on the contract's allowlist: the patch checker for crashes, the output checker for wrong answers
+# (with the byte sweep), and the rule checker for bugs judged by a public rule module. Rebuild any of them with
+# scripts/check_image_id.sh.
 CHECKERS = {'crash': 'dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc',
-            'output': '005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089'}
-def mode_of(b): return 'output' if str(b.get('mode', 'crash')).strip().lower() == 'output' else 'crash'
-def secret_args(mode, secret, fix):
-    """The host's arguments that name the secret: --exploit for a crash; --output --secret --reference-fix for output."""
+            'output': '005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089',
+            'rule': '2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa'}
+RULE_CORPUS_DOMAIN = b'skarbnik-rule-corpus-v1'  # harness/checker-rule/src/lib.rs, CORPUS_DOMAIN
+MAX_RULE_BYTES = 4096                            # the rule checker's limit on the rule module (Limits::default)
+def mode_of(b):
+    m = str(b.get('mode', 'crash')).strip().lower(); return m if m in ('output', 'rule') else 'crash'
+def rule_of(b, module):
+    """The public rule module of a rule bounty: bounty.rule (or a watch entry's rule), else <module>/rule.wasm."""
+    r = os.path.expanduser(str(b.get('rule') or os.path.join(module, 'rule.wasm')))
+    return r if os.path.isabs(r) else os.path.join(ROOT, r)
+def secret_args(mode, secret, fix, rule=None):
+    """The host's arguments that name the secret: --exploit for a crash; --output --secret --reference-fix for output;
+    --rule <rule.wasm> --secret --reference-fix for the rule checker."""
+    if mode == 'rule': return ['--rule', rule, '--secret', secret, '--reference-fix', fix]
     return ['--exploit', secret] if mode == 'crash' else ['--output', '--secret', secret, '--reference-fix', fix]
-def secret_sweep(path):
-    """The sweep positions on an output secret line (the third field), read without showing anything else."""
+def out_flag(mode):
+    """The bare flag that tells verify, compress and groth16-args which checker's image id the receipt is for."""
+    return {'output': ['--output'], 'rule': ['--rule']}.get(mode, [])
+def secret_sweep(path, mode='output'):
+    """The sweep positions on a secret line (output: the third field; rule: the second), read without showing anything else."""
+    n = 1 if mode == 'rule' else 2
     for line in open(path):
         parts = line.split()
         if parts and not parts[0].startswith('#'):
-            return [int(x) for x in parts[2][len('sweep='):].split(',') if x] if len(parts) > 2 and parts[2].startswith('sweep=') else []
+            return [int(x) for x in parts[n][len('sweep='):].split(',') if x] if len(parts) > n and parts[n].startswith('sweep=') else []
     return []
+def _hexb(t): return b'' if t == '-' else bytes.fromhex(''.join(t.split()))
+def rule_corpus_hash(rule, tests):
+    """The rule checker's corpus hash, as its guest computes it: sha256("skarbnik-rule-corpus-v1" || sha256(rule.wasm) ||
+    for each public test: u32 LE length of the sequence, the sequence, u32 LE length of the transcript, the transcript)."""
+    h = hashlib.sha256(RULE_CORPUS_DOMAIN); h.update(hashlib.sha256(open(rule, 'rb').read()).digest())
+    for line in open(tests):
+        body = line.split('#', 1)[0].strip()
+        if not body: continue
+        parts = body.split()
+        if len(parts) != 2: raise ValueError(f'a public test line has {len(parts)} fields, not 2')
+        for x in map(_hexb, parts): h.update(len(x).to_bytes(4, 'little')); h.update(x)
+    return h.hexdigest()
 def config_sweep(b): return [int(x) for x in str(b.get('sweep', '')).replace(' ', '').split(',') if x]
 
 def now(): return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -97,7 +128,12 @@ def load(path):
 
 def inside_repo(p): return os.path.abspath(p).startswith(ROOT + os.sep)
 def binpath(cfg, name): return os.path.expanduser(cfg.get('paths', {}).get(name, {'host': f'{ROOT}/target/release/skarbnik-host', 'check': f'{ROOT}/target/debug/skarbnik-check',
-                                                                                  'check_output': f'{ROOT}/target/debug/skarbnik-check-output', 'near': 'near'}[name]))
+                                                                                  'check_output': f'{ROOT}/target/debug/skarbnik-check-output', 'near': 'near',
+                                                                                  'check_rule': rule_checker_default()}[name]))
+def rule_checker_default():
+    """The native rule checker: this repository's release build, else its debug build."""
+    r = f'{ROOT}/target/release/skarbnik-check-rule'
+    return r if os.path.exists(r) else f'{ROOT}/target/debug/skarbnik-check-rule'
 
 # ---------------------------------------------------------------- chain (read only)
 def rpc(cfg, method, params):
@@ -202,10 +238,10 @@ class ProverLock:
 def prove_chain(cfg, *a, **k):
     with ProverLock(): return _prove_chain(cfg, *a, **k)
 
-def _prove_chain(cfg, w, name, candidate, module, secret, seed, fuzz, variants, po2, proof0=False, sid=None, groth16=True, mode='crash', fix=None):
+def _prove_chain(cfg, w, name, candidate, module, secret, seed, fuzz, variants, po2, proof0=False, sid=None, groth16=True, mode='crash', fix=None, rule=None):
     """prove -> succinct -> (Level 2: Groth16) -> verify -> contract arguments, in workdir w. Returns the verify text and times."""
-    host = binpath(cfg, 'host'); log = f'{w}/run.log'; times = {}; out = ['--output'] if mode == 'output' else []
-    argv = [host, 'prove', candidate, '--bounty', name, *secret_args(mode, secret, fix), '--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt',
+    host = binpath(cfg, 'host'); log = f'{w}/run.log'; times = {}; out = out_flag(mode)
+    argv = [host, 'prove', candidate, '--bounty', name, *secret_args(mode, secret, fix, rule), '--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt',
             '--fuzz-count', str(fuzz), '--variants', str(variants), '--po2', str(po2), '--seed', seed, '--out', f'{w}/{"p0" if proof0 else "u"}.bin']
     if proof0: argv.insert(3, '--proof0')
     if sid: argv += ['--submission-id', sid]
@@ -220,7 +256,7 @@ def _prove_chain(cfg, w, name, candidate, module, secret, seed, fuzz, variants, 
 
 def verify_succinct(cfg, w, tag, mode='crash'):
     """Levels 0 and 1: verify the succinct receipt here and keep the verify text (no Groth16 step)."""
-    v = subprocess.run([binpath(cfg, 'host'), 'verify', f'{w}/{tag}_succinct.bin', *(['--output'] if mode == 'output' else [])], capture_output=True, text=True).stdout
+    v = subprocess.run([binpath(cfg, 'host'), 'verify', f'{w}/{tag}_succinct.bin', *out_flag(mode)], capture_output=True, text=True).stdout
     open(f'{w}/verify_{tag}.txt', 'w').write(v)
     if not re.search(r'^VALID', v, re.M): raise RuntimeError('the succinct receipt does not verify')
     return v
@@ -241,7 +277,7 @@ def outlayer_args(w, tag, extra):
 
 def wrap(cfg, w, tag, mode='crash'):
     """Groth16 wrap of {tag}_succinct.bin -> verify -> contract arguments, in workdir w. Returns the verify text and seconds."""
-    host = binpath(cfg, 'host'); log = f'{w}/run.log'; out = ['--output'] if mode == 'output' else []
+    host = binpath(cfg, 'host'); log = f'{w}/run.log'; out = out_flag(mode)
     wait_memory(GROTH16_NEED_MIB, log, 'the Groth16 wrap')
     t0 = time.time()
     g = subprocess.run(['/usr/bin/time', '-v', host, 'compress', f'{w}/{tag}_succinct.bin', f'{w}/{tag}_groth16.bin', 'groth16', *out], capture_output=True, text=True, env=dict(os.environ, RISC0_DEV_MODE='0'))
@@ -265,9 +301,10 @@ def proof_args(w, tag, extra):
 # ---------------------------------------------------------------- init
 QUESTIONS = [
     ('bounty', 'name', 'a short name for this bounty (also names its salt in ~/.kintsugi-salts/)', 'mybounty'),
-    ('bounty', 'mode', 'kind of bug: crash (the original crashes on the secret input) or output (it returns a wrong answer there; also memory safety bugs)', 'crash'),
-    ('bounty', 'sweep', 'output mode only: byte positions of the secret input to try with all 256 values, comma separated, at most 4 (for example a length byte); write the same list as sweep=<p>,<p> at the end of the secret line; each position adds about 32 million cycles to every proof; empty for none', '0'),
-    ('bounty', 'module', 'the folder with original.wasm and public_tests.txt', 'data/demo'),
+    ('bounty', 'mode', 'kind of bug: crash (the original crashes on the secret input), output (it returns a wrong answer there; also memory safety bugs) or rule (a program with the call interface breaks a public rule on a secret call sequence)', 'crash'),
+    ('bounty', 'sweep', 'output and rule mode: byte positions of the secret input (rule: of the call sequence) to try with all 256 values, comma separated, at most 4 (for example a length byte); write the same list as sweep=<p>,<p> at the end of the secret line; each position adds work to every proof; empty for none', '0'),
+    ('bounty', 'module', 'the folder with original.wasm and public_tests.txt (rule mode: also rule.wasm)', 'data/demo'),
+    ('bounty', 'rule', 'rule mode only: path of the public rule module (.wasm); empty for <module>/rule.wasm', ''),
     ('bounty', 'reward_near', 'reward in NEAR', '0.1'),
     ('bounty', 'k', 'attempts allowed, K (1 to 16)', '1'),
     ('bounty', 'max_commits_per_account', 'most attempt slots one account may hold at a time (1 to K; 0 = no cap)', '0'),
@@ -279,7 +316,7 @@ QUESTIONS = [
     ('bounty', 'verdict_window_h', 'hours after a reveal to prove it', '24'),
     ('bounty', 'expiry_h', 'hours until the bounty expires', '96'),
     ('bounty', 'po2', 'proof segment size (18 needs about 2.5 GiB, 19 about 5 GiB)', '18'),
-    ('secrets', 'secret', 'path of the secret file, outside the repository: crash mode, the crashing input as hex; output mode, one line <input as hex> <expected value> [sweep=<p>,<p>]', '~/.skarbnik-vendor/mybounty/exploit.hex'),
+    ('secrets', 'secret', 'path of the secret file, outside the repository: crash mode, the crashing input as hex; output mode, one line <input as hex> <expected value> [sweep=<p>,<p>]; rule mode, one line <call sequence as hex> [sweep=<p>,<p>]', '~/.skarbnik-vendor/mybounty/exploit.hex'),
     ('secrets', 'reference_fix', 'path of your reference fix (.wasm), outside the repository', '~/.skarbnik-vendor/mybounty/fixed.wasm'),
     ('prover', 'mode', 'where proving runs: gpu (a rented GPU pod per proof) or cpu (this machine)', 'gpu'),
     ('prover', 'workdir', 'folder for receipts and logs, outside the repository', '~/skarbnik-vendor/mybounty'),
@@ -299,6 +336,11 @@ def cmd_init(a):
         if inside_repo(os.path.expanduser(str(base[sec][key]))): fail(f'{sec}.{key} must point outside the repository')
     mode = mode_of(base['bounty']); base['bounty']['mode'] = mode
     if mode == 'crash': base['bounty'].pop('sweep', None)
+    if mode == 'rule':
+        module = base['bounty'].get('module', 'data/demo')
+        if not base['bounty'].get('rule'): base['bounty']['rule'] = os.path.join(module, 'rule.wasm')
+        if not os.path.isfile(rule_of(base['bounty'], module)): say(f'note: no rule module at {base["bounty"]["rule"]} yet; check refuses until it is there')
+    else: base['bounty'].pop('rule', None)
     if len(config_sweep(base['bounty'])) > 4: fail('at most 4 sweep positions')
     if base.get('chain', {}).get('image_id') in CHECKERS.values() or not base.get('chain', {}).get('image_id'):
         base.setdefault('chain', {})['image_id'] = CHECKERS[mode]
@@ -338,13 +380,43 @@ def preview(cfg, est):
         say(f'  proving one attempt ({mode}): about {hm(est)} (measured, {src}); cost: {"electricity and machine time" if mode == "cpu" else "GPU rental time"}')
         say(f'  time to open: Proof 0 (about {hm(est)}) plus two transactions')
 
+def checker_call(cfg, module):
+    """The native checker of this bounty's mode and its arguments that name the bounty's files (never their contents)."""
+    b, s = cfg['bounty'], cfg['secrets']; mode = mode_of(b)
+    common = ['--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt']
+    if mode == 'rule': return binpath(cfg, 'check_rule'), common + ['--rule', rule_of(b, module), '--secret', s['secret'], '--reference-fix', s['reference_fix']]
+    if mode == 'output': return binpath(cfg, 'check_output'), common + ['--secret', s['secret'], '--reference-fix', s['reference_fix']]
+    return binpath(cfg, 'check'), common + ['--exploit', s['secret']]
+
+def check_candidate(cfg, module, cand, seed=None, explain=False):
+    """check --candidate: the native checker on one file, with the bounty's settings; no chain, no proof. Prints the verdict
+    (and with --explain the step that decided, which can name a sweep position: for the vendor's eyes only)."""
+    b = cfg['bounty']; mode = mode_of(b); chk, common = checker_call(cfg, module)
+    if not os.path.isfile(cand): fail(f'candidate not found: {cand}')
+    seed = seed or os.urandom(32).hex()
+    r = subprocess.run([chk, 'check', '--candidate', cand, *common, '--seed', seed, '--fuzz-count', str(int(b.get('fuzz_count', 16))),
+                        '--variants', str(int(b.get('variants', 32))), *(['--explain'] if explain else [])], capture_output=True, text=True)
+    lines = r.stdout.splitlines()
+    verdict = lines[0].strip() if lines and lines[0].strip() in ('PASS', 'FAIL') else None
+    if verdict is None: fail(f'the {mode} checker gave no verdict: {(r.stderr.strip().splitlines() or ["no output"])[-1][:200]}')
+    say(f'{mode} checker on {cand}: {verdict} (seed {seed[:16]}..., fuzz {b.get("fuzz_count", 16)}, variants {b.get("variants", 32)})')
+    if explain: [say(f'  {l}') for l in lines[1:] if l.startswith('reason (internal)')]
+    if mode == 'rule': say(f'corpus hash (rule checker): {rule_corpus_hash(rule_of(b, module), f"{module}/public_tests.txt")}')
+    sys.exit(0 if verdict == 'PASS' else 1)
+
 def cmd_check(a):
     cfg = load(a.config); b, s, pr = cfg['bounty'], cfg['secrets'], cfg['prover']
     problems = []; ok = lambda m: say(f'  ok   {m}')
-    say(f'Preflight for {b["name"]} ({cfg["_path"]})')
     module = os.path.join(ROOT, b['module']) if not os.path.isabs(b['module']) else b['module']
+    if a.candidate: return check_candidate(cfg, module, os.path.abspath(os.path.expanduser(a.candidate)), a.seed, a.explain)
+    say(f'Preflight for {b["name"]} ({cfg["_path"]})')
+    mode = mode_of(b)
     for f in ('original.wasm', 'public_tests.txt'):
         if not os.path.isfile(f'{module}/{f}'): problems.append(f'{b["module"]}/{f} is missing')
+    if mode == 'rule':
+        rule = rule_of(b, module)
+        if not os.path.isfile(rule): problems.append(f'the rule module {b.get("rule") or b["module"] + "/rule.wasm"} is missing')
+        elif os.path.getsize(rule) > MAX_RULE_BYTES: problems.append(f'the rule module is {os.path.getsize(rule)} bytes; the rule checker takes at most {MAX_RULE_BYTES:,}')
     # A split setup: the secret and the reference fix stay on the proving machine, which made Proof 0 and ran these
     # checks there; this computer only publishes. Then the Proof 0 files must be here and match this module.
     w = os.path.expanduser(pr.get('workdir', ''))
@@ -364,29 +436,32 @@ def cmd_check(a):
     if not split:
         fixsize = os.path.getsize(s['reference_fix'])
         if fixsize > int(b.get('max_patch_bytes', 1024)): problems.append(f'the reference fix is {fixsize} bytes, above max_patch_bytes')
-    mode = mode_of(b)
     if cfg['chain'].get('image_id') != CHECKERS[mode]:
         problems.append(f'chain.image_id is not the {mode} checker ({CHECKERS[mode][:16]}...); set it, or set bounty.mode')
-    if mode == 'output':
-        chk = binpath(cfg, 'check_output')
-        common = ['--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt', '--secret', s['secret'], '--reference-fix', s['reference_fix']]
-    else:
-        chk = binpath(cfg, 'check'); common = ['--original', f'{module}/original.wasm', '--tests', f'{module}/public_tests.txt', '--exploit', s['secret']]
+    chk, common = checker_call(cfg, module)
+    if mode == 'rule':
+        try: ok(f'rule module {os.path.getsize(rule_of(b, module))} bytes; corpus hash (rule, public tests) {rule_corpus_hash(rule_of(b, module), f"{module}/public_tests.txt")[:16]}...')
+        except (OSError, ValueError) as e: problems.append(f'the corpus hash could not be computed: {e}')
     if split:
         v0 = open(f'{w}/verify_p0.txt').read()
         if journal(v0, 'original_hash') != sha_file(f'{module}/original.wasm') or journal(v0, 'verdict') != 'PASS':
             problems.append('the Proof 0 files here are not a PASS for this module')
         else: ok('the secret and the reference fix stay on the proving machine; the Proof 0 made there is here: PASS for this module')
-    elif mode == 'output':
+    elif mode in ('output', 'rule'):
         # Nothing from the secret file is shown: only which step decided, never a value.
         try:
-            sw, want = secret_sweep(s['secret']), config_sweep(b)
+            sw, want = secret_sweep(s['secret'], mode), config_sweep(b)
             if sw != want: problems.append('the sweep positions on the secret line and bounty.sweep differ; write the same list in both')
             elif sw: ok(f'{len(sw)} private sweep position(s), the same on the secret line and in the config')
             else: say('  note no sweep positions: a partial fix that is right on the secret but wrong on nearby lengths may pass')
-        except (OSError, ValueError, IndexError): problems.append('the secret file is not one line <input as hex> <expected value> [sweep=<p>,<p>]')
+        except (OSError, ValueError, IndexError):
+            problems.append('the secret file is not one line ' + ('<call sequence as hex> [sweep=<p>,<p>]' if mode == 'rule' else '<input as hex> <expected value> [sweep=<p>,<p>]'))
         orig = subprocess.run([chk, 'check', '--candidate', f'{module}/original.wasm', *common, '--seed', '00' * 32, '--fuzz-count', '1', '--variants', '1', '--explain'], capture_output=True, text=True)
-        if 'reason (internal): 2 secret' not in orig.stdout: problems.append('the original does not give a wrong answer on the secret input (or the secret file is not readable)')
+        if mode == 'rule':
+            if 'reason (internal): 2 secret: the rule says violation' not in orig.stdout:
+                problems.append('the rule does not say violation for the original on the secret call sequence (or it traps there, or a file is not readable)')
+            else: ok('the original runs the secret call sequence without a trap, and the rule says violation')
+        elif 'reason (internal): 2 secret' not in orig.stdout: problems.append('the original does not give a wrong answer on the secret input (or the secret file is not readable)')
         else: ok('the original gives another answer than the expected one on the secret input')
     else:
         crash = subprocess.run([chk, 'check', '--candidate', f'{module}/original.wasm', *common, '--seed', '00' * 32, '--fuzz-count', '16', '--variants', '32', '--explain'], capture_output=True, text=True)
@@ -396,7 +471,7 @@ def cmd_check(a):
         passes = 0
         for i in range(4):
             seed = hashlib.sha256(f'{b["name"]}:{i}:{time.time()}'.encode()).hexdigest()
-            fixarg = [] if mode == 'output' else ['--reference-fix', s['reference_fix']]
+            fixarg = ['--reference-fix', s['reference_fix']] if mode == 'crash' else []
             r = subprocess.run([chk, 'proof0', *common, *fixarg, '--seed', seed, '--fuzz-count', '64', '--variants', '64'], capture_output=True, text=True)
             passes += r.returncode == 0 and 'proof0: PASS' in r.stdout
         if passes != 4: problems.append(f'Proof 0 (the original is wrong on the secret, the reference fix passes the full check) passed on {passes} of 4 seeds')
@@ -450,7 +525,8 @@ def cmd_prove0(a):
         job = {'bounty_id': b['name'], 'index': 'p0', 'name': b['name'], 'module': module, 'patch': s['reference_fix'], 'secret': s['secret'],
                'salt': os.path.expanduser(f'~/.kintsugi-salts/{b["name"]}.salt'), 'seed': seed, 'sid': None, 'proof0': True,
                'fuzz': int(b.get('fuzz_count', 16)), 'variants': int(b.get('variants', 32)), 'image_id': cfg['chain']['image_id'], 'workdir': w}
-        if mode_of(b) == 'output': job['reference_fix'] = s['reference_fix']  # the output checker compares with it; RAM only on the pod
+        if mode_of(b) in ('output', 'rule'): job['reference_fix'] = s['reference_fix']  # the checker compares with it; RAM only on the pod
+        if mode_of(b) == 'rule': job['rule'] = rule_of(b, module)  # the public rule module, next to the module on the pod
         if not os.path.exists(job['salt']): fail(f'no salt for bounty {b["name"]} in ~/.kintsugi-salts/ (skarbnik-host makes it on first use)')
         with ProverLock():
             try: _, t = gpu.prove_on_gpu(cfg, job, lambda m: say(f'{now()} {m}'))
@@ -461,7 +537,7 @@ def cmd_prove0(a):
     else:
         say(f'{now()} Proof 0 of {b["name"]}: prove, succinct{", Groth16" if level_of(cfg) == 2 else ""}, one step at a time (logs in {w})')
         v, t = prove_chain(cfg, w, b['name'], s['reference_fix'], module, s['secret'], seed, int(b.get('fuzz_count', 16)), int(b.get('variants', 32)), int(b.get('po2', 18)), proof0=True, groth16=level_of(cfg) == 2,
-                           mode=mode_of(b), fix=s['reference_fix'])
+                           mode=mode_of(b), fix=s['reference_fix'], rule=rule_of(b, module) if mode_of(b) == 'rule' else None)
     if journal(v, 'verdict') != 'PASS': fail('Proof 0 did not say PASS')
     if level_of(cfg) == 1:  # the arguments of open_with_outlayer need the journal from the receipt: find it now, not at publish
         try: journal_bytes(f'{w}/p0_succinct.bin', v)
@@ -475,6 +551,11 @@ def cmd_publish(a):
     module = os.path.join(ROOT, b['module']) if not os.path.isabs(b['module']) else b['module']
     if journal(v, 'original_hash') != sha_file(f'{module}/original.wasm'): fail('Proof 0 is not for this module')
     if journal(v, 'verdict') != 'PASS': fail('Proof 0 does not say PASS')
+    if mode_of(b) == 'rule':
+        # The corpus hash binds the public rule module and the public tests; recompute it here and refuse on a mismatch.
+        if re.search(r'^image id: (\S+)', v, re.M).group(1) != CHECKERS['rule']: fail('Proof 0 was not made by the rule checker; set bounty.mode and make Proof 0 again')
+        want = rule_corpus_hash(rule_of(b, module), f'{module}/public_tests.txt')
+        if journal(v, 'corpus_hash') != want: fail(f'Proof 0\'s corpus hash is not the one of this rule module and these public tests ({want[:16]}...)')
     est, _ = proof_time(cfg['prover']['mode'], b['module'], cfg['prover'].get('workdir'), cfg['prover'].get('machine', 'this machine')); preview(cfg, est)
     why = window_rule(cfg, est)
     if why: fail(why)
@@ -539,6 +620,8 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
     patch = f'{w}/patch.wasm'; open(patch, 'wb').write(base64.b64decode(s['patch']))
     sid = view(wcfg, 'get_submission_id', {'bounty_id': bid, 'index': i})
     module = os.path.join(ROOT, e['module']) if not os.path.isabs(e['module']) else e['module']
+    if b['image_id'] in CHECKERS.values() and b['image_id'] != CHECKERS[mode_of(e)]:  # before any pod or proving
+        raise RuntimeError(f'the bounty uses the {[m for m, x in CHECKERS.items() if x == b["image_id"]][0]} checker but its watch entry says mode {mode_of(e)}; fix the watch config')
     log_line(wcfg, f'bounty {bid} attempt {i}: proving (patch sha256 {sha_file(patch)[:16]}..., seed {s["seed"][:16]}..., deadline {datetime.fromtimestamp(int(s["deadline_ns"]) / 1e9, timezone.utc):%Y-%m-%d %H:%M} UTC)')
     prev = st.get(key, {})
     v = t = None
@@ -553,7 +636,8 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
             job = {'bounty_id': bid, 'index': i, 'name': e['name'], 'module': module, 'patch': patch, 'secret': os.path.expanduser(e['secret']),
                    'salt': os.path.expanduser(f'~/.kintsugi-salts/{e["name"]}.salt'), 'seed': s['seed'], 'sid': sid, 'fuzz': b['fuzz_count'],
                    'variants': b['variant_count'], 'image_id': b['image_id'], 'workdir': w}
-            if mode_of(e) == 'output': job['reference_fix'] = os.path.expanduser(e['reference_fix'])
+            if mode_of(e) in ('output', 'rule'): job['reference_fix'] = os.path.expanduser(e['reference_fix'])
+            if mode_of(e) == 'rule': job['rule'] = rule_of(e, module)
             last = None
             for n in (1, 2):
                 try:
@@ -578,7 +662,8 @@ def prove_attempt(wcfg, bid, e, b, i, s, st):
                 log_line(wcfg, f'WARNING bounty {bid} attempt {i}: the GPU path did not give a proof; falling back to cpu on this machine (about 10 h here)')
         if v is None:
             v, t = prove_chain(wcfg, w, e['name'], patch, module, os.path.expanduser(e['secret']), s['seed'], b['fuzz_count'], b['variant_count'], int(e.get('po2', 18)), sid=sid, groth16=level == 2,
-                               mode=mode_of(e), fix=os.path.expanduser(e['reference_fix']) if mode_of(e) == 'output' else None)
+                               mode=mode_of(e), fix=os.path.expanduser(e['reference_fix']) if mode_of(e) in ('output', 'rule') else None,
+                               rule=rule_of(e, module) if mode_of(e) == 'rule' else None)
     if journal(v, 'exploit_commitment') != b['exploit_commitment']: raise RuntimeError('the proof\'s secret commitment is not the bounty\'s (wrong secret or salt); not submitting')
     if journal(v, 'submission_id') != sid: raise RuntimeError('the proof is for another submission id; not submitting')
     verdict = journal(v, 'verdict')
@@ -732,6 +817,10 @@ def main():
     for name in ('check', 'prove0', 'publish', 'watch', 'status'):
         c = sub.add_parser(name); c.add_argument('--config', required=True)
         if name == 'publish': c.add_argument('--yes', action='store_true', help='skip the typed confirmation')
+        if name == 'check':
+            c.add_argument('--candidate', help='only run the native checker on this file and print its verdict (no chain, no proof)')
+            c.add_argument('--seed', help='with --candidate: the fairness seed, 64 hex characters (default: random)')
+            c.add_argument('--explain', action='store_true', help='with --candidate: also print the step that decided (for your eyes only)')
         if name == 'watch': c.add_argument('--once', action='store_true', help='prove what is waiting, then stop')
     a = p.parse_args()
     {'init': cmd_init, 'check': cmd_check, 'prove0': cmd_prove0, 'publish': cmd_publish, 'watch': cmd_watch, 'status': cmd_status}[a.cmd](a)

@@ -19,33 +19,43 @@
  "contract": "kintsugi-l2-cihdp.testnet",
  "site_url": "https://skarbnik.xyz",
  "network": "testnet",
- "generated_at_utc": "2026-11-08T22:09:42Z",
- "updated_at_utc": "2026-11-08T22:09:42Z",
+ "generated_at_utc": "2026-11-09T08:39:25Z",
+ "updated_at_utc": "2026-11-09T08:39:25Z",
  "source": "saved",
  "live_url": "https://skarbnik.xyz/api/feed",
  "note": "Snapshot made by scripts/gen_feed.py. The live feed at live_url re-reads the open and newer bounties from the chain about once a minute. Read get_bounty on the contract for the current state before you commit.",
  "allowed_image_ids": [
   "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
   "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4",
-  "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"
+  "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+  "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa"
  ],
  "checkers": {
   "crash": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
-  "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"
+  "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+  "rule": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa"
  },
- "checkers_note": "Agents and the site take only these two checkers: crash, and output (wrong answers and memory safety bugs). Any other id on the allowlist is retired (retired_checkers).",
+ "checkers_note": "Agents and the site take only these three checkers: crash, output (wrong answers and memory safety bugs) and rule (bugs judged by a public rule module: path traversal, access control, injection). Any other id on the allowlist is retired (retired_checkers).",
  "retired_checkers": {
-  "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4": "The output checker of the spike (no byte sweep). Retired: used only by test bounties 42 and 43. It stays on the allowlist because an id cannot be removed; the site, the feed, the agent servers and the vendor tool accept only the crash checker dd6c5f42... and the output checker 005d8dc7...."
+  "77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4": "The output checker of the spike (no byte sweep). Retired: used only by test bounties 42 and 43. It stays on the allowlist because an id cannot be removed; the site, the feed, the agent servers and the vendor tool accept only the crash checker dd6c5f42..., the output checker 005d8dc7... and the rule checker 2c7b601a...."
  },
  "bug_kinds": {
   "crash": "the original crashes on a secret input (checker dd6c5f42...)",
   "wrong output": "the original returns a wrong answer on a secret input; a fix must return the right answer and match the vendor's hidden reference fix on random and nearby inputs (checker 005d8dc7...)",
-  "memory safety": "a memory bug such as a buffer overflow that gives a wrong answer without crashing; judged like wrong output (checker 005d8dc7...). It does not detect memory corruption in general"
+  "memory safety": "a memory bug such as a buffer overflow that gives a wrong answer without crashing; judged like wrong output (checker 005d8dc7...). It does not detect memory corruption in general",
+  "path traversal": "a path the program returns leaves its root folder on a secret input; every output must obey the vendor's public rule module (checker 2c7b601a...)",
+  "access control": "after a secret series of calls on a program that keeps state, a user acts on something it does not own; every result must obey the vendor's public rule module (checker 2c7b601a...)",
+  "injection": "the program's output carries unsafe input on a secret input, for example HTML that can run a script; every output must obey the vendor's public rule module (checker 2c7b601a...)",
+  "security rule": "a bounty on the rule checker whose program is not published here; the bounty's public rule module decides (checker 2c7b601a...)"
  },
  "targets": {
   "crash": "Change the program so it no longer crashes (traps or runs out of fuel) on the bounty's secret input and on near copies of it where the original crashes, while giving the original's answers on every public test and on fresh inputs drawn from the seed recorded at reveal. Keep the interface input_buf() and parse(len). PASS means it passed this checker against the secret and the public tests; it does not prove the patch is secure against everything.",
   "wrong output": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). PASS means it passed this checker; it does not prove the program correct everywhere.",
-  "memory safety": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). Fix the memory bug itself: the checker judges the answers on the overflow input and nearby inputs; it does not detect memory corruption in general."
+  "memory safety": "Change the program so it returns the right answer on the bounty's secret input (the vendor's private expected value), gives the original's answers on every public test, and gives the same answers as the vendor's hidden reference fix on fresh inputs drawn from the seed recorded at reveal, on near copies of the secret input and on every value of the vendor's private sweep positions. Keep the interface input_buf() and parse(len). Fix the memory bug itself: the checker judges the answers on the overflow input and nearby inputs; it does not detect memory corruption in general.",
+  "path traversal": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every path the program returns.",
+  "access control": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every call that went through, across the whole call sequence.",
+  "injection": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every output the program returns.",
+  "security rule": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case."
  },
  "test_bounty_ids": [
   13,
@@ -60,7 +70,9 @@
   35,
   42,
   43,
-  44
+  44,
+  47,
+  48
  ],
  "test_bounty_note": "Test bounties are for trying the site and the wallet flow, not demos.",
  "open_bounties": [
@@ -2556,7 +2568,7 @@
   },
   {
    "bounty_id": 43,
-   "status": "Demo or test only",
+   "status": "Refunded",
    "kind": "test",
    "judge_bounty": false,
    "retired_judge_bounty": false,
@@ -2755,6 +2767,88 @@
      "code/shelves/rt.h"
     ]
    }
+  },
+  {
+   "bounty_id": 47,
+   "status": "Proof verified",
+   "kind": "test",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": false,
+   "level": 2,
+   "program": null,
+   "module_description": null,
+   "bug_kind": "injection",
+   "checker": "rule",
+   "target": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every output the program returns.",
+   "max_patch_bytes": 1024,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 2,
+   "attempts_used": 2,
+   "attempts": "2 of 2 used",
+   "slots_in_use": 2,
+   "max_commits_per_account": null,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "20000000000000000000000",
+   "next_fee": "0.02 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "21600000000000",
+    "commit_deadline_utc": "2026-11-09T03:37:18Z",
+    "expires_at_utc": "2026-11-09T10:37:18Z"
+   },
+   "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa",
+   "image_id_allowed": true,
+   "original_hash": "0b80190eb73faf07274426e7f2287590356b02507cb4897337bb39f2c830a1a5",
+   "corpus_hash": "9449732f72ce65d5bbd4c253b77a1d7f7030a74f4bf921eb1616bfaafa0fb3b1",
+   "public_code": null
+  },
+  {
+   "bounty_id": 48,
+   "status": "Proof verified",
+   "kind": "test",
+   "judge_bounty": false,
+   "retired_judge_bounty": false,
+   "accepts_commits": false,
+   "level": 2,
+   "program": null,
+   "module_description": null,
+   "bug_kind": "access control",
+   "checker": "rule",
+   "target": "Change the program so that, on the bounty's secret call sequence, it does not trap and the bounty's public rule module (public_code.rule) says ok; it gives exactly the original's results on every public test; on changed copies of the public tests drawn from the seed recorded at reveal it does not trap where the vendor's hidden reference fix does not, the rule says ok, and where the original and the reference fix agree it gives the same results; and on variants of the secret sequence and every value of the vendor's private sweep positions it does not trap and the rule says ok. A fix that refuses everything or breaks normal use fails. Keep the interface: memory, input_buf(), output_buf(), call(op, len) and init() if the original has one. PASS means it passed this checker and this rule; it does not prove the program right in every case. The rule judges every call that went through, across the whole call sequence.",
+   "max_patch_bytes": 1024,
+   "reward_yocto": "100000000000000000000000",
+   "reward": "0.1 NEAR",
+   "max_commits": 2,
+   "attempts_used": 2,
+   "attempts": "2 of 2 used",
+   "slots_in_use": 2,
+   "max_commits_per_account": null,
+   "fee_schedule": {
+    "base_yocto": "10000000000000000000000",
+    "step_yocto": "5000000000000000000000",
+    "rule": "the attempt with index n (from 0) costs base + n * step, from credit in the contract"
+   },
+   "next_fee_yocto": "20000000000000000000000",
+   "next_fee": "0.02 NEAR",
+   "windows": {
+    "reveal_gap_ns": "60000000000",
+    "reveal_window_ns": "3600000000000",
+    "verdict_window_ns": "21600000000000",
+    "commit_deadline_utc": "2026-11-09T03:40:37Z",
+    "expires_at_utc": "2026-11-09T10:40:37Z"
+   },
+   "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa",
+   "image_id_allowed": true,
+   "original_hash": "971414a50dba9afe5647238b61d2f164e2b33bf38e9069dad99d79367339d0a2",
+   "corpus_hash": "4f51b0857d833d11784381306b8f1282936543b32cd4a5c6f5d1f8b60e7c9e64",
+   "public_code": null
   }
  ],
  "paid_by_timeout": [
@@ -2827,6 +2921,153 @@
  ],
  "paid_by_timeout_note": "These bounties were paid by the timeout rule (the vendor gave no verdict in time), not by a proof.",
  "public_code_note": "public_code paths are relative to this file. Check sha256(module) == original_hash and the tests' corpus_hash before you use them.",
+ "public_programs": [
+  {
+   "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+   "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+   "source": "code/demo/original.rs",
+   "module": "code/demo/original.wasm",
+   "tests": "code/demo/public_tests.txt",
+   "build": "code/demo/BUILD.txt",
+   "program": "demo",
+   "description": "a record parser (tag, length, payload records); its public source names its bug in a comment",
+   "bug": "crash"
+  },
+  {
+   "original_hash": "7911181d1c1981a0f4b76a5a8345bf0ea21d5c82514ba24847f926a5304e8bc5",
+   "corpus_hash": "2c13167325b3eff2cc1c25352d31d9fa21eefd3c06099fc50b99efb87475c1bb",
+   "source": "code/unpack/original.rs",
+   "module": "code/unpack/original.wasm",
+   "tests": "code/unpack/public_tests.txt",
+   "build": "code/unpack/BUILD.txt",
+   "program": "unpack",
+   "description": "a decoder for a packed byte format (literals and back copies); no hint at its bug",
+   "bug": "crash"
+  },
+  {
+   "original_hash": "aca5599b379f936e920f0c8d766d2af481a248f7d46d898d65481d0eb6d360f9",
+   "corpus_hash": "38296ee53e263347f6cc69e8d7789d6841da557929f96d23360c718ba2d32fb7",
+   "source": "code/smooth/original.rs",
+   "module": "code/smooth/original.wasm",
+   "tests": "code/smooth/public_tests.txt",
+   "build": "code/smooth/BUILD.txt",
+   "program": "smooth",
+   "description": "a smoothing filter for a stream of sensor samples; no hint at its bug",
+   "bug": "crash"
+  },
+  {
+   "original_hash": "c4fa58a2bafe3d2595c57f9049a765c12c90329dd45977a2840c41a2012cfe5c",
+   "corpus_hash": "da79b27dc8cc91e251d6d3bae0228a8b3615746d7dedc1ace69c6cab1186a5cb",
+   "source": "code/ringlog2/original.rs",
+   "module": "code/ringlog2/original.wasm",
+   "tests": "code/ringlog2/public_tests.txt",
+   "build": "code/ringlog2/BUILD.txt",
+   "program": "ringlog2",
+   "description": "an event log kept in a ring of 16 one-byte slots; no hint at its bug",
+   "bug": "crash"
+  },
+  {
+   "original_hash": "52f3b28a273de0752a52a48e611ebc9a4907cccb22a234e2a27343a9435d259d",
+   "corpus_hash": "f5522fff32de251f4606e8e998cca30329d384b619783bb7df8921db3edf979d",
+   "source": "code/grid/original.rs",
+   "module": "code/grid/original.wasm",
+   "tests": "code/grid/public_tests.txt",
+   "build": "code/grid/BUILD.txt",
+   "program": "grid",
+   "description": "a paint grid of 32 by 32 cells that can scroll; no hint at its bug",
+   "bug": "crash"
+  },
+  {
+   "original_hash": "3788ba07f1dc9c1137e2fcd4434fd692d5906b733913e961b77cf56d2653011b",
+   "corpus_hash": "1523a14d930c52eca97e38b43969c2bc4d44e1e8df4dff25f08a0845bc1b05e3",
+   "source": "code/feecalc/original.rs",
+   "module": "code/feecalc/original.wasm",
+   "tests": "code/feecalc/public_tests.txt",
+   "build": "code/feecalc/BUILD.txt",
+   "program": "feecalc",
+   "description": "a fee calculator (2.5 percent of a list of amounts, rounded up); its public source names its bug in a comment",
+   "bug": "wrong output"
+  },
+  {
+   "original_hash": "568ae6244ef385f707b7b99ebb70057f072eb925fe1e288a64675bb5bfe68174",
+   "corpus_hash": "c12823f8e9c068a49b15fa5f055b3d5775cb07830f0ffbb7f58357705daa0c40",
+   "source": "code/memsafe/original.c",
+   "module": "code/memsafe/original.wasm",
+   "tests": "code/memsafe/public_tests.txt",
+   "build": "code/memsafe/BUILD.txt",
+   "program": "memsafe",
+   "description": "a C record parser that copies a name into a 16 byte buffer; its public source names its buffer overflow",
+   "bug": "memory safety",
+   "extra_files": [
+    "code/memsafe/rt.h"
+   ]
+  },
+  {
+   "original_hash": "df95f243bed5fb68aa94336fdef3c8aa31120fea6095b0da292d9c125e68e86a",
+   "corpus_hash": "957f79719bf7fa02924492d004feb668d112bbbe43f63bf5512c46327304e619",
+   "source": "code/postage/original.rs",
+   "module": "code/postage/original.wasm",
+   "tests": "code/postage/public_tests.txt",
+   "build": "code/postage/BUILD.txt",
+   "program": "postage",
+   "description": "a postage calculator (a cost per parcel by weight, a surcharge for heavy parcels, a discount for large orders); no hint at its bug",
+   "bug": "wrong output"
+  },
+  {
+   "original_hash": "a665c1aef80663bff97717f7919d839b65e1865f323f5e626abcd3e5c8383d58",
+   "corpus_hash": "0c69d2b5fc90ab7e5af3396f97b3fc8ef388600e83067d3e1bb9c8f2df7b1e1f",
+   "source": "code/shelves/original.c",
+   "module": "code/shelves/original.wasm",
+   "tests": "code/shelves/public_tests.txt",
+   "build": "code/shelves/BUILD.txt",
+   "program": "shelves",
+   "description": "a C shelf counter (10 shelves, quantities that stop at 255, a bonus for full shelves); no hint at its bug",
+   "bug": "memory safety",
+   "extra_files": [
+    "code/shelves/rt.h"
+   ]
+  },
+  {
+   "original_hash": "236cb72f37e622b9cf507a68053d6875b4904de4c0f49462928f24889ebb84c6",
+   "corpus_hash": "f664a2d7362d877924d0e8c7192cf1591c026dda14fbc5f00bc55158d2247606",
+   "source": "code/assets/original.c",
+   "module": "code/assets/original.wasm",
+   "tests": "code/assets/public_tests.txt",
+   "build": "code/assets/BUILD.txt",
+   "program": "assets",
+   "description": "a C path resolver for uploads (both / and \\ separate folders; .. goes up one folder); no hint at its bug",
+   "bug": "path traversal",
+   "extra_files": [
+    "code/assets/rt_call.h"
+   ],
+   "checker": "rule",
+   "rule": {
+    "source": "code/assets/rule.c",
+    "module": "code/assets/rule.wasm",
+    "header": "code/assets/rt_rule.h"
+   }
+  },
+  {
+   "original_hash": "a2028e10216f1b911ff9e231a78f42287c3db9212f16d4ae5df773a848b84bd2",
+   "corpus_hash": "9104467afdf3abfe6a6984cdadf02bdfee0391a83b65d70fac1e5f7d72d567ed",
+   "source": "code/projects/original.c",
+   "module": "code/projects/original.wasm",
+   "tests": "code/projects/public_tests.txt",
+   "build": "code/projects/BUILD.txt",
+   "program": "projects",
+   "description": "a C project registry (users log in, create projects, hand them over, rename them); no hint at its bug",
+   "bug": "access control",
+   "extra_files": [
+    "code/projects/rt_call.h"
+   ],
+   "checker": "rule",
+   "rule": {
+    "source": "code/projects/rule.c",
+    "module": "code/projects/rule.wasm",
+    "header": "code/projects/rt_rule.h"
+   }
+  }
+ ],
  "quickstart": "agent-quickstart.txt",
  "quickstart_url": "https://skarbnik.xyz/agent-quickstart.txt"
 }

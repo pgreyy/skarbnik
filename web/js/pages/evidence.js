@@ -3,7 +3,8 @@
 // their deciding transaction, the team run notes, the key numbers and the status labels. Bounties: the four examples
 // in full, then every settled bounty, paid by proof or by timeout (kept apart), with its transactions,
 // then the Proof Ledger read live from the chain (paid accounts, earnings, the numbers, vendors; rules in
-// js/ledger-core.js, the same as ledger.json). Checker: the approved image id, the rebuild command (shown only after
+// js/ledger-core.js, the same as ledger.json). Checker: the image ids of the three approved checkers (crash, output,
+// rule) with their allowlist transactions, the rebuild command (shown only after
 // scripts/check_image_id.sh printed MATCH) and what the checker runs. Contract: the deployment read live (code hash,
 // owner, fee pool, full access keys), how to verify the build yourself, the tests and refused attacks, who may call what, where every fee goes.
 // Security Lab: how much repeated attempts can learn, the recorded probe run, and the guarded (real, testnet) vs
@@ -35,7 +36,7 @@ async function codeHash() {
 // All eight limits, the ones a judge needs first at the top.
 const LIMITS = (live) => [
   ['alert', 'am', 'Testnet only', 'No mainnet contract exists. Every transaction on this site is a testnet transaction, and every bounty so far was set up and run by the Skarbnik team, not by outside customers.', '<span id="paidSoFar">Loading from the contract</span>'],
-  ['cube', '', 'Small programs only', 'Crash bugs in small WebAssembly modules. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. A vendor needs a working fix before posting; a crash with no known fix cannot be posted.'],
+  ['cube', '', 'Small programs only', 'Crash, wrong output, memory safety, path traversal, injection and access control bugs in small WebAssembly modules. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. A vendor needs a working fix before posting; a crash with no known fix cannot be posted.'],
   ['link', 'am', 'Level 1 depends on OutLayer', 'At Level 1 the contract does not check the proof itself: it trusts OutLayer, and its operator, running the verifier program pinned on chain (get_outlayer). OutLayer must be up and able to download the pinned file from GitHub, or still hold it in its cache, which it can drop; if no check arrives, the timeout rule applies. A check costs about 0.011 NEAR and holds about 2.8 NEAR while OutLayer works, returned after. Only Level 2 is checked by the contract itself.'],
   ['hourglass', '', 'A timeout pays whatever was revealed', 'If no verdict arrives in time, the timeout rule splits the reward among the attempts still waiting. The contract does not read the fix, so this is not a pass; under a silent vendor an honest fix may get as little as 1/K of the bounty.'],
   ['check', '', 'What is not shown yet', 'The path works on NEAR testnet and nothing wider. Not shown: an external audit (the contract had AI review passes only), outside customers, a wallet other than NEAR CLI signing a transaction, OutLayer downloading the pinned file afresh when the contract asks, and sealed hardware for OutLayer’s workers (never claimed).'],
@@ -131,7 +132,7 @@ export async function evidence(viewEl, tab) {
   const attacks = (rec.attacks_s6c || []).filter((a) => /refused/.test(a.result)).length;
   const drawNums = () => { const el = $('#nums'); if (!el) return; el.innerHTML = [[all ? `${nProof}` : LOADING, 'Paid by a verified proof', !all], [all ? `${nTime}` : LOADING, 'Paid by timeout, never called proven', !all], [`${nums.contract_unit_tests.value}`, 'Contract unit tests passed'], [`${attacks}`, 'Proof attacks refused on chain'], [`${nums.accepted_proof_tgas.value}<small>Tgas</small>`, `About, per accepted proof (${nums.accepted_proof_tgas.range})`]]
     .map(([v, t, ld]) => `<div role="listitem"><b${ld ? ' class="ld"' : ''}>${v}</b><span>${esc(t)}</span></div>`).join(''); };
-  const ctLine = () => `The contract on NEAR testnet: <a class="tx" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">${esc(CONTRACT)} ${icon('ext')}</a>. ${all ? `One approved checker id, ${all.length} bounties${snapshot ? ` (saved ${esc(savedAt(snapshot.at))})` : ''}, and no mainnet contract.` : `${LOADING}.`} Read it on the explorer, not on this page.`;
+  const ctLine = () => `The contract on NEAR testnet: <a class="tx" href="${EXPLORER_ACCOUNT}${CONTRACT}" target="_blank" rel="noopener">${esc(CONTRACT)} ${icon('ext')}</a>. ${all ? `${Object.keys(CHECKERS).length} approved checker ids, ${all.length} bounties${snapshot ? ` (saved ${esc(savedAt(snapshot.at))})` : ''}, and no mainnet contract.` : `${LOADING}.`} Read it on the explorer, not on this page.`;
 
   // ---- Ledger: the settled bounties (filled in when the live values arrive), then the Proof Ledger
   const chips = (id, how) => {
@@ -163,7 +164,7 @@ export async function evidence(viewEl, tab) {
   // ---- Checker
   const check = rec.last_image_check && rec.last_image_check.result === 'MATCH' ? rec.last_image_check : null;
   const checker = `<div class="stack g24">
-    <div style="max-width:700px"><h2 class="h2s">The approved checkers</h2><p class="body" style="margin-top:12px">A proof counts only for an approved checker program. There are two: one for crashes, and one for wrong answers and memory safety bugs. Each fingerprint, the image id, is on the contract’s allowlist, and anyone can rebuild both and compare.</p></div>
+    <div style="max-width:700px"><h2 class="h2s">The approved checkers</h2><p class="body" style="margin-top:12px">A proof counts only for an approved checker program. There are three: one for crashes, one for wrong answers and memory safety bugs, and one for bugs judged by a public rule, such as path traversal and access control. Each fingerprint, the image id, is on the contract’s allowlist, and anyone can rebuild all three and compare.</p></div>
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><p class="eyebrow" style="color:var(--tx3)">Crash checker</p>${check ? chip('l-demo', `MATCH on rebuild, ${check.utc.slice(0, 10)}`, 'check') : ''}</div>
     <div class="cblk"><p class="imgid">${esc(CHECKERS.crash)}</p>${copyBtn(CHECKERS.crash)}</div>
@@ -172,13 +173,17 @@ export async function evidence(viewEl, tab) {
     <div class="cblk"><p class="imgid">${esc(CHECKERS.output)}</p>${copyBtn(CHECKERS.output)}</div>
     ${rec.output_checker && rec.output_checker.allow_tx ? `<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">${tx(rec.output_checker.allow_tx, 'allowlisted in')}</div>` : ''}
     <p class="small">It passes a fix that returns the right answer on the secret input and the same answers as the vendor’s hidden reference fix on random inputs, near copies of the secret and every value of up to 4 private byte positions. It judges answers; it does not detect memory corruption in general.</p>
+    <p class="eyebrow" style="color:var(--tx3);margin-top:8px">Rule checker: path traversal, access control and injection</p>
+    <div class="cblk"><p class="imgid">${esc(CHECKERS.rule)}</p>${copyBtn(CHECKERS.rule)}</div>
+    ${rec.rule_checker && rec.rule_checker.allow_tx ? `<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">${tx(rec.rule_checker.allow_tx, 'allowlisted in')}</div>` : ''}
+    <p class="small">It judges each output by the vendor’s public rule module, not by one exact answer. A fix passes when the rule says ok on the secret call sequence, it gives the exact results of every public test, it keeps normal use working on changed copies of the public tests, and the rule says ok on variants of the secret and on every value of up to 4 private byte positions. It checks the rule; it does not show the program is safe in general.</p>
     <p class="small" id="allowLine">${LOADING}</p>
     ${Object.keys(rec.retired_checkers || {}).map((r) => `<p class="small faint">Retired: <span class="mono">${esc(r.slice(0, 16))}…</span> ${esc(rec.retired_checkers[r])}</p>`).join('')}
     </div>
     <div class="two">
     <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:16px">
     <h3 class="h3">Rebuild it yourself</h3>
-    ${check ? `<p class="small">Level B of the judge guide. It builds both checkers in a pinned container and compares both ids.</p>${cmd('./scripts/check_image_id.sh')}
+    ${check ? `<p class="small">Level B of the judge guide. It builds the three checkers in a pinned container and compares each id.</p>${cmd('./scripts/check_image_id.sh')}
     <p class="small">The last line should read <b class="txt">MATCH</b>. It took ${esc(nums.image_rebuild.cached)} with the Docker images cached, and ${esc(nums.image_rebuild.fresh)} with the ${esc(nums.image_rebuild.download)} image download. Needs Docker.</p>
     <p class="small faint">Shown on one machine so far (${esc(check.source)}).</p>` : '<p class="small">The rebuild command is shown here once scripts/check_image_id.sh has printed MATCH.</p>'}
     </div>
@@ -328,7 +333,7 @@ export async function evidence(viewEl, tab) {
       <dt>Owner</dt><dd>${owner ? (owner === CONTRACT ? 'The contract account itself' : acct(owner)) : 'could not read'}</dd>
       <dt>Fee pool</dt><dd>${pool !== null ? `${esc(near(pool))}, locked. No method takes it out.` : 'could not read'}</dd>
       <dt>Full access keys</dt><dd>${fullKeys === null ? 'could not read' : fullKeys}</dd></dl><p class="small faint">Read live from testnet just now, except the last deploy (${esc(nums.last_deploy.source)}).</p>`;
-    const al = $('#allowLine'); if (al) al.textContent = allowed === null ? 'The allowlist could not be read just now.' : `Read live: the allowlist holds ${allowed.length} ${allowed.length === 1 ? 'id' : 'ids'}: ${allowed.map((a) => a === CHECKERS.crash ? 'the crash checker' : a === CHECKERS.output ? 'the output checker' : (rec.retired_checkers || {})[a] ? 'a retired checker' : 'an unknown id').join(', ')}.`;
+    const al = $('#allowLine'); if (al) al.textContent = allowed === null ? 'The allowlist could not be read just now.' : `Read live: the allowlist holds ${allowed.length} ${allowed.length === 1 ? 'id' : 'ids'}: ${allowed.map((a) => a === CHECKERS.crash ? 'the crash checker' : a === CHECKERS.output ? 'the output checker' : a === CHECKERS.rule ? 'the rule checker' : (rec.retired_checkers || {})[a] ? 'a retired checker' : 'an unknown id').join(', ')}.`;
     const kn = $('#keyNote'); if (kn && fullKeys) kn.innerHTML = note(`Read live just now: the contract account has ${fullKeys} full access ${fullKeys === 1 ? 'key' : 'keys'}. The testnet contract’s account keeps a full access key, so its owner can replace the code under live bounties. This is deliberate: it’s an experimental testnet contract that will keep changing. The mainnet contract (skarbnik.near) is planned without an upgrade key the owner controls alone (key removed, or upgrades behind a multisig or DAO with a delay). To check that the code has not changed silently, compare the live code hash above with the last deploy in docs/EVIDENCE.md, “Contract code and every deploy”, which lists every deploy transaction.`, 'alert');
     drawLimits({ fullKeys });
   })();

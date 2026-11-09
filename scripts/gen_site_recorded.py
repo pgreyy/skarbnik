@@ -314,11 +314,16 @@ _fo = tsv("docs/evidence/feature_output/transactions.tsv")
 out["output_checker"] = {"image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
                          "allow_tx": next((r["tx_hash"] for r in _fo if r["step"] == "allow_output_checker"), None),
                          "source": "docs/evidence/feature_output/transactions.tsv"}
+# The rule checker (bugs judged by a public rule) and the transaction that put it on the allowlist.
+_ab = tsv("docs/evidence/spike_ab/chain/transactions.tsv")
+out["rule_checker"] = {"image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa",
+                       "allow_tx": next((r["tx_hash"] for r in _ab if r["step"] == "allow_rule_checker"), None),
+                       "source": "docs/evidence/spike_ab/chain/transactions.tsv"}
 out["test_bounties"]["47"] = "Test bounty: the scratch bounty of the rule checker's mode A (an HTML escaper with an XSS bug, checker 2c7b601a...): a cheat FAIL, then a correct fix PASS, the FAIL submitted first. Not a demo."
 out["test_bounties"]["48"] = "Test bounty: the scratch bounty of the rule checker's mode B (a file store with an IDOR bug, a call sequence, checker 2c7b601a...): a cheat FAIL, then a correct fix PASS, the FAIL submitted first. Not a demo."
 # Checkers once allowed on the contract and no longer used: an id cannot be removed from the allowlist.
 out["retired_checkers"] = {"77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4":
-    "The output checker of the spike (no byte sweep). Retired: used only by test bounties 42 and 43. It stays on the allowlist because an id cannot be removed; the site, the feed, the agent servers and the vendor tool accept only the crash checker dd6c5f42... and the output checker 005d8dc7...."}
+    "The output checker of the spike (no byte sweep). Retired: used only by test bounties 42 and 43. It stays on the allowlist because an id cannot be removed; the site, the feed, the agent servers and the vendor tool accept only the crash checker dd6c5f42..., the output checker 005d8dc7... and the rule checker 2c7b601a...."}
 if ARENA_BOUNTY:
     out["test_bounties"][ARENA_BOUNTY] = "Test bounty: made for the arena's guarded probe run (a seeded probe account sent 12 commits; the cap counted 3). Not a demo."
 out["judge_bounties"] = {str(j): "Judge bounty: the same hashes as private bounty 17, created closed; anyone can open it once with bounty 17's stored Proof 0 (docs/evidence/receipts/), and the contract checks that proof itself." for j in JUDGE_IDS}

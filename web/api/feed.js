@@ -6,11 +6,13 @@
 // If anything fails (an RPC error, HTTP 429, a timeout), it answers the saved feed, with source "saved" and the
 // reason. Read only: view calls, no key, nothing sent, nothing stored, no logging. A new bounty's public code still
 // needs its program's public files pushed (data/<program>/ and the saved feed); this function only matches a new
-// bounty to a program the saved feed already names.
+// bounty to a program the saved feed already names (public_programs, by original_hash and corpus_hash). Each row names
+// its checker (crash, output or rule) and its kind of bug, as scripts/gen_feed.py does.
 'use strict';
 const SAVED = require('../feed.json');
 const REC = require('../data/recorded.json');
 const SITE = require('../site.config.json');
+const PROGRAMS = require('../data/programs.json'); // each program's kind of bug by original_hash (scripts/gen_feed.py)
 
 const CONTRACT = SITE.contract;
 const CHECKERS = SITE.checkers;
@@ -66,15 +68,19 @@ function reader(deadline, stats) {
 
 // One feed row, in the same shape and order as scripts/gen_feed.py writes it.
 function row(b, subs, kind, status, acc, pc) {
-  // the kind of bug: the published program's, else from the checker (scripts/gen_feed.py, bug_kind)
-  const bug = pc && pc.bug ? pc.bug : b.image_id === CHECKERS.output ? 'wrong output' : 'crash';
+  // the checker that judges it (crash, output, rule, or other: a retired or unknown id) and the kind of bug: the
+  // published program's, else the one data/programs.json names, else from the checker (scripts/gen_feed.py, checker_of
+  // and bug_kind)
+  const checker = Object.keys(CHECKERS).find((k) => CHECKERS[k] === b.image_id) || 'other';
+  const named = (PROGRAMS.programs || {})[b.original_hash];
+  const bug = pc && pc.bug ? pc.bug : named && named.bug ? named.bug : ({ output: 'wrong output', rule: 'security rule' })[checker] || 'crash';
   const cb = (BigInt(b.expires_at_ns) - BigInt(b.reveal_window_ns) - BigInt(b.verdict_window_ns)).toString();
   return {
     bounty_id: Number(b.id), status, kind,
     judge_bounty: !!(REC.judge_bounties && REC.judge_bounties[String(b.id)]),
     retired_judge_bounty: (REC.retired_judge_bounties || []).includes(String(b.id)), accepts_commits: acc, level: b.level,
     program: pc ? pc.program : null, module_description: pc ? pc.description : null,
-    bug_kind: bug, checker: b.image_id === CHECKERS.output ? 'output' : b.image_id === CHECKERS.crash ? 'crash' : 'other',
+    bug_kind: bug, checker,
     target: (SAVED.targets || {})[bug] || (SAVED.bounties.length ? SAVED.bounties[0].target : null), max_patch_bytes: b.max_patch_bytes,
     reward_yocto: b.amount, reward: near(b.amount),
     max_commits: b.max_commits, attempts_used: b.commits, attempts: `${b.commits} of ${b.max_commits} used`, slots_in_use: b.active,
@@ -96,8 +102,13 @@ async function live() {
   const top = savedIds.length ? Math.max(...savedIds) : -1;
   const next = Number(await view('get_next_bounty_id', {}));
   const ids = [...new Set([...SAVED.open_bounties.map((x) => x.bounty_id), ...Array.from({ length: Math.max(0, next - top - 1) }, (_, i) => top + 1 + i)])];
-  // a program's public code, for a bounty of a program the saved feed already names
-  const code = (b) => (SAVED.bounties.find((x) => x.public_code && x.original_hash === b.original_hash && x.corpus_hash === b.corpus_hash) || {}).public_code || null;
+  // a program's public code, matched by (original_hash, corpus_hash): from the saved feed's list of published programs
+  // (public_programs), else from a saved bounty of the same program
+  const code = (b) => {
+    const p = (SAVED.public_programs || []).find((x) => x.original_hash === b.original_hash && x.corpus_hash === b.corpus_hash);
+    if (p) { const { original_hash, corpus_hash, ...pc } = p; return pc; }
+    return (SAVED.bounties.find((x) => x.public_code && x.original_hash === b.original_hash && x.corpus_hash === b.corpus_hash) || {}).public_code || null;
+  };
   const fresh = await Promise.all(ids.map(async (id) => {
     const b = await view('get_bounty', { bounty_id: String(id) });
     if (!b) return null;

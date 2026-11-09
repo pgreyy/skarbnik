@@ -23,7 +23,7 @@ const STEPS = (proof) => [
     p2: 'The secret input is not in that record. The proof is a separate object from the secret, and it covers one patch against one defined check.' },
   { num: '04', label: 'The contract', title: 'The contract applies the rule.',
     p1: proof ? 'The contract checks the proof itself, at about 35 Tgas, and confirms every field in the record belongs to this bounty and this attempt. PASS pays the bounty and returns the winner’s own fee. FAIL spends the attempt.' : 'If the vendor stays silent past the verdict window (set per bounty when it is funded), anyone can call claim_timeout. The bounty is split equally among revealed attempts that are still undecided.',
-    p2: proof ? 'The contract does not run the private evaluation. It trusts only a proof from the one approved checker.' : 'A late proof is refused. The contract does not look at the fix, so this path pays whatever was revealed.' },
+    p2: proof ? 'The contract does not run the private evaluation. It trusts only a proof from an approved checker.' : 'A late proof is refused. The contract does not look at the fix, so this path pays whatever was revealed.' },
 ];
 const SEQ = [{ step: 0, lens: 'agent' }, { step: 0, lens: 'eval' }, { step: 1, phase: 'commit' }, { step: 1, phase: 'reveal' }, { step: 2, tech: false }, { step: 2, tech: true }, { step: 3, path: 'proof' }, { step: 3, path: 'timeout' }];
 

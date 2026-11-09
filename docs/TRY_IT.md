@@ -37,12 +37,13 @@ toolchain. Steps 9 and 10 are optional and need Docker.
    See: `7 2 Open True dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc True` (Level 2, open, opened by
    its Proof 0, the published checker id, on the allowlist).
 
-2. **Check that the contract accepts the two published checkers.**
+2. **Check that the contract accepts the three published checkers.**
 
-       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_allowed_image_ids","args_base64":"e30="}}' | python3 -c 'import json,sys; ids=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(len(ids), "ids", "MATCH" if {"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc", "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"} <= set(ids) else "DIFFERENT")'
+       curl -s https://test.rpc.fastnear.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"kintsugi-l2-cihdp.testnet","method_name":"get_allowed_image_ids","args_base64":"e30="}}' | python3 -c 'import json,sys; ids=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print(len(ids), "ids", "MATCH" if {"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc", "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089", "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa"} <= set(ids) else "DIFFERENT")'
 
-   See: `3 ids MATCH`: the crash checker `dd6c5f42…` and the output checker `005d8dc7…` are on the allowlist; the third
-   id is the retired spike checker `77c2e2d1…` (an id cannot be removed, and nothing uses it).
+   See: `4 ids MATCH`: the crash checker `dd6c5f42…`, the output checker `005d8dc7…` and the rule checker `2c7b601a…`
+   are on the allowlist; the fourth id is the retired spike checker `77c2e2d1…` (an id cannot be removed, and nothing
+   uses it).
 
 3. **See which judge bounties are still closed.** Judge bounties 27 to 31 have the same hashes as private bounty 17 and
    were created closed, so anyone can open one with a real proof (step 5). Each can be opened once; 27 is used, so the

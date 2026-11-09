@@ -22,6 +22,19 @@ Each guard: what it stops, where it lives, and what shows it works.
 | Proof 0 refuses a secret longer than any module may receive (added in S13) | An "unfixable" bounty: an over-long secret made every patch fail | `lib.rs` (`proof0_report`) | `cargo test -p kintsugi-check` test `s13_overlong_exploit_is_refused_by_proof0`; S13 attack 1 (EVIDENCE, S13) |
 | Proof 0 with a reference fix: the vendor's own fix must pass the full check (added in S13) | A bounty no patch could ever pass | `lib.rs` (`proof0_with_reference`), `harness/check-guest/src/main.rs` (Proof 0 mode) | tests `s13_proof0_with_reference_fix_*`; S13 Proof 0, VALID and PASS on the reference fix (EVIDENCE, S13) |
 
+### The rule checker (path traversal, injection and access control; `harness/checker-rule`)
+
+| Guard | What it stops | Code | Shown by |
+| --- | --- | --- | --- |
+| Limits: a program and a rule of at most 2,048 and 4,096 bytes, no imports, 2 and 4 memory pages, 50,000 fuel per call, at most 64 calls and 1,024 output bytes | Oversized or looping modules, proofs that never end | `harness/checker-rule/src/lib.rs` (`Limits`) | `cargo test -p kintsugi-check-rule` |
+| A fresh instance per run; state persists only across the calls of one run | A fix that remembers one run to behave differently in the next | `lib.rs` (`Loaded::run`) | corpus (`docs/evidence/spike_ab/corpus.txt`) |
+| The secret call sequence: no trap, and the vendor's rule says ok | A fix that does not fix the bug | `lib.rs` (`check_report`) | every original FAIL |
+| Public tests: exact results of every call | Fixes that deny every call or return nothing | `lib.rs` | `cheat_deny`, `cheat_empty` FAIL |
+| Fairness on mutations of the public tests: no trap where the reference fix does not, the rule says ok, and the reference fix's exact results where it agrees with the original | Fixes that break normal use | `lib.rs` (`fairness_sequences`) | `cheat_benign` FAIL |
+| Variants of the secret: bytes changed, inserted or deleted, calls swapped, repeated or dropped; the rule must say ok | Fixes that special case the secret's length, layout or ids | `lib.rs` (`secret_variants`) | `cheat_special` FAIL |
+| Sweep: every value at up to 4 private byte positions of the secret | Fixes that block one payload byte or one user id | `lib.rs` | `cheat_payload`, `cheat_users` FAIL |
+| The rule's sha256 is in the corpus hash; the secret, the reference fix's hash and the sweep positions are in the commitment | Swapping the rule or the secret after the bounty opens | `harness/rule-guest/src/main.rs` | test bounties 47 and 48 on testnet |
+
 ### The proof (what a receipt binds)
 
 | Guard | What it stops | Code | Shown by |
@@ -184,6 +197,9 @@ check also needs OutLayer's own fee and input deposit, paid by whoever asks for 
 
 | Date | Commit | Attack | Command | Result |
 | --- | --- | --- | --- | --- |
+| 2026-11-09 | `beb2977` | Rule checker: on four demos, empty output, deny every call, special case the secret, block the exact payload or user ids, break benign inputs; three seeds each | `cargo test -p kintsugi-check-rule` (`docs/evidence/spike_ab/corpus.txt`) | **blocked**: every cheat FAIL; two correct fixes per demo PASS. Before the fixes to the checker: a cheat matching the secret's exact length passed (now caught by inserted and deleted bytes), and a cheat that blocks one spelling of a repeated payload passed (now one payload byte, swept) |
+| 2026-11-09 | `beb2977` | Rule checker on testnet: a cheat on test bounties 47 and 48 | `scripts/spike_ab_prove.sh`, then `submit_groth16` | **blocked**: FAIL proved and submitted (`7NpEGy6Hnt69Ko2LHMtDrF8e4yCNRcMXxZdd92xW6YWf`, `6hKgYNpwiCK2XyEBJrPPqavuP8fArBHbAXzaSsiWEChS`); the correct fixes PASS and paid |
+| 2026-11-09 | `73b2163` | Rule checker, the public bounty programs `data/assets` and `data/projects`: 11 private cheats, three seeds | `skarbnik-check-rule table` | **blocked**: every cheat FAIL; one (block every transfer by one user) only at the sweep |
 | 2026-10-23 | `d150da2` | 18 cheating patches (reject all, constant, special-case the secret, loop forever, memory tricks, early return, disable a feature, memorize tests, wrong fix, subtle change, overbroad fix, wrong export, imports, too large, truncated) | `target/debug/skarbnik-check table --manifest data/attacks/manifest.txt --seed <hex>` | **blocked**: all FAIL except `memory_grow`, **accepted risk**: its oversized memory request is refused by its own limit, it gets no memory and behaves exactly like the honest fix |
 | 2026-10-23 | `d150da2` | Same cheats over 200 seeds, 128 fairness inputs | seed sweep (`docs/evidence/S1/seed_sweep.txt`) | **blocked** on every seed; the honest fix passed on every seed |
 | 2026-10-24 | `2b41cad` | Change the verdict in a receipt's journal; flip one bit of the proof | `skarbnik-host tamper <in> <out> journal`, `... seal`, then `skarbnik-host verify <out>` | **blocked**: INVALID, exit 1 |
@@ -378,6 +394,11 @@ check also needs OutLayer's own fee and input deposit, paid by whoever asks for 
 - Testnet only. No external security audit.
 
 ## 4. Changelog (newest first)
+
+- 2026-11-09: the rule checker `2c7b601a…` for path traversal, injection and access control bugs (guards above). The
+  contract and the journal did not change; the id was added to the owner allowlist (`ABDP1WFVsxCXGuDM3B3kxWLZk7nrbM2WqL8qdnjVGA5a`).
+  Known limits: the rule is the vendor's, so a weak rule lets a weak fix pass; fairness inputs are mutations of the
+  public tests only.
 
 - 2026-11-03 `5d9f9a1`: the vendor watch waits for a free GPU instead of retrying at once without end (the failure count
   reset every round); other failures stop after two rounds with a loud ALERT line. No contract guard changed.

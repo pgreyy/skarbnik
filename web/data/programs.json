@@ -1,5 +1,5 @@
 {
- "note": "Made by scripts/gen_feed.py: each published program by the sha256 of its original module, with its kind of bug.",
+ "note": "Made by scripts/gen_feed.py: each program by the sha256 of its original module, with its kind of bug: the published programs, and the rule checker's scratch bounties 47 (xss) and 48 (idor), which are not published as packages.",
  "programs": {
   "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8": {
    "program": "demo",
@@ -36,6 +36,22 @@
   "a665c1aef80663bff97717f7919d839b65e1865f323f5e626abcd3e5c8383d58": {
    "program": "shelves",
    "bug": "memory safety"
+  },
+  "236cb72f37e622b9cf507a68053d6875b4904de4c0f49462928f24889ebb84c6": {
+   "program": "assets",
+   "bug": "path traversal"
+  },
+  "a2028e10216f1b911ff9e231a78f42287c3db9212f16d4ae5df773a848b84bd2": {
+   "program": "projects",
+   "bug": "access control"
+  },
+  "0b80190eb73faf07274426e7f2287590356b02507cb4897337bb39f2c830a1a5": {
+   "program": "xss",
+   "bug": "injection"
+  },
+  "971414a50dba9afe5647238b61d2f164e2b33bf38e9069dad99d79367339d0a2": {
+   "program": "idor",
+   "bug": "access control"
   }
  }
 }

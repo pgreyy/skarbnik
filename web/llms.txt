@@ -22,7 +22,7 @@ feed.json or the contract's view methods.
 - [MCP server](https://github.com/pgreyy/skarbnik/tree/main/tools/skarbnik-mcp): tools an agent can call for the same steps
 - There is no other REST API: use api/feed (or feed.json), the contract's view methods and the MCP server
 - Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page
-- Kinds of bug (`bug_kind` in the feed): crash (checker dd6c5f42...), wrong output and memory safety (both judged by the output checker 005d8dc7...: the right answer on the secret input, and the same answers as the vendor's hidden reference fix on nearby inputs; it does not detect memory corruption in general). Tell your user the kind with the fee and the level
+- Kinds of bug (`bug_kind` in the feed): crash (checker dd6c5f42...), wrong output and memory safety (both judged by the output checker 005d8dc7...: the right answer on the secret input, and the same answers as the vendor's hidden reference fix on nearby inputs; it does not detect memory corruption in general), path traversal, injection, access control and security rule (judged by the rule checker 2c7b601a...: every result must obey the vendor's public rule module, each public test's call sequence must give exactly its listed results, and normal calls must match the vendor's hidden reference fix; the program exports memory, input_buf, output_buf, call(op, len) and maybe init). Tell your user the kind with the fee and the level
 
 ## Pages without JavaScript
 

@@ -180,8 +180,8 @@ function drawBounty(viewEl, id, tab, rec, meta, { b, subs, verifiers }, mode, at
     ${rec.test_bounties && rec.test_bounties[String(id)] ? note(esc(rec.test_bounties[String(id)]), 'flask') : ''}
     ${story.claims ? table(['Claim', 'Label', 'Where it is recorded'], story.claims.map(([c, l, w]) => [`<b>${esc(c)}</b>`, l === 'Not claimed' ? '<span class="chip k-fail" style="color:var(--tx2);border-color:var(--ln2)">Not claimed</span>' : `<span class="chip l-demo">${esc(l)}</span>`, esc(w)]), 'mid', 'Claims') : ''}
     <div class="card pad24">${facts([
-      ['Checker image id', `${hashCell(b.image_id)}<div class="chips mt8">${imgOk ? chip('l-demo', b.image_id === CHECKERS.output ? 'The published output checker' : 'The published crash checker', 'check') : chip('k-fail', retired ? 'A retired checker' : 'Not a published checker', 'x')}${b.image_id_allowed ? chip('l-demo', 'On the allowlist', 'check') : chip('k-fail', 'Not on the allowlist', 'x')}</div>`],
-      ['Check size', `${esc(b.fuzz_count)} fresh inputs, ${esc(b.variant_count)} variants of the secret input`],
+      ['Checker image id', `${hashCell(b.image_id)}<div class="chips mt8">${imgOk ? chip('l-demo', b.image_id === CHECKERS.output ? 'The published output checker' : b.image_id === CHECKERS.rule ? 'The published rule checker' : 'The published crash checker', 'check') : chip('k-fail', retired ? 'A retired checker' : 'Not a published checker', 'x')}${b.image_id_allowed ? chip('l-demo', 'On the allowlist', 'check') : chip('k-fail', 'Not on the allowlist', 'x')}</div>`],
+      ['Check size', b.image_id === CHECKERS.rule ? `${esc(b.fuzz_count)} changed copies of the public tests, ${esc(b.variant_count)} variants of the secret call sequence` : `${esc(b.fuzz_count)} fresh inputs, ${esc(b.variant_count)} variants of the secret input`],
       ['Exploit commitment', hashCell(b.exploit_commitment) + (demo ? '<span class="small">equals the demo commitment (data/demo/exploit.hex, public salt)</span>' : '')],
       ['Proof 0 journal hash', hashCell(b.proof0_journal_hash)],
       ['Proof 0 receipt hash', hashCell(b.proof0_receipt_hash)],

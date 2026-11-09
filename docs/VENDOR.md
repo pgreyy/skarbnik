@@ -12,9 +12,9 @@ It calls the project's own programs (`skarbnik-host`, `skarbnik-check`), `script
 memory guard, and NEAR CLI (near-cli-rs) for transactions. Testnet only.
 
 Already a vendor? Pull the latest code and rebuild (`git pull`, then the build in Build Skarbnik) to get output mode
-for wrong output and memory safety bugs.
+for wrong output and memory safety bugs, and rule mode for bugs judged by a public rule (below).
 
-## Kinds of bug: crash or output
+## Kinds of bug: crash, output or rule
 
 A bounty has a mode (`bounty.mode` in the config):
 
@@ -40,6 +40,41 @@ segments); with 1 position about 51 million (149 segments); with 4 about 147 mil
 
 The output checker judges answers. It does not detect memory corruption in general: a fix passes if its answers match
 on the inputs the check tries.
+
+### Rule mode
+
+`rule`: for bugs where many fixes are right but none may break a rule, such as injection, path traversal, missing
+authorization or IDOR (one user reads another user's records). The rule checker (`2c7b601a…`) judges it. You write:
+
+- The program, `original.wasm`, with the call interface: `memory`, `input_buf()`, `output_buf()`, `call(op, len)` and
+  optionally `init()`. One run is a fresh instance, then a series of calls; memory stays between the calls of one run.
+  The top comment of `harness/checker-rule/src/lib.rs` has the details.
+- A rule module, `rule.wasm`, public, at most 4,096 bytes: `memory`, `rule_buf()` and `check(len)`. It reads the
+  transcript of a run (every call and its result) and returns 0 when the run is fine.
+- Public tests, `public_tests.txt`: call sequences with the original's results, made with
+  `target/release/skarbnik-check-rule expect --module original.wasm --sequences <file>`.
+- A secret file: one line `<call sequence as hex> sweep=<p>,<p>`, where the original breaks the rule. The sweep
+  positions are byte positions of the sequence (the default is one position, at most 4); `bounty.sweep` lists the same.
+- A reference fix, private, mode 600, outside the repository. It goes with every proof, as in output mode.
+
+The module folder holds `original.wasm`, `public_tests.txt` and `rule.wasm`; `bounty.rule` can name another rule
+file. A fix passes when it does not trap and the rule says fine on the secret sequence, its near copies and every sweep
+value; it gives the original's results on the public tests; and on random sequences it gives the reference fix's
+results wherever the original and the reference fix agree. The corpus hash binds the rule module and the public tests:
+sha256 of `skarbnik-rule-corpus-v1`, the sha256 of `rule.wasm`, then for each public test the sequence and its results,
+each with its length as 4 bytes, low byte first. `publish` computes it and refuses when Proof 0 says otherwise.
+
+Build the native checker once: `cargo build --release -p kintsugi-check-rule`. Then:
+
+    tools/skarbnik-vendor init --out ~/skarbnik-vendor/<name>.toml       # mode: rule
+    tools/skarbnik-vendor check --config ~/skarbnik-vendor/<name>.toml
+    tools/skarbnik-vendor check --config ~/skarbnik-vendor/<name>.toml --candidate <fix.wasm>
+    tools/skarbnik-vendor prove0 --config ~/skarbnik-vendor/<name>.toml
+    tools/skarbnik-vendor publish --config ~/skarbnik-vendor/<name>.toml
+
+`check --candidate` runs the native checker on one file and prints PASS or FAIL, with no chain and no proof. The
+watch config's `[[bounties]]` block needs `mode = "rule"`, `reference_fix` and `rule` (the AI way's `watch_init`
+writes them). `data/assets` and `data/projects` are two public examples of the module folder.
 
 ## Levels
 
@@ -92,7 +127,7 @@ The Terminal way: you type each step. The AI way runs the same steps for you ([W
 | Command | What it does |
 | --- | --- |
 | `init --out <file> [--from <older file>]` | Asks a few questions and writes a bounty config (TOML). `--from` reuses an older config's settings: only the secret and the fix change. Refuses a path inside the repository. |
-| `check --config <file>` | The preflight, then a preview (below). Refuses with a plain reason if anything fails. |
+| `check --config <file> [--candidate <file>]` | The preflight, then a preview (below). Refuses with a plain reason if anything fails. With `--candidate` it only runs the native checker on that file and prints PASS or FAIL. |
 | `prove0 --config <file>` | Proof 0 of the reference fix: prove, shrink to succinct, Groth16, verify, the contract arguments. One step at a time, with a progress line and the memory guard. Its times become the bounty's measured proof time. |
 | `publish --config <file>` | Shows the preview again, asks you to type `publish`, then creates and opens the bounty and prints both transactions. Refuses if the verdict window is too short for the measured proof time. |
 | `watch --config <watch file> [--once]` | The auto prover. Polls the chain for revealed attempts on the bounties it watches, proves each one (oldest first) with the attempt's seed and submission id, checks the verdict, the submission id and the secret's commitment against the chain, and sends `submit_groth16`. Warns early when a window is at risk. Runs unattended. |
@@ -107,16 +142,17 @@ outside the repository (for example `~/skarbnik-vendor/<name>.toml`, mode 600). 
   reward, K, the fee of the first attempt and the step per later attempt, the reveal gap and window, the verdict window,
   the expiry, the patch size limit (the checker allows up to 2,048 bytes; each bounty sets its own), the check size and the proof segment size (`po2`: 18 needs about 2.5 GiB, 19 about
   5 GiB).
-- `[secrets]`: the secret (crash mode: the crashing input; output mode: the line above) and the reference fix. Files of
+- `[secrets]`: the secret (crash mode: the crashing input; output and rule mode: the lines above) and the reference fix. Files of
   mode 600, outside the repository.
 - `[prover]`: the mode (`cpu`), the machine's name (proof times differ by machine), the work folder.
 - `[chain]`: contract, RPC addresses, the checker image id of the bounty's mode (`init` sets it) and the vendor account
   that signs create and open.
-- `[paths]` (optional): where the binaries are.
+- `[paths]` (optional): where the binaries are (`host`, `check`, `check_output`, `check_rule`, `near`).
 
 A watch config has `[watch]` (state file, log, work folder, poll interval), `[prover]`, `[chain]` with the account that
 signs `submit_groth16`, `[paths]`, and one `[[bounties]]` block per secret: the bounty ids, the salt name, the module,
-the secret file and `po2`; for output mode also `mode = "output"` and `reference_fix`.
+the secret file and `po2`; for output mode also `mode = "output"` and `reference_fix`; for rule mode `mode = "rule"`,
+`reference_fix` and `rule`.
 
 When several revealed attempts of one bounty wait, the watch submits every FAIL proof before a PASS: a PASS pays and
 closes the bounty, and an attempt still open is then refunded without its verdict. It holds a ready PASS while another
@@ -130,6 +166,8 @@ logs why: a FAIL still being proved never costs a correct fix its payout.
 2. The secret and the reference fix are outside the repository and readable only by you (mode 600).
 3. Crash mode: the original crashes on the secret input (the checker's own run). Output mode: the original gives
    another answer than the expected value there, and the sweep positions on the secret line and in the config agree.
+   Rule mode: the original runs the secret sequence without a trap and the rule says it breaks the rule; the rule
+   module is within 4,096 bytes; the sweep positions agree.
 4. Proof 0 passes on 4 random seeds, with 64 fresh inputs and 64 variants each: the reference fix passes the full check.
 5. Enough memory for the prover mode: the prover at the chosen `po2`, and about 7.6 GiB of memory plus swap for the
    Groth16 wrap.

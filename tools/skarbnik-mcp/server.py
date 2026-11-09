@@ -26,16 +26,22 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = "0.4.0"
+VERSION = "0.5.0"
 NETWORKS = {
     "testnet": {"contract": "kintsugi-l2-cihdp.testnet", "rpc": ["https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"],
                 "feed": "https://skarbnik.xyz/feed.json"},
     "mainnet": {"contract": None, "rpc": ["https://rpc.mainnet.near.org"], "feed": None},
 }
 PUBLISHED_IMAGE_ID = "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc"
-# The checkers on the contract's allowlist (web/site.config.json, checkers): the crash checker and the output checker
-# (wrong answers, also memory safety bugs that corrupt memory without crashing).
-CHECKERS = {"crash": PUBLISHED_IMAGE_ID, "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089"}
+# The checkers on the contract's allowlist (web/site.config.json, checkers): the crash checker, the output checker
+# (wrong answers, also memory safety bugs that corrupt memory without crashing) and the rule checker (bugs judged by a
+# public rule: path traversal, injection, access control).
+CHECKERS = {"crash": PUBLISHED_IMAGE_ID, "output": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
+            "rule": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa"}
+RULE_PROPERTY = ("the original's output breaks the vendor's public safety rule on a secret input; a fix must make every output obey "
+                 "the rule (the rule module is public), keep the exact results of the public tests, and behave like the vendor's "
+                 "hidden reference fix on normal inputs near the public tests; many different correct fixes can pass.")
+KINDS_TEXT = "crash, wrong output, memory safety, path traversal, access control, injection or security rule"
 BUG_MEANING = {
     "crash": "the original crashes on a secret input; a fix must stop the crash and keep the answers of the public tests and of fresh inputs.",
     "wrong output": ("the original returns a wrong answer on a secret input; a fix must return the right answer there and give the same "
@@ -43,14 +49,25 @@ BUG_MEANING = {
     "memory safety": ("a memory bug (such as a buffer overflow) that gives a wrong answer without crashing; judged like wrong output: the right "
                       "answer on the secret input and the same answers as the vendor's hidden reference fix on nearby inputs. It does not "
                       "detect memory corruption in general."),
+    "path traversal": RULE_PROPERTY,
+    "injection": RULE_PROPERTY,
+    "access control": ("the original lets a caller do something the public rule forbids after a secret series of calls; a fix must refuse "
+                       "it, keep the exact results of the public tests and keep normal use working (judged against the vendor's hidden "
+                       "reference fix on calls near the public tests)."),
+    "security rule": ("the original's results break the vendor's public rule on a secret input or series of calls; a fix must make every "
+                      "result obey the rule (the rule module is public), keep the exact results of the public tests, and behave like the "
+                      "vendor's hidden reference fix on normal calls near the public tests; many different correct fixes can pass."),
 }
 
 
 def bug_kind(b, row=None):
     """The kind of bug of a bounty: its feed row's (its program's) when known, else from its checker."""
-    return (row or {}).get("bug_kind") or ("wrong output" if b.get("image_id") == CHECKERS["output"] else "crash")
+    img = b.get("image_id")
+    return (row or {}).get("bug_kind") or ("wrong output" if img == CHECKERS["output"] else "security rule" if img == CHECKERS["rule"] else "crash")
+
+
 # More checker image ids to accept, only when SKARBNIK_EXTRA_IMAGE_IDS is set (comma separated), for trying a new checker
-# before it is published. Unset, only the two published checkers are accepted.
+# before it is published. Unset, only the three published checkers are accepted.
 EXTRA_IMAGE_IDS = {x.strip() for x in os.environ.get("SKARBNIK_EXTRA_IMAGE_IDS", "").split(",") if x.strip()}
 NONCE_FILE = "skarbnik-mcp-nonces.json"
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -425,7 +442,7 @@ def near(yocto):
 def level_line(b, row=None):
     """The sentence to tell the user before a commit: the fee, the level with its meaning and the kind of bug."""
     lv, bug = b.get("level"), bug_kind(b, row)
-    return f"Fee {near(b['next_fee'])}. Level {lv}: {LEVEL_MEANING.get(lv, 'unknown level')} Kind of bug: {bug}: {BUG_MEANING[bug]}"
+    return f"Fee {near(b['next_fee'])}. Level {lv}: {LEVEL_MEANING.get(lv, 'unknown level')} Kind of bug: {bug}: {BUG_MEANING.get(bug, '')}"
 
 
 def bounty_checks(cfg, b, acct=None, level_0_ok=False):
@@ -459,12 +476,13 @@ def t_list_bounties(cfg, a):
             "generated_at_utc": f.get("generated_at_utc"),
             "note": "Live rows are read from the chain about once a minute (source live), else the saved feed; get_bounty reads the live state before you commit. Tell your user each bounty's level and its meaning with the fee.",
             "bounties": [{"bounty_id": b["bounty_id"], "level": b.get("level"), "level_meaning": LEVEL_MEANING.get(b.get("level")),
-                          "bug_kind": b.get("bug_kind") or "crash", "bug_meaning": BUG_MEANING.get(b.get("bug_kind") or "crash"),
+                          "bug_kind": bug_kind(b, b), "bug_meaning": BUG_MEANING.get(bug_kind(b, b)),
                           "status": b["status"], "kind": b.get("kind"), "accepts_commits": b.get("accepts_commits"),
                           "reward": b.get("reward"), "next_fee": b.get("next_fee"), "max_commits": b.get("max_commits"), "attempts": b.get("attempts"),
                           "slots_in_use": b.get("slots_in_use"), "max_commits_per_account": b.get("max_commits_per_account"),
                           "max_patch_bytes": b.get("max_patch_bytes"), "windows": b.get("windows"), "target": b.get("target"),
-                          "public_code": {k: base + v for k, v in (b.get("public_code") or {}).items() if k in ("source", "module", "tests", "build")}}
+                          "public_code": {**{k: base + v for k, v in (b.get("public_code") or {}).items() if k in ("source", "module", "tests", "build")},
+                                          **({"rule": {k: base + v for k, v in b["public_code"]["rule"].items()}} if (b.get("public_code") or {}).get("rule") else {})}}
                          for b in rows]}
 
 
@@ -483,13 +501,38 @@ def t_get_bounty(cfg, a):
     except (Fail, OSError, ValueError, KeyError):
         row = None
     return {"bounty": {k: b.get(k) for k in keep}, "expires_at_utc": ns_utc(b["expires_at_ns"]),
-            "level_meaning": LEVEL_MEANING.get(b.get("level")), "bug_kind": bug_kind(b, row), "bug_meaning": BUG_MEANING[bug_kind(b, row)],
+            "level_meaning": LEVEL_MEANING.get(b.get("level")), "bug_kind": bug_kind(b, row), "bug_meaning": BUG_MEANING.get(bug_kind(b, row)),
             "tell_the_user": level_line(b, row) + " Wait for their yes before commit.",
             "checks": bounty_checks(cfg, b, acct), "checks_for_account": acct}
 
 
+def rule_corpus_hash(tests_text, rule):
+    """corpus_hash of a rule checker bounty (corpus_bytes in harness/checker-rule/src/lib.rs): sha256 of the domain tag,
+    the rule module's sha256, then each public test's sequence and transcript, each after its length (u32 little endian)."""
+    out = b"skarbnik-rule-corpus-v1" + hashlib.sha256(rule).digest()
+    for line in tests_text.splitlines():
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        fields = line.split()
+        if len(fields) != 2:
+            raise Fail("the bounty's public tests file does not parse")
+        for h in fields:
+            v = b"" if h == "-" else bytes.fromhex(h)
+            out += len(v).to_bytes(4, "little") + v
+    return hashlib.sha256(out).hexdigest()
+
+
+RULE_TESTS_FORMAT = ("One test per line: <call sequence as hex> <the original's results as hex>, \"-\" for empty. A call sequence is, per "
+                     "call: op (1 byte), argument length (1 byte), the arguments. The results are, per call: status (1 byte: 0 returned, "
+                     "1 trapped, 2 out of fuel), code (4 bytes, little endian; the output length when 0 or more), output length (2 bytes, "
+                     "little endian), the output bytes. A trap ends the run. A fix passes a public test only when its results equal "
+                     "these bytes exactly.")
+
+
 def t_get_public_code(cfg, a):
-    """The bounty's public code from the site, checked against the hashes on chain: source, build flags, public tests."""
+    """The bounty's public code from the site, checked against the hashes on chain: source, build flags, public tests,
+    and on a rule checker bounty the public rule (checked with the tests against corpus_hash)."""
     bid = str(a["bounty_id"])
     base = site_base(cfg)
     row = next((b for b in feed(cfg)["bounties"] if str(b["bounty_id"]) == bid), None)
@@ -502,20 +545,46 @@ def t_get_public_code(cfg, a):
         raise Fail(f"the public module of bounty {bid} does not match original_hash on chain; do not use it")
     tests = fetch(base + pc["tests"]).decode()
     try:
-        wat = remote_check({"bounty_id": bid, "want": "original_wat"}).get("original_wat")
+        hosted = remote_check({"bounty_id": bid, "want": "original_wat"})
     except (Fail, OSError, ValueError):
-        wat = None
+        hosted = {}
+    wat = hosted.get("original_wat")
     lang = "C" if pc["source"].endswith(".c") else "Rust"
-    return {"bounty_id": bid, "program": pc.get("program"), "description": pc.get("description"), "target": row.get("target"),
-            "bug_kind": bug_kind(b, row), "bug_meaning": BUG_MEANING[bug_kind(b, row)], "source_language": lang,
-            "max_patch_bytes": b["max_patch_bytes"], "original_module_bytes": len(module),
-            "module_matches_chain": True, "source_file": base + pc["source"], "source": fetch(base + pc["source"]).decode(),
-            "build": fetch(base + pc["build"]).decode(), "public_tests": tests, "original_wat": wat,
-            **({"extra_files": {f.rsplit("/", 1)[-1]: fetch(base + f).decode() for f in pc["extra_files"]}} if pc.get("extra_files") else {}),
-            "next": f"change original_wat (the same program as WebAssembly text) to fix the bug the {lang} source describes, then call "
-                    "check_patch with the whole module as wat; keep the exports and every public test's answer. "
-                    + ("With Rust installed you may write the fixed Rust file and call build_patch instead" if lang == "Rust" else
-                       "Or build the fixed C file yourself with the flags in build and call check_patch with patch_path")}
+    is_rule = b.get("image_id") == CHECKERS["rule"]
+    extra = list(pc.get("extra_files") or []) + ([pc["rule"]["header"]] if is_rule and (pc.get("rule") or {}).get("header") else [])
+    out = {"bounty_id": bid, "program": pc.get("program"), "description": pc.get("description"), "target": row.get("target"),
+           "bug_kind": bug_kind(b, row), "bug_meaning": BUG_MEANING.get(bug_kind(b, row)), "source_language": lang,
+           "max_patch_bytes": b["max_patch_bytes"], "original_module_bytes": len(module),
+           "module_matches_chain": True, "source_file": base + pc["source"], "source": fetch(base + pc["source"]).decode(),
+           **({"build": fetch(base + pc["build"]).decode()} if pc.get("build") else {}), "public_tests": tests, "original_wat": wat,
+           **({"extra_files": {f.rsplit("/", 1)[-1]: fetch(base + f).decode() for f in extra}} if extra else {}),
+           "next": f"change original_wat (the same program as WebAssembly text) to fix the bug the {lang} source describes, then call "
+                   "check_patch with the whole module as wat; keep the exports and every public test's answer. "
+                   + ("With Rust installed you may write the fixed Rust file and call build_patch instead" if lang == "Rust" else
+                      "Or build the fixed C file yourself with the flags in build and call check_patch with patch_path")}
+    if not is_rule:
+        return out
+    if not pc.get("rule"):
+        raise Fail(f"bounty {bid} has no public rule on the site")
+    rule_mod = fetch(base + pc["rule"]["module"])
+    if rule_corpus_hash(tests, rule_mod) != b["corpus_hash"]:
+        raise Fail(f"the public rule and tests of bounty {bid} do not match corpus_hash on chain; do not use them")
+    keep = ("memory, input_buf, output_buf, call and init" if wat and '(export "init"' in wat else "memory, input_buf, output_buf and call")
+    out.update({
+        "rule": {"source_file": base + pc["rule"]["source"], "source": fetch(base + pc["rule"]["source"]).decode(),
+                 "module_file": base + pc["rule"]["module"], "sha256": hashlib.sha256(rule_mod).hexdigest(), "matches_chain": True,
+                 "module_wat": (hosted.get("rule") or {}).get("module_wat"),
+                 "module_form": "WebAssembly text (WAT) of the rule module, from the site's check",
+                 "meaning": "the rule reads every call and its result (see rt_rule.h) and check(len) returns 0 when they obey it; the "
+                            "vendor runs it on the secret and on calls near the public tests"},
+        "public_tests_format": RULE_TESTS_FORMAT,
+        "next": ("change original_wat to fix the bug the C source describes, then call check_patch with the whole module as wat. Keep the "
+                 f"exports {keep} with the same parameters, and the exact results of every public test. Every result must obey the rule "
+                 "in rule.source; normal calls must keep working. The checker refuses floating point instructions, a start function "
+                 "and memory above 2 pages (128 KiB); each call has a fuel limit."
+                 + (" Or build the fixed C file yourself with the flags in build and call check_patch with patch_path" if pc.get("build") else "")),
+    })
+    return out
 
 
 CHECK_URL = os.environ.get("SKARBNIK_CHECK_URL", "https://skarbnik.xyz/api/check")
@@ -712,13 +781,13 @@ def t_status(cfg, a):
 
 
 TOOLS = {
-    "list_bounties": (t_list_bounties, "Bounties from the Skarbnik feed (a snapshot): each bounty's level and what it means, the kind of bug (crash, wrong output or memory safety), terms, next fee, slots, windows and the public code links.",
+    "list_bounties": (t_list_bounties, "Bounties from the Skarbnik feed (a snapshot): each bounty's level and what it means, the kind of bug (" + KINDS_TEXT + "), terms, next fee, slots, windows and the public code links.",
                       {"only_open": {"type": "boolean", "description": "only bounties accepting commits (default true)"}}, []),
     "get_bounty": (t_get_bounty, "The live state of one bounty from the contract, its level and what that means, the kind of bug, the sentence to tell your user (the fee, the level with its meaning and the kind of bug, in one message), and the checks to pass before committing (for the key's account when a key is set).",
                    {"bounty_id": {"type": "string", "description": "the bounty id"}}, ["bounty_id"]),
-    "get_public_code": (t_get_public_code, "The public code of a bounty: the Rust source with its known bug, the build flags, the public tests (input as hex and the value the original returns) and what a fix must do. The module is checked against the hash on chain.",
+    "get_public_code": (t_get_public_code, "The public code of a bounty: the source (Rust or C) with its known bug, the build flags, the public tests and what a fix must do. On a rule checker bounty (path traversal, access control, injection) also the public rule (C source and WebAssembly text), its header and the format of the call sequence tests. The module (and on a rule checker bounty the rule and the tests) is checked against the hashes on chain.",
                         {"bounty_id": {"type": "string"}}, ["bounty_id"]),
-    "check_patch": (t_check_patch, "Check a fix before spending anything: the whole fixed module as WebAssembly text (wat), or a .wasm file (patch_path). The site's check turns the text into a module, confirms it is valid, fits, and has the same exports as the public program, and runs the public tests (and the public demo input on demo bounties). The module is saved next to the key file for commit. Only the fix is sent, never the key. It does not show that the fix passes the private test.",
+    "check_patch": (t_check_patch, "Check a fix before spending anything: the whole fixed module as WebAssembly text (wat), or a .wasm file (patch_path). The site's check turns the text into a module, confirms it is valid, fits, and has the same exports as the public program, and runs the public tests (and the public demo input on demo bounties; on a rule checker bounty each public call sequence, with its results compared byte for byte). The module is saved next to the key file for commit. Only the fix is sent, never the key. It does not show that the fix passes the private test.",
                     {"bounty_id": {"type": "string"}, "wat": {"type": "string"}, "patch_path": {"type": "string"}}, ["bounty_id"]),
     "build_patch": (t_build_patch, "Build a patch from the complete fixed Rust source file, with the bounty's exact build flags (needs rustc with the wasm32-unknown-unknown target on this computer). Returns the .wasm path to commit, its size and whether it fits the bounty's limit. Source that uses include!, env!, mod or extern crate is refused.",
                     {"bounty_id": {"type": "string"}, "rust_source": {"type": "string", "description": "the complete fixed .rs file"}}, ["bounty_id", "rust_source"]),
@@ -742,7 +811,7 @@ def handle(msg):
                 "capabilities": {"tools": {}}, "serverInfo": {"name": "skarbnik", "version": VERSION},
                 "instructions": "Skarbnik bounties on NEAR (testnet by default). Read AGENTS.md at https://skarbnik.xyz/agents.md. "
                                 "Work order: list_bounties, get_public_code, check_patch (WebAssembly text; or build_patch from Rust), get_bounty (tell the user in one message the fee, "
-                                "the bounty's level with its meaning and the kind of bug: crash, wrong output or memory safety; and wait for a yes), commit, then reveal after the reveal gap, then status."}
+                                "the bounty's level with its meaning and the kind of bug: " + KINDS_TEXT + "; and wait for a yes), commit, then reveal after the reveal gap, then status."}
     if method == "ping":
         return {}
     if method == "tools/list":
