@@ -1,0 +1,60 @@
+$ near ... check_with_outlayer sign-as kintsugi-vendor-prnvm.testnet
+"final_pass"
+
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  check_with_outlayer
+│                       args:         {
+│                                       "bounty_id": "37",
+│                                       "index": 0,
+│                                       "receipt_sha256": "bd69f4206382e70f424319e6c9ef6ee512bfb562bf2a7f344898d4eb11435e3a"
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      2.8 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 14.7 Tgas
+│    Transaction fee: 0.001465732912009 NEAR
+│    Transaction ID: 6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_requested","data":[{"bounty_id":"37","index":0,"verdict":"PASS","asker":"kintsugi-vendor-prnvm.testnet","outlayer":"outlayer.testnet"}]}
+│    Logs [outlayer.testnet]:
+│    Logs [outlayer.testnet]:
+│      [[yNEAR charged: "1099187800000000000000"]]
+│      EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_completed","data":[{"sender_id":"kintsugi-vendor-prnvm.testnet","code_source":{"WasmUrl":{"url":"https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm","hash":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1"}},"resources_used":{"instructions":878729917,"time_ms":991,"compile_time_ms":null},"success":true,"error_message":null,"payment_charged":"1099187800000000000000","payment_refunded":"2798900812200000000000000","compilation_note":"Cached WASM from 2026-10-26T05:34:41.403211+00:00","timestamp":1793716101758013360}]}
+│      Execution completed successfully. Output: Json(370 bytes), Resources: { instructions: 878729917, time_ms: 991 }, Cost: 1099187800000000000000 yoctoNEAR, Refund: 2798900812200000000000000 yoctoNEAR, Cached WASM from 2026-10-26T05:34:41.403211+00:00
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_verified","data":[{"bounty_id":"37","index":0,"verdict":"PASS","caller":"kintsugi-l2-cihdp.testnet"}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"paid","data":[{"bounty_id":"37","index":0,"reason":"outlayer_pass","to":"kintt.testnet","amount":"100000000000000000000000"}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"fee_refunded","data":[{"bounty_id":"37","index":1,"to":"skarbnik-agentc-d48260.testnet","fee":"15000000000000000000000","reason":"undecided when the bounty closed"}]}
+│    Logs [kintt.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+
+
+The "check_with_outlayer" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet check_with_outlayer file-args ~/skarbnik-vendor/l1tool-watch-work/b37_a0/u_outlayer_call.json prepaid-gas '300.0 Tgas' attached-deposit '2.8 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+

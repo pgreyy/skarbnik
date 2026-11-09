@@ -1,0 +1,115 @@
+$ near ... create_bounty sign-as kintsugi-vendor-prnvm.testnet
+"37"
+
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  create_bounty
+│                       args:         {
+│                                       "attempt_fee": "10000000000000000000000",
+│                                       "attest_window_ns": "3600000000000",
+│                                       "corpus_hash": "736d160dceba2ce955097aa39072a365f38abe59b7ffec61524dcfd021a1e61b",
+│                                       "expiry_ns": "345600000000000",
+│                                       "exploit_commitment": "22e75bd15b03e742517f38353818f95021ad16dc7084ac994888ca27533a1ec7",
+│                                       "fee_step": "5000000000000000000000",
+│                                       "fuzz_count": 1,
+│                                       "image_id": "dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc",
+│                                       "level": 1,
+│                                       "max_commits": 2,
+│                                       "max_patch_bytes": 1024,
+│                                       "original_hash": "fce3c7f281fed2bfa6c9f25e723b6587886d667d627bf683ba8da79946145fd8",
+│                                       "proof0_journal_hash": "a0db90893f14e9ffb01a50844625e93b017c9d1b978c99d758f3a4591986ff04",
+│                                       "proof0_receipt_hash": "ed0290f1ee9e66d68186ae38315a3d78222a3bf0f7391ca7decbb81ccd3e3dd5",
+│                                       "reference_fix_hash": "42edaaf57b1b428baba4cf7a8ec7d578daae82037ca9a2670dc02c636bcfdc97",
+│                                       "reveal_gap_ns": "60000000000",
+│                                       "reveal_window_ns": "3600000000000",
+│                                       "variant_count": 1,
+│                                       "verdict_window_ns": "86400000000000"
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0.1 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.355 Tgas
+│    Transaction fee: 0.000035440807098 NEAR
+│    Transaction ID: 7QKA1m1Fw8GDanqc8xMjiaiZBeiENVevhmYLZaR1RTV3
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/7QKA1m1Fw8GDanqc8xMjiaiZBeiENVevhmYLZaR1RTV3
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_created","data":[{"bounty_id":"37","vendor":"kintsugi-vendor-prnvm.testnet","amount":"100000000000000000000000","image_id":"dd6c5f42c117ce3a842dbde60cd3fd9f255c85e322317e6bff2357b20533a2fc","exploit_commitment":"22e75bd15b03e742517f38353818f95021ad16dc7084ac994888ca27533a1ec7","max_commits":2,"attempt_fee":"10000000000000000000000","fee_step":"5000000000000000000000","expires_at_ns":"1794058492607801502","max_commits_per_account":null}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+
+
+The "create_bounty" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet create_bounty file-args ~/skarbnik-vendor/l1tool-work/create_call.json prepaid-gas '300.0 Tgas' attached-deposit '0.1 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+$ near ... open_with_outlayer sign-as kintsugi-vendor-prnvm.testnet
+"opened"
+
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  open_with_outlayer
+│                       args:         {
+│                                       "bounty_id": "37",
+│                                       "receipt_sha256": "ed0290f1ee9e66d68186ae38315a3d78222a3bf0f7391ca7decbb81ccd3e3dd5"
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      2.8 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 14.7 Tgas
+│    Transaction fee: 0.0014656709231795 NEAR
+│    Transaction ID: 9fw7pzS7Vt2y4AwqCg5en3c8hHsHmpC8e2N1xBZ8FmeS
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/9fw7pzS7Vt2y4AwqCg5en3c8hHsHmpC8e2N1xBZ8FmeS
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"outlayer_requested","data":[{"bounty_id":"37","index":null,"verdict":"PASS","asker":"kintsugi-vendor-prnvm.testnet","outlayer":"outlayer.testnet"}]}
+│    Logs [outlayer.testnet]:
+│    Logs [outlayer.testnet]:
+│      [[yNEAR charged: "1096887800000000000000"]]
+│      EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_completed","data":[{"sender_id":"kintsugi-vendor-prnvm.testnet","code_source":{"WasmUrl":{"url":"https://raw.githubusercontent.com/pgreyy/skarbnik/4e6a1f634bba37189edf288a857520d3ac3b5399/verifier/outlayer/farbox-verifier.wasm","hash":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1"}},"resources_used":{"instructions":878735654,"time_ms":968,"compile_time_ms":null},"success":true,"error_message":null,"payment_charged":"1096887800000000000000","payment_refunded":"2798903112200000000000000","compilation_note":"Cached WASM from 2026-10-26T05:34:41.403211+00:00","timestamp":1793712906536660456}]}
+│      Execution completed successfully. Output: Json(370 bytes), Resources: { instructions: 878735654, time_ms: 968 }, Cost: 1096887800000000000000 yoctoNEAR, Refund: 2798903112200000000000000 yoctoNEAR, Cached WASM from 2026-10-26T05:34:41.403211+00:00
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_opened","data":[{"bounty_id":"37","by":"outlayer","caller":"kintsugi-vendor-prnvm.testnet"}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+
+
+The "open_with_outlayer" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet open_with_outlayer file-args ~/skarbnik-vendor/l1tool-work/p0_outlayer_call.json prepaid-gas '300.0 Tgas' attached-deposit '2.8 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+

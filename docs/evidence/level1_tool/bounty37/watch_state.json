@@ -1,0 +1,14 @@
+{
+ "37:0": {
+  "state": "submitted",
+  "tx": "6nKhWdEuJxF6o86EMzcTn5Sfu69KqbMo7xLQVVYtD7dS",
+  "verdict": "PASS",
+  "outcome": "Passed",
+  "times_s": {
+   "prove": 1299.18,
+   "succinct": 934.0
+  },
+  "done": "2026-11-03T14:28:29Z",
+  "submit_failures": 0
+ }
+}

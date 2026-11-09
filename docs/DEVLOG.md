@@ -2,6 +2,18 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-09: Records of settled bounties 37, 38 and 42 to 48 kept in docs/evidence before a cleanup
+
+- Before deleting the laptop's private folders of settled bounties, every file in them that is not secret was compared
+  with docs/evidence by content (paths ignored), and every transaction hash in their logs with the docs: all 26 hashes
+  were already there. Copied what was missing (50 files, 2.7 MB): the succinct receipts of each Proof 0 and
+  attempt, the revealed patches, and the create and open call arguments of 42, 43, 44, 47 and 48 next to their logs; and
+  for the Level 1 bounties 37 and 38 new folders `docs/evidence/level1_tool/bounty37/` and `bounty38/` (Proof 0 run log,
+  receipt, the OutLayer call's fields with the receipt as a file and the journal in hex; 37's attempt 0). The submit
+  call arguments were not copied: each equals the `u_args.json` already next to it (the same seal and journal, in hex). Each Proof 0 receipt's sha256 equals the `proof0_receipt_hash` of
+  its bounty's create call (7 of 7). Not copied: secrets, salts, seeds, reference fixes, private inputs, configs and
+  run settings that name private files.
+
 ## 2026-11-09: Public bounties 49 and 50 open, their watches, and a fallback for slow GPU binary copies
 
 - Opened from the laptop with `python3 -I tools/skarbnik-vendor publish --config <laptop config> --yes`, using the
