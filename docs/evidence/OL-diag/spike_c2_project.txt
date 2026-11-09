@@ -1,0 +1,4 @@
+2026-11-03T08:01:04Z
+$ near contract call-function as-transaction outlayer.testnet create_project json-args '{"name":"farbox-verifier-spike","source":{"WasmUrl":{"url":"https://test.fastfs.io/kintsugi-res2-prnvm.testnet/outlayer.testnet/60e04ada562d3f58b91a5a7c328a0cd366d2bdb12221e52a290f214a16f1dd43.wasm","hash":"60e04ada562d3f58b91a5a7c328a0cd366d2bdb12221e52a290f214a16f1dd43","build_target":"wasm32-wasip1"}}}' prepaid-gas '100 Tgas' attached-deposit '0.1 NEAR' sign-as kintsugi-res2-prnvm.testnet ...
+│    Transaction ID: GTeR7qmJCvwNjFGk2VwJ1yjdDJhwLo71dxKZrXvEK7Er
+The "create_project" call to <outlayer.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.

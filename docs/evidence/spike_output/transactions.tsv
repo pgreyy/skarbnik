@@ -12,3 +12,4 @@ open_43	open_with_groth16	kintsugi-vendor-prnvm.testnet	7XmZDUvKLQ9ChRocNQHsWxGA
 submit_43_partial_fix_fail	submit_groth16	kintsugi-vendor-prnvm.testnet	9ahn3Mt38iQyAVZfkQLVJQxWeidADL61DcfbmnG6uxKp	0.378 Tgas	0.0000377153203035	0	6.71
 agent_commit_43_partial_fix	commit	skarbnik-agentc-d48260.testnet	EoYpB23Yj1pPbwUsvp8hNXVgCyAiXcMu5wUgrS48hrW8	-	-	0	-
 agent_reveal_43	reveal	skarbnik-agentc-d48260.testnet	Agy73zEZQH4RBVA9VeZmbu6gercoP2vETq68MCynXci7	-	-	0	-
+expire_43	expire	kintsugi-vendor-prnvm.testnet	5gMmKjkTByKe3kVy85YxaTDz2nz3pAqcyrfTncQMA2yq	0.310 Tgas	0.000030920390916	0	5.41

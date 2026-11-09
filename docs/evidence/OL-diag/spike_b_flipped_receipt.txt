@@ -1,0 +1,74 @@
+2026-11-03T07:45:31Z
+args file: target/ol-spike/args_bad_50.json sha256 b0412782fa180587b20b395f1c02b3c04160e690daf7e95c69133187cb5d5a07, 300377 bytes
+source: {"WasmUrl": {"url": "https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm", "hash": "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8", "build_target": "wasm32-wasip1"}}
+$ near contract call-function as-read-only outlayer.testnet estimate_execution_cost json-args '{"resource_limits": {"max_instructions": 2000000000, "max_memory_mb": 64, "max_execution_seconds": 20}, "input_len": 299986}' network-config testnet now
+"2675180200000000000000000"
+$ near contract call-function as-transaction outlayer.testnet request_execution file-args target/ol-spike/args_bad_50.json prepaid-gas '300.0 Tgas' attached-deposit '2.8 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+├  Unsigned transaction:
+│    signer_id:    kintsugi-res2-prnvm.testnet
+│    receiver_id:  outlayer.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  request_execution
+│                       args:         {
+│                                       "resource_limits": {
+│                                         "max_execution_seconds": 20,
+│                                         "max_instructions": 2000000000,
+│                                         "max_memory_mb": 64
+│                                       },
+│                                       "response_format": "Json",
+│                                       "source": {
+│                                         "WasmUrl": {
+│                                           "build_target": "wasm32-wasip1",
+│                                           "hash": "e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8",
+│                                           "url": "https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm"
+│                                         }
+│                                       }
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      2.8 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:3s7Q4iM6CiU22fe88MfhxSjhaJQP3L3A9dcccTgvTJAF
+│     
+├  Transaction Execution Info:
+│    Gas burned: 14.7 Tgas
+│    Transaction fee: 0.001463196138371 NEAR
+│    Transaction ID: BjdgAJmsxUYGkuunY7pJ81WrmxJzNtsdYADmuYdTWm9N
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/BjdgAJmsxUYGkuunY7pJ81WrmxJzNtsdYADmuYdTWm9N
+│     
+├  Function execution logs:
+│    Logs [outlayer.testnet]:
+│      EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_requested","data":[{"request_data":"{\ ...(cut)
+│    Logs [outlayer.testnet]:
+│      [[yNEAR charged: "1130448500000000000000"]]
+│      EVENT_JSON:{"standard":"near-outlayer","version":"1.0.0","event":"execution_completed","data":[{"sender_id":"kintsugi-res2-prnvm.testnet","code_source":{"WasmUrl":{"url":"https://raw.githubusercontent.com/pgreyy/farbox-verifier/main/farbox-verifier.wasm","hash":"e60647ec50f76f591a6994963f1394d408f516947f2fe927e389daf2166346a8","build_target":"wasm32-wasip1"}},"resources_used":{"instructions":485666155,"time_ms":1304,"compile_time_ms":null},"success":true,"error_message":null,"payment_charged":"1130448500000000000000","payment_refunded":"2798869551500000000000000","compilation_note":"Cached WASM from 2026-10-26T05:34:41.403211+00:00","timestamp":1793691940540798670}]}
+│      Execution completed successfully. Output: Json(364 bytes), Resources: { instructions: 485666155, time_ms: 1304 }, Cost: 1130448500000000000000 yoctoNEAR, Refund: 2798869551500000000000000 yoctoNEAR, Cached WASM from 2026-10-26T05:34:41.403211+00:00
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│    Logs [kintsugi-res2-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+{
+  "error": "receipt is invalid: verification indicates proof is invalid",
+  "image_id": "3edbc2e6a077e5193d6d63983a97553f98b669868492e2a6965dcff25985569d",
+  "journal_sha256": null,
+  "ok": false,
+  "receipt_sha256": "5e95250aa4588bae73eef6edf490d8337361ba36ed1c080cdc903506718cbda0",
+  "submission_id": "fff09869506221aedcd1377d89d6815d07b85202c90b1fa5725efb059e984934",
+  "verdict": null
+}
+
+
+The "request_execution" call to <outlayer.testnet> on behalf of <kintsugi-res2-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction outlayer.testnet request_execution file-args target/ol-spike/args_bad_50.json prepaid-gas '300.0 Tgas' attached-deposit '2.8 NEAR' sign-as kintsugi-res2-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+exit=0 wall_s=13

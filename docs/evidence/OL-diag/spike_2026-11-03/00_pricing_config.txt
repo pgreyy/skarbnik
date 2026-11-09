@@ -1,0 +1,44 @@
+== testnet outlayer.testnet get_pricing
+[
+  "1000000000000000000000",
+  "100000000000000",
+  "100000000000000000",
+  "100000000000000000"
+]
+
+
+Here is your console command if you need to script it or re-run:
+    [33mnear contract call-function as-read-only outlayer.testnet get_pricing json-args {} network-config testnet now[39m
+
+== testnet outlayer.testnet get_config
+[
+  "owner.outlayer.testnet",
+  "worker.outlayer.testnet"
+]
+
+
+Here is your console command if you need to script it or re-run:
+    [33mnear contract call-function as-read-only outlayer.testnet get_config json-args {} network-config testnet now[39m
+
+== mainnet outlayer.near get_pricing
+[
+  "1000000000000000000000",
+  "100000000000000",
+  "100000000000000000",
+  "100000000000000000"
+]
+
+
+Here is your console command if you need to script it or re-run:
+    [33mnear contract call-function as-read-only outlayer.near get_pricing json-args {} network-config mainnet now[39m
+
+== mainnet outlayer.near get_config
+[
+  "owner.outlayer.near",
+  "worker.outlayer.near"
+]
+
+
+Here is your console command if you need to script it or re-run:
+    [33mnear contract call-function as-read-only outlayer.near get_config json-args {} network-config mainnet now[39m
+

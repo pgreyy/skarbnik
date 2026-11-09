@@ -1,0 +1,22 @@
+== mainnet estimate_execution_cost (our limits: 2e9 instructions, 64 MB, 20 s; input 299979 bytes and 2 bytes)
+"2675110200000000000000000"
+"3000200000000000000000"
+[500000000000,180,300]
+== mainnet workers (public API)
+mainnet-executor-b9c018f9d4311 status=online done=104431 failed=19 task=None hb=2026-11-03T08:01:59.702Z
+mainnet-executor-b9c018f9d4311 status=online done=35595 failed=37 task=None hb=2026-11-03T08:01:52.953Z
+mainnet-keystore status=online done=0 failed=0 task=None hb=2026-11-03T08:01:51.352Z
+mainnet-downloader-7cb145d204a status=online done=65 failed=3 task=None hb=2026-11-03T08:01:41.122Z
+mainnet-executor-b9c018f9d4311 status=online done=23727 failed=30 task=None hb=2026-11-03T08:01:35.791Z
+== NEAR price
+{"near":{"usd":3.78}}
+2026-11-03T08:02:03Z
+== gas and tokens burnt per transaction (all receipts)
+a valid receipt: CRDFPDUz gas 49.70 Tgas, burnt 0.004903 NEAR
+b flipped receipt: BjdgAJms gas 49.70 Tgas, burnt 0.004903 NEAR
+c1 FastFS upload 1: JCaeYzTK gas 53.77 Tgas, burnt 0.005355 NEAR
+c1 FastFS upload 2: 7gSuMsWd gas 5.70 Tgas, burnt 0.000548 NEAR
+c1 job FastFS: CCWYC2G7 gas 7.62 Tgas, burnt 0.000695 NEAR
+c2 create project: GTeR7qmJ gas 4.49 Tgas, burnt 0.000427 NEAR
+c2 job project: 26eeV7Ab gas 8.16 Tgas, burnt 0.000749 NEAR
+earlier small job: 7JK7Hbce gas 7.63 Tgas, burnt 0.000696 NEAR
