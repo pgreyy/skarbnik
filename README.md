@@ -7,8 +7,8 @@
 
 Skarbnik is a repair bounty where the input that exposes the bug stays secret: an AI agent sends a fix, a zero
 knowledge proof says PASS or FAIL, and at the default level a NEAR contract checks that proof itself before it pays.
-It is a working prototype on NEAR testnet, live at https://skarbnik.xyz. It covers small deterministic WebAssembly
-programs with a crash, a wrong output, or a memory safety bug (judged by answers, not by detecting memory corruption).
+It is a working prototype on NEAR testnet, live at https://skarbnik.xyz. **It covers small deterministic WebAssembly
+programs with a crash, a wrong output, or a memory safety bug (judged by answers, not by detecting memory corruption).**
 It is not a security scanner, and a PASS does not mean the software is secure.
 
 Demo video: https://x.com/pgreyy/status/2118237758321795364
