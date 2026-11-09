@@ -2,6 +2,27 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-09: The rule checker on the site, the feed, the agent servers and the vendor tool (branch spike-ab)
+
+- Site (`web/site.config.json`, `web/js/status.js`, pages): a third checker `rule` (`2c7b601a…`); bug kinds path
+  traversal, access control, injection, and security rule for an unknown program on the rule checker; a home pill
+  "Path traversal and access control bounties" with the New sticker (`#/bounties?kind=rule`); the rule checker with its
+  allow transaction on the evidence page.
+- Feed (`scripts/gen_feed.py`, `web/api/feed.js`): packages `assets` and `projects` with their rule module, rule source
+  and headers in `web/code/<name>/`, a BUILD.txt for rule programs, the rule corpus hash (it gives the corpus hashes of
+  test bounties 47 and 48 on chain), and `public_programs` so the live feed can give a bounty newer than the saved feed
+  its public code. `node scripts/test_live_feed.mjs`: ALL PASS (a new case for a rule checker bounty).
+- Agent servers (`web/api/_lib/agent.js` 1.3.0, `tools/skarbnik-mcp/server.py` 0.5.0): accept the rule checker;
+  `check_patch` runs call sequences and compares transcripts; `get_public_code` returns the rule source, the rule
+  module as WebAssembly text and the headers, and refuses when they do not match the corpus hash on chain. Offline: every
+  original passes its public tests, all 8 demo fixes pass, every empty and deny cheat fails; crash and output answers
+  unchanged.
+- Vendor tool and vendor MCP server: mode `rule` (init, check, Proof 0, publish, watch); publish refuses a Proof 0 of
+  another checker or another corpus. `check --candidate`: the reference fixes of assets and projects PASS, the
+  originals FAIL. `python3 -I scripts/test_watch_retry.py`: ALL PASS.
+- Docs: README section "Path traversal and access control bugs", CLAIMS, LIMITS, EVIDENCE ("Spike A and B"),
+  ARCHITECTURE, SECURITY, DECISIONS (D16), TRY_IT step 2 (`4 ids MATCH` on the live chain), VENDOR.md.
+
 ## 2026-11-09: Two programs for public rule checker bounties (branch spike-ab)
 
 - The demo fixes and demo secrets of `data/ab/` are public, so the public bounties need new programs with private

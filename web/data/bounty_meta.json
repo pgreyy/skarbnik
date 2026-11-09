@@ -32,7 +32,9 @@
   "43": "Output checker spike, the FAIL on chain (test)",
   "44": "Memory safety scratch (test)",
   "45": "Postage calculator: wrong output",
-  "46": "Shelf counter: memory safety"
+  "46": "Shelf counter: memory safety",
+  "47": "Rule checker spike: injection (test)",
+  "48": "Rule checker spike: access control (test)"
  },
  "notes": {
   "12": "Paid by timeout, not by a proof: its one attempt came from a team-run account (the owner's account, external agent software), and the vendor's watch does not cover bounty 12.",
