@@ -1,0 +1,23 @@
+salt: the private salt of bounty ab-idor (existing)
+candidate: run/patch.wasm
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 64 variants: 64
+total cycles: 3145728
+user cycles: 1772680
+segments: 6
+prove seconds: 7.91
+verify seconds (in process): 0.245
+receipt file: run/u.bin (1610076 bytes)
+seal bytes: 1607280
+journal bytes: 780
+journal.verdict: FAIL
+journal.candidate_hash: 3b8573dee9df43834557a1fea653e602a216e4a48661fc3852f51284f7b9499f
+journal.original_hash: 971414a50dba9afe5647238b61d2f164e2b33bf38e9069dad99d79367339d0a2
+journal.exploit_commitment: 158a6a9342451fde410cbe6f5f44b8697516877c7ba9b2a945e3e2b8baa778c2
+journal.corpus_hash: 4f51b0857d833d11784381306b8f1282936543b32cd4a5c6f5d1f8b60e7c9e64
+journal.fuzz_seed: c8eb68403fd3a240ebc9fa390ccfc039165efabe12853c1b8d59d319db53a8f3
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: cb2bc895ff8e867555d167a1dde3667b012b8f37e94530299e7eb1d0ef824dce

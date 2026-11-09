@@ -127,6 +127,9 @@ BOUNTY_STEPS = [
     # vendor tool from the laptop with Proof 0 made on the VPS; the VPS watches prove their attempts
     ("docs/evidence/feature_output/public_bounties/transactions.tsv", "tools/skarbnik-vendor (check and prove0 on the VPS, publish on the laptop, watch on the VPS)",
      {45: ["b45_"], 46: ["b46_"]}),
+    # The rule checker (spike A and B, docs/evidence/spike_ab/chain/): scratch bounties 47 (A1, XSS) and 48 (B1, IDOR)
+    ("docs/evidence/spike_ab/chain/transactions.tsv", "scripts/spike_ab_prove.sh (GPU, Groth16 on the VPS), NEAR CLI (vendor), tools/skarbnik-mcp (agent)",
+     {47: ["a1_"], 48: ["b1_"]}),
     # The testnet cleanup of 2026-10-30: claim_timeout where a revealed attempt waited, expire on the expired bounties
     ("docs/evidence/cleanup_2026-10-30/transactions.tsv", "NEAR CLI by hand (docs/evidence/cleanup_2026-10-30/README.md)",
      {3: ["cleanup_b3_claim"], 26: ["cleanup_b26_claim"], 0: ["cleanup_b0_expire"], 2: ["cleanup_b2_expire"], 10: ["cleanup_b10_expire"],
@@ -311,6 +314,8 @@ _fo = tsv("docs/evidence/feature_output/transactions.tsv")
 out["output_checker"] = {"image_id": "005d8dc7e6fa2b936d960f6c81af51b5cb3699d319b5d4b71403dd64b051c089",
                          "allow_tx": next((r["tx_hash"] for r in _fo if r["step"] == "allow_output_checker"), None),
                          "source": "docs/evidence/feature_output/transactions.tsv"}
+out["test_bounties"]["47"] = "Test bounty: the scratch bounty of the rule checker's mode A (an HTML escaper with an XSS bug, checker 2c7b601a...): a cheat FAIL, then a correct fix PASS, the FAIL submitted first. Not a demo."
+out["test_bounties"]["48"] = "Test bounty: the scratch bounty of the rule checker's mode B (a file store with an IDOR bug, a call sequence, checker 2c7b601a...): a cheat FAIL, then a correct fix PASS, the FAIL submitted first. Not a demo."
 # Checkers once allowed on the contract and no longer used: an id cannot be removed from the allowlist.
 out["retired_checkers"] = {"77c2e2d15af5b45de35c5a32568be4250ad06f0b31233c6e20a8153f9fa141c4":
     "The output checker of the spike (no byte sweep). Retired: used only by test bounties 42 and 43. It stays on the allowlist because an id cannot be removed; the site, the feed, the agent servers and the vendor tool accept only the crash checker dd6c5f42... and the output checker 005d8dc7...."}

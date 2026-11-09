@@ -1,0 +1,48 @@
+utc_start=2026-11-09T03:35:02.684797801Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  submit_groth16
+│                       args:         {
+│                                       "bounty_id": "47",
+│                                       "index": 0,
+│                                       "seal": "LoqSPJdni9pIgCDGcW6h9AWG+95YLdIxa0gIruhU1d8Q6WX0KAYWc31vS2CJYDIJokDWxgh6vfamn7vdOzeECwhea89p2+z84Gfn8jEWLvw4RhKjRjxOPY5SWwFg6/taA5GJfpiVHRVmcTu7i7UldAN7nXu4V97YsLTjV8xkgWMaFwSWcwoJItc/IOMY7dQntRuR4gm/jLwIKHiO6Z5ppiOj3SMN0bsUBsrG/W/2zQF89/5ctA2pwRJS167ZsYXJA6w+eaPtWOBcgi8Q+OuQWSjc0f5jzuWgwvAsFy6x+SoaVr5C/9sSKCqgq2OCR3NL8i7jnKGo8Vi+4GkZkdsofQ=="
+│                                     }
+│                       gas:          300.0 Tgas
+│                       deposit:      0 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.378 Tgas
+│    Transaction fee: 0.0000377153203035 NEAR
+│    Transaction ID: 7NpEGy6Hnt69Ko2LHMtDrF8e4yCNRcMXxZdd92xW6YWf
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/7NpEGy6Hnt69Ko2LHMtDrF8e4yCNRcMXxZdd92xW6YWf
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"groth16_verified","data":[{"bounty_id":"47","index":0,"verdict":"FAIL","caller":"kintsugi-vendor-prnvm.testnet"}]}
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"attempt_spent","data":[{"bounty_id":"47","index":0}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"final_fail"
+
+
+The "submit_groth16" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+
+
+`near` CLI has a new update available 0.30.1 →  0.31.1
+To update `near` CLI use: near extensions self-update
+exit=0
+wall_seconds=4.65

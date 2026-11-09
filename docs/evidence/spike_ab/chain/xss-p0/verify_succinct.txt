@@ -1,0 +1,14 @@
+receipt file: ~/skarbnik-ab/xss-p0/u_succinct.bin (224786 bytes)
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+verify seconds: 0.049
+VALID
+journal sha256: ad3b9cccc3cb3090912029728b0e1d0fcf9d84e64f3fd872aef62ebd3ecd64d6
+journal.verdict: PASS
+journal.candidate_hash: a96399be1d849fcd305601373fb422a513e77665731debebcb58858754c9b672
+journal.original_hash: 0b80190eb73faf07274426e7f2287590356b02507cb4897337bb39f2c830a1a5
+journal.exploit_commitment: 325a849236df911fc240ad8155b5acab2ba795c78ac61ff575ed70c64c2c5cc7
+journal.corpus_hash: 9449732f72ce65d5bbd4c253b77a1d7f7030a74f4bf921eb1616bfaafa0fb3b1
+journal.fuzz_seed: 43f606b287e0d7e99956b7b09790aca10905351772bdbeab0c827166e3e5ac1f
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: 0f9979a959601e517d0ad8f20e5fa42235bf6257dbe24c7a64aefee44d31b813

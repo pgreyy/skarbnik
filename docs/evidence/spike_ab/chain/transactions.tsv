@@ -1,0 +1,19 @@
+step	method	signer	tx_hash	gas_burned_cli	fee_near	exit	wall_s
+allow_rule_checker	allow_image_id	kintsugi-l2-cihdp.testnet	ABDP1WFVsxCXGuDM3B3kxWLZk7nrbM2WqL8qdnjVGA5a	0.309 Tgas	0.0000308267441862	0	4.89
+agent_credit_ab	deposit_credit	skarbnik-agentc-d48260.testnet	5mr8Td8ydWKBuBJ4yzbb47RpF6qCSDrgV9uCAy6Zz9r2	0.309 Tgas	0.000030882243944	0	7.0
+a1_create	create_bounty	kintsugi-vendor-prnvm.testnet	HSJvX5zYbDFvPD5jwZJszHQu2zuYFuM2vwV77EfqLwv4	0.355 Tgas	0.000035412196869	0	4.83
+a1_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	8bnabZEVi6vuDmRMzSaVsBA49TAbD19uqZN6RzkHxrCM	0.377 Tgas	0.000037681941703	0	4.84
+b1_create	create_bounty	kintsugi-vendor-prnvm.testnet	4gXzoGXQt3vfQdiWUZn5fze4daZ4v7Fr2Xky1wWhaaEi	0.355 Tgas	0.000035412196869	0	4.64
+b1_open	open_with_groth16	kintsugi-vendor-prnvm.testnet	FchbM7JgQZevxSDbpE6Eh3zegpXcYp8vf5rDANKA6TCN	0.377 Tgas	0.000037681941703	0	4.42
+a1_submit_a0_cheat_FAIL	submit_groth16	kintsugi-vendor-prnvm.testnet	7NpEGy6Hnt69Ko2LHMtDrF8e4yCNRcMXxZdd92xW6YWf	0.378 Tgas	0.0000377153203035	0	4.65
+a1_submit_a1_fix_PASS	submit_groth16	kintsugi-vendor-prnvm.testnet	4M5FbnG421ftbJdmroczYZoF1VK48kTXbpUnZE6pgSj8	0.378 Tgas	0.0000377153203035	0	9.66
+b1_submit_a0_cheat_FAIL	submit_groth16	kintsugi-vendor-prnvm.testnet	6hKgYNpwiCK2XyEBJrPPqavuP8fArBHbAXzaSsiWEChS	0.378 Tgas	0.0000377153203035	0	4.86
+b1_submit_a1_fix_PASS	submit_groth16	kintsugi-vendor-prnvm.testnet	AK2ikyVSh4WFhZhpxanhhPhV7kfo9sDXcXasNM72X28b	0.378 Tgas	0.0000377153203035	0	5.93
+a1_agent_commit_a0_cheat	commit	skarbnik-agentc-d48260.testnet	82C2vStzhuLKkxTMBGTfKn8GVMGGLBGGFuWUxSoWM4DV	-	-	0	-
+a1_agent_commit_a1_fix	commit	skarbnik-agentc-d48260.testnet	HZN9uRf2WdbvwNS2MhA6UyhGLC7QmwSL2a3W2AsviFmn	-	-	0	-
+a1_agent_reveal_a0	reveal	skarbnik-agentc-d48260.testnet	3maH9HGiEoWdJwuQVZ4E84ZyeAqnnPNWuDZr2FMcxm6s	-	-	0	-
+a1_agent_reveal_a1	reveal	skarbnik-agentc-d48260.testnet	2sF5pi4YpPQ6cWNqvQGUTsF7pmie42YBo48YRvyFQfNk	-	-	0	-
+b1_agent_commit_a0_cheat	commit	skarbnik-agentc-d48260.testnet	2EvqAWV8yVeCLnUc6SQ3THByyBc7K2wH8baY4D3HrPeZ	-	-	0	-
+b1_agent_commit_a1_fix	commit	skarbnik-agentc-d48260.testnet	DiNXS5tKBfxbkC2rEXnRM7xUu3ZREr7m4p5if6Zena4E	-	-	0	-
+b1_agent_reveal_a0	reveal	skarbnik-agentc-d48260.testnet	2vHWPfVcPaLuELczPHbyiuJdsQSCqGAx78qeetYEYLaE	-	-	0	-
+b1_agent_reveal_a1	reveal	skarbnik-agentc-d48260.testnet	XnLrBMwdZhzAXhZm7Lv3qPnXHSeyxTdH1hnXpsCztTd	-	-	0	-

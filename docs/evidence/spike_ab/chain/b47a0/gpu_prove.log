@@ -1,0 +1,23 @@
+salt: the private salt of bounty ab-xss (existing)
+candidate: run/patch.wasm
+image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa
+receipt kind: composite
+segment po2 limit: 19
+fuzz_count: 64 variants: 64
+total cycles: 3178496
+user cycles: 1903927
+segments: 7
+prove seconds: 8.41
+verify seconds (in process): 0.292
+receipt file: run/u.bin (1819518 bytes)
+seal bytes: 1816536
+journal bytes: 780
+journal.verdict: FAIL
+journal.candidate_hash: 8cfdee56f26e9eea428d87e689fee8598fe6d8649516be108a18a0d271f6851a
+journal.original_hash: 0b80190eb73faf07274426e7f2287590356b02507cb4897337bb39f2c830a1a5
+journal.exploit_commitment: 325a849236df911fc240ad8155b5acab2ba795c78ac61ff575ed70c64c2c5cc7
+journal.corpus_hash: 9449732f72ce65d5bbd4c253b77a1d7f7030a74f4bf921eb1616bfaafa0fb3b1
+journal.fuzz_seed: d316820287620bf0c4cc77773daf4d8d1a3c0a1b0ff7ae96f2382daec7dabcd7
+journal.fuzz_count: 64
+journal.variant_count: 64
+journal.submission_id: f7b142f0cfb74d5c38079f818fdf4b97d428324596e9fd3d0ce36c2214970e8e

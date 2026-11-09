@@ -32,7 +32,14 @@ One dated entry per work block: what was done, the exact commands, the results, 
   modules' declared memory matters: with a 4 page rule and a 2 page program the same Proof 0 was 362 to 446 segments
   (`memory_effect.txt`).
 - Two clean reproducible builds gave the same four ids and guest bytes; the crash checker `dd6c5f42…` and the output
-  checker `005d8dc7…` did not change (`clean_rebuilds.txt`). Not done yet: allow_image_id and the two scratch bounties.
+  checker `005d8dc7…` did not change (`clean_rebuilds.txt`).
+- Worst case in the executor, on the build pod (`docs/evidence/spike_ab/chain/buildpod.log`): a 64 call secret with a 4
+  page rule and 2 page programs, Proof 0 335 million cycles in 1,061 segments, about 7 times the demos.
+- `allow_image_id` for `2c7b601a…` (`ABDP1WFV…`). The laptop had no host after the disk cleanup, so one GPU pod built
+  the CUDA prover and a CPU host for the VPS (same Ubuntu release), and the Groth16 step ran on the VPS.
+- Scratch bounties, both Level 2, 0.1 NEAR, K 2, 64 and 64, one sweep position: 47 (A1, XSS) and 48 (B1, IDOR). For
+  each, Proof 0 opened it, a cheat proved FAIL and was submitted first, then a correct fix proved PASS and was paid.
+  GPU $0.8127 of the $3 cap (8 pods, including the build pod). The private files were shredded afterwards.
 
 ## 2026-11-08: Output mode for wrong output and memory safety bugs (branch feature-output)
 

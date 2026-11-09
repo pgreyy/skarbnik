@@ -1,0 +1,66 @@
+$ near contract call-function as-transaction kintsugi-l2-cihdp.testnet create_bounty json-args {"original_hash": "971414a50dba9afe5647238b61d2f164e2b33bf38e9069dad99d79367339d0a2", "corpus_hash": "4f51b0857d833d11784381306b8f1282936543b32cd4a5c6f5d1f8b60e7c9e64", "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa", "exploit_commitment": "158a6a9342451fde410cbe6f5f44b8697516877c7ba9b2a945e3e2b8baa778c2", "proof0_receipt_hash": "63d258c5bcd19551ff8ccce4f2a6e37fcde1b8826a78491be76f6dcdfc229120", "max_commits": 2, "max_patch_bytes": 1024, "reveal_gap_ns": "60000000000", "verdict_window_ns": "21600000000000", "attest_window_ns": "600000000000", "expiry_ns": "26100000000000", "attempt_fee": "10000000000000000000000", "fee_step": "5000000000000000000000", "reference_fix_hash": "b60bc168ee1cb5f07845c9b95eb1fa9ea48bb15a247913e2a9bb663055493769", "proof0_journal_hash": "1c044f81ab4d51e561dd55918ea9cb0d57bb13a48da9fb7a03f5a80e342dd925", "reveal_window_ns": "3600000000000", "fuzz_count": 64, "variant_count": 64, "level": 2, "max_commits_per_account": null} prepaid-gas 100 Tgas attached-deposit 0.1 NEAR sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+utc_start=2026-11-09T03:25:35.631212338Z
+├  Unsigned transaction:
+│    signer_id:    kintsugi-vendor-prnvm.testnet
+│    receiver_id:  kintsugi-l2-cihdp.testnet
+│    actions:
+│       -- function call:      
+│                       method name:  create_bounty
+│                       args:         {
+│                                       "attempt_fee": "10000000000000000000000",
+│                                       "attest_window_ns": "600000000000",
+│                                       "corpus_hash": "4f51b0857d833d11784381306b8f1282936543b32cd4a5c6f5d1f8b60e7c9e64",
+│                                       "expiry_ns": "26100000000000",
+│                                       "exploit_commitment": "158a6a9342451fde410cbe6f5f44b8697516877c7ba9b2a945e3e2b8baa778c2",
+│                                       "fee_step": "5000000000000000000000",
+│                                       "fuzz_count": 64,
+│                                       "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa",
+│                                       "level": 2,
+│                                       "max_commits": 2,
+│                                       "max_commits_per_account": null,
+│                                       "max_patch_bytes": 1024,
+│                                       "original_hash": "971414a50dba9afe5647238b61d2f164e2b33bf38e9069dad99d79367339d0a2",
+│                                       "proof0_journal_hash": "1c044f81ab4d51e561dd55918ea9cb0d57bb13a48da9fb7a03f5a80e342dd925",
+│                                       "proof0_receipt_hash": "63d258c5bcd19551ff8ccce4f2a6e37fcde1b8826a78491be76f6dcdfc229120",
+│                                       "reference_fix_hash": "b60bc168ee1cb5f07845c9b95eb1fa9ea48bb15a247913e2a9bb663055493769",
+│                                       "reveal_gap_ns": "60000000000",
+│                                       "reveal_window_ns": "3600000000000",
+│                                       "variant_count": 64,
+│                                       "verdict_window_ns": "21600000000000"
+│                                     }
+│                       gas:          100.0 Tgas
+│                       deposit:      0.1 NEAR
+│     
+├  Your transaction was signed successfully.
+│    Public key: ed25519:DSsHDMT25gkjLC5MfARJhrLMuwLBZvRFuDGCzwYhFzs6
+│     
+├  Transaction Execution Info:
+│    Gas burned: 0.355 Tgas
+│    Transaction fee: 0.000035412196869 NEAR
+│    Transaction ID: 4gXzoGXQt3vfQdiWUZn5fze4daZ4v7Fr2Xky1wWhaaEi
+│    To see the transaction in the transaction explorer, please open this url in your browser:
+│    https://explorer.testnet.near.org/transactions/4gXzoGXQt3vfQdiWUZn5fze4daZ4v7Fr2Xky1wWhaaEi
+│     
+├  Function execution logs:
+│    Logs [kintsugi-l2-cihdp.testnet]:
+│      EVENT_JSON:{"standard":"kintsugi","version":"1.0.0","event":"bounty_created","data":[{"bounty_id":"48","vendor":"kintsugi-vendor-prnvm.testnet","amount":"100000000000000000000000","image_id":"2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa","exploit_commitment":"158a6a9342451fde410cbe6f5f44b8697516877c7ba9b2a945e3e2b8baa778c2","max_commits":2,"attempt_fee":"10000000000000000000000","fee_step":"5000000000000000000000","expires_at_ns":"1794220837152256845","max_commits_per_account":null}]}
+│    Logs [kintsugi-vendor-prnvm.testnet]:   No logs
+│     
+
+Function execution return value (printed to stdout):
+"48"
+
+
+The "create_bounty" call to <kintsugi-l2-cihdp.testnet> on behalf of <kintsugi-vendor-prnvm.testnet> succeeded.
+
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction kintsugi-l2-cihdp.testnet create_bounty json-args '{"original_hash": "971414a50dba9afe5647238b61d2f164e2b33bf38e9069dad99d79367339d0a2", "corpus_hash": "4f51b0857d833d11784381306b8f1282936543b32cd4a5c6f5d1f8b60e7c9e64", "image_id": "2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa", "exploit_commitment": "158a6a9342451fde410cbe6f5f44b8697516877c7ba9b2a945e3e2b8baa778c2", "proof0_receipt_hash": "63d258c5bcd19551ff8ccce4f2a6e37fcde1b8826a78491be76f6dcdfc229120", "max_commits": 2, "max_patch_bytes": 1024, "reveal_gap_ns": "60000000000", "verdict_window_ns": "21600000000000", "attest_window_ns": "600000000000", "expiry_ns": "26100000000000", "attempt_fee": "10000000000000000000000", "fee_step": "5000000000000000000000", "reference_fix_hash": "b60bc168ee1cb5f07845c9b95eb1fa9ea48bb15a247913e2a9bb663055493769", "proof0_journal_hash": "1c044f81ab4d51e561dd55918ea9cb0d57bb13a48da9fb7a03f5a80e342dd925", "reveal_window_ns": "3600000000000", "fuzz_count": 64, "variant_count": 64, "level": 2, "max_commits_per_account": null}' prepaid-gas '100.0 Tgas' attached-deposit '0.1 NEAR' sign-as kintsugi-vendor-prnvm.testnet network-config testnet sign-with-legacy-keychain send
+
+
+`near` CLI has a new update available 0.30.1 →  0.31.1
+To update `near` CLI use: near extensions self-update
+exit=0
+wall_seconds=4.64

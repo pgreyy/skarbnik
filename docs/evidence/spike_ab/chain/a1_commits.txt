@@ -1,0 +1,26 @@
+== commit 
+{
+ "committed": true,
+ "tx": "82C2vStzhuLKkxTMBGTfKn8GVMGGLBGGFuWUxSoWM4DV",
+ "bounty_id": "47",
+ "index": 0,
+ "fingerprint": "b8ce937a9970a522fd71715346335a7f189faafaa3b4fa8da43fcb8858c63b65",
+ "payout": "skarbnik-agentc-d48260.testnet",
+ "fee_yocto": "10000000000000000000000",
+ "reveal_after_seconds": 60.0,
+ "reveal_within_seconds": 3600.0,
+ "next": "call reveal with bounty_id 47 and index 0 after 60 s and within 3600 s"
+}
+== commit 
+{
+ "committed": true,
+ "tx": "HZN9uRf2WdbvwNS2MhA6UyhGLC7QmwSL2a3W2AsviFmn",
+ "bounty_id": "47",
+ "index": 1,
+ "fingerprint": "8710e1bb57e74cd425a1e4811ac2efada9a1d541a4b8417efe76c61770e9455a",
+ "payout": "skarbnik-agentc-d48260.testnet",
+ "fee_yocto": "15000000000000000000000",
+ "reveal_after_seconds": 60.0,
+ "reveal_within_seconds": 3600.0,
+ "next": "call reveal with bounty_id 47 and index 1 after 60 s and within 3600 s"
+}

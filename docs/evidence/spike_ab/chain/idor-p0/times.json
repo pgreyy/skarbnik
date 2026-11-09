@@ -1,0 +1,12 @@
+{
+ "pod_ready": 36,
+ "binary": "cached",
+ "setup": 44,
+ "prove": 98.12,
+ "succinct": 72.66,
+ "pod_seconds": 232,
+ "cost_usd": 0.0574,
+ "gpu": "NVIDIA GeForce RTX 4090",
+ "pod": "kgv452jyzhb5ix",
+ "waited_for_watches_s": 0
+}

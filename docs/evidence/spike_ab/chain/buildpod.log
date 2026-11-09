@@ -1,0 +1,10 @@
+2026-11-09T02:29:47Z pod hrr2heo4lrl545 created: NVIDIA GeForce RTX 4090 in None, $0.89/h, hard cap 55 min
+2026-11-09T02:30:13Z pod hrr2heo4lrl545: ssh ready after 26 s, GPU NVIDIA GeForce RTX 4090
+2026-11-09T02:30:15Z pod hrr2heo4lrl545: self stop armed for 60 min (runpodctl)
+2026-11-09T02:43:32Z pod hrr2heo4lrl545: built the GPU binary in 796 s (sha256 202e87536039517e...), kept for the next pods
+2026-11-09T02:43:32Z pod hrr2heo4lrl545: CUDA prover: built in 796 s
+2026-11-09T02:44:16Z pod hrr2heo4lrl545: CPU host built and fetched in 44 s
+2026-11-09T02:45:27Z worst case (64 calls, 4 page rule, 2 page programs), Proof 0: image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa | user cycles: 335445775 | segments: 1061 | execute seconds: 48.06 | journal.verdict: PASS
+2026-11-09T02:46:14Z worst case (64 calls, 4 page rule, 2 page programs), check fix_hide: image id: 2c7b601aeae96b0df295d2f7f7be842792637883148ec2cd26226b6018bfe6aa | user cycles: 333156869 | segments: 1052 | execute seconds: 45.78 | journal.verdict: PASS
+2026-11-09T02:46:18Z pod hrr2heo4lrl545 terminated: 992 s, $0.2452 ($0.89/h); GPU spend so far $0.2452
+2026-11-09T02:46:18Z pod hrr2heo4lrl545: 992 s, $0.2452; spend so far $0.2452
