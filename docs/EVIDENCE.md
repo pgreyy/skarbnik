@@ -107,6 +107,8 @@ window 48 h, expiry 1440 h, one sweep position.
 | `create_bounty` 50 | 0.1 NEAR locked | `GgaSV2CKDCkMkZ9Uv4UrbZVQe8aqXqZbbNBXnk9cSHZi` | 3.06 Tgas |
 | `open_with_groth16` 50 | opened | `EBjiSkirpzQXFsYNymRoa8qGZwHrvsQ8RP2AYxcTZfw2` | 35.27 Tgas |
 
+**The stranger path through the hosted connector (2026-11-09).** The hosted MCP server, added in the Claude app as a custom connector with a test account's connector link: `list_bounties` listed 49 as path traversal and 50 as access control, both open; `get_public_code` gave the C source, the original module as WebAssembly text, the public tests and the rule for each; `check_patch` with a wrong fix (a module that refuses every call) passed 2 of 13 public tests on 49 and 1 of 7 on 50, `ready_to_commit` false. Nothing was sent on chain.
+
 **Failed: the first Proof 0 pod of projects.** Copying the cached 124 MB GPU binary from the VPS to the pod ran past
 its 900 s limit, so the pod was terminated with nothing sent on chain ($0.2339). The assets pod the same morning took
 570 s for the same copy, about 0.2 MB/s. The retry built the binary on the pod instead. GPU spend for both Proof 0s:
@@ -960,6 +962,14 @@ clean up 21:22:36.
 Verdict: PASS. An agent fixed a private bug it could not see and was paid by a proof the contract checked itself, with
 nothing heavy on the vendor's laptop for the attempt. Limits: one bounty, one model, one run; the one line fix equals
 the reference fix, which says nothing about harder bugs; the GPU and the VPS were each used once.
+
+
+Bounty 24 from attempt to payout (screenshots of the live site and the testnet explorer, 2026-10-26):
+
+| The attempt | The proof, checked on chain | The payout |
+| --- | --- | --- |
+| [<img src="img/bounty24-1-attempt.png" alt="Bounty 24 on skarbnik.xyz: the attempt commits a fingerprint, then reveals its patch" width="220">](img/bounty24-1-attempt.png) | [<img src="img/bounty24-2-proof.png" alt="The submit_groth16 receipt on the explorer: Success, result final_pass, log verdict PASS for bounty 24 attempt 0" width="220">](img/bounty24-2-proof.png) | [<img src="img/bounty24-3-payout.png" alt="The payout receipt on the explorer: a transfer of 0.11 NEAR from the contract to kintsugi-agent-d9410f.testnet" width="220">](img/bounty24-3-payout.png) |
+| Commit (a fingerprint), then reveal, on [bounty 24's page](https://skarbnik.xyz/#/bounties/24) | [`submit_groth16`](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the contract's log says verdict PASS | 0.11 NEAR to the agent in [the same transaction](https://testnet.nearblocks.io/txns/9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR): the 0.1 reward and its own 0.01 fee back |
 
 ## Site in the final design (Panyl), and agent setup from the site (2026-10-26)
 

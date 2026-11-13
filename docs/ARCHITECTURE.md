@@ -31,6 +31,89 @@ This file describes only what is in the repository now. It grows as parts are bu
 | `data/arena/` | Arena module with 4,096 secret values and probe templates for the bit leak test | S8 |
 | `docs/` | Versions, evidence, devlog, decisions, security and this file | Kept up to date each work block |
 
+## What each checker checks
+
+Moved here from the README, which keeps a short table of the kinds of bug. A fix must pass every check of its checker, in order; the first failure decides FAIL.
+
+### The crash checker
+
+The checker (`harness/checker`) runs a patched WebAssembly module through five checks, in order. The first failure
+decides FAIL.
+
+| Check | What it means |
+| --- | --- |
+| Module validation | It loads within the limits: patch size (the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page), memory, tables, fuel, call depth. |
+| Secret crash | On the secret input it returns normally: no crash, no running out of fuel. |
+| Public tests | On every public test it returns exactly the expected value. |
+| Fairness inputs | On fresh inputs from a seed the contract records at reveal, it agrees with the original program. |
+| Crash variants | On copies of the secret with one or two bytes changed, it agrees too, so a patch that only spots the secret fails. |
+
+The contract then checks the Groth16 proof against the bounty's image id (only an allowlisted checker can be used),
+and that the proof belongs to this bounty and this attempt: same original, secret commitment, tests and check size,
+the revealed patch, the seed recorded at reveal, and a submission id tied to the attempt.
+
+What it can't test today: a bug that lives outside one small deterministic program. A SQL injection in a web app
+depends on a database and the application stack; a smart contract bug depends on chain state and transaction order; a
+cloud misconfiguration isn't a program repair at all. Each of those needs its own test harness and checker before
+Skarbnik could judge it. A PASS means the patch passed this checker against this secret and these tests, nothing more.
+One verdict also tells the agent one bit about the secret, so each bounty caps its attempts (K).
+
+### The output checker: wrong output and memory safety bugs
+
+A second checker (`harness/checker-output`, image id `005d8dc7…`) judges bugs that give a wrong answer instead of a
+crash. That includes memory safety bugs, such as a C buffer overflow that corrupts memory without crashing in
+WebAssembly. The vendor's secret is an input and the right answer on it. A fix passes when it:
+
+| Check | What it means |
+| --- | --- |
+| Secret answer | On the secret input it returns exactly the vendor's expected value. |
+| Public tests | On every public test it returns exactly the expected value. |
+| Fairness inputs | On fresh inputs from the reveal seed it agrees with the vendor's hidden reference fix. |
+| Variants | On copies of the secret with one or two bytes changed it agrees with the reference fix. |
+| Sweep | At up to 4 private byte positions of the secret (such as a length byte) it agrees with the reference fix on all 256 values. |
+
+What it does not do: it judges answers on the overflow input and nearby inputs. It does not detect memory corruption
+in general. A fix that corrupts memory where no answer changes would pass. The secret, the expected value, the
+reference fix and the sweep positions are bound by one commitment, so they cannot change between proofs.
+- The demo and its cheats: `data/memsafe/`, `data/attacks/memsafe/`. Run
+  `cargo test -p kintsugi-check-output`: correct fixes pass, the original and every cheat fail, and the sweep alone
+  catches a fix that refuses only names over 20 bytes (`harness/checker-output/tests/corpus.rs`).
+- On testnet, bounty 44 (a test bounty): a partial fix proved FAIL (`FDk65JiRdQbukG5wi42L7G4GekGK1yBPrJFxMrrP8AcQ`),
+  then a correct fix proved PASS and was paid (`8y5VPFGPoQzfCaETWBeTGVkLYY9F7ywpHBYCQzxNbQwk`). Logs:
+  `docs/evidence/feature_output/`.
+- Rebuild the checkers and compare their ids: `./scripts/check_image_id.sh`.
+
+### The rule checker: path traversal, access control and injection bugs
+
+A third checker, the rule checker (`harness/checker-rule`, image id `2c7b601a…`), judges bugs with no single right
+answer. The program keeps state across a series of calls (`call(op, len)`), such as log in, create, then transfer. The
+vendor publishes a small rule module that reads every call and its result and says ok or violation, for example "a
+clean path stays inside the root" or "only the owner can hand a project to someone else". The vendor's secret is a
+call sequence on which the original breaks the rule. A fix passes when it:
+
+| Check | What it means |
+| --- | --- |
+| Secret | On the secret call sequence it does not trap, and the rule says ok. |
+| Public tests | On every public test it gives exactly the expected results of every call. |
+| Fairness inputs | On changed copies of the public tests it keeps the rule, and where the original and the hidden reference fix agree it gives the same results. |
+| Variants | On copies of the secret with bytes changed, inserted or deleted, or calls swapped, repeated or dropped, the rule says ok. |
+| Sweep | At up to 4 private byte positions of the secret (such as a user id), the rule says ok on all 256 values. |
+
+What it does not do: it judges by the vendor's rule, so a weak rule lets a weak fix pass. The rule is public, so an
+agent can read what a fix must keep. The rule's hash is in the corpus hash; the secret, the reference fix's hash and
+the sweep positions are bound by one commitment.
+
+- The demos and their cheats: `data/ab/`, `data/attacks/ab/`. Run `cargo test -p kintsugi-check-rule`: correct fixes
+  pass, the original and every cheat fail (`harness/checker-rule/tests/corpus.rs`).
+- On testnet, test bounty 47 (an HTML escaper): a cheat proved FAIL (`7NpEGy6Hnt69Ko2LHMtDrF8e4yCNRcMXxZdd92xW6YWf`),
+  then a fix proved PASS and was paid (`4M5FbnG421ftbJdmroczYZoF1VK48kTXbpUnZE6pgSj8`). Test bounty 48 (a file store
+  with no owner check): FAIL (`6hKgYNpwiCK2XyEBJrPPqavuP8fArBHbAXzaSsiWEChS`), then PASS and paid
+  (`AK2ikyVSh4WFhZhpxanhhPhV7kfo9sDXcXasNM72X28b`). Logs: `docs/evidence/spike_ab/`.
+- Open on testnet with private secrets: bounty 49 (an asset path resolver, path traversal; created
+  `Dh5h1V8Rb332fEuHgA4bxY3RJ2TEvArHJc8Yjg5PcG9W`, opened `DiuovVg3g43kv5reUAWAdNdkUPkZcdXEzA7zZwHNnfiQ`) and bounty 50
+  (a project registry, access control; created `GgaSV2CKDCkMkZ9Uv4UrbZVQe8aqXqZbbNBXnk9cSHZi`, opened
+  `EBjiSkirpzQXFsYNymRoa8qGZwHrvsQ8RP2AYxcTZfw2`). Proof 0 logs: `docs/evidence/spike_ab/public_bounties/`.
+
 ## How the pieces connect today
 
 - `./scripts/build_all.sh` builds everything in one command.

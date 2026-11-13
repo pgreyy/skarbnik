@@ -2,6 +2,25 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-13: README redesign (branch readme-v2)
+
+- README rebuilt in the order: header, at a glance, a 2 minute path for judges, what you can do, how it works (kinds
+  of bug, levels), built on NEAR, for AI agents, for vendors, evidence, honest limits, repository map, run it
+  yourself, roadmap. 409 lines before, 334 after.
+- Screenshots of the live site in `docs/readme/light/` and `docs/readme/dark/` (11 pages, WebP, 1440x900 at scale 2,
+  each under 250 KB) and a hero recording of the site in each theme (`hero.gif`, 1200 px wide; the dark one
+  re-encoded with 64 colours to stay under 5 MB). Every image has an alt text with the values it shows and a caption.
+- Moved out of the README, not deleted: the problem statement, who might use it first and the comparison with private
+  CI to docs/OVERVIEW.md; the checks of each checker and what they cannot test to docs/ARCHITECTURE.md ("What each
+  checker checks"); the built on table with licences to docs/VERSIONS.md; bounty 24's three explorer screenshots to
+  docs/EVIDENCE.md ("Bounty 24"). EVIDENCE also records the 2026-11-09 stranger path through the hosted connector.
+- Fixed: bounty 32 took 17 min 9 s from reveal to submit (08:45:31 to 09:02:40 UTC in the watch log), not 17 min 8 s
+  (README, CLAIMS, VENDOR). The site still says 17 min 8 s.
+- Checked: the README rendered by GitHub's markdown API in a light and a dark page (every image loads, the dark sources
+  switch); 65 local links and anchors resolve; 28 transaction hashes found on chain; the four contract accounts hold
+  code, the bounty contract's code hash `7fgVdHPVUZRzSYg4FRE4exfZb36aKH7znEtMCn87PuRC`; the two curl checks print
+  `24 2 Paid` and `4 ids MATCH`; every bounty's state read on 2026-11-13 matches the status table.
+
 ## 2026-11-09: Records of settled bounties 37, 38 and 42 to 48 kept in docs/evidence before a cleanup
 
 - Before deleting the laptop's private folders of settled bounties, every file in them that is not secret was compared

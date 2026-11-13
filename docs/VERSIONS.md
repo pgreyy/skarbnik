@@ -140,3 +140,21 @@ The demo program and patches in `data/` are built to wasm32-unknown-unknown with
 | Docker | 29.1.3, build 29.1.3-0ubuntu4.1 | `docker --version` |
 | git | 2.53.0 | `git --version` |
 | gh | 2.46.0 | `gh --version` |
+
+## Built on, with licences (moved from the README)
+
+| Piece | Version | Licence |
+| --- | --- | --- |
+| RISC Zero zkVM (`risc0-zkvm`, `risc0-build`; `r0vm`, `cargo-risczero`) | 3.0.6 | Apache-2.0 |
+| RISC Zero Groth16 (`risc0-groth16`) and its prover image `risczero/risc0-groth16-prover` | 3.0.5; image v2025-04-03.1 | Apache-2.0 (crate) |
+| `near-sdk`, the contract's framework | 5.29.1 | MIT OR Apache-2.0 |
+| NEAR's BN254 host functions (`alt_bn128_pairing_check`, `alt_bn128_g1_multiexp`, `alt_bn128_g1_sum`) | NEAR testnet runtime | part of the NEAR protocol |
+| `wasmi`, the checker's WebAssembly interpreter | 2.0.0 | MIT OR Apache-2.0 |
+| `wasmparser` | 0.228.0 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT |
+| `serde`; `bincode` (receipt files) | 1.0.229; 1.3.3 | MIT OR Apache-2.0; MIT |
+| NEAR Connect (`@hot-labs/near-connect`), the site's wallet connector | 0.11.4 | MIT |
+| NEAR AI Cloud, the agent's default model provider (`z-ai/glm-5.3-flash`) | a hosted service | its own terms |
+| Fonts Chakra Petch, Fira Code (self-hosted in `web/fonts`) | 1.000, 5.002 | SIL Open Font License 1.1 |
+
+Tools: near-cli-rs 0.30.1, cargo-near 0.22.0, Docker with buildx. Every version: [docs/VERSIONS.md](docs/VERSIONS.md).
+Every outside file and its licence: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

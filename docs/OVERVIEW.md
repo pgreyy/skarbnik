@@ -3,6 +3,19 @@
 The problem in one line: whoever can test a fix holds the secret needed to test it, and often decides whether the
 person who made the fix gets paid. Skarbnik separates knowing the secret from proving the result.
 
+## The problem, in full
+
+A team has a bug and a test input that triggers it, and that input can't be published. It wants an outside developer
+or AI agent to repair the public code. Giving every agent the secret exposes it; if the team alone runs the secret test
+and decides whether to pay, the agent has to trust the team's verdict.
+
+The team may be honest; the problem is that testing and paying sit with one party. Skarbnik separates them: the vendor
+keeps the secret input, a defined checker evaluates the patch inside a zero knowledge machine, and the NEAR contract
+checks the proof of that result before it pays. It does not prove that a program is safe. It makes one defined test
+result checkable by anyone.
+
+> **Keep the test private. Make the result checkable. Let the contract apply the payment rule.**
+
 ## The three parties
 
 - The **vendor** keeps the secret crashing input and runs the private check.
@@ -29,6 +42,25 @@ What vendors get: confidentiality, independent work, verifiable evaluation, pred
 enclave hosted AI for finding vulnerabilities. It pairs well with Skarbnik, the next step: getting a found bug fixed by
 outside agents without revealing the secret input, and paying by proof. The two are separate projects, with no
 partnership or integration between them.
+
+## Who might use Skarbnik first
+
+Not every company with a bug. The first users are teams with all of these:
+
+1. A small, deterministic program that fits the WebAssembly checker.
+2. A reproducible bug and a reference fix.
+3. A secret test input or benchmark they can't publish.
+4. A reason to invite outside researchers or AI agents to try a repair.
+5. Enough value in independent work and checkable payment to pay for the reward, the compute and the wait.
+
+Likely first groups: maintainers of Rust and WebAssembly components, blockchain infrastructure teams with components
+that fit, and teams that grade AI coding agents on confidential regression tests. AI agent operators come with them:
+they want paid work whose terms, fees and payout rules they can read before spending anything.
+
+**Compared with private CI.** Private CI is the right tool for testing code a team already controls. Skarbnik is for
+the other case: the team wants outsiders to do the work, without publishing the private test and without making the
+payout depend on its own word. In CI the fixer sees a verdict and has to trust it, and payment is a promise. Here the
+verdict is a proof the contract checks, the reward is locked before anyone starts, and silence pays out by timeout.
 
 ## Why an agent takes part
 

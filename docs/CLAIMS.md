@@ -145,7 +145,7 @@ Each claim names the file and the command that show it. Full results, failures i
 - Proving is slow on a laptop CPU: one passing proof with compression takes 1.5 to 4 hours, which is why bounty 17 was
   paid by timeout. On a rented GPU, bounty 24's prove and shrink took under a minute (51.5 s); with the Groth16 wrap
   on another machine (337.73 s) the whole proof took about 6.5 minutes of work, and that run, done by hand, reached the
-  contract 6 h 10 min after the reveal. The vendor's watch in GPU mode does it automatically: 17 min 8 s from reveal to
+  contract 6 h 10 min after the reveal. The vendor's watch in GPU mode does it automatically: 17 min 9 s from reveal to
   verdict for bounty 32. The secret sits in the rented machine's memory for each run.
 - Bounty 12 keeps its secret private but uses the public demo bug. Bounty 7 and the demo bounties use the public demo input.
 - A payout to an account that does not exist is lost (docs/AUDIT.md, finding 8); the site and
