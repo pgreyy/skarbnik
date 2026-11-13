@@ -36,7 +36,7 @@ async function codeHash() {
 // All eight limits, the ones a judge needs first at the top.
 const LIMITS = (live) => [
   ['alert', 'am', 'Testnet only', 'No mainnet contract exists. Every transaction on this site is a testnet transaction, and every bounty so far was set up and run by the Skarbnik team, not by outside customers.', '<span id="paidSoFar">Loading from the contract</span>'],
-  ['cube', '', 'Small programs only', 'Crash, wrong output, memory safety, path traversal, injection and access control bugs in small WebAssembly modules. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. A vendor needs a working fix before posting; a crash with no known fix cannot be posted.'],
+  ['cube', '', 'Small programs only', 'Crash, wrong output, memory safety, path traversal, injection and access control bugs in small WebAssembly modules. Patch size: the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page. A vendor needs a working fix before posting; a crash with no known fix cannot be posted.'],
   ['link', 'am', 'Level 1 depends on OutLayer', 'At Level 1 the contract does not check the proof itself: it trusts OutLayer, and its operator, running the verifier program pinned on chain (get_outlayer). OutLayer must be up and able to download the pinned file from GitHub, or still hold it in its cache, which it can drop; if no check arrives, the timeout rule applies. A check costs about 0.011 NEAR and holds about 2.8 NEAR while OutLayer works, returned after. Only Level 2 is checked by the contract itself.'],
   ['hourglass', '', 'A timeout pays whatever was revealed', 'If no verdict arrives in time, the timeout rule splits the reward among the attempts still waiting. The contract does not read the fix, so this is not a pass; under a silent vendor an honest fix may get as little as 1/K of the bounty.'],
   ['check', '', 'What is not shown yet', 'The path works on NEAR testnet and nothing wider. Not shown: an external audit (the contract had AI review passes only), outside customers, a wallet other than NEAR CLI signing a transaction, OutLayer downloading the pinned file afresh when the contract asks, and sealed hardware for OutLayer’s workers (never claimed).'],
@@ -51,7 +51,7 @@ const proofChip = chip('k-proof', 'Paid by proof', 'check');
 // The four examples: fixed facts of settled bounties (docs/CLAIMS.md, docs/evidence/), each with its deciding transaction.
 const PAID = [
   ['24', 'proof', 'Private repair: an AI agent fixed a bug it could not see; the vendor proved it on a rented GPU', '9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR', 'Proof and payment'],
-  ['32', 'proof', 'Automatic vendor proving: 17 min 8 s from reveal to verdict, no one at the keyboard (public demo program)', '9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y', 'Proof and payment'],
+  ['32', 'proof', 'Automatic vendor proving: 17 min 9 s from reveal to verdict, no one at the keyboard (public demo program)', '9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y', 'Proof and payment'],
   ['33', 'proof', 'Proved inside sealed hardware (Phala TEE, Intel TDX), a team run test', 'Gg81ZZgdnjMrCFM6sZ6KuaW48e2kmKXiG2TUAp8jizmS', 'Proof and payment'],
   ['17', 'timeout', 'Timeout settlement: the proof came after the window, so the timeout rule paid. Not a PASS', 'BLcWs7dpWFaiDn5BmRzr4QVCVRn4zXn4LLUgpRx3e2mh', 'Timeout claim'],
 ];
@@ -63,7 +63,7 @@ ${kv([['Reward', '0.11 NEAR'], ['Verdict after reveal', '6 h 10 min'], ['Proving
 <div class="txs">${tx('9nAK8gi2LxqbfjKupbG8mvADnzArwaG7AaKBWPvmgweR', 'Proof and payment')}<a class="lnk sm" href="#/bounties/24">Bounty 24 ${icon('right')}</a></div></article>
 <article class="card n-ex"><div style="display:flex;flex-wrap:wrap;gap:8px">${proofChip}${chip('k-test', 'Public demo program', 'flask')}</div><p class="eyebrow" style="color:var(--tx3)">Bounty 32</p><h3 class="h3">Automatic vendor proving</h3>
 <p class="body">The vendor tool watched the bounty, proved the revealed patch and sent the proof with no one at the keyboard. The program is the public demo. The secret was private, made on the vendor’s server.</p>
-${kv([['Reveal to verdict', '17 min 8 s'], ['Proving', 'Automatic, skarbnik-vendor watch']])}
+${kv([['Reveal to verdict', '17 min 9 s'], ['Proving', 'Automatic, skarbnik-vendor watch']])}
 <div class="txs">${tx('9B7FPyju4FpmwCLGfkzoccrTfbxdfhpn7EC1uu3UpM7y', 'Proof and payment')}<a class="lnk sm" href="#/bounties/32">Bounty 32 ${icon('right')}</a></div></article>
 <article class="card n-ex"><div style="display:flex;flex-wrap:wrap;gap:8px">${chip('k-timeout', 'Paid by timeout', 'hourglass')}</div><p class="eyebrow" style="color:var(--tx3)">Bounty 17</p><h3 class="h3">Timeout settlement, not a PASS</h3>
 <p class="body">The vendor’s proof finished after the 4 hour window, so the contract paid by the timeout rule. No proof was checked. This is not a proven pass.</p>
@@ -122,6 +122,14 @@ export async function evidence(viewEl, tab) {
   const savedAt = (at) => `${String(at).replace('T', ' ').replace(/:\d\dZ$/, '').replace(/Z$/, '')} UTC`;
   const andList = (ids) => (ids.length > 1 ? `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}` : String(ids[0]));
   let all = null, snapshot = null, settled = [], nProof = 0, nOl = 0, nTime = 0;
+  // Each open bounty's own patch limit (max_patch_bytes), grouped by size: first from the saved feed, then read live.
+  const drawPatchLimits = (list, src) => {
+    const el = $('#patchLimits'); if (!el || !list) return;
+    const by = {};
+    for (const x of list) if (x.accepting && x.b.max_patch_bytes) (by[x.b.max_patch_bytes] = by[x.b.max_patch_bytes] || []).push(Number(x.b.id));
+    const parts = Object.keys(by).map(Number).sort((a, b) => a - b).map((n) => `${n.toLocaleString('en-US')} bytes on ${by[n].length > 1 ? 'bounties' : 'bounty'} ${andList(by[n].sort((a, b) => a - b))}`);
+    el.textContent = parts.length ? `The patch limit of each open bounty, ${src}: ${parts.join('; ')}.` : `No bounty is open right now (${src}).`;
+  };
   const liveP = full(() => loadAll(true)).then((l) => { all = l; }, async (e) => { const f = await fromFeed(); all = f.list; snapshot = { at: f.at, err: e.message }; });
 
   // the bounties paid by a checked proof, read live from the contract (the ledger decides the list)
@@ -194,9 +202,9 @@ export async function evidence(viewEl, tab) {
     </div></div>
     <div class="sub"><h3 class="h3">What the checker runs on every patch</h3>
     <div class="card" style="padding:8px 28px;margin-top:24px"><div class="steps">
-    ${[['Validate the module', 'No imports, at most 2 memory pages, checked exports. The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page.'], ['Run the secret input', 'It must not crash or run out of fuel, 50,000 units per input, in a fresh interpreter each time.'], ['Run the public tests', 'Every answer must match the original program’s.'], ['Run fairness inputs', 'Drawn from the reveal seed, so a patch cannot be tailored to them. They must match the original.'], ['Run crash variants', 'One or two byte changes of the secret must not crash where the original crashes.']]
+    ${[['Validate the module', 'No imports, at most 2 memory pages, checked exports. The checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page.'], ['Run the secret input', 'It must not crash or run out of fuel, 50,000 units per input, in a fresh interpreter each time.'], ['Run the public tests', 'Every answer must match the original program’s.'], ['Run fairness inputs', 'Drawn from the reveal seed, so a patch cannot be tailored to them. They must match the original.'], ['Run crash variants', 'One or two byte changes of the secret must not crash where the original crashes.']]
       .map(([h, p], i) => `<div class="st"><span class="n">${i + 1}</span><div><b class="h4">${esc(h)}</b><p class="small" style="margin-top:4px">${esc(p)}</p></div></div>`).join('')}
-    </div></div></div>
+    </div></div><p class="small" id="patchLimits" style="margin-top:16px"></p></div>
     ${collapse('checkRepo', 'Check it from the repository: five commands', `<p class="small">Commands run from the root of the Skarbnik repository.</p>
     <div class="card pad24 stack g16 mt16">
       <div><b class="h4">Read a bounty from the chain</b><div class="mt8">${cmd(`near contract call-function as-read-only ${CONTRACT} get_bounty json-args '{"bounty_id":"12"}' network-config testnet now`)}</div><p class="small mt8">Or open its <a href="#/raw/12">raw data</a>.</p></div>
@@ -280,6 +288,7 @@ export async function evidence(viewEl, tab) {
   drawNums();
   $('#ctSum').innerHTML = ctLine();
   showPaid();
+  fromFeed().then((f) => { if (!all) drawPatchLimits(f.list, `in the saved feed of ${savedAt(f.at)}`); }).catch(() => {});
   // ledger filter
   const bindLedger = () => bindSeg($('#ledgerTop'), 'data-lf', (f) => { lf = f; $('#lrows').innerHTML = '<div class="lhead" aria-hidden="true"><span>Bounty</span><span>Settlement</span><span>Transactions</span><span>Note</span></div>' + ledgerRows(lf); });
   // security lab stepper
@@ -350,6 +359,7 @@ export async function evidence(viewEl, tab) {
     const ORDER = ['Proof verified', 'Verified by OutLayer', 'Timeout settlement'];
     settled = all.filter((x) => ORDER.includes(x.status)).slice().sort((a, b) => (a.status === b.status ? Number(b.b.id) - Number(a.b.id) : ORDER.indexOf(a.status) - ORDER.indexOf(b.status)));
     drawNums(); $('#ctSum').innerHTML = ctLine();
+    drawPatchLimits(all, snapshot ? `in the saved record of ${savedAt(snapshot.at)}` : 'read live from the contract');
     const ln = $('#ledgerN'); if (ln) ln.textContent = `${settled.length} settled bounties`;
     const lt = $('#ledgerTop'); if (lt) { lt.innerHTML = ledgerTop(); bindLedger(); }
     // the saved record loaded: one calm line, not a warning (a real warning appears only if the saved record failed too)

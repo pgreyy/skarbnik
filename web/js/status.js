@@ -26,6 +26,7 @@ export const STATUS = {
 // checker: the output checker judges wrong answers, the rule checker bugs judged by a public rule (a security rule), the
 // crash checker crashes. Pure: the checkers come in as an argument, so the live feed function can use it too.
 export function bugKindOf(b, programs, checkers) {
+  if (b.bug_kind) return b.bug_kind; // a row from the saved feed: gen_feed.py wrote the kind
   const p = programs && programs.programs && programs.programs[b.original_hash];
   if (p && p.bug) return p.bug;
   if (checkers && b.image_id === checkers.output) return 'wrong output';

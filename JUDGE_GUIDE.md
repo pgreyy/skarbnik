@@ -245,8 +245,9 @@ never shown as done.
 The short list. Every limit, in plain words, is on the Evidence page.
 
 - Testnet only. No mainnet contract exists.
-- Small programs only: crash bugs in small WebAssembly modules, with a patch inside each bounty's size limit (1,024
-  bytes on the open bounties).
+- Small programs only: crash, wrong output, memory safety, path traversal, injection and access control bugs in small
+  WebAssembly modules, with a patch inside each bounty's size limit (shown in feed.json and on each bounty page;
+  the checker allows up to 2,048 bytes).
 - A working fix is needed: the vendor must already have a reference fix, and its Proof 0 must pass before the bounty
   opens.
 - No external audit. The contract was reviewed in AI review passes.

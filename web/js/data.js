@@ -53,7 +53,7 @@ export async function paidByProof() {
 export async function fromFeed() {
   const [rec, feed] = await Promise.all([getRecorded(), json('feed.json')]);
   const demo = (rec.notes.demo_exploit_commitment || {}).commitment;
-  return { at: feed.generated_at_utc, list: feed.bounties.map((f) => ({ snap: f, b: { id: f.bounty_id, amount: f.reward_yocto, max_commits: f.max_commits, commits: f.attempts_used, exploit_commitment: f.kind === 'demo' ? demo : null }, subs: [], kind: f.kind, status: f.status, accepting: f.accepts_commits })) };
+  return { at: feed.generated_at_utc, list: feed.bounties.map((f) => ({ snap: f, b: { id: f.bounty_id, amount: f.reward_yocto, max_commits: f.max_commits, commits: f.attempts_used, exploit_commitment: f.kind === 'demo' ? demo : null, image_id: f.image_id, original_hash: f.original_hash, bug_kind: f.bug_kind, max_patch_bytes: f.max_patch_bytes }, subs: [], kind: f.kind, status: f.status, accepting: f.accepts_commits })) };
 }
 // Some bounties only, by id, with every attempt.
 export async function loadSome(ids) {

@@ -154,7 +154,7 @@ export async function agents(viewEl, tab, sub) {
     ['program, module_description, public_code', 'which public program the bounty is about, and where its source, module, tests and build flags are (paths relative to feed.json; check sha256(module) = original_hash and the tests’ corpus_hash); a rule checker bounty also names its public rule module (public_code.rule), whose sha256 is part of the corpus_hash'],
     ['bug_kind, checker', 'the kind of bug: crash, wrong output, memory safety, path traversal, access control, injection, or security rule (a rule checker bounty whose program is not published); and the checker that judges it: crash, output or rule (other: a retired checker)'],
     ['target', 'what a fix must do to PASS, and what PASS does not mean'],
-    ['max_patch_bytes', 'the largest patch the contract accepts at reveal for this bounty; the checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page'],
+    ['max_patch_bytes', 'the largest patch the contract accepts at reveal for this bounty; the checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page'],
     ['reward, reward_yocto', 'the bounty'],
     ['max_commits, attempts_used, attempts, slots_in_use, max_commits_per_account', 'K, the commits counted so far, the same as text ("1 of 8 used"), the slots held now, and the per-account cap (null: none)'],
     ['fee_schedule, next_fee, next_fee_yocto', 'base and step of the attempt fee, and the exact fee of the next attempt'],
@@ -239,7 +239,7 @@ export async function agents(viewEl, tab, sub) {
     const ns = (v) => (v ? span(String(v)) : 'not given');
     $('#compat').innerHTML = `<table class="n-tab"><caption class="sr-only">What the feed gives, per check</caption><thead><tr><th scope="col">Check</th><th scope="col">What the feed gives</th></tr></thead><tbody>
 <tr><td>Task type</td><td>WebAssembly repair of a crash, a wrong output, a memory safety bug, or a bug judged by a public rule (path traversal, access control, injection). Each bounty names its kind of bug (bug_kind), its program and where its public code is.</td></tr>
-<tr><td>Patch size limit</td><td>The checker allows up to 2,048 bytes; each bounty sets its own limit (the open bounties use 1,024), shown in feed.json and on the bounty page. In the feed made now: ${limits.length ? `${limits.map(bytes).join(' or ')} on the open bounties` : 'no bounty is open'} (max_patch_bytes).</td></tr>
+<tr><td>Patch size limit</td><td>The checker allows up to 2,048 bytes; each bounty sets its own limit, shown in feed.json and on the bounty page. In the feed made now: ${limits.length ? `${limits.map(bytes).join(' or ')} on the open bounties` : 'no bounty is open'} (max_patch_bytes).</td></tr>
 <tr><td>Next attempt fee</td><td>The exact fee for your next commit, per bounty (below)</td></tr>
 <tr><td>Deadlines</td><td>When commits close, the reveal gap and the verdict window, per bounty (below)</td></tr>
 </tbody></table>

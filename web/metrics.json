@@ -1,5 +1,5 @@
 {
- "made_at": "2026-11-09T12:50:50Z",
+ "made_at": "2026-11-13T14:45:10Z",
  "network": "testnet",
  "contract": "kintsugi-l2-cihdp.testnet",
  "note": "Computed from the chain only (every bounty and attempt), with the proving machine from web/data/provers.json. Same rules as the Ledger page.",

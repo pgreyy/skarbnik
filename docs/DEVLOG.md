@@ -2,6 +2,23 @@
 
 One dated entry per work block: what was done, the exact commands, the results, what failed, what is next.
 
+## 2026-11-13: Three site fixes: the kind of bug before live data, each bounty's patch limit, 17 min 9 s
+
+- The bounty list drew rows from the saved feed with no image id or kind, so before the chain answered it showed
+  "Crash bug" for 47 to 50. `web/js/data.js` (`fromFeed`) now keeps `image_id`, `original_hash`, `bug_kind` and
+  `max_patch_bytes` from the feed, and `web/js/status.js` (`bugKindOf`) uses the feed's `bug_kind` first, so any
+  future bounty in the saved feed shows its own kind too.
+- The Proofs tab said "the open bounties use 1,024". It now lists each open bounty's own limit, from the saved feed at
+  once and read live when the chain answers (2,048 bytes on 40, 41, 45, 46, 49 and 50; 1,024 on 7, 18 and 35). The
+  same stale bracket was removed from the agents page and the Limits card; JUDGE_GUIDE.md's limit line names every
+  kind of bug and points to each bounty's limit.
+- Bounty 32: 17 min 9 s from reveal to submit on the home and evidence pages (the watch log: 08:45:31 to 09:02:40 UTC).
+- Checked on the local site with the RPCs blocked (the saved data path) and live: 47 to 50 show Injection, Access
+  control, Path traversal and Access control, NEW on 49 and 50; the limit line as above; no page errors.
+  `node scripts/test_live_feed.mjs`: ALL PASS. Site data and saved pages rebuilt by `scripts/rebuild_site_data.sh`.
+- A first try declared a second `drawLimits` in `web/js/pages/evidence.js`, which stopped the page from loading; the
+  local check caught it before any deploy and the helper is now `drawPatchLimits`.
+
 ## 2026-11-13: README redesign (branch readme-v2)
 
 - README rebuilt in the order: header, at a glance, a 2 minute path for judges, what you can do, how it works (kinds
